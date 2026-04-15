@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(file:*)",
+      "Bash(du:*)",
+      "Bash(stat:*)",
+      "Bash(find * -name:*)",
+      "Bash(find * -type:*)",
+      "Bash(find * -path:*)",
+      "Bash(find * -maxdepth:*)",
+      "Bash(find * -mindepth:*)",
+      "Bash(find * -size:*)",
+      "Bash(find * -mtime:*)",
+      "Bash(find * -newer:*)"
+    ]
+  }
+}
