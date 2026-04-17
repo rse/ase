@@ -1,5 +1,5 @@
 ---
-name: ase-code-architect
+name: ase-code-audit
 argument-hint: "<source-reference>"
 description: Review software architecture
 user-invocable: true
