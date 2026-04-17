@@ -158,22 +158,22 @@ interface quality, and style conformance.
      diagram under ~25 lines. Example shape (inside a fenced code
      block):
 
-     +---------------+
-     |   UI Layer    |  WebController, Views
-     +-------+-------+
-             |
-             v
-     +---------------+
-     | Service Layer |  UserService, OrderService
-     +-------+-------+
-             |
-             v
-     +---------------+
-     |  Data Layer   |  UserRepo, OrderRepo
-     +---------------+
+     ┌───────────────┐
+     │   UI Layer    │  WebController, Views
+     └───────┬───────┘
+             │
+             ▼
+     ┌───────────────┐
+     │ Service Layer │  UserService, OrderService
+     └───────┬───────┘
+             │
+             ▼
+     ┌───────────────┐
+     │  Data Layer   │  UserRepo, OrderRepo
+     └───────────────┘
 
    - Mark detected *anomalies* directly in the diagram with
-     symbols like `!` (problem), `<-->` (cycle), `(?)` (unclear).
+     symbols like `!` (problem), `◀─▶` (cycle), `(?)` (unclear).
    </step>
 
 3. <step id="STEP 3: Show Results">
