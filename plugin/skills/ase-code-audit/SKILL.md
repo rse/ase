@@ -36,8 +36,8 @@ interface quality, and style conformance.
    Event-Driven, Modular Monolith — from project documentation,
    README files, or folder structure.
 
-   Investigate the following 20 architecture quality aspects across
-   5 thematic blocks:
+   Investigate the following architecture quality aspects across
+   6 thematic blocks:
 
    **Block 1 — Component Boundaries**
    - **SA01 COMPONENT-CONCERNS**: each component (module, class,
