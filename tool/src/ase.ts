@@ -11,6 +11,7 @@ import type { LogLevel }           from "./ase-log.js"
 import ConfigCommand               from "./ase-config.js"
 import ServiceCommand              from "./ase-service.js"
 import HookCommand                 from "./ase-hook.js"
+import DiagramCommand              from "./ase-diagram.js"
 import pkg                         from "../package.json" with { type: "json" }
 
 /*  type of top-level (global) options  */
@@ -54,6 +55,7 @@ const main = async (): Promise<void> => {
     new ConfigCommand(log).register(program)
     new ServiceCommand(log).register(program)
     new HookCommand(log).register(program)
+    new DiagramCommand(log).register(program)
 
     /*  parse program arguments  */
     await program.parseAsync(process.argv)
