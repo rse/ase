@@ -131,9 +131,9 @@ interface quality, and style conformance.
    </step>
 
 2. <step id="STEP 2: Show Architecture Overview">
-   Render the *discovered architecture* as a concise *ASCII
-   diagram* so the user can verify what you understood as the
-   architecture before reading the findings.
+   Render the *discovered architecture* as a concise *diagram*
+   so the user can verify what you understood as the architecture
+   before reading the findings.
 
    Use the following output <template/>:
 
@@ -151,51 +151,11 @@ interface quality, and style conformance.
    - For <style/>, name the detected architecture style or
      "*undeclared*" if none is documented.
 
-   - For <rendered-diagram-as-fenced-code-block/>, you *MUST*
-     emit *Mermaid* source for a `flowchart TB` (or `LR`) of the
-     high-level component or layer structure and render it via
-     the `ase diagram` CLI. Invoke the `Bash` tool with the
-     Mermaid source piped on stdin, then place the tool's stdout
-     *verbatim* inside a Markdown fenced code block. Do *not*
-     hand-draw the diagram. Show layers / slices / major
-     components and their dependency direction.
-
-     Mermaid source (example):
-
-     ```
-     flowchart TB
-       UI["UI Layer<br/>WebController, Views"] --> SVC["Service Layer<br/>UserService, OrderService"]
-       SVC --> DATA["Data Layer<br/>UserRepo, OrderRepo"]
-     ```
-
-     Bash invocation:
-
-     ```
-     cat <<'EOF' | ase diagram
-     flowchart TB
-       UI["UI Layer<br/>WebController, Views"] --> SVC["..."]
-       SVC --> DATA["..."]
-     EOF
-     ```
-
-     Expected rendered output (paste verbatim into the response):
-
-     ```
-     ┌───────────────────────────┐
-     │          UI Layer         │
-     │    WebController, Views   │
-     └─────────────┬─────────────┘
-                   ▼
-     ┌───────────────────────────┐
-     │       Service Layer       │
-     │ UserService, OrderService │
-     └─────────────┬─────────────┘
-                   ▼
-     ┌───────────────────────────┐
-     │         Data Layer        │
-     │    UserRepo, OrderRepo    │
-     └───────────────────────────┘
-     ```
+   - For <rendered-diagram-as-fenced-code-block/>, emit *Mermaid*
+     source for a `flowchart TB` (or `LR`) of the high-level
+     component or layer structure and render it via `ase diagram`
+     per the *Diagrams* rules in the skill meta. Show layers /
+     slices / major components and their dependency direction.
 
    - Mark detected *anomalies* directly in the Mermaid source as
      node labels or edge labels: prefix problem nodes with `!`,
@@ -219,21 +179,25 @@ interface quality, and style conformance.
 
    **Tension matrix** (use to detect paired/clustered findings):
 
-   | Pair                    | Tension                                            |
-   |-------------------------|----------------------------------------------------|
-   | SA01/SA02 ↔ SA03        | single concern/responsibility vs. granularity      |
-   | SA09     ↔ SA10         | loose coupling vs. strong cohesion                 |
-   | SA11     ↔ SA13         | extensibility vs. encapsulation                    |
-   | SA11     ↔ SA14         | extensibility vs. interface size                   |
-   | SA12     ↔ SA09         | cross-cutting separation vs. coupling              |
-   | SA15     ↔ SA16         | interface abstraction vs. composability            |
-   | SA21     ↔ SA13         | testability vs. encapsulation                      |
-   | SA21     ↔ SA14         | testability vs. interface size                     |
-   | SA22     ↔ SA01         | observability vs. single concern                   |
-   | SA22     ↔ SA09         | observability vs. coupling                         |
-   | SA06     ↔ SA10         | slice cycle-freeness vs. cohesion                  |
-   | SA20     ↔ SA11         | pattern restraint vs. extensibility                |
-   | SA07     ↔ SA11         | single dependency direction vs. extensibility      |
+   ```
+   ┌──────────────────┬───────────────────────────────────────────────┐
+   │       Pair       │                    Tension                    │
+   ├──────────────────┼───────────────────────────────────────────────┤
+   │ SA01/SA02 ↔ SA03 │ single concern/responsibility vs. granularity │
+   │ SA09      ↔ SA10 │ loose coupling vs. strong cohesion            │
+   │ SA11      ↔ SA13 │ extensibility vs. encapsulation               │
+   │ SA11      ↔ SA14 │ extensibility vs. interface size              │
+   │ SA12      ↔ SA09 │ cross-cutting separation vs. coupling         │
+   │ SA15      ↔ SA16 │ interface abstraction vs. composability       │
+   │ SA21      ↔ SA13 │ testability vs. encapsulation                 │
+   │ SA21      ↔ SA14 │ testability vs. interface size                │
+   │ SA22      ↔ SA01 │ observability vs. single concern              │
+   │ SA22      ↔ SA09 │ observability vs. coupling                    │
+   │ SA06      ↔ SA10 │ slice cycle-freeness vs. cohesion             │
+   │ SA20      ↔ SA11 │ pattern restraint vs. extensibility           │
+   │ SA07      ↔ SA11 │ single dependency direction vs. extensibility │
+   └──────────────────┴───────────────────────────────────────────────┘
+   ```
 
    Report each unpaired finding with the following <template/>:
 
