@@ -20,7 +20,7 @@ specialized in *reviewing software architecture*.
 *Review* the *software architecture* of $ARGUMENTS, and its directly
 related source code, for *potential problems* across component
 boundaries, structural organization, architecture principles,
-interface quality, and style conformance.
+interface quality, quality attributes, and architecture governance.
 </objective>
 
 <flow>
@@ -40,80 +40,71 @@ interface quality, and style conformance.
    6 thematic blocks:
 
    **Block 1 — Component Boundaries**
-   - **SA01 COMPONENT-CONCERNS**: each component (module, class,
-     package) addresses exactly *one clear concern*.
-   - **SA02 COMPONENT-RESPONSIBILITY**: each component has exactly
-     *one reason to change*.
-   - **SA03 COMPONENT-GRANULARITY**: components have *appropriate
+   - **SA01 COMPONENT-RESPONSIBILITY**: each component (module,
+     class, package) addresses exactly *one single concern* —
+     i.e., has exactly *one reason to change*.
+   - **SA02 COMPONENT-GRANULARITY**: components have *appropriate
      size* — neither monolithic nor fragmented.
-   - **SA04 COMPONENT-HIERARCHY**: components placed at the *correct
+   - **SA03 COMPONENT-HIERARCHY**: components placed at the *correct
      level* of the component hierarchy (system / program / module /
      class / function or its language equivalent).
 
    **Block 2 — Structural Organization**
-   - **SA05 LAYERING**: *layers* (horizontal cuts) clearly
+   - **SA04 LAYERING**: *layers* (horizontal cuts) clearly
      separated, named, and ranked; no upward dependencies.
-   - **SA06 SLICING**: *slices* (vertical cuts — e.g., feature
+   - **SA05 SLICING**: *slices* (vertical cuts — e.g., feature
      modules, bounded contexts) clearly separated and *cycle-free*.
-   - **SA07 DEPENDENCY-DIRECTION**: dependencies flow in exactly
+   - **SA06 DEPENDENCY-DIRECTION**: dependencies flow in exactly
      *one direction*; no *circular dependencies*.
-   - **SA08 REFERENCE-ARCHITECTURE**: conformance to the *declared
-     reference architecture* model, if any.
+   - **SA07 REFERENCE-ARCHITECTURE**: *declared-style conformance* —
+     the chosen architecture style (Layered, Hexagonal, Onion, Clean,
+     CQRS, Microservices, Event-Driven, Modular Monolith, ...) is
+     applied *consistently* throughout the codebase, without
+     accidental mixing of styles.
 
    **Block 3 — Architecture Principles**
-   - **SA09 COUPLING**: *loose coupling* between components — no
+   - **SA08 COUPLING**: *loose coupling* between components — no
      shared mutable state, no concrete-type dependencies where
      abstractions exist.
-   - **SA10 COHESION**: *strong cohesion* within each component —
+   - **SA09 COHESION**: *strong cohesion* within each component —
      internal parts work toward the component's single concern.
-   - **SA11 EXTENSIBILITY**: components are *open for extension*
+   - **SA10 EXTENSIBILITY**: components are *open for extension*
      (plugins, SPIs, hooks) but *closed for modification*.
-   - **SA12 SEPARATION**: *cross-cutting concerns* (logging,
-     security, caching, transactions) isolated from domain logic.
-   - **SA13 ENCAPSULATION**: unavoidable complexity *encapsulated*
-     behind a simple interface.
+   - **SA11 SEPARATION**: *cross-cutting concerns* (logging,
+     security, caching, transactions, tracing) isolated from
+     domain logic; trace context propagated across component
+     boundaries.
+   - **SA12 ENCAPSULATION**: unavoidable complexity *encapsulated*
+     behind a simple interface that *shields* its implementation
+     details.
 
    **Block 4 — Interface Quality**
-   - **SA14 INTERFACE-SIZE**: each interface *proportional in size*
+   - **SA13 INTERFACE-SIZE**: each interface *proportional in size*
      to its functionality.
-   - **SA15 INTERFACE-ABSTRACTION**: each interface *shields* its
-     implementation details.
-   - **SA16 INTERFACE-COMPOSABILITY**: interface methods are
+   - **SA14 INTERFACE-COMPOSABILITY**: interface methods are
      *orthogonal* and enable combinatorial use-cases without
      boilerplate.
-   - **SA17 INTERFACE-CONTRACT**: each interface declares clear
+   - **SA15 INTERFACE-CONTRACT**: each interface declares clear
      *syntactic* and *semantic* contracts (pre/post-conditions,
      invariants, idempotency, thread-safety).
 
-   **Block 5 — Style Conformance**
-   - **SA18 STYLE-DECLARATION**: overall *architecture style*
-     explicitly chosen and documented.
-   - **SA19 STYLE-CONSISTENCY**: chosen style applied *consistently*
-     throughout the codebase, without accidental mixing.
-   - **SA20 PATTERN-USAGE**: design patterns (Facade, Adapter,
-     Strategy, Observer, Factory, Builder, Decorator, Command,
-     Repository) *correctly implemented* and *not overused*.
-
-   **Block 6 — Quality Attributes**
-   - **SA21 TESTABILITY**: architectural *seams* enable testing in
+   **Block 5 — Quality Attributes**
+   - **SA16 TESTABILITY**: architectural *seams* enable testing in
      isolation — dependency injection at component boundaries,
      mockable interfaces, side effects (DB, filesystem, network,
      time, randomness) hidden behind abstractions.
-   - **SA22 OBSERVABILITY**: *logging*, *metrics*, and *tracing*
-     are wired in as *cross-cutting concerns* (via middleware,
-     decorators, aspects) rather than scattered ad-hoc through
-     business logic. Trace context is propagated across component
-     boundaries.
-   - **SA23 DECISION-RECORDS**: non-trivial architectural decisions
-     are *documented* with rationale (Architecture Decision Records
-     / ADRs, README sections, or in-code comments capturing *why*).
-     The chosen style, deviations from defaults, and trade-offs are
-     traceable.
-   - **SA24 CONCURRENCY**: the *concurrency model* (event loop,
+   - **SA17 CONCURRENCY**: the *concurrency model* (event loop,
      threads, goroutines, async/await, actors, ...) is *explicitly
      chosen* and applied *consistently*. Thread-safety boundaries
      between components are clear; shared mutable state is
      localized and protected.
+
+   **Block 6 — Architecture Governance**
+   - **SA18 DECISION-RECORDS**: non-trivial architectural decisions
+     are *documented* with rationale (Architecture Decision Records
+     / ADRs, README sections, or in-code comments capturing *why*).
+     The chosen style, deviations from defaults, and trade-offs are
+     traceable.
 
    Hints:
 
@@ -128,6 +119,14 @@ interface quality, and style conformance.
 
    - For the *target programming language*, apply each aspect
      according to its *idiomatic conventions* and *best practices*.
+
+   - *Control-flow verification* (SA17, SA08, SA06, SA11): for
+     any claim about *ordering*, *lock hold time*, *thread
+     boundary*, or *call from context X*, trace the actual
+     acquire/release and call order line-by-line. Do not
+     pattern-match on "loop inside method with lock" — verify
+     which operations sit *between* the specific acquire and
+     release in source order.
    </step>
 
 2. <step id="STEP 2: Show Architecture Overview">
@@ -172,7 +171,7 @@ interface quality, and style conformance.
    - *Paired* — exactly two aspects of a single tension pair hit
      → emit `TRADEOFF` template (cluster of size 2).
    - *Clustered* — an aspect appears in *multiple* triggered
-     tensions (e.g., SA11 hit against both SA13 and SA14) →
+     tensions (e.g., SA10 hit against both SA12 and SA13) →
      collapse into *one* `TRADEOFF` with the recurring aspect
      as *focal aspect* and the others as *partners*. One
      direction for the whole cluster.
@@ -180,23 +179,20 @@ interface quality, and style conformance.
    **Tension matrix** (use to detect paired/clustered findings):
 
    ```
-   ┌──────────────────┬───────────────────────────────────────────────┐
-   │       Pair       │                    Tension                    │
-   ├──────────────────┼───────────────────────────────────────────────┤
-   │ SA01/SA02 ↔ SA03 │ single concern/responsibility vs. granularity │
-   │ SA09      ↔ SA10 │ loose coupling vs. strong cohesion            │
-   │ SA11      ↔ SA13 │ extensibility vs. encapsulation               │
-   │ SA11      ↔ SA14 │ extensibility vs. interface size              │
-   │ SA12      ↔ SA09 │ cross-cutting separation vs. coupling         │
-   │ SA15      ↔ SA16 │ interface abstraction vs. composability       │
-   │ SA21      ↔ SA13 │ testability vs. encapsulation                 │
-   │ SA21      ↔ SA14 │ testability vs. interface size                │
-   │ SA22      ↔ SA01 │ observability vs. single concern              │
-   │ SA22      ↔ SA09 │ observability vs. coupling                    │
-   │ SA06      ↔ SA10 │ slice cycle-freeness vs. cohesion             │
-   │ SA20      ↔ SA11 │ pattern restraint vs. extensibility           │
-   │ SA07      ↔ SA11 │ single dependency direction vs. extensibility │
-   └──────────────────┴───────────────────────────────────────────────┘
+   ┌─────────────┬───────────────────────────────────────────────┐
+   │    Pair     │                    Tension                    │
+   ├─────────────┼───────────────────────────────────────────────┤
+   │ SA01 ↔ SA02 │ single concern/responsibility vs. granularity │
+   │ SA08 ↔ SA09 │ loose coupling vs. strong cohesion            │
+   │ SA10 ↔ SA12 │ extensibility vs. encapsulation               │
+   │ SA10 ↔ SA13 │ extensibility vs. interface size              │
+   │ SA11 ↔ SA08 │ cross-cutting separation vs. coupling         │
+   │ SA12 ↔ SA14 │ encapsulation vs. composability               │
+   │ SA16 ↔ SA12 │ testability vs. encapsulation                 │
+   │ SA16 ↔ SA13 │ testability vs. interface size                │
+   │ SA05 ↔ SA09 │ slice cycle-freeness vs. cohesion             │
+   │ SA06 ↔ SA10 │ single dependency direction vs. extensibility │
+   └─────────────┴───────────────────────────────────────────────┘
    ```
 
    Report each unpaired finding with the following <template/>:
@@ -226,19 +222,11 @@ interface quality, and style conformance.
      especially do *not* give any further explanations or
      information.
 
-   - *Control-flow verification* (SA24, SA09, SA07, SA22): for
-     any claim about *ordering*, *lock hold time*, *thread
-     boundary*, or *call from context X*, trace the actual
-     acquire/release and call order line-by-line. Do not
-     pattern-match on "loop inside method with lock" — verify
-     which operations sit *between* the specific acquire and
-     release in source order.
-
    - Uniquely identify problems with `P<n/>` and tradeoffs with
      `T<n/>` where <n/> is 1, 2, ...
 
    - For <aspect-id/>, <focal-aspect/> and every entry in
-     <partner-list/>, name the aspect (e.g., `SA07
+     <partner-list/>, name the aspect (e.g., `SA06
      DEPENDENCY-DIRECTION`).
 
    - The <focal-aspect/> is the aspect that participates in
@@ -274,14 +262,13 @@ interface quality, and style conformance.
      partner.
 
    - *Per-aspect consistency (mandatory)*: every aspect may
-     appear in *at most one* TRADEOFF output. If the same
-     aspect is hit in several tensions, they *MUST* collapse
-     into a single clustered TRADEOFF — never emit contradictory
-     recommendations for the same aspect across separate
-     TRADEOFFs.
-
-   - Do *not* emit both halves of a tension pair as separate
-     PROBLEMs; always collapse into one TRADEOFF.
+     appear in *at most one* output. Collapse both halves of
+     a hit tension pair into a single TRADEOFF; if an aspect
+     participates in *multiple* hit tensions, collapse all of
+     them into one clustered TRADEOFF with that aspect as the
+     focal aspect. Never emit contradictory recommendations
+     for the same aspect, and never emit both halves of a
+     tension pair as separate PROBLEMs.
    </step>
 
 4. <step id="STEP 4: Give Final Hint">
