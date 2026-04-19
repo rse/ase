@@ -56,13 +56,15 @@ Skill Output
         to include both endpoints. Never let arrows pierce
         `subgraph` walls.
 
-    -   For diagrams prefer the following diagrams types: for
-        *structure* (layout, components, dependencies, etc) use
-        Boxes'n'Lines, for *control flow* (branching, concurrency, etc)
-        use Flowchart, for *state machine* (states, transitions, etc) use
-        UML State Diagram, for *data flow* (actors, messages, etc) use UML
-        Sequence Diagram, and for *data structure* (classes, entities,
-        relationships, etc) use UML Class Diagram.
+    -   For diagrams, choose the Mermaid type per intent:
+
+        -   *structure / layout / components / dependencies* → `flowchart TB`
+        -   *control flow / branching / concurrency*         → `flowchart TB`
+        -   *state machine / states / transitions*           → `stateDiagram-v2`
+        -   *data flow / actors / messages / protocols*      → `sequenceDiagram`
+        -   *data structure / classes / methods*             → `classDiagram`
+        -   *data model / entities / relationships*          → `erDiagram`
+        -   *metrics / distributions / time series*          → `xychart-beta`
 
     -   *Always* render diagrams inside a Markdown *fenced code block*
         (triple backticks).
