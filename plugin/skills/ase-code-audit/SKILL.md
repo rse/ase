@@ -176,14 +176,57 @@ interface quality, and style conformance.
      symbols like `!` (problem), `◀─▶` (cycle), `(?)` (unclear).
    </step>
 
-3. <step id="STEP 3: Show Results">
-   For every detected problem, immediately report it with the
-   following output <template/>, based on concise bullet points.
+3. <step id="STEP 3: Reconcile and Show Results">
+   Before reporting, classify every finding into one of three
+   categories:
+
+   - *Unpaired* — single aspect violated, no partner in the
+     tension matrix hit → emit `PROBLEM` template.
+   - *Paired* — exactly two aspects of a single tension pair hit
+     → emit `TRADEOFF` template (cluster of size 2).
+   - *Clustered* — an aspect appears in *multiple* triggered
+     tensions (e.g., SA11 hit against both SA13 and SA14) →
+     collapse into *one* `TRADEOFF` with the recurring aspect
+     as *focal aspect* and the others as *partners*. One
+     direction for the whole cluster.
+
+   **Tension matrix** (use to detect paired/clustered findings):
+
+   | Pair                    | Tension                                            |
+   |-------------------------|----------------------------------------------------|
+   | SA01/SA02 ↔ SA03        | single concern/responsibility vs. granularity      |
+   | SA09     ↔ SA10         | loose coupling vs. strong cohesion                 |
+   | SA11     ↔ SA13         | extensibility vs. encapsulation                    |
+   | SA11     ↔ SA14         | extensibility vs. interface size                   |
+   | SA12     ↔ SA09         | cross-cutting separation vs. coupling              |
+   | SA15     ↔ SA16         | interface abstraction vs. composability            |
+   | SA21     ↔ SA13         | testability vs. encapsulation                      |
+   | SA21     ↔ SA14         | testability vs. interface size                     |
+   | SA22     ↔ SA01         | observability vs. single concern                   |
+   | SA22     ↔ SA09         | observability vs. coupling                         |
+   | SA06     ↔ SA10         | slice cycle-freeness vs. cohesion                  |
+   | SA20     ↔ SA11         | pattern restraint vs. extensibility                |
+   | SA07     ↔ SA11         | single dependency direction vs. extensibility      |
+
+   Report each unpaired finding with the following <template/>:
 
    <template>
    &#x1F7E0; **PROBLEM** P<n/> (Severity: <severity/>, Aspect: <aspect-id/>): **<title/>**
 
    <description/>
+   </template>
+
+   Report each paired or clustered finding with the following <template/>:
+
+   <template>
+   &#x1F535; **TRADEOFF** T<n/> (Severity: <severity/>): **<title/>**
+
+   - *Focal aspect*: <focal-aspect/> — <focal-state/>
+   - *In tension with*: <partner-list/>
+
+   **RECOMMENDED**: lean toward *<focal|partners/>*
+   *Reason*: <rationale/>
+   *Implies*: <partner-implications/>
    </template>
 
    Hints:
@@ -192,27 +235,51 @@ interface quality, and style conformance.
      especially do *not* give any further explanations or
      information.
 
-   - Uniquely identify the problems with `P<n/>` where <n/> is
-     1, 2, ...
+   - Uniquely identify problems with `P<n/>` and tradeoffs with
+     `T<n/>` where <n/> is 1, 2, ...
 
-   - For <aspect-id/>, name the violated aspect (e.g., `SA07
+   - For <aspect-id/>, <focal-aspect/> and every entry in
+     <partner-list/>, name the aspect (e.g., `SA07
      DEPENDENCY-DIRECTION`).
 
-   - In <description/>, use *very brief* but as *precise* as
-     possible problem descriptions.
+   - The <focal-aspect/> is the aspect that participates in
+     *all* tensions of the cluster. For a size-2 cluster, pick
+     the aspect whose direction is most constrained by the
+     detected style.
 
-   - In <description/>, highlight *code* as <template>`<code/>`</template>
+   - In <description/>, <focal-state/>, and <partner-implications/>,
+     use *very brief* but as *precise* as possible descriptions.
+
+   - Highlight *code* as <template>`<code/>`</template>
      and *key aspects* as <template>*<aspect/>*</template>.
 
-   - In <description/>, add inline *references* to the related
-     code positions in the form of either
+   - Add inline *references* to related code positions in the
+     form of either
      <template>(`<filename/>:<line-number/>`)</template>,
      <template>(`<filename/>:<line-number/>-<line-number/>`)</template> or
      <template>(`<filename/>#<function-or-method/>`)</template>.
 
-   - In <description/>, classify the problem with a <severity/>
-     of <template>LOW</template>, <template>MEDIUM</template> or
+   - Classify each finding with a <severity/> of
+     <template>LOW</template>, <template>MEDIUM</template> or
      <template>HIGH</template>.
+
+   - In <rationale/>, justify the chosen direction in *one
+     sentence* with reference to style, domain constraints, or
+     language idioms — not generic principles.
+
+   - In <partner-implications/>, name what accepting the chosen
+     direction means for each partner in one short bullet per
+     partner.
+
+   - *Per-aspect consistency (mandatory)*: every aspect may
+     appear in *at most one* TRADEOFF output. If the same
+     aspect is hit in several tensions, they *MUST* collapse
+     into a single clustered TRADEOFF — never emit contradictory
+     recommendations for the same aspect across separate
+     TRADEOFFs.
+
+   - Do *not* emit both halves of a tension pair as separate
+     PROBLEMs; always collapse into one TRADEOFF.
    </step>
 
 4. <step id="STEP 4: Give Final Hint">
@@ -221,13 +288,13 @@ interface quality, and style conformance.
    <template>
    &#x26AA; **NEXT STEP**: For deeper analysis, suggestions on
    solution approaches and then final source code changes, use
-   `/ase:ase-code-elaborate P<n>` in the same *Claude Code* session
-   or open a new *Claude Code* session and copy & paste one of the
-   above problem descriptions as a whole with
-   `/ase:ase-code-elaborate <problem>`. For *structural*
-   refactorings (component splits, layer reorganization,
-   dependency-direction fixes), prefer `/ase:ase-code-refactor`
-   with the problem description.
+   `/ase:ase-code-elaborate P<n>` or `/ase:ase-code-elaborate T<n>`
+   in the same *Claude Code* session or open a new *Claude Code*
+   session and copy & paste one of the above problem or tradeoff
+   descriptions as a whole with `/ase:ase-code-elaborate <finding>`.
+   For *structural* refactorings (component splits, layer
+   reorganization, dependency-direction fixes), prefer
+   `/ase:ase-code-refactor` with the finding description.
    </template>
    </step>
 </flow>
