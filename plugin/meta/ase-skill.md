@@ -69,6 +69,15 @@ Skill Output
     -   *Always* render diagrams inside a Markdown *fenced code block*
         (triple backticks).
 
+    -   For *comparison diagrams* (e.g., *current vs. proposed*,
+        *before vs. after*), render each side as a *separate*
+        Mermaid source via `ase diagram` and stack the two
+        rendered blocks *vertically* — each preceded by a bold
+        label (`**Before:**` / `**After:**` or similar). Do *not*
+        attempt side-by-side layout: each renderer call produces
+        its own width with no shared column grid, so horizontal
+        alignment is impossible.
+
 -   *IMPORTANT*: For Markdown *Tables*:
 
     -   *Alignment is mandatory*: every vertical edge character
