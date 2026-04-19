@@ -65,10 +65,9 @@ code and *explain* it in *brief*, *standardized*, and *concise* way.
     relationships. What gives the best overall overview of the code?
     Choose the best diagrams of the types UML Class Diagram, UML State
     Diagram, UML Sequence Diagram, or Boxes'n'Lines.
-    For any *complex* diagram (nesting, ≥4 siblings in a row, Sequence,
-    State, or Class diagrams) render via `ase diagram` by piping
-    Mermaid source through the `Bash` tool, per the *Diagrams* rules
-    in the skill meta. Only ≤3-box linear sketches may be hand-drawn.
+    Render the diagram via `ase diagram` by piping Mermaid source
+    through the `Bash` tool, per the *Diagrams* rules in the skill
+    meta. Do *not* hand-draw.
 
     Keep your explanation *brief* and *concise*.
     Output the result with the following <template/>:
