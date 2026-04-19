@@ -33,7 +33,7 @@ interface quality, and style conformance.
    *Determine* the *target programming language* and the *declared
    architecture style* (if any) — e.g., Layered, Hexagonal
    (Ports & Adapters), Onion, Clean, CQRS, Microservices,
-   Event-Driven, Modular Monolith — from project documentation,
+   Event-Driven, Modular Monolith — from code, project documentation,
    README files, or folder structure.
 
    Investigate the following architecture quality aspects across
