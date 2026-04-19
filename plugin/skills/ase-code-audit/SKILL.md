@@ -268,8 +268,11 @@ interface quality, and style conformance.
      <template>(`<filename/>#<function-or-method/>`)</template>.
 
    - Classify each finding with a <severity/> of
-     <template>LOW</template>, <template>MEDIUM</template> or
-     <template>HIGH</template>.
+     <template>LOW</template>, <template>MEDIUM</template>,
+     <template>HIGH</template>, or <template>ACCEPTED</template>.
+     Use <template>ACCEPTED</template> when the
+     contract-already-addressed check applies (see skill meta
+     rules on Findings).
 
    - In <rationale/>, justify the chosen direction in *one
      sentence* with reference to style, domain constraints, or
