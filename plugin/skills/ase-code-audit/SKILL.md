@@ -235,6 +235,14 @@ interface quality, and style conformance.
      especially do *not* give any further explanations or
      information.
 
+   - *Control-flow verification* (SA24, SA09, SA07, SA22): for
+     any claim about *ordering*, *lock hold time*, *thread
+     boundary*, or *call from context X*, trace the actual
+     acquire/release and call order line-by-line. Do not
+     pattern-match on "loop inside method with lock" — verify
+     which operations sit *between* the specific acquire and
+     release in source order.
+
    - Uniquely identify problems with `P<n/>` and tradeoffs with
      `T<n/>` where <n/> is 1, 2, ...
 
