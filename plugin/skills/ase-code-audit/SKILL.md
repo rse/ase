@@ -143,7 +143,7 @@ interface quality, and style conformance.
    *Detected style*: <style/>
    *Target language*: <language/>
 
-   <ascii-diagram-as-fenced-code-block/>
+   <rendered-diagram-as-fenced-code-block/>
    </template>
 
    Hints:
@@ -151,29 +151,56 @@ interface quality, and style conformance.
    - For <style/>, name the detected architecture style or
      "*undeclared*" if none is documented.
 
-   - For <ascii-diagram-as-fenced-code-block/>, output a markdown
-     fenced code block containing a *box-and-arrow* diagram of the
-     high-level component or layer structure. Show layers / slices
-     / major components and their dependency direction. Keep the
-     diagram under ~25 lines. Example shape (inside a fenced code
-     block):
+   - For <rendered-diagram-as-fenced-code-block/>, you *MUST*
+     emit *Mermaid* source for a `flowchart TB` (or `LR`) of the
+     high-level component or layer structure and render it via
+     the `ase diagram` CLI. Invoke the `Bash` tool with the
+     Mermaid source piped on stdin, then place the tool's stdout
+     *verbatim* inside a Markdown fenced code block. Do *not*
+     hand-draw the diagram. Show layers / slices / major
+     components and their dependency direction.
 
-     ┌───────────────┐
-     │   UI Layer    │  WebController, Views
-     └───────┬───────┘
-             │
-             ▼
-     ┌───────────────┐
-     │ Service Layer │  UserService, OrderService
-     └───────┬───────┘
-             │
-             ▼
-     ┌───────────────┐
-     │  Data Layer   │  UserRepo, OrderRepo
-     └───────────────┘
+     Mermaid source (example):
 
-   - Mark detected *anomalies* directly in the diagram with
-     symbols like `!` (problem), `◀─▶` (cycle), `(?)` (unclear).
+     ```
+     flowchart TB
+       UI["UI Layer<br/>WebController, Views"] --> SVC["Service Layer<br/>UserService, OrderService"]
+       SVC --> DATA["Data Layer<br/>UserRepo, OrderRepo"]
+     ```
+
+     Bash invocation:
+
+     ```
+     cat <<'EOF' | ase diagram
+     flowchart TB
+       UI["UI Layer<br/>WebController, Views"] --> SVC["..."]
+       SVC --> DATA["..."]
+     EOF
+     ```
+
+     Expected rendered output (paste verbatim into the response):
+
+     ```
+     ┌───────────────────────────┐
+     │          UI Layer         │
+     │    WebController, Views   │
+     └─────────────┬─────────────┘
+                   ▼
+     ┌───────────────────────────┐
+     │       Service Layer       │
+     │ UserService, OrderService │
+     └─────────────┬─────────────┘
+                   ▼
+     ┌───────────────────────────┐
+     │         Data Layer        │
+     │    UserRepo, OrderRepo    │
+     └───────────────────────────┘
+     ```
+
+   - Mark detected *anomalies* directly in the Mermaid source as
+     node labels or edge labels: prefix problem nodes with `!`,
+     cycles with `◀─▶`, unclear parts with `(?)`. The renderer
+     preserves these glyphs verbatim inside the boxes.
    </step>
 
 3. <step id="STEP 3: Reconcile and Show Results">
