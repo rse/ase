@@ -47,7 +47,7 @@ interface quality, quality attributes, and architecture governance.
      size* — neither monolithic nor fragmented.
    - **SA03 COMPONENT-HIERARCHY**: components placed at the *correct
      level* of the component hierarchy (system / program / module /
-     class / function or its language equivalent).
+     class / function).
 
    **Block 2 — Structural Organization**
    - **SA04 LAYERING**: *layers* (horizontal cuts) clearly
@@ -57,17 +57,20 @@ interface quality, quality attributes, and architecture governance.
    - **SA06 DEPENDENCY-DIRECTION**: dependencies flow in exactly
      *one direction*; no *circular dependencies*.
    - **SA07 REFERENCE-ARCHITECTURE**: *declared-style conformance* —
-     the chosen architecture style (Layered, Hexagonal, Onion, Clean,
-     CQRS, Microservices, Event-Driven, Modular Monolith, ...) is
-     applied *consistently* throughout the codebase, without
-     accidental mixing of styles.
+     the chosen architecture style (see STEP 1 intro for the
+     recognized style list) is applied *consistently* throughout
+     the codebase, without accidental mixing of styles.
 
    **Block 3 — Architecture Principles**
-   - **SA08 COUPLING**: *loose coupling* between components — no
-     shared mutable state, no concrete-type dependencies where
-     abstractions exist.
+   - **SA08 COUPLING**: *loose data coupling* between components —
+     no *concrete-type dependencies* where abstractions exist, no
+     shared data structures leaking across boundaries, communication
+     via defined ports / facades / DTOs. (Runtime coupling such as
+     races and shared mutable state is covered by SA17.)
    - **SA09 COHESION**: *strong cohesion* within each component —
-     internal parts work toward the component's single concern.
+     internal parts (functions, fields, methods) are *tightly
+     related*, *co-change*, and share data or behaviour; scattered
+     helpers that merely coexist by accident are flagged.
    - **SA10 EXTENSIBILITY**: components are *open for extension*
      (plugins, SPIs, hooks) but *closed for modification*.
    - **SA11 SEPARATION**: *cross-cutting concerns* (logging,
@@ -95,9 +98,10 @@ interface quality, quality attributes, and architecture governance.
      time, randomness) hidden behind abstractions.
    - **SA17 CONCURRENCY**: the *concurrency model* (event loop,
      threads, goroutines, async/await, actors, ...) is *explicitly
-     chosen* and applied *consistently*. Thread-safety boundaries
-     between components are clear; shared mutable state is
-     localized and protected.
+     chosen* and applied *consistently*. *Runtime coupling* —
+     thread-safety boundaries, shared mutable state, races, lock
+     hold times, async/sync boundaries — is explicit and localized;
+     shared mutable state is protected.
 
    **Block 6 — Architecture Governance**
    - **SA18 DECISION-RECORDS**: non-trivial architectural decisions
@@ -151,15 +155,26 @@ interface quality, quality attributes, and architecture governance.
      "*undeclared*" if none is documented.
 
    - For <rendered-diagram-as-fenced-code-block/>, emit *Mermaid*
-     source for a `flowchart TB` (or `LR`) of the high-level
-     component or layer structure and render it via `ase diagram`
-     per the *Diagrams* rules in the skill meta. Show layers /
-     slices / major components and their dependency direction.
+     source for a `flowchart TB` of the high-level component or
+     layer structure and render it via `ase diagram` per the
+     *Diagrams* rules in the skill meta. Show layers / slices /
+     major components and their dependency direction.
 
-   - Mark detected *anomalies* directly in the Mermaid source as
-     node labels or edge labels: prefix problem nodes with `!`,
-     cycles with `◀─▶`, unclear parts with `(?)`. The renderer
-     preserves these glyphs verbatim inside the boxes.
+   - Mark detected *anomalies* directly in the Mermaid source.
+     Because `!` and `?` are Mermaid special characters, *always
+     quote* anomaly-bearing node labels:
+
+     -   *Problem node* — prefix label with `!` inside quotes:
+         `A["!PluginIBTWS"]`.
+     -   *Unclear node* — suffix label with `(?)` inside quotes:
+         `B["DataFeedPlugin (?)"]`.
+     -   *Cyclic edge* — annotate the *edge* (not a node) with a
+         `cycle` label on a bidirectional arrow:
+         `A <-- "cycle" --> B` (or two labelled one-way edges if
+         the renderer rejects `<-->`).
+
+     The renderer preserves these glyphs verbatim inside the
+     boxes and along the edges.
    </step>
 
 3. <step id="STEP 3: Reconcile and Show Results">
@@ -213,7 +228,9 @@ interface quality, quality attributes, and architecture governance.
 
    **RECOMMENDED**: lean toward *<focal|partners/>*
    *Reason*: <rationale/>
-   *Implies*: <partner-implications/>
+   *Implies*:
+   - <partner-aspect-1/>: <partner-implication-1/>
+   - <partner-aspect-2/>: <partner-implication-2/>
    </template>
 
    Hints:
@@ -221,9 +238,6 @@ interface quality, quality attributes, and architecture governance.
    - For the final results, do *not* output anything else,
      especially do *not* give any further explanations or
      information.
-
-   - Uniquely identify problems with `P<n/>` and tradeoffs with
-     `T<n/>` where <n/> is 1, 2, ...
 
    - For <aspect-id/>, <focal-aspect/> and every entry in
      <partner-list/>, name the aspect (e.g., `SA06
@@ -234,8 +248,12 @@ interface quality, quality attributes, and architecture governance.
      the aspect whose direction is most constrained by the
      detected style.
 
-   - In <description/>, <focal-state/>, and <partner-implications/>,
-     use *very brief* but as *precise* as possible descriptions.
+   - *Brevity and precision*: all free-form placeholders
+     (<description/>, <focal-state/>, partner-implications)
+     are *very brief* but *precise*. <rationale/> is exactly
+     *one sentence* grounded in the detected style, domain
+     constraints, or language idioms — never generic
+     principles.
 
    - Highlight *code* as <template>`<code/>`</template>
      and *key aspects* as <template>*<aspect/>*</template>.
@@ -252,14 +270,6 @@ interface quality, quality attributes, and architecture governance.
      Use <template>ACCEPTED</template> when the
      contract-already-addressed check applies (see skill meta
      rules on Findings).
-
-   - In <rationale/>, justify the chosen direction in *one
-     sentence* with reference to style, domain constraints, or
-     language idioms — not generic principles.
-
-   - In <partner-implications/>, name what accepting the chosen
-     direction means for each partner in one short bullet per
-     partner.
 
    - *Per-aspect consistency (mandatory)*: every aspect may
      appear in *at most one* output. Collapse both halves of
