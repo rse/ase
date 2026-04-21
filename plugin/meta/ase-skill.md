@@ -47,6 +47,18 @@ Skill Output
         `--pad-x`/`--pad-y` (defaults `3`/`3` are already tight;
         lower values break junction rendering).
 
+    -   *Budget compliance is non-negotiable*. If restructuring
+        the Mermaid source cannot bring the rendered width
+        ≤120 chars (e.g., four populated `subgraph`s side by
+        side), *reduce scope*: show only the *top-level
+        structure* (the root node and ≤1 level of children) in
+        the diagram, and enumerate the detail as a bulleted
+        list *below* the rendered block. *Never* emit Mermaid
+        source as a substitute for a rendered diagram. The
+        choice is: render (possibly at reduced scope) or omit
+        the diagram entirely with a one-line note — *not* ship
+        unrendered source.
+
     -   *Keep edges inside subgraph boundaries*. An edge that
         crosses a `subgraph` border produces a visually ambiguous
         `┼` glyph where the border line (`─`) and the edge line
