@@ -23,15 +23,29 @@ Skill Output
 
 -   *IMPORTANT*: For *Diagrams*:
 
-    -   You *MUST* emit *every* diagram as Mermaid source and
-        invoke the `Bash` tool with `ase diagram` piping the
-        Mermaid source on stdin, then include the tool's stdout
-        *verbatim* inside a Markdown fenced code block. The tool
-        defaults to aligned Unicode box-drawing; do *not* pass
-        `--ascii`. Do *not* hand-draw diagrams -— token-by-token
+    -   *NEVER hand-draw diagrams under any circumstances*.
+        Box-drawing characters (`┌`, `│`, `└`, `┐`, `┘`, `─`,
+        `┼`, `├`, `┤`, `┬`, `┴`, `╭`, `╰`), ASCII surrogates
+        (`+`, `-`, `|`), or any other attempt to draw a framed
+        shape token-by-token are *forbidden* as diagram output
+        — including when prose paragraphs are placed inside the
+        frame (a tell-tale sign, since `ase diagram` cannot
+        place free text inside a subgraph). Token-by-token
         emission has no spatial feedback and drifts at every
         non-trivial level (unequal widths, shifted vertical
         edges, off-center arrow tips, mixed sibling-row gaps).
+
+    -   *MUST use `ase diagram`*. Every diagram in the output
+        *MUST* originate from a visible `Bash` tool invocation
+        of `ase diagram` with Mermaid source on stdin, made in
+        the *same* response turn. The visible tool call is the
+        proof. *Self-check before emitting*: if your response
+        contains any of the box-drawing characters listed above
+        *without* a preceding `Bash(ase diagram ...)` tool call
+        in this same turn, you broke the rule — re-render via
+        the tool. The tool's stdout is included *verbatim*
+        inside a Markdown fenced code block. The tool defaults
+        to aligned Unicode box-drawing; do *not* pass `--ascii`.
 
     -   *Keep diagrams narrow* — target *≤120 chars rendered
         width*. The renderer's horizontal extent scales with
