@@ -156,9 +156,9 @@ interface quality, quality attributes, and architecture governance.
 
    - For <rendered-diagram-as-fenced-code-block/>, emit *Mermaid*
      source for a `flowchart TB` of the high-level component or
-     layer structure and render it via `ase diagram` per the
-     *Diagrams* rules in the skill meta. Show layers / slices /
-     major components and their dependency direction.
+     layer structure and invoke the `ase-diagram` skill via the
+     `Skill` tool to render it. Show layers / slices / major
+     components and their dependency direction.
 
    - Mark detected *anomalies* directly in the Mermaid source.
      Because `!` and `?` are Mermaid special characters, *always
