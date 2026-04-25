@@ -75,7 +75,8 @@
       "Bash(find:* | wc:*)",
       "Bash(awk:* | head:*)",
       "Bash(sort:* | uniq:*)",
-      "Bash(sort:* | head:*)"
+      "Bash(sort:* | head:*)",
+      "Skill(ase:ase-arch-analyze)"
     ]
   }
 }
