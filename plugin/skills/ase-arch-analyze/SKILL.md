@@ -165,9 +165,9 @@ interface quality, quality attributes, and architecture governance.
      quote* anomaly-bearing node labels:
 
      -   *Problem node* — prefix label with `!` inside quotes:
-         `A["!PluginIBTWS"]`.
+         `A["!ComponentA"]`.
      -   *Unclear node* — suffix label with `(?)` inside quotes:
-         `B["DataFeedPlugin (?)"]`.
+         `B["ComponentB (?)"]`.
      -   *Cyclic edge* — annotate the *edge* (not a node) with a
          `cycle` label on a bidirectional arrow:
          `A <-- "cycle" --> B` (or two labelled one-way edges if
