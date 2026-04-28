@@ -80,7 +80,7 @@ Documenation
 
 - [Setup: Installation, Update, Uninstallation](docs/setup.md)
 - [Configuration: Parameters](docs/configuration.md)
-- [Architecture: Building Blocks](docs/building-blocks.md]
+- [Architecture: Building Blocks](docs/building-blocks.md)
 - [Usage: Plugin Skills](docs/usage-plugin.md)
 - [Usage: Plugin Tool](docs/usage-tool.md)
 
