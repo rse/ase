@@ -15,8 +15,14 @@ tooling of *Dr. Ralf S. Engelschall* for combining the approach of
 AI Coding Tools* like *Claude Code*. **ASE** primarily consists of a
 *Claude Code* plugin and a Command-Line Interface (CLI) tool. **ASE**
 provides skills and commands to support the most important, recurring
-work steps in the primary disciplines of *Software Engineering*,
+work-steps in the primary disciplines of *Software Engineering*,
 especially in the discipline *Software Development*.
+
+> [!NOTE]
+> **ASE** is *agentic*, but not pure *agent*-based, i.e., it focuses
+> on supporting the role of a software engineer with *Agentic AI* and
+> not driving the disciple software engineering with fully autonomous
+> agents.
 
 > [!NOTE]
 > The initial, primary focus of **ASE** is on the tool *Claude Code* and
@@ -29,6 +35,31 @@ especially in the discipline *Software Development*.
 > broken and hence not ready for production use. If you are not a
 > hard-boiled early adopter, please visit this project again, once we
 > reached at least version 0.9.x!
+
+Features
+--------
+
+**ASE** provides the following four distinct features:
+
+- **Configuration Scopes** (100% done):
+  Parameters of project and agent can be configured on the hierarchy of
+  the scopes *user*, *project*, *task*, and *skill*. This allows
+  the flexible configuration of **ASE**.
+
+- **Session Constitution** (80% done):
+  All agent sessions have a "constitution" preloaded all the time, based
+  on the configured parameters. This allows to control the *general*
+  agent behavior.
+
+- **Task Skills** (30% done):
+  Recurring tasks are supported with dedicated skills, based on the
+  configured parameters. This allows to control the *specific* agent
+  behavior.
+
+- **Context Gathering** (0% done):
+  The agent context is loaded with individual information for all
+  particular tasks. This allows the agent to more precisely perform the
+  tasks.
 
 User Setup
 ----------
