@@ -36,6 +36,7 @@ We distinguish the following three defined ruleset levels:
 -   You *MUST* *keep* technical terms exactly.
 -   You *MUST* *keep* code blocks unchanged.
 -   You *MUST* *keep* errors quoted exactly.
+-   You *MUST* *use* diagrams instead of prose when a topic this way can be explained more consisely.
 </define>
 
 ### Level 2
