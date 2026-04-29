@@ -20,6 +20,10 @@ The following ASE commands/skills exist on the meta-level:
 - **/ase-meta-quorum** *question*:<br/>
   Query multiple AIs for a quorum answer.
 
+- **/ase-meta-evaluate** *alternatives*:<br/>
+  Evaluate alternatives through an ad-hoc weighted multi-criteria
+  decision matrix.
+
 - **/ase-meta-llm** *llm* *query*:<br/>
   Query a foreign LLM like OpenAI ChatGPT, Google Gemini, DeepSeek or
   xAI Grok.
