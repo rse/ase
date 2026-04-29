@@ -1,6 +1,6 @@
 ---
 name: ase-meta-evaluate
-argument-hint: "<alternatives>"
+argument-hint: "<request>"
 description: >
     Evaluate alternatives through an ad-hoc multi-criteria decision.
     Use when the user calls for the evaluation of alteratives.
