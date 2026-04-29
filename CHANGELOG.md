@@ -2,8 +2,17 @@
 ChangeLog
 =========
 
-0.0.12 (2026-04-28)
+0.0.12 (2026-04-30)
 -------------------
+
+- FEATURE: add `ase-meta-evaluate` skill
+- IMPROVEMENT: improve persona skill
+- IMPROVEMENT: improve explain skill
+- IMPROVEMENT: use colored bullets
+- BUGFIX: fix markdown
+- UPDATE: provide more information about ASE
+- CLEANUP: consolidate documentation in `docs/` folder
+- CLEANUP: minor skill and icon cleanups
 
 0.0.11 (2026-04-27)
 -------------------
