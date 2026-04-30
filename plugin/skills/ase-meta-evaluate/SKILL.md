@@ -28,16 +28,16 @@ multi-*criteria* decision matrix.
         or more alternatives <alternative-K/> (K=1-N) the user requested
         to be evaluated. Do not output anything.
 
-    -   For each alternative <alternative-K/>, decide whether you have
+    -   For each alternative <alternative-K/> (K=1-N), decide whether you have
         all necessary information at hand to give it the proper, unique,
         short, and *concise name* <alternative-K/>. If you are unsure,
         use the `WebSearch` tool to find out more and adjust the name
         <alternative-K/>. Do not output anything.
 
-    -   For each alternative <alternative-K/>, decide what it is
+    -   For each alternative <alternative-K/> (K=1-N), decide what it is
         *Unique Selling Point (USP)* (What makes it unique), *Crux*
         (What you should notice), or *Gotcha* (What you should not
-        stumble over) and remember this as an <info-K/> which is
+        stumble over) and remember this as an <info-K/> (K=1-N) which is
         formatted like `<type/>: <hint/>` where <type/> is one of `USP`,
         `Crux` or `Gotcha` and <hint/> is a 1-4 word hint.
 
@@ -50,9 +50,9 @@ multi-*criteria* decision matrix.
         <template>
         &#x26AA; **ALTERNATIVES**: *<class-of-alternatives/>*
 
-        ⚑ **<alternative-1/>** (*<hint-1/>*)
+        ⚑ **<alternative-1/>** (*<info-1/>*)
         [...]
-        ⚑ **<alternative-N/>** (*<hint-N/>*)
+        ⚑ **<alternative-N/>** (*<info-N/>*)
         </template>
     </step>
 
