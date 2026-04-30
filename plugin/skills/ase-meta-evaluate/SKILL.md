@@ -109,8 +109,9 @@ multi-*criteria* decision matrix.
     -   To prevent a single high-weight criterion from dominating
         the weighted sum (the weight set is geometric ×2 while the
         evaluation Likert scale is linear), assign weight 4.00 to
-        *at most two* criteria and weight 2.00 to *at most three*
-        criteria. Do not output anything.
+        *at least one* and *at most two* criteria, and weight 2.00
+        to *at least two* and *at most three* criteria. Do not
+        output anything.
     </step>
 
 4.  <step id="STEP 4: Evaluate Alternatives against Criteria">
