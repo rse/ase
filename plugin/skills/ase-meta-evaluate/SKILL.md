@@ -45,6 +45,20 @@ multi-*criteria* decision matrix.
     -   For the set of alternatives, decide what the 1-4 word long
         name of the *class of alternatives* <class-of-alternatives/> is.
 
+    -   For each alternative <alternative-K/> (K=1-N), decide whether
+        it is a genuine member of <class-of-alternatives/>. If any
+        <alternative-K/> is *not* a member (i.e. the alternatives are
+        not mutually comparable within a single class), output the
+        following <template/> and *stop the entire flow* immediately
+        without executing any further steps:
+
+        <template>
+        &#x1F7E0; **INCOMPARABLE ALTERNATIVES**: *<class-of-alternatives/>*
+
+        ⚑ **<alternative-K/>** (*member of a different class*)
+        [...]
+        </template>
+
     -   Output the detetermined, individual alternatives with just
         the following <template/> and do not output anything else:
 
