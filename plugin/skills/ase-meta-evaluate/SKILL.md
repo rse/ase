@@ -52,7 +52,7 @@ multi-*criteria* decision matrix.
         &#x26AA; **ALTERNATIVES**: *<class-of-alternatives/>*
 
         ⚑ **<alternative-1/>** (*<info-1/>*)
-        [...]
+        [...alternatives 2-(N-1)...]
         ⚑ **<alternative-N/>** (*<info-N/>*)
         </template>
     </step>
@@ -98,7 +98,7 @@ multi-*criteria* decision matrix.
 
         ⦿ *Criteria*  | ⚖ *Weight*  | ⚑ **<alternative-1/>** | [...] | ⚑ **<alternative-N/>**
         <criteria-1/> | <weight-1/> | <eval-1-1/>            | [...] | <eval-1-N/>
-        [...]
+        [...criterias 2-(M-1)...]
         <criteria-M/> | <weight-M/> | <eval-M-1/>            | [...] | <eval-M-N/>
         **RATING**    |             | **<rating-1/>**        | [...] | **<rating-N/>**
         </template>
