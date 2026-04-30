@@ -70,7 +70,7 @@ multi-*criteria* decision matrix.
         in the following. Do not output anything.
 
     -   For each criteria <criteria-L/> (L=1-M), decide on its <weight-L/>
-        from the value set { 4, 2, 1, 1/2, 1/4 } (from most important,
+        from the value set { 4.00, 2.00, 1.00, 0.50, 0.25 } (from most important,
         over normal, to less important). Do not output anything.
     </step>
 
