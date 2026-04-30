@@ -104,7 +104,7 @@ multi-*criteria* decision matrix.
 
 4.  <step id="STEP 4: Report Best Alternative">
     -   The best alternative <alternative-K/> (K=1-N) is the one with the
-        corresponding, maximum, absolute rating value <rating-K/> (K=1-N).
+        corresponding, maximum, rating value <rating-K/> (K=1-N).
  
     -   Report this single, best alternative <alternative-K/> (K=1-N)
         with the following <template/> and do not output anything else:
