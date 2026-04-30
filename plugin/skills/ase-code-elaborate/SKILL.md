@@ -50,7 +50,8 @@ specialized in *debugging and fixing source code*.
      (branching, concurrency, etc), complex *state machine* (states,
      transitions, etc), complex *data flow* (actors, messages, etc), or
      complex *data structure* (classes, entities, relationships, etc),
-     visualize it with an optional diagram <optional-diagram/>. Omit
+     visualize it with an optional diagram <optional-diagram/> by
+     invoking the `ase-diagram` skill via the `Skill` tool. Omit
      <optional-diagram/> entirely for simple or purely local situation.
    </step>
 
@@ -86,9 +87,13 @@ specialized in *debugging and fixing source code*.
      avoid cluttering the source code with too much error handling at all.
 
    - In case of a *complex solution situation* only, visualize it with
-     an optional diagram <optional-diagram/>, showing a *side-by-side
-     diagram (current vs. proposed)* Omit <optional-diagram/> entirely
-     for simple or purely local situation.
+     an optional diagram <optional-diagram/> by invoking the
+     `ase-diagram` skill via the `Skill` tool. For *current vs.
+     proposed* comparisons, render each side as a *separate*
+     `ase-diagram` invocation and stack the rendered blocks
+     *vertically* (labels `**Before:**` / `**After:**`); never
+     side-by-side. Omit <optional-diagram/> entirely for simple or
+     purely local situation.
    </step>
 
 3. <step id="STEP 3: Choose Solution Approach">
