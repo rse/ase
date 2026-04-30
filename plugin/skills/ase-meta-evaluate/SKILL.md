@@ -72,15 +72,18 @@ multi-*criteria* decision matrix.
         [...]
         </template>
 
-    -   Output the determined, individual alternatives with just
-        the following <template/> and do not output anything else:
+    -   Output the determined, individual alternatives as a Markdown *table*
+        with just the following <template/> and do not output anything
+        else:
 
         <template>
         &#x26AA; **ALTERNATIVES**: *<class-of-alternatives/>*
 
-        ⚑ **<alternative-1/>** (*<info-1/>*)
+        | ⚑ *Alternative*        | ⚖ *Hint*  |
+        | :--------------------- | :-------- |
+        | ⚑ **<alternative-1/>** | <info-1/> |
         [...alternatives K=2-(N-1) for N>2...]
-        ⚑ **<alternative-N/>** (*<info-N/>*)
+        | ⚑ **<alternative-N/>** | <info-N/> |
         </template>
     </step>
 
@@ -131,7 +134,6 @@ multi-*criteria* decision matrix.
         and *N-2 columns when N>=4*.
 
     -   Output the resulting *Weighted Decision Matrix* as a Markdown *table*
-        (first column left-aligned, all other columns right-aligned)
         with just the following <template/> and do no output anything else:
 
         <template>
