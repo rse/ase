@@ -103,12 +103,12 @@ multi-*criteria* decision matrix.
         <template>
         &#x1F7E0; **EVALUATION**: *Weighted Multi-Criteria Decision Matrix*
 
-        ⦿ *Criteria*  | ⚖ *Weight*  | ⚑ **<alternative-1/>** | [...alternatives 2-(N-1)...] | ⚑ **<alternative-N/>**
-        :------------ | ----------: | ---------------------: | ---------------------------: | ---------------------:
-        <criteria-1/> | <weight-1/> | <eval-1-1/>            | [...evals 1-2..1-(N-1)...]   | <eval-1-N/>
+        | ⦿ *Criteria*  | ⚖ *Weight*  | ⚑ **<alternative-1/>** | [...alternatives 2-(N-1)...] | ⚑ **<alternative-N/>** |
+        | :------------ | ----------: | ---------------------: | ---------------------------: | ---------------------: |
+        | <criteria-1/> | <weight-1/> | <eval-1-1/>            | [...evals 1-2..1-(N-1)...]   | <eval-1-N/>            |
         [...criterias 2-(M-1)...]
-        <criteria-M/> | <weight-M/> | <eval-M-1/>            | [...evals M-2..M-(N-1)...]   | <eval-M-N/>
-        **RATING**    |             | **<rating-1/>**        | [...ratings 2-(N-1)...]      | **<rating-N/>**
+        | <criteria-M/> | <weight-M/> | <eval-M-1/>            | [...evals M-2..M-(N-1)...]   | <eval-M-N/>            |
+        | **RATING**    |             | **<rating-1/>**        | [...ratings 2-(N-1)...]      | **<rating-N/>**        |
         </template>
     </step>
 
