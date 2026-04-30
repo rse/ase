@@ -53,7 +53,7 @@ multi-*criteria* decision matrix.
         all necessary information at hand to give it the proper, unique,
         short, and *concise name* <alternative-K/>. If you are unsure,
         use the `WebSearch` tool (at most one invocation per alternative,
-        drawing from the *skill-wide shared budget* of at most 4
+        drawing from the *skill-wide shared budget* of at most 8
         `WebSearch` invocations in total across STEP 2 and STEP 3
         combined) to find out more and adjust the name <alternative-K/>;
         if still unsure after the shared budget is exhausted, pick the
@@ -116,7 +116,7 @@ multi-*criteria* decision matrix.
         criteria which potentially allow best to triage the
         alternatives, take the <reason/> into account, and use the
         `WebSearch` tool (drawing from the *skill-wide shared budget*
-        of at most 4 `WebSearch` invocations in total across STEP 2
+        of at most 8 `WebSearch` invocations in total across STEP 2
         and STEP 3 combined) to find out about the potentially still
         missing criteria and assign their <weight-L/>; if still under
         8 criteria after the shared budget is exhausted, fill the
