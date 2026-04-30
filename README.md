@@ -61,6 +61,10 @@ Features
   particular tasks. This allows the agent to more precisely perform the
   tasks.
 
+- **Project Templates** (0% done):
+  The agent is equipped with reasonable templates to scaffold
+  Library/Framework, CLI and WebUI projects.
+
 Installation
 ------------
 
