@@ -52,8 +52,11 @@ multi-*criteria* decision matrix.
     -   For each alternative <alternative-K/> (K=1-N), decide whether you have
         all necessary information at hand to give it the proper, unique,
         short, and *concise name* <alternative-K/>. If you are unsure,
-        use the `WebSearch` tool to find out more and adjust the name
-        <alternative-K/>. Do not output anything.
+        use the `WebSearch` tool (at most one invocation per alternative
+        and at most 4 invocations in total across all alternatives) to
+        find out more and adjust the name <alternative-K/>; if still
+        unsure after the budget is exhausted, pick the best-guess
+        concise name and proceed. Do not output anything.
 
     -   For each alternative <alternative-K/> (K=1-N), decide which
         *one* of *USP* (Unique Selling Point -- what makes it unique),
@@ -111,10 +114,13 @@ multi-*criteria* decision matrix.
         requested, use the set of alternatives to decide on additional
         criteria which potentially allow best to triage the
         alternatives, take the <reason/> into account, and use the
-        `WebSearch` tool to find out about the potentially still
-        missing criteria and assign their <weight-L/>; if more than 12
-        criteria were requested, drop the criteria with the smallest
-        <weight-L/> until 12 remain. Do not output anything.
+        `WebSearch` tool (at most 4 invocations in total) to find out
+        about the potentially still missing criteria and assign their
+        <weight-L/>; if still under 8 criteria after the budget is
+        exhausted, fill the remaining slots from existing knowledge
+        without further searches; if more than 12 criteria were
+        requested, drop the criteria with the smallest <weight-L/>
+        until 12 remain. Do not output anything.
 
     -   To prevent a single high-weight criterion from dominating
         the weighted sum (the weight set is geometric ×2 while the
