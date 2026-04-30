@@ -127,14 +127,10 @@ multi-*criteria* decision matrix.
         <rating-K/> to 2 decimal places before emitting it. Do not
         output anything.
 
-    -   When emitting the table below, render *one column per alternative*
-        <alternative-K/> (K=1-N). The middle range marker `[...alternatives
-        2-(N-1)...]` (and its row counterparts, including the alignment
-        row) expands to *zero columns when N=2*, *one column when N=3*,
-        and *N-2 columns when N>=4*.
-
     -   Output the resulting *Weighted Decision Matrix* as a Markdown *table*
-        with just the following <template/> and do no output anything else:
+        with just the following <template/> and do no output anything
+        else. When emitting the table, render *one column per
+        alternative* <alternative-K/> (K=1-N).
 
         <template>
         &#x1F535; **EVALUATION**: *Weighted Multi-Criteria Decision Matrix*
@@ -154,18 +150,35 @@ multi-*criteria* decision matrix.
         STEP 4) is the maximum rounded rating value across all
         alternatives.
 
-    -   If multiple alternatives have the same maximum, rounded rating (a tie
-        situation), tell the problem with just the following <template/> and
-        do no output anything else:
+    -   The second best alternative <alternative-X/> (X=1-N, X != K) is the
+        alternative whose <rating-X/> (rounded to 2 decimal places per
+        STEP 4) is the second largest rounded rating value across all
+        alternatives.
+
+    -   Determine rating distance <distance/> between <alternative-K/> and
+        <alternative-X/> by calculating: <distance/> = <rating-K/> - <rating-X/>.
+
+    -   Determine rating distance percentage <percentage/> between <alternative-K/> and
+        <alternative-X/> by calculating: <percentage/> = <distance/> / <rating-K/>.
+
+    -   If <distance/> is zero, stop the flow after you output just the following
+        <template/> and do no output anything else:
 
         <template>
         &#x1F7E0; **ERROR**: ✘ *MULTIPLE BEST ALTERNATIVES FOUND*,
-        Please give hints on the criterias to ensure a clear best alternative!
+        Please give some hints on the criterias to ensure a single best alternative!
         </template>
 
-    -   If a single alternative <alternative-K/> (K=1-N) has the maximum,
-        rounded rating, output this result with just the following
-        <template/> and do not output anything else:
+    -   If <distance/> is not zero and <percentage/> is less than 0.10,
+        stop the flow after you output just the following <template/> and do
+        no output anything else:
+
+        <template>
+        &#x1F7E0; **BEST ALTERNATIVE**: ⚑ **<alternative-K/>** ⚠ *ATTENTION: small distance to second best alternative!*
+        </template>
+
+    -   If <distance/> is not zero and <percentage/> is greater than or equal 0.10,
+        output just the following <template/> and do no output anything else:
 
         <template>
         &#x1F7E0; **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
