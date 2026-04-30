@@ -41,17 +41,17 @@ Features
 
 **ASE** provides the following four distinct features:
 
-- **Configuration Scopes** (100% done):
+- [**Configuration Scopes**](docs/configuration.md) (100% done):
   Parameters of project and agent can be configured on the hierarchy of
   the scopes *user*, *project*, *task*, and *skill*. This allows
   the flexible configuration of **ASE**.
 
-- **Session Constitution** (80% done):
+- [**Session Constitution**](plugin/meta/ase-constitution.md) (80% done):
   All agent sessions have a "constitution" preloaded all the time, based
   on the configured parameters. This allows to control the *general*
   agent behavior.
 
-- **Task Skills** (30% done):
+- [**Task Skills**](plugin/skills/) (30% done):
   Recurring tasks are supported with dedicated skills, based on the
   configured parameters. This allows to control the *specific* agent
   behavior.
