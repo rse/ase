@@ -59,7 +59,7 @@ multi-*criteria* decision matrix.
 
 2.  <step id="STEP 2: Decide Criterias">
     -   From the <request>$ARGUMENTS</request> decide whether and what
-        criterias <criteria-L/> the user requested. Do not output
+        criterias <criteria-L/> (L=1-M) the user requested. Do not output
         anything.
 
     -   Ensure the final number of criterias is always within the range
@@ -86,8 +86,15 @@ multi-*criteria* decision matrix.
     -   Then, for each alternative <alternative-K/> (K=1-N), calculate a
         rating <rating-K/> (K=1-N) which is the product-sum of all
         weights <weight-L/> (L=1-M) and the evaluation <eval-K-L/>
-        (K=1-N, L=1-M). The result is always a numerical value. Do not
+        (K=1-N, L=1-M). The result is always a numerical value. Round
+        <rating-K/> to 2 decimal places before emitting it. Do not
         output anything.
+
+    -   When emitting the table below, render *one column per alternative*
+        <alternative-K/> (K=1-N). The middle range marker `[...alternatives
+        2-(N-1)...]` (and its row counterparts, including the alignment
+        row) expands to *zero columns when N=2*, *one column when N=3*,
+        and *N-2 columns when N>=4*.
 
     -   Output the resulting *Weighted Decision Matrix* as a Markdown *table*
         (first column left-aligned, all other columns right-aligned)
@@ -96,18 +103,20 @@ multi-*criteria* decision matrix.
         <template>
         &#x1F7E0; **EVALUATION**: *Weighted Multi-Criteria Decision Matrix*
 
-        ⦿ *Criteria*  | ⚖ *Weight*  | ⚑ **<alternative-1/>** | [...] | ⚑ **<alternative-N/>**
-        <criteria-1/> | <weight-1/> | <eval-1-1/>            | [...] | <eval-1-N/>
+        ⦿ *Criteria*  | ⚖ *Weight*  | ⚑ **<alternative-1/>** | [...alternatives 2-(N-1)...] | ⚑ **<alternative-N/>**
+        :------------ | ----------: | ---------------------: | ---------------------------: | ---------------------:
+        <criteria-1/> | <weight-1/> | <eval-1-1/>            | [...evals 1-2..1-(N-1)...]   | <eval-1-N/>
         [...criterias 2-(M-1)...]
-        <criteria-M/> | <weight-M/> | <eval-M-1/>            | [...] | <eval-M-N/>
-        **RATING**    |             | **<rating-1/>**        | [...] | **<rating-N/>**
+        <criteria-M/> | <weight-M/> | <eval-M-1/>            | [...evals M-2..M-(N-1)...]   | <eval-M-N/>
+        **RATING**    |             | **<rating-1/>**        | [...ratings 2-(N-1)...]      | **<rating-N/>**
         </template>
     </step>
 
 4.  <step id="STEP 4: Report Best Alternative">
     -   The best alternative(s) <alternative-K/> (K=1-N) are *all* those
-        alternatives whose <rating-K/> equals the maximum rating value
-        across all alternatives. In the typical case, this is exactly one
+        alternatives whose <rating-K/> (rounded to 2 decimal places per
+        STEP 3) equals the maximum rounded rating value across all
+        alternatives. In the typical case, this is exactly one
         alternative. In case of a tie, it is two or more alternatives.
 
     -   Report each best alternative <alternative-K/> with the following
@@ -115,6 +124,7 @@ multi-*criteria* decision matrix.
 
         <template>
         &#x1F535; **BEST ALTERNATIVE(S)**:
+
         ⚑ **<alternative-K/>**
         [...]
         </template>
