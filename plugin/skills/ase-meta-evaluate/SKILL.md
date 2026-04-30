@@ -118,7 +118,7 @@ multi-*criteria* decision matrix.
         <criteria-L/> (L=1-M), decide on the evaluation <eval-K-L/>,
         which means how good the alternative meets the criteria on
         a Likert-scale from { -2, -1, 0, +1, +2 } (from worst, over
-        unsure, to best). Do not output anything.
+        neutral, to best). Do not output anything.
 
     -   Then, for each alternative <alternative-K/> (K=1-N), calculate a
         rating <rating-K/> (K=1-N) which is the product-sum of all
