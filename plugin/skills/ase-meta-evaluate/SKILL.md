@@ -210,7 +210,7 @@ multi-*criteria* decision matrix.
 
         <template>
         &#x1F7E0; **ERROR**: ✘ *MULTIPLE BEST ALTERNATIVES FOUND*,
-        Please give some hints on the criteria to ensure a single best alternative!
+        ⚠ *Please give some hints on the criteria to ensure a single best alternative!*
         </template>
 
     -   Otherwise, if <percentage/> is less than 0.10,
@@ -218,7 +218,8 @@ multi-*criteria* decision matrix.
         not output anything else:
 
         <template>
-        &#x1F7E0; **BEST ALTERNATIVE**: ⚑ **<alternative-K/>** ⚠ *ATTENTION: small distance to second best alternative!*
+        &#x1F7E0; **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
+        ⚠ *ATTENTION: small distance to second best alternative!*
         </template>
 
     -   Otherwise (<percentage/> is greater than or equal 0.10),
