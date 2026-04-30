@@ -52,7 +52,7 @@ multi-*criteria* decision matrix.
 
         ⚑ **<alternative-1/>** (*<hint-1/>*)
         [...]
-        ⚑ <**alternative-N/>** (*<hint-N/>*)
+        ⚑ **<alternative-N/>** (*<hint-N/>*)
         </template>
     </step>
 
