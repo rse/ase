@@ -199,7 +199,10 @@ multi-*criteria* decision matrix.
     -   By construction, <rating-K/> is the maximum rating across
         all alternatives, so <distance/> >= 0 always holds; using
         abs(<rating-K/>) keeps <percentage/> sign-stable across all rating
-        regimes.
+        regimes. Note that when <rating-K/> itself is negative, the
+        denominator anchors to a poor best rating and small gaps can
+        appear large; the all-negative regime is surfaced as a dedicated
+        warning branch below.
 
     -   If <percentage/> is less than 0.01 (i.e. <distance/> is
         effectively zero relative to abs(<rating-K/>)), stop the flow after
@@ -218,6 +221,16 @@ multi-*criteria* decision matrix.
         <template>
         &#x1F7E0; **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
         ⚠ *ATTENTION: small distance to second best alternative!*
+        </template>
+
+    -   Otherwise, if <rating-K/> is less than zero (i.e. all alternatives
+        rate negatively and the "best" is merely the least-bad), stop the
+        flow after you output just the following <template/> and do not
+        output anything else:
+
+        <template>
+        &#x1F7E0; **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
+        ⚠ *ATTENTION: all alternatives rate negatively; this is the least-bad choice, not a strong winner!*
         </template>
 
     -   Otherwise (<percentage/> is greater than or equal 0.10), output
