@@ -369,16 +369,18 @@ export class Config {
             if (sc.kind === "default") {
                 const doc = new Document()
                 doc.contents = doc.createNode({})
-                const preset = projectClassificationPresets.default
-                for (const [ k, val ] of Object.entries(preset)) {
-                    const segments = k.split(".")
-                    for (let j = 1; j < segments.length; j++) {
-                        const prefix = segments.slice(0, j)
-                        const node   = doc.getIn(prefix, true)
-                        if (node === undefined)
-                            doc.setIn(prefix, doc.createNode({}))
+                if (this.name === "config") {
+                    const preset = projectClassificationPresets.default
+                    for (const [ k, val ] of Object.entries(preset)) {
+                        const segments = k.split(".")
+                        for (let j = 1; j < segments.length; j++) {
+                            const prefix = segments.slice(0, j)
+                            const node   = doc.getIn(prefix, true)
+                            if (node === undefined)
+                                doc.setIn(prefix, doc.createNode({}))
+                        }
+                        doc.setIn(segments, doc.createNode(val))
                     }
-                    doc.setIn(segments, doc.createNode(val))
                 }
                 docs.push({ scope: sc, filename: "", doc })
                 continue
