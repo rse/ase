@@ -54,9 +54,9 @@ multi-*criteria* decision matrix.
     -   For each alternative <alternative-K/> (K=1-N), decide whether
         you have all necessary information at hand to give it the proper,
         unique, short, and *concise name* <alternative-K/>. If you are
-        unsure, use the `WebSearch` tool (at most one invocation per
+        unsure, use the `ase-meta-search` skill (at most one invocation per
         alternative, drawing from the *skill-wide shared budget* of at
-        most 8 `WebSearch` invocations in total across STEP 2 and STEP 3
+        most 8 `ase-meta-search` invocations in total across STEP 2 and STEP 3
         combined) to find out more and adjust the name <alternative-K/>.
 
         If still unsure after the shared budget is exhausted, pick the
@@ -116,8 +116,8 @@ multi-*criteria* decision matrix.
         minimum 8 and maximum 12: if less than 8 criteria were requested,
         use the set of alternatives to decide on additional criteria
         which potentially allow best to triage the alternatives, take the
-        <reason/> into account, and use the `WebSearch` tool (drawing from
-        the *skill-wide shared budget* of at most 8 `WebSearch` invocations
+        <reason/> into account, and use the `ase-meta-search` skill (drawing from
+        the *skill-wide shared budget* of at most 8 `ase-meta-search` invocations
         in total across STEP 2 and STEP 3 combined) to find out about the
         potentially still missing criteria and assign their <weight-L/>.
 
