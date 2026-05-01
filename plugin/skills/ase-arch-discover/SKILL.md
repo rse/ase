@@ -84,49 +84,51 @@ for the technology stack to *provide* the *needed functionality*
         <keyword-L/> (L=1-M), which allow you to search for suitable
         components.
 
-    -   In to be discovered result set of components <component-K/>
+    -   In the to be discovered result set of components <component-K/>
         (K=1-N), remember the component name as <name-K/>, the
         official package name as <package-K/>, the latest version as
         <version-K/>, the stars as <stars-K/>, the created date as
         <created-K/>, the last updated date as <updated-K/>, the total
-        number of downloads in the last month <downloads-K/>.
+        number of downloads in the last month ias <downloads-K/>.
 
     -   If <stack/> is "JavaScript" or "TypeScript":
 
-        -   Use the `ase-meta-search` skill in a subagent to discover
-            *generally* *NPM packages* <component-K/> (K=1-N) based on
-            the essential keywords <keyword-L/> (L=1-M). For each found
-            package <component-K/> (K=1-N), use the shell command
-            `npm view --json "<package-K/>" version time.modified
-            time.created)` to discover its version <version-K/>,
-            its time modified <updated-K/>, and its time created
-            <created-K>.
+        -   Based on the essential keywords <keyword-L/> (L=1-M),
+            use the `ase-meta-search` skill in a subagent to *generally*
+            discover *NPM packages* <component-K/> and at least
+            their real name <name/> and their unique package names
+            <package-K/>.
 
         -   Use the shell command `npm search --searchlimit 20 --json
-            "<keyword-1/>" [...] "<keyword-M/>"` to specifically
-            discover *NPM packages* <package-K/> (K=1-N) and their
-            <version-K/> -- based on the essential keywords <keyword-L/>
-            (L=1-M). Merge the results into the already existing
-            result set, but deduplicate entries.
+            "<keyword-1/>" [...] "<keyword-M/>"` to *specifically*
+            discover *NPM packages* <component-K/> and at least their
+            unique package names <package-K/>, based on the essential
+            keywords <keyword-L/> (L=1-M). Merge the results into the
+            already existing result set, but deduplicate entries.
 
-        -   For each discovered *NPM package* <package-K/>, use the
-            `WebFetch` tool on the URL `https://npmtrends.com/<package-K/>`
-            to fetch information from the `Stats` table on the page
-            by extracting the <stars-K/> from the `Stars` column,
-            <created-K/> from the `Created` column, and <updated-K/>
-            from the `Updated` column.
+        -   For each discovered *NPM package* <component-K/> (K=1-N), use the shell command
+            `npm view --json "<package-K/>" version time.modified
+            time.created repository.url)` to discover its version
+            <version-K/>, its time modified <updated-K/>,
+            its time created <created-K>, and its repository
+            URL <repository-K/>.
 
-        -   For each discovered *NPM package* <package-K/>, use the
-            `WebFetch` tool on the URL
+        -   If the <repository-K/> matches `[...]github.com/<org/>/<name/>[...]`
+            use the `WebFetch` tool to fetch the URL
+            `https://api.github.com/repos/<org/>/<name/>` and extract
+            <stars-K/> from its JSON `stargazers_count` field, else set
+            <stars-K/> to `N.A.`.
+
+        -   For each discovered *NPM package* <component-K/>
+            (K=1-N), use the `WebFetch` tool on the URL
             `https://api.npmjs.org/downloads/point/last-month/<package-K/>`
-            to extract the <downloads-K/> from the `downloads`
-            field.
+            to extract the <downloads-K/> from the `downloads` field.
     </step>
 
 4.  <step id="STEP 4: Report Components">
     -   Sort, in descending order, the discovered components
-        <component-K/> (K=1-N) by their <stars-K/>, then <downloads-K/>,
-        and then <updated-K/> information.
+        <component-K/> (K=1-N) by their <downloads-K/>, then by their
+        <stars-K/>, then by their then <updated-K/> information.
 
     -   Display the discovered components as a Markdown *table*
         with just the following <template/>:
@@ -134,11 +136,11 @@ for the technology stack to *provide* the *needed functionality*
         <template>
         &#x1F535; **COMPONENTS**:
 
-        | *Component*   | *Package*      | *Version*    | *Stars*        | *Downloads*        | *Updated*        | *Created*    |
-        | :------------ | :------------- | :------------| :------------- | :----------------- | :--------------- | :----------- |
-        | **<name-1/>** | `<package-1/>` | <version-1/> | **<stars-1/>** | **<downloads-1/>** | **<updated-1/>** | <created-1/> |
+        | *Component*   | *Package*      | *Version*    | *Downloads*        | *Stars*        | *Updated*        | *Created*    |
+        | :------------ | :------------- | :------------| :----------------- | :------------- | :--------------- | :----------- |
+        | **<name-1/>** | `<package-1/>` | <version-1/> | **<downloads-1/>** | **<stars-1/>** | **<updated-1/>** | <created-1/> |
         [...]
-        | **<name-N/>** | `<package-N/>` | <version-N/> | **<stars-N/>** | **<downloads-N/>** | **<updated-N/>** | <created-N/> |
+        | **<name-N/>** | `<package-N/>` | <version-N/> | **<downloads-N/>** | **<stars-N/>** | **<updated-N/>** | <created-N/> |
         </template>
     </step>
 </flow>
