@@ -5,6 +5,7 @@ ChangeLog
 0.0.15 (2026-05-01)
 -------------------
 
+- FEATURE: add a "diagram" tool to the "ase" MCP service and use this in the "ase-meta-diagram" skill
 - FEATURE: add first cut for a `ase mcp` command which uses the `ase service` under the hood
 
 0.0.14 (2026-05-01)
