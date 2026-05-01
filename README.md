@@ -13,10 +13,11 @@ About
 tooling of *Dr. Ralf S. Engelschall* for combining the approach of
 *Agentic AI* into *Software Engineering* with the help of *Agentic
 AI Coding Tools* like *Claude Code*. **ASE** primarily consists of a
-*Claude Code* plugin and a Command-Line Interface (CLI) tool. **ASE**
-provides skills and commands to support the most important, recurring
-work-steps in the primary disciplines of *Software Engineering*,
-especially in the discipline *Software Development*.
+*Claude Code* plugin and a Command-Line Interface (CLI) tool, including
+an *MCP* service. **ASE** provides skills and commands to support
+the most important, recurring work-steps in the primary disciplines
+of *Software Engineering*, especially in the discipline *Software
+Development*.
 
 > [!NOTE]
 > **ASE** is *agentic*, but not pure *agent*-based, i.e., it focuses
