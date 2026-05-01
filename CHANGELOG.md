@@ -6,7 +6,7 @@ ChangeLog
 -------------------
 
 - FEATURE: add `ase diagram` CLI subcommand that renders Mermaid source to ASCII/Unicode
-- FEATURE: add `ase-diagram` skill with diagram rendering rules
+- FEATURE: add `ase-meta-diagram` skill with diagram rendering rules
 - IMPROVEMENT: route all meta and consumer skills through `ase-diagram` skill
 - UPDATE: upgrade dependencies
 
