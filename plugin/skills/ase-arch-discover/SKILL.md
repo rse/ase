@@ -46,30 +46,30 @@ for the technology stack to *provide* the *needed functionality*
     </step>
 
 2.  <step id="STEP 2: Determine Technology Stack">
-    -   Determine the used technology stack.
+    -   Determine the used technology stack:
 
-    -   If a file `package.json` is found in the top-level directory
-        of the project and contains an entry `typescript` under `dependencies`
-        or `devDependencies`, then <stack>TypeScript</stack>.
+        -   If a file `package.json` is found in the top-level directory
+            of the project and contains an entry `typescript` under `dependencies`
+            or `devDependencies`, then <stack>TypeScript</stack>.
 
-    -   Else, if a file `package.json` is found in the top-level directory
-        of the project, then <stack>JavaScript</stack>.
+        -   Else, if a file `package.json` is found in the top-level directory
+            of the project, then <stack>JavaScript</stack>.
 
-    -   Else, if a file `build.gradle.kts` or `settings.gradle.kts`
-        is found in the top-level directory, then <stack>Kotlin</stack>.
+        -   Else, if a file `build.gradle.kts` or `settings.gradle.kts`
+            is found in the top-level directory, then <stack>Kotlin</stack>.
 
-    -   Else, if a file `build.gradle` is found in the top-level directory and
-        is applying `kotlin`, `org.jetbrains.kotlin.jvm`, `kotlin-android`,
-        or `kotlin-multiplatform` plugins, then <stack>Kotlin</stack>.
+        -   Else, if a file `build.gradle` is found in the top-level directory and
+            is applying `kotlin`, `org.jetbrains.kotlin.jvm`, `kotlin-android`,
+            or `kotlin-multiplatform` plugins, then <stack>Kotlin</stack>.
 
-    -   Else, if a file `pom.xml` is found in the top-level directory and
-        contains `kotlin-maven-plugin` or `kotlin-stdlib` dependencies, then
-        <stack>Kotlin</stack>.
+        -   Else, if a file `pom.xml` is found in the top-level directory and
+            contains `kotlin-maven-plugin` or `kotlin-stdlib` dependencies, then
+            <stack>Kotlin</stack>.
 
-    -   Else, if a file `pom.xml` or `build.gradle` is found in the top-level directory
-        of the project, then <stack>Java</stack>.
+        -   Else, if a file `pom.xml` or `build.gradle` is found in the top-level directory
+            of the project, then <stack>Java</stack>.
 
-    -   Else, use <stack>Unknown</stack>.
+        -   Else, use <stack>Unknown</stack>.
 
     -   Display the determined final technology stack with just the
         following <template/>:
@@ -95,13 +95,13 @@ for the technology stack to *provide* the *needed functionality*
 
         -   Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
-            discover an initial set of a maximum of 8 *NPM packages*
+            discover an initial set of a maximum of 12 *NPM packages*
             <component-K/> and at least their real name <name/> and
             their unique package names <package-K/>.
 
-        -   Use the shell command `npm search --json --searchlimit 8
+        -   Use the shell command `npm search --json --searchlimit 12
             "<keyword-1/>" [...] "<keyword-M/>"` to *specifically*
-            discover an additional set of a maximum of 8 *NPM packages*
+            discover an additional set of a maximum of 12 *NPM packages*
             <component-K/> and at least their unique package names
             <package-K/>, based on the essential keywords <keyword-L/>
             (L=1-M). Merge the results into the already existing result
@@ -131,7 +131,7 @@ for the technology stack to *provide* the *needed functionality*
     -   Sort, in descending order, the discovered components
         <component-K/> (K=1-N) first by their <downloads-K/> and second
         by their <stars-K/> and trim the result list to just a maximum
-        of 8 total components.
+        of 12 total components.
 
     -   Display the discovered components as a Markdown *table*
         with just the following <template/>:
