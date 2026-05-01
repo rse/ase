@@ -43,10 +43,8 @@ Rules
 
     Every diagram in the output *MUST* originate from a `diagram`
     MCP tool call, with Mermaid diagram specification passed in the
-    `diagram` field, made in the *same* session response turn. You
-    *MUST* use a timeout of 20 seconds with the `diagram` MCP tool call
-    and the MCP `timeout` facility. Also, pass a `colorMode` of `none`
-    to get monochrome renderings.
+    `diagram` field, made in the *same* session response turn. Also,
+    pass a `colorMode` of `none` to always get monochrome renderings.
 
 -   INPUT:
     For describing the diagrams, you *MUST* use the *Mermaid* diagram
@@ -54,8 +52,8 @@ Rules
 
     Use the following Mermaid diagram types per intent:
 
-    -   *structure / layout / components / dependencies* → `flowchart TB`
-    -   *control flow / branching / concurrency*         → `flowchart TB`
+    -   *structure / layout / components / dependencies* → `flowchart`
+    -   *control flow / branching / concurrency*         → `flowchart`
     -   *state machine / states / transitions*           → `stateDiagram-v2`
     -   *data flow / actors / messages / protocols*      → `sequenceDiagram`
     -   *data structure / classes / methods*             → `classDiagram`
@@ -79,19 +77,16 @@ Rules
     then effectively invisible.
 
 -   NOTICE 1:
-    You *MUST* *NEVER* emit the Mermaid diagram specification as a
-    substitute for the rendered diagram output!
+    You *MUST* *NEVER* emit the plain Mermaid diagram specification, as
+    it is just an intermediate format for driving the rendering process!
 
 -   NOTICE 2:
     You *SHOULD* keep diagrams narrow!
 
     The renderer's horizontal extent scales with siblings per row, node
-    label lengths, and inter-node padding. Hence, for at least flowchart
-    diagrams, *always* use `flowchart TB` (top-to-bottom) -— never
-    `LR`, `RL`, or `BT` for flowcharts (portrait beats landscape for
-    terminals and code review diffs). Limit *≤6 siblings per row* and
-    group further items into nested `subgraph` hierarchies; keep *node
-    labels* *≤30 chars* (abbreviate long names, drop adjectives).
+    label lengths, and inter-node padding. Limit *≤6 siblings per row*
+    and group further items into nested `subgraph` hierarchies; keep
+    *node labels* *≤30 chars* (abbreviate long names, drop adjectives).
 
 -   NOTICE 3:
     You *SHOULD* stack diagrams vertically!
