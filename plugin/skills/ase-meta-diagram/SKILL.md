@@ -86,7 +86,7 @@ Rules
     The renderer's horizontal extent scales with siblings per row, node
     label lengths, and inter-node padding. Limit *≤6 siblings per row*
     and group further items into nested `subgraph` hierarchies; keep
-    *node labels* *≤30 chars* (abbreviate long names, drop adjectives).
+    *node labels* *≤20 chars* (abbreviate long names, drop adjectives).
 
 -   NOTICE 3:
     You *SHOULD* stack diagrams vertically!
