@@ -10,6 +10,9 @@ effort: medium
 allowed-tools:
     - "Bash(npm search *)"
     - "Bash(npm view *)"
+    - "Skill(ase-meta-search)"
+    - "Agent(ase-meta-search)"
+    - "WebFetch"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
@@ -52,7 +55,7 @@ for the technology stack to *provide* the *needed functionality*
         of the project and contains an entry `typescript` under `dependencies`
         or `devDependencies`, then <stack>TypeScript</stack>.
 
-    -   If a file `build.xml`, `pom.xml` or `build.gradle` is found in the top-level directory
+    -   If a file `pom.xml` or `build.gradle` is found in the top-level directory
         of the project, then <stack>Java</stack>.
 
     -   If a file `build.gradle.kts` or `settings.gradle.kts`
@@ -82,57 +85,50 @@ for the technology stack to *provide* the *needed functionality*
         components.
 
     -   In to be discovered result set of components <component-K/>
-        (K=0-N), remember the component name as <name-K/>, the
+        (K=1-N), remember the component name as <name-K/>, the
         official package name as <package-K/>, the latest version as
         <version-K/>, the stars as <stars-K/>, the created date as
         <created-K/>, the last updated date as <updated-K/>, the total
-        number of downloads in the last month <downloads-K/>, and the
-        homepage as <homepage-K/>.
+        number of downloads in the last month <downloads-K/>.
 
     -   If <stack/> is "JavaScript" or "TypeScript":
 
         -   Use the `ase-meta-search` skill in a subagent to discover
-            *generally* *NPM packages* <component-K/> (K=0-N) based on
+            *generally* *NPM packages* <component-K/> (K=1-N) based on
             the essential keywords <keyword-L/> (L=1-M). For each found
-            package <component-K/> (K=0-N), use the shell command
-            `npm view --json "<package-K/>" name version homepage` to
-            discover its <version-K/> and <homepage-K/>.
+            package <component-K/> (K=1-N), use the shell command
+            `npm view --json "<package-K/>" version time.modified
+            time.created)` to discover its version <version-K/>,
+            its time modified <updated-K/>, and its time created
+            <created-K>.
 
         -   Use the shell command `npm search --searchlimit 20 --json
-            "<keyword-1/>" [...] "<keyword-M/>"` to specificially
-            discover *NPM packages* <package-K/> (K=0-N), their
-            <version-K/>, and their <homepage-K/> -- based on the
-            essential keywords <keyword-L/> (L=1-M).
+            "<keyword-1/>" [...] "<keyword-M/>"` to specifically
+            discover *NPM packages* <package-K/> (K=1-N) and their
+            <version-K/> -- based on the essential keywords <keyword-L/>
+            (L=1-M). Merge the results into the already existing
+            result set, but deduplicate entries.
 
         -   For each discovered *NPM package* <package-K/>, use the
-            `Fetch` tool on the URL `https://npmtrends.com/<package-K/>`
+            `WebFetch` tool on the URL `https://npmtrends.com/<package-K/>`
             to fetch information from the `Stats` table on the page
             by extracting the <stars-K/> from the `Stars` column,
             <created-K/> from the `Created` column, and <updated-K/>
             from the `Updated` column.
 
         -   For each discovered *NPM package* <package-K/>, use the
-            `Fetch` tool on the URL
-            `https://api.npmjs.org/downloads/point/last-month/<package-K
-            />` to extract the <downloads-K/> from the `downloads`
+            `WebFetch` tool on the URL
+            `https://api.npmjs.org/downloads/point/last-month/<package-K/>`
+            to extract the <downloads-K/> from the `downloads`
             field.
-
-    -   If <stack/> is "Java" or "Kotlin":
-
-        -   Use the `ase-meta-search` skill in a subagent to discover
-            *generally* *Java components* <component-K/> (K=0-N) based on
-            the essential keywords <keyword-L/> (L=1-M). For each found
-            component <component-K/> (K=0-N), use the shell command
-            `npm view --json "<package-K/>" name version homepage` to
-            discover its <version-K/> and <homepage-K/>.
     </step>
 
 4.  <step id="STEP 4: Report Components">
-    -   Sort the discovered components <component-K/> (K=1-N)
-        by their <stars-K/>, then <downloads-K/>, and then <updated-K/>
-        information.
+    -   Sort, in descending order, the discovered components
+        <component-K/> (K=1-N) by their <stars-K/>, then <downloads-K/>,
+        and then <updated-K/> information.
 
-    -   Display the discovered components as a Markdown *table* 
+    -   Display the discovered components as a Markdown *table*
         with just the following <template/>:
 
         <template>
@@ -141,7 +137,7 @@ for the technology stack to *provide* the *needed functionality*
         | *Component*   | *Package*      | *Version*    | *Stars*        | *Downloads*        | *Updated*        | *Created*    |
         | :------------ | :------------- | :------------| :------------- | :----------------- | :--------------- | :----------- |
         | **<name-1/>** | `<package-1/>` | <version-1/> | **<stars-1/>** | **<downloads-1/>** | **<updated-1/>** | <created-1/> |
-        [...]                                                                                                       
+        [...]
         | **<name-N/>** | `<package-N/>` | <version-N/> | **<stars-N/>** | **<downloads-N/>** | **<updated-N/>** | <created-N/> |
         </template>
     </step>
