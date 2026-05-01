@@ -83,9 +83,10 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     &#x1F535; **MODULE STRUCTURE**:
     </template>
 
-    Find all modules (or OOP classes) and draw an Unicode-symbol based
-    "Boxes-and-Lines" diagram with all modules as boxes and the imports
-    between modules as the directed lines. Do not display any forther
+    Find all modules (or OOP classes) and draw a `flowchart TB`
+    diagram with all modules as boxes and the imports between modules
+    as the directed edges. Invoke the `ase-diagram` skill via the
+    `Skill` tool to render the diagram. Do not display any further
     explanation except for this diagram.
     </step>
 </flow>

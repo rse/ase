@@ -60,11 +60,14 @@ code and *explain* it in *brief*, *standardized*, and *concise* way.
     style of explanations. For very complex concepts, use multiple
     analogies.
 
-    Second, draw a diagram as ASCII art (with Unicode symbols) to show
-    the control or data flow, code or data structure, or code or data
-    relationships. What gives the best overall overview of the code?
-    Choose the best diagrams of the types UML Class Diagram, UML State
-    Diagram, UML Sequence Diagram, or Boxes'n'Lines.
+    Second, draw a diagram to show the control or data flow, code or
+    data structure, or code or data relationships. What gives the best
+    overall overview of the code?
+    Choose the Mermaid diagram type per intent: `classDiagram` for
+    class/method structure, `sequenceDiagram` for actor/message flow,
+    or `flowchart TB` for boxes-and-lines component layouts.
+    Invoke the `ase-diagram` skill via the `Skill` tool to render the
+    diagram. Do *not* hand-draw.
 
     Keep your explanation *brief* and *concise*.
     Output the result with the following <template/>:
