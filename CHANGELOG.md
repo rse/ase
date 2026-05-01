@@ -5,6 +5,8 @@ ChangeLog
 0.0.13 (2026-04-30)
 -------------------
 
+- FEATURE: add comprehensive `ase-arch-discover` skill
+
 0.0.12 (2026-04-30)
 -------------------
 
