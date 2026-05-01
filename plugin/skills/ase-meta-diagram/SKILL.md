@@ -63,7 +63,7 @@ Rules
     without the reproduction of the output is a defect: the diagram is
     then effectively invisible.
 
--   *Keep diagrams narrow* — target a *≤120 chars rendering
+-   *Keep diagrams narrow* — target a *≤240 chars rendering
     width*. The renderer's horizontal extent scales with siblings
     per row, node label lengths, and inter-node padding. *Always*
     use `flowchart TB` (top-to-bottom) -— never `LR`, `RL`, or `BT`
@@ -77,7 +77,7 @@ Rules
     rendering).
 
 -   *Budget compliance is non-negotiable*. If restructuring the Mermaid
-    diagram specification cannot bring the rendered width ≤120 chars (e.g.,
+    diagram specification cannot bring the rendered width ≤240 chars (e.g.,
     four populated `subgraph`s side-by-side), *reduce scope*: show only
     the *top-level structure* (the root node and ≤1 level of children)
     in the diagram, and enumerate the detail as a bulleted list *below*
