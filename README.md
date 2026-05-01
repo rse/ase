@@ -71,11 +71,11 @@ Installation
 
 ```
 #   install ASE tool into system via NPM
-#   (can be reversed with "npm uninstall -g @rse/ase" at any time)
+#   (non-destructive: can be reversed with "npm uninstall -g @rse/ase" at any time)
 npm install -g @rse/ase
 
 #   install ASE plugin into Claude Code via ASE
-#   (can be reversed with "ase setup uninstall" at any time)
+#   (non-destructive: can be reversed with "ase setup uninstall" at any time)
 ase setup install
 ```
 
