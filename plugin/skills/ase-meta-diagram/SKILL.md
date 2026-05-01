@@ -50,6 +50,9 @@ Rules
     string `ase diagram`. Do not use any variant of this or the
     permission hooks will break.
 
+-   *MUST* use a timeout of 20 seconds with the `Bash` command
+    for the `ase diagram` invocation.
+
 -   *MUST reproduce the tool stdout in the response text*.
     After the `Bash(ase diagram [...])` call completes, the skill *MUST*
     copy the tool's stdout *verbatim* into a Markdown-fenced code block
