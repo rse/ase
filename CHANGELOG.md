@@ -5,8 +5,15 @@ ChangeLog
 0.0.15 (2026-05-02)
 -------------------
 
-- FEATURE: add a "diagram" tool to the "ase" MCP service and use this in the "ase-meta-diagram" skill
-- FEATURE: add first cut for a `ase mcp` command which uses the `ase service` under the hood
+- FEATURE: add `diagram` tool to `ase` MCP service and use it in `ase-meta-diagram` skill
+- FEATURE: add `ase mcp` command which uses the `ase service` under the hood
+- FEATURE: auto-install MCP service
+- IMPROVEMENT: improve `ase diagram` command (TTY querying, output truncation, color mode detection)
+- IMPROVEMENT: improve `ase-meta-diagram` skill (drop diagram-width option since LLM no longer renders)
+- IMPROVEMENT: always allow MCP service
+- BUGFIX: fix warnings on `ase service start/stop`
+- UPDATE: document MCP service availability
+- CLEANUP: final cleanup to diagram skill
 
 0.0.14 (2026-05-01)
 -------------------
