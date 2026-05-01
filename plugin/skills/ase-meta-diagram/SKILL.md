@@ -64,8 +64,9 @@ Rules
     and hence should *not* be specified!
 
 -   OUTPUT:
-    You *MUST* reproduce the `text` output of the `diagram` tool from the
-    `ase` MCP service in the response text!
+    You *MUST* reproduce the `text` output of the `diagram` tool from
+    the `ase` MCP service in the response text! Do not produce any other
+    output, especially no explanations.
 
     In other words, after the `diagram` tool call completes, the
     skill *MUST* copy the tool's `text` result *verbatim* into a
