@@ -35,9 +35,7 @@ Rules
     Box-drawing characters (`┌`, `│`, `└`, `┐`, `┘`, `─`, `┼`, `├`,
     `┤`, `┬`, `┴`, `╭`, `╰`), ASCII surrogates (`+`, `-`, `|`), or any
     other attempt to draw a framed shape token-by-token are *forbidden*
-    as your own diagram output -— including when prose paragraphs are
-    placed inside the frame (a tell-tale sign, since the `diagram` tool
-    cannot place free text inside a subgraph).
+    as your own diagram output.
 
 -   WHEN:
     You *MUST* always use the `diagram` tool from the `ase` MCP service,
@@ -47,13 +45,15 @@ Rules
     MCP tool call, with Mermaid diagram specification passed in the
     `diagram` field, made in the *same* session response turn. You
     *MUST* use a timeout of 20 seconds with the `diagram` MCP tool call
-    and the MCP `timeout` facility.
+    and the MCP `timeout` facility. Also, pass a `colorMode` of `none`
+    to get monochrome renderings.
 
 -   INPUT:
     For describing the diagrams, you *MUST* use the *Mermaid* diagram
     specification language!
 
-    Use the following diagram types per intent:
+    Use the following Mermaid diagram types per intent:
+
     -   *structure / layout / components / dependencies* → `flowchart TB`
     -   *control flow / branching / concurrency*         → `flowchart TB`
     -   *state machine / states / transitions*           → `stateDiagram-v2`
@@ -61,6 +61,9 @@ Rules
     -   *data structure / classes / methods*             → `classDiagram`
     -   *data model / entities / relationships*          → `erDiagram`
     -   *metrics / distributions / time series*          → `xychart-beta`
+
+    Other Mermaid diagram types are *not* supported by the renderer
+    and hence should *not* be specified!
 
 -   OUTPUT:
     You *MUST* reproduce the `text` output of the `diagram` tool from the
@@ -82,13 +85,13 @@ Rules
 -   NOTICE 2:
     You *SHOULD* keep diagrams narrow!
 
-    The renderer's horizontal extent scales with siblings per row,
-    node label lengths, and inter-node padding. Hence, *always* use
-    `flowchart TB` (top-to-bottom) -— never `LR`, `RL`, or `BT`
-    (portrait beats landscape for terminals and code review diffs).
-    Limit *≤6 siblings per row* and group further items into nested
-    `subgraph` hierarchies; keep *node labels* *≤30 chars* (abbreviate
-    long names, drop adjectives).
+    The renderer's horizontal extent scales with siblings per row, node
+    label lengths, and inter-node padding. Hence, for at least flowchart
+    diagrams, *always* use `flowchart TB` (top-to-bottom) -— never
+    `LR`, `RL`, or `BT` for flowcharts (portrait beats landscape for
+    terminals and code review diffs). Limit *≤6 siblings per row* and
+    group further items into nested `subgraph` hierarchies; keep *node
+    labels* *≤30 chars* (abbreviate long names, drop adjectives).
 
 -   NOTICE 3:
     You *SHOULD* stack diagrams vertically!
