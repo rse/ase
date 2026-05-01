@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.0.15 (2026-05-01)
+0.0.15 (2026-05-02)
 -------------------
 
 - FEATURE: add a "diagram" tool to the "ase" MCP service and use this in the "ase-meta-diagram" skill
