@@ -63,28 +63,17 @@ Rules
     without the reproduction of the output is a defect: the diagram is
     then effectively invisible.
 
--   *Keep diagrams narrow* — target a *≤120 chars rendering
-    width*. The renderer's horizontal extent scales with siblings
+-   *Keep diagrams narrow*.
+    The renderer's horizontal extent scales with siblings
     per row, node label lengths, and inter-node padding. *Always*
     use `flowchart TB` (top-to-bottom) -— never `LR`, `RL`, or `BT`
     (portrait beats landscape for terminals and code review diffs).
     Limit *≤4 siblings per row* and group further items into nested
     `subgraph` hierarchies; keep *node labels* *≤30 chars* (abbreviate
-    long names, drop adjectives). If the rendered output still exceeds
-    the budget, restructure the Mermaid diagram specification —- do
-    *not* widen the terminal and do *not* raise `--pad-x`/`--pad-y`
-    (defaults `3`/`3` are already tight; lower values break junction
-    rendering).
+    long names, drop adjectives).
 
--   *Budget compliance is non-negotiable*. If restructuring the Mermaid
-    diagram specification cannot bring the rendered width ≤120 chars (e.g.,
-    four populated `subgraph`s side-by-side), *reduce scope*: show only
-    the *top-level structure* (the root node and ≤1 level of children)
-    in the diagram, and enumerate the detail as a bulleted list *below*
-    the rendered block. *Never* emit Mermaid diagram specification as a
-    substitute for a rendered diagram. The choice is: render (possibly at
-    reduced scope) or omit the diagram entirely with a one-line note -—
-    *never* ship unrendered diagram specifications.
+-   *Never* emit Mermaid diagram specification as a substitute for a
+    rendered diagram.
 
 -   *Keep edges inside subgraph boundaries*. An edge that crosses a
     `subgraph` border produces a visually ambiguous `┼` glyph where the
@@ -110,7 +99,7 @@ Rules
     *before vs. after*), render each side as a *separate* Mermaid
     diagram specification via `ase diagram` and then stack the two
     rendered blocks *vertically* — each preceded by a bold label
-    (`**Before:**` / `**After:**` or similar). Do *not* attempt
+    (`**BEFORE:**` / `**AFTER:**` or similar). Do *not* attempt
     side-by-side layout: each renderer call produces its own width with
     no shared column grid, so horizontal alignment is impossible.
 
