@@ -2,7 +2,7 @@
 Workflow
 ========
 
-**ASE** supports the following simple, two-phase workflow:
+**ASE** supports the following simple, two-stage workflow:
 
 ![workflow](workflow.svg)
 

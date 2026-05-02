@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" viewBox="35.850395 9.383158 787.837 550.04205" width="787.837" height="550.04205">
+<svg version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" viewBox="35.850395 9.383158 787.837 550.04205" width="787.837" height="550.04205">
   <defs>
     <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#1067b2">
       <g>
@@ -28,8 +28,9 @@
       </g>
     </marker>
   </defs>
-  <g id="Canvas_1" fill="none" fill-opacity="1" stroke-opacity="1" stroke-dasharray="none" stroke="none">
+  <g id="Canvas_1" stroke-opacity="1" stroke-dasharray="none" fill-opacity="1" fill="none" stroke="none">
     <title>Canvas 1</title>
+    <rect fill="white" x="35.850395" y="9.383158" width="787.837" height="550.04205"/>
     <g id="Canvas_1_Content">
       <title>Content</title>
       <g id="Graphic_799">
@@ -54,8 +55,8 @@
           <path d="M 358.96064 110.55118 L 469.38584 110.55118 C 471.595 110.55118 473.38584 112.34205 473.38584 114.55118 L 473.38584 151.90552 C 473.38584 154.11466 471.595 155.90552 469.38584 155.90552 L 358.96064 155.90552 C 356.7515 155.90552 354.96064 154.11466 354.96064 151.90552 L 354.96064 114.55118 C 354.96064 112.34205 356.7515 110.55118 358.96064 110.55118 Z" fill="#368ddf"/>
         </g>
         <g id="Graphic_628">
-          <text transform="translate(390.5118 126.88977)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x=".304" y="12" xml:space="preserve">analyse</tspan>
+          <text transform="translate(390.8158 126.88977)" fill="white">
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="61106675e-20" y="12" xml:space="preserve">analyse</tspan>
           </text>
         </g>
       </g>
@@ -269,6 +270,16 @@
       </g>
       <g id="Line_802">
         <path d="M 257.95276 456.37797 L 257.95276 489.563 C 264.45276 489.563 264.45276 502.563 257.95276 502.563 L 257.95276 520.463 L 665.9113 518.7402 L 665.9113 359.5714" marker-end="url(#FilledArrow_Marker_5)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_803">
+        <text transform="translate(107.04725 107.04725)" fill="#1067b2">
+          <tspan font-family="Myriad Pro" font-size="12" fill="#1067b2" x="0" y="9" xml:space="preserve">SKETCHING</tspan>
+        </text>
+      </g>
+      <g id="Graphic_804">
+        <text transform="translate(107.04725 513.5134)" fill="#b26813">
+          <tspan font-family="Myriad Pro" font-size="12" fill="#b26813" x="0" y="9" xml:space="preserve">SPECIFYING</tspan>
+        </text>
       </g>
     </g>
   </g>
