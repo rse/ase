@@ -28,6 +28,21 @@ The following ASE commands/skills exist on the meta-level:
   Query a foreign LLM like OpenAI ChatGPT, Google Gemini, DeepSeek or
   xAI Grok.
 
+- **/ase-meta-persona** \[*persona*\]:<br/>
+  Adjust communication style in four intensity levels of token usage.
+  The *persona* can be either a decorative, eloquent, and explaining
+  `writer`, a brief, factual, and accurate `engineer` (default), a
+  very brief, factual, and abbreviating `telegrapher`, or an ultra
+  brief, rough and stuttering `caveman`.
+
+### Architecture Commands
+
+The following ASE commands/skills exist on the architecture-level:
+
+- **/ase-arch-discover** *functionality*:<br/>
+  Discover additional, third-party components (libraries/frameworks)
+  for the technology stack to provide needed functionality.
+
 ### Spec Commands
 
 The following ASE commands/skills exist on the specification-level:

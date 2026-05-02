@@ -84,6 +84,8 @@ The following top-level commands exist for configuration handling:
 - `ase config init` *type*:
   Initialize `.ase/config.yaml` with preset values for all recognized
   keys. The *type* argument selects the preset:
+  `default` (empty baseline with all recognized keys present and
+  unset),
   `vibe` (solo rookie: small black-box prototype, bare code, fully
   agent-driven, spec-driven, engineer ambition),
   `pro` (solo expert: medium white-box product, framework-based,
@@ -149,6 +151,60 @@ The following top-level commands exist for service management:
   the port is not responding, prints an informational message and
   exits with status 0.
 
+The following top-level command exists for bridging the per-project
+background service as a *Claude Code* MCP server:
+
+- `ase mcp`:
+  Bridge stdio MCP to the per-project background service over
+  Streamable HTTP. The command accepts MCP requests on standard
+  input, forwards them to the running `ase service` (auto-starting
+  it if necessary), and writes responses to standard output. It
+  is intended to be configured as a stdio MCP server in *Claude
+  Code* and not invoked directly by end users.
+
+The following top-level command exists for diagram rendering:
+
+- `ase diagram`:
+  Render a *Mermaid* diagram specification (read from standard
+  input or from `--input` *file*) as Unicode/ASCII art. Supports
+  the following options:
+    - \[`-i`|`--input` *file*\]:
+      read *Mermaid* source from *file* instead of standard input.
+    - \[`-a`|`--ascii`\]:
+      emit plain ASCII (`+-|`) instead of Unicode box-drawing.
+    - \[`-c`|`--color-mode` *mode*\]:
+      force color mode (`none`, `ansi16`, or `ansi256`).
+    - \[`--node-margin-x` *n*\] / \[`--node-margin-y` *n*\]:
+      horizontal/vertical margin between nodes.
+    - \[`--node-padding` *n*\]:
+      horizontal and vertical inner node padding.
+    - \[`--diagram-clip-x` *n*\] / \[`--diagram-clip-y` *n*\]:
+      extra clipping of the diagram relative to terminal width/height.
+    - \[`--terminal-width` *n*\] / \[`--terminal-height` *n*\]:
+      explicit terminal width/height for clipping.
+
+The following top-level commands exist for installing, updating, and
+uninstalling the *ASE* tool and its companion *Claude Code* plugin:
+
+- `ase setup`:
+  Entry point group for setup operations. Without a subcommand, the
+  help text is shown and the command exits with status 1.
+
+- `ase setup install` \[`-d`|`--dev`\]:
+  Install the *ASE Claude Code* plugin (and, in `--dev` mode, the
+  local working copy of the `@rse/ase` tool instead of the published
+  npm package). The default for `--dev` is taken from the
+  `ASE_SETUP_DEV` environment variable.
+
+- `ase setup update` \[`-f`|`--force`\] \[`-d`|`--dev`\]:
+  Update the *ASE* tool and the *ASE Claude Code* plugin to their
+  latest versions. With `--force`, the update is always performed
+  even if already at the latest version. With `--dev`, the local
+  working copy is used instead of the remote repository.
+
+- `ase setup uninstall` \[`-d`|`--dev`\]:
+  Uninstall the *ASE Claude Code* plugin and the *ASE* tool.
+
 The following top-level commands exist for *Claude Code* hook
 integration:
 
@@ -159,6 +215,12 @@ integration:
 
 - `ase hook session-start`:
   Handle the *Claude Code* `SessionStart` hook event. This
+  subcommand is intended to be invoked by *Claude Code*
+  internally as a configured hook handler only, not directly
+  by end users.
+
+- `ase hook pre-tool-use`:
+  Handle the *Claude Code* `PreToolUse` hook event. This
   subcommand is intended to be invoked by *Claude Code*
   internally as a configured hook handler only, not directly
   by end users.
