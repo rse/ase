@@ -12,7 +12,7 @@ import { execa }         from "execa"
 import which             from "which"
 
 import type Log          from "./ase-log.js"
-import pkg               from "../package.json" with { type: "json" }
+import Version           from "./ase-version.js"
 
 /*  CLI command "ase setup"  */
 export default class SetupCommand {
@@ -30,14 +30,6 @@ export default class SetupCommand {
         this.log.write("info", `setup: running: $ ${cmd} ${args.join(" ")}` +
             (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
         await execa(cmd, args, { stdio: "inherit", cwd })
-    }
-
-    /*  capture stdout of a sub-process  */
-    private async capture (cmd: string, args: string[], cwd?: string): Promise<string> {
-        this.log.write("info", `setup: running: $ ${cmd} ${args.join(" ")}` +
-            (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
-        const r = await execa(cmd, args, { stdio: [ "ignore", "pipe", "pipe" ], cwd })
-        return r.stdout.trim()
     }
 
     /*  handler for "ase setup install"  */
@@ -74,15 +66,8 @@ export default class SetupCommand {
         }
         else {
             /*  perform NPM version check  */
-            const current = pkg.version
-            let   latest  = ""
-            try {
-                latest = await this.capture("npm", [ "view", "@rse/ase", "version" ])
-            }
-            catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                this.log.write("warning", `setup: update: failed to query latest ASE version: ${message}`)
-            }
+            const current = Version.current()
+            const latest  = await Version.latest()
             if (!force && latest !== "" && latest === current) {
                 this.log.write("info", `setup: update: ASE already at latest version ${current}`)
                 return 0

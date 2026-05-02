@@ -11,13 +11,14 @@ import { Command }    from "commander"
 import { execaSync }  from "execa"
 
 import type Log       from "./ase-log.js"
+import Version        from "./ase-version.js"
 
 /*  CLI command "ase hook"  */
 export default class HookCommand {
     constructor (private log: Log) {}
 
     /*  handler for "ase hook session-start"  */
-    private doSessionStart (): number {
+    private async doSessionStart (): Promise<number> {
         /*  determine plugin root  */
         const pluginRoot = process.env.CLAUDE_PLUGIN_ROOT ?? ""
         if (pluginRoot === "")
@@ -32,7 +33,20 @@ export default class HookCommand {
         let   md  = fs.readFileSync(fileMd,  "utf8")
 
         /*  determine own version  */
-        const version = (JSON.parse(pkg).version as string | undefined) ?? ""
+        const versionCurrentPlugin = (JSON.parse(pkg).version as string | undefined) ?? ""
+        const versionCurrentTool   = Version.current()
+        const versionLatestTool    = await Version.latest()
+
+        /*  sanity check situation  */
+        const versionHints = []
+        if (versionCurrentPlugin !== versionCurrentTool)
+            versionHints.push("**WARNING:** version *mismatch*: " +
+                `tool: **${versionCurrentPlugin}**, plugin: **${versionCurrentTool}**`)
+        if (versionCurrentTool !== versionLatestTool)
+            versionHints.push(`**NOTICE:** *latest* version: **${versionLatestTool}**`)
+        if (process.env.ASE_SETUP_DEV !== undefined)
+            versionHints.push("**NOTICE:** *development* setup")
+        const versionHint = versionHints.length > 0 ? "(" + versionHints.join(", ") + ")" : ""
 
         /*  read session information  */
         const stdin = fs.readFileSync(0, "utf8")
@@ -56,7 +70,7 @@ export default class HookCommand {
         const envFile = process.env.CLAUDE_ENV_FILE ?? ""
         if (envFile !== "") {
             const script =
-                `export ASE_VERSION="${version}"\n` +
+                `export ASE_VERSION="${versionCurrentPlugin}"\n` +
                 `export ASE_SESSION_ID="${sessionId}"\n` +
                 `export ASE_TASK_ID="${taskId}"\n`
             fs.appendFileSync(envFile, script, "utf8")
@@ -64,7 +78,8 @@ export default class HookCommand {
 
         /*  prepend ASE information to constitution markdown  */
         md =
-            `<ase-version>${version}</ase-version>\n` +
+            `<ase-version>${versionCurrentPlugin}</ase-version>\n` +
+            `<ase-version-hint>${versionHint}</ase-version-hint>\n` +
             `<ase-task-id>${taskId}</ase-task-id>\n` +
             `<ase-session-id>${sessionId}</ase-session-id>\n` +
             "\n" + md
@@ -134,8 +149,8 @@ export default class HookCommand {
         hookCmd
             .command("session-start")
             .description("handle Claude Code SessionStart hook event")
-            .action(() => {
-                process.exit(this.doSessionStart())
+            .action(async () => {
+                process.exit(await this.doSessionStart())
             })
 
         /*  register CLI sub-command "ase hook pre-tool-use"  */
