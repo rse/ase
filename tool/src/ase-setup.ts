@@ -25,11 +25,23 @@ export default class SetupCommand {
         })
     }
 
-    /*  run a sub-process with inherited stdio so users see live output  */
+    /*  run a sub-process, suppressing output on success and emitting it on failure  */
     private async run (cmd: string, args: string[], cwd?: string): Promise<void> {
-        this.log.write("info", `setup: running: $ ${cmd} ${args.join(" ")}` +
+        this.log.write("info", `setup: $ ${cmd} ${args.join(" ")}` +
             (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
-        await execa(cmd, args, { stdio: "inherit", cwd })
+        await execa(cmd, args, { stdio: "pipe", cwd }).catch((err) => {
+            const exitCode = typeof err?.exitCode === "number" ? err.exitCode : -1
+            this.log.write("error", `setup: command failed: exit code: ${exitCode}`)
+            if (typeof err?.stdout === "string" && err.stdout.length > 0) {
+                this.log.write("error", "setup: command failed: stdout:")
+                process.stdout.write(err.stdout)
+            }
+            if (typeof err?.stderr === "string" && err.stderr.length > 0) {
+                this.log.write("error", "setup: command failed: stderr:")
+                process.stderr.write(err.stderr)
+            }
+            throw err
+        })
     }
 
     /*  handler for "ase setup install"  */
