@@ -8,28 +8,25 @@ User Setup
 ### Installation
 
 ```
-#   install ASE tool
+#   install ASE tool into PATH (bootstrapping only)
 npm install -g @rse/ase
 
-#   install ASE plugin
+#   install ASE plugin into Claude Code
 ase setup install
 ```
 
-### Update
+### Updating
 
 ```
-#   update ASE tool and ASE plugin
+#   update ASE tool in PATH and ASE plugin in Claude Code
 ase setup update
 ```
 
 ### Uninstallation
 
 ```
-#   uninstall ASE plugin
+#   uninstall ASE tool from PATH and ASE plugin from Claude Code
 ase setup uninstall
-
-#   uninstall ASE tool
-npm uninstall -g @rse/ase
 ```
 
 Contributor Setup
@@ -38,20 +35,18 @@ Contributor Setup
 ### Initial Setup
 
 ```
+#   decide on a working directory
+asedir=/path/to/ase
+
 #   clone repository
-git clone https://github.com/rse/ase
-cd ase
+git clone https://github.com/rse/ase $asedir
 
-#   build tool
-(cd tool && npm install && npm start build)
+#   extend your Bash shell environment
+echo "PATH=\$PATH:$asedir/bin" >>~/.bashrc
+exec bash
 
-#   install tool call wrapper
-mkdir -p $HOME/bin
-(echo "#!/bin/sh"; echo "exec node `pwd`/tool/dst/ase.js \${1+\"$@\"}") >$HOME/bin/ase
-chmod 755 $HOME/bin/ase
-
-#   install plugin
-ase setup install --dev
+#   build and install ASE tool and plugin
+ase setup install
 ```
 
 ### Upgrade Setup (after foreign changes)
@@ -62,20 +57,14 @@ git stash
 git pull
 git stash pop
 
-#   re-build tool
-(cd tool && npm install && npm start build)
-
-#   re-install plugin
-ase setup update --dev
+#   re-build and re-install ASE tool and plugin
+ase setup update
 ```
 
 ### Update Setup (after own local changes)
 
 ```
-#   re-build tool
-(cd tool && npm install && npm start build)
-
-#   re-install plugin
-ase setup update --dev
+#   re-build and re-install ASE tool and plugin
+ase setup update
 ```
 

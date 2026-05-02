@@ -66,17 +66,31 @@ Features
   The agent is equipped with reasonable templates to scaffold
   Library/Framework, CLI and WebUI projects.
 
-Installation
-------------
+User Setup
+----------
+
+### Installation
 
 ```
-#   install ASE tool into PATH via NPM
-#   (non-destructive: can be reversed with "npm uninstall -g @rse/ase" at any time)
+#   install ASE tool into PATH (bootstrapping only)
 npm install -g @rse/ase
 
-#   install ASE plugin into Claude Code via ASE
-#   (non-destructive: can be reversed with "ase setup uninstall" at any time)
+#   install ASE plugin into Claude Code
 ase setup install
+```
+
+### Updating
+
+```
+#   update ASE tool in PATH and ASE plugin in Claude Code
+ase setup update
+```
+
+### Uninstallation
+
+```
+#   uninstall ASE tool from PATH and ASE plugin from Claude Code
+ase setup uninstall
 ```
 
 Documenation

@@ -4,32 +4,38 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-import { Command } from "commander"
-import { execa }   from "execa"
+import path              from "node:path"
+import { fileURLToPath } from "node:url"
 
-import type Log    from "./ase-log.js"
-import pkg         from "../package.json" with { type: "json" }
+import { Command }       from "commander"
+import { execa }         from "execa"
+
+import type Log          from "./ase-log.js"
+import pkg               from "../package.json" with { type: "json" }
 
 /*  CLI command "ase setup"  */
 export default class SetupCommand {
     constructor (private log: Log) {}
 
     /*  run a sub-process with inherited stdio so users see live output  */
-    private async run (cmd: string, args: string[]): Promise<void> {
-        this.log.write("info", `setup: running: ${cmd} ${args.join(" ")}`)
-        await execa(cmd, args, { stdio: "inherit" })
+    private async run (cmd: string, args: string[], cwd?: string): Promise<void> {
+        this.log.write("info", `setup: running: $ ${cmd} ${args.join(" ")}` +
+            (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
+        await execa(cmd, args, { stdio: "inherit", cwd })
     }
 
     /*  capture stdout of a sub-process  */
-    private async capture (cmd: string, args: string[]): Promise<string> {
-        this.log.write("info", `setup: running: ${cmd} ${args.join(" ")}`)
-        const r = await execa(cmd, args, { stdio: [ "ignore", "pipe", "pipe" ] })
+    private async capture (cmd: string, args: string[], cwd?: string): Promise<string> {
+        this.log.write("info", `setup: running: $ ${cmd} ${args.join(" ")}` +
+            (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
+        const r = await execa(cmd, args, { stdio: [ "ignore", "pipe", "pipe" ], cwd })
         return r.stdout.trim()
     }
 
     /*  handler for "ase setup install"  */
     private async doInstall (dev: boolean): Promise<number> {
-        this.log.write("info", "setup: install: installing ASE Claude Code plugin")
+        this.log.write("info", `setup: install${dev ? "[dev]" : ""}: ` +
+            `installing ASE Claude Code plugin (origin: ${dev ? "local" : "remote"})`)
         const source = dev ? process.cwd() : "rse/ase"
         await this.run("claude", [ "plugin", "marketplace", "add", source ])
         await this.run("claude", [ "plugin", "install", "ase@ase" ])
@@ -39,15 +45,21 @@ export default class SetupCommand {
     /*  handler for "ase setup update"  */
     private async doUpdate (force: boolean, dev: boolean): Promise<number> {
         if (dev) {
-            /*  in dev mode the local files are already current, so just
-                re-install the plugin to pick up local changes  */
-            this.log.write("info", "setup: update: re-installing ASE Claude Code plugin from local hierarchy")
+            /*  update ASE CLI Tool  */
+            this.log.write("info", "setup: update[dev]: re-build ASE CLI tool (origin: local)")
+            const tooldir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
+            await this.run("npm", [ "install" ], tooldir)
+            await this.run("npm", [ "start", "build" ], tooldir)
+
+            /*  in development mode the local plugin files are already current
+                but there is no version change in the plugin manifest,
+                so just re-install the plugin to let Claude Code update its copy  */
+            this.log.write("info", "setup: update[dev]: re-install ASE Claude Code plugin (origin: local)")
             await this.run("claude", [ "plugin", "uninstall", "ase@ase" ])
             await this.run("claude", [ "plugin", "install",   "ase@ase" ])
-            return 0
         }
         else {
-            /*  perform version check  */
+            /*  perform NPM version check  */
             const current = pkg.version
             let   latest  = ""
             try {
@@ -61,13 +73,12 @@ export default class SetupCommand {
                 this.log.write("info", `setup: update: ASE already at latest version ${current}`)
                 return 0
             }
-            this.log.write("info", `setup: update: updating ASE tool: ${current} -> ${latest}`)
 
-            /*  update ASE CLI Tool  */
-            this.log.write("info", "setup: update: updating ASE CLI tool")
+            /*  update ASE CLI tool  */
+            this.log.write("info", `setup: update: updating ASE CLI tool: ${current} -> ${latest}`)
             await this.run("npm", [ "update", "-g", "@rse/ase" ])
 
-            /*  update ASE Claude Code Plugin  */
+            /*  update ASE Claude Code plugin  */
             this.log.write("info", "setup: update: updating ASE Claude Code plugin")
             await this.run("claude", [ "plugin", "marketplace", "update", "ase" ])
             await this.run("claude", [ "plugin", "update", "ase@ase" ])
@@ -76,10 +87,18 @@ export default class SetupCommand {
     }
 
     /*  handler for "ase setup uninstall"  */
-    private async doUninstall (_dev: boolean): Promise<number> {
-        this.log.write("info", "setup: uninstall: uninstalling ASE Claude Code plugin")
+    private async doUninstall (dev: boolean): Promise<number> {
+        /*  uninstall ASE Claude Code plugin  */
+        this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
+            `uninstalling ASE Claude Code plugin (origin: ${dev ? "local" : "remote"})`)
         await this.run("claude", [ "plugin", "uninstall", "ase@ase" ])
         await this.run("claude", [ "plugin", "marketplace", "remove", "ase" ])
+
+        /*  uninstall ASE CLI tool (non-development only)  */
+        if (!dev) {
+            this.log.write("info", "setup: uninstall: uninstalling ASE CLI tool (origin: remote)")
+            await this.run("npm", [ "uninstall", "-g", "@rse/ase" ])
+        }
         return 0
     }
 
