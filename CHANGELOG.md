@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.0.17 (2026-05-02)
+-------------------
+
+- CLEANUP: update documentation for usage of plugin and tool
+
 0.0.16 (2026-05-02)
 -------------------
 
