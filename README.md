@@ -26,10 +26,10 @@ Development*.
 > agents.
 
 > [!NOTE]
-> At least initially, the primary focus of **ASE** is on the tool
-> *Claude Code* and the *TypeScript/JavaScript* technology stack. A
-> later, secondary focus could be also the tool *Github Copilot CLI* and
-> the *Java* technology stack.
+> Initially, the primary focus of **ASE** is on the Agentic AI Coding
+> tool *Claude Code*. Later, a secondary focus could be also on the
+> alternative tools *Github Copilot CLI*, *OpenAI Codex*, *Google Gemini
+> CLI* or *OpenCode* -- if their features support it.
 
 > [!CAUTION]
 > **ASE** is still under heavy development, still incomplete, partially
