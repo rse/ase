@@ -121,7 +121,7 @@ export default class SetupCommand {
         setupCmd
             .command("install")
             .description("install the ASE Claude Code plugin")
-            .option("-d, --dev", "use local installation hierarchy instead of GitHub", devDflt)
+            .option("-d, --dev", "use local working copy instead of remote repository", devDflt)
             .action(async (opts: { dev: boolean }) => {
                 process.exit(await this.doInstall(opts.dev))
             })
@@ -131,7 +131,7 @@ export default class SetupCommand {
             .command("update")
             .description("update the ASE tool and the ASE Claude Code plugin")
             .option("-f, --force", "always perform the update, even if already at latest version", false)
-            .option("-d, --dev",   "use local installation hierarchy instead of GitHub", devDflt)
+            .option("-d, --dev",   "use local working copy instead of remote repository", devDflt)
             .action(async (opts: { force: boolean, dev: boolean }) => {
                 process.exit(await this.doUpdate(opts.force, opts.dev))
             })
@@ -140,7 +140,7 @@ export default class SetupCommand {
         setupCmd
             .command("uninstall")
             .description("uninstall the ASE Claude Code plugin and the ASE tool")
-            .option("-d, --dev", "use local installation hierarchy instead of GitHub", devDflt)
+            .option("-d, --dev", "use local working copy instead of remote repository", devDflt)
             .action(async (opts: { dev: boolean }) => {
                 process.exit(await this.doUninstall(opts.dev))
             })
