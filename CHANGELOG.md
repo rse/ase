@@ -5,6 +5,7 @@ ChangeLog
 0.0.16 (2026-05-02)
 -------------------
 
+- IMPROVEMENT: add bin/ase{,.sh,js} bootstrapping files for developers
 - IMPROVEMENT: add `ase setup install|update|uninstall` commands for convenience
 - IMPROVEMENT: tighten `ase-meta-diagram` skill output to suppress extraneous text
 - BUGFIX: fix the pre-tool-use hook in `plugin/hooks/hooks.json`

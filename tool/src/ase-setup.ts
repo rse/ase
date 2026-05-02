@@ -85,6 +85,10 @@ export default class SetupCommand {
 
     /*  register commands  */
     register (program: Command): void {
+        /*  default for --dev derived from ASE_SETUP_DEV environment variable  */
+        const envDev  = process.env.ASE_SETUP_DEV ?? ""
+        const devDflt = envDev !== "" && envDev !== "0" && envDev.toLowerCase() !== "false"
+
         /*  register CLI top-level command "ase setup"  */
         const setupCmd = program
             .command("setup")
@@ -98,7 +102,7 @@ export default class SetupCommand {
         setupCmd
             .command("install")
             .description("install the ASE Claude Code plugin")
-            .option("-d, --dev", "use local installation hierarchy instead of GitHub", false)
+            .option("-d, --dev", "use local installation hierarchy instead of GitHub", devDflt)
             .action(async (opts: { dev: boolean }) => {
                 process.exit(await this.doInstall(opts.dev))
             })
@@ -108,7 +112,7 @@ export default class SetupCommand {
             .command("update")
             .description("update the ASE tool and the ASE Claude Code plugin")
             .option("-f, --force", "always perform the update, even if already at latest version", false)
-            .option("-d, --dev",   "use local installation hierarchy instead of GitHub", false)
+            .option("-d, --dev",   "use local installation hierarchy instead of GitHub", devDflt)
             .action(async (opts: { force: boolean, dev: boolean }) => {
                 process.exit(await this.doUpdate(opts.force, opts.dev))
             })
@@ -117,7 +121,7 @@ export default class SetupCommand {
         setupCmd
             .command("uninstall")
             .description("uninstall the ASE Claude Code plugin and the ASE tool")
-            .option("-d, --dev", "use local installation hierarchy instead of GitHub", false)
+            .option("-d, --dev", "use local installation hierarchy instead of GitHub", devDflt)
             .action(async (opts: { dev: boolean }) => {
                 process.exit(await this.doUninstall(opts.dev))
             })

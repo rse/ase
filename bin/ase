@@ -1,0 +1,23 @@
+#!/bin/sh
+##
+##  Agentic Software Engineering (ASE)
+##  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+##  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+##
+
+#   resolve our own path
+self="$0"
+while [ -L "$self" ]; do
+    target=$(readlink "$self")
+    case "$target" in
+        /* ) self="$target" ;;
+        *  ) self="$(dirname "$self")/$target" ;;
+    esac
+done
+
+#   resolve our base directory
+basedir=$(cd "$(dirname "$self")" && pwd)
+
+#   pass-through execution
+exec node "$basedir/ase.js" ${1+"$@"}
+
