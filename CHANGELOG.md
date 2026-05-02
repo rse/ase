@@ -6,7 +6,10 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: ensure tools like "npm" and "claude" are found in $PATH
-- CLEANUP: update documentation for usage of plugin and tool
+- IMPROVEMENT: show current and latest version on startup, with hint on available updates
+- IMPROVEMENT: improve running of external commands (suppress output on success, emit on failure)
+- UPDATE: document prerequisites
+- CLEANUP: update documentation and improve wording for usage of plugin and tool
 
 0.0.16 (2026-05-02)
 -------------------
