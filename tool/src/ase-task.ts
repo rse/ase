@@ -34,7 +34,9 @@ export const taskLoad = (id: string): string => {
     return fs.readFileSync(file, "utf8")
 }
 
-/*  save a task as UTF-8 text under the given id  */
+/*  save a task as UTF-8 text under the given id; the task's home
+    directory ~/.ase/task/<id>/ is owned by ASE and removed in full
+    by taskDelete, so callers must not place foreign files there  */
 export const taskSave = (id: string, text: string): void => {
     if (typeof text !== "string")
         throw new Error("task: text must be a string")
@@ -43,7 +45,8 @@ export const taskSave = (id: string, text: string): void => {
     fs.writeFileSync(file, text, "utf8")
 }
 
-/*  delete a task by id; returns true if a task existed and was removed  */
+/*  delete a task by id; removes the entire task home directory
+    ~/.ase/task/<id>/ (owned by ASE); returns true if a task existed  */
 export const taskDelete = (id: string): boolean => {
     const file = taskPath(id)
     if (!fs.existsSync(file))
