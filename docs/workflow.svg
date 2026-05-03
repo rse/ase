@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" viewBox="7.937054 9.383158 820.0629 571.7192" width="820.0629" height="571.7192">
+<svg version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="7.937054 9.383158 820.0629 571.7192" width="820.0629" height="571.7192">
   <defs>
     <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#1067b2">
       <g>
@@ -28,7 +28,7 @@
       </g>
     </marker>
   </defs>
-  <g id="Canvas_1" fill="none" fill-opacity="1" stroke-dasharray="none" stroke-opacity="1" stroke="none">
+  <g id="Canvas_1" stroke-opacity="1" stroke-dasharray="none" stroke="none" fill="none" fill-opacity="1">
     <title>Canvas 1</title>
     <rect fill="white" x="7.937054" y="9.383158" width="820.0629" height="571.7192"/>
     <g id="Canvas_1_Content">
@@ -386,20 +386,20 @@
       </g>
       <g id="Group_845">
         <g id="Graphic_847">
-          <path d="M 299.08662 527.2441 L 370.4567 527.2441 C 372.66584 527.2441 374.4567 529.035 374.4567 531.2441 L 374.4567 568.59844 C 374.4567 570.8076 372.66584 572.59844 370.4567 572.59844 L 299.08662 572.59844 C 296.8775 572.59844 295.08662 570.8076 295.08662 568.59844 L 295.08662 531.2441 C 295.08662 529.035 296.8775 527.2441 299.08662 527.2441 Z" fill="#929292"/>
+          <path d="M 346.99214 527.2441 L 418.3622 527.2441 C 420.57136 527.2441 422.3622 529.035 422.3622 531.2441 L 422.3622 568.59844 C 422.3622 570.8076 420.57136 572.59844 418.3622 572.59844 L 346.99214 572.59844 C 344.783 572.59844 342.99214 570.8076 342.99214 568.59844 L 342.99214 531.2441 C 342.99214 529.035 344.783 527.2441 346.99214 527.2441 Z" fill="#929292"/>
         </g>
         <g id="Graphic_846">
-          <text transform="translate(306.7928 543.5827)" fill="white">
+          <text transform="translate(354.6983 543.5827)" fill="white">
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="2344791e-19" y="12" xml:space="preserve">persona</tspan>
           </text>
         </g>
       </g>
       <g id="Group_848">
         <g id="Graphic_850">
-          <path d="M 384.126 527.2441 L 455.4961 527.2441 C 457.7052 527.2441 459.4961 529.035 459.4961 531.2441 L 459.4961 568.59844 C 459.4961 570.8076 457.7052 572.59844 455.4961 572.59844 L 384.126 572.59844 C 381.91686 572.59844 380.126 570.8076 380.126 568.59844 L 380.126 531.2441 C 380.126 529.035 381.91686 527.2441 384.126 527.2441 Z" fill="#929292"/>
+          <path d="M 432.0315 527.2441 L 503.4016 527.2441 C 505.6107 527.2441 507.4016 529.035 507.4016 531.2441 L 507.4016 568.59844 C 507.4016 570.8076 505.6107 572.59844 503.4016 572.59844 L 432.0315 572.59844 C 429.82237 572.59844 428.0315 570.8076 428.0315 568.59844 L 428.0315 531.2441 C 428.0315 529.035 429.82237 527.2441 432.0315 527.2441 Z" fill="#929292"/>
         </g>
         <g id="Graphic_849">
-          <text transform="translate(405.2181 543.5827)" fill="white">
+          <text transform="translate(453.1236 543.5827)" fill="white">
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="6554757e-19" y="12" xml:space="preserve">task</tspan>
           </text>
         </g>
@@ -411,16 +411,6 @@
         <g id="Graphic_867">
           <text transform="translate(751.4068 282.7953)" fill="white">
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="0" y="12" xml:space="preserve">diagram</tspan>
-          </text>
-        </g>
-      </g>
-      <g id="Group_869">
-        <g id="Graphic_871">
-          <path d="M 469.16537 527.2441 L 540.53545 527.2441 C 542.7446 527.2441 544.53545 529.035 544.53545 531.2441 L 544.53545 568.59844 C 544.53545 570.8076 542.7446 572.59844 540.53545 572.59844 L 469.16537 572.59844 C 466.95623 572.59844 465.16537 570.8076 465.16537 568.59844 L 465.16537 531.2441 C 465.16537 529.035 466.95623 527.2441 469.16537 527.2441 Z" fill="#929292"/>
-        </g>
-        <g id="Graphic_870">
-          <text transform="translate(489.19926 543.5827)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="20250468e-20" y="12" xml:space="preserve">plan</tspan>
           </text>
         </g>
       </g>
