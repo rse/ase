@@ -14,6 +14,7 @@ import MCPCommand                  from "./ase-mcp.js"
 import HookCommand                 from "./ase-hook.js"
 import DiagramCommand              from "./ase-diagram.js"
 import SetupCommand                from "./ase-setup.js"
+import StatuslineCommand           from "./ase-statusline.js"
 import TaskCommand                 from "./ase-task.js"
 import pkg                         from "../package.json" with { type: "json" }
 
@@ -61,6 +62,7 @@ const main = async (): Promise<void> => {
     new HookCommand(log).register(program)
     new DiagramCommand(log).register(program)
     new SetupCommand(log).register(program)
+    new StatuslineCommand(log).register(program)
     new TaskCommand(log).register(program)
 
     /*  parse program arguments  */

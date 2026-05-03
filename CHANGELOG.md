@@ -2,6 +2,35 @@
 ChangeLog
 =========
 
+0.0.19 (2026-05-04)
+-------------------
+
+- IMPROVEMENT: provide "ase statusline" CLI command (factored out of claudeX sister project)
+
+0.0.18 (2026-05-03)
+-------------------
+
+- FEATURE: add `ase-arch-analyze` skill (formerly `ase-code-audit`/`ase-code-architect`) for software architecture review
+- FEATURE: switch to a new task-based (plan-mode supported) two-phase workflow
+- FEATURE: add `ase task edit <id>` CLI command for task plan editing
+- FEATURE: support ACCEPTED severity and clustered tradeoff reporting in arch-analyze skill
+- IMPROVEMENT: extend plugin Bash allow-list (git read-only commands, analysis pipes, audit metrics)
+- IMPROVEMENT: always stop the service on update and uninstall
+- IMPROVEMENT: route architecture overview diagram through `ase-meta-diagram` skill
+- IMPROVEMENT: polish arch-analyze skill (compactness, control-flow hint, unicode diagrams, code-based architecture detection)
+- IMPROVEMENT: provide status message during operations
+- IMPROVEMENT: add standalone skill hint
+- REFACTOR: drop `plugin/settings.json`, move Bash allow-list into skill `allowed-tools`
+- REFACTOR: restructure arch-analyze aspects (merge redundancies, split governance, render via `ase diagram`)
+- BUGFIX: fix block count in arch-analyze skill (5→6)
+- BUGFIX: fix typo in skill name (`ase-arch-analyse` → `ase-arch-analyze`)
+- UPDATE: bump version to 0.0.18
+- UPDATE: update documentation for latest changes
+- CLEANUP: remove all trailing whitespaces from source files
+- CLEANUP: cleanup frontmatters, setup code, and reduce text
+- CLEANUP: neutralize project-specific examples in anomaly annotation rules
+- CLEANUP: rename `ase-diagram` skill reference to `ase-meta-diagram`
+
 0.0.17 (2026-05-03)
 -------------------
 
