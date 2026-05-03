@@ -162,6 +162,30 @@ background service as a *Claude Code* MCP server:
   is intended to be configured as a stdio MCP server in *Claude
   Code* and not invoked directly by end users.
 
+The following top-level command exists for rendering the *Claude Code*
+statusline:
+
+- `ase statusline`:
+  Render the *Claude Code* statusline from a JSON payload read on
+  standard input. Intended to be configured as the `statusLine`
+  command in *Claude Code* settings and not invoked directly by end
+  users. The input JSON is the standard *Claude Code* statusline
+  payload (with `workspace.current_dir`, `model.display_name`,
+  `context_window.used_percentage`, `effort.level`, `thinking.enabled`,
+  and `session_id`). The output is a multi-line, ANSI-colored
+  rendering of the user, project, task, session, model, effort,
+  thinking, persona, and a context-usage progress bar. The bar color
+  shifts from default to blue, yellow, and red as context usage
+  crosses 40%, 60%, and 80%. The active task id and persona style
+  are resolved from the *ASE* configuration cascade (with the current
+  session id) and fall back to the `ASE_TASK_ID` and
+  `ASE_PERSONA_STYLE` environment variables. Lines wrap dynamically
+  based on the controlling terminal width (probed via `/dev/tty`).
+  When run inside a *tmux* pane, the resolved task id is also
+  published as the per-pane user option `@ase_task_id`, so external
+  tools (like the *claudeX* sister project) can pick it up via
+  `#{@ase_task_id}`.
+
 The following top-level command exists for diagram rendering:
 
 - `ase diagram`:
