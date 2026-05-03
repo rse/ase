@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.0.17 (2026-05-02)
+0.0.17 (2026-05-03)
 -------------------
 
 - CLEANUP: remove unused variables except for the "boxing" (coming soon)
