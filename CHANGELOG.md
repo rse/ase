@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.0.19 (2026-05-04)
+0.0.19 (2026-05-03)
 -------------------
 
 - IMPROVEMENT: provide "ase statusline" CLI command (factored out of claudeX sister project)
