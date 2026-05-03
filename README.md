@@ -98,6 +98,17 @@ ase setup update
 ase setup uninstall
 ```
 
+Overview
+--------
+
+### Architecture &amp; Building Blocks
+
+![building-blocks](docs/building-blocks.svg)
+
+### Skills &amp; Workflow
+
+![workflow](docs/workflow.svg)
+
 Documenation
 ------------
 

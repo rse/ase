@@ -2,6 +2,8 @@
 Usage of Plugin
 ===============
 
+![workflow](workflow.svg)
+
 ### Meta Commands
 
 The following ASE commands/skills exist on the meta-level:
