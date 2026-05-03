@@ -26,9 +26,14 @@ export default class SetupCommand {
     }
 
     /*  run a sub-process, suppressing output on success and emitting it on failure  */
-    private async run (cmd: string, args: string[], cwd?: string): Promise<void> {
+    private async run (cmd: string, args: string[], opts: { cwd?: string, quiet?: boolean } = {}): Promise<void> {
+        const { cwd, quiet = false } = opts
         this.log.write("info", `setup: $ ${cmd} ${args.join(" ")}` +
             (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
+        if (quiet) {
+            await execa(cmd, args, { stdio: "ignore", cwd, reject: false })
+            return
+        }
         await execa(cmd, args, { stdio: "pipe", cwd }).catch((err) => {
             const exitCode = typeof err?.exitCode === "number" ? err.exitCode : -1
             this.log.write("error", `setup: command failed: exit code: ${exitCode}`)
@@ -63,15 +68,16 @@ export default class SetupCommand {
         await this.ensureTool("claude")
 
         /*  best-effort stop of background service  */
-        this.log.write("info", `setup: update${dev ? "[dev]" : ""}: $ ase service stop`)
-        await execa("ase", [ "service", "stop" ], { stdio: "ignore", reject: false })
+        this.log.write("info", `setup: update${dev ? "[dev]" : ""}: ` +
+            "stopping a potentially running ASE service")
+        await this.run("ase", [ "service", "stop" ], { quiet: true })
 
         if (dev) {
             /*  update ASE CLI Tool  */
             this.log.write("info", "setup: update[dev]: re-build ASE CLI tool (origin: local)")
             const tooldir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
-            await this.run("npm", [ "install" ], tooldir)
-            await this.run("npm", [ "start", "build" ], tooldir)
+            await this.run("npm", [ "install" ], { cwd: tooldir })
+            await this.run("npm", [ "start", "build" ], { cwd: tooldir })
 
             /*  in development mode the local plugin files are already current
                 but there is no version change in the plugin manifest,
@@ -107,8 +113,9 @@ export default class SetupCommand {
         await this.ensureTool("claude")
 
         /*  best-effort stop of background service  */
-        this.log.write("info", `setup: update${dev ? "[dev]" : ""}: $ ase service stop`)
-        await execa("ase", [ "service", "stop" ], { stdio: "ignore", reject: false })
+        this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
+            "stopping a potentially running ASE service")
+        await this.run("ase", [ "service", "stop" ], { quiet: true })
 
         /*  uninstall ASE Claude Code plugin  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
