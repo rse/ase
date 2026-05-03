@@ -85,9 +85,9 @@ flow* is found.
 
    <template>
    &#x26AA; **NEXT STEP**: For deeper analysis, suggestions on solution approaches and then final
-   source code changes, use `/ase-code-elaborate P<n>` in the same *Claude Code* session or
+   source code changes, use `/ase-code-resolve P<n>` in the same *Claude Code* session or
    open a new *Claude Code* session and copy & paste one of the above problem descriptions
-   as a whole with `/ase-code-elaborate <problem>`.
+   as a whole with `/ase-code-resolve <problem>`.
    </template>
    </step>
 </flow>

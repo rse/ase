@@ -1,68 +1,79 @@
 ---
 name: ase-spec-preflight
-argument-hint: "<feature-id>"
 description: >
-    Edit a stand-alone feature specification.
+    Preflight the implementation of the current task plan.
 user-invocable: true
 disable-model-invocation: false
-effort: high
+effort: xhigh
 allowed-tools:
     - "Bash(date)"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Preflight a Feature Specification
-=================================
+Preflight Implementation of Task
+================================
 
 Your role is an experienced, *expert-level software developer*,
-specialized in the *implementation* of IT systems.
+specialized in the *implementation* of software.
 
 <objective>
-*Preflight* the *feature specification* of an IT system by creating a
+*Preflight* the *implementation* of the current task plan by creating a
 draft for a corresponding, *complete source code change set*.
 </objective>
 
 <flow>
-1. <step id="STEP 1: Determine Operation">
-   - The first word of "$ARGUMENTS" is the unique <feature-id/> of the
-     specification.
+1.  <step id="STEP 1: Determine Operation">
+    -   Call the `task_load` tool (`id` set to <ase-task-id/>) of the `ase`
+        MCP service to load the current task plan content and set <content/> to the
+        `text` output field of the `task_load` tool call. Calculate the
+        number of words <words/> of <content/>. Do not output anything
+        related to this MCP tool call except the following <template/>:
 
-   - Derive the specification file
-     <feature-filename/> from `<feature-id/>.md`.
+        <template>
+        &#x1F535; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **loaded**
+        </template>
 
-   - If the <feature-filename/> DOES STILL NOT exist,
-     complain and tell the user to use the `ase-spec-edit <feature-id/>`
-     skill first.
-
-   - If the <feature-filename/> exists, read this artifact
-     for the specification of the feature to be implemented.
+    -   If the <content/> is still empty, complain and tell the user to use the
+        `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`, or `ase-spec-edit`
+        skills first to create a task plan.
    </step>
 
-2. <step id="STEP 2: Create Implementation Draft">
-   Perform a *preflight* of the *feature specification* by creating a
-   draft for a corresponding, *complete source code change set*
-   which would fully implement the feature. Append this source
-   code change set as a complete <unified-diff/> to the end
-   of the <feature-filename/> with the following <template/>:
+2.  <step id="STEP 2: Create Implementation Draft">
+    -   Perform a *preflight* of the *implementation* of <content/> by creating a
+        draft for a corresponding, *complete source code change set*
+        which would fully implement the task plan <content/>. Append this source
+        code change set as a complete <unified-diff/> to the end
+        of the <content/> with the following <template/>:
 
-   <template>
+        <template>
 
-   ## ≡ IMPLEMENTATION DRAFT
+        ## IMPLEMENTATION DRAFT
 
-   ```
-   <unified-diff/>
-   ```
-   </template>
+        ```
+        <unified-diff/>
+        ```
 
-   Hints:
+        </template>
 
-   - If a section named `## ≡ IMPLEMENTATION DRAFT` already exists from
-     a previous run of this skill, update this existing section.
+        Hints:
 
-   - On modifying <feature-filename/>, set the "modified": timestamp to
-     the current timestamp in the ISO-style format `YYYY-mm-dd HH:MM`
-     which can be determined with `date "+%Y-%m-%d %H:%M"`.
-   </step>
+        -   If a section named `## IMPLEMENTATION DRAFT` already exists from
+            a previous run of this skill, replace this existing section.
+
+        -   On modifying <content/>, set the "modified" timestamp to
+            the current timestamp in the ISO-style format `YYYY-mm-dd HH:MM`
+            which can be determined with `date "+%Y-%m-%d %H:%M"`.
+
+    -   Finally, call the `task_save` tool (`id` set to <ase-task-id/>,
+        text: <content/>) of the `ase` MCP service to save the updated task
+        plan content. Calculate the number of words <words/> of <content/>.
+        Do not output anything related to this MCP tool call except the
+        following <template/>:
+
+        <template>
+        &#x1F7E0; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **saved**
+        </template>
+    </step>
 </flow>
 

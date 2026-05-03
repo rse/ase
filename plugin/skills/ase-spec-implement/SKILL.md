@@ -1,8 +1,8 @@
 ---
 name: ase-spec-implement
-argument-hint: "<feature-id>"
 description: >
-    Implement a stand-alone feature specification.
+    Implement current task plan. Use when the user calls to "implement",
+    "realize" or "apply" the "task", "plan", "spec", or "specification".
 user-invocable: true
 disable-model-invocation: false
 effort: xhigh
@@ -10,44 +10,45 @@ effort: xhigh
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Implement a Feature Specification
-=================================
+Implement a Task
+================
 
 Your role is an experienced, *expert-level software developer*,
-specialized in the *implementation* of IT systems.
+specialized in the *implementation* of software.
 
 <objective>
-*Implement* the *feature specification* of an IT system by modifying the
-*source code* with a corresponding, complete *change set*.
+*Implement* a task by modifying the *source code*
+with a corresponding, complete *change set*.
 </objective>
 
 <flow>
-1. <step id="STEP 1: Determine Operation">
-   -  The first word of "$ARGUMENTS" is the unique <feature-id/> of the
-      specification.
+1.  <step id="STEP 1: Determine Operation">
+    -   Call the `task_load` tool (`id` set to <ase-task-id/>) of the `ase`
+        MCP service to load the current task plan content and set <content/> to the
+        `text` output field of the `task_load` tool call. Calculate the
+        number of words <words/> of <content/>. Do not output anything
+        related to this MCP tool call except the following <template/>:
 
-   -  Derive the specification file
-      <feature-filename/> from `<feature-id/>.md`.
+        <template>
+        &#x1F535; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **loaded**
+        </template>
 
-   -  If the <feature-filename/> DOES STILL NOT exist,
-      complain and tell the user to use the `ase-spec-edit <feature-id/>`
-      skill first.
+    -   If the <content/> is still empty, complain and tell the user to use the
+        `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`, or `ase-spec-edit`
+        skills first to create a task plan.
+    </step>
 
-   -  If the <feature-filename/> exists, read this artifact
-      for the specification of the feature to be implemented.
-   </step>
+2.  <step id="STEP 2: Create Implementation">
+    -  Perform a *final implementation* of the *specification*
+       by modifying the *source code* with a corresponding, complete
+       *change set*.
 
-2. <step id="STEP 2: Create Implementation">
-   -  Perform a *final implementation* of the *feature specification*
-      by by modifying the *source code* with a corresponding, complete
-      *change set*.
+    -  For this, primarily follow and honor the specification in <content/>.
 
-   -  For this primarily read the details in the feature
-      specification.
-
-   -  Secondarily, derive hints from the optionally existing
-      `IMPLEMENTATION DRAFT` section in the feature specification. But the
-      feature specification always overrules the implementation draft.
-   </step>
+    -  Secondarily, derive hints from the optionally existing
+       `IMPLEMENTATION DRAFT` section in <content/>. But the specification
+       text in <content/> always overrules the implementation draft in the
+       `IMPLEMENTATION DRAFT` section of <content/>.
+    </step>
 </flow>
 
