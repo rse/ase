@@ -9,6 +9,7 @@ import os   from "node:os"
 import fs   from "node:fs"
 
 import { Command } from "commander"
+import { execaSync } from "execa"
 
 import type Log    from "./ase-log.js"
 
@@ -146,6 +147,22 @@ export default class TaskCommand {
             .action((id: string) => {
                 const text = taskLoad(id)
                 process.stdout.write(text)
+                process.exit(0)
+            })
+
+        /*  register CLI sub-command "ase task edit"  */
+        task
+            .command("edit")
+            .description("Edit a task by id with $EDITOR")
+            .argument("<id>", "Task identifier")
+            .action((id: string) => {
+                const file   = taskPath(id)
+                const editor = process.env.EDITOR ?? process.env.VISUAL ?? "vi"
+                fs.mkdirSync(path.dirname(file), { recursive: true })
+                if (!fs.existsSync(file))
+                    fs.writeFileSync(file, "", "utf8")
+                execaSync(editor, [ file ], { stdio: "inherit" })
+                this.log.write("info", `task: edited "${id}"`)
                 process.exit(0)
             })
 
