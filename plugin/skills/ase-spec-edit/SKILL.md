@@ -44,7 +44,7 @@ Manage the Plan for a Task
 
 5. <if condition="<content/> is still empty">
    Ask the user interactively for the plan <content/> with a single
-   question `Still **no** plan content. What is the **task** you want
+   question `Still no plan content. What is the task you want
    to plan?`. Then set <content/> to the response of the user. Do not
    output anything further in this step.
    </if>
