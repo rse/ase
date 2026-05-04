@@ -5,6 +5,7 @@ ChangeLog
 0.0.20 (2026-05-04)
 -------------------
 
+- CLEANUP: switch "ase statusline" from hard-coded ANSI sequences to use of NPM package "chalk"
 - IMPROVEMENT: provide --no-icons and --no-labels options to "ase statusline"
 - IMPROVEMENT: refactor "ase statusline" CLI command to support flexible expansion of information and coloring
 - IMPROVEMENT: retry `claude plugin install` up to 3 times in `ase setup`

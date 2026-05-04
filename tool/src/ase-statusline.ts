@@ -10,9 +10,21 @@ import { execFileSync }                     from "node:child_process"
 
 import { Command, InvalidArgumentError }    from "commander"
 import { execaSync }                        from "execa"
+import { Chalk }                            from "chalk"
+import type { ForegroundColorName }         from "chalk"
 
 import type Log                             from "./ase-log.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
+
+/*  forced-color chalk instance: stdout is a pipe under Claude Code,
+    so chalk auto-detection would yield level 0; force level 1 to keep
+    emitting ANSI sequences as the original implementation did  */
+const c = new Chalk({ level: 1 })
+
+/*  set of valid <color>...</color> markup names (chalk basic foreground colors plus "default")  */
+const COLORS: ReadonlySet<string> = new Set<ForegroundColorName | "default">([
+    "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "default"
+])
 
 /*  shape of the JSON payload Claude Code passes on stdin  */
 interface StatuslineInput {
@@ -132,23 +144,6 @@ export default class StatuslineCommand {
                 const width  = opts.width > 0 ? opts.width : detectTermWidth()
                 const budget = width > 0 ? width - 2 * opts.margin : 0
 
-                /*  configure ANSI sequences for bold  */
-                const BOLD   = "\x1b[1m"
-                const NOBOLD = "\x1b[22m"
-
-                /*  configure ANSI foreground color map  */
-                const FG: Record<string, string> = {
-                    black:   "\x1b[30m",
-                    red:     "\x1b[31m",
-                    green:   "\x1b[32m",
-                    yellow:  "\x1b[33m",
-                    blue:    "\x1b[34m",
-                    magenta: "\x1b[35m",
-                    cyan:    "\x1b[36m",
-                    white:   "\x1b[37m",
-                    default: "\x1b[39m"
-                }
-
                 /*  determine context bar information  */
                 const barSize  = 20
                 const filled   = Math.round(pct / 100 * barSize)
@@ -170,6 +165,16 @@ export default class StatuslineCommand {
                     col += raw.length
                 }
 
+                /*  active <color> span state: when non-null, renderer/literal output is buffered
+                    instead of appended directly, and flushed via c[color](buf) on </color>  */
+                let span: { color: string, buf: string } | null = null
+                const emit = (chunk: string): void => {
+                    if (span !== null)
+                        span.buf += chunk
+                    else
+                        appendOutput(chunk)
+                }
+
                 /*  helper to build the "<icon> <label>: " prefix subject to --no-icons / --no-labels  */
                 const prefix = (icon: string, label: string): string => {
                     const i = opts.icons  ? `${icon} `    : ""
@@ -179,21 +184,21 @@ export default class StatuslineCommand {
 
                 /*  identifier -> renderer map  */
                 const renderers: Record<string, () => void> = {
-                    u: () => appendOutput(`${prefix("※", "user")}${BOLD}${user}${NOBOLD}`),
-                    p: () => appendOutput(`${prefix("⚑", "project")}${BOLD}${dir}${NOBOLD}`),
+                    u: () => emit(`${prefix("※", "user")}${c.bold(user)}`),
+                    p: () => emit(`${prefix("⚑", "project")}${c.bold(dir)}`),
                     T: () => {
                         if (taskId !== "")
-                            appendOutput(`${prefix("◉", "task")}${BOLD}${taskId}${NOBOLD}`)
+                            emit(`${prefix("◉", "task")}${c.bold(taskId)}`)
                     },
-                    s: () => appendOutput(`${prefix("⏻", "session")}${BOLD}${sessionId}${NOBOLD}`),
-                    m: () => appendOutput(`${prefix("⚙", "model")}${BOLD}${model}${NOBOLD}`),
-                    e: () => appendOutput(`${prefix("⚒", "effort")}${BOLD}${effort}${NOBOLD}`),
-                    t: () => appendOutput(`${prefix("⚛", "thinking")}${BOLD}${thinking}${NOBOLD}`),
+                    s: () => emit(`${prefix("⏻", "session")}${c.bold(sessionId)}`),
+                    m: () => emit(`${prefix("⚙", "model")}${c.bold(model)}`),
+                    e: () => emit(`${prefix("⚒", "effort")}${c.bold(effort)}`),
+                    t: () => emit(`${prefix("⚛", "thinking")}${c.bold(thinking)}`),
                     P: () => {
                         if (persona !== "")
-                            appendOutput(`${prefix("☯", "persona")}${BOLD}${persona}${NOBOLD}`)
+                            emit(`${prefix("☯", "persona")}${c.bold(persona)}`)
                     },
-                    c: () => appendOutput(`${prefix("◔", "context")}${bar} ${pct}%${NOBOLD}`)
+                    c: () => emit(`${prefix("◔", "context")}${bar} ${pct}%`)
                 }
 
                 /*  determine effective template lines  */
@@ -207,8 +212,18 @@ export default class StatuslineCommand {
                         const next = line[i + 1]
                         if (ch === "<") {
                             const m = line.slice(i).match(/^<(\/?)([a-z]+)>/)
-                            if (m !== null && FG[m[2]!] !== undefined) {
-                                appendOutput(m[1] === "/" ? FG.default! : FG[m[2]!]!)
+                            if (m !== null && COLORS.has(m[2]!)) {
+                                if (m[1] === "/") {
+                                    if (span !== null) {
+                                        const wrapped = span.color === "default" ?
+                                            span.buf :
+                                            (c[span.color as ForegroundColorName])(span.buf)
+                                        span = null
+                                        appendOutput(wrapped)
+                                    }
+                                }
+                                else if (span === null)
+                                    span = { color: m[2]!, buf: "" }
                                 i += m[0].length
                                 continue
                             }
@@ -218,9 +233,17 @@ export default class StatuslineCommand {
                             i += 2
                         }
                         else {
-                            appendOutput(ch)
+                            emit(ch)
                             i += 1
                         }
+                    }
+                    /*  flush any unterminated span at end of line  */
+                    if (span !== null) {
+                        const wrapped = span.color === "default" ?
+                            span.buf :
+                            (c[span.color as ForegroundColorName])(span.buf)
+                        span = null
+                        appendOutput(wrapped)
                     }
                     out += "\n"
                     col  = 0
