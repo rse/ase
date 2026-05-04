@@ -7,6 +7,8 @@ ChangeLog
 
 - IMPROVEMENT: refactor "ase statusline" CLI command to support flexible expansion of information
 - IMPROVEMENT: add coloring functionality to "ase statusline" CLI command
+- IMPROVEMENT: retry `claude plugin install` up to 3 times in `ase setup`
+- BUGFIX: remove unsupported Markdown formatting from `ase-spec-edit` user dialog
 
 0.0.19 (2026-05-03)
 -------------------

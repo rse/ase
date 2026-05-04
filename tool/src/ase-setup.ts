@@ -26,27 +26,47 @@ export default class SetupCommand {
     }
 
     /*  run a sub-process, suppressing output on success and emitting it on failure  */
-    private async run (cmd: string, args: string[], opts: { cwd?: string, quiet?: boolean } = {}): Promise<void> {
-        const { cwd, quiet = false } = opts
+    private async run (cmd: string, args: string[], opts: { cwd?: string, quiet?: boolean, retries?: number } = {}): Promise<void> {
+        const { cwd, quiet = false, retries = 1 } = opts
         this.log.write("info", `setup: $ ${cmd} ${args.join(" ")}` +
             (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
-        if (quiet) {
-            await execa(cmd, args, { stdio: "ignore", cwd, reject: false })
-            return
+        for (let i = 0; i < retries; i++) {
+            const final = (i === retries - 1)
+            try {
+                if (quiet) {
+                    const result = await execa(cmd, args, { stdio: "ignore", cwd, reject: false })
+                    if (typeof result.exitCode === "number" && result.exitCode !== 0 && !final) {
+                        this.log.write("info",
+                            `setup: attempt ${i + 1}/${retries} failed for "${cmd} ${args.join(" ")}" ` +
+                            `(exit code: ${result.exitCode}): retrying...`)
+                        await new Promise((resolve) => setTimeout(resolve, 1000))
+                        continue
+                    }
+                    return
+                }
+                await execa(cmd, args, { stdio: "pipe", cwd })
+                return
+            }
+            catch (err: any) {
+                if (!final) {
+                    this.log.write("info",
+                        `setup: attempt ${i + 1}/${retries} failed for "${cmd} ${args.join(" ")}": retrying...`)
+                    await new Promise((resolve) => setTimeout(resolve, 1000))
+                    continue
+                }
+                const exitCode = typeof err?.exitCode === "number" ? err.exitCode : -1
+                this.log.write("error", `setup: command failed: exit code: ${exitCode}`)
+                if (typeof err?.stdout === "string" && err.stdout.length > 0) {
+                    this.log.write("error", "setup: command failed: stdout:")
+                    process.stdout.write(err.stdout)
+                }
+                if (typeof err?.stderr === "string" && err.stderr.length > 0) {
+                    this.log.write("error", "setup: command failed: stderr:")
+                    process.stderr.write(err.stderr)
+                }
+                throw err
+            }
         }
-        await execa(cmd, args, { stdio: "pipe", cwd }).catch((err) => {
-            const exitCode = typeof err?.exitCode === "number" ? err.exitCode : -1
-            this.log.write("error", `setup: command failed: exit code: ${exitCode}`)
-            if (typeof err?.stdout === "string" && err.stdout.length > 0) {
-                this.log.write("error", "setup: command failed: stdout:")
-                process.stdout.write(err.stdout)
-            }
-            if (typeof err?.stderr === "string" && err.stderr.length > 0) {
-                this.log.write("error", "setup: command failed: stderr:")
-                process.stderr.write(err.stderr)
-            }
-            throw err
-        })
     }
 
     /*  handler for "ase setup install"  */
@@ -58,7 +78,7 @@ export default class SetupCommand {
             `installing ASE Claude Code plugin (origin: ${dev ? "local" : "remote"})`)
         const source = dev ? process.cwd() : "rse/ase"
         await this.run("claude", [ "plugin", "marketplace", "add", source ])
-        await this.run("claude", [ "plugin", "install", "ase@ase" ])
+        await this.run("claude", [ "plugin", "install", "ase@ase" ], { retries: 3 })
         return 0
     }
 
@@ -84,7 +104,7 @@ export default class SetupCommand {
                 so just re-install the plugin to let Claude Code update its copy  */
             this.log.write("info", "setup: update[dev]: re-install ASE Claude Code plugin (origin: local)")
             await this.run("claude", [ "plugin", "uninstall", "ase@ase" ])
-            await this.run("claude", [ "plugin", "install",   "ase@ase" ])
+            await this.run("claude", [ "plugin", "install",   "ase@ase" ], { retries: 3 })
         }
         else {
             /*  perform NPM version check  */
