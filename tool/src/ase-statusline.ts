@@ -28,6 +28,8 @@ interface StatuslineInput {
 interface StatuslineOpts {
     width:  number
     margin: number
+    icons:  boolean
+    labels: boolean
 }
 
 /*  custom argument parser for Commander: non-negative integer  */
@@ -76,6 +78,10 @@ export default class StatuslineCommand {
             .option("-m, --margin <n>",
                 "reduce maximum used terminal width by <n> characters on each side",
                 parseInteger("--margin"), 2)
+            .option("--no-icons",
+                "disable icons in placeholder rendering")
+            .option("--no-labels",
+                "disable labels in front of bold values")
             .argument("[lines...]",
                 "one or more template lines with %u %p %T %s %m %e %t %P %c placeholders " +
                 "and <color>...</color> markup (color: black, red, green, yellow, blue, " +
@@ -164,23 +170,30 @@ export default class StatuslineCommand {
                     col += raw.length
                 }
 
+                /*  helper to build the "<icon> <label>: " prefix subject to --no-icons / --no-labels  */
+                const prefix = (icon: string, label: string): string => {
+                    const i = opts.icons  ? `${icon} `    : ""
+                    const l = opts.labels ? `${label}: ` : ""
+                    return `${i}${l}`
+                }
+
                 /*  identifier -> renderer map  */
                 const renderers: Record<string, () => void> = {
-                    u: () => appendOutput(`※ user: ${BOLD}${user}${NOBOLD}`),
-                    p: () => appendOutput(`⚑ project: ${BOLD}${dir}${NOBOLD}`),
+                    u: () => appendOutput(`${prefix("※", "user")}${BOLD}${user}${NOBOLD}`),
+                    p: () => appendOutput(`${prefix("⚑", "project")}${BOLD}${dir}${NOBOLD}`),
                     T: () => {
                         if (taskId !== "")
-                            appendOutput(`◉ task: ${BOLD}${taskId}${NOBOLD}`)
+                            appendOutput(`${prefix("◉", "task")}${BOLD}${taskId}${NOBOLD}`)
                     },
-                    s: () => appendOutput(`⏻ session: ${BOLD}${sessionId}${NOBOLD}`),
-                    m: () => appendOutput(`⚙ model: ${BOLD}${model}${NOBOLD}`),
-                    e: () => appendOutput(`⚒ effort: ${BOLD}${effort}${NOBOLD}`),
-                    t: () => appendOutput(`⚛ thinking: ${BOLD}${thinking}${NOBOLD}`),
+                    s: () => appendOutput(`${prefix("⏻", "session")}${BOLD}${sessionId}${NOBOLD}`),
+                    m: () => appendOutput(`${prefix("⚙", "model")}${BOLD}${model}${NOBOLD}`),
+                    e: () => appendOutput(`${prefix("⚒", "effort")}${BOLD}${effort}${NOBOLD}`),
+                    t: () => appendOutput(`${prefix("⚛", "thinking")}${BOLD}${thinking}${NOBOLD}`),
                     P: () => {
                         if (persona !== "")
-                            appendOutput(`☯ persona: ${BOLD}${persona}${NOBOLD}`)
+                            appendOutput(`${prefix("☯", "persona")}${BOLD}${persona}${NOBOLD}`)
                     },
-                    c: () => appendOutput(`◔ context: ${bar} ${pct}%${NOBOLD}`)
+                    c: () => appendOutput(`${prefix("◔", "context")}${bar} ${pct}%${NOBOLD}`)
                 }
 
                 /*  determine effective template lines  */

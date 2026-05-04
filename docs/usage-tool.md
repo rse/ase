@@ -165,7 +165,7 @@ background service as a *Claude Code* MCP server:
 The following top-level command exists for rendering the *Claude Code*
 statusline:
 
-- `ase statusline` \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[*line* \[...\]\]:
+- `ase statusline` \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[`--no-icons`\] \[`--no-labels`\] \[*line* \[...\]\]:
   Render the *Claude Code* statusline from a JSON payload read on
   standard input. Intended to be configured as the `statusLine`
   command in *Claude Code* settings and not invoked directly by end
@@ -200,6 +200,12 @@ statusline:
     - \[`-m`|`--margin` *n*\]:
       reduce maximum used terminal width by *n* characters on each
       side (default: `2`).
+    - \[`--no-icons`\]:
+      disable the leading icon glyph (e.g. `※`, `⚑`, `⚙`) in front of
+      each placeholder rendering.
+    - \[`--no-labels`\]:
+      disable the textual label (e.g. `user:`, `project:`, `model:`)
+      in front of the bold value of each placeholder rendering.
   When run inside a *tmux* pane, the resolved task id is also
   published as the per-pane user option `@ase_task_id`, so external
   tools (like the *claudeX* sister project) can pick it up via

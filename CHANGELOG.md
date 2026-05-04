@@ -5,6 +5,7 @@ ChangeLog
 0.0.20 (2026-05-04)
 -------------------
 
+- IMPROVEMENT: provide --no-icons and --no-labels options to "ase statusline"
 - IMPROVEMENT: refactor "ase statusline" CLI command to support flexible expansion of information and coloring
 - IMPROVEMENT: retry `claude plugin install` up to 3 times in `ase setup`
 - BUGFIX: tolerate missing plugin on `ase setup uninstall` and `ase setup update`
