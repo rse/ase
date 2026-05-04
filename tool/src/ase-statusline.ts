@@ -8,7 +8,7 @@ import fs                                   from "node:fs"
 import path                                 from "node:path"
 import { execFileSync }                     from "node:child_process"
 
-import { Command }                          from "commander"
+import { Command, InvalidArgumentError }    from "commander"
 import { execaSync }                        from "execa"
 
 import type Log                             from "./ase-log.js"
@@ -22,6 +22,20 @@ interface StatuslineInput {
     effort?:         { level?:           string  }
     thinking?:       { enabled?:         boolean }
     session_id?:     string
+}
+
+/*  internal command options type  */
+interface StatuslineOpts {
+    width:  number
+    margin: number
+}
+
+/*  custom argument parser for Commander: non-negative integer  */
+const parseInteger = (name: string) => (value: string): number => {
+    const n = Number.parseInt(value, 10)
+    if (!Number.isFinite(n) || n < 0)
+        throw new InvalidArgumentError(`${name} must be a non-negative integer`)
+    return n
 }
 
 /*  read stdin into a single string  */
@@ -56,7 +70,16 @@ export default class StatuslineCommand {
         program
             .command("statusline")
             .description("Render Claude Code statusline from stdin JSON")
-            .action(async () => {
+            .option("-w, --width <n>",
+                "force terminal width to <n> characters (0 = auto-detect via /dev/tty)",
+                parseInteger("--width"), 0)
+            .option("-m, --margin <n>",
+                "reduce maximum used terminal width by <n> characters on each side",
+                parseInteger("--margin"), 2)
+            .argument("[lines...]",
+                "one or more template lines with %u %p %T %s %m %e %t %P %c placeholders " +
+                "(default: single line \"%m %e %t\")")
+            .action(async (lines: string[], opts: StatuslineOpts) => {
                 /*  read all of stdin  */
                 const input = await readStdin()
 
@@ -72,6 +95,7 @@ export default class StatuslineCommand {
                 }
 
                 /*  fetch information from data  */
+                const user      = process.env.USER ?? process.env.LOGNAME ?? "unknown"
                 const dir       = path.basename(data.workspace?.current_dir ?? "")
                 const model     = data.model?.display_name ?? ""
                 const pct       = Math.floor(data.context_window?.used_percentage ?? 0)
@@ -97,8 +121,9 @@ export default class StatuslineCommand {
                     /*  cascade unavailable; keep env-var fallbacks  */
                 }
 
-                /*  optionally determine terminal width  */
-                const width = detectTermWidth()
+                /*  determine effective terminal width and budget  */
+                const width  = opts.width > 0 ? opts.width : detectTermWidth()
+                const budget = width > 0 ? width - 2 * opts.margin : 0
 
                 /*  configure ANSI sequences  */
                 const RESET  = "\x1b[0m"
@@ -114,36 +139,65 @@ export default class StatuslineCommand {
                 const filled   = Math.round(pct / 100 * barSize)
                 const bar      = "█".repeat(filled) + "░".repeat(barSize - filled)
 
-                /*  generate output  */
-                let output = ""
-                output += `${BLUE}※ user: ${BOLD}${process.env.USER ?? process.env.LOGNAME ?? "unknown"}${RESET} `
-                if (width > 0 && width < 30)
-                    output += "\n"
-                output += `${RED}⚑ project: ${BOLD}${dir}${RESET} `
-                if (width > 0 && width < 60)
-                    output += "\n"
-                if (taskId !== "") {
-                    output += `${BLACK}◉ task: ${BOLD}${taskId}${RESET} `
-                    if (width > 0 && width < 90)
-                        output += "\n"
+                /*  shared output state and append helper with auto-wrap;
+                    the helper itself strips ANSI CSI escape sequences to
+                    measure the raw visible width of the chunk  */
+                let out = ""
+                let col = 0
+                const appendOutput = (ansi: string): void => {
+                    /*  eslint-disable-next-line no-control-regex  */
+                    const raw = ansi.replace(/\x1b\[[0-9;]*[A-Za-z]/g, "")
+                    if (budget > 0 && col > 0 && col + raw.length > budget) {
+                        out += "\n"
+                        col  = 0
+                    }
+                    out += ansi
+                    col += raw.length
                 }
-                output += `⏻ session: ${BOLD}${sessionId}${RESET}\n`
-                output += `⚙ model: ${BOLD}${model}${RESET} `
-                if (width > 0 && width < 30)
-                    output += "\n"
-                output += `⚒ effort: ${BOLD}${effort}${RESET} `
-                if (width > 0 && width < 60)
-                    output += "\n"
-                output += `⚛ thinking: ${BOLD}${thinking}${RESET}\n`
-                if (persona !== "") {
-                    output += `☯ persona: ${BOLD}${persona}${RESET} `
-                    if (width > 0 && width < 30)
-                        output += "\n"
+
+                /*  identifier -> renderer map  */
+                const renderers: Record<string, () => void> = {
+                    u: () => appendOutput(`${BLUE}※ user: ${BOLD}${user}${RESET}`),
+                    p: () => appendOutput(`${RED}⚑ project: ${BOLD}${dir}${RESET}`),
+                    T: () => {
+                        if (taskId !== "")
+                            appendOutput(`${BLACK}◉ task: ${BOLD}${taskId}${RESET}`)
+                    },
+                    s: () => appendOutput(`⏻ session: ${BOLD}${sessionId}${RESET}`),
+                    m: () => appendOutput(`⚙ model: ${BOLD}${model}${RESET}`),
+                    e: () => appendOutput(`⚒ effort: ${BOLD}${effort}${RESET}`),
+                    t: () => appendOutput(`⚛ thinking: ${BOLD}${thinking}${RESET}`),
+                    P: () => {
+                        if (persona !== "")
+                            appendOutput(`☯ persona: ${BOLD}${persona}${RESET}`)
+                    },
+                    c: () => appendOutput(`${barColor}◔ context: ${bar} ${pct}%${RESET}`)
                 }
-                output += `${barColor}◔ context: ${bar} ${pct}%${RESET}\n`
+
+                /*  determine effective template lines  */
+                const tmpl = lines.length > 0 ? lines : [ "%m %e %t" ]
+
+                /*  walk each template line and render  */
+                for (const line of tmpl) {
+                    let i = 0
+                    while (i < line.length) {
+                        const ch   = line[i]!
+                        const next = line[i + 1]
+                        if (ch === "%" && next !== undefined && renderers[next] !== undefined) {
+                            renderers[next]!()
+                            i += 2
+                        }
+                        else {
+                            appendOutput(ch)
+                            i += 1
+                        }
+                    }
+                    out += "\n"
+                    col  = 0
+                }
 
                 /*  send output  */
-                process.stdout.write(output)
+                process.stdout.write(out)
 
                 /*  optionally publish task id to the calling tmux pane as a per-pane user
                     option, so someone (like claudeX) can pick it up via #{@ase_task_id}  */

@@ -165,22 +165,36 @@ background service as a *Claude Code* MCP server:
 The following top-level command exists for rendering the *Claude Code*
 statusline:
 
-- `ase statusline`:
+- `ase statusline` \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[*line* \[...\]\]:
   Render the *Claude Code* statusline from a JSON payload read on
   standard input. Intended to be configured as the `statusLine`
   command in *Claude Code* settings and not invoked directly by end
   users. The input JSON is the standard *Claude Code* statusline
   payload (with `workspace.current_dir`, `model.display_name`,
   `context_window.used_percentage`, `effort.level`, `thinking.enabled`,
-  and `session_id`). The output is a multi-line, ANSI-colored
-  rendering of the user, project, task, session, model, effort,
-  thinking, persona, and a context-usage progress bar. The bar color
-  shifts from default to blue, yellow, and red as context usage
-  crosses 40%, 60%, and 80%. The active task id and persona style
-  are resolved from the *ASE* configuration cascade (with the current
-  session id) and fall back to the `ASE_TASK_ID` and
-  `ASE_PERSONA_STYLE` environment variables. Lines wrap dynamically
-  based on the controlling terminal width (probed via `/dev/tty`).
+  and `session_id`). The output is an ANSI-colored rendering composed
+  from one or more template *line* arguments. Each *line* may contain
+  literal characters and the following `%`-prefixed placeholders:
+  `%u` (user), `%p` (project), `%T` (task, suppressed if empty),
+  `%s` (session), `%m` (model), `%e` (effort), `%t` (thinking),
+  `%P` (persona, suppressed if empty), and `%c` (context-usage
+  progress bar with a 20-cell bar and percentage). The context bar
+  color shifts from default to blue, yellow, and red as context usage
+  crosses 40%, 60%, and 80%. If no *line* arguments are given, a
+  single default line `"%m %e %t"` is rendered. The active task id
+  and persona style are resolved from the *ASE* configuration cascade
+  (with the current session id) and fall back to the `ASE_TASK_ID`
+  and `ASE_PERSONA_STYLE` environment variables. Each rendered line
+  is wrapped automatically when it would exceed the available width
+  budget, where the budget is derived from the controlling terminal
+  width (probed via `/dev/tty`) reduced by `2 *` *margin* characters.
+  Supports the following options:
+    - \[`-w`|`--width` *n*\]:
+      force terminal width to *n* characters
+      (`0`, the default, auto-detects via `/dev/tty`).
+    - \[`-m`|`--margin` *n*\]:
+      reduce maximum used terminal width by *n* characters on each
+      side (default: `2`).
   When run inside a *tmux* pane, the resolved task id is also
   published as the per-pane user option `@ase_task_id`, so external
   tools (like the *claudeX* sister project) can pick it up via

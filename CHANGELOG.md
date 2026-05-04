@@ -5,6 +5,8 @@ ChangeLog
 0.0.20 (2026-05-04)
 -------------------
 
+- IMPROVEMENT: refactor "ase statusline" CLI command to support flexible expansion of information
+
 0.0.19 (2026-05-03)
 -------------------
 
