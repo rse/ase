@@ -238,7 +238,7 @@ specialized in *resolving problems*.
 
     <template>
     &#x1F535; Problem Resolution Plan Created.
-    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-implement` skills.
+    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-spec-implement` skills.
     </template>
     </step>
 </flow>

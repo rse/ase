@@ -181,7 +181,7 @@ From scratch *craft* the following feature: <feature>$ARGUMENTS</feature>.
 
     <template>
     &#x1F535; Refactoring Plan Created.
-    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-implement` skills.
+    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-spec-implement` skills.
     </template>
     </step>
 </flow>

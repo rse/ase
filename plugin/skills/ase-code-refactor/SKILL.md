@@ -191,7 +191,7 @@ specialized in *refactoring source artifacts*.
 
     <template>
     &#x1F535; Artifact Refactoring Plan Created.
-    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-implement` skills.
+    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-spec-implement` skills.
     </template>
     </step>
 </flow>
