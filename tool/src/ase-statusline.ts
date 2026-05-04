@@ -258,59 +258,9 @@ export default class StatuslineCommand {
                     process.exit(1)
                 }
 
-                /*  fetch information from data  */
-                const user         = process.env.USER ?? process.env.LOGNAME ?? "unknown"
-                const cwd          = data.workspace?.current_dir ?? ""
-                const dir          = path.basename(cwd)
-                const model        = data.model?.display_name ?? ""
-                const pct          = Math.floor(data.context_window?.used_percentage ?? 0)
-                const effort       = data.effort?.level ?? "unknown"
-                const thinking     = (data.thinking?.enabled ?? false) === true ? "yes" : "no"
-                const sessionId    = data.session_name ?? data.session_id ?? "unknown"
-                const ctxIn        = data.context_window?.current_usage?.input_tokens                ?? 0
-                const ctxCcIn      = data.context_window?.current_usage?.cache_creation_input_tokens ?? 0
-                const ctxCrIn      = data.context_window?.current_usage?.cache_read_input_tokens     ?? 0
-                const tokensCur    = ctxIn + ctxCcIn + ctxCrIn
-                const tokensLim    = pct > 0 && tokensCur > 0 ? Math.round(tokensCur * 100 / pct) : 0
-                const tokensCum    = (data.context_window?.total_input_tokens  ?? 0) +
-                                     (data.context_window?.total_output_tokens ?? 0)
-                const pct5h        = data.rate_limits?.five_hour?.used_percentage
-                const until5h      = data.rate_limits?.five_hour?.resets_at ?? ""
-                const pctWk        = data.rate_limits?.seven_day?.used_percentage
-                const untilWk      = data.rate_limits?.seven_day?.resets_at ?? ""
-                const sessDurMs    = data.cost?.total_duration_ms ?? 0
-                const sessCost     = data.cost?.total_cost_usd
-                const ccVersion    = data.version ?? ""
-                const styleName    = data.output_style?.name ?? ""
-                const linesAdded   = data.cost?.total_lines_added ?? 0
-                const linesRemoved = data.cost?.total_lines_removed ?? 0
-
-                /*  optionally determine ASE task id and persona style via in-process Config  */
-                let taskId  = process.env.ASE_TASK_ID       ?? ""
-                let persona = process.env.ASE_PERSONA_STYLE ?? ""
-                try {
-                    const cfg = new Config("config", configSchema, this.log,
-                        parseScope(`session:${sessionId}`))
-                    cfg.read("lenient")
-                    const t = String(cfg.get("agent.task")    ?? "").trim()
-                    const p = String(cfg.get("agent.persona") ?? "").trim()
-                    if (t !== "")
-                        taskId = t
-                    if (p !== "")
-                        persona = p
-                }
-                catch (_e) {
-                    /*  cascade unavailable; keep env-var fallbacks  */
-                }
-
                 /*  determine effective terminal width and budget  */
                 const width  = opts.width > 0 ? opts.width : detectTermWidth()
                 const budget = width > 0 ? width - 2 * opts.margin : 0
-
-                /*  determine context bar information  */
-                const barSize  = 20
-                const filled   = Math.round(pct / 100 * barSize)
-                const bar      = "█".repeat(filled) + "░".repeat(barSize - filled)
 
                 /*  shared output state and append helper with auto-wrap;
                     the helper itself strips ANSI CSI escape sequences to
@@ -348,13 +298,42 @@ export default class StatuslineCommand {
                 /*  determine effective template lines  */
                 const tmpl = lines.length > 0 ? lines : [ "%m %e %t" ]
 
-                /*  lazy probes: only invoke git/memory subprocesses when their tokens
-                    actually appear in the template, and memoize the result for this run  */
-                const all = tmpl.join("")
+                /*  lazy memoized probes for cross-renderer values: each is computed at most
+                    once per run and only when first requested by a renderer (or by the
+                    post-loop tmux publish for the Config cascade)  */
+                let sessCache: string | null = null
+                const getSession = (): string => {
+                    if (sessCache === null)
+                        sessCache = data.session_name ?? data.session_id ?? "unknown"
+                    return sessCache
+                }
+                let cfgCache: { taskId: string, persona: string } | null = null
+                const getCfg = (): { taskId: string, persona: string } => {
+                    if (cfgCache !== null)
+                        return cfgCache
+                    let taskId  = process.env.ASE_TASK_ID       ?? ""
+                    let persona = process.env.ASE_PERSONA_STYLE ?? ""
+                    try {
+                        const cfg = new Config("config", configSchema, this.log,
+                            parseScope(`session:${getSession()}`))
+                        cfg.read("lenient")
+                        const t = String(cfg.get("agent.task")    ?? "").trim()
+                        const p = String(cfg.get("agent.persona") ?? "").trim()
+                        if (t !== "")
+                            taskId = t
+                        if (p !== "")
+                            persona = p
+                    }
+                    catch (_e) {
+                        /*  cascade unavailable; keep env-var fallbacks  */
+                    }
+                    cfgCache = { taskId, persona }
+                    return cfgCache
+                }
                 let gitCache: ReturnType<typeof probeGit> | null = null
                 const getGit = (): ReturnType<typeof probeGit> => {
                     if (gitCache === null)
-                        gitCache = probeGit(cwd)
+                        gitCache = probeGit(data.workspace?.current_dir ?? "")
                     return gitCache
                 }
                 let memCache: ReturnType<typeof probeMemory> | null = null
@@ -363,70 +342,114 @@ export default class StatuslineCommand {
                         memCache = probeMemory()
                     return memCache
                 }
-                if (/%[bgG]/.test(all))
-                    getGit()
-                if (all.includes("%M"))
-                    getMem()
 
-                /*  identifier to renderer map  */
+                /*  identifier to renderer map: each callback fetches its own information
+                    directly from data (or via the lazy helpers above for shared values)  */
                 const renderers: Record<string, () => void> = {
-                    u: () => emit(`${prefix("※", "user")}${c.bold(user)}`),
-                    p: () => emit(`${prefix("⚑", "project")}${c.bold(dir)}`),
+                    u: () => {
+                        const user = process.env.USER ?? process.env.LOGNAME ?? "unknown"
+                        emit(`${prefix("※", "user")}${c.bold(user)}`)
+                    },
+                    p: () => {
+                        const dir = path.basename(data.workspace?.current_dir ?? "")
+                        emit(`${prefix("⚑", "project")}${c.bold(dir)}`)
+                    },
                     T: () => {
+                        const { taskId } = getCfg()
                         if (taskId !== "")
                             emit(`${prefix("◉", "task")}${c.bold(taskId)}`)
                     },
-                    s: () => emit(`${prefix("⏻", "session")}${c.bold(sessionId)}`),
-                    m: () => emit(`${prefix("⚙", "model")}${c.bold(model)}`),
-                    e: () => emit(`${prefix("⚒", "effort")}${c.bold(effort)}`),
-                    t: () => emit(`${prefix("⚛", "thinking")}${c.bold(thinking)}`),
+                    s: () => emit(`${prefix("⏻", "session")}${c.bold(getSession())}`),
+                    m: () => {
+                        const model = data.model?.display_name ?? ""
+                        emit(`${prefix("⚙", "model")}${c.bold(model)}`)
+                    },
+                    e: () => {
+                        const effort = data.effort?.level ?? "unknown"
+                        emit(`${prefix("⚒", "effort")}${c.bold(effort)}`)
+                    },
+                    t: () => {
+                        const thinking = (data.thinking?.enabled ?? false) === true ? "yes" : "no"
+                        emit(`${prefix("⚛", "thinking")}${c.bold(thinking)}`)
+                    },
                     P: () => {
+                        const { persona } = getCfg()
                         if (persona !== "")
                             emit(`${prefix("☯", "persona")}${c.bold(persona)}`)
                     },
-                    c: () => emit(`${prefix("◔", "context")}${bar} ${pct}%`),
-                    a: () => emit(`${prefix("⊕", "added")}${c.bold(linesAdded)}`),
-                    r: () => emit(`${prefix("⊖", "removed")}${c.bold(linesRemoved)}`),
+                    c: () => {
+                        const pct     = Math.floor(data.context_window?.used_percentage ?? 0)
+                        const barSize = 20
+                        const filled  = Math.round(pct / 100 * barSize)
+                        const bar     = "█".repeat(filled) + "░".repeat(barSize - filled)
+                        emit(`${prefix("◔", "context")}${bar} ${pct}%`)
+                    },
+                    a: () => {
+                        const linesAdded = data.cost?.total_lines_added ?? 0
+                        emit(`${prefix("⊕", "added")}${c.bold(linesAdded)}`)
+                    },
+                    r: () => {
+                        const linesRemoved = data.cost?.total_lines_removed ?? 0
+                        emit(`${prefix("⊖", "removed")}${c.bold(linesRemoved)}`)
+                    },
                     C: () => {
+                        const ctxIn     = data.context_window?.current_usage?.input_tokens                ?? 0
+                        const ctxCcIn   = data.context_window?.current_usage?.cache_creation_input_tokens ?? 0
+                        const ctxCrIn   = data.context_window?.current_usage?.cache_read_input_tokens     ?? 0
+                        const tokensCur = ctxIn + ctxCcIn + ctxCrIn
                         if (tokensCur > 0)
                             emit(`${prefix("◇", "tokens")}${c.bold(formatTokens(tokensCur))}`)
                     },
                     L: () => {
+                        const pct       = Math.floor(data.context_window?.used_percentage ?? 0)
+                        const ctxIn     = data.context_window?.current_usage?.input_tokens                ?? 0
+                        const ctxCcIn   = data.context_window?.current_usage?.cache_creation_input_tokens ?? 0
+                        const ctxCrIn   = data.context_window?.current_usage?.cache_read_input_tokens     ?? 0
+                        const tokensCur = ctxIn + ctxCcIn + ctxCrIn
+                        const tokensLim = pct > 0 && tokensCur > 0 ? Math.round(tokensCur * 100 / pct) : 0
                         if (tokensLim > 0)
                             emit(`${prefix("◆", "limit")}${c.bold(formatTokens(tokensLim))}`)
                     },
                     N: () => {
+                        const tokensCum = (data.context_window?.total_input_tokens  ?? 0) +
+                                          (data.context_window?.total_output_tokens ?? 0)
                         if (tokensCum > 0)
                             emit(`${prefix("Σ", "total")}${c.bold(formatTokens(tokensCum))}`)
                     },
                     S: () => {
+                        const pct5h = data.rate_limits?.five_hour?.used_percentage
                         if (pct5h !== undefined)
                             emit(`${prefix("⏲", "session")}${c.bold(`${pct5h.toFixed(1)}%`)}`)
                     },
                     D: () => {
-                        const s = formatTimeUntil(until5h)
+                        const until5h = data.rate_limits?.five_hour?.resets_at ?? ""
+                        const s       = formatTimeUntil(until5h)
                         if (s !== "")
                             emit(`${prefix("⏱", "session-resets")}${c.bold(s)}`)
                     },
                     W: () => {
+                        const pctWk = data.rate_limits?.seven_day?.used_percentage
                         if (pctWk !== undefined)
                             emit(`${prefix("⏲", "weekly")}${c.bold(`${pctWk.toFixed(1)}%`)}`)
                     },
                     Q: () => {
-                        const s = formatTimeUntil(untilWk)
+                        const untilWk = data.rate_limits?.seven_day?.resets_at ?? ""
+                        const s       = formatTimeUntil(untilWk)
                         if (s !== "")
                             emit(`${prefix("⏱", "weekly-resets")}${c.bold(s)}`)
                     },
                     H: () => {
+                        const sessDurMs = data.cost?.total_duration_ms ?? 0
                         if (sessDurMs > 0)
                             emit(`${prefix("⏱", "elapsed")}${c.bold(formatHoursMinutes(sessDurMs))}`)
                     },
                     X: () => {
+                        const sessCost = data.cost?.total_cost_usd
                         if (sessCost !== undefined)
                             emit(`${prefix("$", "cost")}${c.bold(formatCostUsd(sessCost))}`)
                     },
                     b: () => {
-                        const g = getGit()
+                        const g     = getGit()
                         const label = g.branch !== "" ? g.branch : "no git"
                         emit(`${prefix("⎇", "branch")}${c.bold(label)}`)
                     },
@@ -441,6 +464,7 @@ export default class StatuslineCommand {
                             emit(`${prefix("⁈", "untracked")}${c.bold(String(g.untracked))}`)
                     },
                     d: () => {
+                        const cwd = data.workspace?.current_dir ?? ""
                         if (cwd !== "")
                             emit(`${prefix("▶", "cwd")}${c.bold(cwd)}`)
                     },
@@ -450,10 +474,12 @@ export default class StatuslineCommand {
                             emit(`${prefix("⛁", "mem")}${c.bold(`${formatBytes(m.used)}/${formatBytes(m.total)}`)}`)
                     },
                     V: () => {
+                        const ccVersion = data.version ?? ""
                         if (ccVersion !== "")
                             emit(`${prefix("⎈", "version")}${c.bold(ccVersion)}`)
                     },
                     o: () => {
+                        const styleName = data.output_style?.name ?? ""
                         if (styleName !== "")
                             emit(`${prefix("≡", "style")}${c.bold(styleName)}`)
                     }
@@ -513,6 +539,7 @@ export default class StatuslineCommand {
                     && process.env.TMUX !== ""
                     && process.env.TMUX_PANE !== undefined
                     && process.env.TMUX_PANE !== "") {
+                    const { taskId } = getCfg()
                     const tid = taskId !== "" ? taskId : "default"
                     execaSync("tmux", [ "set-option", "-p", "-t", process.env.TMUX_PANE,
                         "@ase_task_id", tid ], { stdio: "ignore", reject: false })
