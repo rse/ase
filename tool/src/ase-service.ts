@@ -25,7 +25,11 @@ import { z }                             from "zod"
 
 import { Config, configSchema, parseScope } from "./ase-config.js"
 import type Log                 from "./ase-log.js"
-import { renderDiagram }        from "./ase-diagram.js"
+import {
+    renderDiagram,
+    detectTermWidth,
+    detectTermHeight
+}                               from "./ase-diagram.js"
 import { taskLoad, taskSave, taskDelete, taskList } from "./ase-task.js"
 import pkg                      from "../package.json" with { type: "json" }
 
@@ -262,10 +266,10 @@ export default class ServiceCommand {
                         .describe("extra horizontal clipping: subtract this many characters from `terminalWidth`"),
                     diagramClipY: z.number().int().min(0).default(0)
                         .describe("extra vertical clipping: subtract this many lines from `terminalHeight`"),
-                    terminalWidth: z.number().int().min(0).default(0)
-                        .describe("terminal width in characters; 0 disables horizontal clipping"),
-                    terminalHeight: z.number().int().min(0).default(0)
-                        .describe("terminal height in lines; 0 disables vertical clipping")
+                    terminalWidth: z.number().int().min(0).default(detectTermWidth())
+                        .describe("terminal width in characters; 0 disables horizontal clipping; defaults to ASE_TERM_WIDTH env var if set"),
+                    terminalHeight: z.number().int().min(0).default(detectTermHeight())
+                        .describe("terminal height in lines; 0 disables vertical clipping; defaults to ASE_TERM_HEIGHT env var if set")
                 }
             }, async (args) => {
                 try {
