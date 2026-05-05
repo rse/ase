@@ -40,6 +40,45 @@ Skill Output
         within it. Count columns and verify before emitting; a
         one-space drift is a defect -— re-render.
 
+-   *IMPORTANT*: For *Findings* (problems, tradeoffs, warnings
+    emitted by analysis skills):
+
+    -   *Evidence-grounded (mandatory)*: each finding MUST cite
+        the exact line range that triggers it AND the cited
+        snippet must prove the claim *verbatim*. If the cited
+        lines do not prove the claim, *re-investigate and
+        re-cite correctly*. Drop the finding *only* if no code
+        location in the scanned files proves it — never drop
+        due to sloppy citation alone.
+
+    -   *Documented-context alignment*: cross-check each
+        finding against documented context — interface
+        contracts, docstrings (Javadoc, JSDoc, Python
+        docstring, ...), adjacent code comments, and
+        project-level AI guidance files (`CLAUDE.md`,
+        `AGENTS.md`, `GEMINI.md`, `MEMORY.md`,
+        `.github/copilot-instructions.md`, `.cursor/rules/`,
+        or similar). Two cases resolve via the same
+        mechanism — do *not* drop, keep the finding visible
+        for traceability:
+
+        -   *Problem already addressed*: the finding's
+            concern is explicitly stated in a contract or
+            docstring (e.g. "MUST be non-blocking"). Mark
+            severity `ACCEPTED` with note "contractually
+            addressed".
+
+        -   *Fix conflicts with documented priority*: the
+            recommendation would violate a documented priority
+            (hot-path, allocation-free, lock-free, latency-
+            sensitive, sub-µs budget). Either weaken the
+            recommendation, convert it to a tradeoff, or mark
+            severity `ACCEPTED` with note "priority-conflict
+            accepted".
+
+        Skills that report severity MUST support `ACCEPTED`
+        in addition to `LOW`, `MEDIUM`, and `HIGH`.
+
 Skill Control Flow
 ------------------
 
