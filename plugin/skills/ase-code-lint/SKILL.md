@@ -137,12 +137,31 @@ related to a set of code quality aspects.
 
 7.  <step id="A06 - REDUNDANCY">
     <expand name="linter" arg1="A06 - REDUNDANCY">
-    Check for redundancies through duplications of identical code or
-    nearly identical code.
+    Check for *redundant code* through duplications of identical or
+    near-identical code. Apply graded severity by block size,
+    occurrence count, and locality across the following sub-aspects:
 
-    For redundant code of more than 3 lines, suggest factoring it out
-    into a utility function, but position it before its calls as close
-    as possible.
+    -   **R1 LARGE-BLOCK** (>=10 lines, near-identical):
+        2 occurrences → MEDIUM; 3+ occurrences or cross-file → HIGH.
+
+    -   **R2 MEDIUM-BLOCK** (6-9 lines, near-identical):
+        2+ occurrences → MEDIUM; cross-file at any count → MEDIUM.
+
+    -   **R3 SMALL-PATTERN** (<6 lines, near-identical):
+        3+ occurrences → LOW. Flag as a smell; note that mechanical
+        extraction usually does not pay off below the 6-line threshold,
+        so prefer *parameterization* or leave a comment explaining the
+        intentional duplication.
+
+    -   **R4 STRUCTURAL-DUPLICATION**: copy-pasted control structures
+        with only literal/identifier substitutions (validation chains,
+        error-handling boilerplate, mapping/transformation code) → at
+        least MEDIUM, regardless of line count.
+
+    For any flagged redundancy of more than 6 lines, *propose
+    extraction* into a utility function placed before its first call
+    site as close as possible. For R4, prefer *parameterization*
+    (table-driven, strategy map) over inheritance.
     </expand>
     </step>
 
@@ -287,10 +306,55 @@ related to a set of code quality aspects.
 
 21. <step id="A20 - DEAD-CODE">
     <expand name="linter" arg1="A20 - DEAD-CODE">
-    Check for dead or unused code.
+    Check for *dead or unused code* across the following sub-aspects.
+    For each finding, *guard against false positives* by considering
+    the language- and framework-specific access paths listed.
 
-    Especially, try to detect classes, functions or control flow
-    branches which are effectively dead or unused.
+    -   **D1 UNUSED-CALLABLES**: classes, interfaces, methods, or
+        functions with no callers in the codebase. Before flagging,
+        consider *reflection*, *framework hooks* (DI containers,
+        annotation-driven dispatch, route registrations), *external
+        module consumers* (public API surface), and *test fixtures*.
+
+    -   **D2 UNUSED-MEMBERS**: class attributes or struct fields
+        assigned but never read. Before flagging, consider
+        *serialization frameworks*, *ORM/persistence mapping*,
+        *template or UI binding via reflection*, and *dynamic property
+        access* (where the language allows reading members by name at
+        runtime).
+
+    -   **D3 UNUSED-IMPORTS**: import statements for symbols never
+        referenced in the file.
+
+    -   **D4 UNUSED-LOCALS**: local variables and function parameters
+        declared but never read. Exclude *conventional placeholders*
+        such as a single underscore or leading-underscore names that
+        signal intentional disuse.
+
+    -   **D5 UNREACHABLE-CODE**: code following an unconditional
+        `return`, `throw`, `break`, `continue`, or process termination.
+
+    -   **D6 PASS-ONLY-CALLABLES**: functions whose entire body is
+        `pass`, an empty block, a bare `return` / `return None`, or
+        just a docstring. Exclude *abstract methods*, *protocol stubs
+        for type checking*, and language-required no-ops.
+
+    -   **D7 DEPRECATED-DRIFT**: two related cases —
+        (a) deprecated symbols with zero remaining callers (removable),
+        (b) production code still calling deprecated symbols
+        (migration debt).
+
+    -   **D8 SILENCED-EXCEPTIONS**: exception handlers that swallow
+        errors without logging, re-throwing, or setting an explicit
+        error flag (`except: pass`, `catch (e) {}`, empty `recover()`).
+        Exclude handlers carrying an *explanatory comment* that states
+        why silencing is intentional.
+
+    Severity guidance: D1, D2, D5, D6, D7, D8 default to MEDIUM unless
+    the construct is purely local and trivial (then LOW). D3 and D4
+    default to LOW. Escalate to HIGH only when the dead construct
+    *masks* another bug (e.g., unreachable code after a misplaced
+    `return` that skips cleanup logic).
     </expand>
     </step>
 
