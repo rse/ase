@@ -138,24 +138,27 @@ related to a set of code quality aspects.
 7.  <step id="A06 - REDUNDANCY">
     <expand name="linter" arg1="A06 - REDUNDANCY">
     Check for *redundant code* through duplications of identical or
-    near-identical sequences. Apply graded severity by block size,
+    near-identical code. Apply graded severity by block size,
     occurrence count, and locality across the following sub-aspects:
 
     -   **R1 LARGE-BLOCK** (>=10 lines, near-identical):
         2 occurrences → MEDIUM; 3+ occurrences or cross-file → HIGH.
 
-    -   **R2 MEDIUM-BLOCK** (5-9 lines, near-identical):
+    -   **R2 MEDIUM-BLOCK** (6-9 lines, near-identical):
         2+ occurrences → MEDIUM; cross-file at any count → MEDIUM.
 
-    -   **R3 SMALL-PATTERN** (<5 lines, near-identical):
-        3+ occurrences → LOW.
+    -   **R3 SMALL-PATTERN** (<6 lines, near-identical):
+        3+ occurrences → LOW. Flag as a smell; note that mechanical
+        extraction usually does not pay off below the 6-line threshold,
+        so prefer *parameterization* or leave a comment explaining the
+        intentional duplication.
 
     -   **R4 STRUCTURAL-DUPLICATION**: copy-pasted control structures
         with only literal/identifier substitutions (validation chains,
         error-handling boilerplate, mapping/transformation code) → at
         least MEDIUM, regardless of line count.
 
-    For any flagged redundancy of more than 3 lines, *propose
+    For any flagged redundancy of more than 6 lines, *propose
     extraction* into a utility function placed before its first call
     site as close as possible. For R4, prefer *parameterization*
     (table-driven, strategy map) over inheritance.
@@ -315,16 +318,18 @@ related to a set of code quality aspects.
 
     -   **D2 UNUSED-MEMBERS**: class attributes or struct fields
         assigned but never read. Before flagging, consider
-        *serialization* (Jackson, serde, marshaling), *ORM mapping*
-        (JPA, SQLAlchemy), *template/UI binding via reflection*, and
-        dynamic access (`getattr`, `Object.keys`, etc.).
+        *serialization frameworks*, *ORM/persistence mapping*,
+        *template or UI binding via reflection*, and *dynamic property
+        access* (where the language allows reading members by name at
+        runtime).
 
     -   **D3 UNUSED-IMPORTS**: import statements for symbols never
         referenced in the file.
 
     -   **D4 UNUSED-LOCALS**: local variables and function parameters
         declared but never read. Exclude *conventional placeholders*
-        (`_` in Go/Python, leading-underscore in some style guides).
+        such as a single underscore or leading-underscore names that
+        signal intentional disuse.
 
     -   **D5 UNREACHABLE-CODE**: code following an unconditional
         `return`, `throw`, `break`, `continue`, or process termination.
