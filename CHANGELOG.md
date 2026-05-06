@@ -2,8 +2,14 @@
 ChangeLog
 =========
 
-0.0.21 (2026-05-05)
+0.0.21 (2026-05-07)
 -------------------
+
+- IMPROVEMENT: expand and refine ase-code-lint A06/A20 with sub-aspects, severity guidance, and technology-neutral rules
+- IMPROVEMENT: emit clip warning in rendered diagram and honor env-driven terminal size defaults in MCP service
+- IMPROVEMENT: add evidence-grounded and contract-aware finding-report filters to skill meta rules
+- BUGFIX: add health check and auto-reconnect/restart when MCP service is unavailable
+- UPDATE: upgrade dependencies
 
 0.0.20 (2026-05-04)
 -------------------
