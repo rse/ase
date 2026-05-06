@@ -54,7 +54,7 @@ const parseColorMode = (name: string) => (value: string): "none" | "ansi16" | "a
 }
 
 /*  detect terminal column width  */
-const detectTermWidth = (): number => {
+export const detectTermWidth = (): number => {
     let width = 0
 
     /*  attempt 1: query environment variable  */
@@ -75,7 +75,7 @@ const detectTermWidth = (): number => {
 }
 
 /*  detect terminal row height  */
-const detectTermHeight = (): number => {
+export const detectTermHeight = (): number => {
     let height = 0
 
     /*  attempt 1: query environment variable  */
@@ -157,6 +157,30 @@ const truncateAnsiLine = (line: string, budget: number): string => {
     return out
 }
 
+/*  measure visible column width of a rendered line, ignoring ANSI escape
+    sequences (CSI ...m); mirrors the visibility model of truncateAnsiLine  */
+const visibleWidth = (line: string): number => {
+    let visible = 0
+    let i       = 0
+    while (i < line.length) {
+        const ch = line[i]!
+        if (ch === "\x1b" && line[i + 1] === "[") {
+            let j = i + 2
+            while (j < line.length && !/[A-Za-z]/.test(line[j]!))
+                j++
+            if (j < line.length) {
+                i = j + 1
+                continue
+            }
+            i++
+            continue
+        }
+        visible++
+        i++
+    }
+    return visible
+}
+
 /*  pure rendering helper: turn a Mermaid source string plus options into
     a rendered Unicode/ASCII diagram string. Throws on render failure.  */
 export const renderDiagram = (src: string, opts: DiagramRenderOpts): string => {
@@ -191,12 +215,34 @@ export const renderDiagram = (src: string, opts: DiagramRenderOpts): string => {
         const maxWidth   = termWidth  > 0 ? termWidth  - opts.diagramClipX : 0
         const maxHeight  = termHeight > 0 ? termHeight - opts.diagramClipY : 0
         const trailingNL = out.endsWith("\n")
-        let lines = (trailingNL ? out.slice(0, -1) : out).split("\n")
-        if (maxWidth > 0)
+        let lines        = (trailingNL ? out.slice(0, -1) : out).split("\n")
+        let widthWarn    = ""
+        let heightWarn   = ""
+        if (maxWidth > 0) {
+            const widest = lines.reduce((m, l) => Math.max(m, visibleWidth(l)), 0)
+            if (widest > maxWidth)
+                widthWarn =
+                    `ase diagram: WARNING: rendered diagram width ${widest} exceeds budget ${maxWidth}; ` +
+                    "rightmost content was clipped. Please regenerate the Mermaid source to fit " +
+                    `within ${maxWidth} chars by preferring a portrait orientation ` +
+                    "(\"flowchart TB\", top-to-bottom) over landscape (\"LR\"/\"RL\"/\"BT\"), " +
+                    "reducing siblings per row, abbreviating node labels, or restructuring " +
+                    "into nested subgraph hierarchies."
             lines = lines.map((l) => truncateAnsiLine(l, maxWidth))
-        if (maxHeight > 0 && lines.length > maxHeight)
+        }
+        if (maxHeight > 0 && lines.length > maxHeight) {
+            const overflow = lines.length - maxHeight
+            heightWarn =
+                `ase diagram: WARNING: rendered diagram height ${lines.length} exceeds budget ${maxHeight}; ` +
+                `bottom ${overflow} line(s) were clipped. Please regenerate the Mermaid source to fit ` +
+                `within ${maxHeight} lines by reducing depth or splitting into multiple diagrams.`
             lines = lines.slice(0, maxHeight)
+        }
         out = lines.join("\n") + (trailingNL ? "\n" : "")
+        if (widthWarn !== "")
+            out += "\n" + widthWarn + "\n"
+        if (heightWarn !== "")
+            out += "\n" + heightWarn + "\n"
     }
 
     return out
