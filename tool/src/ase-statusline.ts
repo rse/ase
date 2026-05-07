@@ -318,7 +318,7 @@ export default class StatuslineCommand {
                 let sessCache: string | null = null
                 const getSession = (): string => {
                     if (sessCache === null)
-                        sessCache = data.session_name ?? data.session_id ?? "unknown"
+                        sessCache = data.session_id ?? "unknown"
                     return sessCache
                 }
                 let cfgCache: { taskId: string, persona: string } | null = null
