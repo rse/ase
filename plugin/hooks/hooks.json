@@ -23,6 +23,18 @@
                     }
                 ]
             }
+        ],
+        "sessionStart": [
+            {
+                "type": "command",
+                "bash": "ase hook session-start --tool copilot"
+            }
+        ],
+        "preToolUse": [
+            {
+                "type": "command",
+                "bash": "ase hook pre-tool-use --tool copilot"
+            }
         ]
     }
 }

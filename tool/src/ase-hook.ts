@@ -150,7 +150,6 @@ export default class HookCommand {
 
         /*  expand all @<file> references manually  */
         md = this.expandReferences(md, path.dirname(fileMd))
-        fs.writeFileSync("/tmp/xxx", md, "utf8")
 
         /*  inject markdown into session context  */
         process.stdout.write(JSON.stringify({
