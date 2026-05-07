@@ -39,16 +39,16 @@ with a corresponding, complete *change set*.
     </step>
 
 2.  <step id="STEP 2: Create Implementation">
-    -  Perform a *final implementation* of the *specification*
-       by modifying the *source code* with a corresponding, complete
-       *change set*.
+    -   Perform a *final implementation* of the *specification*
+        by modifying the *source code* with a corresponding, complete
+        *change set*.
 
-    -  For this, primarily follow and honor the specification in <content/>.
+    -   For this, primarily follow and honor the specification in <content/>.
 
-    -  Secondarily, derive hints from the optionally existing
-       `IMPLEMENTATION DRAFT` section in <content/>. But the specification
-       text in <content/> always overrules the implementation draft in the
-       `IMPLEMENTATION DRAFT` section of <content/>.
+    -   Secondarily, derive hints from the optionally existing
+        `IMPLEMENTATION DRAFT` section in <content/>. But the specification
+        text in <content/> always overrules the implementation draft in the
+        `IMPLEMENTATION DRAFT` section of <content/>.
     </step>
 </flow>
 
