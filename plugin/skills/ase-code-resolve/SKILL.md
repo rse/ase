@@ -1,6 +1,6 @@
 ---
 name: ase-code-resolve
-argument-hint: "<problem>"
+argument-hint: "[<task-id>:] <problem>"
 description: >
     Resolve Problem:
     Use when user wants a bug fixed or problem resolved.
@@ -26,19 +26,33 @@ Your role is an experienced, *expert-level software developer*.
 
 <flow>
 1.  <step id="STEP 1: Reason About Problem">
-    -   Enter *Plan Mode* with the `EnterPlanMode` tool.
+    1.  Enter *Plan Mode* with the `EnterPlanMode` tool.
 
-    -   Clear any old plans of the *Plan Mode* and start planning from
+    2.  Clear any old plans of the *Plan Mode* and start planning from
         scratch with an empty plan.
 
-    -   Figure out what the requested <problem/> is about.
+    3.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
+        the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
+        <problem><text/></problem> and <ase-task-id><id/></ase-task-id>
+        and call the `task_id(id: <ase-task-id/>, session:
+        <ase-session-id/>)` tool from the `ase` MCP service to
+        implicitly switch the task.
 
-    -   Ask the user for clarification if the goal of this resolution is
+    4.  Report the task and problem with the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**
+        ⧉ **ASE**: ◉ problem: **<problem/>**
+        </template>
+
+    5.  Figure out what the requested <problem/> is about.
+
+    6.  Ask the user for clarification if the goal of this resolution is
         too unclear.
 
-    -   Do not output anything in this step, except you asked the user.
+    7.  Do not output anything in this step, except you asked the user.
 
-    -   Investigate and *figure out details* related to this problem.
+    8.  Investigate and *figure out details* related to this problem.
         Report those details with the following <template/>:
 
         <template>
@@ -72,10 +86,10 @@ Your role is an experienced, *expert-level software developer*.
     </step>
 
 2.  <step id="STEP 2: Investigate Code Base">
-    -   Check the existing source files for all code which is related to the
+    1.  Check the existing source files for all code which is related to the
         requested <problem/> resolution.
 
-    -   Check the architecture of the existing code base to understand the
+    2.  Check the architecture of the existing code base to understand the
         overall structures and dynamics.
     </step>
 
@@ -121,7 +135,7 @@ Your role is an experienced, *expert-level software developer*.
         side-by-side. Omit <optional-diagram/> entirely for simple or
         purely local situation.
 
-    Tenets (generic):
+    *Recommended* Tenets (generic):
 
     -   **Surgical Changes**:
         Keep source code changes always as small as possible.
@@ -139,7 +153,7 @@ Your role is an experienced, *expert-level software developer*.
         Strictly align with the existing code base by exactly following its
         coding style, its structure, its naming conventions, etc.
 
-    Tenets (specific, *ESSENTIAL*):
+    *Essential* Tenets (specific):
 
     -   **No Cleanups**:
         Strictly focus on resolving the problem and do not mix this task

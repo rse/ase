@@ -1,6 +1,6 @@
 ---
 name: ase-code-craft
-argument-hint: "<feature>"
+argument-hint: "[<task-id>:] <feature>"
 description: >
     Craft Source Code:
     Use when user wants to create or craft a new feature from scratch.
@@ -25,23 +25,38 @@ From scratch *craft* the following feature:
 
 <flow>
 1.  <step id="STEP 1: Reason About Feature">
-    -   Enter *Plan Mode* with the `EnterPlanMode` tool.
+    1.  Enter *Plan Mode* with the `EnterPlanMode` tool.
 
-    -   Clear any old plans of the *Plan Mode* and start planning from
+    2.  Clear any old plans of the *Plan Mode* and start planning from
         scratch with an empty plan.
 
-    -   Figure out what the requested <feature/> to be crafted is about.
+    3.  If <feature/> has the format `<id/>: <text/>` where <id/> matches
+        the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
+        <feature><text/></feature> and <ase-task-id><id/></ase-task-id>
+        and call the `task_id(id: <ase-task-id/>, session:
+        <ase-session-id/>)` tool from the `ase` MCP service to
+        implicitly switch the task.
 
-    -   Ask the user for clarification if the goal of this crafting is too
+    4.  Report the task and feature with the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**
+        ⧉ **ASE**: ◉ feature: **<feature/>**
+        </template>
+
+    5.  Figure out what the requested <feature/> to be crafted is about.
+
+    6.  Ask the user for clarification if the goal of this crafting is too
         unclear.
 
-    -   Do not output anything in this step, except you asked the user.
+    7.  Do not output anything in this step, except you asked the user.
     </step>
 
 2.  <step id="STEP 2: Investigate Code Base">
-    -   Check the existing source files for all code which is related to the
+    1.  Check the existing source files for all code which is related to the
         requested new <feature/>.
-    -   Check the architecture of the existing code base to understand the
+
+    2.  Check the architecture of the existing code base to understand the
         overall structures and dynamics.
     </step>
 
@@ -76,7 +91,7 @@ From scratch *craft* the following feature:
         side-by-side. Omit <optional-diagram/> entirely for simple or
         purely local situation.
 
-    Tenets (generic):
+    *Recommended* Tenets (generic):
 
     -   **Surgical Changes**:
         Keep source code changes always as small as possible.
@@ -94,7 +109,7 @@ From scratch *craft* the following feature:
         Strictly align with the existing code base by exactly following its
         coding style, its structure, its naming conventions, etc.
 
-    Tenets (specific, *ESSENTIAL*):
+    *Essential* Tenets (specific):
 
     -   **High Cohesion, Low Coupling**:
         Strike for a set of small, focused parts (high cohesion) connected by

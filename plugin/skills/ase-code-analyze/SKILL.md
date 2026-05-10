@@ -52,7 +52,7 @@ flow* is found.
    output <template/>, based on concise bullet points.
 
    <template>
-   &#x1F7E0; PROBLEM **P</n/>** (Severity: **<severity/>**): **<title/>**
+   &#x1F7E0; PROBLEM (Severity: **<severity/>**): **P</n/>**: **<title/>**
 
    <description/>
    </template>
