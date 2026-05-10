@@ -9,6 +9,7 @@ ChangeLog
 - IMPROVEMENT: improve `ase-code-changes` skill by extending its context when necessary
 - BUGFIX: fix allowed-tools Bash pattern syntax in `ase-meta-chat` skill
 - BUGFIX: omit session name in `ase statusline` output for now
+- BUGFIX: "ase setup install" in development mode has to use the ASE base directory, not cwd
 - UPDATE: mention rudimentary Github Copilot CLI support in README
 - CLEANUP: remove debugging leftovers in `plugin/hooks/hooks.json` and `ase-hook.ts`
 - CLEANUP: fix indentation in `ase-spec-implement` skill

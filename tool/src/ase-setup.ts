@@ -95,7 +95,8 @@ export default class SetupCommand {
 
         this.log.write("info", `setup: install${dev ? "[dev]" : ""}: ` +
             `installing ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote"})`)
-        const source = dev ? process.cwd() : "rse/ase"
+        const basedir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..")
+        const source  = dev ? basedir : "rse/ase"
         await this.run(spec.cli, [ "plugin", "marketplace", "add", source ])
         await this.run(spec.cli, [ "plugin", "install", "ase@ase" ], { retries: 3 })
         return 0
