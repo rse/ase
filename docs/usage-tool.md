@@ -163,13 +163,20 @@ background service as a *Claude Code* MCP server:
   Code* and not invoked directly by end users.
 
 The following top-level command exists for rendering the *Claude Code*
-statusline:
+or *GitHub Copilot CLI* statusline:
 
-- `ase statusline` \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[`--no-icons`\] \[`--no-labels`\] \[*line* \[...\]\]:
-  Render the *Claude Code* statusline from a JSON payload read on
-  standard input. Intended to be configured as the `statusLine`
-  command in *Claude Code* settings and not invoked directly by end
-  users. The input JSON is the standard *Claude Code* statusline
+- `ase statusline` \[`-t`|`--tool` `claude`|`copilot`\] \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[`--no-icons`\] \[`--no-labels`\] \[*line* \[...\]\]:
+  Render the *Claude Code* or *GitHub Copilot CLI* statusline from a
+  JSON payload read on standard input. Intended to be configured as
+  the `statusLine` command in *Claude Code* settings (or the
+  `statusLine.command` entry in `~/.copilot/settings.json` for *GitHub
+  Copilot CLI*) and not invoked directly by end users. The `--tool`
+  option selects the host (default: `claude`, or the value of the
+  `ASE_TOOL` environment variable if set); under `--tool copilot` the
+  payload's top-level `cwd` field is mapped onto `workspace.current_dir`
+  for the renderers below, and placeholders backed by Claude-Code-only
+  fields (such as `%e`, `%t`, `%o`, `%S`, `%D`, `%W`, `%Q`) are simply
+  suppressed. The input JSON is the standard *Claude Code* statusline
   payload (with `workspace.current_dir`, `model.display_name`,
   `context_window.used_percentage`, `effort.level`, `thinking.enabled`,
   `session_id`, and -- on *Claude Code* `2.1.90+` -- additionally
