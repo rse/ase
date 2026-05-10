@@ -3,11 +3,12 @@ name: ase-code-resolve
 argument-hint: "<problem>"
 description: >
     Resolve a problem in depth in order to fix it.
-    Use when user wants a bug fixed or problem resolved.
+    Use when user wants a *bug fixed* or *problem resolved*.
 user-invocable: true
 disable-model-invocation: false
 effort: high
 allowed-tools:
+    - "Bash(date)"
     - "Skill(ase:ase-meta-diagram)"
 ---
 
@@ -16,11 +17,11 @@ allowed-tools:
 Resolve Problem
 ===============
 
-Your role is an experienced, *expert-level software developer*,
-specialized in *resolving problems*.
+Your role is an experienced, *expert-level software developer*.
 
 <objective>
-*Resolve* the following problem: <problem>$ARGUMENTS</problem>.
+*Resolve* the following problem:
+<problem>$ARGUMENTS</problem>
 </objective>
 
 <flow>
@@ -237,8 +238,8 @@ specialized in *resolving problems*.
     and do not output anything else in this step:
 
     <template>
-    &#x1F535; Problem Resolution Plan Created.
-    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-spec-implement` skills.
+    ✔ **RESULT**: Artifact Refactoring Plan Created.
+    ▶ **NEXT**: `ase-spec-edit`, `ase-spec-preflight`, or `ase-spec-implement`.
     </template>
     </step>
 </flow>

@@ -3,7 +3,7 @@ name: ase-code-refactor
 argument-hint: "<request>"
 description: >
     Refactor Source Code.
-    Use when user wants to refactor the code base.
+    Use when user wants to *refactor* the code base.
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -16,11 +16,11 @@ allowed-tools:
 Refactor Artifacts
 ==================
 
-Your role is an experienced, *expert-level software developer*,
-specialized in *refactoring source artifacts*.
+Your role is an experienced, *expert-level software developer*.
 
 <objective>
-*Refactor* existing artifacts the following way: <request>$ARGUMENTS</request>.
+*Refactor* existing artifacts the following way:
+<request>$ARGUMENTS</request>
 </objective>
 
 <flow>
@@ -190,8 +190,8 @@ specialized in *refactoring source artifacts*.
     and do not output anything else in this step:
 
     <template>
-    &#x1F535; Artifact Refactoring Plan Created.
-    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-spec-implement` skills.
+    ✔ **RESULT**: Artifact Refactoring Plan Created.
+    ▶ **NEXT**: `ase-spec-edit`, `ase-spec-preflight`, or `ase-spec-implement`.
     </template>
     </step>
 </flow>

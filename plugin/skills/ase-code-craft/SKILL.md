@@ -3,10 +3,12 @@ name: ase-code-craft
 argument-hint: "<feature>"
 description: >
     Craft Source Code From Scratch.
-    Use when user wants a create a new feature.
+    Use when user wants a *create* or *craft* a *new feature*.
 user-invocable: true
 disable-model-invocation: false
 effort: high
+allowed-tools:
+    - "Bash(date)"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
@@ -14,11 +16,11 @@ effort: high
 Craft Feature
 =============
 
-Your role is an experienced, *expert-level software developer*,
-specialized in *crafting features*.
+Your role is an experienced, *expert-level software developer*.
 
 <objective>
-From scratch *craft* the following feature: <feature>$ARGUMENTS</feature>.
+From scratch *craft* the following feature:
+<feature>$ARGUMENTS</feature>
 </objective>
 
 <flow>
@@ -180,8 +182,8 @@ From scratch *craft* the following feature: <feature>$ARGUMENTS</feature>.
     and do not output anything else in this step:
 
     <template>
-    &#x1F535; Refactoring Plan Created.
-    &#x26AA; Next Step: `ase-spec-edit`, `ase-meta-preflight`, or `ase-spec-implement` skills.
+    ✔ **RESULT**: Artifact Refactoring Plan Created.
+    ▶ **NEXT**: `ase-spec-edit`, `ase-spec-preflight`, or `ase-spec-implement`.
     </template>
     </step>
 </flow>
