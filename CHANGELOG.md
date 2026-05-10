@@ -8,6 +8,7 @@ ChangeLog
 - IMPROVEMENT: add initial Github Copilot CLI support to "ase setup" commands and provide marketplace/plugin JSON config files
 - IMPROVEMENT: improve `ase-code-changes` skill by extending its context when necessary
 - IMPROVEMENT: add support for Copilot preToolUse hook
+- IMPROVEMENT: add `-t`/`--tool` option to `ase statusline` and support Github Copilot CLI status line
 - BUGFIX: fix allowed-tools Bash pattern syntax in `ase-meta-chat` skill
 - BUGFIX: omit session name in `ase statusline` output for now
 - BUGFIX: "ase setup install" in development mode has to use the ASE base directory, not cwd

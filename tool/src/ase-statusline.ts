@@ -27,8 +27,17 @@ const COLORS: ReadonlySet<string> = new Set<ForegroundColorName | "default">([
     "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "default"
 ])
 
-/*  shape of the JSON payload Claude Code passes on stdin  */
+/*  type of supported tool (host) systems  */
+type Tool = "claude" | "copilot"
+
+/*  shape of the JSON payload Claude Code / Copilot CLI passes on stdin
+    (Copilot CLI's payload is mostly a subset of Claude Code's, with the
+    extra top-level "cwd" field and without "effort", "thinking",
+    "output_style", and "rate_limits"; the "context_window.current_usage"
+    sub-object is shared, and "model.display_name" plus the cost,
+    workspace, session and version fields are also shared)  */
 interface StatuslineInput {
+    cwd?: string
     workspace?: {
         current_dir?: string
     }
@@ -79,6 +88,7 @@ interface StatuslineInput {
 
 /*  internal command options type  */
 interface StatuslineOpts {
+    tool:   string
     width:  number
     margin: number
     icons:  boolean
@@ -237,11 +247,24 @@ const probeMemory = (): { used: number, total: number } => {
 export default class StatuslineCommand {
     constructor (private log: Log) {}
 
+    /*  parse and validate the --tool option  */
+    private parseTool (value: string): Tool {
+        if (value !== "claude" && value !== "copilot")
+            throw new Error(`invalid --tool value: "${value}" (expected "claude" or "copilot")`)
+        return value
+    }
+
     /*  register commands  */
     register (program: Command): void {
+        /*  default for --tool derived from ASE_TOOL environment variable  */
+        const envTool  = process.env.ASE_TOOL ?? ""
+        const toolDflt = envTool !== "" ? envTool : "claude"
+
         program
             .command("statusline")
-            .description("Render Claude Code statusline from stdin JSON")
+            .description("Render Claude Code or GitHub Copilot CLI statusline from stdin JSON")
+            .option("-t, --tool <tool>",
+                "target tool (\"claude\" or \"copilot\")", toolDflt)
             .option("-w, --width <n>",
                 "force terminal width to <n> characters (0 = auto-detect via /dev/tty)",
                 parseInteger("--width"), 0)
@@ -258,6 +281,9 @@ export default class StatuslineCommand {
                 "(color: black, red, green, yellow, blue, magenta, cyan, white, default) " +
                 "(default: single line \"%m %e %t\")")
             .action(async (lines: string[], opts: StatuslineOpts) => {
+                /*  validate target tool  */
+                const tool = this.parseTool(opts.tool)
+
                 /*  read all of stdin  */
                 const input = await readStdin()
 
@@ -270,6 +296,14 @@ export default class StatuslineCommand {
                     const message = err instanceof Error ? err.message : String(err)
                     this.log.write("error", `statusline: invalid JSON on stdin: ${message}`)
                     process.exit(1)
+                }
+
+                /*  normalize Copilot CLI's top-level "cwd" into the
+                    "workspace.current_dir" structure shared with Claude Code  */
+                if (tool === "copilot"
+                    && (data.workspace?.current_dir === undefined || data.workspace.current_dir === "")
+                    && typeof data.cwd === "string" && data.cwd !== "") {
+                    data.workspace = { ...(data.workspace ?? {}), current_dir: data.cwd }
                 }
 
                 /*  determine effective terminal width and budget  */
