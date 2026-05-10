@@ -14,6 +14,41 @@ import type Log                             from "./ase-log.js"
 import Version                              from "./ase-version.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
 
+/*  type of supported tool (host) systems  */
+type Tool = "claude" | "copilot"
+
+/*  per-tool dispatch table for the parts that actually differ between
+    Claude Code and GitHub Copilot CLI hook integrations.  */
+type ToolSpec = {
+    toolNameField:          "tool_name"  | "toolName"
+    toolInputField:         "tool_input" | "toolArgs"
+    toolInputIsString:      boolean
+    bashToolName:           "Bash" | "bash"
+    mcpToolNamePattern:     RegExp
+    preToolUseWrapped:      boolean
+    preToolUseEvent:        "PreToolUse" | "preToolUse"
+}
+const toolSpecs: Record<Tool, ToolSpec> = {
+    "claude": {
+        toolNameField:      "tool_name",
+        toolInputField:     "tool_input",
+        toolInputIsString:  false,
+        bashToolName:       "Bash",
+        mcpToolNamePattern: /^mcp__plugin_ase_ase__.+/,
+        preToolUseWrapped:  true,
+        preToolUseEvent:    "PreToolUse"
+    },
+    "copilot": {
+        toolNameField:      "toolName",
+        toolInputField:     "toolArgs",
+        toolInputIsString:  true,
+        bashToolName:       "bash",
+        mcpToolNamePattern: /^ase-.+/,
+        preToolUseWrapped:  false,
+        preToolUseEvent:    "preToolUse"
+    }
+}
+
 /*  CLI command "ase hook"  */
 export default class HookCommand {
     constructor (private log: Log) {}
@@ -43,7 +78,11 @@ export default class HookCommand {
         })
     }
 
-    /*  handler for "ase hook session-start"  */
+    /*  handler for "ase hook session-start"
+        (NOTICE: Claude Code only: Copilot CLI's "sessionStart"
+        command-type hook discards stdout, so its constitution is wired
+        up via a static "type: prompt" hook in plugin/hooks/hooks.json
+        instead) */
     private async doSessionStart (): Promise<number> {
         /*  determine plugin root  */
         const pluginRoot = process.env.CLAUDE_PLUGIN_ROOT ?? ""
@@ -154,28 +193,40 @@ export default class HookCommand {
         /*  inject markdown into session context  */
         process.stdout.write(JSON.stringify({
             "hookSpecificOutput": {
-                "hookEventName":    "SessionStart",
+                "hookEventName":     "SessionStart",
                 "additionalContext": md
             }
         }))
         return 0
     }
 
-    /*  handler for "ase hook pre-tool-use"  */
-    private doPreToolUse (): number {
+    /*  handler for "ase hook pre-tool-use" (both tools)  */
+    private doPreToolUse (tool: Tool): number {
+        const spec = toolSpecs[tool]
+
         /*  read tool invocation information  */
         const stdin = fs.readFileSync(0, "utf8")
-        const input = stdin.trim() !== "" ? JSON.parse(stdin) as {
-            tool_name?:  string,
-            tool_input?: { command?: string, skill?: string }
-        } : {}
+        const input = stdin.trim() !== "" ? JSON.parse(stdin) as Record<string, unknown> : {}
 
-        /*  determine whether to auto-approve the tool invocation  */
-        const toolName    = input.tool_name  ?? ""
-        const toolInput   = input.tool_input ?? {}
-        let   approve     = false
-        let   reason      = ""
-        if (toolName === "Bash" && /^ase(\s|$)/.test(toolInput.command ?? "")) {
+        /*  determine whether to auto-approve the tool invocation
+            (field names and value shapes differ between tools)  */
+        const toolName  = typeof input[spec.toolNameField] === "string" ?
+            input[spec.toolNameField] as string : ""
+        let toolInput: { command?: string, skill?: string } = {}
+        const rawInput  = input[spec.toolInputField]
+        if (spec.toolInputIsString && typeof rawInput === "string") {
+            try {
+                toolInput = JSON.parse(rawInput) as { command?: string, skill?: string }
+            }
+            catch (_e) {
+                /*  best-effort: leave toolInput empty on parse failure  */
+            }
+        }
+        else if (!spec.toolInputIsString && typeof rawInput === "object" && rawInput !== null)
+            toolInput = rawInput as { command?: string, skill?: string }
+        let approve = false
+        let reason  = ""
+        if (toolName === spec.bashToolName && /^ase(\s|$)/.test(toolInput.command ?? "")) {
             approve = true
             reason  = "ASE CLI invocation auto-approved"
         }
@@ -183,36 +234,54 @@ export default class HookCommand {
             approve = true
             reason  = "ASE skill invocation auto-approved"
         }
-        else if (/^mcp__plugin_ase_ase__.+/.test(toolName)) {
+        else if (spec.mcpToolNamePattern.test(toolName)) {
             approve = true
             reason  = "ASE MCP tool invocation auto-approved"
         }
 
-        /*  emit permission decision (or stay silent to defer to default flow)  */
+        /*  emit permission decision (or stay silent to defer to default flow).
+            Claude Code expects the decision nested in "hookSpecificOutput";
+            Copilot CLI expects flat top-level fields.  */
         if (approve) {
-            process.stdout.write(JSON.stringify({
+            const payload = spec.preToolUseWrapped ? {
                 "hookSpecificOutput": {
-                    "hookEventName":           "PreToolUse",
-                    "permissionDecision":      "allow",
+                    "hookEventName":            spec.preToolUseEvent,
+                    "permissionDecision":       "allow",
                     "permissionDecisionReason": reason
                 }
-            }))
+            } : {
+                "permissionDecision":       "allow",
+                "permissionDecisionReason": reason
+            }
+            process.stdout.write(JSON.stringify(payload))
         }
         return 0
     }
 
+    /*  parse and validate the --tool option  */
+    private parseTool (value: string): Tool {
+        if (value !== "claude" && value !== "copilot")
+            throw new Error(`invalid --tool value: "${value}" (expected "claude" or "copilot")`)
+        return value
+    }
+
     /*  register commands  */
     register (program: Command): void {
+        /*  default for --tool derived from ASE_TOOL environment variable  */
+        const envTool  = process.env.ASE_TOOL ?? ""
+        const toolDflt = envTool !== "" ? envTool : "claude"
+
         /*  register CLI top-level command "ase hook"  */
         const hookCmd = program
             .command("hook")
-            .description("Claude Code hook entry points")
+            .description("Claude Code and Copilot CLI hook entry points")
             .action(() => {
                 hookCmd.outputHelp()
                 process.exit(1)
             })
 
-        /*  register CLI sub-command "ase hook session-start"  */
+        /*  register CLI sub-command "ase hook session-start"
+            (Claude Code only -- see comment on doSessionStart)  */
         hookCmd
             .command("session-start")
             .description("handle Claude Code SessionStart hook event")
@@ -223,9 +292,10 @@ export default class HookCommand {
         /*  register CLI sub-command "ase hook pre-tool-use"  */
         hookCmd
             .command("pre-tool-use")
-            .description("handle Claude Code PreToolUse hook event")
-            .action(() => {
-                process.exit(this.doPreToolUse())
+            .description("handle tool PreToolUse hook event")
+            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .action((opts: { tool: string }) => {
+                process.exit(this.doPreToolUse(this.parseTool(opts.tool)))
             })
     }
 }
