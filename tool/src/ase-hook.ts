@@ -162,6 +162,9 @@ export default class HookCommand {
         if (typeof val === "string")
             persona = val
 
+        /*  determine headless mode  */
+        const headless = (process.env.ASE_HEADLESS ?? "false") === "true" ? "true" : "false"
+
         /*  provide ASE information to Claude Code shell commands
             (Claude Code only -- Copilot CLI has no equivalent mechanism)  */
         const envFile = tool === "claude" ? (process.env.CLAUDE_ENV_FILE ?? "") : ""
@@ -171,7 +174,8 @@ export default class HookCommand {
                 `export ASE_USER_ID="${userId}"\n` +
                 `export ASE_PROJECT_ID="${projectId}"\n` +
                 `export ASE_TASK_ID="${taskId}"\n` +
-                `export ASE_SESSION_ID="${sessionId}"\n`
+                `export ASE_SESSION_ID="${sessionId}"\n` +
+                `export ASE_HEADLESS="${headless}"\n`
             fs.appendFileSync(envFile, script, "utf8")
         }
 
@@ -184,6 +188,7 @@ export default class HookCommand {
             `<ase-project-id>${projectId}</ase-project-id>\n` +
             `<ase-task-id>${taskId}</ase-task-id>\n` +
             `<ase-session-id>${sessionId}</ase-session-id>\n` +
+            `<ase-headless>${headless}</ase-headless>\n` +
             "\n" + md
 
         /*  expand all @<file> references manually  */
