@@ -22,6 +22,7 @@ import prettyMs               from "pretty-ms"
 import { McpServer }                     from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 import { z }                             from "zod"
+import { DateTime }                      from "luxon"
 
 import { Config, configSchema, parseScope } from "./ase-config.js"
 import type Log                 from "./ase-log.js"
@@ -233,6 +234,31 @@ export default class ServiceCommand {
                 }
                 return {
                     content: [ { type: "text", text: JSON.stringify(status) } ]
+                }
+            })
+            mcp.registerTool("timestamp", {
+                title: "ASE timestamp",
+                description:
+                    "Return the current local date/time formatted via a Luxon format string. " +
+                    "Pass the Luxon format tokens as `format` (default: `yyyy-LL-dd HH:mm`). " +
+                    "Returns the formatted timestamp as `text`.",
+                inputSchema: {
+                    format: z.string().default("yyyy-LL-dd HH:mm")
+                        .describe("Luxon format tokens (default: `yyyy-LL-dd HH:mm`)")
+                }
+            }, async (args) => {
+                try {
+                    const text = DateTime.now().toFormat(args.format)
+                    return {
+                        content: [ { type: "text", text } ]
+                    }
+                }
+                catch (err: unknown) {
+                    const message = err instanceof Error ? err.message : String(err)
+                    return {
+                        isError: true,
+                        content: [ { type: "text", text: `timestamp: format failed: ${message}` } ]
+                    }
                 }
             })
             mcp.registerTool("diagram", {
