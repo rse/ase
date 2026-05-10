@@ -49,6 +49,11 @@ with a corresponding, complete *change set*.
         `IMPLEMENTATION DRAFT` section in <content/>. But the specification
         text in <content/> always overrules the implementation draft in the
         `IMPLEMENTATION DRAFT` section of <content/>.
+
+    -   Finally, cleanup and call the `task_delete` tool (`id` set to
+        <ase-task-id/>) of the `ase` MCP service to delete the current task
+        plan content persistance and then clear the plan content of the
+        *Plan Mode*.
     </step>
 </flow>
 
