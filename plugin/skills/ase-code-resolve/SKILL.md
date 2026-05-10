@@ -2,8 +2,8 @@
 name: ase-code-resolve
 argument-hint: "<problem>"
 description: >
-    Resolve a problem in depth in order to fix it.
-    Use when user wants a *bug fixed* or *problem resolved*.
+    Resolve Problem:
+    Use when user wants a bug fixed or problem resolved.
 user-invocable: true
 disable-model-invocation: false
 effort: high

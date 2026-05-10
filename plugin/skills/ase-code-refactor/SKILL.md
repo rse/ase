@@ -2,8 +2,8 @@
 name: ase-code-refactor
 argument-hint: "<request>"
 description: >
-    Refactor Source Code.
-    Use when user wants to *refactor* the code base.
+    Refactor Code Base:
+    Use when user wants to refactor the code base.
 user-invocable: true
 disable-model-invocation: false
 effort: high

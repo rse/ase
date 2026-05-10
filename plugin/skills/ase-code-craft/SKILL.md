@@ -2,8 +2,8 @@
 name: ase-code-craft
 argument-hint: "<feature>"
 description: >
-    Craft Source Code From Scratch.
-    Use when user wants a *create* or *craft* a *new feature*.
+    Craft Source Code:
+    Use when user wants to create or craft a new feature from scratch.
 user-invocable: true
 disable-model-invocation: false
 effort: high
