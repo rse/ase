@@ -4,14 +4,14 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-import path from "node:path"
-import os   from "node:os"
-import fs   from "node:fs"
+import path          from "node:path"
+import os            from "node:os"
+import fs            from "node:fs"
 
-import { Command } from "commander"
+import { Command }   from "commander"
 import { execaSync } from "execa"
 
-import type Log    from "./ase-log.js"
+import type Log      from "./ase-log.js"
 
 /*  validate the task id to keep it safe as a filename component  */
 const validateId = (id: string): void => {
@@ -211,3 +211,4 @@ export default class TaskCommand {
             })
     }
 }
+
