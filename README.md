@@ -28,9 +28,10 @@ Development*.
 > [!NOTE]
 > Initially, the primary focus of **ASE** is on the Agentic AI Coding
 > tool *Claude Code*. Secondary focus and only rudimentary support
-> exists for *Github Copilot CLI*. Later, a forthcoming focus could be
-> also on the alternative tools *OpenAI Codex*, *Google Gemini CLI*, or
-> *OpenCode* &mdash; if their features support it.
+> exists for *Github Copilot CLI* (just set environment variable
+> `ASE_TOOL=copilot`). Later, a forthcoming focus could be also on the
+> alternative tools *OpenAI Codex*, *Google Gemini CLI*, or *OpenCode*
+> &mdash; if their features support it.
 
 > [!CAUTION]
 > **ASE** is still under heavy development, still incomplete, partially
