@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: add "timestamp" MCP tool to service for use by skills
 - IMPROVEMENT: support task id as prefix for craft/refactor/resolve skills
+- IMPROVEMENT: use new "timestamp" MCP tool instead of Bash(date) to figure out time
 - CLEANUP: align craft/refactor/resolve skills
 
 0.0.22 (2026-05-10)

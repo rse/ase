@@ -7,9 +7,6 @@ description: >
 user-invocable: true
 disable-model-invocation: false
 effort: high
-allowed-tools:
-    - "Bash(date)"
-    - "Skill(ase:ase-meta-diagram)"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
@@ -219,9 +216,11 @@ Your role is an experienced, *expert-level software developer*.
         as *very precise* as possible description of the overall change.
 
     -   The <timestamp-created/> is the timestamp when this feature specification
-        was created. The <timestamp-modified/> is the timestamp when this
-        feature specification was last modified. Both use the ISO-style format
-        `YYYY-mm-dd HH:MM` which should be determined with `date "+%Y-%m-%d %H:%M"`.
+        was created. The <timestamp-modified/> is the timestamp when
+        this feature specification was last modified. Both use a
+        ISO-style format value, which has to be determined by calling
+        the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
+        MCP service and use the `text` field of its response.
 
     -   The <title/> is a short summary of the <problem-summary/>, no longer than
         50 characters.
