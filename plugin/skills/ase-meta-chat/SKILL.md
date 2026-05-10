@@ -10,10 +10,10 @@ disable-model-invocation: false
 context: fork
 effort: low
 allowed-tools:
-    - "mcp__chat-openai-chatgpt",
-    - "mcp__chat-google-gemini",
-    - "mcp__chat-deepseek",
-    - "mcp__chat-xai-grok",
+    - "mcp__chat-openai-chatgpt"
+    - "mcp__chat-google-gemini"
+    - "mcp__chat-deepseek"
+    - "mcp__chat-xai-grok"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
