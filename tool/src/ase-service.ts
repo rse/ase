@@ -569,9 +569,9 @@ export default class ServiceCommand {
                 await mcp.connect(transport)
                 await transport.handleRequest(request.raw.req, request.raw.res, body)
             }
-            catch (_err: unknown) {
-                const err = _err instanceof Error ? _err : new Error(String(_err))
-                this.log.write("error", `mcp: ${err.message}`)
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                this.log.write("error", `mcp: ${message}`)
                 if (!request.raw.res.headersSent) {
                     request.raw.res.statusCode = 500
                     request.raw.res.end()
