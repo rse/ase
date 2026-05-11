@@ -19,7 +19,7 @@ ChangeLog
 0.0.22 (2026-05-10)
 -------------------
 
-- IMPROVEMENT: add end of `ase-spec-implement` skill, delete the task
+- IMPROVEMENT: at end of `ase-spec-implement` skill, delete the task
 - IMPROVEMENT: support `ASE_HEADLESS` mode for skipping the constitution banner under "claude -p" use by claudeX
 - IMPROVEMENT: add initial Github Copilot CLI support to "ase setup" commands and provide marketplace/plugin JSON config files
 - IMPROVEMENT: improve `ase-code-changes` skill by extending its context when necessary
