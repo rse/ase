@@ -5,6 +5,8 @@ ChangeLog
 0.0.24 (2026-05-11)
 -------------------
 
+- IMPROVEMENT: improve edit skill to honor a task-id
+
 0.0.23 (2026-05-11)
 -------------------
 
