@@ -1,14 +1,12 @@
 ---
 name: ase-spec-edit
-argument-hint: "[<content> ...]"
+argument-hint: "[<task-id>|[<task-id>: ]<content>]"
 description: >
     Load and save a named plan for a task and apply Claude Code *Plan Mode* on it.
     Use when the user wants to plan a task.
 user-invocable: true
 disable-model-invocation: false
 effort: medium
-allowed-tools:
-    - "Bash(date)"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
@@ -16,19 +14,32 @@ allowed-tools:
 Manage the Plan for a Task
 ==========================
 
-1. Output the current plan id with the following <template/>:
-
-   <template>
-   &#x26AA; Task: **<ase-task-id/>**
-   </template>
-
-2. Enter *Plan Mode* by using the `EnterPlanMode` tool and clear any old
+1. Enter *Plan Mode* by using the `EnterPlanMode` tool and clear any old
    plan content of the *Plan Mode* and start planning from scratch with an
    empty initial plan.
 
-3. Determine the new plan content by setting
-   <content>$ARGUMENTS</content> initially. Do not output anything
-   related to this step.
+2. Determine the new plan content by setting
+   <content>$ARGUMENTS</content> initially.
+
+   If <content/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
+   <ase-task-id/><content></ase-task-id> (set task id to content) and
+   <content></content> (set content empty) and call the `task_id(id:
+   <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase` MCP
+   service to implicitly switch the task.
+
+   Else, if <content/> has the format `<id/>: <text/>` where
+   <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
+   <content><text/></content> and <ase-task-id><id/></ase-task-id> and
+   call the `task_id(id: <ase-task-id/>, session: <ase-session-id/>)`
+   tool from the `ase` MCP service to implicitly switch the task.
+
+   Do not output anything related to this entire step.
+
+3. Output the current plan id with the following <template/>:
+
+   <template>
+   &#x26AA; task: **<ase-task-id/>**
+   </template>
 
 4. <if condition="<content/> is empty">
    Call the `task_load` tool (`id` set to <ase-task-id/>) of the `ase`
@@ -38,7 +49,7 @@ Manage the Plan for a Task
    related to this MCP tool call except the following <template/>:
 
    <template>
-   &#x1F535; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **loaded**
+   &#x1F535; task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **loaded**
    </template>
    </if>
 
@@ -50,9 +61,10 @@ Manage the Plan for a Task
    </if>
 
 6. If a <timestamp-modified/> is present in the plan, set the
-   <timestamp-modified/> to the current time in the ISO-style format
-   `YYYY-mm-dd HH:MM` which can be determined with the command
-   `date "+%Y-%m-%d %H:%M"`.
+   <timestamp-modified/> to the current time in ISO-style format
+   value, which has to be determined by calling the `timestamp(format:
+   "yyyy-LL-dd HH:mm")` tool of the `ase` MCP service and use the `text`
+   field of its response.
 
 7. Now use <content/> for the new plan content in *Plan Mode*.
    For this, you *MUST* immediately *replace* the plan content of the
@@ -75,6 +87,6 @@ Manage the Plan for a Task
    <template/>:
 
    <template>
-   &#x1F7E0; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **saved**
+   &#x1F7E0; task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **saved**
    </template>
 
