@@ -1,5 +1,5 @@
 ---
-name: ase-spec-edit
+name: ase-task-edit
 argument-hint: "[<task-id>|[<task-id>: ]<content>]"
 description: >
     Load and save a named plan for a task and apply Claude Code *Plan Mode* on it.

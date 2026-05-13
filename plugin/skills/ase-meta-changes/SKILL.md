@@ -1,5 +1,5 @@
 ---
-name: ase-code-changes
+name: ase-meta-changes
 argument-hint: ""
 description: >
     Update changes entries in CHANGELOG.md files

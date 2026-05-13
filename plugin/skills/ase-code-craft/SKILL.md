@@ -198,7 +198,7 @@ From scratch *craft* the following feature:
 
     <template>
     ✔ **RESULT**: Artifact Refactoring Plan Created.
-    ▶ **NEXT**: `ase-spec-edit`, `ase-spec-preflight`, or `ase-spec-implement`.
+    ▶ **NEXT**: `ase-task-edit`, `ase-task-preflight`, or `ase-task-implement`.
     </template>
     </step>
 </flow>

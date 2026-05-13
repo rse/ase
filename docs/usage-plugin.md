@@ -32,11 +32,6 @@ The following ASE commands/skills exist on the meta-level:
   very brief, factual, and abbreviating `telegrapher`, or an ultra
   brief, rough and stuttering `caveman`.
 
-- **/ase-meta-task** *task-id*:<br/>
-  Get or set the unique ASE task id for the current session. Without an
-  argument, displays the current task id. With an argument, sets the
-  task id (persisted in the session-scoped configuration).
-
 - **/ase-meta-diagram** *description*:<br/>
   Render diagrams via the `diagram` tool of the `ase` MCP service.
   Use to visualize structure/layout/components/dependencies as a
@@ -46,6 +41,12 @@ The following ASE commands/skills exist on the meta-level:
   data-structure/classes/methods as an UML Class Diagram,
   data-model/entities/relationships as an ER Diagram,
   or metrics/distributions/time-series as XY-Charts.
+
+- **/ase-meta-changes**:<br/>
+  Update changes entries in `CHANGELOG.md` files from Git commit information.
+
+- **/ase-meta-commit**:<br/>
+  Determine commit message for staged Git changes.
 
 ### Architecture Commands
 
@@ -58,18 +59,23 @@ The following ASE commands/skills exist on the architecture-level:
 - **/ase-arch-analyze** *source-reference*:<br/>
   Review the software architecture.
 
-### Spec Commands
+### Task Commands
 
-The following ASE commands/skills exist on the specification-level:
+The following ASE commands/skills exist on the task-level:
 
-- **/ase-spec-preflight**:<br/>
-  Preflight the implementation of the current task plan.
+- **/ase-task-id** *task-id*:<br/>
+  Get or set the unique ASE task id for the current session. Without an
+  argument, displays the current task id. With an argument, sets the
+  task id (persisted in the session-scoped configuration).
 
-- **/ase-spec-edit** \[*content* ...\]:<br/>
+- **/ase-task-edit** \[*content* ...\]:<br/>
   Load and save a named plan for a task and apply Claude Code *Plan
   Mode* on it.
 
-- **/ase-spec-implement**:<br/>
+- **/ase-task-preflight**:<br/>
+  Preflight the implementation of the current task plan.
+
+- **/ase-task-implement**:<br/>
   Implement the current task plan.
 
 ### Code Commands
@@ -78,9 +84,6 @@ The following ASE commands/skills exist on the code-level:
 
 - **/ase-code-craft** *feature*:<br/>
   Craft source code from scratch.
-
-- **/ase-code-changes**:<br/>
-  Update changes entries in `CHANGELOG.md` files from Git commit information.
 
 - **/ase-code-insight**:<br/>
   Give insights into the project.
@@ -99,9 +102,6 @@ The following ASE commands/skills exist on the code-level:
 
 - **/ase-code-refactor** *refactor-hint*:<br/>
   Refactor source code.
-
-- **/ase-code-commit**:<br/>
-  Determine commit message for staged Git changes.
 
 - **/ase-code-lint** *source-reference*:<br/>
   Lint the source code in an interactive review loop.

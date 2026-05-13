@@ -1,5 +1,5 @@
 ---
-name: ase-spec-implement
+name: ase-task-implement
 description: >
     Implement current task plan. Use when the user calls to "implement",
     "realize" or "apply" the "task", "plan", "spec", or "specification".
@@ -34,7 +34,7 @@ with a corresponding, complete *change set*.
         </template>
 
     -   If the <content/> is still empty, complain and tell the user to use the
-        `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`, or `ase-spec-edit`
+        `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`, or `ase-task-edit`
         skills first to create a task plan.
     </step>
 

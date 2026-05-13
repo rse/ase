@@ -1,5 +1,5 @@
 ---
-name: ase-meta-task
+name: ase-task-id
 argument-hint: "[list|<id>]"
 description: >
     Get or set unique task id <id>, or list all task ids with 'list'.

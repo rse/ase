@@ -5,6 +5,12 @@ ChangeLog
 0.0.25 (2026-05-13)
 -------------------
 
+- IMPROVEMENT: rename skills for clearer grouping: `ase-meta-task` →
+  `ase-task-id`, `ase-spec-edit` → `ase-task-edit`, `ase-spec-implement`
+  → `ase-task-implement`, `ase-spec-preflight` → `ase-task-preflight`,
+  `ase-code-changes` → `ase-meta-changes`, `ase-code-commit` →
+  `ase-meta-commit`
+
 0.0.24 (2026-05-11)
 -------------------
 

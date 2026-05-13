@@ -1,5 +1,5 @@
 ---
-name: ase-spec-preflight
+name: ase-task-preflight
 description: >
     Preflight the implementation of the current task plan.
 user-invocable: true
@@ -35,7 +35,7 @@ draft for a corresponding, *complete source code change set*.
         </template>
 
     -   If the <content/> is still empty, complain and tell the user to use the
-        `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`, or `ase-spec-edit`
+        `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`, or `ase-task-edit`
         skills first to create a task plan.
    </step>
 
