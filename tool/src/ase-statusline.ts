@@ -16,6 +16,7 @@ import type { ForegroundColorName }         from "chalk"
 
 import type Log                             from "./ase-log.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
+import pkg                                  from "../package.json" with { type: "json" }
 
 /*  forced-color chalk instance: stdout is a pipe under Claude Code,
     so chalk auto-detection would yield level 0; force level 1 to keep
@@ -523,8 +524,13 @@ export default class StatuslineCommand {
                     },
                     V: () => {
                         const ccVersion = data.version ?? ""
+                        const aseVersion = pkg.version ?? ""
+                        let version = ""
                         if (ccVersion !== "")
-                            emit(`${prefix("⎈", "version")}${c.bold(ccVersion)}`)
+                            version += `claude/${ccVersion}`
+                        if (aseVersion !== "")
+                            version += `${version !== "" ? " " : ""}ase/${aseVersion}`
+                        emit(`${prefix("⎈", "version")}${c.bold(version)}`)
                     },
                     o: () => {
                         const styleName = data.output_style?.name ?? ""
