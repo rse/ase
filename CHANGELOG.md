@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.0.26 (2026-05-13)
+-------------------
+
+- IMPROVEMENT: speed up startup times by migrating from "npm view" to cache-using "update-notifier"
+
 0.0.25 (2026-05-13)
 -------------------
 

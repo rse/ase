@@ -4,9 +4,9 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-import { execa }   from "execa"
+import updateNotifier from "update-notifier"
 
-import pkg         from "../package.json" with { type: "json" }
+import pkg            from "../package.json" with { type: "json" }
 
 /*  determination of current and available ASE versions  */
 export default class Version {
@@ -17,16 +17,10 @@ export default class Version {
 
     /*  return latest ASE version available on the NPM registry  */
     static async latest (): Promise<string> {
-        let latest = ""
-        try {
-            const r = await execa("npm", [ "view", "@rse/ase", "version" ],
-                { stdio: [ "ignore", "pipe", "pipe" ] })
-            latest = r.stdout.trim()
-        }
-        catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err)
-            throw new Error(`failed to query latest ASE version: ${message}`, { cause: err })
-        }
-        return latest
+        const notifier = updateNotifier({
+            pkg,
+            updateCheckInterval: 1000 * 60 * 60
+        })
+        return notifier.update?.latest ?? Version.current()
     }
 }
