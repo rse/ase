@@ -175,7 +175,7 @@ or *GitHub Copilot CLI* statusline:
   `ASE_TOOL` environment variable if set); under `--tool copilot` the
   payload's top-level `cwd` field is mapped onto `workspace.current_dir`
   for the renderers below, and placeholders backed by Claude-Code-only
-  fields (such as `%e`, `%t`, `%o`, `%S`, `%D`, `%W`, `%Q`) are simply
+  fields (such as `%e`, `%t`, `%O`, `%S`, `%D`, `%W`, `%Q`) are simply
   suppressed. The input JSON is the standard *Claude Code* statusline
   payload (with `workspace.current_dir`, `model.display_name`,
   `context_window.used_percentage`, `effort.level`, `thinking.enabled`,
@@ -203,7 +203,7 @@ or *GitHub Copilot CLI* statusline:
   `$54.44`), `%b` (git branch, or `no git`), `%g` (git status:
   `clean` or `dirty`), `%G` (git untracked file count), `%d` (full
   current working directory path), `%M` (memory used/total, e.g.
-  `33.2G/64.0G`), `%V` (*Claude Code* version), and `%o`
+  `33.2G/64.0G`), `%V` (*Claude Code* version), and `%O`
   (output-style name). All `%`-tokens whose source field is missing
   in the input JSON (or, for `%b`/`%g`/`%G`, when the *cwd* is not a
   git working tree) are *suppressed silently*, so older *Claude Code*

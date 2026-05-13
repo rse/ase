@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: speed up startup times by migrating from "npm view" to cache-using "update-notifier"
 - IMPROVEMENT: provide Claude Code and ASE version in statusline under %V
+- CLEANUP: rename "ase statusline" placeholder %o to %O for output style
 
 0.0.25 (2026-05-13)
 -------------------

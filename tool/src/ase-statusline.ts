@@ -421,6 +421,11 @@ export default class StatuslineCommand {
                         const thinking = (data.thinking?.enabled ?? false) === true ? "yes" : "no"
                         emit(`${prefix("⚛", "thinking")}${c.bold(thinking)}`)
                     },
+                    O: () => {
+                        const styleName = data.output_style?.name ?? ""
+                        if (styleName !== "")
+                            emit(`${prefix("≡", "style")}${c.bold(styleName)}`)
+                    },
                     P: () => {
                         const { persona } = getCfg()
                         if (persona !== "")
@@ -531,11 +536,6 @@ export default class StatuslineCommand {
                         if (aseVersion !== "")
                             version += `${version !== "" ? " " : ""}ase/${aseVersion}`
                         emit(`${prefix("⎈", "version")}${c.bold(version)}`)
-                    },
-                    o: () => {
-                        const styleName = data.output_style?.name ?? ""
-                        if (styleName !== "")
-                            emit(`${prefix("≡", "style")}${c.bold(styleName)}`)
                     }
                 }
 
