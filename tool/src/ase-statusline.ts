@@ -395,6 +395,7 @@ export default class StatuslineCommand {
                 /*  identifier to renderer map: each callback fetches its own information
                     directly from data (or via the lazy helpers above for shared values)  */
                 const renderers: Record<string, () => void> = {
+                    /*  ==== SCOPE ====  */
                     u: () => {
                         const user = process.env.USER ?? process.env.LOGNAME ?? "unknown"
                         emit(`${prefix("※", "user")}${c.bold(user)}`)
@@ -409,6 +410,8 @@ export default class StatuslineCommand {
                             emit(`${prefix("◉", "task")}${c.bold(taskId)}`)
                     },
                     s: () => emit(`${prefix("⏻", "session")}${c.bold(getSession())}`),
+
+                    /*  ==== MODEL ====  */
                     m: () => {
                         const model = data.model?.display_name ?? ""
                         emit(`${prefix("⚙", "model")}${c.bold(model)}`)
@@ -421,6 +424,8 @@ export default class StatuslineCommand {
                         const thinking = (data.thinking?.enabled ?? false) === true ? "yes" : "no"
                         emit(`${prefix("⚛", "thinking")}${c.bold(thinking)}`)
                     },
+
+                    /*  ==== OUTPUT ====  */
                     O: () => {
                         const styleName = data.output_style?.name ?? ""
                         if (styleName !== "")
@@ -431,6 +436,8 @@ export default class StatuslineCommand {
                         if (persona !== "")
                             emit(`${prefix("☯", "persona")}${c.bold(persona)}`)
                     },
+
+                    /*  ==== CONTEXT ====  */
                     c: () => {
                         const pct     = Math.floor(data.context_window?.used_percentage ?? 0)
                         const barSize = 20
@@ -438,38 +445,17 @@ export default class StatuslineCommand {
                         const bar     = "█".repeat(filled) + "░".repeat(barSize - filled)
                         emit(`${prefix("◔", "context")}${bar} ${pct}%`)
                     },
-                    a: () => {
-                        const linesAdded = data.cost?.total_lines_added ?? 0
-                        emit(`${prefix("⊕", "added")}${c.bold(linesAdded)}`)
-                    },
-                    r: () => {
-                        const linesRemoved = data.cost?.total_lines_removed ?? 0
-                        emit(`${prefix("⊖", "removed")}${c.bold(linesRemoved)}`)
-                    },
                     C: () => {
-                        const ctxIn     = data.context_window?.current_usage?.input_tokens                ?? 0
-                        const ctxCcIn   = data.context_window?.current_usage?.cache_creation_input_tokens ?? 0
-                        const ctxCrIn   = data.context_window?.current_usage?.cache_read_input_tokens     ?? 0
-                        const tokensCur = ctxIn + ctxCcIn + ctxCrIn
-                        if (tokensCur > 0)
-                            emit(`${prefix("◇", "tokens")}${c.bold(formatTokens(tokensCur))}`)
-                    },
-                    L: () => {
-                        const pct       = Math.floor(data.context_window?.used_percentage ?? 0)
-                        const ctxIn     = data.context_window?.current_usage?.input_tokens                ?? 0
-                        const ctxCcIn   = data.context_window?.current_usage?.cache_creation_input_tokens ?? 0
-                        const ctxCrIn   = data.context_window?.current_usage?.cache_read_input_tokens     ?? 0
-                        const tokensCur = ctxIn + ctxCcIn + ctxCrIn
-                        const tokensLim = pct > 0 && tokensCur > 0 ? Math.round(tokensCur * 100 / pct) : 0
+                        const context = Math.floor(data.context_window?.used_percentage ?? 0)
+                        const tokensCur =
+                            (data.context_window?.total_input_tokens  ?? 0) +
+                            (data.context_window?.total_output_tokens ?? 0)
+                        const tokensLim = context > 0 && tokensCur > 0 ? Math.round(tokensCur * 100 / context) : 0
                         if (tokensLim > 0)
-                            emit(`${prefix("◆", "limit")}${c.bold(formatTokens(tokensLim))}`)
+                            emit(`${prefix("◆", "tokens")}${c.bold(formatTokens(tokensCur) + "/" + formatTokens(tokensLim))}`)
                     },
-                    N: () => {
-                        const tokensCum = (data.context_window?.total_input_tokens  ?? 0) +
-                                          (data.context_window?.total_output_tokens ?? 0)
-                        if (tokensCum > 0)
-                            emit(`${prefix("Σ", "total")}${c.bold(formatTokens(tokensCum))}`)
-                    },
+
+                    /*  ==== RATE LIMITS ====  */
                     S: () => {
                         const pct5h = data.rate_limits?.five_hour?.used_percentage
                         if (pct5h !== undefined)
@@ -492,6 +478,8 @@ export default class StatuslineCommand {
                         if (s !== "")
                             emit(`${prefix("⏱", "weekly-resets")}${c.bold(s)}`)
                     },
+
+                    /*  ==== COSTS ====  */
                     H: () => {
                         const sessDurMs = data.cost?.total_duration_ms ?? 0
                         if (sessDurMs > 0)
@@ -501,6 +489,16 @@ export default class StatuslineCommand {
                         const sessCost = data.cost?.total_cost_usd
                         if (sessCost !== undefined)
                             emit(`${prefix("$", "cost")}${c.bold(formatCostUsd(sessCost))}`)
+                    },
+
+                    /*  ==== VERSION CONTROL ====  */
+                    a: () => {
+                        const linesAdded = data.cost?.total_lines_added ?? 0
+                        emit(`${prefix("⊕", "added")}${c.bold(linesAdded)}`)
+                    },
+                    r: () => {
+                        const linesRemoved = data.cost?.total_lines_removed ?? 0
+                        emit(`${prefix("⊖", "removed")}${c.bold(linesRemoved)}`)
                     },
                     b: () => {
                         const g     = getGit()
@@ -522,11 +520,15 @@ export default class StatuslineCommand {
                         if (cwd !== "")
                             emit(`${prefix("▶", "cwd")}${c.bold(cwd)}`)
                     },
+
+                    /*  ==== RESOURCES ====  */
                     M: () => {
                         const m = getMem()
                         if (m.total > 0)
                             emit(`${prefix("⛁", "mem")}${c.bold(`${formatBytes(m.used)}/${formatBytes(m.total)}`)}`)
                     },
+
+                    /*  ==== VERSIONS ====  */
                     V: () => {
                         const ccVersion = data.version ?? ""
                         const aseVersion = pkg.version ?? ""
