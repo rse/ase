@@ -14,13 +14,22 @@ effort: low
 Task List
 =========
 
-1.  Call the `task_list()` tool from the `ase` MCP service.
+1.  Call the `task_list({ verbose: true })` tool from the `ase` MCP service.
+    The result is a structured object with a `tasks` array; each
+    entry has an `id` field and an `mtime` field (formatted as
+    `YYYY-MM-DD HH:MM`).
 
 2.  Output:
+
     <template>
     ⧉ **ASE**: ◉ tasks:
+
+    | *Task Id* | *Last Modified*    |
+    |-----------|--------------------|
     <task-list/>
     </template>
 
-    where <task-list/> is each returned id on its own line prefixed with `-   `.
-    If the list is empty, output `*(none)*` instead of any lines.
+    where <task-list/> is each returned task on its own row formatted
+    as <template>| **<id/>** | `<mtime/>` |</template>.
+    If the `tasks` array is empty, output `*(none)*` instead of the table.
+

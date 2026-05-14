@@ -325,15 +325,33 @@ export default class ServiceCommand {
             mcp.registerTool("task_list", {
                 title:       "ASE task list",
                 description:
-                    "List all persisted task `id`s. " +
-                    "Returns the ids as `text`, one per line, in lexicographic order; " +
-                    "returns an empty string if no tasks exist.",
-                inputSchema: {}
-            }, async () => {
+                    "List all persisted tasks. " +
+                    "Returns a `tasks` array (in lexicographic `id` order) where each item has the " +
+                    "task `id`. If `verbose` is `true`, each item additionally has an `mtime` field " +
+                    "(last modification time of the task's `plan.md`, formatted as `YYYY-MM-DD HH:MM`). " +
+                    "Returns an empty array if no tasks exist.",
+                inputSchema:  {
+                    verbose: z.boolean().optional()
+                        .describe("if true, also include the `mtime` field per task (default: false)")
+                },
+                outputSchema: {
+                    tasks: z.array(z.object({
+                        id:    z.string().describe("task identifier"),
+                        mtime: z.string().optional()
+                            .describe("plan.md modification time (`YYYY-MM-DD HH:MM`); only present if `verbose` is true")
+                    })).describe("all persisted tasks in lexicographic id order")
+                }
+            }, async (args) => {
                 try {
-                    const ids = taskList()
+                    const verbose = args.verbose ?? false
+                    const items   = taskList(verbose)
+                    const tasks   = verbose ?
+                        items.map((item) => ({ id: item.id, mtime: item.mtime as string })) :
+                        items.map((item) => ({ id: item.id }))
+                    const result  = { tasks }
                     return {
-                        content: [ { type: "text", text: ids.join("\n") } ]
+                        structuredContent: result,
+                        content:           [ { type: "text", text: JSON.stringify(result) } ]
                     }
                 }
                 catch (err: unknown) {

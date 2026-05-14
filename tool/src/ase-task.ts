@@ -10,6 +10,7 @@ import fs            from "node:fs"
 
 import { Command }   from "commander"
 import { execaSync } from "execa"
+import { DateTime }  from "luxon"
 
 import type Log      from "./ase-log.js"
 
@@ -56,12 +57,14 @@ export const taskDelete = (id: string): boolean => {
     return true
 }
 
-/*  list all persisted task ids in lexicographic order  */
-export const taskList = (): string[] => {
+/*  list all persisted tasks in lexicographic id order; if verbose is true,
+    each entry's `mtime` is set to the `plan.md` modification time formatted
+    as "YYYY-MM-DD HH:MM", otherwise it is left undefined  */
+export const taskList = (verbose = false): { id: string, mtime: string | undefined }[] => {
     const dir = path.join(os.homedir(), ".ase", "task")
     if (!fs.existsSync(dir))
         return []
-    const ids: string[] = []
+    const out: { id: string, mtime: string | undefined }[] = []
     for (const entry of fs.readdirSync(dir)) {
         if (!/^[A-Za-z0-9-]+$/.test(entry))
             continue
@@ -71,10 +74,11 @@ export const taskList = (): string[] => {
         const st = fs.statSync(file)
         if (!st.isFile())
             continue
-        ids.push(entry)
+        const mtime = verbose ? DateTime.fromJSDate(st.mtime).toFormat("yyyy-LL-dd HH:mm") : undefined
+        out.push({ id: entry, mtime })
     }
-    ids.sort()
-    return ids
+    out.sort((a, b) => a.id.localeCompare(b.id))
+    return out
 }
 
 /*  purge tasks whose modification time is older than the given cutoff in
@@ -132,10 +136,15 @@ export default class TaskCommand {
         task
             .command("list")
             .description("List all persisted task ids, one per line")
-            .action(() => {
-                const ids = taskList()
-                for (const id of ids)
-                    process.stdout.write(`${id}\n`)
+            .option("-v, --verbose", "also show the plan.md modification time as (YYYY-MM-DD HH:MM)")
+            .action((opts: { verbose?: boolean }) => {
+                const items = taskList(opts.verbose ?? false)
+                for (const item of items) {
+                    if (opts.verbose)
+                        process.stdout.write(`${item.id}\t(${item.mtime})\n`)
+                    else
+                        process.stdout.write(`${item.id}\n`)
+                }
                 process.exit(0)
             })
 
