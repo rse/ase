@@ -88,7 +88,7 @@ Manage the Plan for a Task
 9.  You *MUST* then immediately exit *Plan Mode* by calling the
     `ExitPlanMode` tool.
 
-10. Once the user will leave *Plan Mode* by using the `ExitPlanMode` tool,
+10. Once the *Plan Mode* was left after using the `ExitPlanMode` tool,
     you *always* *MUST* update <content/> to be the last plan content
     from the *Plan Mode*. Then you *always* *MUST* *save* the updated
     <content/> with the `task_save` tool (`id` set to <ase-task-id/>, `text`
