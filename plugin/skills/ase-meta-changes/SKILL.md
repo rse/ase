@@ -10,6 +10,8 @@ allowed-tools:
     - "Bash(git log *)"
     - "Bash(git status *)"
     - "Bash(git show *)"
+    - "Write"
+    - "Edit"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
