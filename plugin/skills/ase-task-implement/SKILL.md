@@ -53,8 +53,7 @@ with a corresponding, complete *change set*.
 
     -   Finally, cleanup and call the `task_delete` tool (`id` set to
         <ase-task-id/>) of the `ase` MCP service to delete the current task
-        plan content persistance and then clear the plan content of the
-        *Plan Mode*.
+        plan content persistance.
     </step>
 </flow>
 
