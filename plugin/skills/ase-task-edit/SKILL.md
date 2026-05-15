@@ -39,7 +39,7 @@ Manage the Plan for a Task
 3.  Output the current plan id with the following <template/>:
 
     <template>
-    &#x26AA; task: **<ase-task-id/>**
+    ⧉ **ASE**: ◉ task: **<ase-task-id/>**
     </template>
 
 4.  <if condition="<content/> is empty">
@@ -50,7 +50,7 @@ Manage the Plan for a Task
     related to this MCP tool call except the following <template/>:
 
     <template>
-    &#x1F535; task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **loaded**
+    ⧉ **ASE**: ◉ task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **loaded**
     </template>
     </if>
 
@@ -78,7 +78,7 @@ Manage the Plan for a Task
 8.  You *MUST* output the following <template/>:
 
     <template>
-    ◉ **NOTICE**: In the following, we will try to exit the *Plan Mode*
+    ⧉ **ASE**: **NOTICE**: In the following, we will try to exit the *Plan Mode*
     again. You can still *chat* on the plan in order to still change it.
     Or just press **SHIFT+TAB** twice to finally exit the *Plan Mode*. We
     will then just exit the *Plan Mode* and do nothing more, especially
@@ -98,6 +98,6 @@ Manage the Plan for a Task
     <template/>:
 
     <template>
-    &#x1F7E0; task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **saved**
+    ⧉ **ASE**: ◉ task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **saved**
     </template>
 
