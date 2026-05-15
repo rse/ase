@@ -13,6 +13,7 @@ allowed-tools:
     - "Skill(ase-meta-search)"
     - "Agent(ase-meta-search)"
     - "WebFetch"
+    - "AskUserQuestion"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md

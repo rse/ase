@@ -7,6 +7,8 @@ description: >
 user-invocable: true
 disable-model-invocation: false
 effort: high
+allowed-tools:
+    - "AskUserQuestion"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
