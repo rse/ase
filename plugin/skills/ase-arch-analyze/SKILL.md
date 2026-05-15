@@ -1,7 +1,7 @@
 ---
 name: ase-arch-analyze
 argument-hint: "<source-reference>"
-description: Review software architecture
+description: Review software architecture, including package cohesion and inter-package coupling
 user-invocable: true
 disable-model-invocation: false
 model: opus
@@ -200,6 +200,33 @@ interface quality, quality attributes, and architecture governance.
      The chosen style, deviations from defaults, and trade-offs are
      traceable.
 
+   **Block 7 — Package Cohesion**
+   - **SA19 PACKAGE-COHESION**: each first-party package has a
+     coherent role *and* topical theme — its members serve a
+     common purpose, share a dominant noun-cluster, and have
+     non-trivial cross-package use. Flag:
+     - *grab-bag*: members split into ≥3 unrelated topical
+       clusters (e.g. a `util` package mixing date-parsing,
+       network-retry, and string-formatting helpers)
+     - *misplaced class*: a class only imported once cross-package
+       but referenced *≥3 times* inside the consumer (likely
+       belongs in the consumer or in a shared utility package)
+     - *topical outlier*: a class whose name-tokens share *<30%*
+       overlap with the package's dominant noun-cluster, or with
+       its `package-info` / `README` declaration when present
+   - **SA20 PACKAGE-CYCLE**: no *cyclic dependencies* between
+     first-party packages — neither direct (`A → B` and `B → A`)
+     nor transitive (via *Tarjan SCC* or pairwise scan). Each
+     cycle is reported with the exact import lines that close it.
+   - **SA21 PACKAGE-SIZE**: package size and coupling shape are
+     justified — flag packages at either extreme:
+     - *god-package*: *incoming ≥ 5* and *outgoing ≥ 3* —
+       coordinator dumping ground that should be split along its
+       internal topical clusters
+     - *fragment*: 1–2 files under a sibling parent that share a
+       *name prefix* or *imported interface* with that sibling —
+       consolidation candidate
+
    Hints:
 
    - During investigation, do *not* output anything else,
@@ -221,6 +248,22 @@ interface quality, quality attributes, and architecture governance.
      pattern-match on "loop inside method with lock" — verify
      which operations sit *between* the specific acquire and
      release in source order.
+
+   - *Package-graph construction (SA19–SA21)*: parse each file's
+     import (or equivalent language construct) statement, keep
+     only first-party packages within the analysed scope, and
+     persist two intermediate structures: the per-package
+     incoming/outgoing class-edge map (drives SA20, SA21) and
+     the per-package noun-token frequency table extracted from
+     class names in camelCase / snake_case (drives SA19 topical
+     analysis). No external NLP — pure tokens. Cite each finding
+     with the exact import lines or class-name evidence.
+
+   - *Block 7 severity ladder*: SA20 (cycle) → HIGH; SA21
+     (size/shape) → MEDIUM; SA19 (cohesion) → LOW. Mark ACCEPTED
+     when `CLAUDE.md`, `AGENTS.md`, `package-info`, or class
+     Javadoc explicitly justifies the pattern (per skill-meta
+     contract-already-addressed rule).
    </step>
 
 2. <step id="STEP 2: Show Architecture Overview">
