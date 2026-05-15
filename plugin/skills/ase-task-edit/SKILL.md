@@ -23,7 +23,7 @@ Manage the Plan for a Task
     <content>$ARGUMENTS</content> initially.
 
     If <content/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
-    <ase-task-id/><content></ase-task-id> (set task id to content) and
+    <ase-task-id><content/></ase-task-id> (set task id to content) and
     <content></content> (set content empty) and call the `task_id(id:
     <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase` MCP
     service to implicitly switch the task.
