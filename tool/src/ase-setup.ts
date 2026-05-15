@@ -61,7 +61,7 @@ export default class SetupCommand {
                 await execa(cmd, args, { stdio: "pipe", cwd })
                 return
             }
-            catch (err: any) {
+            catch (err: unknown) {
                 if (!final) {
                     this.log.write("info",
                         `setup: attempt ${i + 1}/${retries} failed for "${cmd} ${args.join(" ")}": retrying...`)
@@ -72,15 +72,16 @@ export default class SetupCommand {
                     this.log.write("info", `setup: ${ignoreError} (skipped)`)
                     return
                 }
-                const exitCode = typeof err?.exitCode === "number" ? err.exitCode : -1
+                const e = err as { exitCode?: number, stdout?: string, stderr?: string }
+                const exitCode = typeof e.exitCode === "number" ? e.exitCode : -1
                 this.log.write("error", `setup: command failed: exit code: ${exitCode}`)
-                if (typeof err?.stdout === "string" && err.stdout.length > 0) {
+                if (typeof e.stdout === "string" && e.stdout.length > 0) {
                     this.log.write("error", "setup: command failed: stdout:")
-                    process.stdout.write(err.stdout)
+                    process.stdout.write(e.stdout)
                 }
-                if (typeof err?.stderr === "string" && err.stderr.length > 0) {
+                if (typeof e.stderr === "string" && e.stderr.length > 0) {
                     this.log.write("error", "setup: command failed: stderr:")
-                    process.stderr.write(err.stderr)
+                    process.stderr.write(e.stderr)
                 }
                 throw err
             }
