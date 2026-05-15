@@ -8,6 +8,7 @@ disable-model-invocation: false
 effort: xhigh
 ---
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
 Implement a Task

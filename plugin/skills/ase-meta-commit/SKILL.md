@@ -10,6 +10,7 @@ allowed-tools:
     - "Bash(git diff *)"
 ---
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
 Git Commit

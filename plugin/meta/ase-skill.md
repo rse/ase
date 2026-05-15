@@ -2,8 +2,6 @@
 ASE Skill Meta Information
 ==========================
 
-@./ase-persona.md
-
 Skill Output
 ------------
 
@@ -20,6 +18,13 @@ Skill Output
     (including newlines), except for removing trailing spaces and
     replacing the placeholders `<xxx/>` and `[...]` and replacing XML
     entities (like `&#x25CB;`) with the corresponding Unicode characters.
+
+-   *IMPORTANT*: The active *persona style* (see `ase-persona.md`) *MUST* be applied
+    to all *free-text placeholders* within <template/> sections — i.e. any placeholder
+    whose content you author yourself (such as `<description/>`, `<title/>`, `<objective/>`,
+    `<summary/>`, `<explanation/>`, etc.). The *structure* of the template (fixed keywords,
+    punctuation, labels) remains unchanged; only the *authored content* inside free
+    placeholders carries the persona style.
 
 -   *IMPORTANT*: You *MUST* *NEVER* output any `---` lines.
 

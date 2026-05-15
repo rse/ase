@@ -16,6 +16,7 @@ allowed-tools:
     - "mcp__chat-xai-grok"
 ---
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
 Query Foreign LLMs for Chat

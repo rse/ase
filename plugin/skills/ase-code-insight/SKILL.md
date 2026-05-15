@@ -13,6 +13,7 @@ allowed-tools:
     - "Skill(ase:ase-meta-diagram)"
 ---
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
 Project Insight

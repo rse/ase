@@ -9,6 +9,7 @@ disable-model-invocation: false
 effort: high
 ---
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
 Refactor Artifacts
