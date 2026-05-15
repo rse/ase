@@ -9,6 +9,7 @@ disable-model-invocation: false
 effort: high
 allowed-tools:
     - "AskUserQuestion"
+    - "Skill(ase:ase-meta-diagram)"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
