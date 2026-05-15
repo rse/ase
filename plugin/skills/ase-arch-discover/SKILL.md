@@ -97,7 +97,7 @@ for the technology stack to *provide* the *needed functionality*
         -   Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
             discover an initial set of a maximum of 12 *NPM packages*
-            <component-K/> and at least their real name <name/> and
+            <component-K/> and at least their real name <name-K/> and
             their unique package names <package-K/>.
 
         -   Use the shell command `npm search --json --searchlimit 12
