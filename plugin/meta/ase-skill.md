@@ -139,9 +139,9 @@ Skill Control Flow
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <while condition="<while-condition/>"><while-body/></while>:
 
-    This specifies a <while-body/> which is *repeated* until <while-condition/> is met.
-    This construct is expanded to the repetition of <while-body/>.
-    Do not output anything else.
+    This specifies a <while-body/> which is *repeated* as long as
+    <while-condition/> is met. This construct is expanded to the
+    repetition of <while-body/>. Do not output anything else.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <for items="<for-item/> [...]"><for-body/></for>:
