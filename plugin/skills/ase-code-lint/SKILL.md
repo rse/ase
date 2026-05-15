@@ -24,12 +24,12 @@ related to a set of code quality aspects.
 
 <define name="linter">
     Your current *sub-objective* is:
-    <body/>
+    <content/>
 
     For this, first output the following <template/> to inform the user:
 
     <template>
-    **<arg1/>**: <body/>
+    **<arg1/>**: <content/>
     </template>
 
     Then decide whether you detected *potential problems* which
