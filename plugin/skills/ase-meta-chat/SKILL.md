@@ -14,6 +14,8 @@ allowed-tools:
     - "mcp__chat-google-gemini"
     - "mcp__chat-deepseek"
     - "mcp__chat-xai-grok"
+    - "Task"
+    - "Agent"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md

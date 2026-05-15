@@ -12,6 +12,7 @@ allowed-tools:
     - "mcp__brave__brave_web_search"
     - "WebSearch"
     - "WebFetch"
+    - "Task"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
