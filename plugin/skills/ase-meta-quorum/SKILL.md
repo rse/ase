@@ -73,9 +73,10 @@ by querying *multiple* AIs for an *optimal consensus*.
     available AIs above. If all responses disagree, the consensus <c/> is zero.
     If all responses agree, <c/> is <n/>.
 
-    If not all AIs agree, determine a <disagreement/> information, formatted
-    as `(disagreement: <ai/>, <ai/>, [...])` where <ai/> is the name of
-    an AI which disagreed from the consensus.
+    If not all AIs agree, determine a <disagreement/> information,
+    formatted as `(disagreement: <ai/>, <ai/>, [...])` where <ai/> is a
+    name of an AI which disagreed from the consensus. Else, if all AIs
+    agree, set <disagreement></disagreement>.
     </step>
 
 6.  <step id="STEP 6: Show Results">
