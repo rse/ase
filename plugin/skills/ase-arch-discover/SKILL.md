@@ -126,6 +126,14 @@ for the technology stack to *provide* the *needed functionality*
             (K=1-N), use the `WebFetch` tool on the URL
             `https://api.npmjs.org/downloads/point/last-month/<package-K/>`
             to extract the <downloads-K/> from the `downloads` field.
+
+    -   If <stack/> is "Java" or "Kotlin":
+
+        -   Based on the essential keywords <keyword-L/> (L=1-M),
+            use the `ase-meta-search` skill in a subagent to *generally*
+            discover an initial set of a maximum of 12 *Java packages*
+            <component-K/> and at least their real name <name-K/> and
+            their unique package names <package-K/>.
     </step>
 
 4.  <step id="STEP 4: Report Components">
