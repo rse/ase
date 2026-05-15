@@ -118,10 +118,11 @@ for the technology stack to *provide* the *needed functionality*
             and its repository URL <repository-K/>.
 
         -   If the <repository-K/> regexp-matches
-            `.+?//github\.com/([^/]+/[^/.]+).*` use the `WebFetch` tool to
-            fetch the URL `https://api.github.com/repos/$1` and extract
-            <stars-K/> from its JSON `stargazers_count` field, else set
-            <stars-K/> to `N.A.`.
+            `.+?//github\.com/([^/]+/[^/.]+).*` use the `WebFetch` tool
+            to fetch the URL `https://api.github.com/repos/$1` (`$1`
+            is the value matched by the first capturing parenthesis
+            in the regexp) and extract <stars-K/> from its JSON
+            `stargazers_count` field, else set <stars-K/> to `N.A.`.
 
         -   For each discovered *NPM package* <component-K/>
             (K=1-N), use the `WebFetch` tool on the URL
