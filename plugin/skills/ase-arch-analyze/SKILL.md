@@ -377,10 +377,10 @@ interface quality, quality attributes, and architecture governance.
    <template>
    &#x26AA; **NEXT STEP**: For deeper analysis, suggestions on
    solution approaches and then final source code changes, use
-   `/ase:ase-code-elaborate P<n>` or `/ase:ase-code-elaborate T<n>`
+   `/ase:ase-code-resolve P<n>` or `/ase:ase-code-resolve T<n>`
    in the same *Claude Code* session or open a new *Claude Code*
    session and copy & paste one of the above problem or tradeoff
-   descriptions as a whole with `/ase:ase-code-elaborate <finding>`.
+   descriptions as a whole with `/ase:ase-code-resolve <finding>`.
    For *structural* refactorings (component splits, layer
    reorganization, dependency-direction fixes), prefer
    `/ase:ase-code-refactor` with the finding description.
