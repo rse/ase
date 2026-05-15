@@ -8,6 +8,10 @@ Skill Output
 -   *IMPORTANT*: The following rules apply both to regular skill responses
     *and* to generated plan files (`EnterPlanMode` tool).
 
+-   *IMPORTANT*: The syntax `<xxx>[...]</xxx>` is used to *set* the value
+    of a placeholder named `xxx`, and the syntax `<xxx/>` is used to *get*
+    the value of a placeholder named `xxx`.
+
 -   *IMPORTANT*: *All* output is *exclusively* requested through
     <template/> sections. You *MUST* *NOT* output anything *EXCEPT* it
     is explicitly included in such a <template/> section. Especially,
