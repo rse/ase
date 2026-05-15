@@ -19,12 +19,12 @@ Prohibitions
 ------------
 
 - Do *not* factor out (move) code into own functions without good reason, like necessary reusability.
-- Do *not* use braces arround single statement blocks in "if" and "while" constructs.
+- Do *not* use braces around single statement blocks in "if" and "while" constructs unless the language requires them.
 - Do *not* insist on early "return" in "if" blocks if an "else" block exists.
 - Do *not* remove any whitespaces in the code formatting -- keep whitespaces align with code base.
-- Do *not* show just partial code changes -- always show comlete changes.
+- Do *not* show just partial code changes -- always show complete changes.
 - Do *not* produce any line which consists of just one or more space characters before the newline -- use just the newline.
-- Do *not* use semicolons in the source at all, except inside `for` clauses.
+- Do *not* use semicolons where they are syntactically optional, except inside `for` clauses.
 - Do *not* split continuous chunks of code less than 100 lines into individual functions.
 - Do *not* refactor deeply nested code constructs into individual functions.
 - Do *not* answer with the "You're absolutely right", "You are
