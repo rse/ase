@@ -103,16 +103,33 @@ ase setup uninstall
 Overview
 --------
 
-### Architecture &amp; Building Blocks
+### Agentic Levels &amp; ASE Sweetspot
 
-![building-blocks](docs/building-blocks.svg)
+We can distinguish multiple levels of Agentic AI Coding. **ASE**
+focuses on the levels 1-3, i.e., it supports the assisted, agentic, and
+delegated modes of operations best. **ASE** is especially not intended
+for the full autonomous agent mode of operation.
+
+![building-blocks](docs/agentic-levels.svg)
 
 ### Skills &amp; Workflow
 
+The **ASE** skills can be classified into standalone/meta skills,
+specification/plan-driven skills, and sketching skills. The
+specification/plan-driven and sketching skills especially try to improve
+and not replace the agent's plan mode.
+
 ![workflow](docs/workflow.svg)
 
-Documenation
-------------
+### Architecture &amp; Building Blocks
+
+**ASE** primarily consists of a constitution, various skills, and
+corresponding (CLI or MCP driven) tools.
+
+![building-blocks](docs/building-blocks.svg)
+
+Documentation
+-------------
 
 - [Setup: Installation, Update, Uninstallation](docs/setup.md)
 - [Configuration: Parameters](docs/configuration.md)

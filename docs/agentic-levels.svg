@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" viewBox="35.850395 9.383158 787.837 557.6092" width="787.837" height="557.6092">
+  <defs/>
+  <g id="Canvas_1" fill-opacity="1" fill="none" stroke-opacity="1" stroke-dasharray="none" stroke="none">
+    <title>Canvas 1</title>
+    <g id="Canvas_1_Content">
+      <title>Content</title>
+      <g id="Graphic_809">
+        <rect x="304.35442" y="345.2569" width="73.037755" height="30.573944" fill="#595959"/>
+      </g>
+      <g id="Graphic_808">
+        <rect x="379.94" y="345.2569" width="72.82544" height="30.573944" fill="#595959"/>
+      </g>
+      <g id="Graphic_807">
+        <rect x="455.31327" y="345.2569" width="73.037755" height="30.573944" fill="#595959"/>
+      </g>
+      <g id="Graphic_806">
+        <rect x="530.68654" y="345.04456" width="73.037755" height="30.786263" fill="#595959"/>
+      </g>
+      <g id="Graphic_805">
+        <rect x="228.98116" y="345.2569" width="73.037755" height="30.573944" fill="#595959"/>
+      </g>
+      <g id="Graphic_804">
+        <path d="M 70.6973 173.9118 C 70.6973 169.39917 74.35556 165.74112 78.86798 165.74112 L 603.72854 165.74112 C 608.2403 165.74112 611.8986 169.39917 611.8986 173.9118 L 611.8986 322.96763 C 611.8986 327.4794 608.2403 331.13766 603.72854 331.13766 L 78.86798 331.13766 C 74.35556 331.13766 70.6973 327.4794 70.6973 322.96763 Z" fill="#7f7f7f" fill-opacity=".403922"/>
+        <path d="M 70.6973 173.9118 C 70.6973 169.39917 74.35556 165.74112 78.86798 165.74112 L 603.72854 165.74112 C 608.2403 165.74112 611.8986 169.39917 611.8986 173.9118 L 611.8986 322.96763 C 611.8986 327.4794 608.2403 331.13766 603.72854 331.13766 L 78.86798 331.13766 C 74.35556 331.13766 70.6973 327.4794 70.6973 322.96763 Z" stroke="#404040" stroke-linecap="butt" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_803">
+        <rect x="304.77906" y="231.45387" width="73.037755" height="90.2356" fill="#7f7f7f"/>
+      </g>
+      <g id="Graphic_802">
+        <rect x="380.15233" y="231.45387" width="73.037755" height="90.2356" fill="#7f7f7f"/>
+      </g>
+      <g id="Graphic_801">
+        <rect x="455.5256" y="231.45387" width="73.037755" height="90.2356" fill="#7f7f7f"/>
+      </g>
+      <g id="Graphic_800">
+        <rect x="531.1112" y="231.24155" width="72.82544" height="90.44792" fill="#7f7f7f"/>
+      </g>
+      <g id="Graphic_799">
+        <rect x="229.4058" y="231.45387" width="72.82544" height="90.2356" fill="#7f7f7f"/>
+      </g>
+      <g id="Graphic_798">
+        <rect x="229.4058" y="173.9154" width="73.037755" height="54.566" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_797">
+        <title>Text</title>
+        <text transform="translate(263.06558 182.59693)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">0</tspan>
+        </text>
+      </g>
+      <g id="Graphic_796">
+        <rect x="304.77906" y="173.9154" width="73.037755" height="54.566" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_795">
+        <title>Text</title>
+        <text transform="translate(338.4707 182.59693)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_794">
+        <rect x="380.15233" y="173.9154" width="73.037755" height="54.566" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_793">
+        <title>Text</title>
+        <text transform="translate(413.8758 182.59693)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">2</tspan>
+        </text>
+      </g>
+      <g id="Graphic_792">
+        <rect x="455.5256" y="173.9154" width="73.037755" height="54.566" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_791">
+        <title>Text</title>
+        <text transform="translate(489.28304 182.59693)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_790">
+        <rect x="530.89885" y="173.9154" width="73.25007" height="54.566" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_789">
+        <title>Text</title>
+        <text transform="translate(564.68815 182.59693)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">4</tspan>
+        </text>
+      </g>
+      <g id="Graphic_788">
+        <path d="M 229.83043 490.0585 L 229.83043 443.3483 L 604.5736 490.0585 Z" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_787">
+        <path d="M 604.5736 443.3483 L 604.5736 490.0585 L 229.83043 443.3483 Z" fill="#595959"/>
+      </g>
+      <g id="Graphic_786">
+        <title>Text</title>
+        <text transform="translate(233.90232 468.93723)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">costs</tspan>
+        </text>
+      </g>
+      <g id="Graphic_785">
+        <title>Text</title>
+        <text transform="translate(547.0736 447.63083)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="34319214e-19" y="11" xml:space="preserve">efficiency</tspan>
+        </text>
+      </g>
+      <g id="Graphic_784">
+        <path d="M 237.2616 268.29122 C 237.2616 252.51974 250.04746 239.7343 265.8185 239.7343 C 281.58957 239.7343 294.37543 252.51974 294.37543 268.29122 C 294.37543 284.0623 281.58957 296.84814 265.8185 296.84814 C 250.04746 296.84814 237.2616 284.0623 237.2616 268.29122 Z" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_783">
+        <path d="M 312.42255 268.29122 C 312.42255 252.51974 325.2084 239.7343 340.97946 239.7343 C 356.7505 239.7343 369.53637 252.51974 369.53637 268.29122 C 369.53637 284.0623 356.7505 296.84814 340.97946 296.84814 C 325.2084 296.84814 312.42255 284.0623 312.42255 268.29122 Z" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_782">
+        <path d="M 340.97946 239.7343 C 356.66135 239.7343 369.4111 252.38173 369.53637 268.06404 L 340.97946 268.29122 Z" fill="#262626"/>
+      </g>
+      <g id="Graphic_781">
+        <path d="M 388.22045 268.50354 C 388.22045 252.73206 401.0063 239.94663 416.77736 239.94663 C 432.5484 239.94663 445.3343 252.73206 445.3343 268.50354 C 445.3343 284.2746 432.5484 297.06046 416.77736 297.06046 C 401.0063 297.06046 388.22045 284.2746 388.22045 268.50354 Z" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_780">
+        <path d="M 416.77736 239.94663 C 432.5484 239.94663 445.3343 252.73185 445.3343 268.50354 C 445.3343 284.2746 432.5484 297.06046 416.77736 297.06046 L 416.77736 268.50354 Z" fill="#262626"/>
+      </g>
+      <g id="Graphic_779">
+        <path d="M 463.80603 269.35282 C 463.80603 253.58134 476.5919 240.7959 492.36295 240.7959 C 508.134 240.7959 520.91986 253.58134 520.91986 269.35282 C 520.91986 285.12388 508.134 297.90973 492.36295 297.90973 C 476.5919 297.90973 463.80603 285.12388 463.80603 269.35282 Z" fill="#bfbfbf"/>
+      </g>
+      <g id="Graphic_778">
+        <path d="M 492.36295 240.7959 C 508.134 240.7959 520.91986 253.58134 520.91986 269.35282 C 520.91986 285.12388 508.134 297.90973 492.36295 297.90973 C 476.71503 297.90973 463.98013 285.31497 463.80816 269.66705 L 492.36295 269.35282 Z" fill="#262626"/>
+      </g>
+      <g id="Graphic_777">
+        <path d="M 538.967 267.97275 C 538.967 252.25986 551.7528 239.522 567.5239 239.522 C 583.29495 239.522 596.0808 252.25986 596.0808 267.97275 C 596.0808 283.68648 583.29495 296.4235 567.5239 296.4235 C 551.7528 296.4235 538.967 283.68648 538.967 267.97275 Z" fill="#262626"/>
+      </g>
+      <g id="Graphic_776">
+        <path d="M 229.83043 545.6861 L 229.83043 498.9759 L 604.5736 545.6861 Z" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_775">
+        <path d="M 604.5736 498.9759 L 604.5736 545.6861 L 229.83043 498.9759 Z" fill="#595959"/>
+      </g>
+      <g id="Graphic_773">
+        <title>Text</title>
+        <text transform="translate(231.76007 524.736)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">quality guarantee</tspan>
+        </text>
+      </g>
+      <g id="Graphic_771">
+        <title>Text</title>
+        <text transform="translate(539.3077 503.47074)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="3261391e-18" y="11" xml:space="preserve">quality risk</tspan>
+        </text>
+      </g>
+      <g id="Graphic_770">
+        <path d="M 229.19348 150.13567 L 229.19348 103.42548 L 603.9366 150.13567 Z" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_769">
+        <path d="M 603.9366 103.42548 L 603.9366 150.13567 L 229.19348 103.42548 Z" fill="#595959"/>
+      </g>
+      <g id="Graphic_768">
+        <title>Text</title>
+        <text transform="translate(238.37176 129.27501)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">HUMAN</tspan>
+        </text>
+      </g>
+      <g id="Graphic_767">
+        <title>Text</title>
+        <text transform="translate(541.1334 109.43249)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">AI AGENT</tspan>
+        </text>
+      </g>
+      <g id="Graphic_766">
+        <path d="M 229.83043 434.8555 L 229.83043 388.14533 L 604.5736 434.8555 Z" fill="#d9d9d9"/>
+      </g>
+      <g id="Graphic_765">
+        <path d="M 604.5736 388.14533 L 604.5736 434.8555 L 229.83043 388.14533 Z" fill="#595959"/>
+      </g>
+      <g id="Graphic_764">
+        <title>Text</title>
+        <text transform="translate(233.90232 413.9466)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">control authority</tspan>
+        </text>
+      </g>
+      <g id="Graphic_763">
+        <title>Text</title>
+        <text transform="translate(540.333 392.6402)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="980549e-18" y="11" xml:space="preserve">delegation</tspan>
+        </text>
+      </g>
+      <g id="Graphic_761">
+        <title>Text</title>
+        <text transform="translate(237.01333 205.61479)" fill="black">
+          <tspan font-family="Myriad Pro" font-weight="bold" font-size="14" fill="black" x="0" y="11" xml:space="preserve">manually</tspan>
+        </text>
+      </g>
+      <g id="Graphic_760">
+        <title>Text</title>
+        <text transform="translate(550.1415 205.61479)" fill="black">
+          <tspan font-family="Myriad Pro" font-weight="bold" font-size="14" fill="black" x="0" y="11" xml:space="preserve">vibed</tspan>
+        </text>
+      </g>
+      <g id="Graphic_759">
+        <title>Text</title>
+        <text transform="translate(462.62194 205.61479)" fill="black">
+          <tspan font-family="Myriad Pro" font-weight="bold" font-size="14" fill="black" x="0" y="11" xml:space="preserve">delegated</tspan>
+        </text>
+      </g>
+      <g id="Graphic_758">
+        <title>Text</title>
+        <text transform="translate(395.26103 205.61479)" fill="black">
+          <tspan font-family="Myriad Pro" font-weight="bold" font-size="14" fill="black" x="0" y="11" xml:space="preserve">agentic</tspan>
+        </text>
+      </g>
+      <g id="Graphic_757">
+        <title>Text</title>
+        <text transform="translate(318.32523 205.61479)" fill="black">
+          <tspan font-family="Myriad Pro" font-weight="bold" font-size="14" fill="black" x="0" y="11" xml:space="preserve">assisted</tspan>
+        </text>
+      </g>
+      <g id="Graphic_755">
+        <title>Text</title>
+        <text transform="translate(243.9568 354.1003)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">…2025</tspan>
+        </text>
+      </g>
+      <g id="Graphic_754">
+        <title>Text</title>
+        <text transform="translate(541.7307 354.2643)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">3rd party</tspan>
+        </text>
+      </g>
+      <g id="Graphic_753">
+        <title>Text</title>
+        <text transform="translate(462.4419 354.1003)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">offshoring</tspan>
+        </text>
+      </g>
+      <g id="Graphic_752">
+        <title>Text</title>
+        <text transform="translate(316.428 354.1003)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">assistant</tspan>
+        </text>
+      </g>
+      <g id="Graphic_749">
+        <title>Text</title>
+        <text transform="translate(387.5282 354.1003)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">co-worker</tspan>
+        </text>
+      </g>
+      <g id="Graphic_748">
+        <title>Text</title>
+        <text transform="translate(83.88805 263.3379)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">View</tspan>
+        </text>
+      </g>
+      <g id="Graphic_747">
+        <title>Text</title>
+        <text transform="translate(83.88805 401.7699)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">Sovereignty</tspan>
+        </text>
+      </g>
+      <g id="Graphic_746">
+        <title>Text</title>
+        <text transform="translate(83.88805 456.76055)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">Productivity</tspan>
+        </text>
+      </g>
+      <g id="Graphic_745">
+        <title>Text</title>
+        <text transform="translate(84.35197 512.60046)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">Risk</tspan>
+        </text>
+      </g>
+      <g id="Graphic_744">
+        <title>Text</title>
+        <text transform="translate(83.88805 193.90956)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">Level</tspan>
+        </text>
+      </g>
+      <g id="Graphic_743">
+        <title>Text</title>
+        <text transform="translate(83.88805 353.5735)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">Think</tspan>
+        </text>
+      </g>
+      <g id="Graphic_742">
+        <title>Text</title>
+        <text transform="translate(248.4938 302.4322)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">white</tspan>
+        </text>
+      </g>
+      <g id="Graphic_741">
+        <title>Text</title>
+        <text transform="translate(553.2516 302.4322)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">black</tspan>
+        </text>
+      </g>
+      <g id="Graphic_740">
+        <title>Text</title>
+        <text transform="translate(463.7028 302.4322)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">grey / dark</tspan>
+        </text>
+      </g>
+      <g id="Graphic_739">
+        <title>Text</title>
+        <text transform="translate(401.1423 302.4322)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">grey</tspan>
+        </text>
+      </g>
+      <g id="Graphic_738">
+        <title>Text</title>
+        <text transform="translate(311.3788 302.4322)" fill="white">
+          <tspan font-family="Myriad Pro" font-size="14" fill="white" x="0" y="11" xml:space="preserve">grey / light</tspan>
+        </text>
+      </g>
+      <g id="Graphic_737">
+        <path d="M 303.94404 75.4452 C 303.94404 72.9512 306.3177 70.92933 309.2478 70.92933 L 523.5011 70.92933 C 526.4312 70.92933 528.8049 72.9512 528.8049 75.4452 L 528.8049 562.47715 C 528.8049 564.9716 526.4312 566.99234 523.5011 566.99234 L 309.2478 566.99234 C 306.3177 566.99234 303.94404 564.9716 303.94404 562.47715 Z" fill="#4e95d9" fill-opacity=".19170938"/>
+      </g>
+      <g id="Graphic_736">
+        <title>Text</title>
+        <text transform="translate(377.8129 78.64436)" fill="black">
+          <tspan font-family="Myriad Pro" font-size="14" fill="black" x="0" y="11" xml:space="preserve">ASE Sweetspot</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
