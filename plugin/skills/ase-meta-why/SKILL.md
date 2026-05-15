@@ -51,7 +51,7 @@ addressing surface-level symptoms.
         </template>
 
         Then, for the next iteration let <question/> now be the last <answer/>.
-        The magic is NOT in exactly 5 "Why" -- you can stop the iteration
+        The magic is NOT in exactly 5 "Why" -- you can <break/> the iteration
         when you already reached the root-cause.
     </for>
     </step>

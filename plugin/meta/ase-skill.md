@@ -142,10 +142,11 @@ Skill Control Flow
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <for items="<for-item/> [...]"><for-body/></for>:
 
-    This specifies a <for-body/> which is *repeated* for all <for-item/>s
-    and where `<item/>` is expanded with the current <for-item/> in <for-body/>.
-    This construct is expanded to the repetition of <for-body/>.
-    Do not output anything else.
+    This specifies a <for-body/> which is *repeated* for all
+    <for-item/>s and where `<item/>` is expanded with the current
+    <for-item/> in <for-body/>. This construct is expanded to the
+    repetition of <for-body/>. A <break/> in <for-body/> can stop the
+    repetition early. Do not output anything else.
 
 Skill Sequential Processing
 ---------------------------
