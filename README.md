@@ -103,16 +103,20 @@ ase setup uninstall
 Overview
 --------
 
-### Architecture &amp; Building Blocks
+### Agentic Levels &amp; ASE Sweetspot
 
-![building-blocks](docs/building-blocks.svg)
+![building-blocks](docs/agentic-levels.svg)
 
 ### Skills &amp; Workflow
 
 ![workflow](docs/workflow.svg)
 
-Documenation
-------------
+### Architecture &amp; Building Blocks
+
+![building-blocks](docs/building-blocks.svg)
+
+Documentation
+-------------
 
 - [Setup: Installation, Update, Uninstallation](docs/setup.md)
 - [Configuration: Parameters](docs/configuration.md)
