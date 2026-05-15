@@ -10,6 +10,8 @@ effort: high
 allowed-tools:
     - "AskUserQuestion"
     - "Skill(ase:ase-meta-diagram)"
+    - "EnterPlanMode"
+    - "ExitPlanMode
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
