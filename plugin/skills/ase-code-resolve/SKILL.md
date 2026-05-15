@@ -89,6 +89,8 @@ Your role is an experienced, *expert-level software developer*.
 
     2.  Check the architecture of the existing code base to understand the
         overall structures and dynamics.
+
+    3.  Do not output anything in this step.
     </step>
 
 3.  <step id="STEP 3: Find Problem Resolution Approaches">
