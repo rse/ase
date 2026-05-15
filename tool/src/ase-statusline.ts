@@ -119,7 +119,7 @@ const detectTermWidth = (): number => {
         const tty = fs.openSync("/dev/tty", "r")
         const out = execFileSync("tput", [ "cols" ], { stdio: [ tty, "pipe", "ignore" ] })
         fs.closeSync(tty)
-        width = parseInt(out.toString("utf8").trim()) || 0
+        width = Number.parseInt(out.toString("utf8").trim(), 10) || 0
     }
     catch (_e) {
         /*  no controlling terminal  */
