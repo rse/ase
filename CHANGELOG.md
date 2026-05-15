@@ -2,11 +2,12 @@
 ChangeLog
 =========
 
-0.0.27 (2026-05-13)
+0.0.27 (2026-05-16)
 -------------------
 
 - IMPROVEMENT: render the "ase-task-list" output as a Markdown table with mtime information
 - REFACTORING: split "task list" functionality into own "ase-task-list" skill
+- CLEANUP: multiple cleanups to various skills
 
 0.0.26 (2026-05-13)
 -------------------
