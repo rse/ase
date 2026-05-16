@@ -5,10 +5,30 @@ ChangeLog
 0.0.27 (2026-05-16)
 -------------------
 
-- IMPROVEMENT: render the "ase-task-list" output as a Markdown table with mtime information
-- REFACTORING: split "task list" functionality into own "ase-task-list" skill
-- CLEANUP: multiple cleanups to various skills
+- IMPROVEMENT: render the `ase-task-list` output as a Markdown table with mtime information
+- IMPROVEMENT: support `<break/>` construct for early stop of `<for/>` repetition in skills
+- IMPROVEMENT: clarify XML syntax usage in meta skill for more precise LLM behavior
+- IMPROVEMENT: align outputs across skills (`ase-task-list`, craft/refactor/resolve family, etc.)
+- IMPROVEMENT: provide fallback definition for disagreement in `ase-meta-quorum` skill
+- IMPROVEMENT: add agentic levels diagram with descriptions to documentation
+- IMPROVEMENT: provide rough Java/Kotlin package support in `ase-code-insight` skill
+- IMPROVEMENT: improve TypeScript typing (use `unknown` for caught errors) in tool
+- IMPROVEMENT: verify given session id in `ase hook session-start`
+- BUGFIX: ensure skills apply `agent.persona` style correctly
+- BUGFIX: make constitution semicolon/brace prohibitions language-aware
+- BUGFIX: fix allowed-tools lists and add missing tool entries in multiple skills
+- BUGFIX: fix typos, wrong references, and syntax issues across skills
+- BUGFIX: fix logic bug in skill control-flow handling
+- BUGFIX: use newer `timestamp` MCP tool (drop positional parameter)
+- BUGFIX: do not leak resource in MCP service probe
+- BUGFIX: omit clearing plan mode outside plan mode in `ase-task-edit`
+- BUGFIX: fix swapped tool and plugin in startup output
+- REFACTOR: split `task list` functionality into own `ase-task-list` skill
+- REFACTOR: factor out identical probe code into own module in MCP service
 - UPDATE: upgrade NPM dependencies
+- CLEANUP: multiple cleanups to various skills
+- CLEANUP: cleanup `ase-task-list` skill
+- CLEANUP: remove debugging leftovers
 
 0.0.26 (2026-05-13)
 -------------------
