@@ -119,8 +119,10 @@ export default class HookCommand {
         /*  determine session id  */
         const sessionId = input.session_id ?? input.sessionId ?? ""
 
-        /*  establish config context  */
-        const cfg = new Config("config", configSchema, this.log, parseScope(`session:${sessionId}`))
+        /*  establish config context (session-scoped only if a valid sessionId is present)  */
+        const hasSession = /^[A-Za-z0-9._-]+$/.test(sessionId)
+        const cfg = new Config("config", configSchema, this.log,
+            hasSession ? parseScope(`session:${sessionId}`) : parseScope(undefined))
         try {
             cfg.read()
         }
@@ -128,14 +130,16 @@ export default class HookCommand {
             /*  best-effort: ignore failures  */
         }
 
-        /*  determine task id  */
+        /*  determine task id (only persist when scoped to a real session)  */
         const taskId = process.env.ASE_TASK_ID ?? "default"
-        try {
-            cfg.set("agent.task", taskId)
-            cfg.write()
-        }
-        catch (_e) {
-            /*  best-effort: ignore failures  */
+        if (hasSession) {
+            try {
+                cfg.set("agent.task", taskId)
+                cfg.write()
+            }
+            catch (_e) {
+                /*  best-effort: ignore failures  */
+            }
         }
 
         /*  determine project id  */
