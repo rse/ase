@@ -116,11 +116,13 @@ export default class MCPCommand {
         }
 
         /*  reconnect loop: restart service if needed, then reconnect client  */
-        const reconnect = async (attempt = 0) => {
+        const reconnect = async (attempt = 0, done?: () => void) => {
             const delay = Math.min(500 * 2 ** attempt, 10000)
             await new Promise<void>((resolve) => setTimeout(resolve, delay))
-            if (bridgeDone)
+            if (bridgeDone) {
+                done?.()
                 return
+            }
             try {
                 const ctx = await this.ensureService()
                 port = ctx.port
@@ -129,11 +131,12 @@ export default class MCPCommand {
                 closedByUs = false
                 await connectClient()
                 this.log.write("info", "mcp: reconnected to service")
+                done?.()
             }
             catch (_err: unknown) {
                 const err = _err instanceof Error ? _err : new Error(String(_err))
                 this.log.write("error", `mcp: reconnect failed: ${err.message}`)
-                reconnect(attempt + 1).catch(() => {})
+                reconnect(attempt + 1, done).catch(() => {})
             }
         }
 
@@ -167,7 +170,7 @@ export default class MCPCommand {
                 if (match !== true) {
                     reconnecting = true
                     this.log.write("warning", "mcp: health check failed — reconnecting")
-                    reconnect().catch(() => {}).finally(() => { reconnecting = false })
+                    reconnect(0, () => { reconnecting = false }).catch(() => {})
                 }
             }
             catch { /* ignore probe errors */ }
