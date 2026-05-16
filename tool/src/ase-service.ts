@@ -14,8 +14,10 @@ import type { ChildProcess }  from "node:child_process"
 import { Command }            from "commander"
 import Hapi                   from "@hapi/hapi"
 import axios                  from "axios"
+import type { AxiosError }    from "axios"
 import { isMap }              from "yaml"
 import prettyMs               from "pretty-ms"
+import * as v                 from "valibot"
 
 import { McpServer }                     from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
@@ -27,8 +29,43 @@ import type Log                          from "./ase-log.js"
 import { DiagramMCP }                    from "./ase-diagram.js"
 import { TaskMCP }                       from "./ase-task.js"
 import PersonaMCP                        from "./ase-persona.js"
-import { SERVICE_HOST as HOST, serviceSchema, probe } from "./ase-service-probe.js"
 import pkg                               from "../package.json" with { type: "json" }
+
+/*  shared service host  */
+export const SERVICE_HOST = "127.0.0.1"
+const HOST = SERVICE_HOST
+
+/*  schema for ".ase/service.yaml"  */
+export const serviceSchema = v.nullish(v.strictObject({
+    port: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)))
+}))
+
+/*  distinguish ECONNREFUSED from other Axios transport errors  */
+export const isConnRefused = (err: unknown): boolean => {
+    const e = err as AxiosError & { code?: string, cause?: { code?: string } }
+    return e?.code === "ECONNREFUSED" || e?.cause?.code === "ECONNREFUSED"
+}
+
+/*  probe the service and verify ASE identity banner  */
+export const probe = async (port: number, projectId: string): Promise<boolean | null> => {
+    try {
+        const r = await axios.request({
+            method:         "OPTIONS",
+            url:            `http://${SERVICE_HOST}:${port}/`,
+            timeout:        2000,
+            validateStatus: () => true
+        })
+        if (r.status < 200 || r.status >= 300)
+            return false
+        const d = r.data as { ase?: boolean, projectId?: string } | null
+        return d?.ase === true && d?.projectId === projectId
+    }
+    catch (err: unknown) {
+        if (isConnRefused(err))
+            return null
+        throw err
+    }
+}
 
 interface Context {
     projectId: string

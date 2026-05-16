@@ -16,7 +16,7 @@ import type { JSONRPCMessage }           from "@modelcontextprotocol/sdk/types.j
 
 import { Config, configSchema } from "./ase-config.js"
 import type Log                 from "./ase-log.js"
-import { SERVICE_HOST as HOST, serviceSchema, probe } from "./ase-service-probe.js"
+import { SERVICE_HOST as HOST, serviceSchema, probe } from "./ase-service.js"
 
 /*  CLI command "ase mcp"  */
 export default class MCPCommand {

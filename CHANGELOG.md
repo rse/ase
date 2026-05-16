@@ -9,6 +9,7 @@ ChangeLog
 - IMPROVEMENT: store tasks per project and not per user
 - IMPROVEMENT: support more elaborate age specification in "ase task purge" command
 - REFACTORING: bundle logic, CLI parsing and MCP service registration together
+- REFACTORING: move shared service probing into service functionality
 
 0.0.27 (2026-05-16)
 -------------------
