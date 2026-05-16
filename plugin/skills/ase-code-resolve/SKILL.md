@@ -34,28 +34,37 @@ Your role is an experienced, *expert-level software developer*.
     2.  Clear any old plans of the *Plan Mode* and start planning from
         scratch with an empty plan.
 
-    3.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
+    3.  If <problem/> matches the regexp `^P\d+$` (i.e. a bare problem
+        identifier like `P1`, `P2`, ...), set
+        <problem-id><problem/></problem-id> and call the `kv_get(key:
+        "ase-code-analyze-result-<problem-id/>")` tool of the `ase`
+        MCP service to retrieve the previously persisted problem
+        description. If the returned `text` is non-empty, set
+        <problem><text/></problem>, otherwise complain to the user that
+        no analyzer result exists for <problem-id/> and stop processing.
+
+    4.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
         <problem><text/></problem> and <ase-task-id><id/></ase-task-id>
         and call the `task_id(id: <ase-task-id/>, session:
         <ase-session-id/>)` tool from the `ase` MCP service to
         implicitly switch the task.
 
-    4.  Report the task and problem with the following <template/>:
+    5.  Report the task and problem with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
         ⧉ **ASE**: ◉ problem: **<problem/>**
         </template>
 
-    5.  Figure out what the requested <problem/> is about.
+    6.  Figure out what the requested <problem/> is about.
 
-    6.  Ask the user for clarification if the goal of this resolution is
+    7.  Ask the user for clarification if the goal of this resolution is
         too unclear.
 
-    7.  Do not output anything in this step, except you asked the user.
+    8.  Do not output anything in this step, except you asked the user.
 
-    8.  Investigate and *figure out details* related to this problem.
+    9.  Investigate and *figure out details* related to this problem.
         Report those details with the following <template/>:
 
         <template>
@@ -254,6 +263,13 @@ Your role is an experienced, *expert-level software developer*.
     `task_save` tool (`id` set to <ase-plan-id/>, `text` set to the
     plan content) and then you *MUST* exit the *Plan Mode* with the
     `ExitPlanMode` tool.
+
+    If <problem-id/> is set (i.e. the <problem/> was retrieved from
+    `kv_get` in STEP 1.3 via key `ase-code-analyze-result-<problem-id/>`),
+    you *MUST* additionally call the `kv_delete(key:
+    "ase-code-analyze-result-<problem-id/>")` tool of the `ase` MCP
+    service to remove the now-resolved analyzer result from the
+    in-memory key/value store.
 
     Finally, output a final hint with the following <template/>
     and do not output anything else in this step:
