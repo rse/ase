@@ -155,7 +155,7 @@ Skill Control Flow
 Skill Sequential Processing
 ---------------------------
 
--   *IMPORTANT*: For each <flow/> you *MUST* use the
+-   *IMPORTANT*: For each given <flow/>, you *MUST* use the
     `TaskCreate` tool to create a corresponding set of processing steps.
 
     Each `<step id="xxx" [...]/>` corresponds to a `TaskCreate({
