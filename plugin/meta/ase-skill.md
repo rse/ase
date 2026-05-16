@@ -189,23 +189,29 @@ MCP Tool Calls
 
 -   *IMPORTANT*: Whenever you call *any* tool from the `ase` MCP service,
     you *MUST* check the response immediately:
+
     -   If the call fails because the `ase` MCP service is not running
-        (tool not found, connection refused, server not connected, internal error),
-        output the following and stop immediately:
+        (tool not found, connection refused, server not connected, internal
+        error), output the following and stop immediately:
+
         <template>
         ⧉ **ASE**: **ERROR:** MCP service not running — please start it via `ase service start` and reconnect via `/mcp`, then retry.
         </template>
+
     -   If the call fails for any other reason (timeout, transport error,
-        or other infrastructure problem),
-        output the following and stop immediately:
+        or other infrastructure problem), output the following and stop immediately:
+
         <template>
-        ⧉ **ASE**: **ERROR:** MCP tool unavailable: <tool-name/>
+        ⧉ **ASE**: **ERROR:** MCP tool unavailable
         </template>
-    -   If the response `text` starts with or contains `ERROR:`
+
+    -   If the response `text` starts with or contains `ERROR: <info/>`,
         output the following and stop immediately:
+
         <template>
-        ⧉ **ASE**: **ERROR:** <mcp-response-text/>
+        ⧉ **ASE**: **ERROR:** MCP tool failed: <info/>
         </template>
+
     -   Only on a clean response: proceed as the skill instructs.
 
 Next Step Processing
