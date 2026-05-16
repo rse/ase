@@ -244,8 +244,15 @@ export default class ServiceCommand {
         /*  track start time and last activity  */
         const startTime  = Date.now()
         let lastActivity = Date.now()
+        let inFlight     = 0
         let stopping     = false
         server.ext("onRequest", (_request, h) => {
+            inFlight++
+            lastActivity = Date.now()
+            return h.continue
+        })
+        server.ext("onPreResponse", (_request, h) => {
+            inFlight     = Math.max(0, inFlight - 1)
             lastActivity = Date.now()
             return h.continue
         })
@@ -375,6 +382,8 @@ export default class ServiceCommand {
         /*  stop service after idle timeout  */
         setInterval(async () => {
             if (stopping)
+                return
+            if (inFlight > 0)
                 return
             if (Date.now() - lastActivity > IDLE_MS) {
                 stopping = true
