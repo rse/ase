@@ -43,9 +43,9 @@ Query foreign LLM for: <query>$ARGUMENTS</query>
     </step>
 
 2.  <step id="STEP 2: Spawn Agents">
-    Spawn a *sub-task* with the `ase-meta-chat` *agent* for the selected
-    foreign LLMs, and pass the *second and all remaining* words of the
-    following <query/> as the query for the selected LLM.
+    Spawn a *sub-task* with the companion `ase-meta-chat` *agent* for
+    the selected foreign LLMs, and pass the *second and all remaining*
+    words of the following <query/> as the query for the selected LLM.
     </step>
 
 3.  <step id="STEP 3: Return Responses">
