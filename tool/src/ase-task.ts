@@ -223,13 +223,25 @@ export default class TaskCommand {
         /*  register CLI sub-command "ase task purge"  */
         task
             .command("purge")
-            .description("Remove all tasks with a modification time older than <days> (default: 31)")
-            .argument("[<days>]", "Maximum task age in days", "31")
-            .action((days: string) => {
-                const n = Number.parseInt(days, 10)
-                if (!Number.isFinite(n) || n < 0)
-                    throw new Error("task: <days> must be a non-negative integer")
-                const removed = taskPurge(n * 24 * 60 * 60 * 1000)
+            .description("Remove all tasks with a modification time older than <age> (default: 31d); " +
+                "<age> is <number><unit> with unit h (hour), d (day), m (month), y (year)")
+            .argument("[<age>]", "Maximum task age as <number><unit>", "31d")
+            .action((age: string) => {
+                const m = /^(\d+)([hdmy])$/.exec(age)
+                if (m === null)
+                    throw new Error("task: <age> must match <number><unit> with unit h, d, m, or y")
+                const n = Number.parseInt(m[1], 10)
+                const unit = m[2]
+                const hour  = 60 * 60 * 1000
+                const day   = 24 * hour
+                const month = 30 * day
+                const year  = 365 * day
+                const factor =
+                    unit === "h" ? hour  :
+                        unit === "d" ? day :
+                            unit === "m" ? month :
+                                year
+                const removed = taskPurge(n * factor)
                 if (removed.length === 0)
                     this.log.write("info", "task: no tasks to purge")
                 else
