@@ -56,14 +56,14 @@ const main = async (): Promise<void> => {
     })
 
     /*  register top-level commands  */
-    new ConfigCommand(log).register(program)
-    new ServiceCommand(log).register(program)
-    new MCPCommand(log).register(program)
-    new HookCommand(log).register(program)
-    new DiagramCommand(log).register(program)
     new SetupCommand(log).register(program)
+    new ConfigCommand(log).register(program)
+    new MCPCommand(log).register(program)
+    new ServiceCommand(log).register(program)
+    new HookCommand(log).register(program)
     new StatuslineCommand(log).register(program)
     new TaskCommand(log).register(program)
+    new DiagramCommand(log).register(program)
 
     /*  parse program arguments  */
     await program.parseAsync(process.argv)

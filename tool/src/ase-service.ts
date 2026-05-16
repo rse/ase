@@ -14,7 +14,7 @@ import type { ChildProcess }  from "node:child_process"
 import { Command }            from "commander"
 import Hapi                   from "@hapi/hapi"
 import axios                  from "axios"
-import { isMap, isScalar }    from "yaml"
+import { isMap }              from "yaml"
 import prettyMs               from "pretty-ms"
 
 import { McpServer }                     from "@modelcontextprotocol/sdk/server/mcp.js"
@@ -22,16 +22,13 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { z }                             from "zod"
 import { DateTime }                      from "luxon"
 
-import { Config, configSchema, parseScope } from "./ase-config.js"
-import type Log                 from "./ase-log.js"
-import {
-    renderDiagram,
-    detectTermWidth,
-    detectTermHeight
-}                               from "./ase-diagram.js"
-import { taskLoad, taskSave, taskDelete, taskList } from "./ase-task.js"
+import { Config, configSchema }          from "./ase-config.js"
+import type Log                          from "./ase-log.js"
+import { DiagramMCP }                    from "./ase-diagram.js"
+import { TaskMCP }                       from "./ase-task.js"
+import PersonaMCP                        from "./ase-persona.js"
 import { SERVICE_HOST as HOST, serviceSchema, probe } from "./ase-service-probe.js"
-import pkg                      from "../package.json" with { type: "json" }
+import pkg                               from "../package.json" with { type: "json" }
 
 interface Context {
     projectId: string
@@ -48,93 +45,144 @@ const PORT_MIN   = 42000
 const PORT_MAX   = 44000
 const PORT_TRIES = 20
 
-/*  try binding a single candidate port to verify availability  */
-const tryBind = (port: number): Promise<boolean> => {
-    return new Promise((resolve) => {
-        const s = net.createServer()
-        s.once("error", () => {
-            resolve(false)
+/*  reusable functionality: port allocation, persistence, and process spawning  */
+export class Service {
+    /*  try binding a single candidate port to verify availability  */
+    static tryBind (port: number): Promise<boolean> {
+        return new Promise((resolve) => {
+            const s = net.createServer()
+            s.once("error", () => {
+                resolve(false)
+            })
+            s.once("listening", () => {
+                s.close(() => resolve(true))
+            })
+            s.listen(port, HOST)
         })
-        s.once("listening", () => {
-            s.close(() => resolve(true))
-        })
-        s.listen(port, HOST)
-    })
-}
-
-/*  allocate a fresh random port in PORT_MIN..PORT_MAX  */
-const allocatePort = async (): Promise<number> => {
-    for (let i = 0; i < PORT_TRIES; i++) {
-        const p = PORT_MIN + Math.floor(Math.random() * (PORT_MAX - PORT_MIN + 1))
-        if (await tryBind(p))
-            return p
     }
-    throw new Error(`failed to allocate a port in ${PORT_MIN}..${PORT_MAX} after ${PORT_TRIES} attempts`)
-}
 
-/*  persist an allocated port into ".ase/service.yaml"  */
-const persistPort = (svc: Config, port: number): void => {
-    svc.set("port", port)
-    svc.write()
-}
-
-/*  clear the persisted port and remove ".ase/service.yaml" if it is empty  */
-const clearPort = (svc: Config): void => {
-    svc.delete("port")
-    const root  = svc.get()
-    const empty = root === undefined || root === null || (isMap(root) && root.items.length === 0)
-    if (empty) {
-        if (fs.existsSync(svc.filename))
-            fs.rmSync(svc.filename)
-    }
-    else
-        svc.write()
-}
-
-/*  spawn the current executable detached as a background service  */
-const spawnDetached = (aseDir: string, port: number): { child: ChildProcess, logFile: string } => {
-    fs.mkdirSync(aseDir, { recursive: true })
-    const logFile = path.join(aseDir, "service.log")
-    const fd      = fs.openSync(logFile, "a")
-    const entry   = fileURLToPath(new URL("./ase.js", import.meta.url))
-    const child   = spawn(process.execPath, [ entry, "service", "start" ], {
-        detached: true,
-        env:      { ...process.env, [SERVE_ENV]: "1", [PORT_ENV]: String(port) },
-        stdio:    [ "ignore", fd, fd ]
-    })
-    fs.closeSync(fd)
-    return { child, logFile }
-}
-
-/*  read the last N non-empty lines of a log file for diagnostics  */
-const readLogTail = (logFile: string, lines: number): string => {
-    let fd: number | null = null
-    try {
-        fd = fs.openSync(logFile, "r")
-        const size  = fs.fstatSync(fd).size
-        const CHUNK = 8192
-        const buf   = Buffer.alloc(CHUNK)
-        let pos     = size
-        let tail    = ""
-        let count   = 0
-        while (pos > 0 && count <= lines) {
-            const n = Math.min(CHUNK, pos)
-            pos -= n
-            fs.readSync(fd, buf, 0, n, pos)
-            tail  = buf.toString("utf8", 0, n) + tail
-            count = 0
-            for (let i = 0; i < tail.length; i++)
-                if (tail.charCodeAt(i) === 10) count++
+    /*  allocate a fresh random port in PORT_MIN..PORT_MAX  */
+    static async allocatePort (): Promise<number> {
+        for (let i = 0; i < PORT_TRIES; i++) {
+            const p = PORT_MIN + Math.floor(Math.random() * (PORT_MAX - PORT_MIN + 1))
+            if (await Service.tryBind(p))
+                return p
         }
-        const all = tail.split("\n").filter((l) => l.length > 0)
-        return all.slice(-lines).join("\n")
+        throw new Error(`failed to allocate a port in ${PORT_MIN}..${PORT_MAX} after ${PORT_TRIES} attempts`)
     }
-    catch {
-        return ""
+
+    /*  persist an allocated port into ".ase/service.yaml"  */
+    static persistPort (svc: Config, port: number): void {
+        svc.set("port", port)
+        svc.write()
     }
-    finally {
-        if (fd !== null)
-            fs.closeSync(fd)
+
+    /*  clear the persisted port and remove ".ase/service.yaml" if it is empty  */
+    static clearPort (svc: Config): void {
+        svc.delete("port")
+        const root  = svc.get()
+        const empty = root === undefined || root === null || (isMap(root) && root.items.length === 0)
+        if (empty) {
+            if (fs.existsSync(svc.filename))
+                fs.rmSync(svc.filename)
+        }
+        else
+            svc.write()
+    }
+
+    /*  spawn the current executable detached as a background service  */
+    static spawnDetached (aseDir: string, port: number): { child: ChildProcess, logFile: string } {
+        fs.mkdirSync(aseDir, { recursive: true })
+        const logFile = path.join(aseDir, "service.log")
+        const fd      = fs.openSync(logFile, "a")
+        const entry   = fileURLToPath(new URL("./ase.js", import.meta.url))
+        const child   = spawn(process.execPath, [ entry, "service", "start" ], {
+            detached: true,
+            env:      { ...process.env, [SERVE_ENV]: "1", [PORT_ENV]: String(port) },
+            stdio:    [ "ignore", fd, fd ]
+        })
+        fs.closeSync(fd)
+        return { child, logFile }
+    }
+
+    /*  read the last N non-empty lines of a log file for diagnostics  */
+    static readLogTail (logFile: string, lines: number): string {
+        let fd: number | null = null
+        try {
+            fd = fs.openSync(logFile, "r")
+            const size  = fs.fstatSync(fd).size
+            const CHUNK = 8192
+            const buf   = Buffer.alloc(CHUNK)
+            let pos     = size
+            let tail    = ""
+            let count   = 0
+            while (pos > 0 && count <= lines) {
+                const n = Math.min(CHUNK, pos)
+                pos -= n
+                fs.readSync(fd, buf, 0, n, pos)
+                tail  = buf.toString("utf8", 0, n) + tail
+                count = 0
+                for (let i = 0; i < tail.length; i++)
+                    if (tail.charCodeAt(i) === 10) count++
+            }
+            const all = tail.split("\n").filter((l) => l.length > 0)
+            return all.slice(-lines).join("\n")
+        }
+        catch {
+            return ""
+        }
+        finally {
+            if (fd !== null)
+                fs.closeSync(fd)
+        }
+    }
+}
+
+/*  MCP registration entry point for service-identity tools  */
+export class ServiceMCP {
+    constructor (private ctx: { projectId: string, port: number, startTime: number }) {}
+
+    register (mcp: McpServer): void {
+        mcp.registerTool("ping", {
+            title:       "ASE service ping",
+            description: "Return ASE service identity, port, and uptime.",
+            inputSchema: {}
+        }, async () => {
+            const status = {
+                ok:        true,
+                projectId: this.ctx.projectId,
+                port:      this.ctx.port,
+                uptimeMs:  Date.now() - this.ctx.startTime
+            }
+            return {
+                content: [ { type: "text", text: JSON.stringify(status) } ]
+            }
+        })
+        mcp.registerTool("timestamp", {
+            title: "ASE timestamp",
+            description:
+                "Return the current local date/time formatted via a Luxon format string. " +
+                "Pass the Luxon format tokens as `format` (default: `yyyy-LL-dd HH:mm`). " +
+                "Returns the formatted timestamp as `text`.",
+            inputSchema: {
+                format: z.string().default("yyyy-LL-dd HH:mm")
+                    .describe("Luxon format tokens (default: `yyyy-LL-dd HH:mm`)")
+            }
+        }, async (args) => {
+            try {
+                const text = DateTime.now().toFormat(args.format)
+                return {
+                    content: [ { type: "text", text } ]
+                }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return {
+                    isError: true,
+                    content: [ { type: "text", text: `timestamp: format failed: ${message}` } ]
+                }
+            }
+        })
     }
 }
 
@@ -184,326 +232,13 @@ export default class ServiceCommand {
             return h.continue
         })
 
-        /*  build a fresh MCP server instance with the demo "ping" tool  */
+        /*  build a fresh MCP server instance with all registered tools  */
         const buildMcpServer = (): McpServer => {
             const mcp = new McpServer({ name: "ase", version: pkg.version })
-            mcp.registerTool("ping", {
-                title:       "ASE service ping",
-                description: "Return ASE service identity, port, and uptime.",
-                inputSchema: {}
-            }, async () => {
-                const status = {
-                    ok:        true,
-                    projectId: ctx.projectId,
-                    port:      ctx.port,
-                    uptimeMs:  Date.now() - startTime
-                }
-                return {
-                    content: [ { type: "text", text: JSON.stringify(status) } ]
-                }
-            })
-            mcp.registerTool("timestamp", {
-                title: "ASE timestamp",
-                description:
-                    "Return the current local date/time formatted via a Luxon format string. " +
-                    "Pass the Luxon format tokens as `format` (default: `yyyy-LL-dd HH:mm`). " +
-                    "Returns the formatted timestamp as `text`.",
-                inputSchema: {
-                    format: z.string().default("yyyy-LL-dd HH:mm")
-                        .describe("Luxon format tokens (default: `yyyy-LL-dd HH:mm`)")
-                }
-            }, async (args) => {
-                try {
-                    const text = DateTime.now().toFormat(args.format)
-                    return {
-                        content: [ { type: "text", text } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `timestamp: format failed: ${message}` } ]
-                    }
-                }
-            })
-            mcp.registerTool("diagram", {
-                title:       "ASE diagram render",
-                description:
-                    "Render a Mermaid diagram as Unicode/ASCII art. " +
-                    "Use for visualizing " +
-                    "structure/layout/components/dependencies as a Flowchart, " +
-                    "control-flow/branching/concurrency as a Flowchart, " +
-                    "state-machine/states/transitions as an UML State Diagram, " +
-                    "data-flow/actors/messages/protocols as an UML Sequence Diagram, " +
-                    "data-structure/classes/methods as an UML Class Diagram, " +
-                    "data-model/entities/relationships as an ER Diagram, or " +
-                    "metrics/distributions/time-series as an XY-Chart. " +
-                    "Pass the Mermaid diagram specification as `diagram`. " +
-                    "Returns the rendered art as `text`.",
-                inputSchema: {
-                    diagram: z.string()
-                        .describe("Mermaid diagram specification"),
-                    ascii: z.boolean().default(false)
-                        .describe("emit plain ASCII (+-|) instead of Unicode box-drawing characters"),
-                    colorMode: z.enum([ "none", "ansi16", "ansi256" ]).default("none")
-                        .describe("color mode for ANSI escape sequences in the rendered output"),
-                    nodeMarginX: z.number().int().min(0).default(3)
-                        .describe("horizontal margin between nodes, in characters"),
-                    nodeMarginY: z.number().int().min(0).default(3)
-                        .describe("vertical margin between nodes, in lines"),
-                    nodePadding: z.number().int().min(0).default(1)
-                        .describe("inner horizontal and vertical padding within each node, in characters"),
-                    diagramClipX: z.number().int().min(0).default(0)
-                        .describe("extra horizontal clipping: subtract this many characters from `terminalWidth`"),
-                    diagramClipY: z.number().int().min(0).default(0)
-                        .describe("extra vertical clipping: subtract this many lines from `terminalHeight`"),
-                    terminalWidth: z.number().int().min(0).default(detectTermWidth())
-                        .describe("terminal width in characters; 0 disables horizontal clipping; defaults to ASE_TERM_WIDTH env var if set"),
-                    terminalHeight: z.number().int().min(0).default(detectTermHeight())
-                        .describe("terminal height in lines; 0 disables vertical clipping; defaults to ASE_TERM_HEIGHT env var if set")
-                }
-            }, async (args) => {
-                try {
-                    const out = renderDiagram(args.diagram, {
-                        ascii:          args.ascii,
-                        colorMode:      args.colorMode,
-                        nodeMarginX:    args.nodeMarginX,
-                        nodeMarginY:    args.nodeMarginY,
-                        nodePadding:    args.nodePadding,
-                        diagramClipX:   args.diagramClipX,
-                        diagramClipY:   args.diagramClipY,
-                        terminalWidth:  args.terminalWidth,
-                        terminalHeight: args.terminalHeight
-                    })
-                    return {
-                        content: [ { type: "text", text: out } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `diagram: render failed: ${message}` } ]
-                    }
-                }
-            })
-            mcp.registerTool("task_list", {
-                title:       "ASE task list",
-                description:
-                    "List all persisted tasks. " +
-                    "Returns a `tasks` array (in lexicographic `id` order) where each item has the " +
-                    "task `id`. If `verbose` is `true`, each item additionally has an `mtime` field " +
-                    "(last modification time of the task's `plan.md`, formatted as `YYYY-MM-DD HH:MM`). " +
-                    "Returns an empty array if no tasks exist.",
-                inputSchema:  {
-                    verbose: z.boolean().optional()
-                        .describe("if true, also include the `mtime` field per task (default: false)")
-                },
-                outputSchema: {
-                    tasks: z.array(z.object({
-                        id:    z.string().describe("task identifier"),
-                        mtime: z.string().optional()
-                            .describe("plan.md modification time (`YYYY-MM-DD HH:MM`); only present if `verbose` is true")
-                    })).describe("all persisted tasks in lexicographic id order")
-                }
-            }, async (args) => {
-                try {
-                    const verbose = args.verbose ?? false
-                    const items   = taskList(verbose)
-                    const tasks   = verbose ?
-                        items.map((item) => ({ id: item.id, mtime: item.mtime as string })) :
-                        items.map((item) => ({ id: item.id }))
-                    const result  = { tasks }
-                    return {
-                        structuredContent: result,
-                        content:           [ { type: "text", text: JSON.stringify(result) } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `task_list: ERROR: ${message}` } ]
-                    }
-                }
-            })
-            mcp.registerTool("task_load", {
-                title:       "ASE task load",
-                description:
-                    "Load a previously persisted task by `id`. " +
-                    "Returns the task as `text`; returns an empty string if no task exists for the `id`.",
-                inputSchema: {
-                    id: z.string()
-                        .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '-')")
-                }
-            }, async (args) => {
-                try {
-                    const text = taskLoad(args.id)
-                    return {
-                        content: [ { type: "text", text } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `task_load: ERROR: ${message}` } ]
-                    }
-                }
-            })
-            mcp.registerTool("task_save", {
-                title:       "ASE task save",
-                description:
-                    "Persist a task as `text` under `id`. " +
-                    "Overwrites any existing task for the same `id`.",
-                inputSchema: {
-                    id: z.string()
-                        .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '-')"),
-                    text: z.string()
-                        .describe("text content of the task")
-                }
-            }, async (args) => {
-                try {
-                    taskSave(args.id, args.text)
-                    return {
-                        content: [ { type: "text", text: `task_save: OK: saved task "${args.id}"` } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `task_save: ERROR: ${message}` } ]
-                    }
-                }
-            })
-            mcp.registerTool("task_delete", {
-                title:       "ASE task delete",
-                description:
-                    "Delete a previously persisted task by `id`. " +
-                    "Returns a status `text` indicating whether a task existed and was removed.",
-                inputSchema: {
-                    id: z.string()
-                        .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '-')")
-                }
-            }, async (args) => {
-                try {
-                    const removed = taskDelete(args.id)
-                    const msg     = removed ?
-                        `task_delete: OK: removed task "${args.id}"` :
-                        `task_delete: WARNING: no task "${args.id}" to remove`
-                    return {
-                        content: [ { type: "text", text: msg } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `task_delete: ERROR: ${message}` } ]
-                    }
-                }
-            })
-            mcp.registerTool("persona", {
-                title:       "ASE persona style get/set",
-                description:
-                    "Get or set the active ASE agent persona `style`. " +
-                    "If `style` is provided, it sets the persona style, " +
-                    "otherwise it returns the current persona `style`. " +
-                    "If `session` is provided, the operation is scoped to that session, " +
-                    "otherwise it operates on the broadest scope (user/project cascade). " +
-                    "Allowed styles: \"writer\" (decorative, eloquent, explaining), " +
-                    "\"engineer\" (brief, factual, accurate), " +
-                    "\"telegrapher\" (very brief, factual, abbreviating), " +
-                    "\"caveman\" (ultra brief, rough, stuttering).",
-                inputSchema: {
-                    style: z.enum([ "writer", "engineer", "telegrapher", "caveman" ]).optional()
-                        .describe("persona style to set; if omitted, the current persona style is returned"),
-                    session: z.string().optional()
-                        .describe("session identifier (allowed characters: A-Z, a-z, 0-9, '-'); " +
-                            "if omitted, the operation is not scoped to a specific session")
-                }
-            }, async (args) => {
-                try {
-                    const scope = args.session !== undefined ?
-                        parseScope(`session:${args.session}`) :
-                        parseScope(undefined)
-                    const cfg = new Config("config", configSchema, this.log, scope)
-                    cfg.read()
-                    if (args.style !== undefined) {
-                        cfg.set("agent.persona", args.style)
-                        cfg.write()
-                        const where = args.session !== undefined ?
-                            ` for session "${args.session}"` : ""
-                        const msg = `persona: OK: set agent.persona to "${args.style}"${where}`
-                        return {
-                            content: [ { type: "text", text: msg } ]
-                        }
-                    }
-                    const val = cfg.get("agent.persona")
-                    if (val === undefined)
-                        return {
-                            content: [ { type: "text", text: "engineer" } ]
-                        }
-                    const text = String(isScalar(val) ? val.value : val)
-                    return {
-                        content: [ { type: "text", text } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `persona: ERROR: ${message}` } ]
-                    }
-                }
-            })
-            mcp.registerTool("task_id", {
-                title:       "ASE task id get/set",
-                description:
-                    "Get or set the active ASE task `id` for a given `session`. " +
-                    "If `id` is provided, it sets the task id in the given `session`, " +
-                    "otherwise it returns the current task `id` of the `session`.",
-                inputSchema: {
-                    id: z.string().optional()
-                        .describe("task identifier to set (allowed characters: A-Z, a-z, 0-9, '-'); " +
-                            "if omitted, the current task id is returned"),
-                    session: z.string()
-                        .describe("session identifier (allowed characters: A-Z, a-z, 0-9, '-')")
-                }
-            }, async (args) => {
-                try {
-                    const scope = parseScope(`session:${args.session}`)
-                    const cfg = new Config("config", configSchema, this.log, scope)
-                    cfg.read()
-                    if (args.id !== undefined) {
-                        cfg.set("agent.task", args.id)
-                        cfg.write()
-                        const msg = `task_id: OK: set agent.task to "${args.id}" ` +
-                            `for session "${args.session}"`
-                        return {
-                            content: [ { type: "text", text: msg } ]
-                        }
-                    }
-                    const val = cfg.get("agent.task")
-                    if (val === undefined)
-                        return {
-                            content: [ { type: "text", text: "" } ]
-                        }
-                    const text = String(isScalar(val) ? val.value : val)
-                    return {
-                        content: [ { type: "text", text } ]
-                    }
-                }
-                catch (err: unknown) {
-                    const message = err instanceof Error ? err.message : String(err)
-                    return {
-                        isError: true,
-                        content: [ { type: "text", text: `task_id: ERROR: ${message}` } ]
-                    }
-                }
-            })
+            new ServiceMCP({ projectId: ctx.projectId, port: ctx.port, startTime }).register(mcp)
+            new DiagramMCP().register(mcp)
+            new TaskMCP(this.log).register(mcp)
+            new PersonaMCP(this.log).register(mcp)
             return mcp
         }
 
@@ -599,7 +334,7 @@ export default class ServiceCommand {
         /*  start service  */
         try {
             await server.start()
-            persistPort(ctx.svc, ctx.port)
+            Service.persistPort(ctx.svc, ctx.port)
             this.log.write("info", `service: listening on port ${ctx.port}`)
         }
         catch (err: unknown) {
@@ -610,7 +345,7 @@ export default class ServiceCommand {
                 if (match === true)
                     process.exit(0)
                 this.log.write("error", `service: port ${ctx.port} in use, but not responding!`)
-                clearPort(ctx.svc)
+                Service.clearPort(ctx.svc)
                 process.exit(1)
             }
             this.log.write("error", `service: ${e.message}`)
@@ -626,13 +361,13 @@ export default class ServiceCommand {
                 this.log.write("info", "service: idle timeout reached, stopping")
                 try {
                     await server.stop({ timeout: 1000 })
-                    clearPort(ctx.svc)
+                    Service.clearPort(ctx.svc)
                     process.exit(0)
                 }
                 catch (err: unknown) {
                     const e = err as Error
                     this.log.write("error", `service: stop failed: ${e.message}`)
-                    clearPort(ctx.svc)
+                    Service.clearPort(ctx.svc)
                     process.exit(1)
                 }
             }
@@ -645,7 +380,7 @@ export default class ServiceCommand {
         let port = ctx.port
         if (process.env[SERVE_ENV] === "1") {
             const raw = process.env[PORT_ENV]
-            port = raw !== undefined ? Number(raw) : await allocatePort()
+            port = raw !== undefined ? Number(raw) : await Service.allocatePort()
             await this.runService({ ...ctx, port })
             return await new Promise<number>(() => { /*  never resolves  */ })
         }
@@ -660,8 +395,8 @@ export default class ServiceCommand {
             re-allocate, re-persist, re-spawn; early-break on foreign listener  */
         let lastErr: Error = new Error("service failed to start within timeout")
         for (let attempt = 0; attempt < 3; attempt++) {
-            port = await allocatePort()
-            const { child, logFile } = spawnDetached(ctx.aseDir, port)
+            port = await Service.allocatePort()
+            const { child, logFile } = Service.spawnDetached(ctx.aseDir, port)
             let exited   = false
             let exitCode: number | null = null
             let resolveExit: () => void = () => {}
@@ -693,7 +428,7 @@ export default class ServiceCommand {
                         break
                     }
                 }
-                const tail   = readLogTail(logFile, 20)
+                const tail   = Service.readLogTail(logFile, 20)
                 const reason = exited ?
                     `service exited during startup (code ${exitCode})` :
                     foreign ?
@@ -717,7 +452,7 @@ export default class ServiceCommand {
                 }
             }
         }
-        clearPort(ctx.svc)
+        Service.clearPort(ctx.svc)
         throw lastErr
     }
 
@@ -799,7 +534,7 @@ export default class ServiceCommand {
         }
         if (match === null) {
             this.log.write("info", `service: not running (port ${ctx.port} not responding)`)
-            clearPort(ctx.svc)
+            Service.clearPort(ctx.svc)
             return 0
         }
         const r  = await axios.request({
@@ -809,7 +544,7 @@ export default class ServiceCommand {
             validateStatus: () => true
         })
         const ok = r.status >= 200 && r.status < 300
-        clearPort(ctx.svc)
+        Service.clearPort(ctx.svc)
         return ok ? 0 : 1
     }
 
