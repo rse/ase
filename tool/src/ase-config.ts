@@ -372,15 +372,17 @@ export class Config {
 
     /*  enumerate all full dotted leaf paths from the attached valibot schema  */
     private schemaLeafPaths (): string[][] {
-        const unwrap = (s: any): any => {
-            while (s !== undefined && s !== null && (s.type === "optional" || s.type === "nullish"
-                || s.type === "nullable" || s.type === "undefinedable"))
-                s = s.wrapped
-            return s
+        type SchemaNode = { type?: string, wrapped?: unknown, entries?: Record<string, unknown> }
+        const unwrap = (s: unknown): SchemaNode | null => {
+            let cur = s as SchemaNode | null | undefined
+            while (cur !== undefined && cur !== null && (cur.type === "optional" || cur.type === "nullish"
+                || cur.type === "nullable" || cur.type === "undefinedable"))
+                cur = cur.wrapped as SchemaNode | null | undefined
+            return cur ?? null
         }
-        const walk = (s: any, prefix: string[]): string[][] => {
+        const walk = (s: unknown, prefix: string[]): string[][] => {
             const u = unwrap(s)
-            if (u !== undefined && u !== null
+            if (u !== null
                 && (u.type === "object" || u.type === "strict_object" || u.type === "loose_object")
                 && u.entries !== undefined) {
                 const paths: string[][] = []
