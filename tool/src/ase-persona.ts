@@ -55,7 +55,7 @@ export default class PersonaMCP {
                 "If `style` is provided, it sets the persona style, " +
                 "otherwise it returns the current persona `style`. " +
                 "If `session` is provided, the operation is scoped to that session, " +
-                "otherwise it operates on the broadest scope (user/project cascade). " +
+                "otherwise it operates on the strongest/closest scope (user/project cascade). " +
                 "Allowed styles: \"writer\" (decorative, eloquent, explaining), " +
                 "\"engineer\" (brief, factual, accurate), " +
                 "\"telegrapher\" (very brief, factual, abbreviating), " +
