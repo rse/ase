@@ -252,8 +252,9 @@ export class Config {
     private findUpward (start: string, stop: string, rel: string): string | null {
         let   dir     = fs.realpathSync(start)
         const end     = fs.realpathSync(stop)
-        const between = path.relative(end, dir)
-        const steps   = between === "" ? 0 : between.split(path.sep).length
+        const steps   = dir.split(path.sep).length - end.split(path.sep).length
+        if (steps < 0)
+            return null
         for (let i = 0; i <= steps; i++) {
             const candidate = path.join(dir, rel)
             if (fs.existsSync(candidate))
