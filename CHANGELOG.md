@@ -9,6 +9,7 @@ ChangeLog
 - IMPROVEMENT: provide a key/value storage MCP tool set for temporary information sharing in skills
 - IMPROVEMENT: use new key/value MCP for persisting problems between "ase-code-analyze" and "ase-code-resolve"
 - IMPROVEMENT: improve ase-arch-analyze skill
+- BUGFIX: correctly quote the arguments on the env variable exports
 
 0.0.28 (2026-05-16)
 -------------------

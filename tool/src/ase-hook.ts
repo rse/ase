@@ -10,6 +10,7 @@ import os                                   from "node:os"
 
 import { Command }                          from "commander"
 import { execaSync }                        from "execa"
+import { quote }                            from "shell-quote"
 
 import type Log                             from "./ase-log.js"
 import Version                              from "./ase-version.js"
@@ -175,12 +176,12 @@ export default class HookCommand {
         const envFile = tool === "claude" ? (process.env.CLAUDE_ENV_FILE ?? "") : ""
         if (envFile !== "") {
             const script =
-                `export ASE_VERSION="${versionCurrentPlugin}"\n` +
-                `export ASE_USER_ID="${userId}"\n` +
-                `export ASE_PROJECT_ID="${projectId}"\n` +
-                `export ASE_TASK_ID="${taskId}"\n` +
-                `export ASE_SESSION_ID="${sessionId}"\n` +
-                `export ASE_HEADLESS="${headless}"\n`
+                `export ASE_VERSION=${quote([ versionCurrentPlugin ])}\n` +
+                `export ASE_USER_ID=${quote([ userId ])}\n` +
+                `export ASE_PROJECT_ID=${quote([ projectId ])}\n` +
+                `export ASE_TASK_ID=${quote([ taskId ])}\n` +
+                `export ASE_SESSION_ID=${quote([ sessionId ])}\n` +
+                `export ASE_HEADLESS=${quote([ headless ])}\n`
             fs.appendFileSync(envFile, script, "utf8")
         }
 
