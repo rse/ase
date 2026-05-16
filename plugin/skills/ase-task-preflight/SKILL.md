@@ -5,8 +5,6 @@ description: >
 user-invocable: true
 disable-model-invocation: false
 effort: xhigh
-allowed-tools:
-    - "Bash(date)"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
@@ -63,8 +61,10 @@ draft for a corresponding, *complete source code change set*.
             a previous run of this skill, replace this existing section.
 
         -   On modifying <content/>, set the "modified" timestamp to
-            the current timestamp in the ISO-style format `YYYY-mm-dd HH:MM`
-            which can be determined with `date "+%Y-%m-%d %H:%M"`.
+            the current timestamp in the ISO-style format `YYYY-mm-dd
+            HH:MM` which has to be determined by calling the
+            `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
+            MCP service and use the `text` field of its response.
 
     -   Finally, call the `task_save` tool (`id` set to <ase-task-id/>,
         text: <content/>) of the `ase` MCP service to save the updated task
