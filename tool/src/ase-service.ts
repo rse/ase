@@ -421,7 +421,7 @@ export default class ServiceCommand {
             }
         }
         /*  bounded retry across the bind/start TOCTOU window: on each attempt
-            re-allocate, re-persist, re-spawn; early-break on foreign listener  */
+            re-allocate, re-spawn; early-break on foreign listener  */
         let lastErr: Error = new Error("service failed to start within timeout")
         for (let attempt = 0; attempt < 3; attempt++) {
             port = await Service.allocatePort()
@@ -483,9 +483,10 @@ export default class ServiceCommand {
                         child.unref()
                     }
                 }
+                if (!success)
+                    Service.clearPort(ctx.svc)
             }
         }
-        Service.clearPort(ctx.svc)
         throw lastErr
     }
 
