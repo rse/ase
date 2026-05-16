@@ -11,7 +11,7 @@ allowed-tools:
     - "AskUserQuestion"
     - "Skill"
     - "EnterPlanMode"
-    - "ExitPlanMode
+    - "ExitPlanMode"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
