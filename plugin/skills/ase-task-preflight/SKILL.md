@@ -30,7 +30,7 @@ draft for a corresponding, *complete source code change set*.
         related to this MCP tool call except the following <template/>:
 
         <template>
-        &#x1F535; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **loaded**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **loaded**
         </template>
 
     -   If the <content/> is still empty, complain and tell the user to use the
@@ -73,7 +73,7 @@ draft for a corresponding, *complete source code change set*.
         following <template/>:
 
         <template>
-        &#x1F7E0; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **saved**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **saved**
         </template>
     </step>
 </flow>

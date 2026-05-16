@@ -31,7 +31,7 @@ with a corresponding, complete *change set*.
         related to this MCP tool call except the following <template/>:
 
         <template>
-        &#x1F535; Task: **<ase-task-id/>**, Plan: **<words/>** words, Status: plan **loaded**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **loaded**
         </template>
 
     -   If the <content/> is still empty, complain and tell the user to use the
