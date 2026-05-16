@@ -12,6 +12,18 @@
                 ]
             }
         ],
+        "SessionEnd": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook session-end",
+                        "statusMessage": "Cleaning up ASE..."
+                    }
+                ]
+            }
+        ],
         "PreToolUse": [
             {
                 "matcher": "",

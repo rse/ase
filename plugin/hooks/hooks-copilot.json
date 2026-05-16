@@ -7,6 +7,12 @@
                 "bash":   "ase hook session-start --tool copilot"
             }
         ],
+        "sessionEnd": [
+            {
+                "type":   "command",
+                "bash":   "ase hook session-end --tool copilot"
+            }
+        ],
         "preToolUse": [
             {
                 "type":   "command",

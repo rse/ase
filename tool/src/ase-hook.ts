@@ -6,6 +6,7 @@
 
 import path                                 from "node:path"
 import fs                                   from "node:fs"
+import os                                   from "node:os"
 
 import { Command }                          from "commander"
 import { execaSync }                        from "execa"
@@ -213,6 +214,30 @@ export default class HookCommand {
         return 0
     }
 
+    /*  handler for "ase hook session-end" (both tools)  */
+    private doSessionEnd (_tool: Tool): number {
+        /*  read session information (Claude Code uses snake_case fields,
+            Copilot CLI uses camelCase fields)  */
+        const stdin = fs.readFileSync(0, "utf8")
+        const input = stdin.trim() !== "" ? JSON.parse(stdin) as
+            { session_id?: string, sessionId?: string } : {}
+
+        /*  determine session id  */
+        const sessionId = input.session_id ?? input.sessionId ?? ""
+
+        /*  remove the session directory ~/.ase/session/<id> (only for a valid sessionId)  */
+        if (/^[A-Za-z0-9._-]+$/.test(sessionId)) {
+            const dir = path.join(os.homedir(), ".ase", "session", sessionId)
+            try {
+                fs.rmSync(dir, { recursive: true, force: true })
+            }
+            catch (_e) {
+                /*  best-effort: ignore failures  */
+            }
+        }
+        return 0
+    }
+
     /*  handler for "ase hook pre-tool-use" (both tools)  */
     private doPreToolUse (tool: Tool): number {
         const spec = toolSpecs[tool]
@@ -300,6 +325,15 @@ export default class HookCommand {
             .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
             .action(async (opts: { tool: string }) => {
                 process.exit(await this.doSessionStart(this.parseTool(opts.tool)))
+            })
+
+        /*  register CLI sub-command "ase hook session-end"  */
+        hookCmd
+            .command("session-end")
+            .description("handle SessionEnd hook event")
+            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .action((opts: { tool: string }) => {
+                process.exit(this.doSessionEnd(this.parseTool(opts.tool)))
             })
 
         /*  register CLI sub-command "ase hook pre-tool-use"  */

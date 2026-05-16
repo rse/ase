@@ -5,6 +5,8 @@ ChangeLog
 0.0.28 (2026-05-16)
 -------------------
 
+- IMPROVEMENT: add a "session-end" hook for removing the session storage again
+
 0.0.27 (2026-05-16)
 -------------------
 
