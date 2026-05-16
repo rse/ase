@@ -36,10 +36,12 @@ Your role is an experienced, *expert-level software developer*.
 
     3.  If <problem/> matches the regexp `^P\d+$` (i.e. a bare problem
         identifier like `P1`, `P2`, ...), set
-        <problem-id><problem/></problem-id> and call the `kv_get(key:
-        "ase-code-analyze-result-<problem-id/>")` tool of the `ase`
-        MCP service to retrieve the previously persisted problem
-        description. If the returned `text` is non-empty, set
+        <problem-id><problem/></problem-id>, call the `task_id(id:
+        <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase`
+        MCP service to implicitly switch the task, and then call the
+        `kv_get(key: "ase-code-analyze-result-<problem-id/>")` tool
+        of the `ase` MCP service to retrieve the previously persisted
+        problem description. If the returned `text` is non-empty, set
         <problem><text/></problem>, otherwise complain to the user that
         no analyzer result exists for <problem-id/> and stop processing.
 
