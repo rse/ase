@@ -14,6 +14,8 @@ import { Document, parseDocument, isMap, isScalar } from "yaml"
 import { execaSync }                                from "execa"
 import * as v                                       from "valibot"
 import Table                                        from "cli-table3"
+import writeFileAtomic                              from "write-file-atomic"
+import lockfile                                     from "proper-lockfile"
 
 import type Log                                     from "./ase-log.js"
 
@@ -173,12 +175,12 @@ export class Config {
     public  filename: string
 
     /*  private state  */
-    private name:   string
-    private scope:  Scope
-    private schema: v.GenericSchema | null
-    private log:    Log
-    private docs:   Layer[]
-    private target: number
+    private name:    string
+    private scope:   Scope
+    private schema:  v.GenericSchema | null
+    private log:     Log
+    private docs:    Layer[]
+    private target:  number
 
     /*  creation  */
     constructor (
@@ -326,6 +328,24 @@ export class Config {
         }
     }
 
+    /*  acquire a cross-process advisory lock on the target scope's file,
+        execute the callback, then release the lock  */
+    lock (cb: () => void): void {
+        const td = this.docs[this.target]
+        if (td.scope.kind === "default")
+            throw new Error("internal error: \"default\" scope is not lockable")
+        fs.mkdirSync(path.dirname(td.filename), { recursive: true })
+        if (!fs.existsSync(td.filename))
+            fs.writeFileSync(td.filename, "", "utf8")
+        const release = lockfile.lockSync(td.filename)
+        try {
+            cb()
+        }
+        finally {
+            release()
+        }
+    }
+
     /*  write in-memory configuration back to the target scope's file  */
     write (): void {
         const td = this.docs[this.target]
@@ -333,7 +353,7 @@ export class Config {
             throw new Error("internal error: \"default\" scope is not writable")
         this.validateDoc(td.doc, td.filename, "strict")
         fs.mkdirSync(path.dirname(td.filename), { recursive: true })
-        fs.writeFileSync(td.filename, td.doc.toString({ indent: 4 }), "utf8")
+        writeFileAtomic.sync(td.filename, td.doc.toString({ indent: 4 }), { encoding: "utf8" })
     }
 
     /*  validate a single YAML document against the optional schema  */
@@ -567,14 +587,16 @@ export default class ConfigCommand {
                 if (preset === undefined)
                     throw new Error(`unknown preset "${type}" (expected: default|vibe|pro|industry)`)
                 const cfg = new Config("config", configSchema, this.log, scope)
-                cfg.read()
-                const targetKind = scope[scope.length - 1].kind
-                for (const [ k, val ] of Object.entries(preset)) {
-                    if (!cfg.isWritableOn(k, targetKind))
-                        continue
-                    cfg.set(k, val)
-                }
-                cfg.write()
+                cfg.lock(() => {
+                    cfg.read()
+                    const targetKind = scope[scope.length - 1].kind
+                    for (const [ k, val ] of Object.entries(preset)) {
+                        if (!cfg.isWritableOn(k, targetKind))
+                            continue
+                        cfg.set(k, val)
+                    }
+                    cfg.write()
+                })
             })
 
         /*  register CLI sub-command "ase config list"  */
@@ -656,9 +678,11 @@ export default class ConfigCommand {
             .action((key: string, value: string, _opts: unknown, cmd: Command) => {
                 const scope = parseScope(cmd.optsWithGlobals().scope as string | undefined)
                 const cfg   = new Config("config", configSchema, this.log, scope)
-                cfg.read()
-                cfg.set(key, value)
-                cfg.write()
+                cfg.lock(() => {
+                    cfg.read()
+                    cfg.set(key, value)
+                    cfg.write()
+                })
             })
     }
 }

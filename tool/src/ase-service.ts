@@ -110,21 +110,27 @@ export class Service {
 
     /*  persist an allocated port into ".ase/service.yaml"  */
     static persistPort (svc: Config, port: number): void {
-        svc.set("port", port)
-        svc.write()
+        svc.lock(() => {
+            svc.read()
+            svc.set("port", port)
+            svc.write()
+        })
     }
 
     /*  clear the persisted port and remove ".ase/service.yaml" if it is empty  */
     static clearPort (svc: Config): void {
-        svc.delete("port")
-        const root  = svc.get()
-        const empty = root === undefined || root === null || (isMap(root) && root.items.length === 0)
-        if (empty) {
-            if (fs.existsSync(svc.filename))
-                fs.rmSync(svc.filename)
-        }
-        else
-            svc.write()
+        svc.lock(() => {
+            svc.read()
+            svc.delete("port")
+            const root  = svc.get()
+            const empty = root === undefined || root === null || (isMap(root) && root.items.length === 0)
+            if (empty) {
+                if (fs.existsSync(svc.filename))
+                    fs.rmSync(svc.filename)
+            }
+            else
+                svc.write()
+        })
     }
 
     /*  spawn the current executable detached as a background service  */

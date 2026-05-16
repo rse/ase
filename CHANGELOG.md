@@ -9,6 +9,7 @@ ChangeLog
 - IMPROVEMENT: provide a key/value storage MCP tool set for temporary information sharing in skills
 - IMPROVEMENT: use new key/value MCP for persisting problems between "ase-code-analyze" and "ase-code-resolve"
 - IMPROVEMENT: improve ase-arch-analyze skill
+- IMPROVEMENT: use atomic cross-process config file management to avoid conflicts
 - REFACTOR: move "timestamp" MCP tool into its own ase-timestamp.ts module
 - BUGFIX: correctly quote the arguments on the env variable exports
 

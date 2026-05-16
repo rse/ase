@@ -147,11 +147,13 @@ export class Task {
 
     /*  set the active task id for a given session  */
     static setId (log: Log, session: string, id: string): void {
-        const scope = parseScope(`session:${session}`)
+        const scope   = parseScope(`session:${session}`)
         const cfg = new Config("config", configSchema, log, scope)
-        cfg.read()
-        cfg.set("agent.task", id)
-        cfg.write()
+        cfg.lock(() => {
+            cfg.read()
+            cfg.set("agent.task", id)
+            cfg.write()
+        })
     }
 }
 

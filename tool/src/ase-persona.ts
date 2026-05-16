@@ -37,9 +37,11 @@ export class Persona {
             parseScope(`session:${session}`) :
             parseScope(undefined)
         const cfg = new Config("config", configSchema, log, scope)
-        cfg.read()
-        cfg.set("agent.persona", style)
-        cfg.write()
+        cfg.lock(() => {
+            cfg.read()
+            cfg.set("agent.persona", style)
+            cfg.write()
+        })
     }
 }
 
