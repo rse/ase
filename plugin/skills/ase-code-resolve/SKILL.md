@@ -9,7 +9,7 @@ disable-model-invocation: false
 effort: high
 allowed-tools:
     - "AskUserQuestion"
-    - "Skill(ase:ase-meta-diagram)"
+    - "Skill"
     - "EnterPlanMode"
     - "ExitPlanMode
 ---

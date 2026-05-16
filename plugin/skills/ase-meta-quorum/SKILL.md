@@ -6,6 +6,8 @@ description: >
 user-invocable: true
 disable-model-invocation: false
 effort: medium
+allowed-tools:
+    - "Task"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
