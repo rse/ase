@@ -10,8 +10,8 @@ effort: medium
 allowed-tools:
     - "Bash(npm search --json *)"
     - "Bash(npm view --json *)"
-    - "Skill(ase-meta-search)"
-    - "Agent(ase-meta-search)"
+    - "Skill"
+    - "Agent"
     - "WebFetch"
     - "AskUserQuestion"
 ---
