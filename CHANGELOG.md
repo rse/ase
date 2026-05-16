@@ -8,6 +8,7 @@ ChangeLog
 - IMPROVEMENT: add a "session-end" hook for removing the session storage again
 - IMPROVEMENT: store tasks per project and not per user
 - IMPROVEMENT: support more elaborate age specification in "ase task purge" command
+- REFACTORING: bundle logic, CLI parsing and MCP service registration together
 
 0.0.27 (2026-05-16)
 -------------------
