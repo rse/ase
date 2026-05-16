@@ -8,10 +8,17 @@ ChangeLog
 - IMPROVEMENT: at end of craft/resolve/refactor skills, interactively ask for next step
 - IMPROVEMENT: provide a key/value storage MCP tool set for temporary information sharing in skills
 - IMPROVEMENT: use new key/value MCP for persisting problems between "ase-code-analyze" and "ase-code-resolve"
-- IMPROVEMENT: improve ase-arch-analyze skill
+- IMPROVEMENT: add package-cohesion audit aspects (SA19-SA21) to ase-arch-analyze skill
 - IMPROVEMENT: use atomic cross-process config file management to avoid conflicts
+- IMPROVEMENT: improve port handling and timeout handling in MCP service shutdown
+- IMPROVEMENT: improve SIGKILL handling and track in-flight requests in MCP service
+- BUGFIX: correctly quote arguments on env variable exports in session-start hook
+- BUGFIX: fix MCP service reconnect logic
+- BUGFIX: fix root-level config validation
+- BUGFIX: fix config path up-walking
+- BUGFIX: always set task id in session-start hook
+- BUGFIX: fix scope information display in ase config
 - REFACTOR: move "timestamp" MCP tool into its own ase-timestamp.ts module
-- BUGFIX: correctly quote the arguments on the env variable exports
 
 0.0.28 (2026-05-16)
 -------------------
