@@ -326,7 +326,7 @@ export class TaskMCP {
                 const message = err instanceof Error ? err.message : String(err)
                 return {
                     isError: true,
-                    content: [ { type: "text", text: `task_list: ERROR: ${message}` } ]
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
                 }
             }
         })
@@ -352,7 +352,7 @@ export class TaskMCP {
                 const message = err instanceof Error ? err.message : String(err)
                 return {
                     isError: true,
-                    content: [ { type: "text", text: `task_load: ERROR: ${message}` } ]
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
                 }
             }
         })
@@ -380,7 +380,7 @@ export class TaskMCP {
                 const message = err instanceof Error ? err.message : String(err)
                 return {
                     isError: true,
-                    content: [ { type: "text", text: `task_save: ERROR: ${message}` } ]
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
                 }
             }
         })
@@ -407,7 +407,7 @@ export class TaskMCP {
                 const message = err instanceof Error ? err.message : String(err)
                 return {
                     isError: true,
-                    content: [ { type: "text", text: `task_delete: ERROR: ${message}` } ]
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
                 }
             }
         })
@@ -445,7 +445,7 @@ export class TaskMCP {
                 const message = err instanceof Error ? err.message : String(err)
                 return {
                     isError: true,
-                    content: [ { type: "text", text: `task_id: ERROR: ${message}` } ]
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
                 }
             }
         })
