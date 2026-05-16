@@ -11,6 +11,6 @@ effort: low
 ---
 
 Just perform the given *query*
-and give back the *plain reponses*
+and give back the *plain responses*
 without any modifications.
 

@@ -6,5 +6,5 @@ model: haiku
 
 With a corresponding *MCP server* named `ase-chat-xxx`,
 just perform the given *queries*,
-and give back the *plain reponses without any modifications*.
+and give back the *plain responses without any modifications*.
 
