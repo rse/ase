@@ -44,12 +44,12 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Reason About Problem**:
 
-    1.  If <problem/> matches the regexp `^P\d+$` (i.e. a bare problem
-        identifier like `P1`, `P2`, ...), set
+    1.  If <problem/> matches the regexp `^[PT]\d+$` (i.e. a bare issue
+        identifier like `P1`, `P2`, `T1`, `T2`, ...), set
         <problem-id><problem/></problem-id>, call the `task_id(id:
         <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase`
         MCP service to implicitly switch the task, and then call the
-        `kv_get(key: "ase-code-analyze-result-<problem-id/>")` tool
+        `kv_get(key: "ase-issue-<problem-id/>")` tool
         of the `ase` MCP service to retrieve the previously persisted
         problem description. If the returned `text` is non-empty, set
         <problem><text/></problem>, otherwise complain to the user that
@@ -236,9 +236,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
         `task_save(id: <ase-task-id/>, text: <content/>)`.
 
     4.  If <problem-id/> is set (i.e. the <problem/> was retrieved from
-        `kv_get` in STEP 1.3 via key `ase-code-analyze-result-<problem-id/>`),
+        `kv_get` in STEP 1.3 via key `ase-issue-<problem-id/>`),
         you *MUST* additionally call the `kv_delete(key:
-        "ase-code-analyze-result-<problem-id/>")` tool of the `ase` MCP
+        "ase-issue-<problem-id/>")` tool of the `ase` MCP
         service to remove the now-resolved analyzer result from the
         in-memory key/value store.
 

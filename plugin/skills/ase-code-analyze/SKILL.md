@@ -92,8 +92,7 @@ code, for problems in its *logic* and *semantics* and its related
      MCP service to clear the in-memory key/value store, and then, for
      *every* reported problem, persist its problem analysis result
      via the `kv_set` tool of the `ase` MCP service, using `key` set
-     to `ase-code-analyze-result-P<n/>` and `val` set to `<title/>:
-     <description/>`.
+     to `ase-issue-P<n/>` and `val` set to `<title/>: <description/>`.
    </step>
 
 3. <step id="STEP 3: Give Final Hint">

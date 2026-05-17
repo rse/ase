@@ -420,21 +420,22 @@ interface quality, quality attributes, and architecture governance.
      focal aspect. Never emit contradictory recommendations
      for the same aspect, and never emit both halves of a
      tension pair as separate PROBLEMs.
+
+   - *Additionally*, first call the `kv_clear()` tool of the `ase`
+     MCP service to clear the in-memory key/value store, and then,
+     for *every* reported PROBLEM and TRADEOFF, persist its finding
+     result via the `kv_set` tool of the `ase` MCP service, using
+     `key` set to `ase-issue-P<n/>` (for PROBLEMs) or
+     `ase-issue-T<n/>` (for TRADEOFFs) and `val` set to
+     `<title/>: <description/>`.
    </step>
 
 4. <step id="STEP 4: Give Final Hint">
    Finally, output the following <template/> to give a final hint:
 
    <template>
-   &#x26AA; **NEXT STEP**: For deeper analysis, suggestions on
-   solution approaches and then final source code changes, use
-   `/ase-code-resolve P<n>` or `/ase-code-resolve T<n>`
-   in the same *Claude Code* session or open a new *Claude Code*
-   session and copy & paste one of the above problem or tradeoff
-   descriptions as a whole with `/ase-code-resolve <finding>`.
-   For *structural* refactorings (component splits, layer
-   reorganization, dependency-direction fixes), prefer
-   `/ase-code-refactor` with the finding description.
+   ⧉ **ASE**: ☻ skill: **<skill-name/>**, ▶ status: **skill finished**
+   ⧉ **ASE**: ↪ hint: **For deeper analysis, suggestions on solution approaches and then final source code changes, use `/ase-code-resolve P{n}` or `/ase-code-resolve T{n}` in the same or even a different session.**
    </template>
    </step>
 </flow>
