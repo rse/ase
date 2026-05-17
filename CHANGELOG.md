@@ -10,7 +10,7 @@ ChangeLog
 
 - REVAMPING: reimplement ase-task-* skills to no longer use agent
   harness "plan mode" as especially the `ExitPlanMode` tool is Claude
-  Code specific and cannot be not customized and not controlled in any
+  Code specific and cannot be customized and not controlled in any
   reasonable way.
 
 0.0.29 (2026-05-16)
