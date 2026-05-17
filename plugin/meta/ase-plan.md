@@ -8,7 +8,7 @@ Every *task plan* uses a strict and fixed format:
 
 # ✪ TASK PLAN: **<title/>**
 
-◉ task id: **<ase-task-id/>** | ✳ created: **<timestamp-created/>** | ✎ modified: **<timestamp-modified/>**
+◉ task id: **<ase-task-id/>** // ✳ created: **<timestamp-created/>** // ✎ modified: **<timestamp-modified/>**
 
 ## ※ CONTEXT:
 
