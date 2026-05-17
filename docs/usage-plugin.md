@@ -63,20 +63,32 @@ The following ASE commands/skills exist on the architecture-level:
 
 The following ASE commands/skills exist on the task-level:
 
-- **/ase-task-id** *task-id*:<br/>
+- **/ase-task-id** \[*id*\]:<br/>
   Get or set the unique ASE task id for the current session. Without an
   argument, displays the current task id. With an argument, sets the
   task id (persisted in the session-scoped configuration).
 
-- **/ase-task-edit** \[*content* ...\]:<br/>
-  Load and save a named plan for a task and apply Claude Code *Plan
-  Mode* on it.
+- **/ase-task-list**:<br/>
+  List all available persisted task ids.
 
-- **/ase-task-preflight**:<br/>
-  Preflight the implementation of the current task plan.
+- **/ase-task-edit** \[*id*\]:<br/>
+  Iteratively craft and refine a named task plan through a
+  conversational loop, without using *Claude Code Plan Mode*.
 
-- **/ase-task-implement**:<br/>
-  Implement the current task plan.
+- **/ase-task-view** \[*id*\]:<br/>
+  View the current or given task plan.
+
+- **/ase-task-reboot** \[*id*\]:<br/>
+  Reboot the current or given task plan by crafting it from scratch.
+
+- **/ase-task-preflight** \[*id*\]:<br/>
+  Preflight the implementation of the current or given task plan.
+
+- **/ase-task-implement** \[*id*\]:<br/>
+  Implement the current or given task plan.
+
+- **/ase-task-delete** \[*id*\]:<br/>
+  Delete the current or given task plan.
 
 ### Code Commands
 

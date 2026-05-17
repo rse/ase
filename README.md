@@ -54,10 +54,12 @@ Features
   on the configured parameters. This allows to control the *general*
   agent behavior.
 
-- [**Task Skills**](plugin/skills/) (80% done):
+- [**Task Skills**](plugin/skills/) (85% done):
   Recurring tasks are supported with dedicated skills, based on the
   configured parameters. This allows to control the *specific* agent
-  behavior.
+  behavior. Skills are grouped into meta (`ase-meta-*`), code
+  (`ase-code-*`), architecture (`ase-arch-*`), and task (`ase-task-*`)
+  families, covering 26 skills in total.
 
 - **Context Gathering** (0% done):
   The agent context is loaded with individual information for all
