@@ -2,7 +2,7 @@
 name: ase-task-reboot
 argument-hint: "[<id>]"
 description: >
-    Reboot the current or given task plan by crafting it from scratch.
+    Reboot the current or given task plan by re-creating it from scratch.
     Use when the user calls to "reboot", "recreate" or "refresh"
     the "task", "plan", "spec", or "specification".
 user-invocable: true

@@ -2,12 +2,11 @@
 name: ase-task-edit
 argument-hint: "[<id> | <id>: <instruction> | <instruction>]"
 description: >
-    Iteratively craft and refine a named plan for a task through
-    a conversational loop, without using the agent harness *Plan
-    Mode*. Each round, the current plan is shown and the user is asked
-    whether to keep refining, mark the plan as done, or proceed to the
-    implementation or preflight. Use when the user wants to plan a task
-    purely through chat-driven refinement.
+    Iteratively edit and refine a named plan for a task through a
+    conversational loop. Each round, the current plan is shown and the
+    user is asked whether to keep refining, mark the plan as done, or
+    proceed to the implementation or preflight. Use when the user wants
+    to plan a task purely through chat-driven refinement.
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -29,9 +28,9 @@ specialized in the *planning* of changes
 through *iterative conversational refinement*.
 
 Establish and refine the *task plan* purely through a *chat-driven
-loop*, *without* entering the *Plan Mode* of the agent harness. The
-user steers each round via interactive dialog that offers continued
-refinement, finalization, or hand-off to implementation or preflight.
+loop*. The user steers each round via interactive dialog that offers
+continued refinement, finalization, or hand-off to implementation or
+preflight.
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 
