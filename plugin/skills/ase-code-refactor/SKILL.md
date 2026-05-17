@@ -18,10 +18,18 @@ allowed-tools:
 Refactor Artifacts
 ==================
 
-Your role is an experienced, *expert-level software developer*.
+<skill name="ase-code-refactor">
+Refactor Artifacts
+</skill>
 
+<role>
+Your role is an experienced, *expert-level software developer*.
+</role>
+
+<objective>
 *Refactor* existing artifacts the following way:
 <request>$ARGUMENTS</request>
+</objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 

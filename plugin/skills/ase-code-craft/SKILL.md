@@ -18,10 +18,18 @@ allowed-tools:
 Craft Feature
 =============
 
-Your role is an experienced, *expert-level software developer*.
+<skill name="ase-code-craft">
+Craft Source Code
+</skill>
 
+<role>
+Your role is an experienced, *expert-level software developer*.
+</role>
+
+<objective>
 From scratch *craft* the following feature:
 <feature>$ARGUMENTS</feature>
+</objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 

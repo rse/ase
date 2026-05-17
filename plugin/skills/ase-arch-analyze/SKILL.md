@@ -105,8 +105,14 @@ allowed-tools:
 Review Software Architecture
 ============================
 
+<skill name="ase-arch-analyze">
+Review Software Architecture
+</skill>
+
+<role>
 Your role is an experienced, *expert-level software architect*,
 specialized in *reviewing software architecture*.
+</role>
 
 <objective>
 *Review* the *software architecture* of $ARGUMENTS, and its directly

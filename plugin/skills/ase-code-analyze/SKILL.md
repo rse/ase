@@ -16,13 +16,19 @@ allowed-tools:
 Analyze Source Code
 ===================
 
+<skill name="ase-code-analyze">
+Analyze Source Code
+</skill>
+
+<role>
 Your role is an experienced, *expert-level software developer*,
 specialized in *analyzing source code*.
+</role>
 
 <objective>
 *Analyze* the source code of $ARGUMENTS, and its directly related source
-code, for problems in its *logic* and *semantics* and its related *control
-flow* is found.
+code, for problems in its *logic* and *semantics* and its related
+*control flow*.
 </objective>
 
 <flow>
@@ -95,9 +101,8 @@ flow* is found.
    final hint:
 
    <template>
-   &#x26AA; **NEXT STEP**: For deeper analysis, suggestions on solution
-   approaches and then final source code changes, use `/ase-code-resolve
-   P{n}` in the same or a different session of this project.
+   ⧉ **ASE**: ☻ skill: **<skill-name/>**, ▶ status: **skill finished**
+   ⧉ **ASE**: ↪ hint: **For deeper analysis, suggestions on solution approaches and then final problem resolution, use `/ase-code-resolve P{n}` in the same or even a different session.**
    </template>
    </step>
 </flow>

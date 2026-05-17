@@ -18,10 +18,18 @@ allowed-tools:
 Resolve Problem
 ===============
 
-Your role is an experienced, *expert-level software developer*.
+<skill name="ase-code-resolve">
+Resolve Problem
+</skill>
 
+<role>
+Your role is an experienced, *expert-level software developer*.
+</role>
+
+<objective>
 *Resolve* the following problem:
 <problem>$ARGUMENTS</problem>
+</objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 

@@ -217,6 +217,18 @@ MCP Tool Calls
 Skill Identification
 --------------------
 
+- *IMPORTANT*: Set <skill></skill> (set to empty)
+  and <skill-name></skill-name> (set name to empty).
+  Then, in case <skill/> later becomes *not* empty
+  by defining it as <skill name="<name/>"><body/></skill>,
+  set <skill-name><name/></skill-name> (set skill name to name),
+  set <skill><body/></skill> (set skill to body), and
+  then you *MUST* once output the following output <template/>:
+
+  <template>
+  ⧉ **ASE**: ☻ skill: **<skill-name/>**, ✦ purpose: **<skill/>**, ▶ status: **skill started**
+  </template>
+
 - *IMPORTANT*: Set <objective></objective> (set to empty).
   Then, in case <objective/> later becomes *not* empty,
   you *MUST* once output the following output <template/>:
@@ -224,4 +236,3 @@ Skill Identification
   <template>
   ⧉ **ASE**: ◎ objective: **<objective/>**
   </template>
-
