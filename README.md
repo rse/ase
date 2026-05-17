@@ -115,11 +115,34 @@ for the full autonomous agent mode of operation.
 ### Skills &amp; Workflow
 
 The **ASE** skills can be classified into standalone/meta skills,
-specification/plan-driven skills, and sketching skills. The
-specification/plan-driven and sketching skills especially try to improve
-and not replace the agent's plan mode.
+task-driven skills, and funnel skills.
 
 ![workflow](docs/workflow.svg)
+
+When working with **ASE** the user decided (usually on the extend
+of the task to perform) which mode to choose:
+
+1. **Ad-Hoc Mode** (**Claude Code**):
+   The default mode of the agent harness where the user just ad-hoc
+   enters a prompt with an instruction. The instructions are persisted only
+   in the current session.
+2. **Plan Mode** (**Claude Code**):
+   The advanced mode of the agent harness where the user enters a
+   dedicated "plan mode" to initially craft and then continuously refine
+   a plan. The plan has an ad-hoc format and is persisted internally
+   by the agent, but is available in the current session only.
+3. **Task Mode** (**ASE**):
+   The more advanced mode of **ASE** where the user initially crafts and
+   then continuously refines a task plan. The task plan has a fixed
+   format and is persisted by **ASE** and hence is available across
+   agent sessions.
+4. **Funnel Mode** (**ASE**):
+   The ultra advanced mode of **ASE** where the user first sketches the
+   plan, then the agent figures out possible approaches, then the user
+   selects one approach, then a task plan is created for this approach,
+   and and then finally this switches over to the regular **Task Mode**.
+   The task plan has a fixed format and is persisted by **ASE** and
+   hence is available across agent sessions.
 
 ### Architecture &amp; Building Blocks
 
