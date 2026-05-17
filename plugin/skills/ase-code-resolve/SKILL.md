@@ -49,28 +49,50 @@ explicitly requested by this procedure via outputs based on a <template/>!
         <problem><text/></problem>, otherwise complain to the user that
         no analyzer result exists for <problem-id/> and stop processing.
 
-    2.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
+    2.  <if condition="
+            <problem/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+        ">
+        Set <ase-task-id><problem/></ase-task-id> (set task id to problem)
+        and <problem></problem> (set problem empty), call the
+        `task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
+        from the `ase` MCP service to switch the task, and then only
+        output the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
+        </template>
+        </if>
+
+    3.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
         <problem><text/></problem> and <ase-task-id><id/></ase-task-id>
         and call the `task_id(id: <ase-task-id/>, session:
         <ase-session-id/>)` tool from the `ase` MCP service to
         implicitly switch the task.
 
-    3.  Report the task and problem with the following <template/>:
+    4.  If <problem/> is empty,
+        ask the user interactively, without a special tool, for the
+        initial problem with a single question:
+
+        `**No problem details known yet. What is the problem you want to resolve?**`
+
+        Then set <problem/> to the response of the user.
+
+    5.  Report the task and problem with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
-        ⧉ **ASE**: ◉ problem: **<problem/>**
+        ⧉ **ASE**: ⇌ problem: **<problem/>**
         </template>
 
-    4.  Figure out what the requested <problem/> is about.
+    6.  Figure out what the requested <problem/> is about.
 
-    5.  Ask the user for clarification if the goal of this resolution is
+    7.  Ask the user for clarification if the goal of this resolution is
         too unclear.
 
-    6.  Do not output anything in this step, except you asked the user.
+    8.  Do not output anything in this step, except you asked the user.
 
-    7.  Investigate and *figure out details* related to this problem.
+    9.  Investigate and *figure out details* related to this problem.
         Report those details with the following <template/>:
 
         <template>

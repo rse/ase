@@ -36,26 +36,48 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Reason About Refactoring**:
 
-    1.  If <request/> has the format `<id/>: <text/>` where <id/> matches
+    1.  <if condition="
+            <request/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+        ">
+        Set <ase-task-id><request/></ase-task-id> (set task id to request)
+        and <request></request> (set request empty), call the
+        `task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
+        from the `ase` MCP service to switch the task, and then only
+        output the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
+        </template>
+        </if>
+
+    2.  If <request/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`, then set
         <request><text/></request> and <ase-task-id><id/></ase-task-id>
         and call the `task_id(id: <ase-task-id/>, session:
         <ase-session-id/>)` tool from the `ase` MCP service to
         implicitly switch the task.
 
-    2.  Report the task and request with the following <template/>:
+    3.  If <request/> is empty,
+        ask the user interactively, without a special tool, for the
+        initial request with a single question:
+
+        `**No refactoring details known yet. What is the refactoring you want to request?**`
+
+        Then set <request/> to the response of the user.
+
+    4.  Report the task and request with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
-        ⧉ **ASE**: ◉ request: **<request/>**
+        ⧉ **ASE**: ⇌ request: **<request/>**
         </template>
 
-    3.  Figure out what the artifact refactoring <request/> is about.
+    5.  Figure out what the artifact refactoring <request/> is about.
 
-    4.  Ask the user for clarification if the goal of this refactoring is
+    6.  Ask the user for clarification if the goal of this refactoring is
         too unclear.
 
-    5.  Do not output anything in this step, except you asked the user.
+    7.  Do not output anything in this step, except you asked the user.
 
 2.  **Investigate Code Base**:
 

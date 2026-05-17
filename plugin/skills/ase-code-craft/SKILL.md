@@ -38,26 +38,48 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Reason About Feature**:
 
-    1.  If <feature/> has the format `<id/>: <text/>` where <id/> matches
+    1.  <if condition="
+            <feature/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+        ">
+        Set <ase-task-id><feature/></ase-task-id> (set task id to feature)
+        and <feature></feature> (set feature empty), call the
+        `task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
+        from the `ase` MCP service to switch the task, and then only
+        output the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
+        </template>
+        </if>
+
+    2.  If <feature/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
         <feature><text/></feature> and <ase-task-id><id/></ase-task-id>
         and call the `task_id(id: <ase-task-id/>, session:
         <ase-session-id/>)` tool from the `ase` MCP service to
         implicitly switch the task.
 
-    2.  Report the task and feature with the following <template/>:
+    3.  If <feature/> is empty,
+        ask the user interactively, without a special tool, for the
+        initial feature with a single question:
+
+        `**No feature known yet. What is the feature you want to craft?**`
+
+        Then set <feature/> to the response of the user.
+
+    4.  Report the task and feature with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
-        ⧉ **ASE**: ◉ feature: **<feature/>**
+        ⧉ **ASE**: ⇌ feature: **<feature/>**
         </template>
 
-    3.  Figure out what the requested <feature/> to be crafted is about.
+    5.  Figure out what the requested <feature/> to be crafted is about.
 
-    4.  Ask the user for clarification if the goal of this crafting is too
+    6.  Ask the user for clarification if the goal of this crafting is too
         unclear.
 
-    5.  Do not output anything in this step, except you asked the user.
+    7.  Do not output anything in this step, except you asked the user.
 
 2.  **Investigate Code Base**:
 
