@@ -20,15 +20,22 @@ Refactor Artifacts
 
 Your role is an experienced, *expert-level software developer*.
 
-<objective>
 *Refactor* existing artifacts the following way:
 <request>$ARGUMENTS</request>
-</objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 
-<flow>
-1.  <step id="STEP 1: Reason About Refactoring">
+Procedure
+---------
+
+You *MUST* follow the following numbered items *strictly* *sequentially*!
+You *MUST* not skip any numbered item during processing!
+
+You *MUST* *NOT* output anything in this entire procedure, *except* when
+explicitly requested by this procedure via outputs based on a <template/>!
+
+1.  **Reason About Refactoring**:
+
     1.  If <request/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`, then set
         <request><text/></request> and <ase-task-id><id/></ase-task-id>
@@ -49,9 +56,9 @@ Your role is an experienced, *expert-level software developer*.
         too unclear.
 
     5.  Do not output anything in this step, except you asked the user.
-    </step>
 
-2.  <step id="STEP 2: Investigate Code Base">
+2.  **Investigate Code Base**:
+
     1.  Check the existing source files for all code which is related to the
         refactoring <request/>.
 
@@ -59,97 +66,99 @@ Your role is an experienced, *expert-level software developer*.
         overall structures and dynamics.
 
     3.  Do not output anything in this step.
-    </step>
 
-3.  <step id="STEP 3: Find Refactoring Approaches">
-    *Propose* corresponding *refactoring approach*, including
-    optionally, some *alternative* refactoring approaches.
+3.  **Find Refactoring Approaches**:
 
-    Annotate the approach you recommend with an <annotation/> of ` ⚝
-    **RECOMMENDATION** ⚝`. Report each approach with the following
-    <template/> and do not output anything else in this step:
+    1.  *Propose* corresponding *refactoring approach*, including
+        optionally, some *alternative* refactoring approaches.
 
-    <template>
-    &#x1F535; **APPROACH A<n/>**<annotation/>: *<summary/>*
-    - [...]
-    - [...]
-    - [...]
-    <optional-diagram/>
-    </template>
+    2.  Annotate the approach you recommend with an <annotation/> of
+        ` ⚝ **RECOMMENDATION** ⚝`.
 
-    Hints:
+    3.  Report each approach with the following <template/>
+        and do not output anything else in this step:
 
-    -   Give a short one-sentence <summary/> of the refactoring approach plus
-        *precise* and *brief* refactoring information. Try to keep the
-        number of bullet points in the range of 1-4.
+        <template>
+        &#x1F535; **APPROACH A<n/>**<annotation/>: *<summary/>*
+        - [...]
+        - [...]
+        - [...]
+        <optional-diagram/>
+        </template>
 
-    -   In case of a *complex refactoring situation* only, visualize it with
-        an optional diagram <optional-diagram/> by invoking the
-        `ase-meta-diagram` skill via the `Skill` tool. For *current vs.
-        proposed* comparisons, render each side as a *separate*
-        `ase-meta-diagram` invocation and stack the rendered blocks
-        *vertically* (labels `**Before:**` / `**After:**`); never
-        side-by-side. Omit <optional-diagram/> entirely for simple or
-        purely local situation.
+        Hints:
 
-    *Recommended* Tenets (generic):
+        -   Give a short one-sentence <summary/> of the refactoring approach plus
+            *precise* and *brief* refactoring information. Try to keep the
+            number of bullet points in the range of 1-4.
 
-    -   **Surgical Changes**:
-        Keep source code changes always as small as possible.
+        -   In case of a *complex refactoring situation* only, visualize it with
+            an optional diagram <optional-diagram/> by invoking the
+            `ase-meta-diagram` skill via the `Skill` tool. For *current vs.
+            proposed* comparisons, render each side as a *separate*
+            `ase-meta-diagram` invocation and stack the rendered blocks
+            *vertically* (labels `**Before:**` / `**After:**`); never
+            side-by-side. Omit <optional-diagram/> entirely for simple or
+            purely local situation.
 
-    -   **Separation of Concerns**:
-        Clearly separate all individual concerns as good as possible.
+        *Recommended* Tenets (generic):
 
-    -   **Single Responsibility Principle**:
-        Every module, class, or function should have only one reason to change.
+        -   **Surgical Changes**:
+            Keep source code changes always as small as possible.
 
-    -   **Behavior Preservation**:
-        Refactoring changes only re-structure, never change any observable behavior.
+        -   **Separation of Concerns**:
+            Clearly separate all individual concerns as good as possible.
 
-    -   **Align with Code Base**:
-        Strictly align with the existing code base by exactly following its
-        coding style, its structure, its naming conventions, etc.
+        -   **Single Responsibility Principle**:
+            Every module, class, or function should have only one reason to change.
 
-    *Essential* Tenets (specific):
+        -   **Behavior Preservation**:
+            Refactoring changes only re-structure, never change any observable behavior.
 
-    -   **Boy Scout Rule**:
-        After the refactoring, leave the code base cleaner than you found it.
+        -   **Align with Code Base**:
+            Strictly align with the existing code base by exactly following its
+            coding style, its structure, its naming conventions, etc.
 
-    -   **High Cohesion, Low Coupling**:
-        Strike for a set of small, focused parts (high cohesion) connected by
-        thin, explicit wires (low coupling).
-    </step>
+        *Essential* Tenets (specific):
 
-4.  <step id="STEP 4: Choose Refactoring Approach">
-    Let the *user interactively choose* the preferred refactoring approach A<n/>
-    with the help of the `AskUserQuestion` tool. Use *single-selection* only
-    and provide small *code change previews*. Mark your recommended
-    refactoring approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
-    Except for the interactive selection, do not output anything in this step.
-    </step>
+        -   **Boy Scout Rule**:
+            After the refactoring, leave the code base cleaner than you found it.
 
-5.  <step id="STEP 5: Write Refactoring Plan">
-    *Write a refactoring plan* for the chosen refactoring A<n/> by
-    closely aligning to the existing architecture and the existing
-    code base. Use the <format/> defined for a task plan and inject
-    the information from refactoring A<n/> and all derived realization
-    decisions into it. Store the resulting task plan in <content/>.
+        -   **High Cohesion, Low Coupling**:
+            Strike for a set of small, focused parts (high cohesion) connected by
+            thin, explicit wires (low coupling).
 
-    You then *MUST* *save* the resulting plan content with the
-    `task_save(id: <ase-plan-id/>, text: <content/>)`.
+4.  **Choose Refactoring Approach**:
 
-    Finally, output a final hint with the following <template/>
-    and do not output anything else in this step:
+    1.  Let the *user interactively choose* the preferred refactoring approach A<n/>
+        with the help of the `AskUserQuestion` tool. Use *single-selection* only
+        and provide small *code change previews*. Mark your recommended
+        refactoring approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
+        Except for the interactive selection, do not output anything in this step.
 
-    <template>
-    ✔ **RESULT**: Artifact Refactoring Plan Created.
-    ▶ **NEXT**: `ase-task-edit`, `ase-task-preflight`, or `ase-task-implement`.
-    </template>
+5.  **Write Refactoring Plan**:
 
-    <expand name="next-step" arg1="ase-code-refactor">
-        { label: "Skill: ase-task-edit",      description: "Edit the task plan again." },
-        { label: "Skill: ase-task-preflight", description: "Preflight the task plan (non-destructive)." },
-        { label: "Skill: ase-task-implement", description: "Implement the task plan (destructive)." }
-    </expand>
-    </step>
-</flow>
+    1.  *Write a refactoring plan* for the chosen refactoring A<n/> by
+        closely aligning to the existing architecture and the existing
+        code base. Use the <format/> defined for a task plan and inject
+        the information from refactoring A<n/> and all derived realization
+        decisions into it. Store the resulting task plan in <content/>.
+
+    2.  You then *MUST* *save* the resulting plan content with the
+        `task_save(id: <ase-plan-id/>, text: <content/>)`.
+
+    3.  Finally, output a final hint with the following <template/>
+        and do not output anything else in this step:
+
+        <template>
+        ✔ **RESULT**: Artifact Refactoring Plan Created.
+        ▶ **NEXT**: `ase-task-edit`, `ase-task-preflight`, or `ase-task-implement`.
+        </template>
+
+    4.  Provide next step options:
+
+        <expand name="next-step" arg1="ase-code-refactor">
+            { label: "Skill: ase-task-edit",      description: "Edit the task plan again." },
+            { label: "Skill: ase-task-preflight", description: "Preflight the task plan (non-destructive)." },
+            { label: "Skill: ase-task-implement", description: "Implement the task plan (destructive)." }
+        </expand>

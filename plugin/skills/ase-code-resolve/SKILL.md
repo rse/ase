@@ -22,15 +22,22 @@ Resolve Problem
 
 Your role is an experienced, *expert-level software developer*.
 
-<objective>
 *Resolve* the following problem:
 <problem>$ARGUMENTS</problem>
-</objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 
-<flow>
-1.  <step id="STEP 1: Reason About Problem">
+Procedure
+---------
+
+You *MUST* follow the following numbered items *strictly* *sequentially*!
+You *MUST* not skip any numbered item during processing!
+
+You *MUST* *NOT* output anything in this entire procedure, *except* when
+explicitly requested by this procedure via outputs based on a <template/>!
+
+1.  **Reason About Problem**:
+
     1.  If <problem/> matches the regexp `^P\d+$` (i.e. a bare problem
         identifier like `P1`, `P2`, ...), set
         <problem-id><problem/></problem-id>, call the `task_id(id:
@@ -94,9 +101,9 @@ Your role is an experienced, *expert-level software developer*.
           visualize it with an optional diagram <optional-diagram/> by
           invoking the `ase-meta-diagram` skill via the `Skill` tool. Omit
           <optional-diagram/> entirely for simple or purely local situation.
-    </step>
 
-2.  <step id="STEP 2: Investigate Code Base">
+2.  **Investigate Code Base**:
+
     1.  Check the existing source files for all code which is related to the
         requested <problem/> resolution.
 
@@ -104,112 +111,114 @@ Your role is an experienced, *expert-level software developer*.
         overall structures and dynamics.
 
     3.  Do not output anything in this step.
-    </step>
 
-3.  <step id="STEP 3: Find Problem Resolution Approaches">
-    *Propose* corresponding *resolution approach*, including optionally,
-    some *alternative* resolution approaches.
+3.  **Find Problem Resolution Approaches**:
 
-    Annotate the approach you recommend with an <annotation/> of ` ⚝
-    **RECOMMENDATION** ⚝`. Report each approach with the following
-    <template/>:
+    1.  *Propose* corresponding *resolution approach*, including optionally,
+        some *alternative* resolution approaches.
 
-    <template>
-    &#x1F535; **APPROACH A<n/>**<annotation/>: *<summary/>*
-    - [...]
-    - [...]
-    - [...]
-    <optional-diagram/>
-    </template>
+    2.  Annotate the approach you recommend with an <annotation/> of
+        ` ⚝ **RECOMMENDATION** ⚝`.
 
-    Hints:
+    3.  Report each approach with the following <template/>
+        and do not output anything else in this step:
 
-    -   Give a short one-sentence <summary/> of the resolution approach plus
-        *precise* and *brief* resolution information. Try to keep the
-        number of bullet points in the range of 1-4.
+        <template>
+        &#x1F535; **APPROACH A<n/>**<annotation/>: *<summary/>*
+        - [...]
+        - [...]
+        - [...]
+        <optional-diagram/>
+        </template>
 
-    -   Focus on resolution approaches for *practically relevant* cases and do *not*
-        investigate on theoretical or fictive cases. This is especially the case
-        for error handling cases and race condition cases.
+        Hints:
 
-    -   In case of resolution approaches for problems related to *obvious or
-        expected* errors, they *should* be handled *near the origin*.
+        -   Give a short one-sentence <summary/> of the resolution approach plus
+            *precise* and *brief* resolution information. Try to keep the
+            number of bullet points in the range of 1-4.
 
-    -   In case of resolution approaches for problems related to *theoretical
-        or unexpected* errors, they *should* be handled in parent scopes to
-        avoid cluttering the source code with too much error handling at all.
+        -   Focus on resolution approaches for *practically relevant* cases and do *not*
+            investigate on theoretical or fictive cases. This is especially the case
+            for error handling cases and race condition cases.
 
-    -   In case of a *complex resolution situation* only, visualize it with
-        an optional diagram <optional-diagram/> by invoking the
-        `ase-meta-diagram` skill via the `Skill` tool. For *current vs.
-        proposed* comparisons, render each side as a *separate*
-        `ase-meta-diagram` invocation and stack the rendered blocks
-        *vertically* (labels `**Before:**` / `**After:**`); never
-        side-by-side. Omit <optional-diagram/> entirely for simple or
-        purely local situation.
+        -   In case of resolution approaches for problems related to *obvious or
+            expected* errors, they *should* be handled *near the origin*.
 
-    *Recommended* Tenets (generic):
+        -   In case of resolution approaches for problems related to *theoretical
+            or unexpected* errors, they *should* be handled in parent scopes to
+            avoid cluttering the source code with too much error handling at all.
 
-    -   **Surgical Changes**:
-        Keep source code changes always as small as possible.
+        -   In case of a *complex resolution situation* only, visualize it with
+            an optional diagram <optional-diagram/> by invoking the
+            `ase-meta-diagram` skill via the `Skill` tool. For *current vs.
+            proposed* comparisons, render each side as a *separate*
+            `ase-meta-diagram` invocation and stack the rendered blocks
+            *vertically* (labels `**Before:**` / `**After:**`); never
+            side-by-side. Omit <optional-diagram/> entirely for simple or
+            purely local situation.
 
-    -   **Separation of Concerns**:
-        Clearly separate all individual concerns as good as possible.
+        *Recommended* Tenets (generic):
 
-    -   **Single Responsibility Principle**:
-        Every module, class, or function should have only one reason to change.
+        -   **Surgical Changes**:
+            Keep source code changes always as small as possible.
 
-    -   **Behavior Preservation**:
-        Refactoring changes only re-structure, never change any observable behavior.
+        -   **Separation of Concerns**:
+            Clearly separate all individual concerns as good as possible.
 
-    -   **Align with Code Base**:
-        Strictly align with the existing code base by exactly following its
-        coding style, its structure, its naming conventions, etc.
+        -   **Single Responsibility Principle**:
+            Every module, class, or function should have only one reason to change.
 
-    *Essential* Tenets (specific):
+        -   **Behavior Preservation**:
+            Refactoring changes only re-structure, never change any observable behavior.
 
-    -   **No Cleanups**:
-        Strictly focus on resolving the problem and do not mix this task
-        with any other necessary code cleanups, except they are really
-        necessary for resolving the task.
-    </step>
+        -   **Align with Code Base**:
+            Strictly align with the existing code base by exactly following its
+            coding style, its structure, its naming conventions, etc.
 
-4.  <step id="STEP 4: Choose Problem Resolution Approach">
-    Let the *user interactively choose* the preferred resolution approach A<n/>
-    with the help of the `AskUserQuestion` tool. Use *single-selection* only
-    and provide small *code change previews*. Mark your recommended
-    resolution approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
-    </step>
+        *Essential* Tenets (specific):
 
-5.  <step id="STEP 5: Write Problem Resolution Plan">
-    *Write a plan* with code references, a precise description of the
-    problem, the chosen resolution approach, a preview of the *unified
-    diff* of the necessary code changes, and a possible way to verify
-    the success of the resolution, by using the <format/> defined for a
-    task plan. Store the resulting task plan in <content/>.
+        -   **No Cleanups**:
+            Strictly focus on resolving the problem and do not mix this task
+            with any other necessary code cleanups, except they are really
+            necessary for resolving the task.
 
-    You then *MUST* *save* the resulting plan content with the
-    `task_save(id: <ase-plan-id/>, text: <content/>)`.
+4.  **Choose Problem Resolution Approach**:
 
-    If <problem-id/> is set (i.e. the <problem/> was retrieved from
-    `kv_get` in STEP 1.3 via key `ase-code-analyze-result-<problem-id/>`),
-    you *MUST* additionally call the `kv_delete(key:
-    "ase-code-analyze-result-<problem-id/>")` tool of the `ase` MCP
-    service to remove the now-resolved analyzer result from the
-    in-memory key/value store.
+    1.  Let the *user interactively choose* the preferred resolution approach A<n/>
+        with the help of the `AskUserQuestion` tool. Use *single-selection* only
+        and provide small *code change previews*. Mark your recommended
+        resolution approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
 
-    Finally, output a final hint with the following <template/>
-    and do not output anything else in this step:
+5.  **Write Problem Resolution Plan**:
 
-    <template>
-    ✔ **RESULT**: Problem Resolving Plan Created.
-    ▶ **NEXT**: `ase-task-edit`, `ase-task-preflight`, or `ase-task-implement`.
-    </template>
+    1.  *Write a plan* with code references, a precise description of the
+        problem, the chosen resolution approach, a preview of the *unified
+        diff* of the necessary code changes, and a possible way to verify
+        the success of the resolution, by using the <format/> defined for a
+        task plan. Store the resulting task plan in <content/>.
 
-    <expand name="next-step" arg1="ase-code-resolve">
-        { label: "Skill: ase-task-edit",      description: "Edit the task plan again." },
-        { label: "Skill: ase-task-preflight", description: "Preflight the task plan (non-destructive)." },
-        { label: "Skill: ase-task-implement", description: "Implement the task plan (destructive)." }
-    </expand>
-    </step>
-</flow>
+    2.  You then *MUST* *save* the resulting plan content with the
+        `task_save(id: <ase-plan-id/>, text: <content/>)`.
+
+    3.  If <problem-id/> is set (i.e. the <problem/> was retrieved from
+        `kv_get` in STEP 1.3 via key `ase-code-analyze-result-<problem-id/>`),
+        you *MUST* additionally call the `kv_delete(key:
+        "ase-code-analyze-result-<problem-id/>")` tool of the `ase` MCP
+        service to remove the now-resolved analyzer result from the
+        in-memory key/value store.
+
+    4.  Finally, output a final hint with the following <template/>
+        and do not output anything else in this step:
+
+        <template>
+        ✔ **RESULT**: Problem Resolving Plan Created.
+        ▶ **NEXT**: `ase-task-edit`, `ase-task-preflight`, or `ase-task-implement`.
+        </template>
+
+    5.  Provide next step options:
+
+        <expand name="next-step" arg1="ase-code-resolve">
+            { label: "Skill: ase-task-edit",      description: "Edit the task plan again." },
+            { label: "Skill: ase-task-preflight", description: "Preflight the task plan (non-destructive)." },
+            { label: "Skill: ase-task-implement", description: "Implement the task plan (destructive)." }
+        </expand>
