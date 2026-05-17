@@ -94,6 +94,7 @@ export default class SetupCommand {
         await this.ensureTool("npm")
         await this.ensureTool(spec.cli)
 
+        this.log.write("info", `setup: install${dev ? "[dev]" : ""}: used ASE version: ${Version.current()}`)
         this.log.write("info", `setup: install${dev ? "[dev]" : ""}: ` +
             `installing ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote/bundled"})`)
         const pkgdir  = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
@@ -116,6 +117,7 @@ export default class SetupCommand {
 
         if (dev) {
             /*  update ASE CLI Tool  */
+            this.log.write("info", `setup: update[dev]: used ASE version: ${Version.current()}`)
             this.log.write("info", "setup: update[dev]: re-build ASE CLI tool (origin: local)")
             const tooldir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
             await this.run("npm", [ "install" ], { cwd: tooldir })
@@ -132,6 +134,7 @@ export default class SetupCommand {
         else {
             /*  perform NPM version check  */
             const current = Version.current()
+            this.log.write("info", `setup: update: used ASE version: ${current}`)
             const latest  = await Version.latest()
             if (!force && latest !== "" && latest === current) {
                 this.log.write("info", `setup: update: ASE already at latest version ${current}`)
