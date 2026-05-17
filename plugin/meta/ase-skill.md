@@ -214,52 +214,14 @@ MCP Tool Calls
 
     -   Only on a clean response: proceed as the skill instructs.
 
-Next Step Processing
---------------------
-
-<define name="next-step">
-Output `⧉ **ASE**: ✱ skill: **<arg1/>**, ▶ status: **ending**`.
-Then let the *user interactively choose*, with the help of the `AskUserQuestion` tool,
-what to do as the next step. For this, call:
-
-`AskUserQuestion({
-    questions: [
-        {
-            header: "Next Step",
-            question: "What next step do you prefer to perform?",
-            multiSelect: false,
-            options: [
-                { label: "None": "Just stop the current skill processing (or press ESCAPE)." },
-                <content/>
-            ]
-        }
-    ]
-})`
-
-Check the tool result and dispatch accordingly:
-
--   If the tool result contains the `user doesn't want to proceed`,
-    `tool use was rejected`, `user declined to answer questions`,
-    stop processing immediately.
-
--   If the tool result is `"What next step do you prefer to perform?"="<answer/>"`,
-    dispatch according to the value of <answer/>:
-
-    -   If <answer/> is `None`, stop processing immediately.
-
-    -   If <answer/> is `Skill: <name/>`, output
-        `⧉ **ASE**: ✱ skill: **<name/>**, ▶ status: **starting**`
-        and then call the `Skill(skill: <name/>)` tool and let it
-        continue the further processing.
-</define>
-
 Skill Identification
 --------------------
 
-- *IMPORTANT*: Initially, and only in case <objective/> is *not* empty,
+- *IMPORTANT*: Set <objective></objective> (set to empty).
+  Then, in case <objective/> later becomes *not* empty,
   you *MUST* once output the following output <template/>:
 
   <template>
-  &#x26AA; **OBJECTIVE**: <objective/>
+  ⧉ **ASE**: ◎ objective: **<objective/>**
   </template>
 
