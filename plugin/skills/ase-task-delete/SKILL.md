@@ -2,7 +2,7 @@
 name: ase-task-delete
 argument-hint: "[<id>]"
 description: >
-    Implement current or given task plan.
+    Delete the current or given task plan.
     Use when the user calls to "delete", "remove" or "clear" the
     "task", "plan", "spec", or "specification".
 user-invocable: true
