@@ -174,7 +174,8 @@ export default class HookCommand {
                 `export ASE_PROJECT_ID=${quote([ projectId ])}\n` +
                 `export ASE_TASK_ID=${quote([ taskId ])}\n` +
                 `export ASE_SESSION_ID=${quote([ sessionId ])}\n` +
-                `export ASE_HEADLESS=${quote([ headless ])}\n`
+                `export ASE_HEADLESS=${quote([ headless ])}\n` +
+                `export ASE_AGENT_TOOL=${quote([ tool ])}\n`
             fs.appendFileSync(envFile, script, "utf8")
         }
 
@@ -188,6 +189,7 @@ export default class HookCommand {
             `<ase-task-id>${taskId}</ase-task-id>\n` +
             `<ase-session-id>${sessionId}</ase-session-id>\n` +
             `<ase-headless>${headless}</ase-headless>\n` +
+            `<ase-agent-tool>${tool}</ase-agent-tool>\n` +
             "\n" + md
 
         /*  expand all @<file> references manually  */
