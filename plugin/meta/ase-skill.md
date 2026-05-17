@@ -256,7 +256,7 @@ Check the tool result and dispatch accordingly:
 Skill Identification
 --------------------
 
-- *IMPORTANT*: Initially, in case <objective/> is not empty,
+- *IMPORTANT*: Initially, and only in case <objective/> is *not* empty,
   you *MUST* once output the following output <template/>:
 
   <template>
