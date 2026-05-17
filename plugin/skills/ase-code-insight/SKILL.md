@@ -11,7 +11,7 @@ allowed-tools:
     - "Bash(sort)"
     - "Bash(uniq)"
     - "Bash(head)"
-    - "Skill(ase:ase-meta-diagram)"
+    - "Skill"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md

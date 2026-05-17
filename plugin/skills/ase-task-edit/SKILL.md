@@ -15,6 +15,7 @@ effort: high
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 
 Iteratively Edit a Task Plan
 ============================
@@ -23,11 +24,10 @@ Your role is an experienced, *expert-level assistant*,
 specialized in the *planning* of changes
 through *iterative conversational refinement*.
 
-Establish and refine the *task plan* purely through a *chat-driven loop*,
-*without* entering the *Plan Mode* of the agent harness. The user steers
-each round via dialog, based on the `AskUserQuestion` tool, that offers
-continued refinement, finalization, or hand-off to implementation or
-preflight.
+Establish and refine the *task plan* purely through a *chat-driven
+loop*, *without* entering the *Plan Mode* of the agent harness. The
+user steers each round via interactive dialog that offers continued
+refinement, finalization, or hand-off to implementation or preflight.
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 
@@ -159,31 +159,18 @@ explicitly requested by this procedure via outputs based on a <template/>!
     3.  <if condition="<content/> is not empty AND
             <instruction/> is not empty AND
             <instruction/> is not equal <content/>">
-        Let the *user interactively choose*, with the help of the
-        `AskUserQuestion` tool, what to do as the next step. For this,
-        call:
+        Let the *user interactively choose* what to do as the next step.
 
-        `AskUserQuestion({
-            questions: [
-                {
-                    header: "Previous Plan Content",
-                    question: "Should the previous plan content be overwritten, refined, or preserved?",
-                    multiSelect: false,
-                    options: [
-                        { label: "OVERWRITE", description: "Continue operation, overwrite previous plan." },
-                        { label: "REFINE",    description: "Continue operation, refine previous plan." },
-                        { label: "PRESERVE",  description: "Cancel operation, preserve previous plan." }
-                    ]
-                }
-            ]
-        })`
+        <expand name="user-dialog>
+        Previous Plan: Should the previous plan content be overwritten, refined, or preserved?
+        OVERWRITE: Continue operation, overwrite previous plan.
+        REFINE: Continue operation, refine previous plan.
+        PRESERVE: Cancel operation, preserve previous plan.
+        </expand>
 
-        Check the tool result and dispatch accordingly:
+        Check the tool <result/> and dispatch accordingly:
 
-        -   If the tool result contains the `user doesn't want to
-            proceed`, `tool use was rejected`, `user declined to answer
-            questions`, or is
-            `"Should the previous plan content be overwritten, refined, or preserved?"="PRESERVE"`:
+        -   If <result/> is `CANCEL` or `PRESERVE`:
 
             Only output the following <template/> and then immediately
             *STOP* processing this skill:
@@ -192,8 +179,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan preserved**
             </template>
 
-        -   If the tool result is
-            `"Should the previous plan content be overwritten, refined, or preserved?"="OVERWRITE"`:
+        -   If <result/> is `OVERWRITE`:
 
             Create a new plan from scratch and store the result as
             <content/> by closely following the defined plan format
@@ -216,8 +202,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
             </template>
 
-        -   If the tool result is
-            `"Should the previous plan content be overwritten, refined, or preserved?"="REFINE"`:
+        -   If <result/> is `REFINE`:
 
             Treat the <instruction/> as a *refinement instruction* for
             the plan, and update <content/> in-place by *applying* the
@@ -307,41 +292,20 @@ explicitly requested by this procedure via outputs based on a <template/>!
         ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(**  `TASK-PLAN-END`  **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
         </template>
 
-    4.  *Ask user*: Let the *user interactively choose*, with the help of
-        the `AskUserQuestion` tool, what to do as the next step. For this,
-        call:
+    4.  *Ask user*: Let the *user interactively choose* what to do as the
+        next step.
 
-        `AskUserQuestion({
-            questions: [
-                {
-                    header: "Next Step",
-                    question: "How would you like to proceed with the plan?",
-                    multiSelect: false,
-                    options: [
-                        {
-                            label: "DONE",
-                            description: "Mark plan finalized, exit planning loop."
-                        },
-                        {
-                            label: "IMPLEMENT",
-                            description: "Hand off plan to implementation."
-                        },
-                        {
-                            label: "PREFLIGHT",
-                            description: "Hand off plan to pre-flighting."
-                        },
-                        {
-                            label: "REFINE",
-                            description: "Further refine plan with instructions in main context, or use options to refine via inline prompting or in chat sub-context."
-                        }
-                    ]
-                }
-            ]
-        })`
+        <expand name="user-dialog>
+        Next Step: How would you like to proceed with the plan?
+        DONE: Mark plan finalized, exit planning loop.
+        IMPLEMENT: Hand off plan to implementation.
+        PREFLIGHT: Hand off plan to pre-flighting.
+        REFINE: Further refine plan with instructions.
+        </expand>
 
-        Check the tool result and dispatch accordingly:
+        Check the tool <result/> and dispatch accordingly:
 
-        -   If the user selected `DONE`:
+        -   If <result/> is `DONE`:
 
             *Break* out of the *loop*, only output the following <template/>
             and then *STOP*. Do *not* implement the plan.
@@ -350,7 +314,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- done**
             </template>
 
-        -   If the user selected `IMPLEMENT`:
+        -   If <result/> is `IMPLEMENT`:
 
             *Break* out of the *loop*, only output the following
             <template/> and then use the `Skill` tool to invoke the
@@ -361,7 +325,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to implementation**
             </template>
 
-        -   If the user selected `PREFLIGHT`:
+        -   If <result/> is `PREFLIGHT`:
 
             *Break* out of the *loop*, only output the following
             <template/> and then use the `Skill` tool to invoke the
@@ -372,7 +336,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to pre-flight**
             </template>
 
-        -   If the user selected `REFINE`:
+        -   If <result/> is `REFINE`:
 
             Ask the user interactively, without a special tool, for
             the refinement instruction with a single question `**What
@@ -394,10 +358,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **plan refined**
             </template>
 
-        -   If the user selected "Other", *or* responded outside the
-            dialog with a free-form refinement instruction:
+        -   If <result/> matches `OTHER: <text/>`:
 
-            Set <instruction/> to the response of the user.
+            Set <instruction><text/></instruction>.
 
             Treat the <instruction/> as a *refinement instruction* for
             the plan, and update <content/> in-place by *applying* the
@@ -414,10 +377,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **plan refined**
             </template>
 
-        -   If the tool result contains `User doesn't want to proceed`,
-            `Tool use was rejected`, or `User declined to answer
-            question`, or in case of *any other response* still *not*
-            covered by the previous cases:
+        -   If <result/> is `CANCEL`:
 
             *Break* out of the *loop*, only output the following <template/>
             and then *STOP*. Do *not* implement the plan.

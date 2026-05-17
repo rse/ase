@@ -12,6 +12,7 @@ effort: xhigh
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 
 Implement a Task Plan
 =====================
@@ -112,40 +113,25 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 4.  **Decide Next Step:**
 
-    1.  *Ask user*: Let the *user interactively choose*, with the help of
-        the `AskUserQuestion` tool, what to do as the next step. For this,
-        call:
+    1.  *Ask user*: Let the *user interactively choose*
+        what to do as the next step.
 
-        `AskUserQuestion({
-            questions: [
-                {
-                    header: "Next Step",
-                    question: "How would you like to proceed with the plan?",
-                    multiSelect: false,
-                    options: [
-                        {
-                            label: "DONE",
-                            description: "Stop processing and preserve the task plan."
-                        },
-                        {
-                            label: "DELETE",
-                            description: "Stop processing and delete the task plan."
-                        }
-                    ]
-                }
-            ]
-        })`
+        <expand name="user-dialog>
+        Next Step: How would you like to proceed with the plan?
+        DONE: Stop processing and PRESERVE task plan.
+        DELETE: Stop processing and DELETE the task plan.
+        </expand>
 
-    2.  Check the tool result and dispatch accordingly:
+    2.  Check the tool <result/> and dispatch accordingly:
 
-        -   If the user selected `DONE`:
+        -   If <result/> is `DONE` or `CANCEL`:
             Only output the following <template/> and then *STOP*.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan implemented -- done**
             </template>
 
-        -   If the user selected `DELETE`:
+        -   If <result/> is `DELETE`:
             Only output the following <template/> and then use the
             `Skill` tool to invoke the `ase:ase-task-delete` skill in
             order to *implement* the updated plan. Immediately stop

@@ -12,6 +12,7 @@ effort: xhigh
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 
 Preflight a Task Plan
 =====================
@@ -130,49 +131,30 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated**
-        ⧉ **ASE**: ▶ hint: use **/ase-task-edit <ase-task-id/>** skill to check and further refine task plan!
         </template>
 
 4.  **Decide Next Step:**
 
-    1.  *Ask user*: Let the *user interactively choose*, with the help of
-        the `AskUserQuestion` tool, what to do as the next step. For this,
-        call:
+    1.  *Ask user*: Let the *user interactively choose*
+        what to do as the next step.
 
-        `AskUserQuestion({
-            questions: [
-                {
-                    header: "Next Step",
-                    question: "How would you like to proceed with the plan?",
-                    multiSelect: false,
-                    options: [
-                        {
-                            label: "DONE",
-                            description: "Stop processing."
-                        },
-                        {
-                            label: "EDIT",
-                            description: "Hand processing off to the editing."
-                        },
-                        {
-                            label: "IMPLEMENT",
-                            description: "Hand processing off to the implementation."
-                        }
-                    ]
-                }
-            ]
-        })`
+        <expand name="user-dialog>
+        Next Step: How would you like to proceed with the plan?
+        DONE: Stop processing.
+        EDIT: Hand processing off to editing.
+        IMPLEMENT: Hand processing off to implementation.
+        </expand>
 
-    2.  Check the tool result and dispatch accordingly:
+    2.  Check the tool <result/> and dispatch accordingly:
 
-        -   If the user selected `DONE`:
+        -   If <result/> is `DONE` or `CANCEL`:
             Only output the following <template/> and then *STOP*.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- done**
             </template>
 
-        -   If the user selected `EDIT`:
+        -   If <result/> is `EDIT`:
             Only output the following <template/> and then use the
             `Skill` tool to invoke the `ase:ase-task-edit` skill
             in order to *edit* the updated plan. Immediately stop
@@ -182,7 +164,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to edit**
             </template>
 
-        -   If the user selected `IMPLEMENT`:
+        -   If <result/> is `IMPLEMENT`:
             Only output the following <template/> and then use the
             `Skill` tool to invoke the `ase:ase-task-implement` skill
             in order to *implement* the updated plan. Immediately stop

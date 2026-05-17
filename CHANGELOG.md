@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: as "claude plugin install" does not support pinned versions, install plugin from bundled version of NPM package
 - IMPROVEMENT: provide `<ase-agent-tool/>` in context and `ASE_AGENT_TOOL` in environment to indentify the agent tool
+- IMPROVEMENT: make skills more portable by using `AskUserQuestion` in Claude Code and `ask_user` in Github Copilot CLI.
 
 0.0.30 (2026-05-17)
 -------------------

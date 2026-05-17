@@ -8,14 +8,12 @@ user-invocable: true
 disable-model-invocation: false
 effort: high
 allowed-tools:
-    - "AskUserQuestion"
     - "Skill"
-    - "EnterPlanMode"
-    - "ExitPlanMode"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 
 Resolve Problem
 ===============
@@ -207,7 +205,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 4.  **Choose Problem Resolution Approach**:
 
     1.  Let the *user interactively choose* the preferred resolution approach A<n/>
-        with the help of the `AskUserQuestion` tool. Use *single-selection* only
+        with the help of the <user-dialog-tool/> tool. Use *single-selection* only
         and provide small *code change previews*. Mark your recommended
         resolution approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
 

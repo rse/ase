@@ -8,12 +8,12 @@ user-invocable: true
 disable-model-invocation: false
 effort: high
 allowed-tools:
-    - "AskUserQuestion"
-    - "Skill(ase:ase-meta-diagram)"
+    - "Skill"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 
 Refactor Artifacts
 ==================
@@ -153,7 +153,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 4.  **Choose Refactoring Approach**:
 
     1.  Let the *user interactively choose* the preferred refactoring approach A<n/>
-        with the help of the `AskUserQuestion` tool. Use *single-selection* only
+        with the help of the <user-dialog-tool/> tool. Use *single-selection* only
         and provide small *code change previews*. Mark your recommended
         refactoring approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
         Except for the interactive selection, do not output anything in this step.

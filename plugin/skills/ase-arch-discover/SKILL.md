@@ -13,7 +13,6 @@ allowed-tools:
     - "Skill"
     - "Agent"
     - "WebFetch"
-    - "AskUserQuestion"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
@@ -37,7 +36,7 @@ for the technology stack to *provide* the *needed functionality*
         the functionality description very *brief* but still *precise*.
 
     -   If <functionality/> is not clear or not precise enough, raise
-        questions to the user with the help of the `AskUserQuestion` tool.
+        questions to the user with the help of an interactive user dialog tool.
 
     -   Display the determined final functionality with just the following
         <template/>:

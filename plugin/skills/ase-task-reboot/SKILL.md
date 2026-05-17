@@ -12,6 +12,7 @@ effort: xhigh
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 
 Reboot a Task Plan
 ==================
@@ -127,45 +128,30 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 4.  **Decide Next Step:**
 
-    1.  *Ask user*: Let the *user interactively choose*, with the help of
-        the `AskUserQuestion` tool, what to do as the next step. For this,
-        call:
+    1.  *Ask user*: Let the *user interactively choose*
+        what to do as the next step.
 
-        `AskUserQuestion({
-            questions: [
-                {
-                    header: "Next Step",
-                    question: "How would you like to proceed with the plan?",
-                    multiSelect: false,
-                    options: [
-                        {
-                            label: "DONE",
-                            description: "Stop processing."
-                        },
-                        {
-                            label: "EDIT",
-                            description: "Hand processing off to the editing."
-                        }
-                    ]
-                }
-            ]
-        })`
+        <expand name="user-dialog>
+        Next Step: How would you like to proceed with the plan?
+        DONE: Stop processing.
+        EDIT: Hand processing off to editing.
+        </expand>
 
-    2.  Check the tool result and dispatch accordingly:
+    2.  Check the tool <result/> and dispatch accordingly:
 
-        -   If the user selected `DONE`:
+        -   If <result/> is `DONE` or `CANCEL`:
             Only output the following <template/> and then *STOP*.
 
             <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan rebooted -- done**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- done**
             </template>
 
-        -   If the user selected `EDIT`:
+        -   If <result/> is `EDIT`:
             Only output the following <template/> and then use the
             `Skill` tool to invoke the `ase:ase-task-edit` skill
             in order to *edit* the updated plan. Immediately stop
             processing the current skill once the `Skill` tool was used.
 
             <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan rebooted -- hand-off to edit**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to edit**
             </template>
