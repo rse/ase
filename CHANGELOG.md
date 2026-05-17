@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.0.30 (2026-05-16)
+0.0.30 (2026-05-17)
 -------------------
 
 - REVAMPING: reimplement ase-task-* skills to no longer use agent
