@@ -2,12 +2,16 @@
 ChangeLog
 =========
 
-0.0.31 (2026-05-17)
+0.0.31 (2026-05-18)
 -------------------
 
 - IMPROVEMENT: as "claude plugin install" does not support pinned versions, install plugin from bundled version of NPM package
-- IMPROVEMENT: provide `<ase-agent-tool/>` in context and `ASE_AGENT_TOOL` in environment to indentify the agent tool
-- IMPROVEMENT: make skills more portable by using `AskUserQuestion` in Claude Code and `ask_user` in Github Copilot CLI.
+- IMPROVEMENT: provide `<ase-agent-tool/>` in context and `ASE_AGENT_TOOL` in environment to identify the agent tool
+- IMPROVEMENT: make skills more portable by using `AskUserQuestion` in Claude Code and `ask_user` in Github Copilot CLI
+- IMPROVEMENT: add `<skill>` tags and objectives to all `ase-task-*` skills and use them in skill-started status output
+- IMPROVEMENT: add kv-store persistence of findings to `ase-arch-analyze` skill and unify kv key naming
+- IMPROVEMENT: improve status output and display ASE version during setup operations
+- BUGFIX: fix wrong description in `ase-task-delete` skill frontmatter
 
 0.0.30 (2026-05-17)
 -------------------
