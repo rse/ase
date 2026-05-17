@@ -5,6 +5,8 @@ ChangeLog
 0.0.31 (2026-05-17)
 -------------------
 
+- IMPROVEMENT: as "claude plugin install" does not support pinned versions, install plugin from bundled version of NPM package
+
 0.0.30 (2026-05-17)
 -------------------
 

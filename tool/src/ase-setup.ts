@@ -95,9 +95,9 @@ export default class SetupCommand {
         await this.ensureTool(spec.cli)
 
         this.log.write("info", `setup: install${dev ? "[dev]" : ""}: ` +
-            `installing ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote"})`)
-        const basedir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..")
-        const source  = dev ? basedir : "rse/ase"
+            `installing ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote/bundled"})`)
+        const pkgdir  = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
+        const source  = dev ? path.resolve(pkgdir, "..") : pkgdir
         await this.run(spec.cli, [ "plugin", "marketplace", "add", source ])
         await this.run(spec.cli, [ "plugin", "install", "ase@ase" ], { retries: 3 })
         return 0
@@ -163,7 +163,7 @@ export default class SetupCommand {
 
         /*  uninstall ASE plugin  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
-            `uninstalling ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote"})`)
+            `uninstalling ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote/bundled"})`)
         await this.run(spec.cli, [ "plugin", "uninstall", "ase@ase" ],
             { ignoreError: `ASE ${spec.label} plugin not installed` })
         await this.run(spec.cli, [ "plugin", "marketplace", "remove", "ase" ],
@@ -208,7 +208,7 @@ export default class SetupCommand {
             .command("install")
             .description("install the ASE plugin for a tool")
             .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
-            .option("-d, --dev",         "use local working copy instead of remote repository", devDflt)
+            .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
             .action(async (opts: { tool: string, dev: boolean }) => {
                 process.exit(await this.doInstall(this.parseTool(opts.tool), opts.dev))
             })
@@ -219,7 +219,7 @@ export default class SetupCommand {
             .description("update the ASE tool and the ASE plugin for a tool")
             .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
             .option("-f, --force",       "always perform the update, even if already at latest version", false)
-            .option("-d, --dev",         "use local working copy instead of remote repository", devDflt)
+            .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
             .action(async (opts: { tool: string, force: boolean, dev: boolean }) => {
                 process.exit(await this.doUpdate(this.parseTool(opts.tool), opts.force, opts.dev))
             })
@@ -229,7 +229,7 @@ export default class SetupCommand {
             .command("uninstall")
             .description("uninstall the ASE plugin for a tool and the ASE tool")
             .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
-            .option("-d, --dev",         "use local working copy instead of remote repository", devDflt)
+            .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
             .action(async (opts: { tool: string, dev: boolean }) => {
                 process.exit(await this.doUninstall(this.parseTool(opts.tool), opts.dev))
             })

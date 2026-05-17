@@ -1,4 +1,5 @@
 node_modules/
 dst/
+plugin/
 *.log
 .DS_Store

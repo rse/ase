@@ -67,6 +67,7 @@
     "files": [
         "dst/**/*",
         "bin/**/*",
+        "plugin/**/*",
         "README.md"
     ],
     "scripts": {
