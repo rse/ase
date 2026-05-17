@@ -37,6 +37,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     1.  Set <instruction>$ARGUMENTS</instruction> initially.
         Inherit the always existing <ase-task-id/> from the current context.
+        Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
 
     2.  React on task id:
@@ -115,7 +116,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
     8.  Call the `task_save(id: <ase-task-id/>,
         text: <content/>)` of the `ase` MCP service to save the updated
         task plan content. Do not output anything related to this MCP
-        tcall.
+        call.
 
     9.  Only output the following <template/> and continue processing:
 

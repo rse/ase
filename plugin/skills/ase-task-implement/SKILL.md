@@ -35,6 +35,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     1.  Set <instruction>$ARGUMENTS</instruction> initially.
         Inherit the always existing <ase-task-id/> from the current context.
+        Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
 
     2.  React on task id:
@@ -107,7 +108,6 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan implemented**
-        ⧉ **ASE**: ▶ hint: use **/ase-task-delete <ase-task-id/>** skill to finally delete task plan!
         </template>
 
 4.  **Decide Next Step:**

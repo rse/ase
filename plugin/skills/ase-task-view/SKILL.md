@@ -35,18 +35,19 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Do not output anything.
 
     2.  <if condition="<id/> is empty">
-        Set <id><ase-task-id/><id/>
+        Set <id><ase-task-id/></id>
         Do not output anything.
         </if>
 
 2.  **Perform Operation**:
 
     1.  Call the `task_load(id: <id/>)` tool of the `ase` MCP
-        service to delete the task plan content and set <text/> to the
-        `text` output field of this `task_delete` tool call. Do not
+        service to load the task plan content and set <text/> to the
+        `text` output field of this `task_load` tool call. Do not
         output anything related to this MCP tool call.
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
+            Set <content></content> (set content to empty).
             Only output the following <template/>:
 
             <template>

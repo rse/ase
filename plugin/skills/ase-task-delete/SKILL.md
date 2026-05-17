@@ -35,7 +35,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Do not output anything.
 
     2.  <if condition="<id/> is empty">
-        Set <id><ase-task-id/><id/>
+        Set <id><ase-task-id/></id>
         Do not output anything.
         </if>
 

@@ -197,25 +197,31 @@ explicitly requested by this procedure via outputs based on a <template/>!
         the success of the resolution, by using the <format/> defined for a
         task plan. Store the resulting task plan in <content/>.
 
-    2.  You then *MUST* *save* the resulting plan content with the
-        `task_save(id: <ase-plan-id/>, text: <content/>)`.
+    2.  Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+        `ase` MCP service and use the `text` field of its response for
+        <timestamp-created/> and <timestamp-modified/> information. Then
+        insert the current <ase-task-id/>, <timestamp-created/>, and
+        <timestamp-modified/> information and calculate the number of
+        words <words/> of <content/>.
 
-    3.  If <problem-id/> is set (i.e. the <problem/> was retrieved from
+    3.  You then *MUST* *save* the resulting plan content with the
+        `task_save(id: <ase-task-id/>, text: <content/>)`.
+
+    4.  If <problem-id/> is set (i.e. the <problem/> was retrieved from
         `kv_get` in STEP 1.3 via key `ase-code-analyze-result-<problem-id/>`),
         you *MUST* additionally call the `kv_delete(key:
         "ase-code-analyze-result-<problem-id/>")` tool of the `ase` MCP
         service to remove the now-resolved analyzer result from the
         in-memory key/value store.
 
-    4.  Finally, output a final hint with the following <template/>
-        and do not output anything else in this step:
+    5.  Output a hint with the following <template/>:
 
         <template>
         ✔ **RESULT**: Problem Resolving Plan Created.
         ▶ **NEXT**: `ase-task-edit`, `ase-task-preflight`, or `ase-task-implement`.
         </template>
 
-    5.  Provide next step options:
+    6.  Provide next step options:
 
         <expand name="next-step" arg1="ase-code-resolve">
             { label: "Skill: ase-task-edit",      description: "Edit the task plan again." },
