@@ -27,33 +27,30 @@ From scratch *craft* the following feature:
 <feature>$ARGUMENTS</feature>
 </objective>
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
+
 <flow>
 1.  <step id="STEP 1: Reason About Feature">
-    1.  Enter *Plan Mode* with the `EnterPlanMode` tool.
-
-    2.  Clear any old plans of the *Plan Mode* and start planning from
-        scratch with an empty plan.
-
-    3.  If <feature/> has the format `<id/>: <text/>` where <id/> matches
+    1.  If <feature/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
         <feature><text/></feature> and <ase-task-id><id/></ase-task-id>
         and call the `task_id(id: <ase-task-id/>, session:
         <ase-session-id/>)` tool from the `ase` MCP service to
         implicitly switch the task.
 
-    4.  Report the task and feature with the following <template/>:
+    2.  Report the task and feature with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
         ⧉ **ASE**: ◉ feature: **<feature/>**
         </template>
 
-    5.  Figure out what the requested <feature/> to be crafted is about.
+    3.  Figure out what the requested <feature/> to be crafted is about.
 
-    6.  Ask the user for clarification if the goal of this crafting is too
+    4.  Ask the user for clarification if the goal of this crafting is too
         unclear.
 
-    7.  Do not output anything in this step, except you asked the user.
+    5.  Do not output anything in this step, except you asked the user.
     </step>
 
 2.  <step id="STEP 2: Investigate Code Base">
@@ -132,74 +129,12 @@ From scratch *craft* the following feature:
 5.  <step id="STEP 5: Write Feature Crafting Plan">
     *Write a feature plan* for the chosen feature A<n/> by
     closely aligning to the existing architecture and the existing
-    code base. Use the following <template/> for the plan and inject
+    code base. Use the <format/> defined for a task plan and inject
     the information from feature A<n/> and all derived realization
-    decisions into it:
-
-    <template>
-
-    # ✪ FEATURE: **<title/>**
-
-    ⚑ task id: **<ase-task-id/>** | ✳ created: **<timestamp-created/>** | ✎ modified: **<timestamp-modified/>**
-
-    ## CONTEXT
-
-    - **WHAT**: <summary-what/>
-
-    - **WHY**: <summary-why/>
-
-    ## CHANGES:
-
-    - [...]
-
-    - [...]
-
-    - [...]
-
-    ## VERIFICATION:
-
-    - [...]
-
-    - [...]
-
-    - [...]
-    </template>
-
-    Hints:
-
-    -   In all descriptions, highlight *code* as
-        <template>`<code/>`</template> and *key aspects* as
-        <template>*<aspect/>*</template>.
-
-    -   For <summary-what/> and <summary-why/> use *ultra brief* but
-        as *very precise* as possible description of the overall change. In
-        <summary-what/> tell what is changed. In <summary-why/> tell why it
-        is changed, or what benefit results.
-
-    -   The <timestamp-created/> is the timestamp when this feature crafting specification
-        was created. The <timestamp-modified/> is the timestamp when
-        this feature specification was last modified. Both use a
-        ISO-style format value, which has to be determined by calling
-        the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
-        MCP service and use the `text` field of its response.
-
-    -   The <title/> is a short summary of the <summary-what/>, no longer than
-        50 characters.
-
-    -   The sections `CHANGES` and `VERIFICATION` all are just a short
-        list of 1-5 bullet points. Each bullet points is formatted as
-        `- **<aspect/>**: <specification/>` where <aspect/> indicates
-        the aspect of the section and <specification/> is 1-3 sentences
-        giving a *ultra precise* but also *ultra brief* and *ultra concise*
-        description of the aspect.
-
-    -   In all sections, break all lines with a newline character
-        after about 120 characters per line.
+    decisions into it. Store the resulting task plan in <content/>.
 
     You then *MUST* *save* the resulting plan content with the
-    `task_save` tool (`id` set to <ase-plan-id/>, `text` set to the
-    plan content) and then you *MUST* exit the *Plan Mode* with the
-    `ExitPlanMode` tool.
+    `task_save(id: <ase-plan-id/>, text: <content/>)`.
 
     Finally, output a final hint with the following <template/>
     and do not output anything else in this step:

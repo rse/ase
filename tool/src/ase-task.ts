@@ -397,8 +397,8 @@ export class TaskMCP {
             try {
                 const removed = Task.delete(args.id)
                 const msg     = removed ?
-                    `task_delete: OK: removed task "${args.id}"` :
-                    `task_delete: WARNING: no task "${args.id}" to remove`
+                    "OK: removed task" :
+                    "WARNING: task not found"
                 return {
                     content: [ { type: "text", text: msg } ]
                 }

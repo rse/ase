@@ -1,38 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="7.937054 9.383158 820.0629 571.7192" width="820.0629" height="571.7192">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="7.937054 9.383158 820.0629 571.7192" width="820.0629" height="571.7192">
   <defs>
-    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#1067b2">
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#6d6d6d">
       <g>
         <path d="M 3.6 0 L 0 -1.35 L 0 1.35 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
-    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#b31f19">
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#1067b2">
       <g>
         <path d="M 3.6 0 L 0 -1.35 L 0 1.35 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
-    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_3" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#b26813">
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_3" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#b31f19">
       <g>
         <path d="M 3.6 0 L 0 -1.35 L 0 1.35 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
-    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_4" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-5 -3 6 6" markerWidth="6" markerHeight="6" color="#b26813">
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_4" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#b26813">
+      <g>
+        <path d="M 3.6 0 L 0 -1.35 L 0 1.35 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_5" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-5 -3 6 6" markerWidth="6" markerHeight="6" color="#b26813">
       <g>
         <path d="M -3.6 0 L 0 1.35 L 0 -1.35 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
-    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_5" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="black">
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_6" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="black">
+      <g>
+        <path d="M 3.6 0 L 0 -1.35 L 0 1.35 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker_7" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#b26813">
       <g>
         <path d="M 3.6 0 L 0 -1.35 L 0 1.35 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
       </g>
     </marker>
   </defs>
-  <g id="Canvas_1" fill="none" stroke-dasharray="none" stroke-opacity="1" stroke="none" fill-opacity="1">
+  <g id="Canvas_1" fill-opacity="1" stroke-opacity="1" stroke-dasharray="none" stroke="none" fill="none">
     <title>Canvas 1</title>
     <rect fill="white" x="7.937054" y="9.383158" width="820.0629" height="571.7192"/>
     <g id="Canvas_1_Content">
       <title>Content</title>
+      <g id="Graphic_897">
+        <path d="M 112.0315 76.535435 L 724.504 76.535435 C 726.7131 76.535435 728.504 78.3263 728.504 80.53544 L 728.504 140.56693 C 728.504 142.77607 726.7131 144.56693 724.504 144.56693 L 112.0315 144.56693 C 109.82236 144.56693 108.0315 142.77607 108.0315 140.56693 L 108.0315 80.53544 C 108.0315 78.3263 109.82236 76.535435 112.0315 76.535435 Z" fill="#dbdbdb"/>
+      </g>
       <g id="Graphic_882">
         <path d="M 105.48036 70.86614 L 730.17325 70.86614 C 732.3824 70.86614 734.17325 72.657 734.17325 74.86614 L 734.17325 514.7402 C 734.17325 516.9493 732.3824 518.7402 730.17325 518.7402 L 105.48036 518.7402 C 103.27122 518.7402 101.48036 516.9493 101.48036 514.7402 L 101.48036 74.86614 C 101.48036 72.657 103.27122 70.86614 105.48036 70.86614 Z M 17.889763 56.692915 Z M 17.889763 56.692915 L 11.937054 56.692915 C 9.727915 56.692915 7.937054 58.483776 7.937054 60.692915 L 7.937054 577.1024 C 7.937054 579.3115 9.727915 581.1024 11.937054 581.1024 L 17.889763 581.1024 L 48.50394 581.1024 L 824 581.1024 C 826.2091 581.1024 828 579.3115 828 577.1024 L 828 60.692915 C 828 58.483776 826.2091 56.692915 824 56.692915 L 48.50394 56.692915 Z" fill="#dbdbdb"/>
       </g>
@@ -40,7 +53,7 @@
         <path d="M 112.31496 325.98426 L 724.7874 325.98426 C 726.9966 325.98426 728.7874 327.77512 728.7874 329.98426 L 728.7874 509.0709 C 728.7874 511.28 726.9966 513.0709 724.7874 513.0709 L 112.31496 513.0709 C 110.10583 513.0709 108.31496 511.28 108.31496 509.0709 L 108.31496 329.98426 C 108.31496 327.77512 110.10583 325.98426 112.31496 325.98426 Z" fill="#f5dbc1"/>
       </g>
       <g id="Graphic_798">
-        <path d="M 112.31496 79.37008 L 724.7874 79.37008 C 726.9966 79.37008 728.7874 81.16094 728.7874 83.37008 L 728.7874 316.31497 C 728.7874 318.5241 726.9966 320.31497 724.7874 320.31497 L 112.31496 320.31497 C 110.10583 320.31497 108.31496 318.5241 108.31496 316.31497 L 108.31496 83.37008 C 108.31496 81.16094 110.10583 79.37008 112.31496 79.37008 Z" fill="#c0dbf5"/>
+        <path d="M 112.31496 147.40158 L 724.7874 147.40158 C 726.9966 147.40158 728.7874 149.19244 728.7874 151.40158 L 728.7874 316.31497 C 728.7874 318.5241 726.9966 320.31497 724.7874 320.31497 L 112.31496 320.31497 C 110.10583 320.31497 108.31496 318.5241 108.31496 316.31497 L 108.31496 151.40158 C 108.31496 149.19244 110.10583 147.40158 112.31496 147.40158 Z" fill="#c0dbf5"/>
       </g>
       <g id="Group_774">
         <g id="Graphic_629">
@@ -55,16 +68,17 @@
       </g>
       <g id="Group_767">
         <g id="Graphic_631">
-          <path d="M 367.74804 90.70866 L 478.17324 90.70866 C 480.3824 90.70866 482.17324 92.49952 482.17324 94.70866 L 482.17324 132.063 C 482.17324 134.27213 480.3824 136.063 478.17324 136.063 L 367.74804 136.063 C 365.5389 136.063 363.74804 134.27213 363.74804 132.063 L 363.74804 94.70866 C 363.74804 92.49952 365.5389 90.70866 367.74804 90.70866 Z" fill="#368ddf"/>
+          <path d="M 367.74804 90.70866 L 478.17324 90.70866 C 480.3824 90.70866 482.17324 92.49952 482.17324 94.70866 L 482.17324 132.063 C 482.17324 134.27213 480.3824 136.063 478.17324 136.063 L 367.74804 136.063 C 365.5389 136.063 363.74804 134.27213 363.74804 132.063 L 363.74804 94.70866 C 363.74804 92.49952 365.5389 90.70866 367.74804 90.70866 Z" fill="#6d6d6d"/>
         </g>
         <g id="Graphic_628">
-          <text transform="translate(399.6032 107.04725)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="61106675e-20" y="12" xml:space="preserve">analyse</tspan>
+          <text transform="translate(380.95523 107.04725)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">code-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">analyse</tspan>
           </text>
         </g>
       </g>
       <g id="Line_639">
-        <path d="M 363.74804 110.55118 L 161.85827 110.55118 L 161.85827 235.2756 L 196.7126 235.2756" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 363.74804 110.55118 L 161.85827 110.55118 L 161.85827 235.2756 L 196.7126 235.2756" marker-end="url(#FilledArrow_Marker)" stroke="#6d6d6d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_777">
         <g id="Graphic_725">
@@ -81,29 +95,31 @@
           <path d="M 367.74804 157.62836 L 478.17324 157.62836 C 480.3824 157.62836 482.17324 159.41922 482.17324 161.62836 L 482.17324 198.98269 C 482.17324 201.19183 480.3824 202.98269 478.17324 202.98269 L 367.74804 202.98269 C 365.5389 202.98269 363.74804 201.19183 363.74804 198.98269 L 363.74804 161.62836 C 363.74804 159.41922 365.5389 157.62836 367.74804 157.62836 Z" fill="#1067b2"/>
         </g>
         <g id="Graphic_727">
-          <text transform="translate(399.4331 173.96694)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="63593575e-20" y="12" xml:space="preserve">resolve</tspan>
+          <text transform="translate(380.7851 173.96694)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">code-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">resolve</tspan>
           </text>
         </g>
       </g>
       <g id="Line_729">
-        <path d="M 325.4303 230.39038 L 340.44096 230.39038 L 340.44096 177.47088 L 352.61812 177.47088" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 325.4303 230.39038 L 340.44096 230.39038 L 340.44096 177.47088 L 352.61812 177.47088" marker-end="url(#FilledArrow_Marker_2)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_769">
         <g id="Graphic_731">
           <path d="M 367.74804 211.48662 L 478.17324 211.48662 C 480.3824 211.48662 482.17324 213.27749 482.17324 215.48662 L 482.17324 252.84096 C 482.17324 255.0501 480.3824 256.84096 478.17324 256.84096 L 367.74804 256.84096 C 365.5389 256.84096 363.74804 255.0501 363.74804 252.84096 L 363.74804 215.48662 C 363.74804 213.27749 365.5389 211.48662 367.74804 211.48662 Z" fill="#1067b2"/>
         </g>
         <g id="Graphic_730">
-          <text transform="translate(396.9771 227.8252)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="7744916e-19" y="12" xml:space="preserve">refactor</tspan>
+          <text transform="translate(378.3291 227.8252)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="7105427e-21" y="12" xml:space="preserve">code-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">refactor</tspan>
           </text>
         </g>
       </g>
       <g id="Line_734">
-        <line x1="325.6378" y1="235.2756" x2="355.45277" y2="235.2756" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line x1="325.6378" y1="235.2756" x2="355.45277" y2="235.2756" marker-end="url(#FilledArrow_Marker_2)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_735">
-        <path d="M 326.26773 240.9449 L 340.44096 240.9449 L 340.44096 286.29922 L 355.45277 286.29922" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 326.26773 240.9449 L 340.44096 240.9449 L 340.44096 286.29922 L 355.45277 286.29922" marker-end="url(#FilledArrow_Marker_2)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_775">
         <g id="Graphic_737">
@@ -116,13 +132,13 @@
         </g>
       </g>
       <g id="Line_738">
-        <path d="M 482.17324 177.47088 L 499.1811 177.47088 L 499.1811 230.39038 L 508.52364 230.39038" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 482.17324 177.47088 L 499.1811 177.47088 L 499.1811 230.39038 L 508.52364 230.39038" marker-end="url(#FilledArrow_Marker_2)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_739">
-        <line x1="482.17324" y1="235.2756" x2="508.52364" y2="235.2756" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line x1="482.17324" y1="235.2756" x2="508.52364" y2="235.2756" marker-end="url(#FilledArrow_Marker_2)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_740">
-        <path d="M 482.17324 286.29922 L 499.1811 286.29922 L 499.1811 240.9449 L 508.52364 240.9449" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 482.17324 286.29922 L 499.1811 286.29922 L 499.1811 240.9449 L 508.52364 240.9449" marker-end="url(#FilledArrow_Marker_2)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_776">
         <g id="Graphic_742">
@@ -135,68 +151,69 @@
         </g>
       </g>
       <g id="Line_743">
-        <path d="M 637.4488 235.2756 L 652.252 235.2756 L 652.252 323.90093 L 178.86615 323.90093 L 178.86615 408.189 L 196.7126 408.189" marker-end="url(#FilledArrow_Marker_2)" stroke="#b31f19" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 637.4488 235.2756 L 652.252 235.2756 L 652.252 323.90093 L 178.86615 323.90093 L 178.86615 408.189 L 196.7126 408.189" marker-end="url(#FilledArrow_Marker_3)" stroke="#b31f19" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_771">
         <g id="Graphic_749">
-          <path d="M 367.74804 340.94157 L 478.17324 340.94157 C 480.3824 340.94157 482.17324 342.73243 482.17324 344.94157 L 482.17324 382.2959 C 482.17324 384.50504 480.3824 386.2959 478.17324 386.2959 L 367.74804 386.2959 C 365.5389 386.2959 363.74804 384.50504 363.74804 382.2959 L 363.74804 344.94157 C 363.74804 342.73243 365.5389 340.94157 367.74804 340.94157 Z" fill="#df8f37"/>
+          <path d="M 367.46458 359.80962 L 477.8898 359.80962 C 480.0989 359.80962 481.8898 361.6005 481.8898 363.80962 L 481.8898 381.95625 C 481.8898 384.1654 480.0989 385.95625 477.8898 385.95625 L 367.46458 385.95625 C 365.25544 385.95625 363.46458 384.1654 363.46458 381.95625 L 363.46458 363.80962 C 363.46458 361.6005 365.25544 359.80962 367.46458 359.80962 Z" fill="#b26813"/>
         </g>
         <g id="Graphic_748">
-          <text transform="translate(410.6971 357.28015)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="0" y="12" xml:space="preserve">edit</tspan>
+          <text transform="translate(395.6616 365.16313)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="14210855e-21" y="12" xml:space="preserve">task-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">edit</tspan>
           </text>
         </g>
       </g>
       <g id="Group_772">
         <g id="Graphic_747">
-          <path d="M 367.74804 394.79984 L 478.17324 394.79984 C 480.3824 394.79984 482.17324 396.5907 482.17324 398.79984 L 482.17324 436.15417 C 482.17324 438.3633 480.3824 440.15417 478.17324 440.15417 L 367.74804 440.15417 C 365.5389 440.15417 363.74804 438.3633 363.74804 436.15417 L 363.74804 398.79984 C 363.74804 396.5907 365.5389 394.79984 367.74804 394.79984 Z" fill="#b26813"/>
+          <path d="M 367.46458 415.9619 L 477.8898 415.9619 C 480.0989 415.9619 481.8898 417.7528 481.8898 419.9619 L 481.8898 436.9326 C 481.8898 439.14173 480.0989 440.9326 477.8898 440.9326 L 367.46458 440.9326 C 365.25544 440.9326 363.46458 439.14173 363.46458 436.9326 L 363.46458 419.9619 C 363.46458 417.7528 365.25544 415.9619 367.46458 415.9619 Z" fill="#b26813"/>
         </g>
         <g id="Graphic_746">
-          <text transform="translate(386.3771 411.1384)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="0" y="12" xml:space="preserve">implement</tspan>
+          <text transform="translate(371.3416 420.6429)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">implement</tspan>
           </text>
         </g>
       </g>
       <g id="Group_773">
         <g id="Graphic_745">
-          <path d="M 367.74804 448.6581 L 478.17324 448.6581 C 480.3824 448.6581 482.17324 450.44897 482.17324 452.6581 L 482.17324 490.01244 C 482.17324 492.2216 480.3824 494.01244 478.17324 494.01244 L 367.74804 494.01244 C 365.5389 494.01244 363.74804 492.2216 363.74804 490.01244 L 363.74804 452.6581 C 363.74804 450.44897 365.5389 448.6581 367.74804 448.6581 Z" fill="#df8f37"/>
+          <path d="M 367.46458 443.2464 L 477.8898 443.2464 C 480.0989 443.2464 481.8898 445.03726 481.8898 447.2464 L 481.8898 464.2171 C 481.8898 466.4262 480.0989 468.2171 477.8898 468.2171 L 367.46458 468.2171 C 365.25544 468.2171 363.46458 466.4262 363.46458 464.2171 L 363.46458 447.2464 C 363.46458 445.03726 365.25544 443.2464 367.46458 443.2464 Z" fill="#df8f37"/>
         </g>
         <g id="Graphic_744">
-          <text transform="translate(394.2971 464.9967)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="0" y="12" xml:space="preserve">preflight</tspan>
+          <text transform="translate(379.2616 447.92737)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">preflight</tspan>
           </text>
         </g>
       </g>
       <g id="Line_755">
-        <line x1="482.17324" y1="419.52757" x2="508.52364" y2="419.52757" marker-end="url(#FilledArrow_Marker_3)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 481.8898 428.0315 L 498.89765 428.0315 L 498.4178 419.8111 L 508.52463 419.67204" marker-end="url(#FilledArrow_Marker_4)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_756">
-        <path d="M 637.4488 419.52757 L 660.7559 419.52757 L 660.7559 110.55118 L 492.67324 110.55118" marker-end="url(#FilledArrow_Marker)" stroke="#1067b2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 637.4488 419.52757 L 660.7559 419.52757 L 660.7559 110.55118 L 492.67324 110.55118" marker-end="url(#FilledArrow_Marker)" stroke="#6d6d6d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_770">
         <g id="Graphic_733">
           <path d="M 367.74804 265.3449 L 478.17324 265.3449 C 480.3824 265.3449 482.17324 267.13575 482.17324 269.3449 L 482.17324 306.69923 C 482.17324 308.90836 480.3824 310.69923 478.17324 310.69923 L 367.74804 310.69923 C 365.5389 310.69923 363.74804 308.90836 363.74804 306.69923 L 363.74804 269.3449 C 363.74804 267.13575 365.5389 265.3449 367.74804 265.3449 Z" fill="#1067b2"/>
         </g>
         <g id="Graphic_758">
-          <text transform="translate(407.28098 279.96064)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="6430412e-19" y="12" xml:space="preserve">craft</tspan>
+          <text transform="translate(388.63297 279.96064)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">code-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">craft</tspan>
           </text>
         </g>
       </g>
       <g id="Line_761">
-        <path d="M 363.1181 476.2205 L 161.85827 476.2205 L 161.85827 423.474 L 196.7126 423.474" marker-end="url(#FilledArrow_Marker_3)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-      </g>
-      <g id="Line_763">
-        <path d="M 196.7126 402.5197 L 190.20473 402.5197 L 190.20473 351.49607 L 363.1181 351.49607" marker-start="url(#FilledArrow_Marker_4)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 354.18062 479.2856 L 336.0507 479.2856 L 336.0507 436.7659 L 326.769 436.6578" marker-end="url(#FilledArrow_Marker_4)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_780">
-        <path d="M 326.26773 412.9195 L 341.2784 412.9195 L 341.2784 360 L 353.45556 360" marker-end="url(#FilledArrow_Marker_3)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 336.48426 408.189 L 342.99214 408.189 L 342.99214 371.49893 L 352.61845 371.42224" marker-end="url(#FilledArrow_Marker_4)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_779">
-        <line x1="326.47524" y1="417.80473" x2="356.2902" y2="417.80473" marker-end="url(#FilledArrow_Marker_3)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 336.69172 416.6598 L 348.43095 416.6228 L 348.29167 401.36736 L 352.3347 401.37863" marker-end="url(#FilledArrow_Marker_4)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_778">
-        <path d="M 325.4303 423.474 L 341.2784 423.474 L 341.2784 468.82836 L 356.2902 468.82836" marker-end="url(#FilledArrow_Marker_3)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 330.93363 431.10546 L 343.2825 431.387 L 343.51297 453.5433 L 351.70473 453.5433" marker-end="url(#FilledArrow_Marker_4)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Graphic_781">
         <text transform="translate(229.94285 242.15276)" fill="white">
@@ -219,14 +236,14 @@
         </text>
       </g>
       <g id="Line_785">
-        <path d="M 147.68504 323.1496 L 161.85827 323.1496 L 161.85827 240.9449 L 196.7126 240.9449" marker-end="url(#FilledArrow_Marker_5)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 147.68504 323.1496 L 161.85827 323.1496 L 161.85827 240.9449 L 196.7126 240.9449" marker-end="url(#FilledArrow_Marker_6)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Graphic_786">
         <circle cx="136.34646" cy="323.1496" r="11.338601110497" fill="black"/>
         <circle cx="136.34646" cy="323.1496" r="11.338601110497" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
       </g>
       <g id="Line_788">
-        <path d="M 637.4488 425.19686 L 669.2599 425.19686 L 669.2599 324.87245 L 681.437 324.87245" marker-end="url(#FilledArrow_Marker_5)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 637.4488 425.19686 L 669.2599 425.19686 L 669.2599 324.87245 L 681.437 324.87245" marker-end="url(#FilledArrow_Marker_6)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_791">
         <g id="Graphic_787">
@@ -238,7 +255,7 @@
         </g>
       </g>
       <g id="Line_790">
-        <path d="M 147.68504 323.1496 L 161.85827 323.1496 L 161.85827 415.73544 L 196.7126 415.73544" marker-end="url(#FilledArrow_Marker_5)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 147.68504 323.1496 L 161.85827 323.1496 L 161.85827 415.73544 L 196.7126 415.73544" marker-end="url(#FilledArrow_Marker_6)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Graphic_792">
         <text transform="translate(560.874 311.14174)" fill="#b31f19">
@@ -272,16 +289,16 @@
         </text>
       </g>
       <g id="Line_802">
-        <path d="M 266.74017 436.53545 L 266.74017 469.7205 C 273.24017 469.7205 273.24017 482.7205 266.74017 482.7205 L 266.74017 500.6205 L 674.6987 498.89765 L 674.6987 339.7289" marker-end="url(#FilledArrow_Marker_5)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 207.2126 425.19686 L 161.85827 425.19686 L 161.85827 504.56694 L 674.6457 504.56694 L 674.6987 331.88403 L 681.4418 331.6803" marker-end="url(#FilledArrow_Marker_6)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Graphic_803">
-        <text transform="translate(115.83465 87.20473)" fill="#1067b2">
-          <tspan font-family="Myriad Pro" font-size="12" fill="#1067b2" x="0" y="9" xml:space="preserve">SKETCHING</tspan>
+        <text transform="translate(222.83766 169.40945)" fill="#1067b2">
+          <tspan font-family="Myriad Pro" font-size="12" fill="#1067b2" x="2629008e-19" y="9" xml:space="preserve">FUNNEL MODE</tspan>
         </text>
       </g>
       <g id="Graphic_804">
-        <text transform="translate(115.83465 493.6709)" fill="#b26813">
-          <tspan font-family="Myriad Pro" font-size="12" fill="#b26813" x="0" y="9" xml:space="preserve">SPECIFYING</tspan>
+        <text transform="translate(234.4143 353.66143)" fill="#b26813">
+          <tspan font-family="Myriad Pro" font-size="12" fill="#b26813" x="5506706e-19" y="9" xml:space="preserve">TASK MODE</tspan>
         </text>
       </g>
       <g id="Group_805">
@@ -399,8 +416,8 @@
           <path d="M 432.0315 527.2441 L 503.4016 527.2441 C 505.6107 527.2441 507.4016 529.035 507.4016 531.2441 L 507.4016 568.59844 C 507.4016 570.8076 505.6107 572.59844 503.4016 572.59844 L 432.0315 572.59844 C 429.82237 572.59844 428.0315 570.8076 428.0315 568.59844 L 428.0315 531.2441 C 428.0315 529.035 429.82237 527.2441 432.0315 527.2441 Z" fill="#929292"/>
         </g>
         <g id="Graphic_849">
-          <text transform="translate(453.1236 543.5827)" fill="white">
-            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="6554757e-19" y="12" xml:space="preserve">task</tspan>
+          <text transform="translate(443.9636 543.5827)" fill="white">
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" x="5115908e-19" y="12" xml:space="preserve">task-id</tspan>
           </text>
         </g>
       </g>
@@ -428,6 +445,45 @@
         <text transform="translate(13.503937 61.692915)" fill="#494949">
           <tspan font-family="Myriad Pro" font-size="12" fill="#494949" x="0" y="9" xml:space="preserve">STANDALONE</tspan>
         </text>
+      </g>
+      <g id="Group_884">
+        <g id="Graphic_886">
+          <path d="M 367.46458 388.38656 L 477.8898 388.38656 C 480.0989 388.38656 481.8898 390.1774 481.8898 392.38656 L 481.8898 409.35723 C 481.8898 411.56637 480.0989 413.35723 477.8898 413.35723 L 367.46458 413.35723 C 365.25544 413.35723 363.46458 411.56637 363.46458 409.35723 L 363.46458 392.38656 C 363.46458 390.1774 365.25544 388.38656 367.46458 388.38656 Z" fill="#df8f37"/>
+        </g>
+        <g id="Graphic_885">
+          <text transform="translate(385.8776 393.06753)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">reboot</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_887">
+        <g id="Graphic_889">
+          <path d="M 367.46458 470.5512 L 477.8898 470.5512 C 480.0989 470.5512 481.8898 472.34206 481.8898 474.5512 L 481.8898 491.52187 C 481.8898 493.731 480.0989 495.52187 477.8898 495.52187 L 367.46458 495.52187 C 365.25544 495.52187 363.46458 493.731 363.46458 491.52187 L 363.46458 474.5512 C 363.46458 472.34206 365.25544 470.5512 367.46458 470.5512 Z" fill="#df8f37"/>
+        </g>
+        <g id="Graphic_888">
+          <text transform="translate(387.4456 475.23216)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="3623768e-19" y="12" xml:space="preserve">task-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">delete</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Group_890">
+        <g id="Graphic_892">
+          <path d="M 367.46458 332.48505 L 477.8898 332.48505 C 480.0989 332.48505 481.8898 334.2759 481.8898 336.48505 L 481.8898 353.4557 C 481.8898 355.66486 480.0989 357.4557 477.8898 357.4557 L 367.46458 357.4557 C 365.25544 357.4557 363.46458 355.66486 363.46458 353.4557 L 363.46458 336.48505 C 363.46458 334.2759 365.25544 332.48505 367.46458 332.48505 Z" fill="#df8f37"/>
+        </g>
+        <g id="Graphic_891">
+          <text transform="translate(393.0856 337.166)" fill="white">
+            <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
+            <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">view</tspan>
+          </text>
+        </g>
+      </g>
+      <g id="Line_893">
+        <path d="M 324.42176 423.474 L 348.66143 423.474 L 348.66143 431.67734 L 352.34174 431.5421" marker-end="url(#FilledArrow_Marker_7)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_894">
+        <path d="M 320.43636 397.89207 L 337.32284 396.8504 L 337.32284 348.66143 L 352.33466 348.66143" marker-end="url(#FilledArrow_Marker_7)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
     </g>
   </g>

@@ -27,14 +27,11 @@ Your role is an experienced, *expert-level software developer*.
 <problem>$ARGUMENTS</problem>
 </objective>
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
+
 <flow>
 1.  <step id="STEP 1: Reason About Problem">
-    1.  Enter *Plan Mode* with the `EnterPlanMode` tool.
-
-    2.  Clear any old plans of the *Plan Mode* and start planning from
-        scratch with an empty plan.
-
-    3.  If <problem/> matches the regexp `^P\d+$` (i.e. a bare problem
+    1.  If <problem/> matches the regexp `^P\d+$` (i.e. a bare problem
         identifier like `P1`, `P2`, ...), set
         <problem-id><problem/></problem-id>, call the `task_id(id:
         <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase`
@@ -45,28 +42,28 @@ Your role is an experienced, *expert-level software developer*.
         <problem><text/></problem>, otherwise complain to the user that
         no analyzer result exists for <problem-id/> and stop processing.
 
-    4.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
+    2.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
         <problem><text/></problem> and <ase-task-id><id/></ase-task-id>
         and call the `task_id(id: <ase-task-id/>, session:
         <ase-session-id/>)` tool from the `ase` MCP service to
         implicitly switch the task.
 
-    5.  Report the task and problem with the following <template/>:
+    3.  Report the task and problem with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
         ⧉ **ASE**: ◉ problem: **<problem/>**
         </template>
 
-    6.  Figure out what the requested <problem/> is about.
+    4.  Figure out what the requested <problem/> is about.
 
-    7.  Ask the user for clarification if the goal of this resolution is
+    5.  Ask the user for clarification if the goal of this resolution is
         too unclear.
 
-    8.  Do not output anything in this step, except you asked the user.
+    6.  Do not output anything in this step, except you asked the user.
 
-    9.  Investigate and *figure out details* related to this problem.
+    7.  Investigate and *figure out details* related to this problem.
         Report those details with the following <template/>:
 
         <template>
@@ -187,84 +184,12 @@ Your role is an experienced, *expert-level software developer*.
 5.  <step id="STEP 5: Write Problem Resolution Plan">
     *Write a plan* with code references, a precise description of the
     problem, the chosen resolution approach, a preview of the *unified
-    diff* of the necessary code changes, and a possible way to verify the
-    success of the resolution, by using the following <template/> for the
-    plan:
-
-    <template>
-    # ✪ RESOLUTION: **<title/>**
-
-    ⚑ task id: **<ase-task-id/>** | ✳ created: **<timestamp-created/>** | ✎ modified: **<timestamp-modified/>**
-
-    ## PROBLEM: *<problem-summary/>*
-
-    - [...]
-
-    - [...]
-
-    - [...]
-
-    ## SOLUTION: *<solution-summary/>*
-
-    - [...]
-
-    - [...]
-
-    - [...]
-
-    ## CHANGES:
-
-    <unified-diff-preview-of-changes/>
-
-    ## VERIFICATION:
-
-    - [...]
-
-    - [...]
-
-    - [...]
-    </template>
-
-    Hints:
-
-    -   In all descriptions, highlight *code* as
-        <template>`<code/>`</template> and *key aspects* as
-        <template>*<aspect/>*</template>.
-
-    -   For <problem-summary/> and <solution-summary/> use *ultra brief* but
-        as *very precise* as possible description of the overall change.
-
-    -   The <timestamp-created/> is the timestamp when this problem resolution specification
-        was created. The <timestamp-modified/> is the timestamp when
-        this feature specification was last modified. Both use a
-        ISO-style format value, which has to be determined by calling
-        the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
-        MCP service and use the `text` field of its response.
-
-    -   The <title/> is a short summary of the <problem-summary/>, no longer than
-        50 characters.
-
-    -   The sections `PROBLEM`, `SOLUTION`, and `VERIFICATION` all are
-        just a short list of 1-5 bullet points. Each bullet points is
-        formatted as `- **<aspect/>**: <specification/>` where <aspect/>
-        indicates the aspect of the section and <specification/> is 1-3
-        sentences giving a *ultra precise* but also *ultra brief* and
-        *ultra concise* description of the aspect.
-
-    -   In the section `CHANGES`:
-        Show complete change set. Avoid introducing dedicated state
-        variables for individual error cases. If state variables are
-        needed to detect error cases, at least use minimum number of
-        those variables only. In general, use minimum number of state
-        variables to span the maximum of error space.
-
-    -   In all sections except `CHANGES`, break all lines with a newline
-        character after about 120 characters per line.
+    diff* of the necessary code changes, and a possible way to verify
+    the success of the resolution, by using the <format/> defined for a
+    task plan. Store the resulting task plan in <content/>.
 
     You then *MUST* *save* the resulting plan content with the
-    `task_save` tool (`id` set to <ase-plan-id/>, `text` set to the
-    plan content) and then you *MUST* exit the *Plan Mode* with the
-    `ExitPlanMode` tool.
+    `task_save(id: <ase-plan-id/>, text: <content/>)`.
 
     If <problem-id/> is set (i.e. the <problem/> was retrieved from
     `kv_get` in STEP 1.3 via key `ase-code-analyze-result-<problem-id/>`),

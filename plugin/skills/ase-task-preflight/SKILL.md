@@ -1,7 +1,10 @@
 ---
 name: ase-task-preflight
+argument-hint: "[<id>]"
 description: >
-    Preflight the implementation of the current task plan.
+    Preflight the implementation of current or given task plan.
+    Use when the user calls to "preflight", "dry-run" or "test-drive"
+    the "task", "plan", "spec", or "specification".
 user-invocable: true
 disable-model-invocation: false
 effort: xhigh
@@ -10,44 +13,98 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Preflight Implementation of Task
-================================
+Preflight a Task Plan
+=====================
 
-Your role is an experienced, *expert-level software developer*,
-specialized in the *implementation* of software.
+Your role is an experienced, *expert-level assistant*,
+specialized in the *implementation* of changes.
 
-<objective>
-*Preflight* the *implementation* of the current task plan by creating a
-draft for a corresponding, *complete source code change set*.
-</objective>
+*Preflight* the implementation of a task plan by creating a draft
+for a corresponding, *complete source code change set*.
 
-<flow>
-1.  <step id="STEP 1: Determine Operation">
-    -   Call the `task_load` tool (`id` set to <ase-task-id/>) of the `ase`
-        MCP service to load the current task plan content and set <content/> to the
-        `text` output field of the `task_load` tool call. Calculate the
-        number of words <words/> of <content/>. Do not output anything
-        related to this MCP tool call except the following <template/>:
+Procedure
+---------
+
+You *MUST* follow the following numbered items *strictly* *sequentially*!
+You *MUST* not skip any numbered item during processing!
+
+You *MUST* *NOT* output anything in this entire procedure, *except* when
+explicitly requested by this procedure via outputs based on a <template/>!
+
+1.  **Determine Task:**
+
+    1.  Set <instruction>$ARGUMENTS</instruction> initially.
+        Inherit the always existing <ase-task-id/> from the current context.
+        Do not output anything.
+
+    2.  React on task id:
+
+        1.  <if condition="
+                <instruction/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+            ">
+            Set <ase-task-id><instruction/></ase-task-id> (set task
+            id to instruction) and <instruction></instruction> (set
+            instruction empty), call the `task_id(id: <ase-task-id/>,
+            session: <ase-session-id/>)` tool from the `ase` MCP
+            service to switch the task, and then only output the
+            following <template/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
+            </template>
+            </if>
+
+        2.  else <if condition="
+                <instruction/> has the format `<id/>: <text/>` where
+                <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$` and
+                <text/> is *empty*
+            ">
+            Set <instruction></instruction> (set instruction to empty)
+            and <ase-task-id><id/></ase-task-id> (set task id to
+            id) and call the `task_id(id: <ase-task-id/>, session:
+            <ase-session-id/>)` tool from the `ase` MCP service to
+            switch the task, and then only output the following
+            <template/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
+            </template>
+            </if>
+
+2.  **Determine Operation:**
+
+    1.  Call the `task_load(id: <ase-task-id/>)` tool of the `ase` MCP
+        service to load the current task plan content and set <content/> to
+        the `text` output field of the `task_load` tool call.
+
+        Calculate the number of words <words/> of <content/>.
+
+        Only output the following <template/>:
 
         <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **loaded**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan loaded**
         </template>
 
-    -   If the <content/> is still empty, complain and tell the user to use the
-        `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`, or `ase-task-edit`
-        skills first to create a task plan.
-   </step>
+    2.  If the <content/> is still empty, complain and tell the user to
+        use the `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`,
+        or `ase-task-edit` skills first to create a task plan.
 
-2.  <step id="STEP 2: Create Implementation Draft">
-    -   Perform a *preflight* of the *implementation* of <content/> by creating a
-        draft for a corresponding, *complete source code change set*
-        which would fully implement the task plan <content/>. Append this source
-        code change set as a complete <unified-diff/> to the end
-        of the <content/> with the following <template/>:
+3.  **Create Implementation Draft:**
+
+    1.  Perform a *preflight* of the *implementation* of <content/> by creating a
+        draft for a corresponding, *complete artifact change set*
+        which *would* fully implement the task plan <content/>. Store
+        this artifact change set in *unified diff* format in <unified-diff/>.
+
+    2.  Append this artifact change set <unified-diff/> to the end
+        of the <content/> with the following <template/>. If a section
+        named `## ※ IMPLEMENTATION DRAFT:` already exists from a
+        previous run of this skill, *replace* this entire existing
+        section.
 
         <template>
 
-        ## IMPLEMENTATION DRAFT
+        ## ※ IMPLEMENTATION DRAFT:
 
         ```
         <unified-diff/>
@@ -55,26 +112,83 @@ draft for a corresponding, *complete source code change set*.
 
         </template>
 
-        Hints:
+    3.  <if condition="<content/> contains '✎ modified:'">
+        Set update <timestamp-modified/> with the current time in
+        ISO-style format, which has to be determined by calling the
+        `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
+        MCP service and use the `text` field of its response. Update
+        <content/> with the new `✎ modified: **<timestamp-modified/>**`.
+        Do not output anything.
+        </if>
 
-        -   If a section named `## IMPLEMENTATION DRAFT` already exists from
-            a previous run of this skill, replace this existing section.
-
-        -   On modifying <content/>, set the "modified" timestamp to
-            the current timestamp in the ISO-style format `YYYY-mm-dd
-            HH:MM` which has to be determined by calling the
-            `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
-            MCP service and use the `text` field of its response.
-
-    -   Finally, call the `task_save` tool (`id` set to <ase-task-id/>,
-        text: <content/>) of the `ase` MCP service to save the updated task
-        plan content. Calculate the number of words <words/> of <content/>.
-        Do not output anything related to this MCP tool call except the
-        following <template/>:
+    4.  Finally, call the `task_save(id: <ase-task-id/>,
+        text: <content/>)` of the `ase` MCP service to save the updated
+        task plan content. Calculate the number of words <words/> of
+        <content/>. Do not output anything related to this MCP tool call
+        except the following <template/>:
 
         <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, plan: **<words/>** words, status: plan **saved**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated**
+        ⧉ **ASE**: ▶ hint: use **/ase-task-edit <ase-task-id/>** skill to check and further refine task plan!
         </template>
-    </step>
-</flow>
+
+4.  **Decide Next Step:**
+
+    1.  *Ask user*: Let the *user interactively choose*, with the help of
+        the `AskUserQuestion` tool, what to do as the next step. For this,
+        call:
+
+        `AskUserQuestion({
+            questions: [
+                {
+                    header: "Next Step",
+                    question: "How would you like to proceed with the plan?",
+                    multiSelect: false,
+                    options: [
+                        {
+                            label: "DONE",
+                            description: "Stop processing."
+                        },
+                        {
+                            label: "EDIT",
+                            description: "Hand processing off to the editing."
+                        },
+                        {
+                            label: "IMPLEMENT",
+                            description: "Hand processing off to the implementation."
+                        }
+                    ]
+                }
+            ]
+        })`
+
+    2.  Check the tool result and dispatch accordingly:
+
+        -   If the user selected `DONE`:
+            Only output the following <template/> and then *STOP*.
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- done**
+            </template>
+
+        -   If the user selected `EDIT`:
+            Only output the following <template/> and then use the
+            `Skill` tool to invoke the `ase:ase-task-edit` skill
+            in order to *edit* the updated plan. Immediately stop
+            processing the current skill once the `Skill` tool was used.
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to edit**
+            </template>
+
+        -   If the user selected `IMPLEMENT`:
+            Only output the following <template/> and then use the
+            `Skill` tool to invoke the `ase:ase-task-implement` skill
+            in order to *implement* the updated plan. Immediately stop
+            processing the current skill once the `Skill` tool was used.
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to implement**
+            </template>
+
 
