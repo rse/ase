@@ -17,6 +17,10 @@ effort: xhigh
 Implement a Task Plan
 =====================
 
+<skill name="ase-task-implement">
+Implement a Task Plan
+</skill>
+
 Your role is an experienced, *expert-level assistant*,
 specialized in the *implementation* of changes.
 

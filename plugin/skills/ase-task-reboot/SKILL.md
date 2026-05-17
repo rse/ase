@@ -17,6 +17,10 @@ effort: xhigh
 Reboot a Task Plan
 ==================
 
+<skill name="ase-task-reboot">
+Reboot a Task Plan
+</skill>
+
 Your role is an experienced, *expert-level assistant*,
 specialized in the *planning* of changes.
 

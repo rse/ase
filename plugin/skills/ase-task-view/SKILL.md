@@ -16,6 +16,10 @@ effort: low
 View a Task Plan
 ================
 
+<skill name="ase-task-view">
+View a Task Plan
+</skill>
+
 Your role is an experienced, *expert-level assistant*.
 *View* the task plan.
 

@@ -16,6 +16,10 @@ effort: low
 Task Configuration
 ==================
 
+<skill name="ase-task-id">
+Configure Task Id
+</skill>
+
 1.  Determine request:
     <request>$ARGUMENTS</request>
 

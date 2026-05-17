@@ -20,6 +20,10 @@ effort: high
 Iteratively Edit a Task Plan
 ============================
 
+<skill name="ase-task-edit">
+Iteratively Edit a Task Plan
+</skill>
+
 Your role is an experienced, *expert-level assistant*,
 specialized in the *planning* of changes
 through *iterative conversational refinement*.

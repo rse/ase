@@ -16,6 +16,10 @@ effort: low
 Delete a Task Plan
 ==================
 
+<skill name="ase-task-delete">
+Delete a Task Plan
+</skill>
+
 Your role is an experienced, *expert-level assistant*.
 *Delete* the task plan.
 

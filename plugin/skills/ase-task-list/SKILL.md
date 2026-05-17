@@ -15,6 +15,10 @@ effort: low
 Task List
 =========
 
+<skill name="ase-task-list">
+List Task Plans
+</skill>
+
 1.  Call the `task_list({ verbose: true })` tool from the `ase` MCP service.
     The result is a structured object with a `tasks` array where each
     entry has an `id` field and an `mtime` field (formatted as

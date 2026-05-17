@@ -17,6 +17,10 @@ effort: xhigh
 Preflight a Task Plan
 =====================
 
+<skill name="ase-task-preflight">
+Preflight a Task Plan
+</skill>
+
 Your role is an experienced, *expert-level assistant*,
 specialized in the *implementation* of changes.
 
