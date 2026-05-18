@@ -16,6 +16,10 @@ allowed-tools:
 Query Multiple AIs for Quorum Answer
 ====================================
 
+<skill name="ase-meta-quorum">
+Query Multiple AIs for Quorum Answer
+</skill>
+
 Your role is an *expert-level assistant*.
 
 <objective>

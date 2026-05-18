@@ -14,6 +14,10 @@ effort: medium
 Lint Source Code
 ================
 
+<skill name="ase-code-lint">
+Lint Source Code
+</skill>
+
 Your role is an experienced, *expert-level software developer*,
 specialized in *analyzing source code*.
 

@@ -24,6 +24,10 @@ allowed-tools:
 Query Foreign LLMs for Chat
 ===========================
 
+<skill name="ase-meta-chat">
+Query Foreign LLMs for Chat
+</skill>
+
 Your role is to act as a proxy to query a foreign LLM for a single chat message.
 
 <objective>

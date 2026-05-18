@@ -21,6 +21,10 @@ allowed-tools:
 Search the Internet/Web
 =======================
 
+<skill name="ase-meta-search">
+Search the Internet/Web
+</skill>
+
 Your role is an expert-level *web specialist*.
 
 <objective>

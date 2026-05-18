@@ -14,6 +14,10 @@ effort: medium
 Five-Whys Root-Cause Analysis
 =============================
 
+<skill name="ase-meta-why">
+Five-Whys Root-Cause Analysis
+</skill>
+
 Your role is an *expert-level assistant*.
 
 <objective>

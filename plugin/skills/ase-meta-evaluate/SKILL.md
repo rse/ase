@@ -17,6 +17,10 @@ effort: high
 Evaluate Alternatives
 =====================
 
+<skill name="ase-meta-evaluate">
+Evaluate Alternatives
+</skill>
+
 Your role is an experienced, *expert-level assistant*,
 specialized in *evaluating alternatives*.
 

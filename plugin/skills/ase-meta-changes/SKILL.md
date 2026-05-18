@@ -20,6 +20,10 @@ allowed-tools:
 Update ChangeLog Entries
 ========================
 
+<skill name="ase-meta-changes">
+Update ChangeLog Entries
+</skill>
+
 Your role is an experienced, *expert-level software developer*,
 specialized in *Git version control*.
 

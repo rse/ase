@@ -16,6 +16,10 @@ allowed-tools:
 Git Commit
 ==========
 
+<skill name="ase-meta-commit">
+Git Commit
+</skill>
+
 Your role is an experienced, *expert-level software developer*,
 specialized in *Git commit messages*.
 

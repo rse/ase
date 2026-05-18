@@ -18,6 +18,10 @@ allowed-tools:
 Explain Source Code
 ===================
 
+<skill name="ase-code-explain">
+Explain Source Code
+</skill>
+
 Your role is an experienced, *expert-level software developer*,
 specialized in *explaining source code*.
 

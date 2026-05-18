@@ -21,6 +21,10 @@ allowed-tools:
 Discover Components
 ===================
 
+<skill name="ase-arch-discover">
+Discover Components
+</skill>
+
 Your role is an experienced, *expert-level software architect*,
 specialized in *finding components* (libraries/frameworks) for the technology stack.
 

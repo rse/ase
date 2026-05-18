@@ -20,6 +20,10 @@ allowed-tools:
 Project Insight
 ===============
 
+<skill name="ase-code-insight">
+Project Insight
+</skill>
+
 Your role is an experienced, *expert-level software developer*,
 specialized in *analyzing source code* and giving insights.
 
