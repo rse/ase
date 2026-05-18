@@ -42,6 +42,10 @@ You *MUST* not skip any numbered item during processing!
 You *MUST* *NOT* output anything in this entire procedure, *except* when
 explicitly requested by this procedure via outputs based on a <template/>!
 
+You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
+filesystem-modifying tool during this entire skill. The *only*
+permitted way to persist artifacts is via `task_save(...)`.
+
 1.  **Reason About Refactoring**:
 
     1.  <if condition="
@@ -166,14 +170,16 @@ explicitly requested by this procedure via outputs based on a <template/>!
         refactoring approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
         Except for the interactive selection, do not output anything in this step.
 
-5.  **Write Refactoring Plan**:
+5.  **Compose Refactoring Plan**:
 
-    1.  *Write a refactoring plan* for the chosen refactoring A<n/> by
+    1.  *Compose a refactoring plan* for the chosen refactoring A<n/> by
         closely aligning to the existing architecture and the existing
         code base. Use the <format/> defined for a task plan and inject
         the information from refactoring A<n/> and all derived realization
         decisions into it. Store the resulting task plan in <content/>.
-        You still *MUST* *NOT* modify any artifacts at this time!
+
+        You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
+        filesystem-modifying tool during this step.
 
     2.  Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP service and use the `text` field of its response for

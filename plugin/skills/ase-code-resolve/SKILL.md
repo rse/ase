@@ -42,6 +42,10 @@ You *MUST* not skip any numbered item during processing!
 You *MUST* *NOT* output anything in this entire procedure, *except* when
 explicitly requested by this procedure via outputs based on a <template/>!
 
+You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
+filesystem-modifying tool during this entire skill. The *only*
+permitted way to persist artifacts is via `task_save(...)`.
+
 1.  **Reason About Problem**:
 
     1.  If <problem/> matches the regexp `^[PT]\d+$` (i.e. a bare issue
@@ -217,14 +221,16 @@ explicitly requested by this procedure via outputs based on a <template/>!
         and provide small *code change previews*. Mark your recommended
         resolution approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
 
-5.  **Write Problem Resolution Plan**:
+5.  **Compose Problem Resolution Plan**:
 
-    1.  *Write a plan* with code references, a precise description of the
+    1.  *Compose a plan* with code references, a precise description of the
         problem, the chosen resolution approach, a preview of the *unified
         diff* of the necessary code changes, and a possible way to verify
         the success of the resolution, by using the <format/> defined for a
         task plan. Store the resulting task plan in <content/>.
-        You still *MUST* *NOT* modify any artifacts at this time!
+
+        You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
+        filesystem-modifying tool during this step.
 
     2.  Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP service and use the `text` field of its response for
