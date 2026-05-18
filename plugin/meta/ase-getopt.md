@@ -46,7 +46,7 @@ set placeholders into the context as a side-effect.
     ```json
     {
         "opts": { "<long1/>": <value1/>, "<long2/>": <value2/>, ... },
-        "argv": [ "<arg1/>", "<arg2/>", ... ]
+        "argv": [ "<arg1/>", "<arg2/>", ... ],
         "args": "..."
     }
     ```
