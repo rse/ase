@@ -35,7 +35,7 @@ Your role is an experienced, *expert-level software developer*.
 
 <objective>
 From scratch *craft* the following feature:
-<feature><arguments/></feature>
+<feature><getopt-arguments/></feature>
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md

@@ -35,7 +35,7 @@ Your role is an experienced, *expert-level software developer*.
 
 <objective>
 *Refactor* existing artifacts the following way:
-<request><arguments/></request>
+<request><getopt-arguments/></request>
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md

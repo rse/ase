@@ -35,7 +35,7 @@ Your role is an experienced, *expert-level software developer*.
 
 <objective>
 *Resolve* the following problem:
-<problem><arguments/></problem>
+<problem><getopt-arguments/></problem>
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
