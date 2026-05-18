@@ -28,6 +28,7 @@ console.log(`++ new version: ${version}`)
 for (const file of [
     "package.json",
     "tool/package.json",
+    "plugin/package.json",
     "plugin/.claude-plugin/plugin.json",
     "plugin/.github/plugin/plugin.json"
 ] as const) {
