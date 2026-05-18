@@ -122,23 +122,30 @@ task-driven skills, and funnel skills.
 
 [![workflow](docs/workflow.svg)](docs/workflow.pdf)
 
-When working with **ASE** the user decided (usually on the extend
-of the task to perform) which mode to choose:
+### Agent Harness &amp; Operation Modes
+
+When working with **ASE** the user decides (usually on the estimated extend
+and complexity of the task to perform) which operation mode to choose:
+
+[![operation-modes](docs/operation-modes.svg)](docs/operation-modes.pdf)
 
 1. **Ad-Hoc Mode** (**Claude Code**):
    The default mode of the agent harness where the user just ad-hoc
    enters a prompt with an instruction. The instructions are persisted only
    in the current session.
+
 2. **Plan Mode** (**Claude Code**):
    The advanced mode of the agent harness where the user enters a
    dedicated "plan mode" to initially craft and then continuously refine
    a plan. The plan has an ad-hoc format and is persisted internally
    by the agent, but is available in the current session only.
+
 3. **Task Mode** (**ASE**):
    The more advanced mode of **ASE** where the user initially crafts and
    then continuously refines a task plan. The task plan has a fixed
    format and is persisted by **ASE** and hence is available across
    agent sessions.
+
 4. **Funnel Mode** (**ASE**):
    The ultra advanced mode of **ASE** where the user first sketches the
    plan, then the agent figures out possible approaches, then the user
