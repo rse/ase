@@ -135,7 +135,7 @@ interface quality, quality attributes, and architecture governance.
     README files, or folder structure.
 
     Investigate the following architecture quality aspects across
-    6 thematic blocks:
+    7 thematic blocks:
 
     **Block 1 — Component Boundaries**:
 
