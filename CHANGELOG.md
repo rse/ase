@@ -5,6 +5,12 @@ ChangeLog
 0.0.32 (2026-05-18)
 -------------------
 
+- IMPROVEMENT: add markdown linting infrastructure to plugin directory
+- IMPROVEMENT: provide PDF versions of docs diagrams
+- UPDATE: add Github Copilot CLI information to README
+- BUGFIX: fix docs/workflow diagram source and SVG
+- CLEANUP: fix markdown linting issues in plugin skills and meta files
+
 0.0.31 (2026-05-18)
 -------------------
 
