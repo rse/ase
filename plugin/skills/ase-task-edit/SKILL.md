@@ -15,6 +15,7 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 Iteratively Edit a Task Plan
 ============================
@@ -22,6 +23,12 @@ Iteratively Edit a Task Plan
 <skill name="ase-task-edit">
 Iteratively Edit a Task Plan
 </skill>
+
+<expand name="getopt"
+    arg1="ase-task-edit"
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --next|-n=(none|DONE|IMPLEMENT|PREFLIGHT|REFINE)">
+    $ARGUMENTS
+</expand>
 
 Your role is an experienced, *expert-level assistant*,
 specialized in the *planning* of changes
@@ -45,7 +52,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Determine Task and Instruction:**
 
-    1.  Set <instruction>$ARGUMENTS</instruction> initially.
+    1.  Set <instruction><getopt-arguments/></instruction> initially.
         Inherit the always existing <ase-task-id/> from the current context.
         Do not output anything.
 
@@ -162,14 +169,21 @@ explicitly requested by this procedure via outputs based on a <template/>!
     3.  <if condition="<content/> is not empty AND
             <instruction/> is not empty AND
             <instruction/> is not equal <content/>">
-        Let the *user interactively choose* what to do as the next step.
+        *Determine previous-plan handling*:
 
-        <expand name="user-dialog>
-        Previous Plan: Should the previous plan content be overwritten, refined, or preserved?
-        OVERWRITE: Continue operation, overwrite previous plan.
-        REFINE: Continue operation, refine previous plan.
-        PRESERVE: Cancel operation, preserve previous plan.
-        </expand>
+        -   If <getopt-option-plan/> matches the regex `^(OVERWRITE|REFINE|PRESERVE)$`:
+            Honor the pre-selection what to do with the previous plan.
+            Set <result><getopt-option-plan/></result>.
+
+        -   If <getopt-option-plan/> is equal to `none`:
+            Let the *user interactively choose* what to do as the next step.
+
+            <expand name="user-dialog>
+                Previous Plan: Should the previous plan content be overwritten, refined, or preserved?
+                OVERWRITE: Continue operation, overwrite previous plan.
+                REFINE: Continue operation, refine previous plan.
+                PRESERVE: Cancel operation, preserve previous plan.
+            </expand>
 
         Check the tool <result/> and dispatch accordingly:
 
@@ -297,16 +311,24 @@ explicitly requested by this procedure via outputs based on a <template/>!
         ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(**  `TASK-PLAN-END`  **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
         </template>
 
-    4.  *Ask user*: Let the *user interactively choose* what to do as the
-        next step.
+    4.  *Determine next step*:
 
-        <expand name="user-dialog>
-        Next Step: How would you like to proceed with the plan?
-        DONE: Mark plan finalized, exit planning loop.
-        IMPLEMENT: Hand off plan to implementation.
-        PREFLIGHT: Hand off plan to pre-flighting.
-        REFINE: Further refine plan with instructions.
-        </expand>
+        -   If <getopt-option-next/> matches the regex `^(DONE|IMPLEMENT|PREFLIGHT|REFINE)$`:
+            Honor the pre-selection what to do as the next step.
+            Set <result><getopt-option-next/></result>.
+            Then *clear* <getopt-option-next/> by setting <getopt-option-next>none</getopt-option-next>
+            so that subsequent loop iterations fall back to the interactive dialog.
+
+        -   If <getopt-option-next/> is equal to `none`:
+            Let the *user interactively choose* what to do as the next step.
+
+            <expand name="user-dialog>
+                Next Step: How would you like to proceed with the plan?
+                DONE: Mark plan finalized, exit planning loop.
+                IMPLEMENT: Hand off plan to implementation.
+                PREFLIGHT: Hand off plan to pre-flighting.
+                REFINE: Further refine plan with instructions.
+            </expand>
 
         Check the tool <result/> and dispatch accordingly:
 

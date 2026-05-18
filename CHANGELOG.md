@@ -9,6 +9,8 @@ ChangeLog
 - IMPROVEMENT: truncate IMPLEMENTATION DRAFT section in "ase-task-edit" skill
 - IMPROVEMENT: add a ase-getopt.md (plugin) and ase-getopt.ts (tool) for option parsing
 - IMPROVEMENT: support option -a|--auto (prefer A1) and -n|--next (choose step) in "ase-code-{craft,refactor,resolve}" skills
+- IMPROVEMENT: support option -n|--next (choose step) in "ase-task-{edit,implement,preflight,reboot}" skills
+- IMPROVEMENT: support option -p|--plan (choose previous-plan handling) in "ase-task-edit" skill
 - BUGFIX: fix bundling of plugin into tool
 - BUGFIX: try to force "ase-code-{craft,refactor,resolve}" skills even hard to not immediately implement.
 

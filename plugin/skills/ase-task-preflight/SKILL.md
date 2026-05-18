@@ -13,6 +13,7 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 Preflight a Task Plan
 =====================
@@ -20,6 +21,12 @@ Preflight a Task Plan
 <skill name="ase-task-preflight">
 Preflight a Task Plan
 </skill>
+
+<expand name="getopt"
+    arg1="ase-task-preflight"
+    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT)">
+    $ARGUMENTS
+</expand>
 
 Your role is an experienced, *expert-level assistant*,
 specialized in the *implementation* of changes.
@@ -38,7 +45,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Determine Task:**
 
-    1.  Set <instruction>$ARGUMENTS</instruction> initially.
+    1.  Set <instruction><getopt-arguments/></instruction> initially.
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
@@ -139,15 +146,21 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 4.  **Decide Next Step:**
 
-    1.  *Ask user*: Let the *user interactively choose*
-        what to do as the next step.
+    1.  *Determine next step*:
 
-        <expand name="user-dialog>
-        Next Step: How would you like to proceed with the plan?
-        DONE: Stop processing.
-        EDIT: Hand processing off to editing.
-        IMPLEMENT: Hand processing off to implementation.
-        </expand>
+        -   If <getopt-option-next/> matches the regex `^(DONE|EDIT|IMPLEMENT)$`:
+            Honor the pre-selection what to do as the next step.
+            Set <result><getopt-option-next/></result>.
+
+        -   If <getopt-option-next/> is equal to `none`:
+            Let the *user interactively choose* what to do as the next step.
+
+            <expand name="user-dialog>
+                Next Step: How would you like to proceed with the plan?
+                DONE: Stop processing.
+                EDIT: Hand processing off to editing.
+                IMPLEMENT: Hand processing off to implementation.
+            </expand>
 
     2.  Check the tool <result/> and dispatch accordingly:
 

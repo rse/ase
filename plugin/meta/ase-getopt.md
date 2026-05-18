@@ -16,7 +16,7 @@ set placeholders into the context as a side-effect.
 2.  **Short-Circuit for Quick Processing**:
     If <getopt-opts/> contains `quick` *AND*
     <getopt-args/> does *NOT* match the regexp `^\s*-':
-    Set <arguments><getopt-args/></arguments> and
+    Set <getopt-arguments><getopt-args/></getopt-arguments> and
     then just silently *SKIP* the following steps 3-7!
 
 3.  **MCP Call**:
