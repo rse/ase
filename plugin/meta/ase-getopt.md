@@ -22,7 +22,11 @@ set placeholders into the context as a side-effect.
 3.  **MCP Call**:
     Call the `getopt(name: <getopt-skill/>, spec: <getopt-spec/>, args:
     <getopt-args/>)` tool of the `ase` MCP service and set <text/> to the
-    `text` output field of this tool call.
+    `text` output field of this tool call. The `spec` syntax for each
+    option token is `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)]`,
+    where `=<default>` declares a value-taking option with a default,
+    and `=(<c1>|<c2>|...)` declares a value-taking option restricted to
+    the listed fixed choices (the first choice acts as the default).
 
 4.  **Short-Circuit for Error**:
     If <text/> starts with `ERROR:`:
@@ -49,9 +53,9 @@ set placeholders into the context as a side-effect.
 
 6.  **Materializing into Context**:
     For each *key* `<long/>` in <getopt-result/>`.opts`:
-    Set <option-<long/>/> to the corresponding value from
+    Set <getopt-option-<long/>/> to the corresponding value from
     `<getopt-result/>.opts[<long/>]`.
-    Set <arguments/> to the value of `<getopt-result/>.args`.
+    Set <getopt-arguments/> to the value of `<getopt-result/>.args`.
     Set <getopt-info/> to `<getopt-result/>`.info`.
 
 7.  **Display Results**:

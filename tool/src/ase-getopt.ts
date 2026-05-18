@@ -36,6 +36,7 @@ export class GetoptMCP {
                     .describe("Arguments to parse (string is split on whitespace)")
             }
         }, async (args) => {
+            let helpText = ""
             try {
                 /*  normalize args  */
                 const argsRaw    = typeof args.args === "string" ? args.args : null
@@ -50,26 +51,32 @@ export class GetoptMCP {
                     .allowUnknownOption(false)
                     .passThroughOptions(true)
                     .configureOutput({
-                        writeOut: () => {},
+                        writeOut: (str) => { helpText += str },
                         writeErr: () => {}
                     })
 
                 /*  tokenize spec and add one option per token  */
-                const tokens = shParse(args.spec).filter((e): e is string => typeof e === "string")
-                const re = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(.*))?$/
+                const tokens = args.spec.split(/\s+/).filter((e) => e.length > 0)
+                const re = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)|.*))?$/
                 for (const tok of tokens) {
                     const m = re.exec(tok)
                     if (m === null)
                         throw new Error(`invalid spec token "${tok}"`)
                     const long       = m[1]
                     const short      = m[2] ?? null
-                    const dflt       = m[3] ?? null
-                    const takesValue = dflt !== null
+                    const valuePart  = m[3] ?? null
+                    const choicePart = m[4] ?? null
+                    const takesValue = valuePart !== null
+                    const choices    = choicePart !== null ? choicePart.split("|") : null
+                    const dflt       = choices !== null ? choices[0] : valuePart
                     const head       = short !== null ? `-${short}, --${long}` : `--${long}`
                     const flags      = takesValue ? `${head} <value>` : head
                     const opt        = new Option(flags)
-                    if (takesValue)
+                    if (takesValue) {
+                        if (choices !== null)
+                            opt.choices(choices)
                         opt.default(dflt)
+                    }
                     else
                         opt.default(false)
                     cmd.addOption(opt)
@@ -130,6 +137,16 @@ export class GetoptMCP {
                 }
             }
             catch (err: unknown) {
+                /*  intercept commander help/version output  */
+                const code = (err as { code?: string } | null)?.code ?? ""
+                if (code === "commander.helpDisplayed"
+                    || code === "commander.help"
+                    || code === "commander.version") {
+                    return {
+                        isError: true,
+                        content: [ { type: "text", text: `ERROR: usage information requested\n\n${helpText.trimEnd()}` } ]
+                    }
+                }
                 const message = err instanceof Error ? err.message : String(err)
                 return {
                     isError: true,
