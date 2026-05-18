@@ -65,11 +65,11 @@ Let the *user interactively choose* an answer.
             -   If the tool result contains `user doesn't want to proceed`,
                 `tool use was rejected`, or `user declined to answer
                 questions`, or the result clearly indicates that the
-                dialog was cancelled, rejected or skipped, set set
+                dialog was cancelled, rejected or skipped, set
                 <result>CANCEL</result>.
 
             -   Otherwise, extract the selected <answer/> from the
-                tool result `"<question-description/>"="<answer/>".
+                tool result `"<question-description/>"="<answer/>"`.
                 Set <result><answer/></result>.
                 If <result/> is then NOT one
                 the "label" values from <config/>, set
@@ -92,7 +92,7 @@ Let the *user interactively choose* an answer.
                 Set <config><config/>"<label/>: <description/>"</config> (append a config entry).
             </for>
 
-        2.  Call the `AskUserQuestion` tool of the agent harness with:
+        2.  Call the `ask_user` tool of the agent harness with:
 
             `ask_user({
                 question: "<question-label>: <question-description/>",
