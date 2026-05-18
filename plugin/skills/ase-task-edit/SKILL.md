@@ -285,9 +285,11 @@ explicitly requested by this procedure via outputs based on a <template/>!
         </if>
 
     3.  *Render plan*: Only output the following <template/>, so the user
-        can read the plan and react to it. Do *not* truncate, summarize,
-        or partially show the plan -- always show the complete plan
-        <content/> here:.
+        can read the plan and react to it. If <content/> is longer than
+        90 lines and a `※ IMPLEMENTATION DRAFT` section exists, replace
+        the entire content of the `※ IMPLEMENTATION DRAFT` section with
+        `[...]`. Else, do *not* truncate, summarize, or partially show
+        the plan. Use the following <template/>:
 
         <template>
         ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `TASK-PLAN-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈

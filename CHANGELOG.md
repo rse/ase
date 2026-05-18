@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: add "ase setup enable" and "ase setup disable" for enabling/disabling ASE in the agent tool
+- IMPROVEMENT: truncate IMPLEMENTATION DRAFT section in "ase-task-edit" skill
 
 0.0.32 (2026-05-18)
 -------------------
