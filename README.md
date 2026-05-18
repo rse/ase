@@ -76,8 +76,9 @@ User Setup
 
 ### Prerequisites
 
-- [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
-- [Node.js](https://nodejs.org)
+- Operating System: macOS, Linux, Windows
+- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
+- Runtime Engine: [Node.js](https://nodejs.org)
 
 ### Installation
 
