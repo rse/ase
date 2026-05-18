@@ -32,6 +32,7 @@ code, for problems in its *logic* and *semantics* and its related
 </objective>
 
 <flow>
+
 1. <step id="STEP 1: Investigate Code Base">
    In this STEP 1, investigate on the code. If the code base is large,
    you *MUST* use the `Agent` tool (not inline work) to create multiple
@@ -104,5 +105,6 @@ code, for problems in its *logic* and *semantics* and its related
    ⧉ **ASE**: ↪ hint: **For deeper analysis, suggestions on solution approaches and then final problem resolution, use `/ase-code-resolve P{n}` in the same or even a different session.**
    </template>
    </step>
+
 </flow>
 

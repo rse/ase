@@ -31,6 +31,7 @@ Query foreign LLM for: <query>$ARGUMENTS</query>
 </objective>
 
 <flow>
+
 1.  <step id="STEP 1: Select LLMs">
     Use the *first word* of the following <query/> for selecting the
     foreign LLMs to query, and their corresponding MCP servers, from the
@@ -54,5 +55,6 @@ Query foreign LLM for: <query>$ARGUMENTS</query>
     text from the agent response on your own and do not interpret the
     result in any way.
     </step>
+
 </flow>
 

@@ -27,6 +27,7 @@ code and *explain* it in *brief*, *standardized*, and *concise* way.
 </objective>
 
 <flow>
+
 1.  <step id="STEP 1: Investigate Code Base">
     Investigate on the code. If the code base is large, you *MUST* use
     the `Agent` tool (not inline work) to create multiple sub-agents to
@@ -111,5 +112,6 @@ code and *explain* it in *brief*, *standardized*, and *concise* way.
     - [...]
     </template>
     </step>
+
 </flow>
 

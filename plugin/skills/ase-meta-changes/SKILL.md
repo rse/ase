@@ -45,6 +45,7 @@ The ChangeLog entries for a single product release version
 are also grouped and sorted according to the above <prefix/>es.
 
 <flow>
+
 1. <step id="STEP 1: Locate and read existing ChangeLog entries">
    The *ChangeLog* file `CHANGELOG.md` contains sections
    with headers in the style `N.M.K (YYYY-MM-DD)`.
@@ -91,5 +92,6 @@ are also grouped and sorted according to the above <prefix/>es.
    Also, update the date `YYYY-MM-DD` in the `N.M.K (YYYY-MM-DD)`
    headline of the *first* (most recent) section.
    </step>
+
 </flow>
 
