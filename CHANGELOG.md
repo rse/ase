@@ -9,6 +9,7 @@ ChangeLog
 - IMPROVEMENT: truncate IMPLEMENTATION DRAFT section in "ase-task-edit" skill
 - IMPROVEMENT: add a ase-getopt.md (plugin) and ase-getopt.ts (tool) for option parsing
 - BUGFIX: fix bundling of plugin into tool
+- BUGFIX: try to force "ase-code-{craft,refactor,resolve}" skills even hard to not immediately implement.
 
 0.0.32 (2026-05-18)
 -------------------
