@@ -40,6 +40,39 @@ Development*.
 > hard-boiled early adopter, please visit this project again, once we
 > reached at least version 0.9.x!
 
+User Setup
+----------
+
+### Prerequisites
+
+- Operating System: macOS, Linux, Windows
+- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
+- Runtime Engine: [Node.js](https://nodejs.org)
+
+### Installation
+
+```
+#   install ASE tool into PATH (bootstrapping only)
+npm install -g @rse/ase
+
+#   install ASE plugin into agent tool
+ase setup install [--tool claude|copilot]
+```
+
+### Updating
+
+```
+#   update ASE tool in PATH and ASE plugin in agent tool
+ase setup update [--tool claude|copilot]
+```
+
+### Uninstallation
+
+```
+#   uninstall ASE tool from PATH and ASE plugin from agent tool
+ase setup uninstall [--tool claude|copilot]
+```
+
 Features
 --------
 
@@ -97,39 +130,6 @@ Design Decisions
   **ASE** skills are strongly coupled to and work on top of the
   corresponding **ASE** MCP/CLI service. Especially, the **ASE** skills
   are not written to be used in foreign environments.
-
-User Setup
-----------
-
-### Prerequisites
-
-- Operating System: macOS, Linux, Windows
-- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
-- Runtime Engine: [Node.js](https://nodejs.org)
-
-### Installation
-
-```
-#   install ASE tool into PATH (bootstrapping only)
-npm install -g @rse/ase
-
-#   install ASE plugin into agent tool
-ase setup install [--tool claude|copilot]
-```
-
-### Updating
-
-```
-#   update ASE tool in PATH and ASE plugin in agent tool
-ase setup update [--tool claude|copilot]
-```
-
-### Uninstallation
-
-```
-#   uninstall ASE tool from PATH and ASE plugin from agent tool
-ase setup uninstall [--tool claude|copilot]
-```
 
 Overview
 --------
