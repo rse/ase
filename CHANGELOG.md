@@ -5,6 +5,8 @@ ChangeLog
 0.0.33 (2026-05-18)
 -------------------
 
+- IMPROVEMENT: add "ase setup enable" and "ase setup disable" for enabling/disabling ASE in the agent tool
+
 0.0.32 (2026-05-18)
 -------------------
 

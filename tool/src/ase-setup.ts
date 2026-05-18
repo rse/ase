@@ -153,6 +153,30 @@ export default class SetupCommand {
         return 0
     }
 
+    /*  handler for "ase setup enable" (both tools)  */
+    private async doEnable (tool: Tool): Promise<number> {
+        const spec = toolSpecs[tool]
+        await this.ensureTool(spec.cli)
+        this.log.write("info", `setup: enable: enabling ASE ${spec.label} plugin`)
+        const args = tool === "claude" ?
+            [ "plugin", "enable",  "ase@ase" ] :
+            [ "plugin", "install", "ase@ase" ]
+        await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
+        return 0
+    }
+
+    /*  handler for "ase setup disable" (both tools)  */
+    private async doDisable (tool: Tool): Promise<number> {
+        const spec = toolSpecs[tool]
+        await this.ensureTool(spec.cli)
+        this.log.write("info", `setup: disable: disabling ASE ${spec.label} plugin`)
+        const args = tool === "claude" ?
+            [ "plugin", "disable",   "ase@ase" ] :
+            [ "plugin", "uninstall", "ase@ase" ]
+        await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
+        return 0
+    }
+
     /*  handler for "ase setup uninstall" (both tools)  */
     private async doUninstall (tool: Tool, dev: boolean): Promise<number> {
         const spec = toolSpecs[tool]
@@ -235,6 +259,24 @@ export default class SetupCommand {
             .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
             .action(async (opts: { tool: string, dev: boolean }) => {
                 process.exit(await this.doUninstall(this.parseTool(opts.tool), opts.dev))
+            })
+
+        /*  register CLI sub-command "ase setup enable"  */
+        setupCmd
+            .command("enable")
+            .description("enable the ASE plugin for a tool")
+            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .action(async (opts: { tool: string }) => {
+                process.exit(await this.doEnable(this.parseTool(opts.tool)))
+            })
+
+        /*  register CLI sub-command "ase setup disable"  */
+        setupCmd
+            .command("disable")
+            .description("disable the ASE plugin for a tool")
+            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .action(async (opts: { tool: string }) => {
+                process.exit(await this.doDisable(this.parseTool(opts.tool)))
             })
     }
 }
