@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.0.35 (2026-05-18)
+-------------------
+
+- BUGFIX: commit also plugin/package.json updates on "npm start publish"
+
 0.0.34 (2026-05-18)
 -------------------
 
