@@ -120,7 +120,7 @@ for the full autonomous agent mode of operation.
 The **ASE** skills can be classified into standalone/meta skills,
 task-driven skills, and funnel skills.
 
-![workflow](docs/workflow.svg)
+[![workflow](docs/workflow.svg)](docs/workflow.pdf)
 
 When working with **ASE** the user decided (usually on the extend
 of the task to perform) which mode to choose:
