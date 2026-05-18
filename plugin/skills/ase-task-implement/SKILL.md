@@ -133,7 +133,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   If <getopt-option-next/> is equal to `none`:
             Let the *user interactively choose* what to do as the next step.
 
-            <expand name="user-dialog>
+            <expand name="user-dialog">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Stop processing and PRESERVE task plan.
                 DELETE: Stop processing and DELETE the task plan.

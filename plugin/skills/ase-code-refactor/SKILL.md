@@ -222,7 +222,7 @@ permitted way to persist artifacts is via `task_save(...)`.
         -   If <getopt-option-next/> is equal to `none`:
             Let the *user interactively choose* what to do as the next step.
 
-            <expand name="user-dialog>
+            <expand name="user-dialog">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Stop processing.
                 EDIT: Hand processing off to editing.

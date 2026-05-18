@@ -178,7 +178,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   If <getopt-option-plan/> is equal to `none`:
             Let the *user interactively choose* what to do as the next step.
 
-            <expand name="user-dialog>
+            <expand name="user-dialog">
                 Previous Plan: Should the previous plan content be overwritten, refined, or preserved?
                 OVERWRITE: Continue operation, overwrite previous plan.
                 REFINE: Continue operation, refine previous plan.
@@ -322,7 +322,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   If <getopt-option-next/> is equal to `none`:
             Let the *user interactively choose* what to do as the next step.
 
-            <expand name="user-dialog>
+            <expand name="user-dialog">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Mark plan finalized, exit planning loop.
                 IMPLEMENT: Hand off plan to implementation.
