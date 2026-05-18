@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: draw a operation modes matrix diagram
+- BUGFIX: replace version on "npm start publish" also in plugin/package.json
 - CLEANUP: crop diagram SVGs
 
 0.0.33 (2026-05-18)
