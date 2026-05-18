@@ -36,6 +36,7 @@ Let the *user interactively choose* an answer.
         1.  Start with <config></config> (set config to empty).
             Do not output anything in this step!
 
+            Start with <n>0</n> (set entry count to zero).
             <for items="2 3 4 5">
                 Take from <config/> the line number <item/>.
                 If this line does not exist, <break/>.
@@ -43,7 +44,13 @@ Let the *user interactively choose* an answer.
                 If <config/> is not empty, set <config><config/>, </config> (append comma).
                 Set <config><config/>{ label: "<label/>",
                 description: "<description/>" }</config> (append a config entry).
+                Set <n/> to <n/> + 1 (increment entry count).
             </for>
+
+            If <n/> is less than 2:
+            Set <result>ERROR: user-dialog requires 2-4 answer lines, got <n/></result>
+            and *SKIP* the following step 2 (do not call `AskUserQuestion`)
+            and continue with step 3 dispatch.
 
         2.  Call the `AskUserQuestion` tool of the agent harness with:
 
@@ -84,13 +91,20 @@ Let the *user interactively choose* an answer.
         1.  Start with <config></config> (set config to empty).
             Do not output anything in this step!
 
+            Start with <n>0</n> (set entry count to zero).
             <for items="2 3 4 5">
                 Take from <config/> the line number <item/>.
                 If this line does not exist, <break/>.
                 If this line exists, parse it according to the format `<label/>: <description/>`.
                 If <config/> is not empty, set <config><config/>, </config> (append comma).
                 Set <config><config/>"<label/>: <description/>"</config> (append a config entry).
+                Set <n/> to <n/> + 1 (increment entry count).
             </for>
+
+            If <n/> is less than 2:
+            Set <result>ERROR: user-dialog requires 2-4 answer lines, got <n/></result>
+            and *SKIP* the following step 2 (do not call `ask_user`)
+            and continue with step 3 dispatch.
 
         2.  Call the `ask_user` tool of the agent harness with:
 
