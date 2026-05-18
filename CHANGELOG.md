@@ -5,9 +5,15 @@ ChangeLog
 0.0.36 (2026-05-18)
 -------------------
 
-- BUGFIX: fix XML syntax in ase-getopt.md
-- BUGFIX: fix unterminated regexp literal in ase-getopt.md
-- BUGFIX: add missing comma in JSON example in ase-getopt.md
+- IMPROVEMENT: add missing `<skill>` tags to multiple skills (arch-discover, code-*, meta-*)
+- IMPROVEMENT: give persona style more ability to overrule skill rules in ase-skill.md
+- IMPROVEMENT: restructure README (move setup section to top)
+- BUGFIX: fix XML, regexp, JSON, and other syntax issues in ase-getopt.md
+- BUGFIX: fix multiple issues in ase-dialog.md (require minimum 2 options for user dialog tools)
+- BUGFIX: add missing closing quote in ase-code-{craft,refactor,resolve} and ase-task-{edit,implement,preflight,reboot} skills
+- BUGFIX: fix logic of -a/--auto option in ase-code-{craft,refactor,resolve} skills
+- UPDATE: document design decisions and OS context in README
+- CLEANUP: reduce ambiguity and clean up semantics in ase-skill.md, ase-plan.md, and multiple skills
 
 0.0.35 (2026-05-18)
 -------------------
