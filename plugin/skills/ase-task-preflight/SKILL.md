@@ -112,7 +112,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         ## ※ IMPLEMENTATION DRAFT
 
-        ```
+        ```text
         <unified-diff/>
         ```
 

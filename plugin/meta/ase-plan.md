@@ -10,19 +10,19 @@ Every *task plan* uses a strict and fixed format:
 
 ◉ task id: **<ase-task-id/>** // ✳ created: **<timestamp-created/>** // ✎ modified: **<timestamp-modified/>**
 
-## ※ CONTEXT:
+## ※ CONTEXT
 
 - **WHAT**: <summary-what/>
 
 - **WHY**: <summary-why/>
 
-## ※ CHANGES:
+## ※ CHANGES
 
 - [...]
 
 - [...]
 
-## ※ VERIFICATION:
+## ※ VERIFICATION
 
 - [...]
 
@@ -57,7 +57,7 @@ You *MUST* honor the following hints on this *task plan* format:
 -   The <title/> is a short summary of the <summary-what/>, no longer than
     50 characters.
 
--   The sections `※ CHANGES:` and `※ VERIFICATION:` all are just a short
+-   The sections `※ CHANGES` and `※ VERIFICATION` all are just a short
     list of 1-5 bullet points. Each bullet points is formatted as
     `- **<aspect/>**: <specification/>` where <aspect/> indicates
     the aspect of the section and <specification/> is 1-3 sentences
