@@ -71,6 +71,33 @@ Features
   The agent is equipped with reasonable templates to scaffold
   Library/Framework, CLI and WebUI projects.
 
+Design Decisions
+----------------
+
+**ASE** is based on the following distinct design decisions:
+
+- **Agent &amp; Plugin**:
+  **ASE** is a plugin for the agent tools Claude Code and GitHub Copilot
+  CLI, and can be non-intrusively installed, and later also residue-free
+  uninstalled, from those agent tool at any time. Especially, **ASE** is
+  intended to be used side-by-side with other skills and MCP services.
+
+- **Recurring Software Engineering Tasks**:
+  **ASE** targets the most important, recurring tasks in industrial
+  Software Engineering only. Especially, **ASE** is not targeting
+  Consulting or Operations business.
+
+- **Human in the Loop**:
+  **ASE** targets the scenario of a person performing Software
+  Engineering tasks. Especially, **ASE** is not intended for full
+  autonomous agent scenarios, even if its skills can be conveniently
+  chained.
+
+- **Skills & MCP/CLI**:
+  **ASE** skills are strongly coupled to and work on top of the
+  corresponding **ASE** MCP/CLI service. Especially, the **ASE** skills
+  are not written to be used in foreign environments.
+
 User Setup
 ----------
 
