@@ -29,6 +29,7 @@ import { TaskMCP }                       from "./ase-task.js"
 import { KVMCP }                         from "./ase-kv.js"
 import PersonaMCP                        from "./ase-persona.js"
 import { TimestampMCP }                  from "./ase-timestamp.js"
+import { GetoptMCP }                     from "./ase-getopt.js"
 import pkg                               from "../package.json" with { type: "json" }
 
 /*  shared service host  */
@@ -266,6 +267,7 @@ export default class ServiceCommand {
             new KVMCP().register(mcp)
             new PersonaMCP(this.log).register(mcp)
             new TimestampMCP().register(mcp)
+            new GetoptMCP().register(mcp)
             return mcp
         }
 
