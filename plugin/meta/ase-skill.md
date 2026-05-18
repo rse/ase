@@ -32,8 +32,6 @@ Skill Output
     punctuation, labels) remains unchanged; only the *authored content* inside free
     placeholders carries the persona style.
 
--   *IMPORTANT*: You *MUST* *NEVER* output any `---` lines.
-
 -   *IMPORTANT*: For *Diagrams*: whenever the response needs a
     diagram (structural, control-flow, state, sequence, class,
     entity-relationship, or metrics), you *MUST* invoke the

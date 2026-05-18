@@ -8,7 +8,7 @@ Every *task plan* uses a strict and fixed format:
 
 # ✪ TASK PLAN: **<title/>**
 
-◉ task id: **<ase-task-id/>** // ✳ created: **<timestamp-created/>** // ✎ modified: **<timestamp-modified/>**
+◉ task id: **<task-id/>** // ✳ created: **<timestamp-created/>** // ✎ modified: **<timestamp-modified/>**
 
 ## ※ CONTEXT
 
@@ -44,6 +44,9 @@ You *MUST* honor the following hints on this *task plan* format:
     <summary-what/> tell what is changed. In <summary-why/> tell why it
     is changed, what benefit results or what the rationale is behind the
     change.
+
+-   The <task-id/> has to be substituted with the current value of
+    <ase-task-id/> in the current session context.
 
 -   The <timestamp-created/> is the timestamp when this feature
     crafting specification was created. The
