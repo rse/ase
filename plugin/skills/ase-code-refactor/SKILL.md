@@ -171,14 +171,14 @@ permitted way to persist artifacts is via `task_save(...)`.
 
 4.  **Choose Refactoring Approach**:
 
-    1.  If <getopt-option-auto/> is equal `true`:
+    1.  If <getopt-option-auto/> is equal `false`:
         Let the *user interactively choose* the preferred refactoring approach A<n/>
         with the help of the <user-dialog-tool/> tool. Use *single-selection* only
         and provide small *code change previews*. Mark your recommended
         refactoring approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
         Except for the interactive selection, do not output anything in this step.
 
-    2.  If <getopt-option-auto/> is not equal `true`:
+    2.  If <getopt-option-auto/> is equal `true`:
         Set <n/> to the number of the refactoring approach A<n/> you recommend.
         Output a hint with the following <template/>:
 
