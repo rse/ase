@@ -199,9 +199,10 @@ multi-*criteria* decision matrix.
         abs(<rating-K/>). Do not output anything.
 
     -   If <rating-K/> is exactly zero, skip the division entirely
-        and treat <percentage/> as if it were less than 0.10
-        (i.e. fall through to the *small distance* branch below),
-        since a zero best rating signals a near-tied evaluation.
+        and treat <percentage/> as if it were equal to <distance/>
+        (so a true zero tie with <distance/> = 0 falls into the
+        *MULTIPLE BEST* branch below, and a non-zero gap with zero
+        best falls into the *small distance* branch below).
 
     -   By construction, <rating-K/> is the maximum rating across
         all alternatives, so <distance/> >= 0 always holds; using

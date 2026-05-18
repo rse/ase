@@ -76,8 +76,9 @@ by querying *multiple* AIs for an *optimal consensus*.
 
 5.  <step id="STEP 5: Determine Consensus Rating">
     Determine, on a Likert scale of 0..<n/>, the amount of the overall
-    consensus <c/> of all the responses. The <n/> is 1 plus the number of
-    available AIs above. If all responses disagree, the consensus <c/> is zero.
+    consensus <c/> of all the responses. The <n/> is the *total number of
+    responders* (yourself plus all available foreign AIs above).
+    If all responses disagree, the consensus <c/> is zero.
     If all responses agree, <c/> is <n/>.
 
     If not all AIs agree, determine a <disagreement/> information,
