@@ -68,6 +68,7 @@
         "dst/**/*",
         "bin/**/*",
         "plugin/**/*",
+        ".claude-plugin/**/*",
         "README.md"
     ],
     "scripts": {
