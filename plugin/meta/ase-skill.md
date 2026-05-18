@@ -19,9 +19,11 @@ Skill Output
     explicitly requested.
 
 -   *IMPORTANT*: You *MUST* output all <template/> sections *EXACTLY* as provided
-    (including newlines), except for removing trailing spaces and
-    replacing the placeholders `<xxx/>` and `[...]` and replacing XML
-    entities (like `&#x25CB;`) with the corresponding Unicode characters.
+    (including newlines), except for removing trailing spaces, replacing
+    the placeholders `<xxx/>` and `[...]`, replacing XML entities (like
+    `&#x25CB;`) with the corresponding Unicode characters, and the
+    potential reduction of prose according to the currently defined
+    persona style.
 
 -   *IMPORTANT*: The active *persona style* (see `ase-persona.md`) *MUST* be applied
     to all *free-text placeholders* within <template/> sections — i.e. any placeholder
