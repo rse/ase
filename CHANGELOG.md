@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.0.37 (2026-05-19)
+-------------------
+
+- IMPROVEMENT: add -v|--verbose option to "ase-task-list" skill for explicitly requesting verbose output
+
 0.0.36 (2026-05-18)
 -------------------
 

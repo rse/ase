@@ -1,6 +1,6 @@
 ---
 name: ase-task-list
-argument-hint: ""
+argument-hint: "[-v|--verbose]"
 description: >
     List all available task ids.
     Use when user wants to see all tasks.
@@ -11,6 +11,7 @@ effort: low
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 Task List
 =========
@@ -19,10 +20,17 @@ Task List
 List Task Plans
 </skill>
 
-1.  Call the `task_list(verbose: true)` tool from the `ase` MCP service.
-    The result is a structured object with a `tasks` array where each
-    entry has an `id` field and an `mtime` field (formatted as
-    `YYYY-MM-DD HH:MM`).
+<expand name="getopt"
+    arg1="ase-task-list"
+    arg2="--verbose|-v">
+    $ARGUMENTS
+</expand>
+
+1.  Call the `task_list(verbose: <getopt-option-verbose/>)` tool from
+    the `ase` MCP service. The result is a structured object with a
+    `tasks` array where each entry has an `id` field, and -- if
+    <getopt-option-verbose/> is `true` -- additionally an `mtime` field
+    (formatted as `YYYY-MM-DD HH:MM`).
 
 2.  If the `tasks` array is empty, output the following <template/>:
 
@@ -30,16 +38,33 @@ List Task Plans
     ⧉ **ASE**: ◉ tasks: *(none)*
     </template>
 
-    Else, output the list of tasks with the following <template/>, where
-    each <id/> and <mtime/> correspond to an entry in the task list:
+    Else, dispatch on <getopt-option-verbose/>:
 
-    <template>
-    ⧉ **ASE**: ◉ tasks:
+    -   If <getopt-option-verbose/> is `true`, output the list of tasks
+        with the following <template/>, where each <id/> and <mtime/>
+        correspond to an entry in the task list:
 
-    | *Task Id* | *Last Modified*    |
-    |-----------|--------------------|
-    | **<id/>** | `<mtime/>`         |
-    | [...]     | [...]              |
+        <template>
+        ⧉ **ASE**: ◉ tasks:
 
-    </template>
+        | *Task Id* | *Last Modified*    |
+        |-----------|--------------------|
+        | **<id/>** | `<mtime/>`         |
+        | [...]     | [...]              |
+
+        </template>
+
+    -   If <getopt-option-verbose/> is `false`, output the list of tasks
+        with the following <template/>, where each <id/> corresponds to
+        an entry in the task list:
+
+        <template>
+        ⧉ **ASE**: ◉ tasks:
+
+        | *Task Id* |
+        |-----------|
+        | **<id/>** |
+        | [...]     |
+
+        </template>
 
