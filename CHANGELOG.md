@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: add -v|--verbose option to "ase-task-list" skill for explicitly requesting verbose output
+- IMPROVEMENT: add support (via hooks) for agent ready/busy status which is send to tmux
 
 0.0.36 (2026-05-18)
 -------------------

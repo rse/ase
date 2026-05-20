@@ -21,6 +21,18 @@
                 "bash":       "ase hook pre-tool-use --tool copilot",
                 "powershell": "ase hook pre-tool-use --tool copilot"
             }
+        ],
+        "userPromptSubmitted": [
+            {
+                "type":   "command",
+                "bash":   "ase hook user-prompt-submit --tool copilot"
+            }
+        ],
+        "agentStop": [
+            {
+                "type":   "command",
+                "bash":   "ase hook stop --tool copilot"
+            }
         ]
     }
 }

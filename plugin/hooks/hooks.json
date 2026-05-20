@@ -35,6 +35,28 @@
                     }
                 ]
             }
+        ],
+        "UserPromptSubmit": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook user-prompt-submit"
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "matcher": "",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook stop"
+                    }
+                ]
+            }
         ]
     }
 }

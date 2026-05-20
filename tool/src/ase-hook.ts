@@ -137,6 +137,9 @@ export default class HookCommand {
                 cfg.write()
             })
 
+        /*  initialize agent activity status  */
+        this.writeAgentStatus("ready")
+
         /*  determine project id  */
         const cwd = input.cwd ?? process.cwd()
         let projectDir = cwd
@@ -207,6 +210,35 @@ export default class HookCommand {
             "additionalContext": md
         }
         process.stdout.write(JSON.stringify(payload))
+        return 0
+    }
+
+    /*  publish the agent activity marker to tmux as a per-pane user
+        option, so tmux can render the live state via
+        #{@ase_agent_status} (refreshed on tmux's own interval,
+        independent of Claude Code's statusline repaint cadence).
+        Notice: the Claude Code statusline is not usable for this case
+        here at all, as it is not repainted during agent processing! */
+    private writeAgentStatus (status: "busy" | "ready"): void {
+        const icon = status === "busy" ? "▶" : "⏸"
+        if (process.env.TMUX !== undefined
+            && process.env.TMUX !== ""
+            && process.env.TMUX_PANE !== undefined
+            && process.env.TMUX_PANE !== "") {
+            execaSync("tmux", [ "set-option", "-p", "-t", process.env.TMUX_PANE,
+                "@ase_agent_status", icon ], { stdio: "ignore", reject: false })
+        }
+    }
+
+    /*  handler for "ase hook user-prompt-submit" (both tools)  */
+    private doUserPromptSubmit (_tool: Tool): number {
+        this.writeAgentStatus("busy")
+        return 0
+    }
+
+    /*  handler for "ase hook stop" (both tools)  */
+    private doStop (_tool: Tool): number {
+        this.writeAgentStatus("ready")
         return 0
     }
 
@@ -339,6 +371,24 @@ export default class HookCommand {
             .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
             .action((opts: { tool: string }) => {
                 process.exit(this.doPreToolUse(this.parseTool(opts.tool)))
+            })
+
+        /*  register CLI sub-command "ase hook user-prompt-submit"  */
+        hookCmd
+            .command("user-prompt-submit")
+            .description("handle UserPromptSubmit hook event (mark agent as busy)")
+            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .action((opts: { tool: string }) => {
+                process.exit(this.doUserPromptSubmit(this.parseTool(opts.tool)))
+            })
+
+        /*  register CLI sub-command "ase hook stop"  */
+        hookCmd
+            .command("stop")
+            .description("handle Stop hook event (mark agent as ready)")
+            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .action((opts: { tool: string }) => {
+                process.exit(this.doStop(this.parseTool(opts.tool)))
             })
     }
 }
