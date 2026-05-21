@@ -168,8 +168,9 @@ permitted way to persist artifacts is via `task_save(...)`.
 4.  **Choose Feature Crafting Approach**:
 
     1.  If <getopt-option-auto/> is equal `false`:
-        Let the *user interactively choose* the preferred feature approach A<n/>
-        with the help of the <user-dialog-tool/> tool. Use *single-selection* only
+        Let the *user interactively choose* the preferred feature
+        approach A<n/> with the help of the <user-dialog-tool/> tool.
+        Use the header `Select Approach` and *single-selection* only
         and provide small *code change previews*. Mark your recommended
         feature approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
 

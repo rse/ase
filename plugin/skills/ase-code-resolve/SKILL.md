@@ -224,8 +224,9 @@ permitted way to persist artifacts is via `task_save(...)`.
 4.  **Choose Problem Resolution Approach**:
 
     1.  If <getopt-option-auto/> is equal `false`:
-        Let the *user interactively choose* the preferred resolution approach A<n/>
-        with the help of the <user-dialog-tool/> tool. Use *single-selection* only
+        Let the *user interactively choose* the preferred resolution
+        approach A<n/> with the help of the <user-dialog-tool/> tool.
+        Use the header `Select Approach` and *single-selection* only
         and provide small *code change previews*. Mark your recommended
         resolution approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
 
