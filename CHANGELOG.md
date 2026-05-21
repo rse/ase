@@ -2,11 +2,14 @@
 ChangeLog
 =========
 
-0.0.37 (2026-05-19)
+0.0.37 (2026-05-21)
 -------------------
 
 - IMPROVEMENT: add -v|--verbose option to "ase-task-list" skill for explicitly requesting verbose output
 - IMPROVEMENT: add support (via hooks) for agent ready/busy status which is send to tmux
+- IMPROVEMENT: add Github Copilot support under PowerShell (including newer hooks)
+- BUGFIX: remove obsolete matcher in plugin hooks
+- CLEANUP: use consistent naming of dialog across skills
 
 0.0.36 (2026-05-18)
 -------------------
