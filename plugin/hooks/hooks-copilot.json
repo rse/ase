@@ -3,20 +3,23 @@
     "hooks": {
         "sessionStart": [
             {
-                "type":   "command",
-                "bash":   "ase hook session-start --tool copilot"
+                "type":       "command",
+                "bash":       "ase hook session-start --tool copilot",
+                "powershell": "ase hook session-start --tool copilot"
             }
         ],
         "sessionEnd": [
             {
-                "type":   "command",
-                "bash":   "ase hook session-end --tool copilot"
+                "type":       "command",
+                "bash":       "ase hook session-end --tool copilot",
+                "powershell": "ase hook session-end --tool copilot"
             }
         ],
         "preToolUse": [
             {
-                "type":   "command",
-                "bash":   "ase hook pre-tool-use --tool copilot"
+                "type":       "command",
+                "bash":       "ase hook pre-tool-use --tool copilot",
+                "powershell": "ase hook pre-tool-use --tool copilot"
             }
         ]
     }
