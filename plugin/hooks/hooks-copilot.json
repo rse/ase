@@ -24,14 +24,16 @@
         ],
         "userPromptSubmitted": [
             {
-                "type":   "command",
-                "bash":   "ase hook user-prompt-submit --tool copilot"
+                "type":       "command",
+                "bash":       "ase hook user-prompt-submit --tool copilot",
+                "powershell": "ase hook user-prompt-submit --tool copilot"
             }
         ],
         "agentStop": [
             {
-                "type":   "command",
-                "bash":   "ase hook stop --tool copilot"
+                "type":       "command",
+                "bash":       "ase hook stop --tool copilot",
+                "powershell": "ase hook stop --tool copilot"
             }
         ]
     }
