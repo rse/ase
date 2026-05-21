@@ -56,12 +56,13 @@ permitted way to persist artifacts is via `task_save(...)`.
 1.  **Reason About Problem**:
 
     1.  If <problem/> matches the regexp `^[PT]\d+$` (i.e. a bare issue
-        identifier like `P1`, `P2`, `T1`, `T2`, ...), set
-        <problem-id><problem/></problem-id>, call the `task_id(id:
-        <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase`
-        MCP service to implicitly switch the task, and then call the
-        `kv_get(key: "ase-issue-<problem-id/>")` tool
-        of the `ase` MCP service to retrieve the previously persisted
+        identifier like `P1`, `P2`, `T1`, `T2`, ...),
+        set <problem-id><problem/></problem-id> and
+        <ase-task-id><problem/></ase-task-id>, call the `task_id(id:
+        <ase-task-id/>, session: <ase-session-id/>)` tool from the
+        `ase` MCP service to implicitly switch the task, and then
+        call the `kv_get(key: "ase-issue-<problem-id/>")` tool of
+        the `ase` MCP service to retrieve the previously persisted
         problem description. If the returned `text` is non-empty, set
         <problem><text/></problem>, otherwise complain to the user that
         no analyzer result exists for <problem-id/> and stop processing.
