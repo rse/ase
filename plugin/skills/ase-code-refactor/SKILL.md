@@ -84,19 +84,30 @@ permitted way to persist artifacts is via `task_save(...)`.
 
         Then set <request/> to the response of the user.
 
-    4.  Report the task and request with the following <template/>:
+    4.  <if condition="
+            <ase-task-id/> is equal `default` and
+            <request/> is not empty
+        ">
+        Set <ase-task-id/> to a unique task id, derived from <request/>,
+        which consists of two lower-case words concatenated with a
+        `-` character. Then call the `task_id(id: <ase-task-id/>,
+        session: <ase-session-id/>)` tool from the `ase` MCP service to
+        implicitly switch the task.
+        </if>
+
+    5.  Report the task and request with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
         ⧉ **ASE**: ⇌ request: **<request/>**
         </template>
 
-    5.  Figure out what the artifact refactoring <request/> is about.
+    6.  Figure out what the artifact refactoring <request/> is about.
 
-    6.  Ask the user for clarification if the goal of this refactoring is
+    7.  Ask the user for clarification if the goal of this refactoring is
         too unclear.
 
-    7.  Do not output anything in this step, except you asked the user.
+    8.  Do not output anything in this step, except you asked the user.
 
 2.  **Investigate Code Base**:
 

@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: reduce verbose LLM output in `ase-meta-evaluate` skill
+- IMPROVEMENT: derive a task id if the current is still "default" in craft/resolve/refactor skills
 - BUGFIX: automatically choose "sudo" for "npm install -g" commands when necessary in "ase setup"
 - BUGFIX: also set ase-task-id in `ase-code-resolve` skill
 

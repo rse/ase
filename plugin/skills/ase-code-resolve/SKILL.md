@@ -96,21 +96,32 @@ permitted way to persist artifacts is via `task_save(...)`.
 
         Then set <problem/> to the response of the user.
 
-    5.  Report the task and problem with the following <template/>:
+    5.  <if condition="
+            <ase-task-id/> is equal `default` and
+            <problem/> is not empty
+        ">
+        Set <ase-task-id/> to a unique task id, derived from <problem/>,
+        which consists of two lower-case words concatenated with a
+        `-` character. Then call the `task_id(id: <ase-task-id/>,
+        session: <ase-session-id/>)` tool from the `ase` MCP service to
+        implicitly switch the task.
+        </if>
+
+    6.  Report the task and problem with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**
         ⧉ **ASE**: ⇌ problem: **<problem/>**
         </template>
 
-    6.  Figure out what the requested <problem/> is about.
+    7.  Figure out what the requested <problem/> is about.
 
-    7.  Ask the user for clarification if the goal of this resolution is
+    8.  Ask the user for clarification if the goal of this resolution is
         too unclear.
 
-    8.  Do not output anything in this step, except you asked the user.
+    9.  Do not output anything in this step, except you asked the user.
 
-    9.  Investigate and *figure out details* related to this problem.
+    10. Investigate and *figure out details* related to this problem.
         Report those details with the following <template/>:
 
         <template>
