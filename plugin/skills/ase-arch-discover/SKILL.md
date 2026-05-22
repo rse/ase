@@ -9,10 +9,8 @@ disable-model-invocation: false
 effort: medium
 allowed-tools:
     - "Bash(npm search --json *)"
-    - "Bash(npm view --json *)"
     - "Skill"
     - "Agent"
-    - "WebFetch"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
@@ -112,26 +110,6 @@ for the technology stack to *provide* the *needed functionality*
             (L=1-M). Merge the results into the already existing result
             set, but deduplicate entries.
 
-        -   For each discovered *NPM package* <component-K/> (K=1-N),
-            use the shell command `npm view --json "<package-K/>"
-            version time repository.url` to discover
-            its version <version-K/>, the publish time of that
-            version <updated-K/> (read from `time[<version-K/>]`),
-            its time created <created-K/> (read from `time.created`),
-            and its repository URL <repository-K/>.
-
-        -   If the <repository-K/> regexp-matches
-            `.+?//github\.com/([^/]+/[^/.]+).*` use the `WebFetch` tool
-            to fetch the URL `https://api.github.com/repos/$1` (`$1`
-            is the value matched by the first capturing parenthesis
-            in the regexp) and extract <stars-K/> from its JSON
-            `stargazers_count` field, else set <stars-K/> to `N.A.`.
-
-        -   For each discovered *NPM package* <component-K/>
-            (K=1-N), use the `WebFetch` tool on the URL
-            `https://api.npmjs.org/downloads/point/last-month/<package-K/>`
-            to extract the <downloads-K/> from the `downloads` field.
-
     -   If <stack/> is "Java" or "Kotlin":
 
         -   Based on the essential keywords <keyword-L/> (L=1-M),
@@ -139,6 +117,23 @@ for the technology stack to *provide* the *needed functionality*
             discover an initial set of a maximum of 12 *Java packages*
             <component-K/> and at least their real name <name-K/> and
             their unique package names <package-K/>.
+
+    -   Call the `component_info(stack: <stack/>, components:
+        [ <package-1/>, ..., <package-N/> ])` tool of the `ase` MCP
+        service *once* for the entire set of discovered packages.
+        The tool dispatches internally on <stack/> and fetches all
+        metadata in maximum parallel and returns an array of objects `{
+        name, version, time, repository, stars, downloads }`. For each
+        component <component-K/> (K=1-N) read from its corresponding
+        entry: <version-K/> from `version`, <updated-K/> from `updated`,
+        <created-K/> from `created`, <repository-K/> from `repository`,
+        <stars-K/> from `stars` (numeric or `N.A.`), <downloads-K/>
+        from `downloads` (numeric or `N.A.`) and <rank-K/> from `rank`
+        (numeric).
+
+    -   Sort, in descending order, the discovered components
+        <component-K/> (K=1-N) by their `rank` field and trim the result
+        list to just a maximum of 12 total components.
 
     -   For each component <component-K/> (K=1-N), research and then
         decide which *one* of *USP* (Unique Selling Point -- what makes
@@ -151,11 +146,6 @@ for the technology stack to *provide* the *needed functionality*
     </step>
 
 4.  <step id="STEP 4: Report Components">
-    -   Sort, in descending order, the discovered components
-        <component-K/> (K=1-N) first by their <downloads-K/> and second
-        by their <stars-K/> and trim the result list to just a maximum
-        of 12 total components.
-
     -   Display the determined, individual components as a Markdown
         *table* with just the following <template/> and do not output
         anything else:
@@ -163,11 +153,11 @@ for the technology stack to *provide* the *needed functionality*
         <template>
         &#x1F535; **COMPONENT HINTS**:
 
-        | *Component*        | *Hint*    |
-        | :----------------- | :-------- |
-        | **<component-1/>** | <info-1/> |
+        | *Component*        | *Package*    | *Hint*    |
+        | :----------------- | :----------- | :-------- |
+        | **<component-1/>** | <package-1/> | <info-1/> |
         [...]
-        | **<component-N/>** | <info-N/> |
+        | **<component-N/>** | <package-N/> | <info-N/> |
         </template>
 
     -   Display the discovered components as a Markdown *table*

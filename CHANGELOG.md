@@ -5,6 +5,7 @@ ChangeLog
 0.0.41 (2026-05-22)
 -------------------
 
+- IMPROVEMENT: migrate the parallel WebFetch and sorting functionality of the "discover" skill into a MCP tool
 - IMPROVEMENT: add USP/Crux/Gotcha overview table also to "discover" skill
 - REFACTOR: migrate from Axios to OFetch NPM package
 - CLEANUP: remove inclusion of "ase-persona.md" from all skill files (is part of constitution)
