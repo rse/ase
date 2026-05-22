@@ -119,7 +119,39 @@ permitted way to persist artifacts is via `task_save(...)`.
 
     3.  Do not output anything in this step.
 
-3.  **Find Refactoring Approaches**:
+3.  **Internalize Refactoring Tenets**:
+
+    Internalize and honor the following tenets.
+    Do not output anything.
+
+    1.  *Recommended* Tenets (generic):
+
+        -   **Surgical Changes**:
+            Keep source code changes always as small as possible.
+
+        -   **Separation of Concerns**:
+            Clearly separate all individual concerns as good as possible.
+
+        -   **Single Responsibility Principle**:
+            Every module, class, or function should have only one reason to change.
+
+        -   **Behavior Preservation**:
+            Refactoring changes only re-structure, never change any observable behavior.
+
+        -   **Align with Code Base**:
+            Strictly align with the existing code base by exactly following its
+            coding style, its structure, its naming conventions, etc.
+
+    2.  *Essential* Tenets (refactoring specific):
+
+        -   **Boy Scout Rule**:
+            After the refactoring, leave the code base cleaner than you found it.
+
+        -   **High Cohesion, Low Coupling**:
+            Strike for a set of small, focused parts (high cohesion) connected by
+            thin, explicit wires (low coupling).
+
+4.  **Find Refactoring Approaches**:
 
     You *MUST* perform the following sub-steps *internally* and *without
     any output* until and including the recommendation decision. Only
@@ -167,34 +199,7 @@ permitted way to persist artifacts is via `task_save(...)`.
             side-by-side. Omit <optional-diagram/> entirely for simple or
             purely local situation.
 
-        *Recommended* Tenets (generic):
-
-        -   **Surgical Changes**:
-            Keep source code changes always as small as possible.
-
-        -   **Separation of Concerns**:
-            Clearly separate all individual concerns as good as possible.
-
-        -   **Single Responsibility Principle**:
-            Every module, class, or function should have only one reason to change.
-
-        -   **Behavior Preservation**:
-            Refactoring changes only re-structure, never change any observable behavior.
-
-        -   **Align with Code Base**:
-            Strictly align with the existing code base by exactly following its
-            coding style, its structure, its naming conventions, etc.
-
-        *Essential* Tenets (specific):
-
-        -   **Boy Scout Rule**:
-            After the refactoring, leave the code base cleaner than you found it.
-
-        -   **High Cohesion, Low Coupling**:
-            Strike for a set of small, focused parts (high cohesion) connected by
-            thin, explicit wires (low coupling).
-
-4.  **Choose Refactoring Approach**:
+5.  **Choose Refactoring Approach**:
 
     1.  If <getopt-option-auto/> is equal `false`:
         Let the *user interactively choose* the preferred refactoring
@@ -214,7 +219,7 @@ permitted way to persist artifacts is via `task_save(...)`.
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **auto-chosen approach A<n/>**
         </template>
 
-5.  **Compose Refactoring Plan**:
+6.  **Compose Refactoring Plan**:
 
     1.  *Compose a refactoring plan* for the chosen refactoring A<n/> by
         closely aligning to the existing architecture and the existing

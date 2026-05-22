@@ -163,7 +163,37 @@ permitted way to persist artifacts is via `task_save(...)`.
 
     3.  Do not output anything in this step.
 
-3.  **Find Problem Resolution Approaches**:
+3.  **Internalize Problem Resolution Tenets**:
+
+    Internalize and honor the following tenets.
+    Do not output anything.
+
+    1.  *Recommended* Tenets (generic):
+
+        -   **Surgical Changes**:
+            Keep source code changes always as small as possible.
+
+        -   **Separation of Concerns**:
+            Clearly separate all individual concerns as good as possible.
+
+        -   **Single Responsibility Principle**:
+            Every module, class, or function should have only one reason to change.
+
+        -   **Behavior Preservation**:
+            Refactoring changes only re-structure, never change any observable behavior.
+
+        -   **Align with Code Base**:
+            Strictly align with the existing code base by exactly following its
+            coding style, its structure, its naming conventions, etc.
+
+    2.  *Essential* Tenets (problem resolving specific):
+
+        -   **No Cleanups**:
+            Strictly focus on resolving the problem and do not mix this task
+            with any other necessary code cleanups, except they are really
+            necessary for resolving the task.
+
+4.  **Find Problem Resolution Approaches**:
 
     You *MUST* perform the following sub-steps *internally* and *without
     any output* until and including the recommendation decision. Only
@@ -222,32 +252,7 @@ permitted way to persist artifacts is via `task_save(...)`.
             side-by-side. Omit <optional-diagram/> entirely for simple or
             purely local situation.
 
-        *Recommended* Tenets (generic):
-
-        -   **Surgical Changes**:
-            Keep source code changes always as small as possible.
-
-        -   **Separation of Concerns**:
-            Clearly separate all individual concerns as good as possible.
-
-        -   **Single Responsibility Principle**:
-            Every module, class, or function should have only one reason to change.
-
-        -   **Behavior Preservation**:
-            Refactoring changes only re-structure, never change any observable behavior.
-
-        -   **Align with Code Base**:
-            Strictly align with the existing code base by exactly following its
-            coding style, its structure, its naming conventions, etc.
-
-        *Essential* Tenets (specific):
-
-        -   **No Cleanups**:
-            Strictly focus on resolving the problem and do not mix this task
-            with any other necessary code cleanups, except they are really
-            necessary for resolving the task.
-
-4.  **Choose Problem Resolution Approach**:
+5.  **Choose Problem Resolution Approach**:
 
     1.  If <getopt-option-auto/> is equal `false`:
         Let the *user interactively choose* the preferred resolution
@@ -266,7 +271,7 @@ permitted way to persist artifacts is via `task_save(...)`.
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **auto-chosen approach A<n/>**
         </template>
 
-5.  **Compose Problem Resolution Plan**:
+6.  **Compose Problem Resolution Plan**:
 
     1.  *Compose a plan* with code references, a precise description of the
         problem, the chosen resolution approach, a preview of the *unified
