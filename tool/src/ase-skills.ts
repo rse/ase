@@ -151,9 +151,33 @@ export class Skills {
         const recentness = Math.exp(-ageDays / halfLife)
         return d * s * lifespan * recentness
     }
+
+    /*  compute the per-alternative product-sum (rating) row from a
+        weighted decision matrix. Each input row has the shape
+        `[ weight, eval_1, eval_2, ..., eval_N ]`. For each alternative
+        column j (1..N), the result is the sum over all rows K of
+        `weight_K * eval_K_j`. The output array has length N.  */
+    static productSum (matrix: number[][]): number[] {
+        if (matrix.length === 0)
+            return []
+        const cols = matrix[0].length
+        if (cols < 2)
+            throw new Error("each row must contain a weight followed by at least one evaluation column")
+        const N = cols - 1
+        const ratings = new Array<number>(N).fill(0)
+        for (let i = 0; i < matrix.length; i++) {
+            const row = matrix[i]
+            if (row.length !== cols)
+                throw new Error(`row ${i} has ${row.length} columns, expected ${cols}`)
+            const weight = row[0]
+            for (let j = 0; j < N; j++)
+                ratings[j] += weight * row[j + 1]
+        }
+        return ratings
+    }
 }
 
-/*  MCP registration entry point for the component-info tool  */
+/*  MCP registration entry point for various skill helper tools  */
 export class SkillsMCP {
     register (mcp: McpServer): void {
         mcp.registerTool("component_info", {
@@ -177,6 +201,37 @@ export class SkillsMCP {
         }, async (args) => {
             try {
                 const result = await Skills.info(args.stack, args.components)
+                return {
+                    content: [ { type: "text", text: JSON.stringify(result) } ]
+                }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return {
+                    isError: true,
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
+                }
+            }
+        })
+        mcp.registerTool("decision_matrix", {
+            title: "ASE decision matrix",
+            description:
+                "Compute the per-alternative product-sum (rating) row of a weighted " +
+                "multi-criteria decision matrix. The input `matrix` is an array of rows, " +
+                "one row per criterion, where each row has the shape " +
+                "`[ weight, eval_1, eval_2, ..., eval_N ]` (i.e. the criterion weight " +
+                "followed by N evaluation values, one per alternative). For each " +
+                "alternative column j (1..N), the result is the sum over all rows K of " +
+                "`weight_K * eval_K_j`. Returns a JSON `text` array of length N with " +
+                "the raw, unrounded ratings (one per alternative, in the same column " +
+                "order as the input).",
+            inputSchema: {
+                matrix: z.array(z.array(z.number()))
+                    .describe("Decision matrix rows: each row is `[weight, eval_1, ..., eval_N]`")
+            }
+        }, async (args) => {
+            try {
+                const result = Skills.productSum(args.matrix)
                 return {
                     content: [ { type: "text", text: JSON.stringify(result) } ]
                 }

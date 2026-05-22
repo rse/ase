@@ -152,13 +152,16 @@ multi-*criteria* decision matrix.
         from { -2, -1, 0, +1, +2 } (from worst, over neutral, to best). Do
         not output anything.
 
-    -   Then, for each alternative <alternative-K/> (K=1-N), calculate a
-        rating <rating-K/> (K=1-N) which is the product-sum of all weights
-        <weight-L/> (L=1-M) and the evaluation <eval-K-L/> (K=1-N, L=1-M).
-        The result is always a numerical value. Retain the *raw, unrounded*
-        <rating-K/> for use in STEP 5, but round <rating-K/> to 2 decimal
-        places *for display only* when emitting it in the table below. Do
-        not output anything.
+    -   Then, calculate the ratings <rating-K/> (K=1-N) for all
+        alternatives in a single call by invoking the `decision_matrix(matrix:
+        [ [ <weight-1/>, <eval-1-1/>, ..., <eval-1-N/> ], ..., [ <weight-M/>,
+        <eval-M-1/>, ..., <eval-M-N/> ] ])` tool of the `ase` MCP service.
+        The tool returns an array of N numerical values, where the K-th
+        entry is the product-sum of all weights <weight-L/> (L=1-M) and
+        the evaluation <eval-K-L/> (L=1-M) for alternative <alternative-K/>.
+        Retain the *raw, unrounded* <rating-K/> for use in STEP 5, but
+        round <rating-K/> to 2 decimal places *for display only* when
+        emitting it in the table below. Do not output anything.
 
     -   Output the resulting *Weighted Decision Matrix* as a Markdown
         *table* with just the following <template/> and do not output

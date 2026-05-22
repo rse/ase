@@ -153,11 +153,11 @@ for the technology stack to *provide* the *needed functionality*
         <template>
         &#x1F535; **COMPONENT HINTS**:
 
-        | *Component*        | *Package*    | *Hint*    |
-        | :----------------- | :----------- | :-------- |
-        | **<component-1/>** | <package-1/> | <info-1/> |
+        | ⚑ *Component*      | ▣ *Package*    | ⚖ *Hint*  |
+        | :----------------- | :------------- | :-------- |
+        | **<component-1/>** | `<package-1/>` | <info-1/> |
         [...]
-        | **<component-N/>** | <package-N/> | <info-N/> |
+        | **<component-N/>** | `<package-N/>` | <info-N/> |
         </template>
 
     -   Display the discovered components as a Markdown *table*
@@ -166,11 +166,11 @@ for the technology stack to *provide* the *needed functionality*
         <template>
         &#x1F535; **COMPONENT RANKING**:
 
-        | *Component*   | *Package*      | *Version*    | *Downloads*        | *Stars*        | *Updated*        | *Created*    |
-        | :------------ | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- |
-        | **<name-1/>** | `<package-1/>` | <version-1/> | **<downloads-1/>** | **<stars-1/>** | **<updated-1/>** | <created-1/> |
+        | ⚑ *Component*      | ▣ *Package*    | ❖ *Version*  | ↓ *Downloads*      | ⎈ *Stars*      | ⏲ *Updated*      | ☆ *Created*  |
+        | :----------------- | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- |
+        | **<component-1/>** | `<package-1/>` | <version-1/> | **<downloads-1/>** | **<stars-1/>** | **<updated-1/>** | <created-1/> |
         [...]
-        | **<name-N/>** | `<package-N/>` | <version-N/> | **<downloads-N/>** | **<stars-N/>** | **<updated-N/>** | <created-N/> |
+        | **<component-N/>** | `<package-N/>` | <version-N/> | **<downloads-N/>** | **<stars-N/>** | **<updated-N/>** | <created-N/> |
         </template>
     </step>
 </flow>
