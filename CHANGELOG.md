@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.0.41 (2026-05-22)
+0.0.41 (2026-05-23)
 -------------------
 
 - IMPROVEMENT: rate-limit the HTTP requests in ase-skills.ts to 4 concurrent ones
