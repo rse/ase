@@ -5,6 +5,8 @@ ChangeLog
 0.0.39 (2026-05-22)
 -------------------
 
+- IMPROVEMENT: refine `ase-code-craft`, `ase-code-refactor`, and `ase-code-resolve` skills
+
 0.0.38 (2026-05-22)
 -------------------
 
