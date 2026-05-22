@@ -4,6 +4,7 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
+import fs                from "node:fs/promises"
 import path              from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -37,6 +38,80 @@ export default class SetupCommand {
         return which(tool).catch(() => {
             throw new Error(`mandatory tool "${tool}" not found in $PATH`)
         })
+    }
+
+    /*  determine whether a global "npm" operation requires "sudo" by
+        checking whether the npm global install root is writable by the
+        current user; on Windows or when already running as root, no
+        elevation is needed  */
+    private async npmGlobalNeedsSudo (): Promise<boolean> {
+        /*  Windows has no "sudo" concept here  */
+        if (process.platform === "win32")
+            return false
+
+        /*  already running as root  */
+        const getuid = (process as unknown as { getuid?: () => number }).getuid
+        if (typeof getuid === "function" && getuid.call(process) === 0)
+            return false
+
+        /*  determine the npm global prefix and probe writability of the
+            directories that "npm -g" actually mutates  */
+        let prefix = ""
+        try {
+            const result = await execa("npm", [ "prefix", "-g" ], { stdio: "pipe" })
+            prefix = result.stdout.trim()
+        }
+        catch {
+            /*  if we cannot determine the prefix, fall back to "no sudo"  */
+            return false
+        }
+        if (prefix === "")
+            return false
+        const candidates = [
+            prefix,
+            path.join(prefix, "bin"),
+            path.join(prefix, "lib", "node_modules")
+        ]
+        for (const dir of candidates) {
+            try {
+                await fs.access(dir, fs.constants.W_OK)
+            }
+            catch {
+                /*  directory exists but not writable, or does not exist
+                    inside a non-writable parent: require sudo  */
+                try {
+                    await fs.access(dir, fs.constants.F_OK)
+                    return true
+                }
+                catch {
+                    /*  directory does not exist: check parent writability  */
+                    try {
+                        await fs.access(path.dirname(dir), fs.constants.W_OK)
+                    }
+                    catch {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    /*  build the (cmd, args) pair for an "npm" invocation, prefixing
+        with "sudo" when necessary for global operations  */
+    private async npmCmd (args: string[], global: boolean): Promise<{ cmd: string, args: string[] }> {
+        if (global && await this.npmGlobalNeedsSudo()) {
+            const sudo = await which("sudo").catch(() => "")
+            if (sudo !== "") {
+                this.log.write("info",
+                    "setup: npm global install root not writable: using \"sudo\"")
+                return { cmd: "sudo", args: [ "npm", ...args ] }
+            }
+            this.log.write("warning",
+                "setup: npm global install root is not writable by current user " +
+                "and \"sudo\" not found in $PATH: attempting without elevation")
+        }
+        return { cmd: "npm", args }
     }
 
     /*  run a sub-process, suppressing output on success and emitting it on failure  */
@@ -143,7 +218,8 @@ export default class SetupCommand {
 
             /*  update ASE CLI tool  */
             this.log.write("info", `setup: update: updating ASE CLI tool: ${current} -> ${latest}`)
-            await this.run("npm", [ "update", "-g", "@rse/ase" ])
+            const updateCmd = await this.npmCmd([ "update", "-g", "@rse/ase" ], true)
+            await this.run(updateCmd.cmd, updateCmd.args)
 
             /*  update ASE plugin  */
             this.log.write("info", `setup: update: updating ASE ${spec.label} plugin`)
@@ -199,7 +275,8 @@ export default class SetupCommand {
         /*  uninstall ASE CLI tool (non-development only)  */
         if (!dev) {
             this.log.write("info", "setup: uninstall: uninstalling ASE CLI tool (origin: remote)")
-            await this.run("npm", [ "uninstall", "-g", "@rse/ase" ])
+            const uninstallCmd = await this.npmCmd([ "uninstall", "-g", "@rse/ase" ], true)
+            await this.run(uninstallCmd.cmd, uninstallCmd.args)
         }
         return 0
     }

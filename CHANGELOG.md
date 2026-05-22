@@ -2,8 +2,10 @@
 ChangeLog
 =========
 
-0.0.38 (2026-05-21)
+0.0.38 (2026-05-22)
 -------------------
+
+- BUGFIX: automatically choose "sudo" for "npm install -g" commands when necessary in "ase setup"
 
 0.0.37 (2026-05-21)
 -------------------
