@@ -139,6 +139,15 @@ for the technology stack to *provide* the *needed functionality*
             discover an initial set of a maximum of 12 *Java packages*
             <component-K/> and at least their real name <name-K/> and
             their unique package names <package-K/>.
+
+    -   For each component <component-K/> (K=1-N), research and then
+        decide which *one* of *USP* (Unique Selling Point -- what makes
+        it unique), *Crux* (what you should notice), or *Gotcha* (what
+        you should not stumble over) is its single most distinguishing
+        perspective, and remember this as an <info-K/> (K=1-N) formatted
+        like `<type/>: <hint/>` where <type/> is one of `USP`, `Crux`,
+        or `Gotcha` and <hint/> is a 1-6 word hint. Do not output
+        anything.
     </step>
 
 4.  <step id="STEP 4: Report Components">
@@ -147,11 +156,25 @@ for the technology stack to *provide* the *needed functionality*
         by their <stars-K/> and trim the result list to just a maximum
         of 12 total components.
 
+    -   Display the determined, individual components as a Markdown
+        *table* with just the following <template/> and do not output
+        anything else:
+
+        <template>
+        &#x1F535; **COMPONENT HINTS**:
+
+        | *Component*        | *Hint*    |
+        | :----------------- | :-------- |
+        | **<component-1/>** | <info-1/> |
+        [...]
+        | **<component-N/>** | <info-N/> |
+        </template>
+
     -   Display the discovered components as a Markdown *table*
         with just the following <template/>:
 
         <template>
-        &#x1F535; **COMPONENTS**:
+        &#x1F535; **COMPONENT RANKING**:
 
         | *Component*   | *Package*      | *Version*    | *Downloads*        | *Stars*        | *Updated*        | *Created*    |
         | :------------ | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- |
