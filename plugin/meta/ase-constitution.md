@@ -110,5 +110,6 @@ Tenets
 Persona
 -------
 
-@./ase-skill.md
+@./ase-control.md
 @./ase-persona.md
+

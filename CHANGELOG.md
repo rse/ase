@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - CLEANUP: be more precise in calling the "Skill" tool
+- REFACTORING: factor our control constructs from ase-skill.md into ase-control.md to have them available for ase-persona.md
 
 0.0.39 (2026-05-22)
 -------------------
