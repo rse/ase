@@ -13,8 +13,7 @@ import type { ChildProcess }  from "node:child_process"
 
 import { Command }            from "commander"
 import Hapi                   from "@hapi/hapi"
-import axios                  from "axios"
-import type { AxiosError }    from "axios"
+import { ofetch, FetchError } from "ofetch"
 import { isMap }              from "yaml"
 import prettyMs               from "pretty-ms"
 import * as v                 from "valibot"
@@ -30,6 +29,7 @@ import { KVMCP }                         from "./ase-kv.js"
 import PersonaMCP                        from "./ase-persona.js"
 import { TimestampMCP }                  from "./ase-timestamp.js"
 import { GetoptMCP }                     from "./ase-getopt.js"
+import { SkillsMCP }                     from "./ase-skills.js"
 import pkg                               from "../package.json" with { type: "json" }
 
 /*  shared service host  */
@@ -41,24 +41,25 @@ export const serviceSchema = v.nullish(v.strictObject({
     port: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)))
 }))
 
-/*  distinguish ECONNREFUSED from other Axios transport errors  */
+/*  distinguish ECONNREFUSED from other ofetch transport errors  */
 export const isConnRefused = (err: unknown): boolean => {
-    const e = err as AxiosError & { code?: string, cause?: { code?: string } }
-    return e?.code === "ECONNREFUSED" || e?.cause?.code === "ECONNREFUSED"
+    const e = err as FetchError & { code?: string, cause?: { code?: string, cause?: { code?: string } } }
+    return e?.code === "ECONNREFUSED"
+        || e?.cause?.code === "ECONNREFUSED"
+        || e?.cause?.cause?.code === "ECONNREFUSED"
 }
 
 /*  probe the service and verify ASE identity banner  */
 export const probe = async (port: number, projectId: string): Promise<boolean | null> => {
     try {
-        const r = await axios.request({
-            method:         "OPTIONS",
-            url:            `http://${SERVICE_HOST}:${port}/`,
-            timeout:        2000,
-            validateStatus: () => true
+        const r = await ofetch.raw(`http://${SERVICE_HOST}:${port}/`, {
+            method:              "OPTIONS",
+            signal:              AbortSignal.timeout(2000),
+            ignoreResponseError: true
         })
         if (r.status < 200 || r.status >= 300)
             return false
-        const d = r.data as { ase?: boolean, projectId?: string } | null
+        const d = r._data as { ase?: boolean, projectId?: string } | null
         return d?.ase === true && d?.projectId === projectId
     }
     catch (err: unknown) {
@@ -268,6 +269,7 @@ export default class ServiceCommand {
             new PersonaMCP(this.log).register(mcp)
             new TimestampMCP().register(mcp)
             new GetoptMCP().register(mcp)
+            new SkillsMCP().register(mcp)
             return mcp
         }
 
@@ -501,15 +503,14 @@ export default class ServiceCommand {
         }
         const match = await probe(ctx.port, ctx.projectId)
         if (match === true) {
-            const r = await axios.request({
-                method:         "POST",
-                url:            `http://${HOST}:${ctx.port}/command`,
-                headers:        { "Content-Type": "application/json" },
-                data:           { command: "status" },
-                timeout:        2000,
-                validateStatus: () => true
+            const r = await ofetch.raw(`http://${HOST}:${ctx.port}/command`, {
+                method:              "POST",
+                headers:             { "Content-Type": "application/json" },
+                body:                { command: "status" },
+                signal:              AbortSignal.timeout(2000),
+                ignoreResponseError: true
             })
-            const d        = r.data as { uptimeMs?: number } | null
+            const d        = r._data as { uptimeMs?: number } | null
             const uptimeMs = typeof d?.uptimeMs === "number" ? d.uptimeMs : 0
             const uptime   = prettyMs(uptimeMs, { verbose: true })
             process.stdout.write(`service: running on port ${ctx.port} (uptime: ${uptime})\n`)
@@ -539,17 +540,15 @@ export default class ServiceCommand {
             if (ctx.port === null)
                 throw new Error("service not running (no port configured after auto-start)")
         }
-        const r = await axios.request({
-            method:            "POST",
-            url:               `http://${HOST}:${ctx.port}/command`,
-            headers:           { "Content-Type": "application/json" },
-            data:              { command: cmd },
-            timeout:           5000,
-            validateStatus:    () => true,
-            responseType:      "text",
-            transformResponse: [ (x) => x ]
+        const r = await ofetch.raw(`http://${HOST}:${ctx.port}/command`, {
+            method:              "POST",
+            headers:             { "Content-Type": "application/json" },
+            body:                { command: cmd },
+            signal:              AbortSignal.timeout(5000),
+            ignoreResponseError: true,
+            responseType:        "text"
         })
-        const body = typeof r.data === "string" ? r.data : JSON.stringify(r.data)
+        const body = typeof r._data === "string" ? r._data : JSON.stringify(r._data)
         process.stdout.write(body)
         if (!body.endsWith("\n"))
             process.stdout.write("\n")
@@ -573,11 +572,10 @@ export default class ServiceCommand {
             Service.clearPort(ctx.svc)
             return 0
         }
-        const r  = await axios.request({
-            method:         "GET",
-            url:            `http://${HOST}:${ctx.port}/stop`,
-            timeout:        5000,
-            validateStatus: () => true
+        const r = await ofetch.raw(`http://${HOST}:${ctx.port}/stop`, {
+            method:              "GET",
+            signal:              AbortSignal.timeout(5000),
+            ignoreResponseError: true
         })
         const ok = r.status >= 200 && r.status < 300
         Service.clearPort(ctx.svc)
