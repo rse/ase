@@ -5,6 +5,7 @@ ChangeLog
 0.0.41 (2026-05-22)
 -------------------
 
+- IMPROVEMENT: rate-limit the HTTP requests in ase-skills.ts to 4 concurrent ones
 - IMPROVEMENT: migrate the weighted decision matrix calculation of the "evaluate" skill into a MCP tool
 - IMPROVEMENT: migrate the parallel WebFetch and sorting functionality of the "discover" skill into a MCP tool
 - IMPROVEMENT: add USP/Crux/Gotcha overview table also to "discover" skill

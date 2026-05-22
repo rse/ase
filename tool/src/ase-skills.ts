@@ -26,6 +26,26 @@ export class Skills {
     /*  HTTP timeout for the GitHub/npm-downloads side calls  */
     private static HTTP_TIMEOUT_MS = 10_000
 
+    /*  cap concurrent ofetch web requests to avoid hammering the remote
+        endpoints (GitHub API, npm downloads API)  */
+    private static HTTP_CONCURRENCY = 4
+    private static httpActive       = 0
+    private static httpQueue: Array<() => void> = []
+    private static async httpLimit<T> (fn: () => Promise<T>): Promise<T> {
+        if (Skills.httpActive >= Skills.HTTP_CONCURRENCY)
+            await new Promise<void>((resolve) => Skills.httpQueue.push(resolve))
+        Skills.httpActive++
+        try {
+            return await fn()
+        }
+        finally {
+            Skills.httpActive--
+            const next = Skills.httpQueue.shift()
+            if (next !== undefined)
+                next()
+        }
+    }
+
     /*  fetch the full registry packument for a single package  */
     private static async fetchPackument (name: string): Promise<{
         version: string, time: Record<string, string>, repository: string
@@ -60,10 +80,10 @@ export class Skills {
         if (m === null)
             return "N.A."
         try {
-            const data = await ofetch<{ stargazers_count?: number }>(
+            const data = await Skills.httpLimit(() => ofetch<{ stargazers_count?: number }>(
                 `https://api.github.com/repos/${m[1]}`,
                 { timeout: Skills.HTTP_TIMEOUT_MS, ignoreResponseError: true }
-            )
+            ))
             const n = data?.stargazers_count
             return typeof n === "number" ? n : "N.A."
         }
@@ -75,10 +95,10 @@ export class Skills {
     /*  fetch last-month npm downloads for a single package  */
     private static async fetchDownloads (name: string): Promise<number | "N.A."> {
         try {
-            const data = await ofetch<{ downloads?: number }>(
+            const data = await Skills.httpLimit(() => ofetch<{ downloads?: number }>(
                 `https://api.npmjs.org/downloads/point/last-month/${encodeURIComponent(name)}`,
                 { timeout: Skills.HTTP_TIMEOUT_MS, ignoreResponseError: true }
-            )
+            ))
             const n = data?.downloads
             return typeof n === "number" ? n : "N.A."
         }
