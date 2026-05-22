@@ -344,8 +344,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   If <result/> is `IMPLEMENT`:
 
             *Break* out of the *loop*, only output the following
-            <template/> and then use the `Skill` tool to invoke the
-            `ase:ase-task-implement` skill in order to *apply* the finalized
+            <template/> and then call the `Skill(skill:
+            "ase:ase-task-implement")` tool to *apply* the finalized
             plan.
 
             <template>
@@ -355,8 +355,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   If <result/> is `PREFLIGHT`:
 
             *Break* out of the *loop*, only output the following
-            <template/> and then use the `Skill` tool to invoke the
-            `ase:ase-task-preflight` skill in order to *apply* the finalized
+            <template/> and then call the `Skill(skill:
+            "ase:ase-task-preflight")` tool to *apply* the finalized
             plan.
 
             <template>
@@ -412,3 +412,4 @@ explicitly requested by this procedure via outputs based on a <template/>!
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan refinement cancelled**
             </template>
+
