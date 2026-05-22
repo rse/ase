@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: add USP/Crux/Gotcha overview table also to "discover" skill
+- REFACTOR: migrate from Axios to OFetch NPM package
 - CLEANUP: remove inclusion of "ase-persona.md" from all skill files (is part of constitution)
 
 0.0.40 (2026-05-22)
