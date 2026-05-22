@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: refine `ase-code-craft`, `ase-code-refactor`, and `ase-code-resolve` skills
+- IMPROVEMENT: directly transition at end of craft/refactor/resolve to edit skill
 
 0.0.38 (2026-05-22)
 -------------------

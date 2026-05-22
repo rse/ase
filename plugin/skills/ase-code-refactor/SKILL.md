@@ -246,58 +246,9 @@ permitted way to persist artifacts is via `task_save(...)`.
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan created**
         </template>
 
-    5.  *Determine next step*:
+    5.  Directly pass-through control to the `ase:ase-task-edit` skill.
+        Set <args></args> (set args to empty). If <getopt-option-next/>
+        is not equal `none`, set <args><args/> --next
+        <getopt-option-next/></args> (append to args). Then call the
+        tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`.
 
-        -   If <getopt-option-next/> matches the regex `^(DONE|EDIT|PREFLIGHT|IMPLEMENT)$`:
-            Honor the pre-selection what to do as the next step.
-            Set <result><getopt-option-next/></result>.
-
-        -   If <getopt-option-next/> is equal to `none`:
-            Let the *user interactively choose* what to do as the next step.
-
-            <expand name="user-dialog">
-                Next Step: How would you like to proceed with the plan?
-                DONE: Stop processing.
-                EDIT: Hand processing off to editing.
-                PREFLIGHT: Hand processing off to preflighting.
-                IMPLEMENT: Hand processing off to implementation.
-            </expand>
-
-    6.  Check the tool <result/> and dispatch accordingly:
-
-        -   If <result/> is `DONE` or `CANCEL`:
-            Only output the following <template/> and then *STOP*.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **done**
-            </template>
-
-        -   If <result/> is `EDIT`:
-            Only output the following <template/> and then use the
-            `Skill` tool to invoke the `ase:ase-task-edit` skill in
-            order to edit the plan. Immediately stop processing the
-            current skill once the `Skill` tool was used.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **hand off to edit**
-            </template>
-
-        -   If <result/> is `PREFLIGHT`:
-            Only output the following <template/> and then use the
-            `Skill` tool to invoke the `ase:ase-task-preflight` skill in
-            order to preflight the plan. Immediately stop processing the
-            current skill once the `Skill` tool was used.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **hand off to preflight**
-            </template>
-
-        -   If <result/> is `IMPLEMENT`:
-            Only output the following <template/> and then use the
-            `Skill` tool to invoke the `ase:ase-task-implement` skill in
-            order to implement the plan. Immediately stop processing the
-            current skill once the `Skill` tool was used.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **hand off to implement**
-            </template>
