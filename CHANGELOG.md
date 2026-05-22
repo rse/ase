@@ -5,6 +5,8 @@ ChangeLog
 0.0.41 (2026-05-22)
 -------------------
 
+- CLEANUP: remove inclusion of "ase-persona.md" from all skill files (is part of constitution)
+
 0.0.40 (2026-05-22)
 -------------------
 

@@ -12,7 +12,6 @@ allowed-tools:
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
-@${CLAUDE_SKILL_DIR}/../../meta/ase-persona.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
 Query Multiple AIs for Quorum Answer
