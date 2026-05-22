@@ -5,6 +5,8 @@ ChangeLog
 0.0.40 (2026-05-22)
 -------------------
 
+- CLEANUP: be more precise in calling the "Skill" tool
+
 0.0.39 (2026-05-22)
 -------------------
 
