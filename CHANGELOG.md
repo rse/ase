@@ -5,7 +5,13 @@ ChangeLog
 0.0.43 (2026-05-23)
 -------------------
 
+- IMPROVEMENT: further improve persona style in `ase-persona.md`
+- BUGFIX: fix typo in `ase-meta-changes` skill
 - UPDATE: upgrade NPM dependencies
+- UPDATE: update documentation (AGENTS.md, configuration, setup, usage-tool) to reflect reality
+- UPDATE: refine README wording for more precision
+- CLEANUP: add back missing trailing blank lines in meta and skill files
+- CLEANUP: explicitly ignore `node_modules` also in plugin subdirectory
 
 0.0.42 (2026-05-23)
 -------------------
