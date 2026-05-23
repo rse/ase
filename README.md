@@ -20,10 +20,10 @@ of *Software Engineering*, especially in the discipline *Software
 Development*.
 
 > [!NOTE]
-> **ASE** is *agentic*, but not pure *agent*-based, i.e., it focuses
-> on supporting the role of a software engineer with *Agentic AI* and
-> not driving the disciple software engineering with fully autonomous
-> agents.
+> **ASE** is *agentic*, but not pure *agent*-based, i.e., it focuses on
+> supporting the role of a software engineer with *Agentic AI Coding
+> Tools* and not driving the disciple software engineering with fully
+> autonomous agents.
 
 > [!NOTE]
 > Initially, the primary focus of **ASE** is on the Agentic AI Coding
