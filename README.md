@@ -22,23 +22,23 @@ Development*.
 > [!NOTE]
 > **ASE** is *agentic*, but not pure *agent*-based, i.e., it focuses on
 > supporting the role of a software engineer with *Agentic AI Coding
-> Tools* and not driving the disciple software engineering with fully
+> Tools* and not driving the disciple Software Engineering with fully
 > autonomous agents.
 
 > [!NOTE]
-> Initially, the primary focus of **ASE** is on the Agentic AI Coding
-> tool *Claude Code*. Secondary focus is on the support for *GitHub
-> Copilot CLI* (just set environment variable `ASE_TOOL=copilot`).
-> Later, a forthcoming focus could be also on the alternative tools
-> *OpenAI Codex*, *Google Gemini CLI*, or *OpenCode* &mdash; if their
-> agent harness features (especially hooks, interactive user dialog
-> tool, etc) support it.
+> The primary focus of **ASE** is on the Agentic AI Coding tool *Claude
+> Code*. The secondary focus is on the support for *GitHub Copilot CLI*
+> (just set environment variable `ASE_TOOL=copilot`). In the future, a
+> additional support could be provided also for alternative tools like
+> *OpenAI Codex* or *OpenCode* &mdash; if their agent harness features
+> (especially hooks, interactive user dialog tool, etc) realistically
+> allow it.
 
 > [!CAUTION]
 > **ASE** is still under active development, still somewhat incomplete,
 > perhaps partially broken and hence not ready for production use. If
 > you are not a hard-boiled early adopter, please visit this project
-> again, once we reached at least version 0.9.x!
+> again once we reached at least version 0.9.x!
 
 Unique Selling Points
 ---------------------
