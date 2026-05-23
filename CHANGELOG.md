@@ -5,6 +5,9 @@ ChangeLog
 0.0.45 (2026-05-23)
 -------------------
 
+- IMPROVEMENT: add docs/agentic-software-engineering.md for some definitions
+- IMPROVEMENT: improve rendering of README.md
+
 0.0.44 (2026-05-23)
 -------------------
 
