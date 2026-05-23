@@ -43,7 +43,7 @@ Development*.
 Selling Points
 --------------
 
-<table border="0">
+<table>
 <tr>
 <td width="50%" valign="top">
 
@@ -155,6 +155,10 @@ Features
 
 **ASE** provides the following six distinct features:
 
+<table>
+<tr>
+<td width="50%" valign="top">
+
 - [**Configuration Scopes**](docs/configuration.md) (100% done):
   Parameters of project and agent can be configured on the hierarchy of
   the scopes *user*, *project*, *task*, and *skill*. This allows
@@ -172,6 +176,9 @@ Features
   (`ase-code-*`), architecture (`ase-arch-*`), and task (`ase-task-*`)
   families, covering 26 skills in total.
 
+</td>
+<td width="50%" valign="top">
+
 - **Artifact Formats** (0% done):
   The format of the four primary deliveries of Software Engineering
   (requirements specification, architecture description, documentation,
@@ -187,10 +194,18 @@ Features
   The agent is equipped with reasonable templates to scaffold
   Library/Framework, CLI and WebUI projects.
 
+</td>
+</tr>
+</table>
+
 Design Decisions
 ----------------
 
 **ASE** is based on the following four distinct design decisions:
+
+<table>
+<tr>
+<td width="50%" valign="top">
 
 - **Agent &amp; Plugin**:
   **ASE** is a plugin for the agent tools Claude Code and GitHub Copilot
@@ -203,6 +218,9 @@ Design Decisions
   Software Engineering only. Especially, **ASE** is not targeting
   Consulting or Operations business.
 
+</td>
+<td width="50%" valign="top">
+
 - **Human in the Loop**:
   **ASE** targets the scenario of a person performing Software
   Engineering tasks. Especially, **ASE** is not intended for full
@@ -213,6 +231,10 @@ Design Decisions
   **ASE** skills are strongly coupled to and work on top of the
   corresponding **ASE** MCP/CLI service. Especially, the **ASE** skills
   are not written to be used in foreign environments.
+
+</td>
+</tr>
+</table>
 
 Overview
 --------
