@@ -15,14 +15,20 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   `service`, `mcp`, `hook`, `diagram`, `setup`, `statusline`, and
   `task`, each registered by a corresponding `ase-<name>.ts` module.
   `ase config` manages layered YAML configuration across `user`/
-  `project`/`task`/`session` scopes; `ase service` runs a per-project
-  background HTTP service bridged to *Claude Code* via `ase mcp`; `ase
-  hook` handles *Claude Code* hook events (and emits the Copilot hook
-  variant); `ase setup` installs/updates/uninstalls the tool and its
-  companion plugin; `ase statusline` renders the *Claude Code* status
-  line; `ase task` manages persisted task plans under `<project>/.ase/task/
-  <id>/plan.md`; `ase diagram` renders Mermaid diagrams as Unicode/
-  ASCII art.
+  `project`/`task`/`session` scopes (subcommands: `init`, `list`,
+  `edit`, `get`, `set`); `ase service` runs a per-project background
+  HTTP service (subcommands: `start`, `status`, `send`, `stop`)
+  bridged to *Claude Code* via `ase mcp`; `ase hook` handles agent
+  hook events (subcommands: `session-start`, `session-end`,
+  `pre-tool-use`, `user-prompt-submit`, `stop`); `ase setup`
+  installs/updates/uninstalls/enables/disables the tool and its
+  companion plugin (subcommands: `install`, `update`, `uninstall`,
+  `enable`, `disable`, all with `--tool claude|copilot`);
+  `ase statusline` renders the *Claude Code* (or *GitHub Copilot CLI*)
+  status line; `ase task` manages persisted task plans under
+  `<project>/.ase/task/<id>/plan.md` (subcommands: `list`, `load`,
+  `edit`, `save`, `delete`, `purge`); `ase diagram` renders Mermaid
+  diagrams as Unicode/ASCII art.
 
 - `plugin/` — the Claude Code plugin published via the marketplace
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
@@ -40,8 +46,12 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     `recheck`, `refine`).
   - `plugin/hooks/hooks.json` and `plugin/hooks/hooks-copilot.json` —
     hook wirings into *Claude Code* / Copilot.
-  - `plugin/meta/ase-constitution.md` and `plugin/meta/ase-skill.md` —
-    the constitution and skill-authoring guide injected into sessions.
+  - `plugin/meta/*.md` — meta documents injected into sessions or
+    used by skills: `ase-constitution.md` (session constitution),
+    `ase-skill.md` (skill-authoring guide), `ase-control.md`
+    (skill control flow), `ase-dialog.md` (user-dialog conventions),
+    `ase-getopt.md` (skill option parsing), `ase-persona.md`
+    (persona definitions), and `ase-plan.md` (task-plan conventions).
 
 The root `README.md` is user-facing install docs;
 `pages/` is the GitHub Pages site (`.github/workflows/static.yml`).

@@ -7,8 +7,9 @@ User Setup
 
 ### Prerequisites
 
-- [Claude Code](https://code.claude.com)
-- [Node.js](https://nodejs.org)
+- Operating System: macOS, Linux, Windows
+- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
+- Runtime Engine: [Node.js](https://nodejs.org)
 
 ### Installation
 
@@ -16,22 +17,22 @@ User Setup
 #   install ASE tool into PATH (bootstrapping only)
 npm install -g @rse/ase
 
-#   install ASE plugin into Claude Code
-ase setup install
+#   install ASE plugin into agent tool
+ase setup install [--tool claude|copilot]
 ```
 
 ### Updating
 
 ```
-#   update ASE tool in PATH and ASE plugin in Claude Code
-ase setup update
+#   update ASE tool in PATH and ASE plugin in agent tool
+ase setup update [--tool claude|copilot]
 ```
 
 ### Uninstallation
 
 ```
-#   uninstall ASE tool from PATH and ASE plugin from Claude Code
-ase setup uninstall
+#   uninstall ASE tool from PATH and ASE plugin from agent tool
+ase setup uninstall [--tool claude|copilot]
 ```
 
 Contributor Setup
@@ -39,9 +40,10 @@ Contributor Setup
 
 ### Prerequisites
 
-- [Claude Code](https://code.claude.com)
-- [Node.js](https://nodejs.org)
-- [Git](https://git-scm.com)
+- Operating System: macOS, Linux, Windows
+- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
+- Runtime Engine: [Node.js](https://nodejs.org)
+- Version Control: [Git](https://git-scm.com)
 
 ### Initial Setup
 

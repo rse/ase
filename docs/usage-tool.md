@@ -284,8 +284,20 @@ uninstalling the *ASE* tool and its companion *Claude Code* plugin:
 - `ase setup uninstall` \[`-d`|`--dev`\]:
   Uninstall the *ASE Claude Code* plugin and the *ASE* tool.
 
+- `ase setup enable`:
+  Enable the (already-installed) *ASE* plugin in the agent tool.
+
+- `ase setup disable`:
+  Disable the (already-installed) *ASE* plugin in the agent tool
+  without uninstalling it.
+
+All `ase setup` subcommands accept the host selector \[`-t`|`--tool`
+`claude`|`copilot`\] (default: `claude`, or the value of the
+`ASE_TOOL` environment variable if set) to choose between *Claude
+Code* and *GitHub Copilot CLI* as the target agent tool.
+
 The following top-level commands exist for managing persisted task
-plans under `~/.ase/task/`*id*`/plan.md`:
+plans under `<project>/.ase/task/`*id*`/plan.md`:
 
 - `ase task`:
   Entry point group for task plan management. Without a subcommand,
@@ -309,7 +321,7 @@ plans under `~/.ase/task/`*id*`/plan.md`:
 
 - `ase task delete` *id*:
   Delete the task plan with the given *id* (removing the entire
-  `~/.ase/task/`*id*`/` directory). Exits with status 1 if no such
+  `<project>/.ase/task/`*id*`/` directory). Exits with status 1 if no such
   task existed.
 
 - `ase task purge` \[*days*\]:
@@ -330,11 +342,28 @@ integration:
   internally as a configured hook handler only, not directly
   by end users.
 
+- `ase hook session-end`:
+  Handle the *Claude Code* `SessionEnd` hook event. This
+  subcommand is intended to be invoked by *Claude Code*
+  internally as a configured hook handler only, not directly
+  by end users.
+
 - `ase hook pre-tool-use`:
   Handle the *Claude Code* `PreToolUse` hook event. This
   subcommand is intended to be invoked by *Claude Code*
   internally as a configured hook handler only, not directly
   by end users.
+
+- `ase hook user-prompt-submit`:
+  Handle the *Claude Code* `UserPromptSubmit` hook event. This
+  subcommand is intended to be invoked by *Claude Code*
+  internally as a configured hook handler only, not directly
+  by end users.
+
+- `ase hook stop`:
+  Handle the *Claude Code* `Stop` hook event. This subcommand is
+  intended to be invoked by *Claude Code* internally as a configured
+  hook handler only, not directly by end users.
 
 CONFIGURATION FILES
 -------------------
@@ -367,10 +396,11 @@ STATE FILES
 - `.ase/service.log`:
   Stdout/stderr log of the detached background service.
 
-- `~/.ase/task/`*id*`/plan.md`:
-  Persisted task plan, managed by the `ase task` subcommands. The
-  per-task directory is owned by *ASE* in full and removed by
-  `ase task delete` and `ase task purge`.
+- `<project>/.ase/task/`*id*`/plan.md`:
+  Persisted task plan, managed by the `ase task` subcommands, located
+  relative to the Git top-level directory (or the current working
+  directory outside a Git repository). The per-task directory is owned
+  by *ASE* in full and removed by `ase task delete` and `ase task purge`.
 
 HISTORY
 -------

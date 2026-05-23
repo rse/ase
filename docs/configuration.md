@@ -7,7 +7,7 @@ the following scopes (and in this order, with later scopes overriding
 earlier scopes):
 
 -   `default`: (id: *none*,            storage: *built-in*)
--   `user`:    (id: `$ASE_USER_ID`,    storage: `~/.ase/config.yaml`)
+-   `user`:    (id: `$ASE_USER_ID`,    storage: *per-user config dir*`/config.yaml`)
 -   `project`: (id: `$ASE_PROJECT_ID`, storage: `.ase/config.yaml`)
 -   `task`:    (id: `$ASE_TASK_ID`,    storage: `.ase/task/<task-id>/config.yaml`)
 -   `session`: (id: `$ASE_SESSION_ID`, storage: `~/.ase/session/<session-id>/config.yaml`)
