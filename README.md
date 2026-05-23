@@ -30,8 +30,9 @@ Development*.
 > but still strongly focuses on Human-in-the-Loop.
 
 > [!NOTE]
-> The primary focus of **ASE** is on the Agentic AI Coding tool *Claude
-> Code*. The secondary focus is on the support for *GitHub Copilot CLI*
+> The primary focus of **ASE** is on the Agentic AI Coding tool [*Claude
+> Code*](https://code.claude.com) The secondary focus is on the support
+> for [*GitHub Copilot CLI*](https://github.com/features/copilot/cli)
 > (just set environment variable `ASE_TOOL=copilot`). In the future,
 > a additional support could be provided also for alternative tools
 > &mdash; if their agent harness features (especially hooks, interactive
