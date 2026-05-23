@@ -56,6 +56,18 @@ export class KV {
         KV.store.clear()
         return n
     }
+
+    /*  snapshot the entire store into a fresh map (for transactional batch)  */
+    static snapshot (): Map<string, unknown> {
+        return new Map(KV.store)
+    }
+
+    /*  restore the store from a previously taken snapshot  */
+    static restore (snap: Map<string, unknown>): void {
+        KV.store.clear()
+        for (const [ k, v ] of snap)
+            KV.store.set(k, v)
+    }
 }
 
 /*  MCP registration entry point for in-memory key/value tools  */
@@ -148,6 +160,84 @@ export class KVMCP {
             catch (err: unknown) {
                 const message = err instanceof Error ? err.message : String(err)
                 return { isError: true, content: [ { type: "text", text: `kv_delete: ERROR: ${message}` } ] }
+            }
+        })
+
+        /*  key/value batch  */
+        mcp.registerTool("kv_batch", {
+            title: "ASE key/value batch",
+            description:
+                "Execute an array of in-memory key/value `commands` in a single MCP call. " +
+                "Each entry is an object `{ command: \"clear\"|\"set\"|\"get\"|\"delete\", key?, val? }` " +
+                "and is dispatched to the corresponding single-op tool. " +
+                "If `transactional` is true, the store is snapshotted up-front and rolled back on the " +
+                "first per-command error (remaining commands are skipped); otherwise per-command errors " +
+                "are recorded and execution continues. " +
+                "Returns a single `text` payload containing a JSON array of per-command result strings " +
+                "in the same format emitted by `kv_clear`/`kv_set`/`kv_get`/`kv_delete`.",
+            inputSchema: {
+                commands: z.array(z.object({
+                    command: z.enum([ "clear", "set", "get", "delete" ])
+                        .describe("the KV sub-command to execute"),
+                    key: z.string().optional()
+                        .describe("key identifier (required for `set`/`get`/`delete`)"),
+                    val: z.any().optional()
+                        .describe("value to store (required for `set`)")
+                }))
+                    .describe("ordered list of KV commands to execute"),
+                transactional: z.boolean().optional()
+                    .describe("if true, snapshot the store and roll back on first error")
+            }
+        }, async (args) => {
+            const results: string[] = []
+            const tx       = args.transactional === true
+            const snapshot = tx ? KV.snapshot() : null
+            try {
+                for (const c of args.commands) {
+                    try {
+                        if (c.command === "clear") {
+                            const n = KV.clear()
+                            results.push(`kv_clear: OK: removed ${n} key(s)`)
+                        }
+                        else if (c.command === "set") {
+                            if (c.key === undefined)
+                                throw new Error("kv_set: missing `key`")
+                            KV.set(c.key, c.val)
+                            results.push(`kv_set: OK: stored key "${c.key}"`)
+                        }
+                        else if (c.command === "get") {
+                            if (c.key === undefined)
+                                throw new Error("kv_get: missing `key`")
+                            if (!KV.has(c.key))
+                                results.push("")
+                            else
+                                results.push(JSON.stringify(KV.get(c.key)))
+                        }
+                        else if (c.command === "delete") {
+                            if (c.key === undefined)
+                                throw new Error("kv_delete: missing `key`")
+                            const removed = KV.delete(c.key)
+                            results.push(removed ?
+                                `kv_delete: OK: removed key "${c.key}"` :
+                                `kv_delete: WARNING: no key "${c.key}" to remove`)
+                        }
+                    }
+                    catch (err: unknown) {
+                        const message = err instanceof Error ? err.message : String(err)
+                        if (tx) {
+                            if (snapshot !== null)
+                                KV.restore(snapshot)
+                            results.push(`kv_batch: ERROR: ${message}`)
+                            return { isError: true, content: [ { type: "text", text: JSON.stringify(results) } ] }
+                        }
+                        results.push(`${c.command}: ERROR: ${message}`)
+                    }
+                }
+                return { content: [ { type: "text", text: JSON.stringify(results) } ] }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return { isError: true, content: [ { type: "text", text: `kv_batch: ERROR: ${message}` } ] }
             }
         })
     }

@@ -87,11 +87,12 @@ code, for problems in its *logic* and *semantics* and its related
         of <template>LOW</template>, <template>MEDIUM</template> or
         <template>HIGH</template>.
 
-    -   *Additionally*, first call the `kv_clear()` tool of the `ase`
-        MCP service to clear the in-memory key/value store, and then, for
-        *every* reported problem, persist its problem analysis result
-        via the `kv_set` tool of the `ase` MCP service, using `key` set
-        to `ase-issue-P<n/>` and `val` set to `<title/>: <description/>`.
+    -   *Additionally*, persist all reported problems in a *single*
+        `kv_batch` call to the `ase` MCP service with `transactional`
+        set to `true`. The `commands` parameter array of this call
+        starts with one `{ command: "clear" }` entry, followed by one
+        `{ command: "set", key: "ase-issue-P<n/>", val: "<title/>:
+        <description/>" }` entry per reported problem.
     </step>
 
 3.  <step id="STEP 3: Give Final Hint">
