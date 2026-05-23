@@ -22,6 +22,11 @@ export class KV {
     static validateKey (key: string): void {
         if (typeof key !== "string" || key.length === 0)
             throw new Error("kv: key must be a non-empty string")
+        if (key.trim().length === 0)
+            throw new Error("kv: key must not consist solely of whitespace")
+        /* eslint-disable-next-line no-control-regex */
+        if (/[\x00-\x1F\x7F]/.test(key))
+            throw new Error("kv: key must not contain control characters")
         if (key.length > KV.KEY_MAX_LEN)
             throw new Error(`kv: key must be no longer than ${KV.KEY_MAX_LEN} characters`)
     }
@@ -41,7 +46,7 @@ export class KV {
     /*  set a value under the given key; overwrites any existing value  */
     static set (key: string, val: unknown): void {
         KV.validateKey(key)
-        KV.store.set(key, val)
+        KV.store.set(key, structuredClone(val))
     }
 
     /*  delete a value by key; returns true if a value existed  */
@@ -81,14 +86,14 @@ export class KVMCP {
                 "Returns the value as JSON-encoded `text`; returns an empty string if no value is stored.",
             inputSchema: {
                 key: z.string()
-                    .describe("key identifier (non-empty string, up to 1024 characters)")
+                    .describe("key identifier (non-empty, no whitespace-only, no control characters, up to 1024 characters)")
             }
         }, async (args) => {
             try {
                 if (!KV.has(args.key))
                     return { content: [ { type: "text", text: "" } ] }
                 const val  = KV.get(args.key)
-                const text = JSON.stringify(val)
+                const text = val === undefined ? "" : JSON.stringify(val)
                 return { content: [ { type: "text", text } ] }
             }
             catch (err: unknown) {
@@ -106,8 +111,8 @@ export class KVMCP {
                 "The value can be any JSON-compatible type (string, number, boolean, null, array, object).",
             inputSchema: {
                 key: z.string()
-                    .describe("key identifier (non-empty string, up to 1024 characters)"),
-                val: z.any()
+                    .describe("key identifier (non-empty, no whitespace-only, no control characters, up to 1024 characters)"),
+                val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.any()), z.record(z.string(), z.any()) ])
                     .describe("arbitrary JSON-compatible value to store under `key`")
             }
         }, async (args) => {
@@ -147,7 +152,7 @@ export class KVMCP {
                 "Returns a status `text` indicating whether a value existed and was removed.",
             inputSchema: {
                 key: z.string()
-                    .describe("key identifier (non-empty string, up to 1024 characters)")
+                    .describe("key identifier (non-empty, no whitespace-only, no control characters, up to 1024 characters)")
             }
         }, async (args) => {
             try {
@@ -181,7 +186,7 @@ export class KVMCP {
                         .describe("the KV sub-command to execute"),
                     key: z.string().optional()
                         .describe("key identifier (required for `set`/`get`/`delete`)"),
-                    val: z.any().optional()
+                    val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.any()), z.record(z.string(), z.any()) ]).optional()
                         .describe("value to store (required for `set`)")
                 }))
                     .describe("ordered list of KV commands to execute"),
@@ -210,8 +215,10 @@ export class KVMCP {
                                 throw new Error("kv_get: missing `key`")
                             if (!KV.has(c.key))
                                 results.push("")
-                            else
-                                results.push(JSON.stringify(KV.get(c.key)))
+                            else {
+                                const val = KV.get(c.key)
+                                results.push(val === undefined ? "" : JSON.stringify(val))
+                            }
                         }
                         else if (c.command === "delete") {
                             if (c.key === undefined)
@@ -230,7 +237,7 @@ export class KVMCP {
                             results.push(`kv_batch: ERROR: ${message}`)
                             return { isError: true, content: [ { type: "text", text: JSON.stringify(results) } ] }
                         }
-                        results.push(`${c.command}: ERROR: ${message}`)
+                        results.push(`kv_${c.command}: ERROR: ${message}`)
                     }
                 }
                 return { content: [ { type: "text", text: JSON.stringify(results) } ] }
