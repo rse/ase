@@ -179,7 +179,10 @@ export class KVMCP {
                 "first per-command error (remaining commands are skipped); otherwise per-command errors " +
                 "are recorded and execution continues. " +
                 "Returns a single `text` payload containing a JSON array of per-command result strings " +
-                "in the same format emitted by `kv_clear`/`kv_set`/`kv_get`/`kv_delete`.",
+                "in the same format emitted by `kv_clear`/`kv_set`/`kv_get`/`kv_delete`. " +
+                "On transactional rollback, prior per-command result strings are rewritten to " +
+                "`kv_<cmd>: ROLLED-BACK` to truthfully reflect the post-rollback state, and the " +
+                "final entry remains `kv_batch: ERROR: <message>`.",
             inputSchema: {
                 commands: z.array(z.object({
                     command: z.enum([ "clear", "set", "get", "delete" ])
@@ -197,55 +200,51 @@ export class KVMCP {
             const results: string[] = []
             const tx       = args.transactional === true
             const snapshot = tx ? KV.snapshot() : null
-            try {
-                for (const c of args.commands) {
-                    try {
-                        if (c.command === "clear") {
-                            const n = KV.clear()
-                            results.push(`kv_clear: OK: removed ${n} key(s)`)
-                        }
-                        else if (c.command === "set") {
-                            if (c.key === undefined)
-                                throw new Error("kv_set: missing `key`")
-                            KV.set(c.key, c.val)
-                            results.push(`kv_set: OK: stored key "${c.key}"`)
-                        }
-                        else if (c.command === "get") {
-                            if (c.key === undefined)
-                                throw new Error("kv_get: missing `key`")
-                            if (!KV.has(c.key))
-                                results.push("")
-                            else {
-                                const val = KV.get(c.key)
-                                results.push(val === undefined ? "" : JSON.stringify(val))
-                            }
-                        }
-                        else if (c.command === "delete") {
-                            if (c.key === undefined)
-                                throw new Error("kv_delete: missing `key`")
-                            const removed = KV.delete(c.key)
-                            results.push(removed ?
-                                `kv_delete: OK: removed key "${c.key}"` :
-                                `kv_delete: WARNING: no key "${c.key}" to remove`)
+            for (const c of args.commands) {
+                try {
+                    if (c.command === "clear") {
+                        const n = KV.clear()
+                        results.push(`kv_clear: OK: removed ${n} key(s)`)
+                    }
+                    else if (c.command === "set") {
+                        if (c.key === undefined)
+                            throw new Error("kv_set: missing `key`")
+                        if (c.val === undefined)
+                            throw new Error("kv_set: missing `val`")
+                        KV.set(c.key, c.val)
+                        results.push(`kv_set: OK: stored key "${c.key}"`)
+                    }
+                    else if (c.command === "get") {
+                        if (c.key === undefined)
+                            throw new Error("kv_get: missing `key`")
+                        if (!KV.has(c.key))
+                            results.push("")
+                        else {
+                            const val = KV.get(c.key)
+                            results.push(val === undefined ? "" : JSON.stringify(val))
                         }
                     }
-                    catch (err: unknown) {
-                        const message = err instanceof Error ? err.message : String(err)
-                        if (tx) {
-                            if (snapshot !== null)
-                                KV.restore(snapshot)
-                            results.push(`kv_batch: ERROR: ${message}`)
-                            return { isError: true, content: [ { type: "text", text: JSON.stringify(results) } ] }
-                        }
-                        results.push(`kv_${c.command}: ERROR: ${message}`)
+                    else if (c.command === "delete") {
+                        if (c.key === undefined)
+                            throw new Error("kv_delete: missing `key`")
+                        const removed = KV.delete(c.key)
+                        results.push(removed ?
+                            `kv_delete: OK: removed key "${c.key}"` :
+                            `kv_delete: WARNING: no key "${c.key}" to remove`)
                     }
                 }
-                return { content: [ { type: "text", text: JSON.stringify(results) } ] }
+                catch (err: unknown) {
+                    const message = err instanceof Error ? err.message : String(err)
+                    if (tx) {
+                        if (snapshot !== null)
+                            KV.restore(snapshot)
+                        results.push(`kv_batch: ERROR: ${message}`)
+                        return { isError: true, content: [ { type: "text", text: JSON.stringify(results) } ] }
+                    }
+                    results.push(`kv_${c.command}: ERROR: ${message}`)
+                }
             }
-            catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `kv_batch: ERROR: ${message}` } ] }
-            }
+            return { content: [ { type: "text", text: JSON.stringify(results) } ] }
         })
     }
 }
