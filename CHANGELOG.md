@@ -5,8 +5,12 @@ ChangeLog
 0.0.42 (2026-05-23)
 -------------------
 
+- FEATURE: add KV batch interface MCP tool to speed up `ase-code-analyze` skill
 - IMPROVEMENT: improve the tenets in the craft/resolve/refactor skills
+- IMPROVEMENT: improve and lighten the output styling across skills
+- BUGFIX: various bugfixes to KV store
 - CLEANUP: reformat "ase-code-analyze" skill
+- CLEANUP: various cleanups to KV store and skills
 
 0.0.41 (2026-05-23)
 -------------------
