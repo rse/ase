@@ -40,8 +40,11 @@ Development*.
 > you are not a hard-boiled early adopter, please visit this project
 > again, once we reached at least version 0.9.x!
 
-Selling Points
---------------
+Unique Selling Points
+---------------------
+
+Check out the following questions and answers to see whether
+**ASE** is right for you:
 
 <table>
 <tr>
