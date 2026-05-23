@@ -142,7 +142,7 @@ ase setup uninstall [--tool claude|copilot]
 Features
 --------
 
-**ASE** provides the following five distinct features:
+**ASE** provides the following six distinct features:
 
 - [**Configuration Scopes**](docs/configuration.md) (100% done):
   Parameters of project and agent can be configured on the hierarchy of
@@ -160,6 +160,12 @@ Features
   behavior. Skills are grouped into meta (`ase-meta-*`), code
   (`ase-code-*`), architecture (`ase-arch-*`), and task (`ase-task-*`)
   families, covering 26 skills in total.
+
+- **Artifact Formats** (0% done):
+  The format of the four primary deliveries of Software Engineering
+  (requirements specification, architecture description, documentation,
+  and source code) and their artifacts are strictly defined to allow
+  *both* humans *and* agents to operate on them concurrently.
 
 - **Context Gathering** (0% done):
   The agent context is loaded with individual information for all
