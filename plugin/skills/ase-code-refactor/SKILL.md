@@ -182,7 +182,13 @@ permitted way to persist artifacts is via `task_save(...)`.
         ` ⚝ **RECOMMENDATION** ⚝`. All other approaches receive an
         empty <annotation/>. Do *not* output anything in this sub-step.
 
-    4.  *Now* report each approach with the following <template/>,
+    4.  Indicate start of reporting by showing the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `APPROACHES-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        </template>
+
+    5.  Now report each approach with the following <template/>,
         inlining its pros/cons derived in sub-step 2, and do not output
         anything else in this step:
 
@@ -214,6 +220,12 @@ permitted way to persist artifacts is via `task_save(...)`.
             rendered blocks *vertically* (labels `**Before:**` /
             `**After:**`); never side-by-side. Omit <optional-diagram/>
             entirely for simple or purely local situation.
+
+    6.  Indicate end of reporting by showing the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(**  `APPROACHES-END`  **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        </template>
 
 5.  **Choose Refactoring Approach**:
 

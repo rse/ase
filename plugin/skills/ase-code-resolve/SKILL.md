@@ -203,6 +203,12 @@ permitted way to persist artifacts is via `task_save(...)`.
             possible, as much new problem resolution source code as
             necessary.
 
+        -   **Origin Proximity**:
+            Problems for *obvious, particular, or expected* errors
+            *should* be handled *near the origin*. Problems for
+            *theoretical, fictive, or unexpected* errors, *should* be
+            handled more general and in parent scopes.
+
 4.  **Find Problem Resolution Approaches**:
 
     You *MUST* perform the following sub-steps *internally* and *without
@@ -222,7 +228,13 @@ permitted way to persist artifacts is via `task_save(...)`.
         ` ⚝ **RECOMMENDATION** ⚝`. All other approaches receive an
         empty <annotation/>. Do *not* output anything in this sub-step.
 
-    4.  *Now* report each approach with the following <template/>,
+    4.  Indicate start of reporting by showing the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `APPROACHES-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        </template>
+
+    5.  Now report each approach with the following <template/>,
         inlining its pros/cons derived in sub-step 2, and do not output
         anything else in this step:
 
@@ -242,17 +254,6 @@ permitted way to persist artifacts is via `task_save(...)`.
             *precise* and *brief* resolution information. Try to keep the
             number of bullet points (●) in the range of 1-4.
 
-        -   Focus on resolution approaches for *practically relevant* cases and do *not*
-            investigate on theoretical or fictive cases. This is especially the case
-            for error handling cases and race condition cases.
-
-        -   In case of resolution approaches for problems related to *obvious or
-            expected* errors, they *should* be handled *near the origin*.
-
-        -   In case of resolution approaches for problems related to *theoretical
-            or unexpected* errors, they *should* be handled in parent scopes to
-            avoid cluttering the source code with too much error handling at all.
-
         -   In case of a *complex resolution situation* only,
             visualize it with an optional diagram <optional-diagram/>
             by building a Mermaid specification <mermaid-spec/>
@@ -265,6 +266,12 @@ permitted way to persist artifacts is via `task_save(...)`.
             rendered blocks *vertically* (labels `**Before:**` /
             `**After:**`); never side-by-side. Omit <optional-diagram/>
             entirely for simple or purely local situation.
+
+    6.  Indicate end of reporting by showing the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(**  `APPROACHES-END`  **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        </template>
 
 5.  **Choose Problem Resolution Approach**:
 
