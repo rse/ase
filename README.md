@@ -43,8 +43,8 @@ Development*.
 Unique Selling Points
 ---------------------
 
-Check out the following questions and answers to see whether
-**ASE** is right for you:
+Check out the following questions and corresponding **ASE** examples to
+see whether **ASE** is right for you:
 
 <table>
 <tr>
