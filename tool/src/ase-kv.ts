@@ -197,7 +197,8 @@ export class KVMCP {
                     .describe("if true, snapshot the store and roll back on first error")
             }
         }, async (args) => {
-            const results: string[] = []
+            const results:  string[] = []
+            const cmdNames: string[] = []
             const tx       = args.transactional === true
             const snapshot = tx ? KV.snapshot() : null
             for (const c of args.commands) {
@@ -205,6 +206,7 @@ export class KVMCP {
                     if (c.command === "clear") {
                         const n = KV.clear()
                         results.push(`kv_clear: OK: removed ${n} key(s)`)
+                        cmdNames.push("clear")
                     }
                     else if (c.command === "set") {
                         if (c.key === undefined)
@@ -213,6 +215,7 @@ export class KVMCP {
                             throw new Error("kv_set: missing `val`")
                         KV.set(c.key, c.val)
                         results.push(`kv_set: OK: stored key "${c.key}"`)
+                        cmdNames.push("set")
                     }
                     else if (c.command === "get") {
                         if (c.key === undefined)
@@ -223,6 +226,7 @@ export class KVMCP {
                             const val = KV.get(c.key)
                             results.push(val === undefined ? "" : JSON.stringify(val))
                         }
+                        cmdNames.push("get")
                     }
                     else if (c.command === "delete") {
                         if (c.key === undefined)
@@ -231,6 +235,7 @@ export class KVMCP {
                         results.push(removed ?
                             `kv_delete: OK: removed key "${c.key}"` :
                             `kv_delete: WARNING: no key "${c.key}" to remove`)
+                        cmdNames.push("delete")
                     }
                 }
                 catch (err: unknown) {
@@ -238,6 +243,8 @@ export class KVMCP {
                     if (tx) {
                         if (snapshot !== null)
                             KV.restore(snapshot)
+                        for (let i = 0; i < results.length; i++)
+                            results[i] = `kv_${cmdNames[i]}: ROLLED-BACK`
                         results.push(`kv_batch: ERROR: ${message}`)
                         return { isError: true, content: [ { type: "text", text: JSON.stringify(results) } ] }
                     }
