@@ -43,6 +43,10 @@ Development*.
 Selling Points
 --------------
 
+<table>
+<tr>
+<td width="50%" valign="top">
+
 - You want to speed up your interactive sessions and at the same time
   reduce costs by reducing the amount of produced LLM output tokens?
   &rarr; `/ase-meta-persona engineer` or even `/ase-meta-persona caveman`
@@ -75,6 +79,9 @@ Selling Points
   related to a standard set of code quality aspects?
   &rarr; `/ase-code-lint @tool/src/*.ts`
 
+</td>
+<td width="50%" valign="top">
+
 - You want to analyze code for potential problems
   in its logic, semantics, and control flow?
   &rarr; `/ase-code-analyze @tool/src/*.ts`
@@ -105,6 +112,10 @@ Selling Points
 - You want to be supported in the evaluation of alternatives with the
   methodological help of a weighted multi-criteria decision matrix?
   &rarr; `/ase-meta-evaluate Vue vs. React vs. Angular, focus on TypeScript support and extensibility`
+
+</td>
+</tr>
+</table>
 
 User Setup
 ----------
