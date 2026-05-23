@@ -50,69 +50,84 @@ see whether **ASE** is right for you:
 <tr>
 <td width="50%" valign="top">
 
-- You want to speed up your interactive sessions and at the same time
+- **Boosted Sessions**: 
+  You want to speed up your interactive sessions and at the same time
   reduce costs by reducing the amount of produced LLM output tokens?
   &rarr; `/ase-meta-persona engineer` or even `/ase-meta-persona caveman`
 
-- You prefer a plan-driven approach, but the agent harness'
+- **Alternative Approach Funnel**:
+  You prefer a plan-driven approach, but the agent harness'
   Plan Mode is too unstructured and too direct, because you want to
   leverage from a funnel of alternative approaches first?
   &rarr; `/ase-code-craft hello: "ase hello" CLI command which prints a nice "Hello World" in red`
 
-- You prefer a plan-driven approach, but the agent harness'
+- **Named and Persisted Plans**:
+  You prefer a plan-driven approach, but the agent harness'
   Plan Mode is regularly too weak, because you want named, persisted,
   and more strictly structured plans?
   &rarr; `/ase-task-edit hello`
 
-- You prefer a plan-driven approach, but want to pre-flight the
+- **Implementations Preflights**:
+  You prefer a plan-driven approach, but want to pre-flight the
   implementation without later having to rewind artifacts via the version
   control system or the agent harness' session history?
   &rarr; `/ase-task-preflight hello`
 
-- You want to get a quick insight into code by determining the
-  surrounding project, the code author, the source files with the most
-  churn, and the module structure?
+- **Project Insights**:
+  You want to get a quick insight into a project by determining the
+  the author, the source files with the most churn, and the module
+  structure?
   &rarr; `/ase-code-insight @tool`
 
-- You want to better comprehend code by finding focused information on
+- **Code Comprehension**:
+  You want to better comprehend code by finding focused information on
   What, Why, Analogy, Diagram, Cruxes, and Gotchas?
   &rarr; `/ase-code-explain @tool/src/*.ts`
 
-- You want to analyze code for potential problems
+- **Logical Code Analysis**:
+  You want to analyze code for potential problems
   related to a standard set of code quality aspects?
   &rarr; `/ase-code-lint @tool/src/*.ts`
 
 </td>
 <td width="50%" valign="top">
 
-- You want to analyze code for potential problems
+- **Lexical Code Analysis**:
+  You want to analyze code for potential problems
   in its logic, semantics, and control flow?
   &rarr; `/ase-code-analyze @tool/src/*.ts`
 
-- You want to get your `CHANGELOG.md` entries
+- **Automated Change Logs**:
+  You want to get your `CHANGELOG.md` entries
   automatically derived from your recent Git commits?
   &rarr; `/ase-meta-changes`
 
-- You want to understand the reason for a fact with the help of the
+- **Root-Cause Analysis**:
+  You want to understand the reason for a fact with the help of the
   "Five-Whys" root cause determination method?
   &rarr; `/ase-meta-why is the Decibel (dB) unit a logarithmic one?`
 
-- You want to research a fact by asking multiple (potentially available)
+- **Research Quorum**:
+  You want to research a fact by asking multiple (potentially available)
   foreign LLMs and methodologically derive a quorum answer?
   &rarr; `/ase-meta-quorum What is Agentic Software Engineering?`
 
-- You want to query multiple (potentially available) search engines
+- **Search Engine Consolidation**:
+  You want to query multiple (potentially available) search engines
   and derive a consolidated result?
   &rarr; `/ase-meta-search What is Agentic Software Engineering?`
 
-- You want to directly query a (potentially available) foreign LLM?
+- **Foreign LLM Query**:
+  You want to directly query a (potentially available) foreign LLM?
   &rarr; `/ase-meta-chat gemini What is Agentic Software Engineering?`
 
-- You want to be supported in the discovery of suitable packages
+- **Package Discovery**:
+  You want to be supported in the discovery of suitable packages
   for establishment of your technology stack?
   &rarr; `/ase-arch-discover reactive UI DOM rendering`
 
-- You want to be supported in the evaluation of alternatives with the
+- **Multi-Criteria Decision Matrices**:
+  You want to be supported in the evaluation of alternatives with the
   methodological help of a weighted multi-criteria decision matrix?
   &rarr; `/ase-meta-evaluate Vue vs. React vs. Angular, focus on TypeScript support and extensibility`
 
