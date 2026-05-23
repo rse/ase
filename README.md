@@ -69,9 +69,9 @@ see whether **ASE** is right for you:
   &rarr; `/ase-code-craft hello: "ase hello" CLI command which prints a nice "Hello World" in red`
 
 - **Named and Persisted Plans**:
-  You prefer a plan-driven approach, but the agent harness'
-  Plan Mode is regularly too weak, because you want named, persisted,
-  and more strictly structured plans?
+  You prefer a plan-driven approach, but the agent harness' Plan Mode is
+  regularly too weak, because you want named, persisted, cross-session
+  reachable, and strictly structured plans?
   &rarr; `/ase-task-edit hello`
 
 - **Implementations Preflights**:
@@ -81,7 +81,7 @@ see whether **ASE** is right for you:
   &rarr; `/ase-task-preflight hello`
 
 - **Project Insights**:
-  You want to get a quick insight into a project by determining the
+  You want to get a quick insight into a project by determining
   the author, the source files with the most churn, and the module
   structure?
   &rarr; `/ase-code-insight @tool`
