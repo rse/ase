@@ -43,7 +43,7 @@ Development*.
 Selling Points
 --------------
 
-<table>
+<table border="0">
 <tr>
 <td width="50%" valign="top">
 
