@@ -169,33 +169,39 @@ permitted way to persist artifacts is via `task_save(...)`.
 
 3.  **Internalize Problem Resolution Tenets**:
 
-    Internalize and honor the following tenets.
+    You *MUST* internalize and honor the following tenets when resolving the problem.
     Do not output anything.
 
-    1.  *Recommended* Tenets (generic):
-
-        -   **Surgical Changes**:
-            Keep source code changes always as small as possible.
+    1.  Generic Tenets:
 
         -   **Separation of Concerns**:
             Clearly separate all individual concerns as good as possible.
 
-        -   **Single Responsibility Principle**:
-            Every module, class, or function should have only one reason to change.
+        -   **Code Base Alignment**:
+            Strictly align with the existing source code base by exactly
+            following its coding style, its structure, its naming
+            conventions, etc.
 
-        -   **Behavior Preservation**:
-            Refactoring changes only re-structure, never change any observable behavior.
+    2.  Specific Tenets:
 
-        -   **Align with Code Base**:
-            Strictly align with the existing code base by exactly following its
-            coding style, its structure, its naming conventions, etc.
-
-    2.  *Essential* Tenets (problem resolving specific):
+        -   **Surgical Changes**:
+            Keep source code changes always as small as possible.
 
         -   **No Cleanups**:
-            Strictly focus on resolving the problem and do not mix this task
-            with any other necessary code cleanups, except they are really
-            necessary for resolving the task.
+            Strictly focus on resolving the problem and do not mix this
+            task with any other necessary code cleanups, except they are
+            really necessary for resolving the task.
+
+        -   **Minimum Flags**:
+            Use the absolute minimum total number of flags (boolean
+            variables) to span the entire space of scenarios. Prefer the
+            adjustment of existing flags over the introduction of new
+            flags.
+
+        -   **Code Adequacy**:
+            As little increase in overall source code complexity as
+            possible, as much new problem resolution source code as
+            necessary.
 
 4.  **Find Problem Resolution Approaches**:
 

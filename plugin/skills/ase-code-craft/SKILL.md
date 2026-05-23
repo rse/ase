@@ -121,32 +121,58 @@ permitted way to persist artifacts is via `task_save(...)`.
 
 3.  **Internalize Crafting Tenets**:
 
-    Internalize and honor the following tenets.
+    You *MUST* internalize and honor the following tenets when crafting the new feature.
     Do not output anything.
 
-    1.  *Recommended* Tenets (generic):
-
-        -   **Surgical Changes**:
-            Keep source code changes always as small as possible.
+    1.  Generic Tenets:
 
         -   **Separation of Concerns**:
             Clearly separate all individual concerns as good as possible.
 
-        -   **Single Responsibility Principle**:
-            Every module, class, or function should have only one reason to change.
+        -   **Code Base Alignment**:
+            Strictly align with the existing source code base by exactly
+            following its coding style, its structure, its naming
+            conventions, etc.
 
-        -   **Behavior Preservation**:
-            Refactoring changes only re-structure, never change any observable behavior.
+    2.  Specific Tenets:
 
-        -   **Align with Code Base**:
-            Strictly align with the existing code base by exactly following its
-            coding style, its structure, its naming conventions, etc.
+        -   **Surgical Changes**:
+            Keep source code changes always as small as possible.
 
-    2.  *Essential* Tenets (feature crafting specific):
+        -   **Clear Minimal Scope**:
+            Establish explicit boundaries for the new feature.
+            Avoid feature scope creep and over-engineering.
 
-        -   **High Cohesion, Low Coupling**:
-            Strike for a set of small, focused parts (high cohesion) connected by
-            thin, explicit wires (low coupling).
+        -   **Keep it Simple, Stupid (KISS)**:
+            Build with the simplest design that solves the real problem.
+            Avoid over-engineering.
+
+        -   **You Aren't Gonna Need It (YAGNI)**:
+            Build for today's actual needs, not speculative futures.
+            Avoid premature optimizations, premature abstractions,
+            over-configurability, etc.
+
+        -   **Don't Repeat Yourself (DRY)**:
+            Avoid redundancies, but honor the *Rule of Three*: Don't
+            abstract on the first occurrence -- tolerate (small)
+            duplication on the second -- factor out on the third only.
+
+        -   **Single Responsibility Principle (SRP)**:
+            Every module, class, or function should have only one reason
+            to change.
+
+        -   **Loose Coupling, High Cohesion**:
+            Strike for good modularity by a set of small, focused parts
+            (high cohesion), connected by thin, explicit wires and
+            interfaces (loose coupling).
+
+        -   **Clear Interfaces**:
+            Design clear interfaces, contracts, and data models --
+            with high attention to boundaries and modularity.
+
+        -   **Non-Functional Requirements**:
+            Honor the non-functional requirements Performance, Security,
+            Scalability, Comprehensibility.
 
 4.  **Find Feature Crafting Approaches**:
 

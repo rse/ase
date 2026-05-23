@@ -5,6 +5,9 @@ ChangeLog
 0.0.42 (2026-05-23)
 -------------------
 
+- IMPROVEMENT: improve the tenets in the craft/resolve/refactor skills
+- CLEANUP: reformat "ase-code-analyze" skill
+
 0.0.41 (2026-05-23)
 -------------------
 
