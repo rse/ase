@@ -184,17 +184,17 @@ Features
 <tr>
 <td width="50%" valign="top">
 
-- [**Configuration Scopes**](docs/configuration.md) (100% done):
+- [**Configuration Scopes**](docs/configuration.md) (MANDATORY, 100% done):
   Parameters of project and agent can be configured on the hierarchy of
   the scopes *user*, *project*, *task*, and *skill*. This allows
   the flexible configuration of **ASE**.
 
-- [**Session Constitution**](plugin/meta/ase-constitution.md) (95% done):
+- [**Session Constitution**](plugin/meta/ase-constitution.md) (MANDATORY, 95% done):
   All agent sessions have a "constitution" preloaded all the time, based
   on the configured parameters. This allows to control the *general*
   agent behavior.
 
-- [**Task Skills**](plugin/skills/) (85% done):
+- [**Task Skills**](plugin/skills/) (MANDATORY, 85% done):
   Recurring tasks are supported with dedicated skills, based on the
   configured parameters. This allows to control the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
@@ -204,20 +204,22 @@ Features
 </td>
 <td width="50%" valign="top">
 
-- **Artifact Formats** (0% done):
+- **Artifact Formats** (OPTIONAL, 0% done):
   The format of the four primary deliveries of Software Engineering
   (requirements specification, architecture description, documentation,
-  and source code) and their artifacts are strictly defined to allow
+  and source code) and their artifacts are strictly defined. This allows
   *both* humans *and* agents to operate on them concurrently.
 
-- **Context Gathering** (0% done):
+- **Context Gathering** (OPTIONAL, 0% done):
   The agent context is loaded with individual information for all
   particular tasks. This allows the agent to more precisely perform the
   tasks.
 
-- **Project Templates** (0% done):
+- **Project Templates** (OPTIONAL, 0% done):
   The agent is equipped with reasonable templates to scaffold
-  Library/Framework, CLI and WebUI projects.
+  Library/Framework, CLI and WebUI projects. This allows the user to
+  bootstrap projects more conveniently and the agent skills to operate
+  on pre-existing artifacts from the start.
 
 </td>
 </tr>
