@@ -189,10 +189,12 @@ Features
   the scopes *user*, *project*, *task*, and *skill*. This allows
   the flexible configuration of **ASE**.
 
-- [**Session Constitution**](plugin/meta/ase-constitution.md) (MANDATORY, 95% done):
-  All agent sessions have a "constitution" preloaded all the time, based
-  on the configured parameters. This allows to control the *general*
-  agent behavior.
+- [**Session Constitution**](plugin/meta/) (MANDATORY, 95% done):
+  All agent sessions have meta descriptions as some sort of a
+  "constitution" preloaded all the time, based on the configured
+  parameters. This allows to control the *general* agent behavior.
+  Additionally, skills load more meta descriptions on demand. This
+  allows skills to reuse definitions.
 
 - [**Task Skills**](plugin/skills/) (MANDATORY, 85% done):
   Recurring tasks are supported with dedicated skills, based on the
