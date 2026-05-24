@@ -57,9 +57,9 @@ documents.
 
     ```text
         Agent(
-            name:          "ase-docs-proofread",
+            name:          "ase:ase-docs-proofread",
             description:   "Proofread Investigation",
-            subagent_type: "ase-docs-proofread",
+            subagent_type: "ase:ase-docs-proofread",
             mode:          "plan",
             prompt:        <getopt-arguments/>
         )

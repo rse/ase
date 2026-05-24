@@ -56,9 +56,9 @@ related to a set of code quality aspects.
 
     ```text
         Agent(
-            name:          "ase-code-lint",
+            name:          "ase:ase-code-lint",
             description:   "Lint Investigation",
-            subagent_type: "ase-code-lint",
+            subagent_type: "ase:ase-code-lint",
             mode:          "plan",
             prompt:        <getopt-arguments/>
         )
