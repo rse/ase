@@ -48,96 +48,25 @@ documents.
     &#x26AA; **PROOFREADING INVESTIGATION**
     </template>
 
-    Then dispatch the investigation to a *sub-agent* via the `Agent`
+    Dispatch the investigation to a *sub-agent* via the `Agent`
     tool so that *no* investigation details leak into the user-visible
     transcript. The sub-agent performs the silent reading and checking;
     only its final structured return value is consumed here.
 
-    Invoke the `Agent` tool *exactly once* with:
+    For this, invoke *exactly once* the tool:
 
-    -   `subagent_type`: `general-purpose`
-    -   `description`: `Proofread Investigation`
-    -   `prompt`: a *self-contained* briefing, instructing the sub-agent to:
+    ```
+        Agent(
+            name:          "ase-docs-proofread-investigation",
+            description:   "Proofread Investigation",
+            subagent_type: "ase-docs-proofread-investigation",
+            mode:          "plan",
+            prompt:        <getopt-arguments/>
+        )
+    ```
 
-        1.  Use the `Read` tool to read all document files referenced
-            by <getopt-arguments/>.
-
-        2.  Check the contained texts *only* for the following problem
-            types:
-
-            - **Spelling**
-            - **Punctuation**
-            - **Grammar**
-
-            Do *NOT* flag stylistic preferences, Markdown formatting
-            choices, code/identifiers, XML/template tags, technical
-            terms, intentional capitalization, list/heading style, or
-            anything inside fenced code blocks or backtick spans. Be
-            conservative — only report clear, objective errors.
-
-            For each found problem:
-
-            -   Set <type/> to the string `SPELLING`, `PUNCTUATION`, or
-                `GRAMMAR`, indicating the problem type.
-
-            -   Set <file/> to the *relative* filename path of the document.
-                Set <line/> to the numeric 1-based line number in the
-                document.
-
-            -   Set <old-text/> to the lines of the old text which
-                should be changed. Set <new-text/> to the lines of the
-                new text which will be changed.
-
-            -   Set <description/> to an ultra-brief and concise
-                Markdown-formatted description of the problem with
-                a hint of what is wrong and why it is wrong. In
-                this description, mark up all referenced verbatim
-                words <words/> from <old-text/> or <new-text/> as
-                quoted strings containing monospaced text with
-                Markdown based on the following <template/>:
-                <template>"`<words/>`"</template>.
-
-            -   Set <context-before/> to exactly *up to two* lines of
-                *unchanged* text context which occurs in the document
-                directly *before* <old-text/>, i.e., the lines (<line/>
-                - 2) and (<line/> - 1). Reduce to just one line (<line/>
-                - 1) if <old-text/> is the second line of the document.
-                Set <context-before/> to empty if <old-text/> is the
-                first line in the document.
-
-            -   Set <context-after/> to exactly *up to two* lines of
-                *unchanged* text content which occurs in the document
-                directly *after* <old-text/>, i.e., the lines (<line/>
-                + <n/> + 1) and (<line/> + <n/> + 2), where <n/> is the
-                number of lines in <old-text/>. Reduce to just one line
-                (<line/> + <n/> + 1) if <old-text/> is the second-last
-                line of the document. Set <context-after/> to empty if
-                <old-text/> is the last line in the document.
-
-        3.  Return *exclusively* a single fenced JSON block (no prose,
-            no preamble, no summary) of the following shape:
-
-            ```json
-            [
-                {
-                    "type":           <type/>,
-                    "file":           <file/>,
-                    "line":           <line/>,
-                    "description":    <description/>,
-                    "context_before": <context-before/>,
-                    "old_text":       <old-text/>,
-                    "new_text":       <new-text/>,
-                    "context_after":  <context-after/>
-                },
-                [...]
-            ]
-            ```
-
-        4.  You *MUST* *NOT* propose, apply, or render any document
-            changes yourself.
-
-    Parse the JSON array from the sub-agent's return value and set
-    <problems/> to that list.
+    Parse the single result message of the `Agent` tool as a JSON array
+    and set <problems/> to that list.
 
     You *MUST* *NOT* output anything at all in this step 1 beyond the
     single `Agent` tool invocation.
