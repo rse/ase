@@ -288,7 +288,13 @@ export default class ServiceCommand {
             handler: (_request, h) => {
                 this.log.write("info", "service: stop requested")
                 setImmediate(async () => {
-                    await server.stop({ timeout: 1000 })
+                    try {
+                        await server.stop({ timeout: 1000 })
+                    }
+                    catch (err: unknown) {
+                        const e = err as Error
+                        this.log.write("error", `service: stop failed: ${e.message}`)
+                    }
                     process.exit(0)
                 })
                 return h.response({ ok: true }).code(200)
