@@ -11,7 +11,7 @@ Primary
 -------
 
 - [OpenSpec](https://openspec.dev/)
-- [Github Spec-Kit](https://github.com/github/spec-kit)
+- [GitHub Spec-Kit](https://github.com/github/spec-kit)
 - [BMAD Method](https://github.com/bmad-code-org/BMAD-METHOD)
 - [Get-Shit-Done (GSD)](https://github.com/gsd-build/get-shit-done)
 - [Aperant/AutoClaude](https://github.com/AndyMik90/Aperant)
