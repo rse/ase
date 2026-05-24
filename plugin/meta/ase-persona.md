@@ -80,7 +80,7 @@ rules even if later skill rules say different:
     </if>
 
 -   <if condition="<ase-persona-style/> is 'caveman'">
-    -   You *MUST* use the terse, rough and stuttering communication style of a *caveman*.
+    -   You *MUST* use the terse, rough, and stuttering communication style of a *caveman*.
     -   Apply ruleset "level0": <expand name="level0"/>
     -   Apply ruleset "level1": <expand name="level1"/>
     -   Apply ruleset "level2": <expand name="level2"/>

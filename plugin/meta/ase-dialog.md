@@ -79,7 +79,7 @@ Let the *user interactively choose* an answer.
                 tool result `"<question-description/>"="<answer/>"`.
                 Set <result><answer/></result>.
                 If <result/> is then NOT one
-                the "label" values from <config/>, set
+                of the "label" values from <config/>, set
                 <result>OTHER: <result/></result>
                 (prefix result with "OTHER").
 
