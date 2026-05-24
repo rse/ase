@@ -73,9 +73,9 @@ export default class MCPCommand {
 
         /*  track active client and bridge-level closed state  */
         let client:       StreamableHTTPClientTransport | null = null
-        let closedByUs   = false  /* set when we initiated the client close */
-        let bridgeDone   = false  /* set when stdio side closes             */
-        let reconnecting = false  /* set while a reconnect chain is active  */
+        let closedByUs   = false  /*  set when we initiated the client close  */
+        let bridgeDone   = false  /*  set when stdio side closes              */
+        let reconnecting = false  /*  set while a reconnect chain is active   */
 
         /*  cleanly shut down the whole bridge  */
         const shutdown = async () => {
@@ -95,7 +95,6 @@ export default class MCPCommand {
         const connectClient = async () => {
             const url    = new URL(`http://${HOST}:${port}/mcp`)
             const next   = new StreamableHTTPClientTransport(url)
-            client = next
 
             next.onmessage = (msg: JSONRPCMessage) => {
                 server.send(msg).catch((_err: unknown) => {
@@ -109,7 +108,7 @@ export default class MCPCommand {
 
             /*  service closed the connection — try to recover  */
             next.onclose = () => {
-                if (closedByUs || bridgeDone || reconnecting)
+                if (client !== next || closedByUs || bridgeDone || reconnecting)
                     return
                 reconnecting = true
                 this.log.write("warning", "mcp: http connection lost — reconnecting")
@@ -117,6 +116,7 @@ export default class MCPCommand {
             }
 
             await next.start()
+            client = next
         }
 
         /*  reconnect loop: restart service if needed, then reconnect client  */
