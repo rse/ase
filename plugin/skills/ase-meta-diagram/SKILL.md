@@ -7,7 +7,7 @@ description: >
     control-flow/branching/concurrency as Flowchart,
     state-machine/states/transitions as an UML State Diagram,
     data-flow/actors/messages/protocols as an UML Sequence Diagram,
-    data-structure/classes/methods as an UML Class Diagram
+    data-structure/classes/methods as an UML Class Diagram,
     data-model/entities/relationships as an ER Diagram, or
     metrics/distributions/time-series as XY-Charts.
 user-invocable: false

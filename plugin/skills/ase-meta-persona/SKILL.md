@@ -2,7 +2,7 @@
 name: ase-meta-persona
 argument-hint: "[<persona>]"
 description: >
-    Adjust communication style in four intensivity levels of token usage.
+    Adjust communication style in four intensity levels of token usage.
     The <persona> can be either the decorative, eloquent, and explaining "writer",
     the concise, factual, and accurate "engineer" (default),
     the brief, factual, and abbreviating "telegrapher",

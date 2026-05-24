@@ -116,7 +116,7 @@ multi-*criteria* decision matrix.
     -   From the <request>$ARGUMENTS</request>, try to derive the criteria
         <criteria-L/> (L=1-M) for the evaluation. Do not output anything.
 
-    -   For each criteria <criteria-L/> (L=1-M), decide on its <weight-L/>
+    -   For each criterion <criteria-L/> (L=1-M), decide on its <weight-L/>
         from the value set { 4.00, 2.00, 1.00, 0.50, 0.25 } (from most
         important, over normal, to less important). Do not output anything.
 
@@ -146,9 +146,9 @@ multi-*criteria* decision matrix.
     </step>
 
 4.  <step id="STEP 4: Evaluate Alternatives against Criteria">
-    -   For each alternative <alternative-K/> (K=1-N) and each criteria
+    -   For each alternative <alternative-K/> (K=1-N) and each criterion
         <criteria-L/> (L=1-M), decide on the evaluation <eval-K-L/>, which
-        means how good the alternative meets the criteria on a Likert-scale
+        means how well the alternative meets the criterion on a Likert-scale
         from { -2, -1, 0, +1, +2 } (from worst, over neutral, to best). Do
         not output anything.
 

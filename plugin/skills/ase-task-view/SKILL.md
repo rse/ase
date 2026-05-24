@@ -71,7 +71,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         *Render plan*: Only output the following <template/>, so the user
         can read the plan and react to it. Do *not* truncate, summarize,
         or partially show the plan -- always show the complete plan
-        <content/> here:.
+        <content/> here.
 
         <template>
         ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `TASK-PLAN-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈

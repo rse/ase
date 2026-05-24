@@ -2,9 +2,9 @@
 See Also
 ========
 
-There are a many other interesting approaches for further inspiration.
+There are many other interesting approaches for further inspiration.
 Some of them are more specialized than **ASE**, others perform a rather
-similar task than **ASE**, and others have an even larger scope than
+similar task to **ASE**, and others have an even larger scope than
 **ASE**.
 
 Primary
@@ -28,7 +28,7 @@ Secondary
   [Hamster](https://tryhamster.com/)
 - [OrchestKit](https://github.com/yonatangross/orchestkit)
 - [Oh-My-Claude](https://oh-my-claude.techdufus.com/)
-- [MGX (MetaGPT X]](https://mgx.dev/)
+- [MGX (MetaGPT X)](https://mgx.dev/)
 - [AI Unified Process](https://unifiedprocess.ai/)
 - [SpecPilot](https://github.com/redmoon0x/SpecPilot)
 - [SubAgent-Driven Development](https://tessl.io/registry/skills/github/projectbluefin/dakota/subagent-driven-development)

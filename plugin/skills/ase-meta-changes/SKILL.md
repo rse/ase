@@ -33,7 +33,7 @@ based on underlying *Git* commit messages.
 </objective>
 
 For this, understand that ChangeLog entries are
-are always formatted `<prefix/>: <summary/>` where
+always formatted `<prefix/>: <summary/>` where
 the <prefix/> is one of the following tags
 and their usual related changes...
 
@@ -78,8 +78,8 @@ are also grouped and sorted according to the above <prefix/>es.
    *consolidate* the entries in the first (most recent) section only,
    by summarizing and merging closely related entries.
    Perform the entry consolidation per prefix group only.
-   If a changelog <summary/> is too short or is too less comprehensible
-   because of too less context, add some context, especially references
+   If a changelog <summary/> is too short or is too little comprehensible
+   because of too little context, add some context, especially references
    to the class/module/package, etc.
    </step>
 

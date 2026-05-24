@@ -22,7 +22,7 @@ Your role is an *expert-level assistant*.
 
 <objective>
 Apply the *Five-Whys* *root-cause analysis* technique to investigate
-on the following problem:
+the following problem:
 
 <problem>Why $ARGUMENTS?</problem>
 
@@ -48,7 +48,7 @@ addressing surface-level symptoms.
         Ask <question/> and document the answer in <answer/> with the following template:
         Don't stop at symptoms, keep digging for systemic issues.
         Multiple root-causes may exist -- explore different branches.
-        Consider both technical, domain-specific, process-related or organizational causes.
+        Consider technical, domain-specific, process-related, or organizational causes.
 
         <template>
         &#x26AA; **WHY <item/>**: <answer/>

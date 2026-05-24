@@ -3,7 +3,7 @@ name: ase-meta-chat
 argument-hint: "<llm> <query>"
 description: >
     Query foreign LLM for Chat.
-    Use this skill if a foreign LLM like OpenAI ChatCGPT, Google Gemini,
+    Use this skill if a foreign LLM like OpenAI ChatGPT, Google Gemini,
     DeepSeek or xAI Grok should be queried with a single chat message.
 user-invocable: true
 disable-model-invocation: false

@@ -20,9 +20,9 @@ The following configuration parameters control the project:
 
 -   **project.boxing**: the project *source code* is treated as a...
 
-    -   `white`:     ...white box, i.e., the code is intentially fully transparent and understood.
-    -   `grey`:      ...grey  box, i.e., the code is intentially partially intransparent or not understood.
-    -   `black`:     ...black box, i.e., the code is intentially fully intransparent and not understood.
+    -   `white`:     ...white box, i.e., the code is intentionally fully transparent and understood.
+    -   `grey`:      ...grey  box, i.e., the code is intentionally partially intransparent or not understood.
+    -   `black`:     ...black box, i.e., the code is intentionally fully intransparent and not understood.
 
 -   **project.artifact.build**: glob pattern matching the project *build-time artifact* files.
 

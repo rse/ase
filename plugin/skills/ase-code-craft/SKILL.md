@@ -127,7 +127,7 @@ permitted way to persist artifacts is via `task_save(...)`.
     1.  Generic Tenets:
 
         -   **Separation of Concerns**:
-            Clearly separate all individual concerns as good as possible.
+            Clearly separate all individual concerns as well as possible.
 
         -   **Code Base Alignment**:
             Strictly align with the existing source code base by exactly
@@ -162,7 +162,7 @@ permitted way to persist artifacts is via `task_save(...)`.
             to change.
 
         -   **Loose Coupling, High Cohesion**:
-            Strike for good modularity by a set of small, focused parts
+            Strive for good modularity by a set of small, focused parts
             (high cohesion), connected by thin, explicit wires and
             interfaces (loose coupling).
 
@@ -229,7 +229,7 @@ permitted way to persist artifacts is via `task_save(...)`.
             a *separate* `ase-meta-diagram` invocation and stack the
             rendered blocks *vertically* (labels `**Before:**` /
             `**After:**`); never side-by-side. Omit <optional-diagram/>
-            entirely for simple or purely local situation.
+            entirely for simple or purely local situations.
 
     6.  Indicate end of reporting by showing the following <template/>:
 

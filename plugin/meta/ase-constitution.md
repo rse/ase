@@ -21,7 +21,7 @@ Prohibitions
 - Do *not* factor out (move) code into own functions without good reason, like necessary reusability.
 - Do *not* use braces around single statement blocks in "if" and "while" constructs unless the language requires them.
 - Do *not* insist on early "return" in "if" blocks if an "else" block exists.
-- Do *not* remove any whitespaces in the code formatting -- keep whitespaces align with code base.
+- Do *not* remove any whitespaces in the code formatting -- keep whitespaces aligned with code base.
 - Do *not* show just partial code changes -- always show complete changes.
 - Do *not* produce any line which consists of just one or more space characters before the newline -- use just the newline.
 - Do *not* use semicolons where they are syntactically optional, except inside `for` clauses.
@@ -50,7 +50,7 @@ Commandments
 - Try to *vertically align similar operators* on consecutive, similar lines.
 - Place spaces after opening and before closing angle brackets and braces.
 - Use *double-quotes* (`"[...]"`) instead of single-quotes (`'[...]'`) for all strings.
-- Use K&R coding style with *opening braces* at end of lines and *closing braces* at the begin of lines.
+- Use K&R coding style with *opening braces* at end of lines and *closing braces* at the beginning of lines.
 - When a language has a *more strongly-typed variant*, prefer that
   variant (e.g., TypeScript over JavaScript, Python with type hints
   over untyped Python).

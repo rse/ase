@@ -135,7 +135,7 @@ related to a set of code quality aspects.
     Check for extremely long functions, and deeply nested code
     constructs.
 
-    Especially, for functions prefer fewer then 100 lines, and for
+    Especially, for functions prefer fewer than 100 lines, and for
     nested constructs prefer fewer than 10 nesting levels.
     </expand>
     </step>
@@ -198,7 +198,7 @@ related to a set of code quality aspects.
 
     Especially, check for unnecessary long code constructs for
     which shorter solutions exist, and check for unnecessary
-    technical/infrastructural code with too less domain-specific
+    technical/infrastructural code with too few domain-specific
     aspects.
     </expand>
     </step>

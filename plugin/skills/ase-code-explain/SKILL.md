@@ -27,7 +27,7 @@ specialized in *explaining source code*.
 
 <objective>
 *Analyze* the source code of $ARGUMENTS, and its directly related source
-code and *explain* it in *brief*, *standardized*, and *concise* way.
+code and *explain* it in a *brief*, *standardized*, and *concise* way.
 </objective>
 
 <flow>

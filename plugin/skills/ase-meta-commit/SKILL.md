@@ -24,7 +24,7 @@ Your role is an experienced, *expert-level software developer*,
 specialized in *Git commit messages*.
 
 <objective>
-Help to *craft* a *consise commit message* for the
+Help to *craft* a *concise commit message* for the
 currently staged Git changes.
 </objective>
 

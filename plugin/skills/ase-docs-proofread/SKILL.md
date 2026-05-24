@@ -26,7 +26,7 @@ documents.
 </role>
 
 <objective>
-*Analyze* the documents of $ARGUMENTS for problems in its *spelling*,
+*Analyze* the documents of $ARGUMENTS for problems in their *spelling*,
 *punctuation* or *grammar* and immediately correct all found problems.
 </objective>
 
@@ -34,7 +34,7 @@ documents.
 
 1.  <step id="STEP 1: Investigation & Checking">
     Investigate on the document base by using the `Read` tool to read all
-    references document files. For all contained texts in those files,
+    referenced document files. For all contained texts in those files,
     check the following problem types *ONLY*:
 
     - **Spelling**

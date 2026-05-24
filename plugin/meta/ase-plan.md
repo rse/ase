@@ -51,7 +51,7 @@ You *MUST* honor the following hints on this *task plan* format:
 -   The <timestamp-created/> is the timestamp when this feature
     crafting specification was created. The
     <timestamp-modified/> is the timestamp when this feature
-    specification was last modified. Both use a ISO-style format
+    specification was last modified. Both use an ISO-style format
     value. The value of both can be determined by
     a call to the `timestamp(format: "yyyy-LL-dd HH:mm")`
     tool of the `ase` MCP service and use the `text` field of

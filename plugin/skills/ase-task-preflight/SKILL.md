@@ -126,7 +126,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         </template>
 
     3.  <if condition="<content/> contains '✎ modified:'">
-        Set update <timestamp-modified/> with the current time in
+        Update <timestamp-modified/> with the current time in
         ISO-style format, which has to be determined by calling the
         `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
         MCP service and use the `text` field of its response. Update
