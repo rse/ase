@@ -49,7 +49,7 @@ Skill Output
         padding, draw the top edge to that width, then keep every
         inner line (including annotations like `!`, `?`, `*`)
         within it. Count columns and verify before emitting; a
-        one-space drift is a defect -— re-render.
+        one-space drift is a defect — re-render.
 
 -   *IMPORTANT*: For *Findings* (problems, tradeoffs, warnings
     emitted by analysis skills):

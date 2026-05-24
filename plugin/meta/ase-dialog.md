@@ -109,7 +109,7 @@ Let the *user interactively choose* an answer.
         2.  Call the `ask_user` tool of the agent harness with:
 
             `ask_user({
-                question: "<question-label>: <question-description/>",
+                question: "<question-label/>: <question-description/>",
                 allow_freeform: true,
                 choices: [
                     <config/>

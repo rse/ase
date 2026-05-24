@@ -14,7 +14,7 @@ Control Flow Constructs
     Do not output anything.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
-    <expand name="<define-name/>" [arg1="<expand-arg1/>" [arg2="<expand-arg2/>]" [...]]]><expand-content/></expand>:
+    <expand name="<define-name/>" [arg1="<expand-arg1/>" [arg2="<expand-arg2/>" [...]]]><expand-content/></expand>:
 
     This specifies the *expansion* of previous <define/>.
     This construct is expanded into the <define-body/> of <define/>

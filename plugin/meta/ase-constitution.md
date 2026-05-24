@@ -18,7 +18,7 @@ you *MUST* once and immediately output the following <template/> now:
 Prohibitions
 ------------
 
-- Do *not* factor out (move) code into their own functions without good reason, like necessary reusability.
+- Do *not* factor out (move) code blocks into their own functions without good reason, like necessary reusability.
 - Do *not* use braces around single-statement blocks in "if" and "while" constructs unless the language requires them.
 - Do *not* insist on early "return" in "if" blocks if an "else" block exists.
 - Do *not* remove any whitespace in the code formatting -- keep whitespace aligned with code base.
@@ -50,7 +50,7 @@ Commandments
 - Try to *vertically align similar operators* on consecutive, similar lines.
 - Place spaces after opening and before closing angle brackets and braces.
 - Use *double-quotes* (`"[...]"`) instead of single-quotes (`'[...]'`) for all strings.
-- Use K&R coding style with *opening braces* at end of lines and *closing braces* at the beginning of lines.
+- Use K&R coding style with *opening braces* at the end of lines and *closing braces* at the beginning of lines.
 - When a language has a *more strongly-typed variant*, prefer that
   variant (e.g., TypeScript over JavaScript, Python with type hints
   over untyped Python).
