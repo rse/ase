@@ -84,6 +84,22 @@ export class Task {
         return true
     }
 
+    /*  rename a task by moving the entire task home directory
+        <project>/.ase/task/<oldId>/ to <project>/.ase/task/<newId>/;
+        returns true on success, false if the source task does not exist;
+        throws if the target id already exists  */
+    static rename (oldId: string, newId: string): boolean {
+        const oldDir = path.dirname(Task.path(oldId))
+        const newDir = path.dirname(Task.path(newId))
+        if (!fs.existsSync(oldDir))
+            return false
+        if (fs.existsSync(newDir))
+            throw new Error(`task: target id "${newId}" already exists`)
+        fs.mkdirSync(path.dirname(newDir), { recursive: true })
+        fs.renameSync(oldDir, newDir)
+        return true
+    }
+
     /*  list all persisted tasks in lexicographic id order; if verbose is true,
         each entry's `mtime` is set to the `plan.md` modification time formatted
         as "YYYY-MM-DD HH:MM", otherwise it is left undefined  */
@@ -251,6 +267,21 @@ export default class TaskCommand {
                 process.exit(removed ? 0 : 1)
             })
 
+        /*  register CLI sub-command "ase task rename"  */
+        task
+            .command("rename")
+            .description("Rename a task from <old> to <new>")
+            .argument("<old>", "Old task identifier")
+            .argument("<new>", "New task identifier")
+            .action((oldId: string, newId: string) => {
+                const renamed = Task.rename(oldId, newId)
+                if (renamed)
+                    this.log.write("info", `task: renamed "${oldId}" to "${newId}"`)
+                else
+                    this.log.write("info", `task: no task "${oldId}" to rename`)
+                process.exit(renamed ? 0 : 1)
+            })
+
         /*  register CLI sub-command "ase task purge"  */
         task
             .command("purge")
@@ -398,6 +429,38 @@ export class TaskMCP {
                 const removed = Task.delete(args.id)
                 const msg     = removed ?
                     "OK: removed task" :
+                    "WARNING: task not found"
+                return {
+                    content: [ { type: "text", text: msg } ]
+                }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return {
+                    isError: true,
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
+                }
+            }
+        })
+
+        /*  task rename  */
+        mcp.registerTool("task_rename", {
+            title: "ASE task rename",
+            description:
+                "Rename a previously persisted task from `old` to `new` by atomically moving the " +
+                "task home directory. Returns a status `text` indicating whether the rename succeeded. " +
+                "Fails with an error if the target id already exists.",
+            inputSchema: {
+                old: z.string()
+                    .describe("old task identifier (allowed characters: A-Z, a-z, 0-9, '-')"),
+                new: z.string()
+                    .describe("new task identifier (allowed characters: A-Z, a-z, 0-9, '-')")
+            }
+        }, async (args) => {
+            try {
+                const renamed = Task.rename(args.old, args.new)
+                const msg     = renamed ?
+                    `task_rename: OK: renamed task "${args.old}" to "${args.new}"` :
                     "WARNING: task not found"
                 return {
                     content: [ { type: "text", text: msg } ]
