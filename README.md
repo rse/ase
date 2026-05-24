@@ -138,6 +138,11 @@ see whether **ASE** is right for you:
   methodological help of a weighted multi-criteria decision matrix?
   &rarr; `/ase-meta-evaluate Vue vs. React vs. Angular, focus on TypeScript support and extensibility`
 
+- **Documentation Proofreading**:
+  You want your documents checked and corrected for spelling,
+  punctuation, and grammar errors?
+  &rarr; `/ase-docs-proofread @README.md`
+
 </td>
 </tr>
 </table>

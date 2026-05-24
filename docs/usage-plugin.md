@@ -143,3 +143,11 @@ The following ASE commands/skills exist on the code-level:
       externally and ask it to re-propose its last code change against
       the latest source code.
 
+### Documentation Commands
+
+The following ASE commands/skills exist on the documentation-level:
+
+- **/ase-docs-proofread** *docs-reference*:<br/>
+  Analyze the documents for spelling, punctuation, or grammar errors
+  and immediately correct all found problems.
+
