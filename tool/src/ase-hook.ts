@@ -165,7 +165,7 @@ export default class HookCommand {
         }))
 
         /*  determine session id  */
-        const sessionId = input.session_id ?? input.sessionId ?? ""
+        const sessionId = this.pickSessionId(input)
 
         /*  establish config context (session-scoped only if a valid sessionId is present)  */
         const hasSession = this.isValidSessionId(sessionId)
@@ -326,15 +326,20 @@ export default class HookCommand {
         return 0
     }
 
-    /*  read session id from stdin JSON payload (Claude Code uses
+    /*  pick the session id from a parsed payload (Claude Code uses
         snake_case fields, Copilot CLI uses camelCase fields)  */
+    private pickSessionId (input: { session_id?: string, sessionId?: string }): string {
+        return input.session_id ?? input.sessionId ?? ""
+    }
+
+    /*  read session id from stdin JSON payload  */
     private readSessionIdFromStdin (): string {
         const stdin = fs.readFileSync(0, "utf8")
         const input = this.parseJSON(stdin, v.object({
             session_id: v.optional(v.string()),
             sessionId:  v.optional(v.string())
         }))
-        return input.session_id ?? input.sessionId ?? ""
+        return this.pickSessionId(input)
     }
 
     /*  read the session-scoped "agent.skill" config value  */
@@ -396,7 +401,7 @@ export default class HookCommand {
             reason  = "ASE MCP tool invocation auto-approved"
         }
         else if (toolName === "Edit") {
-            const sessionId   = input.session_id ?? input.sessionId ?? ""
+            const sessionId   = this.pickSessionId(input)
             const activeSkill = this.readActiveSkill(sessionId)
             if (activeSkill === "ase-docs-proofread") {
                 approve = true
