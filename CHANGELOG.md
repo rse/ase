@@ -5,6 +5,8 @@ ChangeLog
 0.0.49 (2026-05-24)
 -------------------
 
+- BUGFIX: always lint before version bump on "npm start publish" procedure
+
 0.0.48 (2026-05-24)
 -------------------
 
