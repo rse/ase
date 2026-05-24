@@ -7,8 +7,12 @@ ChangeLog
 
 - IMPROVEMENT: reimplement "ase-code-lint" skill based on "ase-docs-proofread" agent-based skill mechanics
 - IMPROVEMENT: add "ase-task-rename" skill, MCP tool and CLI command
+- IMPROVEMENT: append "-usage" suffix to weekly/session usage labels in `ase-statusline`
 - BUGFIX: fix argument parsing in `getopt` MCP tool
 - BUGFIX: always lint before version bump on "npm start publish" procedure
+- BUGFIX: protect service stop and remove event listeners later in `ase-service`
+- CLEANUP: harden JSON parsing and refactor redundant code in `ase-hook`
+- CLEANUP: clean up code across `ase-mcp`, `ase-statusline`, `ase-task` and `ase-config`
 - CLEANUP: update workflow diagram to reflect recent changes
 - CLEANUP: fix various remaining proofread problems in texts
 
