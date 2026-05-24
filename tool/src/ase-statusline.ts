@@ -504,11 +504,11 @@ export default class StatuslineCommand {
                     /*  ==== VERSION CONTROL ====  */
                     a: () => {
                         const linesAdded = data.cost?.total_lines_added ?? 0
-                        emit(`${prefix("⊕", "added")}${c.bold(linesAdded)}`)
+                        emit(`${prefix("⊕", "added")}${c.bold(String(linesAdded))}`)
                     },
                     r: () => {
                         const linesRemoved = data.cost?.total_lines_removed ?? 0
-                        emit(`${prefix("⊖", "removed")}${c.bold(linesRemoved)}`)
+                        emit(`${prefix("⊖", "removed")}${c.bold(String(linesRemoved))}`)
                     },
                     b: () => {
                         const g     = getGit()
