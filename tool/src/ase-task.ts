@@ -345,7 +345,7 @@ export class TaskMCP {
                 const verbose = args.verbose ?? false
                 const items   = Task.list(verbose)
                 const tasks   = verbose ?
-                    items.map((item) => ({ id: item.id, mtime: item.mtime as string })) :
+                    items.map((item) => ({ id: item.id, mtime: item.mtime ?? "" })) :
                     items.map((item) => ({ id: item.id }))
                 const result  = { tasks }
                 return {
