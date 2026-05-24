@@ -37,7 +37,7 @@ related to a set of code quality aspects.
     </template>
 
     Then decide whether you detected *potential problems* which
-    *requires* a *code change* and *think* about this decision to be
+    *require* a *code change* and *think* about this decision to be
     sure it is *not* a false positive. Then choose one of the following
     cases:
 

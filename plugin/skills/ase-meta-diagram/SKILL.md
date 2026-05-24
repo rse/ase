@@ -5,9 +5,9 @@ description: >
     *Always use* when you have to *visualize*
     structure/layout/components/dependencies as Flowchart,
     control-flow/branching/concurrency as Flowchart,
-    state-machine/states/transitions as an UML State Diagram,
-    data-flow/actors/messages/protocols as an UML Sequence Diagram,
-    data-structure/classes/methods as an UML Class Diagram,
+    state-machine/states/transitions as a UML State Diagram,
+    data-flow/actors/messages/protocols as a UML Sequence Diagram,
+    data-structure/classes/methods as a UML Class Diagram,
     data-model/entities/relationships as an ER Diagram, or
     metrics/distributions/time-series as XY-Charts.
 user-invocable: false
