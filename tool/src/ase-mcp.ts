@@ -23,7 +23,7 @@ export default class MCPCommand {
     constructor (private log: Log) {}
 
     /*  load service identity context  */
-    private loadContext (): { projectId: string, port: number | null, svc: Config } {
+    private loadContext (): { projectId: string, port: number | null } {
         const cfg = new Config("config", configSchema, this.log)
         cfg.read()
         const svc = new Config("service", serviceSchema, this.log)
@@ -32,10 +32,10 @@ export default class MCPCommand {
         const projectId = rawId ?? path.basename(process.cwd())
         const rawPort   = svc.get("port") as number | null | undefined
         const port: number | null = rawPort ?? null
-        return { projectId, port, svc }
+        return { projectId, port }
     }
 
-    /*  spawn "ase service start" detached and wait for it to come up  */
+    /*  run "ase service start" and wait for the service to come up  */
     private async ensureService (): Promise<{ projectId: string, port: number }> {
         let ctx = this.loadContext()
 
@@ -72,9 +72,10 @@ export default class MCPCommand {
         const server = new StdioServerTransport()
 
         /*  track active client and bridge-level closed state  */
-        let client:      StreamableHTTPClientTransport | null = null
-        let closedByUs = false  /* set when we initiated the client close */
-        let bridgeDone = false  /* set when stdio side closes             */
+        let client:       StreamableHTTPClientTransport | null = null
+        let closedByUs   = false  /* set when we initiated the client close */
+        let bridgeDone   = false  /* set when stdio side closes             */
+        let reconnecting = false  /* set while a reconnect chain is active  */
 
         /*  cleanly shut down the whole bridge  */
         const shutdown = async () => {
@@ -108,10 +109,11 @@ export default class MCPCommand {
 
             /*  service closed the connection — try to recover  */
             next.onclose = () => {
-                if (closedByUs || bridgeDone)
+                if (closedByUs || bridgeDone || reconnecting)
                     return
+                reconnecting = true
                 this.log.write("warning", "mcp: http connection lost — reconnecting")
-                reconnect().catch(() => {})
+                reconnect(0, () => { reconnecting = false }).catch(() => {})
             }
 
             await next.start()
@@ -162,7 +164,6 @@ export default class MCPCommand {
 
         /*  periodically probe the service; trigger reconnect if it is gone  */
         const HEALTH_INTERVAL_MS = 30_000
-        let reconnecting = false
         const healthTimer = setInterval(async () => {
             if (bridgeDone || reconnecting)
                 return
