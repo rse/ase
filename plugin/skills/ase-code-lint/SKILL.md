@@ -54,7 +54,7 @@ related to a set of code quality aspects.
 
     For this, invoke *exactly once* the tool:
 
-    ```
+    ```text
         Agent(
             name:          "ase-code-lint",
             description:   "Lint Investigation",

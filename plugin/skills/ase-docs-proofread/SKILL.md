@@ -55,7 +55,7 @@ documents.
 
     For this, invoke *exactly once* the tool:
 
-    ```
+    ```text
         Agent(
             name:          "ase-docs-proofread",
             description:   "Proofread Investigation",
