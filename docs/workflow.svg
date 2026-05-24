@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="7.937054 5.6692915 820.0629 583.937" width="820.0629" height="583.937">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" viewBox="7.937054 5.6692915 820.0629 583.937" width="820.0629" height="583.937">
   <defs>
     <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="#1067b2">
       <g>
@@ -38,7 +38,7 @@
       </g>
     </marker>
   </defs>
-  <g id="Canvas_1" stroke="none" fill-opacity="1" stroke-dasharray="none" fill="none" stroke-opacity="1">
+  <g id="Canvas_1" stroke-dasharray="none" stroke-opacity="1" stroke="none" fill="none" fill-opacity="1">
     <title>Canvas 1</title>
     <rect fill="white" x="7.937054" y="5.6692915" width="820.0629" height="583.937"/>
     <g id="Canvas_1_Content">
@@ -152,10 +152,10 @@
       </g>
       <g id="Group_771">
         <g id="Graphic_749">
-          <path d="M 366.83466 285.28544 L 477.25986 285.28544 C 479.469 285.28544 481.25986 287.0763 481.25986 289.28544 L 481.25986 310.75768 C 481.25986 312.96682 479.469 314.75768 477.25986 314.75768 L 366.83466 314.75768 C 364.6255 314.75768 362.83466 312.96682 362.83466 310.75768 L 362.83466 289.28544 C 362.83466 287.0763 364.6255 285.28544 366.83466 285.28544 Z" fill="#b26813"/>
+          <path d="M 367.46458 252.28347 L 477.8898 252.28347 C 480.0989 252.28347 481.8898 254.07433 481.8898 256.28347 L 481.8898 277.7557 C 481.8898 279.96485 480.0989 281.7557 477.8898 281.7557 L 367.46458 281.7557 C 365.25544 281.7557 363.46458 279.96485 363.46458 277.7557 L 363.46458 256.28347 C 363.46458 254.07433 365.25544 252.28347 367.46458 252.28347 Z" fill="#b26813"/>
         </g>
         <g id="Graphic_748">
-          <text transform="translate(395.0317 292.5409)" fill="white">
+          <text transform="translate(395.6616 259.53893)" fill="white">
             <tspan font-family="Myriad Pro" font-size="16" fill="white" x="14210855e-21" y="12" xml:space="preserve">task-</tspan>
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">edit</tspan>
           </text>
@@ -174,10 +174,10 @@
       </g>
       <g id="Group_773">
         <g id="Graphic_745">
-          <path d="M 367.46458 387.99747 L 477.8898 387.99747 C 480.0989 387.99747 481.8898 389.78833 481.8898 391.99747 L 481.8898 412.14417 C 481.8898 414.3533 480.0989 416.14417 477.8898 416.14417 L 367.46458 416.14417 C 365.25544 416.14417 363.46458 414.3533 363.46458 412.14417 L 363.46458 391.99747 C 363.46458 389.78833 365.25544 387.99747 367.46458 387.99747 Z" fill="#df8f37"/>
+          <path d="M 367.46458 320.51472 L 477.8898 320.51472 C 480.0989 320.51472 481.8898 322.3056 481.8898 324.51472 L 481.8898 344.66143 C 481.8898 346.87057 480.0989 348.66143 477.8898 348.66143 L 367.46458 348.66143 C 365.25544 348.66143 363.46458 346.87057 363.46458 344.66143 L 363.46458 324.51472 C 363.46458 322.3056 365.25544 320.51472 367.46458 320.51472 Z" fill="#df8f37"/>
         </g>
         <g id="Graphic_744">
-          <text transform="translate(379.2616 394.49484)" fill="white">
+          <text transform="translate(379.2616 327.0121)" fill="white">
             <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">preflight</tspan>
           </text>
@@ -201,7 +201,7 @@
         </g>
       </g>
       <g id="Line_761">
-        <path d="M 352.33466 436.53545 L 337.32284 436.53545 L 337.32284 385.99056 L 330.1896 383.41203" marker-end="url(#FilledArrow_Marker_3)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 352.33466 436.53545 L 337.32284 436.53545 L 337.32284 385.99056 L 320.31497 379.84253" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_780">
         <path d="M 331.88614 348.50637 L 340.1575 342.99214 L 340.1575 297.6378 L 352.33466 297.6378" marker-end="url(#FilledArrow_Marker_3)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
@@ -210,7 +210,7 @@
         <path d="M 336.48426 360 L 345.8268 360 L 345.8268 335.90552 L 352.33466 335.90552" marker-end="url(#FilledArrow_Marker_3)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_778">
-        <path d="M 336.48426 374.17324 L 345.8268 374.17324 L 345.8268 399.68505 L 352.33466 399.68505" marker-end="url(#FilledArrow_Marker_3)" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 352.33466 399.68505 L 345.8268 399.68505 L 345.8268 374.17324 L 325.98426 374.17324" marker-start="url(#FilledArrow_Marker_5)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Graphic_781">
         <text transform="translate(229.94285 179.79055)" fill="white">
@@ -458,10 +458,10 @@
       </g>
       <g id="Group_884">
         <g id="Graphic_886">
-          <path d="M 366.83466 318.37153 L 477.25986 318.37153 C 479.469 318.37153 481.25986 320.1624 481.25986 322.37153 L 481.25986 344.65343 C 481.25986 346.86257 479.469 348.65343 477.25986 348.65343 L 366.83466 348.65343 C 364.6255 348.65343 362.83466 346.86257 362.83466 344.65343 L 362.83466 322.37153 C 362.83466 320.1624 364.6255 318.37153 366.83466 318.37153 Z" fill="#df8f37"/>
+          <path d="M 367.46458 285.36956 L 477.8898 285.36956 C 480.0989 285.36956 481.8898 287.16042 481.8898 289.36956 L 481.8898 311.65146 C 481.8898 313.8606 480.0989 315.65146 477.8898 315.65146 L 367.46458 315.65146 C 365.25544 315.65146 363.46458 313.8606 363.46458 311.65146 L 363.46458 289.36956 C 363.46458 287.16042 365.25544 285.36956 367.46458 285.36956 Z" fill="#df8f37"/>
         </g>
         <g id="Graphic_885">
-          <text transform="translate(385.2477 326.09004)" fill="white">
+          <text transform="translate(385.8776 293.08807)" fill="white">
             <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">reboot</tspan>
           </text>
@@ -480,10 +480,10 @@
       </g>
       <g id="Group_890">
         <g id="Graphic_892">
-          <path d="M 367.46458 253.5249 L 477.8898 253.5249 C 480.0989 253.5249 481.8898 255.31575 481.8898 257.5249 L 481.8898 277.6716 C 481.8898 279.88073 480.0989 281.6716 477.8898 281.6716 L 367.46458 281.6716 C 365.25544 281.6716 363.46458 279.88073 363.46458 277.6716 L 363.46458 257.5249 C 363.46458 255.31575 365.25544 253.5249 367.46458 253.5249 Z" fill="#df8f37"/>
+          <path d="M 367.46458 388.34647 L 477.8898 388.34647 C 480.0989 388.34647 481.8898 390.13733 481.8898 392.34647 L 481.8898 412.49317 C 481.8898 414.7023 480.0989 416.49317 477.8898 416.49317 L 367.46458 416.49317 C 365.25544 416.49317 363.46458 414.7023 363.46458 412.49317 L 363.46458 392.34647 C 363.46458 390.13733 365.25544 388.34647 367.46458 388.34647 Z" fill="#df8f37"/>
         </g>
         <g id="Graphic_891">
-          <text transform="translate(393.0856 260.02226)" fill="white">
+          <text transform="translate(393.0856 394.84384)" fill="white">
             <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">view</tspan>
           </text>
@@ -493,7 +493,7 @@
         <line x1="325.98426" y1="368.06772" x2="352.33466" y2="368.06772" marker-end="url(#FilledArrow_Marker_6)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Line_894">
-        <path d="M 320.31497 348.66143 L 334.4882 334.4882 L 334.4882 266.4567 L 352.34064 267.05972" marker-end="url(#FilledArrow_Marker_6)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 327.7396 341.2368 L 334.4882 334.4882 L 334.4882 267.41418 L 352.33466 267.41418" marker-end="url(#FilledArrow_Marker_6)" marker-start="url(#FilledArrow_Marker_7)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_898">
         <g id="Graphic_900">
@@ -514,17 +514,17 @@
       </g>
       <g id="Group_903">
         <g id="Graphic_905">
-          <path d="M 366.83466 451.51857 L 477.25986 451.51857 C 479.469 451.51857 481.25986 453.30943 481.25986 455.51857 L 481.25986 475.6653 C 481.25986 477.8744 479.469 479.6653 477.25986 479.6653 L 366.83466 479.6653 C 364.6255 479.6653 362.83466 477.8744 362.83466 475.6653 L 362.83466 455.51857 C 362.83466 453.30943 364.6255 451.51857 366.83466 451.51857 Z" fill="#df8f37"/>
+          <path d="M 367.46458 451.51857 L 477.8898 451.51857 C 480.0989 451.51857 481.8898 453.30943 481.8898 455.51857 L 481.8898 475.6653 C 481.8898 477.8744 480.0989 479.6653 477.8898 479.6653 L 367.46458 479.6653 C 365.25544 479.6653 363.46458 477.8744 363.46458 475.6653 L 363.46458 455.51857 C 363.46458 453.30943 365.25544 451.51857 367.46458 451.51857 Z" fill="#df8f37"/>
         </g>
         <g id="Graphic_904">
-          <text transform="translate(382.2077 458.01595)" fill="white">
+          <text transform="translate(382.8376 458.01595)" fill="white">
             <tspan font-family="Myriad Pro" font-size="16" fill="white" x="5400125e-19" y="12" xml:space="preserve">task-</tspan>
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">rename</tspan>
           </text>
         </g>
       </g>
       <g id="Line_906">
-        <path d="M 352.33466 464.8819 L 331.65355 464.8819 L 331.65355 399.68505 L 322.8627 393.17684" marker-end="url(#FilledArrow_Marker_6)" marker-start="url(#FilledArrow_Marker_7)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 352.33466 464.8819 L 331.65355 464.8819 L 331.65355 399.68505 L 314.42373 386.92914" marker-start="url(#FilledArrow_Marker_7)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Group_907">
         <g id="Graphic_909">
@@ -539,17 +539,29 @@
       </g>
       <g id="Group_911">
         <g id="Graphic_913">
-          <path d="M 366.83466 419.758 L 477.25986 419.758 C 479.469 419.758 481.25986 421.5489 481.25986 423.758 L 481.25986 443.9047 C 481.25986 446.11387 479.469 447.9047 477.25986 447.9047 L 366.83466 447.9047 C 364.6255 447.9047 362.83466 446.11387 362.83466 443.9047 L 362.83466 423.758 C 362.83466 421.5489 364.6255 419.758 366.83466 419.758 Z" fill="#df8f37"/>
+          <path d="M 367.46458 419.758 L 477.8898 419.758 C 480.0989 419.758 481.8898 421.5489 481.8898 423.758 L 481.8898 443.9047 C 481.8898 446.11387 480.0989 447.9047 477.8898 447.9047 L 367.46458 447.9047 C 365.25544 447.9047 363.46458 446.11387 363.46458 443.9047 L 363.46458 423.758 C 363.46458 421.5489 365.25544 419.758 367.46458 419.758 Z" fill="#df8f37"/>
         </g>
         <g id="Graphic_912">
-          <text transform="translate(398.4157 426.2554)" fill="white">
+          <text transform="translate(399.0456 426.2554)" fill="white">
             <tspan font-family="Myriad Pro" font-size="16" fill="white" x="0" y="12" xml:space="preserve">task-</tspan>
             <tspan font-family="Myriad Pro" font-weight="bold" font-size="16" fill="white" y="12" xml:space="preserve">list</tspan>
           </text>
         </g>
       </g>
       <g id="Line_916">
-        <path d="M 352.33466 497.4803 L 325.98426 497.4803 L 325.98426 405.35434 L 317.2712 397.96987" marker-end="url(#FilledArrow_Marker_6)" marker-start="url(#FilledArrow_Marker_7)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M 352.33466 497.4803 L 325.98426 497.4803 L 325.98426 405.35434 L 309.261 391.1811" marker-start="url(#FilledArrow_Marker_7)" stroke="#b26813" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_917">
+        <path d="M 481.8898 436.53545 L 668.9764 436.53545 L 669.6063 227.72914 L 681.7835 227.72914" marker-end="url(#FilledArrow_Marker_4)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_918">
+        <path d="M 481.8898 464.8819 L 668.9764 464.8819 L 669.6063 227.72914 L 681.7835 227.72914" marker-end="url(#FilledArrow_Marker_4)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_919">
+        <path d="M 481.25986 497.4803 L 668.9764 497.4803 L 669.6063 227.72914 L 681.7835 227.72914" marker-end="url(#FilledArrow_Marker_4)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_920">
+        <path d="M 482.5197 405.35434 L 668.9764 405.35434 L 669.7154 227.81333 L 681.8926 227.81333" marker-end="url(#FilledArrow_Marker_4)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
     </g>
   </g>
