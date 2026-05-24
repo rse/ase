@@ -270,12 +270,7 @@ export default class HookCommand {
 
         /*  safety net: clear any lingering "agent.skill" marker so a
             crashed or aborted skill loop does not leave information active  */
-        const stdin = fs.readFileSync(0, "utf8")
-        const input = this.parseJSON(stdin, v.object({
-            session_id: v.optional(v.string()),
-            sessionId:  v.optional(v.string())
-        }))
-        const sessionId = input.session_id ?? input.sessionId ?? ""
+        const sessionId = this.readSessionIdFromStdin()
         if (/^[A-Za-z0-9._-]+$/.test(sessionId)) {
             try {
                 const cfg = new Config("config", configSchema, this.log,
@@ -297,16 +292,8 @@ export default class HookCommand {
 
     /*  handler for "ase hook session-end" (both tools)  */
     private doSessionEnd (_tool: Tool): number {
-        /*  read session information (Claude Code uses snake_case fields,
-            Copilot CLI uses camelCase fields)  */
-        const stdin = fs.readFileSync(0, "utf8")
-        const input = this.parseJSON(stdin, v.object({
-            session_id: v.optional(v.string()),
-            sessionId:  v.optional(v.string())
-        }))
-
         /*  determine session id  */
-        const sessionId = input.session_id ?? input.sessionId ?? ""
+        const sessionId = this.readSessionIdFromStdin()
 
         /*  remove the session directory ~/.ase/session/<id> (only for a valid sessionId)  */
         if (/^[A-Za-z0-9._-]+$/.test(sessionId)) {
@@ -319,6 +306,17 @@ export default class HookCommand {
             }
         }
         return 0
+    }
+
+    /*  read session id from stdin JSON payload (Claude Code uses
+        snake_case fields, Copilot CLI uses camelCase fields)  */
+    private readSessionIdFromStdin (): string {
+        const stdin = fs.readFileSync(0, "utf8")
+        const input = this.parseJSON(stdin, v.object({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string())
+        }))
+        return input.session_id ?? input.sessionId ?? ""
     }
 
     /*  read the session-scoped "agent.skill" config value  */
