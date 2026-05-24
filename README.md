@@ -243,7 +243,7 @@ Design Decisions
 
 - **Agent &amp; Plugin**:
   **ASE** is a plugin for the agent tools Claude Code and GitHub Copilot
-  CLI, and can be non-intrusively installed, and later also residue-free
+  CLI, and can be non-intrusively installed and later also residue-free
   uninstalled, from those agent tools at any time. Especially, **ASE** is
   intended to be used side-by-side with other skills and MCP services.
 
