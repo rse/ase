@@ -119,9 +119,9 @@ export class GetoptMCP {
                         }
                         ranges.push({ start, end: i })
                     }
-                    const tail = cmd.args.length
-                    if (tail > 0 && ranges.length >= tail) {
-                        const first = ranges[ranges.length - tail].start
+                    const consumed = argsVec.length - cmd.args.length
+                    if (cmd.args.length > 0 && consumed >= 0 && consumed < ranges.length) {
+                        const first = ranges[consumed].start
                         argsVerbatim = argsRaw.slice(first)
                     }
                 }
