@@ -11,6 +11,7 @@ import os                                   from "node:os"
 import { Command }                          from "commander"
 import { execaSync }                        from "execa"
 import { quote }                            from "shell-quote"
+import * as v                               from "valibot"
 
 import type Log                             from "./ase-log.js"
 import Version                              from "./ase-version.js"
@@ -55,18 +56,28 @@ const toolSpecs: Record<Tool, ToolSpec> = {
 export default class HookCommand {
     constructor (private log: Log) {}
 
-    /*  best-effort JSON parse: returns an empty object on blank input
-        or malformed JSON, so callers can treat the result uniformly  */
-    private parseJSON<T extends object> (text: string): T {
+    /*  best-effort JSON parse with valibot schema validation: returns
+        an empty object on blank input, malformed JSON, or schema
+        mismatch, so callers can treat the result uniformly. Extra
+        properties in the data are tolerated; only the declared schema
+        entries are required to match.  */
+    private parseJSON<TSchema extends v.BaseSchema<unknown, object, v.BaseIssue<unknown>>>
+    (text: string, schema: TSchema): v.InferOutput<TSchema> {
+        const empty = {} as v.InferOutput<TSchema>
         if (text.trim() === "")
-            return {} as T
+            return empty
+        let raw: unknown
         try {
-            return JSON.parse(text) as T
+            raw = JSON.parse(text)
         }
         catch (_e) {
             /*  best-effort: return empty object on malformed JSON  */
-            return {} as T
+            return empty
         }
+        const result = v.safeParse(schema, raw)
+        if (!result.success)
+            return empty
+        return result.output
     }
 
     /*  recursively expand "@<path>" file references in a Markdown text,
@@ -129,7 +140,11 @@ export default class HookCommand {
         /*  read session information (Claude Code uses snake_case fields,
             Copilot CLI uses camelCase fields)  */
         const stdin = fs.readFileSync(0, "utf8")
-        const input = this.parseJSON<{ session_id?: string, sessionId?: string, cwd?: string }>(stdin)
+        const input = this.parseJSON(stdin, v.object({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string()),
+            cwd:        v.optional(v.string())
+        }))
 
         /*  determine session id  */
         const sessionId = input.session_id ?? input.sessionId ?? ""
@@ -256,7 +271,10 @@ export default class HookCommand {
         /*  safety net: clear any lingering "agent.skill" marker so a
             crashed or aborted skill loop does not leave information active  */
         const stdin = fs.readFileSync(0, "utf8")
-        const input = this.parseJSON<{ session_id?: string, sessionId?: string }>(stdin)
+        const input = this.parseJSON(stdin, v.object({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string())
+        }))
         const sessionId = input.session_id ?? input.sessionId ?? ""
         if (/^[A-Za-z0-9._-]+$/.test(sessionId)) {
             try {
@@ -282,7 +300,10 @@ export default class HookCommand {
         /*  read session information (Claude Code uses snake_case fields,
             Copilot CLI uses camelCase fields)  */
         const stdin = fs.readFileSync(0, "utf8")
-        const input = this.parseJSON<{ session_id?: string, sessionId?: string }>(stdin)
+        const input = this.parseJSON(stdin, v.object({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string())
+        }))
 
         /*  determine session id  */
         const sessionId = input.session_id ?? input.sessionId ?? ""
@@ -326,8 +347,10 @@ export default class HookCommand {
 
         /*  read tool invocation information  */
         const stdin = fs.readFileSync(0, "utf8")
-        const input = this.parseJSON<Record<string, unknown> &
-            { session_id?: string, sessionId?: string }>(stdin)
+        const input = this.parseJSON(stdin, v.looseObject({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string())
+        }))
 
         /*  determine whether to auto-approve the tool invocation
             (field names and value shapes differ between tools)  */
@@ -336,7 +359,10 @@ export default class HookCommand {
         let toolInput: { command?: string, skill?: string } = {}
         const rawInput  = input[spec.toolInputField]
         if (spec.toolInputIsString && typeof rawInput === "string")
-            toolInput = this.parseJSON<{ command?: string, skill?: string }>(rawInput)
+            toolInput = this.parseJSON(rawInput, v.object({
+                command: v.optional(v.string()),
+                skill:   v.optional(v.string())
+            }))
         else if (!spec.toolInputIsString && typeof rawInput === "object" && rawInput !== null)
             toolInput = rawInput as { command?: string, skill?: string }
         let approve = false
