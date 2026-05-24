@@ -63,6 +63,11 @@ export default class MCPCommand {
         return { projectId: ctx.projectId, port: ctx.port }
     }
 
+    /*  coerce an unknown thrown value into an Error  */
+    private asError (e: unknown): Error {
+        return e instanceof Error ? e : new Error(String(e))
+    }
+
     /*  bridge stdio to a Streamable HTTP MCP endpoint on the local service  */
     private async runBridge (): Promise<number> {
         /*  ensure the service is running  */
@@ -98,8 +103,7 @@ export default class MCPCommand {
 
             next.onmessage = (msg: JSONRPCMessage) => {
                 server.send(msg).catch((_err: unknown) => {
-                    const err = _err instanceof Error ? _err : new Error(String(_err))
-                    this.log.write("error", `mcp: stdout send: ${err.message}`)
+                    this.log.write("error", `mcp: stdout send: ${this.asError(_err).message}`)
                 })
             }
             next.onerror = (err: Error) => {
@@ -132,14 +136,13 @@ export default class MCPCommand {
                 port = ctx.port
                 closedByUs = true
                 await client?.close()
-                closedByUs = false
                 await connectClient()
+                closedByUs = false
                 this.log.write("info", "mcp: reconnected to service")
                 done?.()
             }
             catch (_err: unknown) {
-                const err = _err instanceof Error ? _err : new Error(String(_err))
-                this.log.write("error", `mcp: reconnect failed: ${err.message}`)
+                this.log.write("error", `mcp: reconnect failed: ${this.asError(_err).message}`)
                 reconnect(attempt + 1, done).catch(() => {})
             }
         }
@@ -147,8 +150,7 @@ export default class MCPCommand {
         /*  wire stdio server  */
         server.onmessage = (msg: JSONRPCMessage) => {
             client?.send(msg).catch((_err: unknown) => {
-                const err = _err instanceof Error ? _err : new Error(String(_err))
-                this.log.write("error", `mcp: http send: ${err.message}`)
+                this.log.write("error", `mcp: http send: ${this.asError(_err).message}`)
             })
         }
         server.onerror = (err: Error) => {
@@ -176,7 +178,10 @@ export default class MCPCommand {
                     reconnect(0, () => { reconnecting = false }).catch(() => {})
                 }
             }
-            catch { /* ignore probe errors */ }
+            catch (err: unknown) {
+                /*  ignore transient probe/context errors but record them  */
+                this.log.write("debug", `mcp: health check error: ${this.asError(err).message}`)
+            }
         }, HEALTH_INTERVAL_MS)
         healthTimer.unref()
 
