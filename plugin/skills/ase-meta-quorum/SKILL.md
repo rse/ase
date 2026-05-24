@@ -21,7 +21,9 @@ Query Multiple AIs for Quorum Answer
 Query Multiple AIs for Quorum Answer
 </skill>
 
+<role>
 Your role is an *expert-level assistant*.
+</role>
 
 <objective>
 Find a *quorum answer* on an arbitrary question,
@@ -29,7 +31,9 @@ by querying *multiple* AIs for an *optimal consensus*.
 </objective>
 
 <flow>
+
 1.  <step id="STEP 1: Determine Own Answer">
+
     Determine your own answer.
     For yourself (Anthropic Claude), first answer the following <query/> in advance:
 
@@ -45,6 +49,7 @@ by querying *multiple* AIs for an *optimal consensus*.
     </step>
 
 2.  <step id="STEP 2: Preview Own Answer">
+
     Show your own answer as a sneak preview.
     For this, use the following output <template/>:
 
@@ -53,28 +58,43 @@ by querying *multiple* AIs for an *optimal consensus*.
     - [...]
     - [...]
     </template>
+
     </step>
 
 3.  <step id="STEP 3: Query Foreign AIs">
-    For each of the following foreign AIs and their potentially
-    available, given, corresponding MCP servers, use a *sub-task* and
-    the `ase-meta-chat` *agent* to perform the above same <query/> zero
-    or more times and in *parallel* again:
 
-    - OpenAI ChatGPT: `chat-openai-chatgpt`
-    - Google Gemini:  `chat-google-gemini`
-    - DeepSeek:       `chat-deepseek`
-    - xAI Grok:       `chat-xai-grok`
+    <define name="agent">
+    Call the `Agent` tool:
 
-    Silently skip those AIs where the corresponding MCP server is not available.
+    ```text
+        Agent(
+            name:          "ase:ase-meta-chat",
+            description:   "Query Foreign LLM for Chat",
+            subagent_type: "ase:ase-meta-chat",
+            prompt:        "<content/> <query/>"
+        )
+    ```
+    </define>
+
+    <expand name="agent">chatgpt</expand>
+    <expand name="agent">gemini</expand>
+    <expand name="agent">deepseek</expand>
+    <expand name="agent">grok</expand>
+
     </step>
 
 4.  <step id="STEP 4: Summarize Responses">
-    Summarize all responses, of both yourself and all available MCP servers,
-    with just 1 to 7 corresponding bullet points and with short sentences.
+
+    Summarize all responses, of both yourself and all agents (which
+    returned not a response with an `ERROR`), with just 1 to 7
+    corresponding bullet points and with short sentences. Agents which
+    returned a response with an `ERROR` are silently skipped as they
+    would be not available.
+
     </step>
 
 5.  <step id="STEP 5: Determine Consensus Rating">
+
     Determine, on a Likert scale of 0..<n/>, the amount of the overall
     consensus <c/> of all the responses. The <n/> is the *total number of
     responders* (yourself plus all available foreign AIs above).
@@ -85,11 +105,14 @@ by querying *multiple* AIs for an *optimal consensus*.
     formatted as `(disagreement: <ai/>, <ai/>, [...])` where <ai/> is a
     name of an AI which disagreed with the consensus. Else, if all AIs
     agree, set <disagreement></disagreement>.
+
     </step>
 
 6.  <step id="STEP 6: Show Results">
-    Finally show the summary, the consensus and the complete and unmodified responses
-    of yourself and each of the MCP servers, based on the following output <template/>:
+
+    Finally show the summary, the consensus and the complete and
+    unmodified responses of yourself and each of the MCP servers, based
+    on the following output <template/>:
 
     <template>
     **QUESTION**:
@@ -123,6 +146,8 @@ by querying *multiple* AIs for an *optimal consensus*.
     </template>
 
     In this output, remove the sections of those AIs which were not available.
+
     </step>
+
 </flow>
 
