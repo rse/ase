@@ -88,7 +88,7 @@ export default class HookCommand {
     /*  recursively expand "@<path>" file references in a Markdown text,
         resolving paths relative to the directory of the containing file  */
     private expandReferences (text: string, baseDir: string, visited = new Set<string>()): string {
-        return text.replace(/@([^\s]+)/g, (match, ref: string) => {
+        return text.replace(/@(\S+)/g, (match, ref: string) => {
             let resolved = ref
             if (resolved.startsWith("~/"))
                 resolved = path.join(process.env.HOME ?? "", resolved.slice(2))
