@@ -21,7 +21,7 @@ export interface ComponentInfo {
     rank:       number
 }
 
-/*  reusable functionality: gather per-package metadata in maximum parallel  */
+/*  reusable functionality: gather per-package metadata with maximum parallelism  */
 export class Skills {
     /*  HTTP timeout for the GitHub/npm-downloads side calls  */
     private static HTTP_TIMEOUT_MS = 10_000
@@ -107,7 +107,7 @@ export class Skills {
         }
     }
 
-    /*  gather metadata for all given components in maximum parallel,
+    /*  gather metadata for all given components with maximum parallelism,
         dispatching on the technology stack:
         -   "JavaScript"/"TypeScript": NPM registry (pacote) + GitHub stars + npm-downloads
         -   "Java"/"Kotlin"/"Unknown": not yet supported -- return empty result  */
@@ -203,7 +203,7 @@ export class SkillsMCP {
         mcp.registerTool("component_info", {
             title: "ASE component info",
             description:
-                "Gather metadata for a list of NPM packages in maximum parallel. " +
+                "Gather metadata for a list of NPM packages with maximum parallelism. " +
                 "For each package, fetches the full registry packument via `pacote` " +
                 "(in-process, no `npm view` subprocess), the GitHub `stargazers_count` " +
                 "from `api.github.com` (if the repository points to GitHub), and the " +

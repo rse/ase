@@ -67,7 +67,7 @@ type ScopeTerm =
     | { kind: "session", id: string }
 
 /*  hard-coded map: which scope kinds each variable may be SET on
-    (reads always cascade through the full chain, this restricts writes only);
+    (reads always cascade through the full chain; this restricts writes only);
     keys absent from this map default to all non-"default" scope kinds  */
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
     "agent.task": [ "session" ]

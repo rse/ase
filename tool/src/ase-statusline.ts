@@ -600,7 +600,7 @@ export default class StatuslineCommand {
                 process.stdout.write(out)
 
                 /*  optionally publish task id to the calling tmux pane as a per-pane user
-                    option, so someone (like claudeX) can pick it up via #{@ase_task_id}  */
+                    option, so something (like claudeX) can pick it up via #{@ase_task_id}  */
                 if (process.env.TMUX !== undefined
                     && process.env.TMUX !== ""
                     && process.env.TMUX_PANE !== undefined

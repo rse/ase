@@ -218,7 +218,7 @@ export default class HookCommand {
         #{@ase_agent_status} (refreshed on tmux's own interval,
         independent of Claude Code's statusline repaint cadence).
         Notice: the Claude Code statusline is not usable for this case
-        here at all, as it is not repainted during agent processing! */
+        at all, as it is not repainted during agent processing!  */
     private writeAgentStatus (status: "busy" | "ready"): void {
         const icon = status === "busy" ? "▶" : "⏸"
         if (process.env.TMUX !== undefined
