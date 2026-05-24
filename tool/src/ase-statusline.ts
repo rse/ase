@@ -287,8 +287,8 @@ export default class StatuslineCommand {
             .option("--no-labels",
                 "disable labels in front of bold values")
             .argument("[lines...]",
-                "one or more template lines with %u %p %T %s %m %e %t %P %c %C %L %N %a %r " +
-                "%S %D %W %Q %H %X %b %g %G %d %M %V %o placeholders and <color>...</color> markup " +
+                "one or more template lines with %u %p %T %s %m %e %t %O %P %c %C %a %r " +
+                "%S %D %W %Q %H %X %b %g %G %d %M %V placeholders and <color>...</color> markup " +
                 "(color: black, red, green, yellow, blue, magenta, cyan, white, default) " +
                 "(default: single line \"%m %e %t\")")
             .action(async (lines: string[], opts: StatuslineOpts) => {
