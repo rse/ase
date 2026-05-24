@@ -5,6 +5,12 @@ ChangeLog
 0.0.46 (2026-05-24)
 -------------------
 
+- FEATURE: allow `ase config` to be managed via MCP, too
+- IMPROVEMENT: greatly improve `ase-docs-proofread` skill (better interactive dialog, sub-agent for investigation, more precise output)
+- IMPROVEMENT: add Java/Kotlin/Maven package support to `ase-arch-discover` skill
+- BUGFIX: fix argument parsing with glob patterns in skill option parsing
+- CLEANUP: fix many proofreading problems across documents
+
 0.0.45 (2026-05-24)
 -------------------
 
