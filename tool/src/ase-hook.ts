@@ -139,7 +139,8 @@ export default class HookCommand {
         }
 
         /*  determine own version  */
-        const versionCurrentPlugin = (JSON.parse(pkg).version as string | undefined) ?? ""
+        const pkgObj = this.parseJSON(pkg, v.object({ version: v.optional(v.string()) }))
+        const versionCurrentPlugin = pkgObj.version ?? ""
         const versionCurrentTool   = Version.current()
         const versionLatestTool    = await Version.latest()
 
