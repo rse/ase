@@ -11,7 +11,7 @@ About
 
 **Agentic Software Engineering (ASE)** is the opinionated companion
 tooling of *Dr. Ralf S. Engelschall* for combining the approach of
-*Agentic AI* into *Software Engineering* with the help of *Agentic
+*Agentic AI* with *Software Engineering* with the help of *Agentic
 AI Coding Tools* like *Claude Code*. **ASE** primarily consists of a
 *Claude Code* plugin and a Command-Line Interface (CLI) tool, including
 an *MCP* service. **ASE** provides skills and commands to support
@@ -21,7 +21,7 @@ Development*.
 
 > [!NOTE]
 > The discipline of [*Agentic Software Engineering*](docs/agentic-software-engineering.md)
-> in *general* is *Software Engineering*, supported by automomous *AI
+> in *general* is *Software Engineering*, supported by autonomous *AI
 > Agents* to perform tasks across the software development lifecycle.
 > This **ASE** product in *particular* is also *agentic*, but not
 > strictly based on autonomous agents. Instead, **ASE** focuses on
@@ -31,33 +31,33 @@ Development*.
 
 > [!NOTE]
 > The primary focus of **ASE** is on the Agentic AI Coding tool [*Claude
-> Code*](https://code.claude.com) The secondary focus is on the support
+> Code*](https://code.claude.com). The secondary focus is on the support
 > for [*GitHub Copilot CLI*](https://github.com/features/copilot/cli)
 > (just set environment variable `ASE_TOOL=copilot`). In the future,
 > additional support could be provided also for alternative tools
 > &mdash; if their agent harness features (especially hooks, interactive
-> user dialog tool, etc) realistically allow it.
+> user dialog tool, etc.) realistically allow it.
 
 > [!CAUTION]
-> **ASE** is still under active initial development and still
+> **ASE** is still under active initial development and
 > somewhat incomplete. All existing functionality is already
 > stable and used on a daily basis in production. If you are not
-> a steadfast early adopter, perhaps better visit this project
-> again, once we reached at least version 0.9.x! Otherwise, feel
-> free to to join us on our journey towards [*Agentic Software
+> a steadfast early adopter, it is perhaps better to visit this project
+> again once we have reached at least version 0.9.x! Otherwise, feel
+> free to join us on our journey towards [*Agentic Software
 > Engineering*](docs/agentic-software-engineering.md).
 
 Unique Selling Points
 ---------------------
 
-Check out the following questions and corresponding **ASE** examples to
+Check out the following scenarios and corresponding **ASE** examples to
 see whether **ASE** is right for you:
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-- **Boosted Sessions**: 
+- **Boosted Sessions**:
   You want to speed up your interactive sessions and at the same time
   reduce costs by reducing the amount of produced LLM output tokens?
   &rarr; `/ase-meta-persona engineer` or even `/ase-meta-persona caveman`
@@ -74,7 +74,7 @@ see whether **ASE** is right for you:
   reachable, and strictly structured plans?
   &rarr; `/ase-task-edit hello`
 
-- **Implementations Preflights**:
+- **Implementation Preflights**:
   You prefer a plan-driven approach, but want to pre-flight the
   implementation without later having to rewind artifacts via the version
   control system or the agent harness' session history?
@@ -130,7 +130,7 @@ see whether **ASE** is right for you:
 
 - **Package Discovery**:
   You want to be supported in the discovery of suitable packages
-  for establishment of your technology stack?
+  for the establishment of your technology stack?
   &rarr; `/ase-arch-discover reactive UI DOM rendering`
 
 - **Multi-Criteria Decision Matrices**:
@@ -192,13 +192,13 @@ Features
 - [**Session Constitution**](plugin/meta/) (MANDATORY, 95% done):
   All agent sessions have meta descriptions as some sort of a
   "constitution" preloaded all the time, based on the configured
-  parameters. This allows to control the *general* agent behavior.
+  parameters. This allows controlling the *general* agent behavior.
   Additionally, skills load more meta descriptions on demand. This
   allows skills to reuse definitions.
 
 - [**Task Skills**](plugin/skills/) (MANDATORY, 85% done):
   Recurring tasks are supported with dedicated skills, based on the
-  configured parameters. This allows to control the *specific* agent
+  configured parameters. This allows controlling the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
   (`ase-code-*`), architecture (`ase-arch-*`), and task (`ase-task-*`)
   families, covering 26 skills in total.
@@ -219,7 +219,7 @@ Features
 
 - **Project Templates** (OPTIONAL, 0% done):
   The agent is equipped with reasonable templates to scaffold
-  Library/Framework, CLI and WebUI projects. This allows the user to
+  Library/Framework, CLI, and WebUI projects. This allows the user to
   bootstrap projects more conveniently and the agent skills to operate
   on pre-existing artifacts from the start.
 
@@ -239,7 +239,7 @@ Design Decisions
 - **Agent &amp; Plugin**:
   **ASE** is a plugin for the agent tools Claude Code and GitHub Copilot
   CLI, and can be non-intrusively installed, and later also residue-free
-  uninstalled, from those agent tool at any time. Especially, **ASE** is
+  uninstalled, from those agent tools at any time. Especially, **ASE** is
   intended to be used side-by-side with other skills and MCP services.
 
 - **Recurring Software Engineering Tasks**:
@@ -274,7 +274,7 @@ The following gives a short overview of the concepts and building blocks of **AS
 
 We can distinguish multiple levels of Agentic AI Coding. **ASE**
 focuses on the levels 1-3, i.e., it supports the assisted, agentic, and
-delegated modes of operations best. **ASE** is especially not intended
+delegated modes of operation best. **ASE** is especially not intended
 for the full autonomous agent mode of operation.
 
 [![building-blocks](docs/agentic-levels.svg)](docs/agentic-levels.pdf)
@@ -288,7 +288,7 @@ task-driven skills, and funnel skills.
 
 ### Agent Harness &amp; Operation Modes
 
-When working with **ASE** the user decides (usually on the estimated extend
+When working with **ASE**, the user decides (usually based on the estimated extent
 and complexity of the task to perform) which operation mode to choose:
 
 [![operation-modes](docs/operation-modes.svg)](docs/operation-modes.pdf)
@@ -311,10 +311,10 @@ and complexity of the task to perform) which operation mode to choose:
    agent sessions.
 
 4. **Funnel Mode** (**ASE**):
-   The ultra advanced mode of **ASE** where the user first sketches the
+   The ultra-advanced mode of **ASE** where the user first sketches the
    plan, then the agent figures out possible approaches, then the user
    selects one approach, then a task plan is created for this approach,
-   and and then finally this switches over to the regular **Task Mode**.
+   and then finally this switches over to the regular **Task Mode**.
    The task plan has a fixed format and is persisted by **ASE** and
    hence is available across agent sessions.
 
