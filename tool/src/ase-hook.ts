@@ -403,7 +403,7 @@ export default class HookCommand {
         else if (toolName === "Edit") {
             const sessionId   = this.pickSessionId(input)
             const activeSkill = this.readActiveSkill(sessionId)
-            if (activeSkill === "ase-docs-proofread") {
+            if (activeSkill === "ase-docs-proofread" || activeSkill === "ase-code-lint") {
                 approve = true
                 reason  = `${activeSkill}: user already consented via AskUserQuestion`
             }

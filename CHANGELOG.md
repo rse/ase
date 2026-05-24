@@ -5,6 +5,7 @@ ChangeLog
 0.0.49 (2026-05-24)
 -------------------
 
+- IMPROVEMENT: reimplement "ase-code-lint" skill based on "ase-docs-proofread" agent-based skill mechanics
 - IMPROVEMENT: add "ase-task-rename" skill, MCP tool and CLI command
 - BUGFIX: fix argument parsing in `getopt` MCP tool
 - BUGFIX: always lint before version bump on "npm start publish" procedure
