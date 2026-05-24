@@ -472,7 +472,6 @@ export default class ServiceCommand {
                 lastErr = new Error(`${reason}${detail}`)
             }
             finally {
-                child.removeListener("exit", onExit)
                 if (!success && !exited) {
                     child.kill("SIGTERM")
                     await Promise.race([
@@ -488,6 +487,7 @@ export default class ServiceCommand {
                         child.unref()
                     }
                 }
+                child.removeListener("exit", onExit)
                 if (!success)
                     Service.clearPort(ctx.svc)
             }
