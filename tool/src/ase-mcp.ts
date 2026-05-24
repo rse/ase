@@ -102,8 +102,8 @@ export default class MCPCommand {
             const next   = new StreamableHTTPClientTransport(url)
 
             next.onmessage = (msg: JSONRPCMessage) => {
-                server.send(msg).catch((_err: unknown) => {
-                    this.log.write("error", `mcp: stdout send: ${this.asError(_err).message}`)
+                server.send(msg).catch((err: unknown) => {
+                    this.log.write("error", `mcp: stdout send: ${this.asError(err).message}`)
                 })
             }
             next.onerror = (err: Error) => {
@@ -141,16 +141,17 @@ export default class MCPCommand {
                 this.log.write("info", "mcp: reconnected to service")
                 done?.()
             }
-            catch (_err: unknown) {
-                this.log.write("error", `mcp: reconnect failed: ${this.asError(_err).message}`)
+            catch (err: unknown) {
+                closedByUs = false
+                this.log.write("error", `mcp: reconnect failed: ${this.asError(err).message}`)
                 reconnect(attempt + 1, done).catch(() => {})
             }
         }
 
         /*  wire stdio server  */
         server.onmessage = (msg: JSONRPCMessage) => {
-            client?.send(msg).catch((_err: unknown) => {
-                this.log.write("error", `mcp: http send: ${this.asError(_err).message}`)
+            client?.send(msg).catch((err: unknown) => {
+                this.log.write("error", `mcp: http send: ${this.asError(err).message}`)
             })
         }
         server.onerror = (err: Error) => {
@@ -195,7 +196,7 @@ export default class MCPCommand {
         /*  shutdown services  */
         clearInterval(healthTimer)
         await shutdown()
-        return 0
+        return 0 /*  unreachable, kept only to satisfy the Promise<number> return type  */
     }
 
     /*  register commands  */
