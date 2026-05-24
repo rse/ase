@@ -12,6 +12,7 @@ allowed-tools:
     - "Bash(uniq)"
     - "Bash(head)"
     - "Skill"
+    - "Agent"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
@@ -93,10 +94,12 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     Find all modules (or OOP classes) and build a Mermaid specification
     <mermaid-spec/> for a `flowchart TB` diagram with all modules as
     boxes and the imports between modules as the directed edges. Then
-    invoke the `ase-meta-diagram` skill by calling the tool
-    `Skill(skill: "ase:ase-meta-diagram", args: <mermaid-spec/>)`
-    to render the diagram. Do not display any further explanation except
-    for this diagram.
+    dispatch the rendering to the `ase-meta-diagram` sub-agent by
+    calling the tool `Agent(name: "ase:ase-meta-diagram", description:
+    "Diagram Rendering", subagent_type: "ase:ase-meta-diagram", prompt:
+    <mermaid-spec/>)` and reproduce its returned fenced code block
+    verbatim in the response text. Do not display any further
+    explanation except for this diagram.
     </step>
 </flow>
 

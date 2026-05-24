@@ -34,11 +34,13 @@ Skill Output
 
 -   *IMPORTANT*: For *Diagrams*: whenever the response needs a
     diagram (structural, control-flow, state, sequence, class,
-    entity-relationship, or metrics), you *MUST* invoke the
-    `ase-meta-diagram` skill via the `Skill` tool and follow its rules.
-    All hand-drawn ASCII frames, raw Mermaid source as a
-    substitute for a rendered block, and missing stdout
-    reproduction are defects defined by that skill.
+    entity-relationship, or metrics), you *MUST* build a Mermaid
+    specification and dispatch its rendering to the `ase-meta-diagram`
+    sub-agent via the `Agent` tool (`subagent_type: "ase:ase-meta-diagram"`),
+    then reproduce its returned fenced code block verbatim in the
+    response text. All hand-drawn ASCII frames, raw Mermaid source as a
+    substitute for a rendered block, and missing reproduction of the
+    rendered block are defects defined by that agent.
 
 -   *IMPORTANT*: For Markdown *Tables*:
 

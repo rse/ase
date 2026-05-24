@@ -34,13 +34,12 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
   `plugin/.claude-plugin/plugin.json`. Layout:
   - `plugin/skills/<name>/SKILL.md` — the skill set, grouped by
-    `ase-meta-*` (chat, search, changes, commit, diagram, evaluate,
-    persona, quorum, why), `ase-code-*` (analyze, craft, explain,
-    insight, lint, refactor, resolve), `ase-arch-*` (analyze, discover),
-    and `ase-task-*` (id, list, edit, view, reboot, preflight, implement,
-    delete).
+    `ase-meta-*` (changes, commit, evaluate, persona, quorum, why),
+    `ase-code-*` (analyze, craft, explain, insight, lint, refactor,
+    resolve), `ase-arch-*` (analyze, discover), and `ase-task-*` (id,
+    list, edit, view, reboot, preflight, implement, delete).
   - `plugin/agents/<name>.md` — sub-agent definitions (`ase-meta-chat`,
-    `ase-meta-search`).
+    `ase-meta-search`, `ase-meta-diagram`, `ase-docs-proofread`).
   - `plugin/commands/<name>/*.md` — slash commands; currently the
     `ase-code-lint` chord (`complete`, `explain`, `nope`, `reassess`,
     `recheck`, `refine`).

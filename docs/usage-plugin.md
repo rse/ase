@@ -32,16 +32,6 @@ The following ASE commands/skills exist on the meta-level:
   very brief, factual, and abbreviating `telegrapher`, or an ultra
   brief, rough and stuttering `caveman`.
 
-- **/ase-meta-diagram** *description*:<br/>
-  Render diagrams via the `diagram` tool of the `ase` MCP service.
-  Use to visualize structure/layout/components/dependencies as a
-  Flowchart, control-flow/branching/concurrency as a Flowchart,
-  state-machine/states/transitions as a UML State Diagram,
-  data-flow/actors/messages/protocols as a UML Sequence Diagram,
-  data-structure/classes/methods as a UML Class Diagram,
-  data-model/entities/relationships as an ER Diagram,
-  or metrics/distributions/time-series as XY-Charts.
-
 - **/ase-meta-changes**:<br/>
   Update changes entries in `CHANGELOG.md` files from Git commit information.
 
