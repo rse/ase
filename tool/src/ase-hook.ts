@@ -56,6 +56,11 @@ const toolSpecs: Record<Tool, ToolSpec> = {
 export default class HookCommand {
     constructor (private log: Log) {}
 
+    /*  validate a session id against the accepted character set  */
+    private isValidSessionId (id: string): boolean {
+        return /^[A-Za-z0-9._-]+$/.test(id)
+    }
+
     /*  best-effort JSON parse with valibot schema validation: returns
         an empty object on blank input, malformed JSON, or schema
         mismatch, so callers can treat the result uniformly. Extra
@@ -150,7 +155,7 @@ export default class HookCommand {
         const sessionId = input.session_id ?? input.sessionId ?? ""
 
         /*  establish config context (session-scoped only if a valid sessionId is present)  */
-        const hasSession = /^[A-Za-z0-9._-]+$/.test(sessionId)
+        const hasSession = this.isValidSessionId(sessionId)
         const cfg = new Config("config", configSchema, this.log,
             hasSession ? parseScope(`session:${sessionId}`) : parseScope(undefined))
         cfg.lock(() => {
@@ -271,7 +276,7 @@ export default class HookCommand {
         /*  safety net: clear any lingering "agent.skill" marker so a
             crashed or aborted skill loop does not leave information active  */
         const sessionId = this.readSessionIdFromStdin()
-        if (/^[A-Za-z0-9._-]+$/.test(sessionId)) {
+        if (this.isValidSessionId(sessionId)) {
             try {
                 const cfg = new Config("config", configSchema, this.log,
                     parseScope(`session:${sessionId}`))
@@ -296,7 +301,7 @@ export default class HookCommand {
         const sessionId = this.readSessionIdFromStdin()
 
         /*  remove the session directory ~/.ase/session/<id> (only for a valid sessionId)  */
-        if (/^[A-Za-z0-9._-]+$/.test(sessionId)) {
+        if (this.isValidSessionId(sessionId)) {
             const dir = path.join(os.homedir(), ".ase", "session", sessionId)
             try {
                 fs.rmSync(dir, { recursive: true, force: true })
@@ -321,7 +326,7 @@ export default class HookCommand {
 
     /*  read the session-scoped "agent.skill" config value  */
     private readActiveSkill (sessionId: string): string {
-        if (!/^[A-Za-z0-9._-]+$/.test(sessionId))
+        if (!this.isValidSessionId(sessionId))
             return ""
         try {
             const cfg = new Config("config", configSchema, this.log, parseScope(`session:${sessionId}`))
