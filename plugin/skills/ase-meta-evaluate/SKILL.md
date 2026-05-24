@@ -248,7 +248,7 @@ multi-*criteria* decision matrix.
         ⚠ *ATTENTION: all alternatives rate negatively; this is the least-bad choice, not a strong winner!*
         </template>
 
-    -   Otherwise (<percentage/> is greater than or equal 0.10), output
+    -   Otherwise (<percentage/> is greater than or equal to 0.10), output
         just the following <template/> and do not output anything else:
 
         <template>

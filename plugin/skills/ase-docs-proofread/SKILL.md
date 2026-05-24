@@ -99,20 +99,20 @@ documents.
 
             -   Set <context-before/> to exactly *up to two* lines of
                 *unchanged* text context which occurs in the document
-                directly *before* <old-text/>, i.e., the lines (<line/> -
-                2) and (<line/> - 1). Reduce to just one line (<line/> -
-                1) if <old-text/> is the second line of the document. Set
-                <context-before/> to empty if <old-text/> is the first line in
-                the document.
+                directly *before* <old-text/>, i.e., the lines (<line/>
+                - 2) and (<line/> - 1). Reduce to just one line (<line/>
+                - 1) if <old-text/> is the second line of the document.
+                Set <context-before/> to empty if <old-text/> is the
+                first line in the document.
 
             -   Set <context-after/> to exactly *up to two* lines of
                 *unchanged* text content which occurs in the document
-                directly *after* <old-text/> the lines (<line/> + <n/> + 1)
-                and (<line/> + <n/> + 2), where <n/> is the number of lines
-                in <old-text/>. Reduce to just one line (<line/> + <n/> + 1)
-                if <old-text/> is the second-last line of the document. Set
-                <context-after/> to empty if <old-text/> is the last line in
-                the document.
+                directly *after* <old-text/>, i.e., the lines (<line/>
+                + <n/> + 1) and (<line/> + <n/> + 2), where <n/> is the
+                number of lines in <old-text/>. Reduce to just one line
+                (<line/> + <n/> + 1) if <old-text/> is the second-last
+                line of the document. Set <context-after/> to empty if
+                <old-text/> is the last line in the document.
 
         3.  Return *exclusively* a single fenced JSON block (no prose,
             no preamble, no summary) of the following shape:
@@ -134,7 +134,7 @@ documents.
             ```
 
         4.  You *MUST* *NOT* propose, apply, or render any document
-            changes itself.
+            changes yourself.
 
     Parse the JSON array from the sub-agent's return value and set
     <problems/> to that list.
