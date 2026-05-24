@@ -16,6 +16,8 @@ import * as v                                       from "valibot"
 import Table                                        from "cli-table3"
 import writeFileAtomic                              from "write-file-atomic"
 import lockfile                                     from "proper-lockfile"
+import { z }                                        from "zod"
+import type { McpServer }                           from "@modelcontextprotocol/sdk/server/mcp.js"
 
 import type Log                                     from "./ase-log.js"
 
@@ -70,7 +72,8 @@ type ScopeTerm =
     (reads always cascade through the full chain; this restricts writes only);
     keys absent from this map default to all non-"default" scope kinds  */
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
-    "agent.task": [ "session" ]
+    "agent.task":  [ "session" ],
+    "agent.skill": [ "session" ]
 }
 
 /*  default set of scope kinds writable for any unrestricted key  */
@@ -160,7 +163,8 @@ export const configSchema = v.nullish(v.strictObject({
     })),
     agent: v.optional(v.strictObject({
         persona: v.optional(v.picklist(agentClassification.persona)),
-        task:    v.optional(v.pipe(v.string(), v.minLength(1)))
+        task:    v.optional(v.pipe(v.string(), v.minLength(1))),
+        skill:   v.optional(v.pipe(v.string(), v.minLength(1)))
     }))
 }))
 
@@ -687,6 +691,107 @@ export default class ConfigCommand {
                     cfg.write()
                 })
             })
+    }
+}
+
+/*  MCP registration entry point for layered YAML configuration access  */
+export class ConfigMCP {
+    constructor (private log: Log) {}
+
+    /*  register the MCP tools  */
+    register (mcp: McpServer): void {
+        /*  config get  */
+        mcp.registerTool("config_get", {
+            title: "ASE config get",
+            description:
+                "Read the effective value of a dotted configuration `key` from the layered " +
+                "configuration, cascading through default/user/project/task/session chain up to and " +
+                "including the requested `scope`. Returns the value as JSON-encoded `text`; " +
+                "returns an empty string if no value is set.",
+            inputSchema: {
+                key: z.string()
+                    .describe("dotted configuration key (e.g. \"agent.skill\")"),
+                scope: z.string()
+                    .describe("scope chain (e.g. \"session:<id>\", \"task:<id>\", \"project\", \"user\")")
+            }
+        }, async (args) => {
+            try {
+                const scope = parseScope(args.scope)
+                const cfg   = new Config("config", configSchema, this.log, scope)
+                let text = ""
+                cfg.lock(() => {
+                    cfg.read()
+                    const val = cfg.get(args.key)
+                    text = val === undefined ? "" : JSON.stringify(val)
+                })
+                return { content: [ { type: "text", text } ] }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return { isError: true, content: [ { type: "text", text: `config_get: ERROR: ${message}` } ] }
+            }
+        })
+
+        /*  config set  */
+        mcp.registerTool("config_set", {
+            title: "ASE config set",
+            description:
+                "Write `val` to a dotted configuration `key` at the target `scope` " +
+                "(the strongest scope term in the chain). The value is validated against " +
+                "the configuration schema before being persisted.",
+            inputSchema: {
+                key: z.string()
+                    .describe("dotted configuration key (e.g. \"agent.skill\")"),
+                val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.any()), z.record(z.string(), z.any()) ])
+                    .describe("value to store under `key`"),
+                scope: z.string()
+                    .describe("scope chain (e.g. \"session:<id>\", \"task:<id>\", \"project\", \"user\")")
+            }
+        }, async (args) => {
+            try {
+                const scope = parseScope(args.scope)
+                const cfg   = new Config("config", configSchema, this.log, scope)
+                cfg.lock(() => {
+                    cfg.read()
+                    cfg.set(args.key, args.val)
+                    cfg.write()
+                })
+                return { content: [ { type: "text", text: `config_set: OK: stored "${args.key}" on scope "${args.scope}"` } ] }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return { isError: true, content: [ { type: "text", text: `config_set: ERROR: ${message}` } ] }
+            }
+        })
+
+        /*  config delete  */
+        mcp.registerTool("config_delete", {
+            title: "ASE config delete",
+            description:
+                "Delete the value at a dotted configuration `key` from the target `scope` " +
+                "(the strongest scope term in the chain). No-op if the key is not present.",
+            inputSchema: {
+                key: z.string()
+                    .describe("dotted configuration key (e.g. \"agent.skill\")"),
+                scope: z.string()
+                    .describe("scope chain (e.g. \"session:<id>\", \"task:<id>\", \"project\", \"user\")")
+            }
+        }, async (args) => {
+            try {
+                const scope = parseScope(args.scope)
+                const cfg   = new Config("config", configSchema, this.log, scope)
+                cfg.lock(() => {
+                    cfg.read()
+                    cfg.delete(args.key)
+                    cfg.write()
+                })
+                return { content: [ { type: "text", text: `config_delete: OK: removed "${args.key}" on scope "${args.scope}"` } ] }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return { isError: true, content: [ { type: "text", text: `config_delete: ERROR: ${message}` } ] }
+            }
+        })
     }
 }
 
