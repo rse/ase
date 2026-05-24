@@ -18,7 +18,7 @@ you *MUST* once and immediately output the following <template/> now:
 Prohibitions
 ------------
 
-- Do *not* factor out (move) code blocks into their own functions without good reason, like necessary reusability.
+- Do *not* factor out (move) code blocks into their own functions without good reason, such as necessary reusability.
 - Do *not* use braces around single-statement blocks in "if" and "while" constructs unless the language requires them.
 - Do *not* insist on early "return" in "if" blocks if an "else" block exists.
 - Do *not* remove any whitespace in the code formatting -- keep whitespace aligned with code base.

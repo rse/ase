@@ -92,7 +92,7 @@ for the technology stack to *provide* the *needed functionality*
         official package name as <package-K/>, the latest version as
         <version-K/>, the stars as <stars-K/>, the created date as
         <created-K/>, the last updated date as <updated-K/>, the total
-        number of downloads in the last month is <downloads-K/>.
+        number of downloads in the last month as <downloads-K/>.
 
     -   If <stack/> is "JavaScript" or "TypeScript":
 

@@ -15,7 +15,7 @@ Skill Output
 -   *IMPORTANT*: *All* output is *exclusively* requested through
     <template/> sections. You *MUST* *NOT* output anything *EXCEPT* it
     is explicitly included in such a <template/> section. Especially,
-    you *MUST* *NOT* output any explanations on your own, except
+    you *MUST* *NOT* output any explanations on your own, unless
     explicitly requested.
 
 -   *IMPORTANT*: You *MUST* output all <template/> sections *EXACTLY* as provided

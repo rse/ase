@@ -71,7 +71,7 @@ Rules
     In other words, after the `diagram` tool call completes, the
     skill *MUST* copy the tool's `text` result *verbatim* into a
     Markdown-fenced code block (triple backticks), directly placed
-    in the response text immediately after the MCP tool call -— the
+    in the response text immediately after the MCP tool call — the
     user reads the Markdown fenced block in the response, not the
     (truncated) tool call display. Emitting only the tool call without
     the reproduction of the `text` output is a defect: the diagram is
@@ -95,7 +95,7 @@ Rules
     For *comparison diagrams* (e.g., *current vs. proposed*, *before
     vs. after*), render each side as a *separate* Mermaid diagram
     specification via the `diagram` tool from the `ase` MCP service, and
-    then stack the two rendered blocks *vertically* -— each preceded by
+    then stack the two rendered blocks *vertically* — each preceded by
     a bold label (`**BEFORE:**` / `**AFTER:**`, or similar). Do *not*
     attempt side-by-side layout.
 

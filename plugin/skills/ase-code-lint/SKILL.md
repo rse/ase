@@ -183,8 +183,8 @@ related to a set of code quality aspects.
     </expand>
     </step>
 
-9.  <step id="A08 - COMPLICATENESS">
-    <expand name="linter" arg1="A08 - COMPLICATENESS">
+9.  <step id="A08 - COMPLICATEDNESS">
+    <expand name="linter" arg1="A08 - COMPLICATEDNESS">
     Check for complicated or cumbersome code constructs.
 
     Especially, check for unnecessarily difficult code constructs

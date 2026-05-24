@@ -206,7 +206,7 @@ permitted way to persist artifacts is via `task_save(...)`.
         -   **Origin Proximity**:
             Problems for *obvious, particular, or expected* errors
             *should* be handled *near the origin*. Problems for
-            *theoretical, fictive, or unexpected* errors, *should* be
+            *theoretical, fictive, or unexpected* errors *should* be
             handled more generally and in parent scopes.
 
 4.  **Find Problem Resolution Approaches**:

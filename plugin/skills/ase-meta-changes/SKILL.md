@@ -66,7 +66,7 @@ are also grouped and sorted according to the above <prefix/>es.
    </step>
 
 3. <step id="STEP 3: Complete ChangeLog entries">
-   Without immediately modifying `CHANGELOG.md` file,
+   Without immediately modifying the `CHANGELOG.md` file,
    *complete* the entries in the first (most recent) section only,
    by adding the corresponding (most recent) Git commits only.
    For each Git commit, reduce the Git commit messages to a single
@@ -74,17 +74,17 @@ are also grouped and sorted according to the above <prefix/>es.
    </step>
 
 4. <step id="STEP 4: Consolidate ChangeLog entries">
-   Without immediately modifying `CHANGELOG.md` file,
+   Without immediately modifying the `CHANGELOG.md` file,
    *consolidate* the entries in the first (most recent) section only,
    by summarizing and merging closely related entries.
    Perform the entry consolidation per prefix group only.
-   If a changelog <summary/> is too short or is too little comprehensible
+   If a changelog <summary/> is too short or is not comprehensible enough
    because of too little context, add some context, especially references
    to the class/module/package, etc.
    </step>
 
 5. <step id="STEP 5: Sort ChangeLog entries">
-   Without immediately modifying `CHANGELOG.md` file,
+   Without immediately modifying the `CHANGELOG.md` file,
    *sort* the entries in the first (most recent) section only.
    Instead of the chronological commit order, group the entries
    by the prefixes.

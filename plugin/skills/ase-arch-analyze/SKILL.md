@@ -170,7 +170,7 @@ interface quality, quality attributes, and architecture governance.
       races and shared mutable state is covered by SA17.)
     - **SA09 COHESION**: *strong cohesion* within each component —
       internal parts (functions, fields, methods) are *tightly
-      related*, *co-change*, and share data or behaviour; scattered
+      related*, *co-change*, and share data or behavior; scattered
       helpers that merely coexist by accident are flagged.
     - **SA10 EXTENSIBILITY**: components are *open for extension*
       (plugins, SPIs, hooks) but *closed for modification*.
@@ -266,7 +266,7 @@ interface quality, quality attributes, and architecture governance.
 
     - *Package-graph construction (SA19–SA21)*: parse each file's
       import (or equivalent language construct) statement, keep
-      only first-party packages within the analysed scope, and
+      only first-party packages within the analyzed scope, and
       persist two intermediate structures: the per-package
       incoming/outgoing class-edge map (drives SA20, SA21) and
       the per-package noun-token frequency table extracted from
