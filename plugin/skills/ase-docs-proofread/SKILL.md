@@ -57,9 +57,9 @@ documents.
 
     ```
         Agent(
-            name:          "ase-docs-proofread-investigation",
+            name:          "ase-docs-proofread",
             description:   "Proofread Investigation",
-            subagent_type: "ase-docs-proofread-investigation",
+            subagent_type: "ase-docs-proofread",
             mode:          "plan",
             prompt:        <getopt-arguments/>
         )

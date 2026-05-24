@@ -1,5 +1,5 @@
 ---
-name: ase-docs-proofread-investigation
+name: ase-docs-proofread
 description: "Proofread Investigation"
 effort: high
 ---
