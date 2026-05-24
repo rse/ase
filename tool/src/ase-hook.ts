@@ -179,6 +179,7 @@ export default class HookCommand {
         const taskId = process.env.ASE_TASK_ID ?? "default"
         if (hasSession)
             cfg.lock(() => {
+                cfg.read()
                 cfg.set("agent.task", taskId)
                 cfg.write()
             })
