@@ -91,18 +91,23 @@ see whether **ASE** is right for you:
   What, Why, Analogy, Diagram, Cruxes, and Gotchas?
   &rarr; `/ase-code-explain @tool/src/*.ts`
 
-- **Logical Code Analysis**:
+- **Lexical Code Analysis**:
   You want to analyze code for potential problems
   related to a standard set of code quality aspects?
   &rarr; `/ase-code-lint @tool/src/*.ts`
 
-- **Lexical Code Analysis**:
-  You want to analyze code for potential problems
-  in its logic, semantics, and control flow?
-  &rarr; `/ase-code-analyze @tool/src/*.ts`
+- **Document Proofreading**:
+  You want your text documents checked and corrected for spelling,
+  punctuation, and grammar errors?
+  &rarr; `/ase-docs-proofread @README.md`
 
 </td>
 <td width="50%" valign="top">
+
+- **Logical Code Analysis**:
+  You want to analyze code for potential problems
+  in its logic, semantics, and control flow?
+  &rarr; `/ase-code-analyze @tool/src/*.ts`
 
 - **Automated Change Logs**:
   You want to get your `CHANGELOG.md` entries
@@ -137,11 +142,6 @@ see whether **ASE** is right for you:
   You want to be supported in the evaluation of alternatives with the
   methodological help of a weighted multi-criteria decision matrix?
   &rarr; `/ase-meta-evaluate Vue vs. React vs. Angular, focus on TypeScript support and extensibility`
-
-- **Document Proofreading**:
-  You want your text documents checked and corrected for spelling,
-  punctuation, and grammar errors?
-  &rarr; `/ase-docs-proofread @README.md`
 
 </td>
 </tr>
