@@ -385,10 +385,7 @@ export class Config {
                     doc.deleteIn(segs)
                     progressed = true
                 }
-                else
-                    /*  root-level issue cannot be deleted; skip it and process
-                        remaining issues so progressed is tracked correctly  */
-                    continue
+                /*  root-level issues cannot be deleted; processing continues with the remaining issues  */
             }
             if (!progressed)
                 return
