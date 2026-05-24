@@ -21,7 +21,7 @@ import * as v                 from "valibot"
 import { McpServer }                     from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 
-import { Config, configSchema }          from "./ase-config.js"
+import { Config, configSchema, ConfigMCP } from "./ase-config.js"
 import type Log                          from "./ase-log.js"
 import { DiagramMCP }                    from "./ase-diagram.js"
 import { TaskMCP }                       from "./ase-task.js"
@@ -270,6 +270,7 @@ export default class ServiceCommand {
             new TimestampMCP().register(mcp)
             new GetoptMCP().register(mcp)
             new SkillsMCP().register(mcp)
+            new ConfigMCP(this.log).register(mcp)
             return mcp
         }
 
