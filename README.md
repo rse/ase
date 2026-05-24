@@ -116,7 +116,7 @@ see whether **ASE** is right for you:
 
 - **Root-Cause Analysis**:
   You want to understand the reason for a fact with the help of the
-  "Five-Whys" root cause determination method?
+  "Five-Whys" root-cause determination method?
   &rarr; `/ase-meta-why is the Decibel (dB) unit a logarithmic one?`
 
 - **Research Quorum**:
