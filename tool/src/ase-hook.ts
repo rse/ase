@@ -330,9 +330,9 @@ export default class HookCommand {
             let val = ""
             cfg.lock(() => {
                 cfg.read()
-                const v = cfg.get("agent.skill")
-                if (typeof v === "string")
-                    val = v
+                const skill = cfg.get("agent.skill")
+                if (typeof skill === "string")
+                    val = skill
             })
             return val
         }
