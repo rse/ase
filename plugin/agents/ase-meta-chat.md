@@ -34,7 +34,6 @@ tools:
     ERROR: LLM `<llm/>` required MCP tool `<tool/>`, but this is (currently) not available.
     </template>
 
-
 3.  **Call MCP Tool**:
 
     Else, call the MCP tool with `<tool/>(content: <query/>)` and
