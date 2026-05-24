@@ -6,7 +6,7 @@ description: >
     The <persona> can be either the decorative, eloquent, and explaining "writer",
     the concise, factual, and accurate "engineer" (default),
     the brief, factual, and abbreviating "telegrapher",
-    the terse, rough and stuttering "caveman".
+    the terse, rough, and stuttering "caveman".
     Use when user says "persona <persona>" or "be <persona>".
 user-invocable: true
 disable-model-invocation: false
