@@ -230,7 +230,6 @@ documents.
             <expand name="user-dialog">
                 CORRECTION: How would you like to proceed with this proposed correction?
                 ACCEPT: Apply the proposed correction.
-                REFINE: Discard this proposed correction and generate a new one.
                 REJECT: Skip this proposed correction.
             </expand>
 
@@ -253,15 +252,12 @@ documents.
 
                 </if>
 
-            -   <if condition="
-                    <result/> starts with 'REFINE' or
-                    <result/> starts with 'OTHER'
-                ">
+            -   <if condition="<result/> starts with 'OTHER'">
 
-                Generate a *new* proposal for the *same* <item/>
-                (incorporating the user's free-text hint from <result/> if
-                provided via the "OTHER" prefix) and loop back to substep 2
-                of this iteration. There is *no* cap on refinement rounds —
+                Generate a *new* proposal for the *same* <item/>,
+                incorporating the user's free-text hint from <result/>
+                after the "OTHER:" prefix, and loop back to substep 2 of
+                this iteration. There is *no* cap on refinement rounds —
                 keep refining until the user picks `ACCEPT` or `REJECT`.
 
                 </if>
