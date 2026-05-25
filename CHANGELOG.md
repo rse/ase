@@ -5,6 +5,16 @@ ChangeLog
 0.0.50 (2026-05-25)
 -------------------
 
+- IMPROVEMENT: improve agent-usage guidance in `ase-meta-quorum` skill
+- IMPROVEMENT: clean up and restructure `ase-meta-search` skill
+- IMPROVEMENT: regroup the USP overview in README
+- BUGFIX: fix obsolete-parameter references in `ase-statusline`
+- BUGFIX: re-read config before write to avoid clobbering stale task id in `ase-hook`
+- CLEANUP: use namespaced agent references in `ase-code-lint` and `ase-docs-proofread` skills
+- CLEANUP: clean up `ase-meta-quorum` skill and remove blank line in `ase-meta-chat` agent
+- CLEANUP: remove obsolete `ase-meta-diagram` skill file
+- CLEANUP: fix punctuation and spellings in README and docs
+- CLEANUP: update workflow diagram
 - REFACTOR: move logic from "ase-meta-chat" skill to the corresponding agent
 - REFACTOR: convert "ase-meta-diagram" skill into a sub-agent and route all callers through the `Agent` tool
 
