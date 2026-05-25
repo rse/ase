@@ -6,7 +6,7 @@
     "homepage":                             "http://github.com/rse/ase",
     "repository":                           { "url": "git+https://github.com/rse/ase.git", "type": "git" },
     "bugs":                                 { "url": "http://github.com/rse/ase/issues" },
-    "version":                              "0.0.49",
+    "version":                              "0.0.50",
     "license":                              "GPL-3.0-only",
     "author": {
         "name":                             "Dr. Ralf S. Engelschall",
