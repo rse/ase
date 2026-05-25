@@ -32,12 +32,11 @@ by querying *multiple* AIs for an *optimal consensus*.
 
 <flow>
 
-1.  <step id="STEP 1: Determine Own Answer">
+1.  <step id="STEP 1: Preview Own Answer">
 
-    Determine your own answer.
-    For yourself (Anthropic Claude), first answer the following <query/> in advance:
+    Prepare the LLM query by setting <query/> to the following <template/>:
 
-    <query>
+    <template>
     $ARGUMENTS.
     Please respond with facts and very concise and brief only,
     usually with just 1 to 7 corresponding bullet points and with short sentences.
@@ -45,13 +44,11 @@ by querying *multiple* AIs for an *optimal consensus*.
     Beside bullet points, do not provide any additional explanations.
     Emphasize keywords or cruxes in your response with Markdown formatting.
     Format code parts with Markdown formatting.
-    </query>
-    </step>
+    </template>
 
-2.  <step id="STEP 2: Preview Own Answer">
-
-    Show your own answer as a sneak preview.
-    For this, use the following output <template/>:
+    For yourself (Anthropic Claude), first answer this <query/> in
+    advance yourself by showing your own answer to the query as a sneak
+    preview. For this, output the following <template/>:
 
     <template>
     **Anthropic Claude** (sneak preview in advance):
@@ -61,7 +58,7 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     </step>
 
-3.  <step id="STEP 3: Query Foreign AIs">
+2.  <step id="STEP 2: Query Foreign AIs">
 
     <define name="agent">
     Call the `Agent` tool:
@@ -69,31 +66,36 @@ by querying *multiple* AIs for an *optimal consensus*.
     ```text
         Agent(
             name:          "ase:ase-meta-chat",
-            description:   "Query Foreign LLM for Chat",
+            description:   "Query Foreign LLM: <arg1/>",
             subagent_type: "ase:ase-meta-chat",
-            prompt:        "<content/> <query/>"
+            prompt:        "<arg2/> <query/>"
         )
     ```
     </define>
 
-    <expand name="agent">chatgpt</expand>
-    <expand name="agent">gemini</expand>
-    <expand name="agent">deepseek</expand>
-    <expand name="agent">grok</expand>
+    <expand name="agent" arg1="OpenAI ChatGPT" arg2="chatgpt"></expand>
+    <expand name="agent" arg1="Google Gemini"  arg2="gemini"></expand>
+    <expand name="agent" arg1="DeepSeek"       arg2="deepseek"></expand>
+    <expand name="agent" arg1="xAI Grok"       arg2="grok"></expand>
+
+    You *MUST* *NOT* output anything in this step.
 
     </step>
 
-4.  <step id="STEP 4: Summarize Responses">
+3.  <step id="STEP 3: Summarize Responses">
+    
+    Agents which returned a response with an `ERROR:` prefix are
+    silently skipped and are treatd as not available.
 
-    Summarize all responses, of both yourself and all agents (which
-    returned not a response with an `ERROR`), with just 1 to 7
-    corresponding bullet points and with short sentences. Agents which
-    returned a response with an `ERROR` are silently skipped as they
-    would be not available.
+    Summarize all responses, of both yourself and all available agents
+    with just 1 to 7 corresponding bullet points and with short
+    sentences.
+
+    You *MUST* *NOT* output anything in this step.
 
     </step>
 
-5.  <step id="STEP 5: Determine Consensus Rating">
+4.  <step id="STEP 4: Determine Consensus Rating">
 
     Determine, on a Likert scale of 0..<n/>, the amount of the overall
     consensus <c/> of all the responses. The <n/> is the *total number of
@@ -106,9 +108,11 @@ by querying *multiple* AIs for an *optimal consensus*.
     name of an AI which disagreed with the consensus. Else, if all AIs
     agree, set <disagreement></disagreement>.
 
+    You *MUST* *NOT* output anything in this step.
+
     </step>
 
-6.  <step id="STEP 6: Show Results">
+5.  <step id="STEP 5: Show Results">
 
     Finally show the summary, the consensus and the complete and
     unmodified responses of yourself and each of the MCP servers, based
@@ -146,6 +150,7 @@ by querying *multiple* AIs for an *optimal consensus*.
     </template>
 
     In this output, remove the sections of those AIs which were not available.
+    You *MUST* *NOT* output any further explanations yourself.
 
     </step>
 
