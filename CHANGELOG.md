@@ -6,6 +6,13 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: add `ase setup mcp list|activate|deactivate` tool for managing foreign MCP servers
+- IMPROVEMENT: add Z.AI GLM and Alibaba Qwen LLMs to `ase-meta-quorum` and `ase-meta-chat`
+- IMPROVEMENT: raise effort to high in `ase-meta-diagram` agent for more precise instruction following
+- BUGFIX: sanitize keys in the `ase setup mcp` output
+- UPDATE: add references to README
+- REFACTOR: rework `ase-meta-chat` agent for the unified `query` MCP tool
+- CLEANUP: clean up and restructure `ase-meta-search` skill and agent
+- CLEANUP: ignore `.env` files in `.gitignore` and `.npmignore`
 
 0.0.50 (2026-05-25)
 -------------------
