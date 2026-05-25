@@ -210,15 +210,32 @@ key variable is unset or empty is silently skipped on activation.
 
 The following AI services are currently defined:
 
+<table>
+<tr>
+<td width="50%" valign="top">
+
 - Chat: OpenAI ChatGPT (`openai-chatgpt`)
 - Chat: Google Gemini (`google-gemini`)
 - Chat: DeepSeek (`deepseek`)
 - Chat: xAI Grok (`xai-grok`)
 - Chat: Alibaba Qwen (`alibaba-qwen`)
 - Chat: Z.AI GLM (`zai-glm`)
+
+</td>
+<td width="50%" valign="top">
+
 - Search: Brave (`brave`)
 - Search: Perplexity (`perplexity`)
 - Search: Exa (`exa`)
+
+</td>
+</tr>
+</table>
+
+Hint: All MCP servers of type "Chat" support both the native API of the
+LLM vendor and the *OpenRouter* proxy API as an alternative, i.e. you
+can leverage from all paid "Chat" AI services by just providing the
+`ASE_MCP_KEY_OPENROUTER` of an *OpenRouter* account.
 
 Features
 --------
