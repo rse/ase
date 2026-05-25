@@ -71,6 +71,7 @@ by querying *multiple* AIs for an *optimal consensus*.
             prompt:        "<arg2/> <query/>"
         )
     ```
+
     </define>
 
     <expand name="agent" arg1="OpenAI ChatGPT" arg2="chatgpt"></expand>
@@ -83,7 +84,7 @@ by querying *multiple* AIs for an *optimal consensus*.
     </step>
 
 3.  <step id="STEP 3: Summarize Responses">
-    
+
     Agents which returned a response with an `ERROR:` prefix are
     silently skipped and are treatd as not available.
 
