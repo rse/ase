@@ -8,8 +8,10 @@ user-invocable: true
 disable-model-invocation: false
 effort: low
 allowed-tools:
-    - "mcp__perplexity__perplexity_search"
-    - "mcp__brave__brave_web_search"
+    - "mcp__search-perplexity__perplexity_search"
+    - "mcp__search-brave__brave_web_search"
+    - "mcp__search-exa__web_search_exa"
+    - "WebSearch"
     - "Agent"
 ---
 
@@ -47,18 +49,26 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     ```
     </define>
 
-    If the MCP tool `mcp__perplexity__perplexity_search` is available, call:
+    If the MCP tool `perplexity_search` from the MCP server `search-perplexity` is available:
     <expand name="agent">
-        Call the MCP tool `mcp__perplexity__perplexity_search(query: "<query/>")`
+        Call the MCP tool `perplexity_search(query: "<query/>")`
+        from the MCP server `search-perplexity`.
     </expand>
 
-    If the MCP tool `mcp__brave__brave_web_search` is available, call:
+    If the MCP tool `brave_web_search` from the MCP server `search-brave` is available:
     <expand name="agent">
-        Call the MCP tool `mcp__brave__brave_web_search(query: "<query/>")`
+        Call the MCP tool `brave_web_search(query: "<query/>")`
+        from the MCP server `search-brave`.
+    </expand>
+
+    If the MCP tool `web_search_exa` from the MCP server `search-exa` is available:
+    <expand name="agent">
+        Call the MCP tool `web_search_exa(query: "<query/>")`
+        from the MCP server `search-exa`.
     </expand>
 
     <expand name="agent">
-        Call the tool `WebSearch(query: "<query/>")`
+        Call the tool `WebSearch(query: "<query/>")`.
     </expand>
 
     </step>
