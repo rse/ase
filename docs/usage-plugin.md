@@ -68,6 +68,9 @@ The following ASE commands/skills exist on the task-level:
 - **/ase-task-view** \[*id*\]:<br/>
   View the current or given task plan.
 
+- **/ase-task-rename** \[*id*\]:<br/>
+  Rename the current or given task plan to a new id.
+
 - **/ase-task-reboot** \[*id*\]:<br/>
   Reboot the current or given task plan by crafting it from scratch.
 

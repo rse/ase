@@ -22,8 +22,12 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   hook events (subcommands: `session-start`, `session-end`,
   `pre-tool-use`, `user-prompt-submit`, `stop`); `ase setup`
   installs/updates/uninstalls/enables/disables the tool and its
-  companion plugin (subcommands: `install`, `update`, `uninstall`,
-  `enable`, `disable`, all with `--tool claude|copilot`);
+  companion plugin and (de)activates pre-defined foreign MCP servers
+  (subcommands: `install`, `update`, `uninstall`, `enable`, `disable`,
+  all with `--tool claude|copilot`, plus `mcp list` and `mcp
+  activate`/`mcp deactivate [<servers>]` which read per-server API keys
+  from `ASE_MCP_KEY_<ID>` environment variables, also sourced from
+  `.env` files);
   `ase statusline` renders the *Claude Code* (or *GitHub Copilot CLI*)
   status line; `ase task` manages persisted task plans under
   `<project>/.ase/task/<id>/plan.md` (subcommands: `list`, `load`,
@@ -34,12 +38,14 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
   `plugin/.claude-plugin/plugin.json`. Layout:
   - `plugin/skills/<name>/SKILL.md` — the skill set, grouped by
-    `ase-meta-*` (changes, commit, evaluate, persona, quorum, why),
-    `ase-code-*` (analyze, craft, explain, insight, lint, refactor,
-    resolve), `ase-arch-*` (analyze, discover), and `ase-task-*` (id,
-    list, edit, view, reboot, preflight, implement, delete).
+    `ase-meta-*` (changes, chat, commit, evaluate, persona, quorum,
+    search, why), `ase-code-*` (analyze, craft, explain, insight, lint,
+    refactor, resolve), `ase-arch-*` (analyze, discover), `ase-task-*`
+    (id, list, edit, view, reboot, rename, preflight, implement,
+    delete), and `ase-docs-*` (proofread).
   - `plugin/agents/<name>.md` — sub-agent definitions (`ase-meta-chat`,
-    `ase-meta-search`, `ase-meta-diagram`, `ase-docs-proofread`).
+    `ase-meta-search`, `ase-meta-diagram`, `ase-code-lint`,
+    `ase-docs-proofread`).
   - `plugin/commands/<name>/*.md` — slash commands; currently the
     `ase-code-lint` chord (`complete`, `explain`, `nope`, `reassess`,
     `recheck`, `refine`).
@@ -76,9 +82,14 @@ No test target is defined. The published `bin/ase` shim loads compiled output fr
 ## Setup
 
 ```
-ase setup install      # install   tool and plugin
-ase setup update       # update    tool and plugin
-ase setup uninstall    # uninstall tool and plugin
+ase setup install         # install    tool and plugin
+ase setup update          # update     tool and plugin
+ase setup uninstall       # uninstall  tool and plugin
+ase setup enable          # enable     plugin (without uninstalling)
+ase setup disable         # disable    plugin (without uninstalling)
+ase setup mcp list        # list       pre-defined foreign MCP servers
+ase setup mcp activate    # activate   foreign MCP servers (keys in ASE_MCP_KEY_<ID>)
+ase setup mcp deactivate  # deactivate foreign MCP servers
 ```
 
 ## Code Style

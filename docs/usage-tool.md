@@ -291,10 +291,50 @@ uninstalling the *ASE* tool and its companion *Claude Code* plugin:
   Disable the (already-installed) *ASE* plugin in the agent tool
   without uninstalling it.
 
-All `ase setup` subcommands accept the host selector \[`-t`|`--tool`
-`claude`|`copilot`\] (default: `claude`, or the value of the
-`ASE_TOOL` environment variable if set) to choose between *Claude
-Code* and *GitHub Copilot CLI* as the target agent tool.
+- `ase setup mcp`:
+  Entry point group for managing the pre-defined *foreign MCP servers*
+  that *ASE* skills can *optionally* leverage. Without a subcommand,
+  the help text is shown and the command exits with status 1.
+
+- `ase setup mcp list`:
+  List all pre-defined MCP servers known to *ASE*, rendered as a table
+  of `ID`, `NAME`, `VERS` (pinned model version), `MCP` (the registered
+  MCP server name), `KEY` (the accepted `ASE_MCP_KEY_<KEY>` suffixes),
+  and `SKILLS` (the *ASE* skills that leverage the server). The
+  currently defined servers are the *chat* servers `openai-chatgpt`,
+  `google-gemini`, `deepseek`, `xai-grok`, `alibaba-qwen`, and
+  `zai-glm` (leveraged by `ase-meta-chat` and `ase-meta-quorum`), and
+  the *search* servers `brave`, `perplexity`, and `exa` (leveraged by
+  `ase-meta-search`, `ase-meta-evaluate`, and `ase-arch-discover`).
+
+- `ase setup mcp activate` \[*servers*\]:
+  Register one or more pre-defined MCP servers with the agent tool. The
+  optional *servers* argument is a comma-separated list of server ids;
+  when omitted or given as the literal `all`, every registered server
+  is selected. Each server reads its API key from an environment
+  variable `ASE_MCP_KEY_<KEY>`, where `<KEY>` is one of the suffixes
+  shown in the `KEY` column of `ase setup mcp list` (e.g. the server
+  `openai-chatgpt` uses `ASE_MCP_KEY_OPENAI_CHATGPT`). These variables
+  are also automatically sourced from `.env` files in the current
+  directory. A server whose key variable is unset or empty is silently
+  skipped when implicitly selected, but causes a hard error when given
+  explicitly on the command line. A stale prior registration of the
+  same server is removed first so it is re-created cleanly. Each *chat*
+  server accepts either the LLM vendor's native API key or the
+  `ASE_MCP_KEY_OPENROUTER` key of an *OpenRouter* account as a common
+  alternative.
+
+- `ase setup mcp deactivate` \[*servers*\]:
+  Unregister one or more pre-defined MCP servers from the agent tool.
+  The optional *servers* argument behaves as for `activate` (empty or
+  `all` selects every registered server). A server that is not
+  currently registered is skipped.
+
+All `ase setup` subcommands -- except `ase setup mcp list` -- accept
+the host selector \[`-t`|`--tool` `claude`|`copilot`\] (default:
+`claude`, or the value of the `ASE_TOOL` environment variable if set)
+to choose between *Claude Code* and *GitHub Copilot CLI* as the target
+agent tool.
 
 The following top-level commands exist for managing persisted task
 plans under `<project>/.ase/task/`*id*`/plan.md`:
