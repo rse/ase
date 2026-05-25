@@ -117,7 +117,8 @@ export default class SetupCommand {
     /*  run a sub-process, suppressing output on success and emitting it on failure  */
     private async run (cmd: string, args: string[], opts: { cwd?: string, quiet?: boolean, retries?: number, ignoreError?: string } = {}): Promise<void> {
         const { cwd, quiet = false, retries = 1, ignoreError } = opts
-        this.log.write("info", `setup: $ ${cmd} ${args.join(" ")}` +
+        const argsLog = args.map((arg) => arg.replace(/(_KEY=)(\S+)/, (_, k, v) => k + "*".repeat(v.length)))
+        this.log.write("info", `setup: $ ${cmd} ${argsLog.join(" ")}` +
             (cwd !== undefined ? ` (cwd: ${cwd})` : ""))
         for (let i = 0; i < retries; i++) {
             const final = (i === retries - 1)
