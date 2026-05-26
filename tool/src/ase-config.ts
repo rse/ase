@@ -451,17 +451,6 @@ export class Config {
         return undefined
     }
 
-    /*  retrieve the effective value together with the scope it came from  */
-    getWithOrigin (key: string): { value: unknown, scope: ScopeTerm } | undefined {
-        const segs = this.resolveKey(key).split(".")
-        for (let i = this.docs.length - 1; i >= 0; i--) {
-            const v = this.docs[i].doc.getIn(segs)
-            if (v !== undefined)
-                return { value: v, scope: this.docs[i].scope }
-        }
-        return undefined
-    }
-
     /*  enumerate the effective leaf entries across the full scope chain;
         each returned entry identifies the originating scope  */
     entries (): Array<{ key: string, value: unknown, scope: ScopeTerm }> {
