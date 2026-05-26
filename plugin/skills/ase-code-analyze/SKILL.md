@@ -88,7 +88,7 @@ code, for problems in its *logic* and *semantics* and its related
         <template>HIGH</template>.
 
     -   *Additionally*, persist all reported problems in a *single*
-        `kv_batch` call to the `ase` MCP service with `transactional`
+        `ase_kv_batch` call to the `ase` MCP server with `transactional`
         set to `true`. The `commands` parameter array of this call
         starts with one `{ command: "clear" }` entry, followed by one
         `{ command: "set", key: "ase-issue-P<n/>", val: "<title/>:

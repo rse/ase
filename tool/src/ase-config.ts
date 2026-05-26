@@ -698,7 +698,7 @@ export class ConfigMCP {
     /*  register the MCP tools  */
     register (mcp: McpServer): void {
         /*  config get  */
-        mcp.registerTool("config_get", {
+        mcp.registerTool("ase_config_get", {
             title: "ASE config get",
             description:
                 "Read the effective value of a dotted configuration `key` from the layered " +
@@ -730,7 +730,7 @@ export class ConfigMCP {
         })
 
         /*  config set  */
-        mcp.registerTool("config_set", {
+        mcp.registerTool("ase_config_set", {
             title: "ASE config set",
             description:
                 "Write `val` to a dotted configuration `key` at the target `scope` " +
@@ -762,7 +762,7 @@ export class ConfigMCP {
         })
 
         /*  config delete  */
-        mcp.registerTool("config_delete", {
+        mcp.registerTool("ase_config_delete", {
             title: "ASE config delete",
             description:
                 "Delete the value at a dotted configuration `key` from the target `scope` " +

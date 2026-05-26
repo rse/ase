@@ -24,8 +24,8 @@ Configure Task Id
     <request>$ARGUMENTS</request>
 
 2.  <if condition="<request/> is empty">
-    -   Call the `task_id(session: <ase-session-id/>)`
-        tool from the `ase` MCP service and set
+    -   Call the `ase_task_id(session: <ase-session-id/>)`
+        tool from the `ase` MCP server and set
         <ase-task-id/> to its `text` output.
 
     -   Output:
@@ -36,8 +36,8 @@ Configure Task Id
 
 3.  <if condition="<request/> is NOT empty">
     -   Set <ase-task-id><request/></ase-task-id> and
-        call the `task_id(id: <ase-task-id/>, session: <ase-session-id/>)`
-        tool from the `ase` MCP service.
+        call the `ase_task_id(id: <ase-task-id/>, session: <ase-session-id/>)`
+        tool from the `ase` MCP server.
 
     -   Output:
         <template>

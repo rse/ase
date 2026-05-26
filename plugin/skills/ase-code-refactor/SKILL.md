@@ -52,7 +52,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
 filesystem-modifying tool during this entire skill. The *only*
-permitted way to persist artifacts is via `task_save(...)`.
+permitted way to persist artifacts is via `ase_task_save(...)`.
 
 1.  **Reason About Refactoring**:
 
@@ -61,8 +61,8 @@ permitted way to persist artifacts is via `task_save(...)`.
         ">
         Set <ase-task-id><request/></ase-task-id> (set task id to request)
         and <request></request> (set request empty), call the
-        `task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
-        from the `ase` MCP service to switch the task, and then only
+        `ase_task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
+        from the `ase` MCP server to switch the task, and then only
         output the following <template/>:
 
         <template>
@@ -73,8 +73,8 @@ permitted way to persist artifacts is via `task_save(...)`.
     2.  If <request/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`, then set
         <request><text/></request> and <ase-task-id><id/></ase-task-id>
-        and call the `task_id(id: <ase-task-id/>, session:
-        <ase-session-id/>)` tool from the `ase` MCP service to
+        and call the `ase_task_id(id: <ase-task-id/>, session:
+        <ase-session-id/>)` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
 
     3.  If <request/> is empty,
@@ -91,8 +91,8 @@ permitted way to persist artifacts is via `task_save(...)`.
         ">
         Set <ase-task-id/> to a unique task id, derived from <request/>,
         which consists of two lower-case words concatenated with a
-        `-` character. Then call the `task_id(id: <ase-task-id/>,
-        session: <ase-session-id/>)` tool from the `ase` MCP service to
+        `-` character. Then call the `ase_task_id(id: <ase-task-id/>,
+        session: <ase-session-id/>)` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
         </if>
 
@@ -262,15 +262,15 @@ permitted way to persist artifacts is via `task_save(...)`.
         You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
         filesystem-modifying tool during this step.
 
-    2.  Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-        `ase` MCP service and use the `text` field of its response for
+    2.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+        `ase` MCP server and use the `text` field of its response for
         <timestamp-created/> and <timestamp-modified/> information. Then
         insert the current <ase-task-id/>, <timestamp-created/>, and
         <timestamp-modified/> information and calculate the number of
         words <words/> of <content/>.
 
     3.  You then *MUST* *save* the resulting plan content with the
-        `task_save(id: <ase-task-id/>, text: <content/>)`.
+        `ase_task_save(id: <ase-task-id/>, text: <content/>)`.
 
     4.  Output a hint with the following <template/>:
 

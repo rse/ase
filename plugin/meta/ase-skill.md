@@ -128,15 +128,15 @@ Skill Sequential Processing
 MCP Tool Calls
 --------------
 
--   *IMPORTANT*: Whenever you call *any* tool from the `ase` MCP service,
+-   *IMPORTANT*: Whenever you call *any* tool from the `ase` MCP server,
     you *MUST* check the response immediately:
 
-    -   If the call fails because the `ase` MCP service is not running
+    -   If the call fails because the `ase` MCP server is not running
         (tool not found, connection refused, server not connected, internal
         error), output the following and stop immediately:
 
         <template>
-        ⧉ **ASE**: **ERROR:** MCP service not running — please start it via `ase service start` and reconnect via `/mcp`, then retry.
+        ⧉ **ASE**: **ERROR:** MCP server not running — please start it via `ase service start` and reconnect via `/mcp`, then retry.
         </template>
 
     -   If the call fails for any other reason (timeout, transport error,

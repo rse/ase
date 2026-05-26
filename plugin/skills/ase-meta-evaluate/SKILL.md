@@ -153,9 +153,9 @@ multi-*criteria* decision matrix.
         not output anything.
 
     -   Then, calculate the ratings <rating-K/> (K=1-N) for all
-        alternatives in a single call by invoking the `decision_matrix(matrix:
+        alternatives in a single call by invoking the `ase_decision_matrix(matrix:
         [ [ <weight-1/>, <eval-1-1/>, ..., <eval-1-N/> ], ..., [ <weight-M/>,
-        <eval-M-1/>, ..., <eval-M-N/> ] ])` tool of the `ase` MCP service.
+        <eval-M-1/>, ..., <eval-M-N/> ] ])` tool of the `ase` MCP server.
         The tool returns an array of N numerical values, where the K-th
         entry is the product-sum of all weights <weight-L/> (L=1-M) and
         the evaluation <eval-K-L/> (L=1-M) for alternative <alternative-K/>.

@@ -26,8 +26,8 @@ List Task Plans
     $ARGUMENTS
 </expand>
 
-1.  Call the `task_list(verbose: <getopt-option-verbose/>)` tool from
-    the `ase` MCP service. The result is a structured object with a
+1.  Call the `ase_task_list(verbose: <getopt-option-verbose/>)` tool from
+    the `ase` MCP server. The result is a structured object with a
     `tasks` array where each entry has an `id` field, and -- if
     <getopt-option-verbose/> is `true` -- additionally an `mtime` field
     (formatted as `YYYY-MM-DD HH:MM`).

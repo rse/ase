@@ -52,18 +52,18 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
 filesystem-modifying tool during this entire skill. The *only*
-permitted way to persist artifacts is via `task_save(...)`.
+permitted way to persist artifacts is via `ase_task_save(...)`.
 
 1.  **Reason About Problem**:
 
     1.  If <problem/> matches the regexp `^[PT]\d+$` (i.e. a bare issue
         identifier like `P1`, `P2`, `T1`, `T2`, ...),
         set <problem-id><problem/></problem-id> and
-        <ase-task-id><problem/></ase-task-id>, call the `task_id(id:
+        <ase-task-id><problem/></ase-task-id>, call the `ase_task_id(id:
         <ase-task-id/>, session: <ase-session-id/>)` tool from the
-        `ase` MCP service to implicitly switch the task, and then
-        call the `kv_get(key: "ase-issue-<problem-id/>")` tool of
-        the `ase` MCP service to retrieve the previously persisted
+        `ase` MCP server to implicitly switch the task, and then
+        call the `ase_kv_get(key: "ase-issue-<problem-id/>")` tool of
+        the `ase` MCP server to retrieve the previously persisted
         problem description. If the returned `text` is non-empty, set
         <problem><text/></problem>, otherwise complain to the user that
         no analyzer result exists for <problem-id/> and stop processing.
@@ -73,8 +73,8 @@ permitted way to persist artifacts is via `task_save(...)`.
         ">
         Set <ase-task-id><problem/></ase-task-id> (set task id to problem)
         and <problem></problem> (set problem empty), call the
-        `task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
-        from the `ase` MCP service to switch the task, and then only
+        `ase_task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
+        from the `ase` MCP server to switch the task, and then only
         output the following <template/>:
 
         <template>
@@ -85,8 +85,8 @@ permitted way to persist artifacts is via `task_save(...)`.
     3.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]+$`, then set
         <problem><text/></problem> and <ase-task-id><id/></ase-task-id>
-        and call the `task_id(id: <ase-task-id/>, session:
-        <ase-session-id/>)` tool from the `ase` MCP service to
+        and call the `ase_task_id(id: <ase-task-id/>, session:
+        <ase-session-id/>)` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
 
     4.  If <problem/> is empty,
@@ -103,8 +103,8 @@ permitted way to persist artifacts is via `task_save(...)`.
         ">
         Set <ase-task-id/> to a unique task id, derived from <problem/>,
         which consists of two lower-case words concatenated with a
-        `-` character. Then call the `task_id(id: <ase-task-id/>,
-        session: <ase-session-id/>)` tool from the `ase` MCP service to
+        `-` character. Then call the `ase_task_id(id: <ase-task-id/>,
+        session: <ase-session-id/>)` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
         </if>
 
@@ -310,21 +310,21 @@ permitted way to persist artifacts is via `task_save(...)`.
         You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
         filesystem-modifying tool during this step.
 
-    2.  Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-        `ase` MCP service and use the `text` field of its response for
+    2.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+        `ase` MCP server and use the `text` field of its response for
         <timestamp-created/> and <timestamp-modified/> information. Then
         insert the current <ase-task-id/>, <timestamp-created/>, and
         <timestamp-modified/> information and calculate the number of
         words <words/> of <content/>.
 
     3.  You then *MUST* *save* the resulting plan content with the
-        `task_save(id: <ase-task-id/>, text: <content/>)`.
+        `ase_task_save(id: <ase-task-id/>, text: <content/>)`.
 
     4.  If <problem-id/> is set (i.e. the <problem/> was retrieved from
-        `kv_get` in STEP 1.3 via key `ase-issue-<problem-id/>`),
-        you *MUST* additionally call the `kv_delete(key:
+        `ase_kv_get` in STEP 1.3 via key `ase-issue-<problem-id/>`),
+        you *MUST* additionally call the `ase_kv_delete(key:
         "ase-issue-<problem-id/>")` tool of the `ase` MCP
-        service to remove the now-resolved analyzer result from the
+        server to remove the now-resolved analyzer result from the
         in-memory key/value store.
 
     5.  Output a hint with the following <template/>:

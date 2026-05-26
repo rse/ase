@@ -356,7 +356,7 @@ export class Skills {
 /*  MCP registration entry point for various skill helper tools  */
 export class SkillsMCP {
     register (mcp: McpServer): void {
-        mcp.registerTool("component_info", {
+        mcp.registerTool("ase_component_info", {
             title: "ASE component info",
             description:
                 "Gather metadata for a list of packages with maximum parallelism, " +
@@ -395,7 +395,7 @@ export class SkillsMCP {
                 }
             }
         })
-        mcp.registerTool("decision_matrix", {
+        mcp.registerTool("ase_decision_matrix", {
             title: "ASE decision matrix",
             description:
                 "Compute the per-alternative product-sum (rating) row of a weighted " +

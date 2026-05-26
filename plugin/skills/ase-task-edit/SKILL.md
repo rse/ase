@@ -63,9 +63,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <ase-task-id><instruction/></ase-task-id> (set task
             id to instruction) and <instruction></instruction> (set
-            instruction empty), call the `task_id(id: <ase-task-id/>,
+            instruction empty), call the `ase_task_id(id: <ase-task-id/>,
             session: <ase-session-id/>)` tool from the `ase` MCP
-            service to switch the task, and then only output the
+            server to switch the task, and then only output the
             following <template/>:
 
             <template>
@@ -80,8 +80,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <instruction></instruction> (set instruction to empty)
             and <ase-task-id><id/></ase-task-id> (set task id to
-            id) and call the `task_id(id: <ase-task-id/>, session:
-            <ase-session-id/>)` tool from the `ase` MCP service to
+            id) and call the `ase_task_id(id: <ase-task-id/>, session:
+            <ase-session-id/>)` tool from the `ase` MCP server to
             switch the task, and then only output the following
             <template/>:
 
@@ -97,8 +97,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <instruction><text/></instruction> (set instruction to
             text) and <ase-task-id><id/></ase-task-id> (set task id
-            to id) and call the `task_id(id: <ase-task-id/>, session:
-            <ase-session-id/>)` tool from the `ase` MCP service to
+            to id) and call the `ase_task_id(id: <ase-task-id/>, session:
+            <ase-session-id/>)` tool from the `ase` MCP server to
             switch the task, and then only output the following
             <template/>:
 
@@ -131,9 +131,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 2.  **Determine Plan:**
 
-    1.  Call the `task_load(id: <ase-task-id/>)` tool of the `ase` MCP
-        service to load any existing plan content and set <text/> to
-        the `text` output field of this `task_load` tool call.
+    1.  Call the `ase_task_load(id: <ase-task-id/>)` tool of the `ase` MCP
+        server to load any existing plan content and set <text/> to
+        the `text` output field of this `ase_task_load` tool call.
         Do not output anything related to this MCP tool call.
         Set <content-dirty>false</content-dirty>.
 
@@ -204,8 +204,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             the <instruction/> and all decisions you derived from the
             <instruction/>.
 
-            Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-            `ase` MCP service and use the `text` field of its response
+            Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+            `ase` MCP server and use the `text` field of its response
             for fresh <timestamp-created/> and <timestamp-modified/>
             information. Then insert the current <ase-task-id/>,
             <timestamp-created/>, and <timestamp-modified/> information
@@ -253,8 +253,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
         the <instruction/> and all decisions you derived from the
         <instruction/>.
 
-        Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-        `ase` MCP service and use the `text` field of its response
+        Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+        `ase` MCP server and use the `text` field of its response
         for fresh <timestamp-created/> and <timestamp-modified/>
         information. Then insert the current <ase-task-id/>,
         <timestamp-created/>, and <timestamp-modified/> information
@@ -279,16 +279,16 @@ explicitly requested by this procedure via outputs based on a <template/>!
         <if condition="<content/> contains '✎ modified:' AND <content-dirty/> is 'true'">
         Update <timestamp-modified/> with the current time in
         ISO-style format, which has to be determined by calling the
-        `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
-        MCP service and use the `text` field of its response. Update
+        `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
+        MCP server and use the `text` field of its response. Update
         <content/> with the new `✎ modified: **<timestamp-modified/>**`.
         Do not output anything.
         </if>
 
     2.  *Persist plan*:
         <if condition="<content-dirty/> is 'true'">
-        Call the `task_save(id: <ase-task-id/>, text: <content/>)` tool
-        of the `ase` MCP service to persist the current plan, and then
+        Call the `ase_task_save(id: <ase-task-id/>, text: <content/>)` tool
+        of the `ase` MCP server to persist the current plan, and then
         set <content-dirty>false</content-dirty> again. Calculate the
         number of words <words/> of <content/>. Do not output anything
         related to this MCP tool call except the following <template/>:

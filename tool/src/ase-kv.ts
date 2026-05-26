@@ -79,7 +79,7 @@ export class KV {
 export class KVMCP {
     register (mcp: McpServer): void {
         /*  key/value get  */
-        mcp.registerTool("kv_get", {
+        mcp.registerTool("ase_kv_get", {
             title: "ASE key/value get",
             description:
                 "Get a value from the in-memory key/value store by `key`. " +
@@ -103,7 +103,7 @@ export class KVMCP {
         })
 
         /*  key/value set  */
-        mcp.registerTool("kv_set", {
+        mcp.registerTool("ase_kv_set", {
             title: "ASE key/value set",
             description:
                 "Store a `val` under the given `key` in the in-memory key/value store. " +
@@ -127,7 +127,7 @@ export class KVMCP {
         })
 
         /*  key/value clear  */
-        mcp.registerTool("kv_clear", {
+        mcp.registerTool("ase_kv_clear", {
             title: "ASE key/value clear",
             description:
                 "Remove all keys from the in-memory key/value store. " +
@@ -145,7 +145,7 @@ export class KVMCP {
         })
 
         /*  key/value delete  */
-        mcp.registerTool("kv_delete", {
+        mcp.registerTool("ase_kv_delete", {
             title: "ASE key/value delete",
             description:
                 "Delete a value from the in-memory key/value store by `key`. " +
@@ -169,7 +169,7 @@ export class KVMCP {
         })
 
         /*  key/value batch  */
-        mcp.registerTool("kv_batch", {
+        mcp.registerTool("ase_kv_batch", {
             title: "ASE key/value batch",
             description:
                 "Execute an array of in-memory key/value `commands` in a single MCP call. " +

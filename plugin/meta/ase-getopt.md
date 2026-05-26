@@ -20,8 +20,8 @@ set placeholders into the context as a side-effect.
     then just silently *SKIP* the following steps 3-7!
 
 3.  **MCP Call**:
-    Call the `getopt(name: <getopt-skill/>, spec: <getopt-spec/>, args:
-    <getopt-args/>)` tool of the `ase` MCP service and set <text/> to the
+    Call the `ase_getopt(name: <getopt-skill/>, spec: <getopt-spec/>, args:
+    <getopt-args/>)` tool of the `ase` MCP server and set <text/> to the
     `text` output field of this tool call. The `spec` syntax for each
     option token is `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)]`,
     where `=<default>` declares a value-taking option with a default,

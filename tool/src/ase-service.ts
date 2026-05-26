@@ -188,7 +188,7 @@ export class ServiceMCP {
     constructor (private ctx: { projectId: string, port: number, startTime: number }) {}
 
     register (mcp: McpServer): void {
-        mcp.registerTool("ping", {
+        mcp.registerTool("ase_ping", {
             title:       "ASE service ping",
             description: "Return ASE service identity, port, and uptime.",
             inputSchema: {}

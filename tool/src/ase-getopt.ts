@@ -15,7 +15,7 @@ import {
 /*  MCP registration entry point for the option-parser tool  */
 export class GetoptMCP {
     register (mcp: McpServer): void {
-        mcp.registerTool("getopt", {
+        mcp.registerTool("ase_getopt", {
             title: "ASE option parser",
             description:
                 "Parse `args` against the options specification in " +

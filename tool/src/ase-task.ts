@@ -321,7 +321,7 @@ export class TaskMCP {
     /*  register MCP tools  */
     register (mcp: McpServer): void {
         /*  task list  */
-        mcp.registerTool("task_list", {
+        mcp.registerTool("ase_task_list", {
             title: "ASE task list",
             description:
                 "List all persisted tasks. " +
@@ -363,7 +363,7 @@ export class TaskMCP {
         })
 
         /*  task load  */
-        mcp.registerTool("task_load", {
+        mcp.registerTool("ase_task_load", {
             title: "ASE task load",
             description:
                 "Load a previously persisted task by `id`. " +
@@ -389,7 +389,7 @@ export class TaskMCP {
         })
 
         /*  task save  */
-        mcp.registerTool("task_save", {
+        mcp.registerTool("ase_task_save", {
             title: "ASE task save",
             description:
                 "Persist a task as `text` under `id`. " +
@@ -415,7 +415,7 @@ export class TaskMCP {
                 }
             }
         })
-        mcp.registerTool("task_delete", {
+        mcp.registerTool("ase_task_delete", {
             title: "ASE task delete",
             description:
                 "Delete a previously persisted task by `id`. " +
@@ -444,7 +444,7 @@ export class TaskMCP {
         })
 
         /*  task rename  */
-        mcp.registerTool("task_rename", {
+        mcp.registerTool("ase_task_rename", {
             title: "ASE task rename",
             description:
                 "Rename a previously persisted task from `old` to `new` by atomically moving the " +
@@ -476,7 +476,7 @@ export class TaskMCP {
         })
 
         /*  task id get/set  */
-        mcp.registerTool("task_id", {
+        mcp.registerTool("ase_task_id", {
             title: "ASE task id get/set",
             description:
                 "Get or set the active ASE task `id` for a given `session`. " +

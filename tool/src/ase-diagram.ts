@@ -344,7 +344,7 @@ export default class DiagramCommand {
 /*  MCP registration entry point for diagram tools  */
 export class DiagramMCP {
     register (mcp: McpServer): void {
-        mcp.registerTool("diagram", {
+        mcp.registerTool("ase_diagram", {
             title:       "ASE diagram render",
             description:
                 "Render a Mermaid diagram as Unicode/ASCII art. " +

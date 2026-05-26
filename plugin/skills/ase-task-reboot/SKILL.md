@@ -59,9 +59,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
         ">
         Set <ase-task-id><instruction/></ase-task-id> (set task
         id to instruction) and <instruction></instruction> (set
-        instruction empty), call the `task_id(id: <ase-task-id/>,
+        instruction empty), call the `ase_task_id(id: <ase-task-id/>,
         session: <ase-session-id/>)` tool from the `ase` MCP
-        service to switch the task, and then only output the
+        server to switch the task, and then only output the
         following <template/>:
 
         <template>
@@ -71,9 +71,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 2.  **Determine Operation:**
 
-    1.  Call the `task_load(id: <ase-task-id/>)` tool of the `ase` MCP
-        service to load the current task plan content and set <content/> to
-        the `text` output field of the `task_load` tool call.
+    1.  Call the `ase_task_load(id: <ase-task-id/>)` tool of the `ase` MCP
+        server to load the current task plan content and set <content/> to
+        the `text` output field of the `ase_task_load` tool call.
 
         Calculate the number of words <words/> of <content/>.
 
@@ -118,15 +118,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
         the <instruction/> and all decisions you derived from the
         <instruction/>.
 
-    7.  Call the `timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-        `ase` MCP service and use the `text` field of its response for
+    7.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+        `ase` MCP server and use the `text` field of its response for
         <timestamp-modified/> information. Then insert the current
         <ase-task-id/>, previous <timestamp-created/>, and refreshed
         <timestamp-modified/> information and calculate the number of
         words <words/> of <content/>.
 
-    8.  Call the `task_save(id: <ase-task-id/>,
-        text: <content/>)` of the `ase` MCP service to save the updated
+    8.  Call the `ase_task_save(id: <ase-task-id/>,
+        text: <content/>)` of the `ase` MCP server to save the updated
         task plan content. Do not output anything related to this MCP
         call.
 

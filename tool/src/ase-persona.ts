@@ -50,7 +50,7 @@ export default class PersonaMCP {
     constructor (private log: Log) {}
 
     register (mcp: McpServer): void {
-        mcp.registerTool("persona", {
+        mcp.registerTool("ase_persona", {
             title:       "ASE persona style get/set",
             description:
                 "Get or set the active ASE agent persona `style`. " +

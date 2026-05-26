@@ -5,6 +5,8 @@ ChangeLog
 0.0.53 (2026-05-26)
 -------------------
 
+- REFACTORING: prefix all MCP tools with "ase_" (technically not necessary, but more precise matching possible)
+
 0.0.52 (2026-05-25)
 -------------------
 

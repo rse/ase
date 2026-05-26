@@ -100,7 +100,7 @@ related to a set of code quality aspects.
 
 3.  <step id="STEP 3: Correction">
 
-    1.  You *MUST* call the MCP tool `config_set(key: "agent.skill", val:
+    1.  You *MUST* call the MCP tool `ase_config_set(key: "agent.skill", val:
         "ase-docs-proofread", scope: "session:<ase-session-id/>")` of the
         `ase` MCP server. You *MUST* *NOT* output anything related to
         this.
@@ -249,7 +249,7 @@ related to a set of code quality aspects.
 
         </for>
 
-    3.  You *MUST* call the MCP tool `config_delete(key: "agent.skill",
+    3.  You *MUST* call the MCP tool `ase_config_delete(key: "agent.skill",
         scope: "session:<ase-session-id/>")` of the `ase` MCP server.
         You *MUST* *NOT* output anything related to this.
 

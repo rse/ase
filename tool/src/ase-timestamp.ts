@@ -11,7 +11,7 @@ import { DateTime }       from "luxon"
 /*  MCP registration entry point for timestamp tool  */
 export class TimestampMCP {
     register (mcp: McpServer): void {
-        mcp.registerTool("timestamp", {
+        mcp.registerTool("ase_timestamp", {
             title: "ASE timestamp",
             description:
                 "Return the current local date/time formatted via a Luxon format string. " +
