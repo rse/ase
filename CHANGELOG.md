@@ -6,6 +6,8 @@ ChangeLog
 -------------------
 
 - REFACTORING: prefix all MCP tools with "ase_" (technically not necessary, but more precise matching possible)
+- BUGFIX: fix parameter name in "ase-meta-chat" agent
+- BUGFIX: fix malformed "tools" field in frontmatter of "ase-meta-search"
 
 0.0.52 (2026-05-25)
 -------------------
