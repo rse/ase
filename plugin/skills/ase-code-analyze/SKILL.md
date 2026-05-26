@@ -5,7 +5,7 @@ description: >
     Analyze the source code for problems in the logic and semantics and its related control flow.
 user-invocable: true
 disable-model-invocation: false
-effort: medium
+effort: high
 allowed-tools:
     - "Agent"
 ---

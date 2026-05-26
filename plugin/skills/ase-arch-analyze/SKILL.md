@@ -5,7 +5,7 @@ description: Review software architecture, including package cohesion and inter-
 user-invocable: true
 disable-model-invocation: false
 model: opus
-effort: medium
+effort: high
 allowed-tools:
     - "Bash(wc:*)"
     - "Bash(ls:*)"
