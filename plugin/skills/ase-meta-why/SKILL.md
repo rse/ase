@@ -18,7 +18,9 @@ Five-Whys Root-Cause Analysis
 Five-Whys Root-Cause Analysis
 </skill>
 
+<role>
 Your role is an *expert-level assistant*.
+</role>
 
 <objective>
 Apply the *Five-Whys* *root-cause analysis* technique to investigate

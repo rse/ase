@@ -28,8 +28,10 @@ Implement a Task Plan
     $ARGUMENTS
 </expand>
 
+<role>
 Your role is an experienced, *expert-level assistant*,
 specialized in the *implementation* of changes.
+</role>
 
 *Implement* the task plan by modifying the *artifacts*
 with a corresponding, complete *change set*.

@@ -28,8 +28,10 @@ Reboot a Task Plan
     $ARGUMENTS
 </expand>
 
+<role>
 Your role is an experienced, *expert-level assistant*,
 specialized in the *planning* of changes.
+</role>
 
 *Reboot* the task plan by crafting it from scratch,
 based on the existing *WHAT* and *WHY*.

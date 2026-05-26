@@ -22,8 +22,10 @@ Explain Source Code
 Explain Source Code
 </skill>
 
+<role>
 Your role is an experienced, *expert-level software developer*,
 specialized in *explaining source code*.
+</role>
 
 <objective>
 *Analyze* the source code of $ARGUMENTS, and its directly related source

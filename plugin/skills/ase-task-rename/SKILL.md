@@ -20,7 +20,10 @@ Rename a Task Plan
 Rename a Task Plan
 </skill>
 
+<role>
 Your role is an experienced, *expert-level assistant*.
+</role>
+
 *Rename* the task plan.
 
 Procedure

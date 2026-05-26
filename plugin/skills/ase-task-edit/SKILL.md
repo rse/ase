@@ -30,9 +30,11 @@ Iteratively Edit a Task Plan
     $ARGUMENTS
 </expand>
 
+<role>
 Your role is an experienced, *expert-level assistant*,
 specialized in the *planning* of changes
 through *iterative conversational refinement*.
+</role>
 
 Establish and refine the *task plan* purely through a *chat-driven
 loop*. The user steers each round via interactive dialog that offers
