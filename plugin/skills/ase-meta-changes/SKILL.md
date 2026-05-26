@@ -86,8 +86,8 @@ Processing
     </template>
 
     To update to entries of the most recent *ChangeLog* section, consult
-    the Git *commits* plus the currenly already staged changes in the Git
-    *index*, but *ignore* the Git *stash* and and still unstaged changes.
+    the Git *commits* plus the currently already staged changes in the Git
+    *index*, but *ignore* the Git *stash* and still unstaged changes.
 
     For finding the corresponding Git *commits*, use the `N.M.K` from the
     *second* level-2 header in the *ChangeLog* file as the corresponding
