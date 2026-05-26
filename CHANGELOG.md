@@ -2,8 +2,15 @@
 ChangeLog
 =========
 
-0.0.55 (2026-05-26)
+0.0.55 (2026-05-27)
 -------------------
+
+- IMPROVEMENT: support also single-character task ids in `ase-code-craft` and `ase-code-resolve` skills
+- IMPROVEMENT: add missing entries to `ase-meta-quorum` skill
+- BUGFIX: honor also `WARNING:` results in `ase-task-delete` and `ase-task-view` skills
+- CLEANUP: simplify code by eliminating redundancies in `ase-setup`
+- CLEANUP: clean up code in `ase-config` and `ase-diagram`
+- CLEANUP: fix typos in `ase-meta-changes` skill
 
 0.0.54 (2026-05-26)
 -------------------
