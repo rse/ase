@@ -165,10 +165,10 @@ export class Service {
                 const n = Math.min(CHUNK, pos)
                 pos -= n
                 fs.readSync(fd, buf, 0, n, pos)
-                tail  = buf.toString("utf8", 0, n) + tail
-                count = 0
-                for (let i = 0; i < tail.length; i++)
-                    if (tail.charCodeAt(i) === 10) count++
+                const chunk = buf.toString("utf8", 0, n)
+                tail = chunk + tail
+                for (let i = 0; i < chunk.length; i++)
+                    if (chunk.charCodeAt(i) === 10) count++
             }
             const all = tail.split("\n").filter((l) => l.length > 0)
             return all.slice(-lines).join("\n")
