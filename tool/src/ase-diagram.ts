@@ -173,7 +173,7 @@ export class Diagram {
 
         /*  attempt 1: query environment variable (explicitly)  */
         if (process.env.ASE_TERM_COLORS !== undefined)
-            if (process.env.ASE_TERM_COLORS.match(/^(?:none|ansi16|ansi256)$/) !== null)
+            if (/^(?:none|ansi16|ansi256)$/.test(process.env.ASE_TERM_COLORS))
                 mode = process.env.ASE_TERM_COLORS as "none" | "ansi16" | "ansi256"
 
         /*  attempt 2: query stdout  */
