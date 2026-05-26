@@ -150,6 +150,14 @@ by querying *multiple* AIs for an *optimal consensus*.
     &#x25CB; **xAI Grok**:
     - [...]
     - [...]
+
+    &#x25CB; **Z.AI GLM**:
+    - [...]
+    - [...]
+
+    &#x25CB; **Alibaba Qwen**:
+    - [...]
+    - [...]
     </template>
 
     In this output, remove the sections of those AIs which were not available.
