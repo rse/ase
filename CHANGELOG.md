@@ -5,7 +5,13 @@ ChangeLog
 0.0.54 (2026-05-26)
 -------------------
 
+- IMPROVEMENT: rework `ase-meta-changes` skill to also consult staged Git changes
+- IMPROVEMENT: optimize tail-reading performance in `ase-service`
+- IMPROVEMENT: use consistent `ase_task_*` result message prefixes in `ase-task`
+- BUGFIX: validate `--tool` value from `ASE_TOOL` in `ase-setup` and `ase-statusline`
+- UPDATE: adjust reasoning effort in several `ase-arch/code/meta/task` skills
 - CLEANUP: remove obsolete "ase-code-lint:xxx" commands
+- CLEANUP: fix spelling in `ase-meta-quorum` and `ase-meta-search` skills
 
 0.0.53 (2026-05-26)
 -------------------
