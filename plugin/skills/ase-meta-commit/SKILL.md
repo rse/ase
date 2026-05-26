@@ -1,6 +1,5 @@
 ---
 name: ase-meta-commit
-argument-hint: ""
 description: >
     Determine commit message for staged Git changes.
 user-invocable: true
@@ -31,6 +30,7 @@ currently staged Git changes.
 </objective>
 
 <flow>
+
 1.  <step id="STEP 1: Find out staged changes">
 
     Run the following command to find out details of what changes are
@@ -72,5 +72,6 @@ currently staged Git changes.
     Do *not* output any further explanation.
 
     </step>
+
 </flow>
 
