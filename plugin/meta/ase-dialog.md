@@ -38,7 +38,7 @@ Let the *user interactively choose* an answer.
 
             Start with <n>0</n> (set entry count to zero).
             <for items="2 3 4 5">
-                Take from <config/> the line number <item/>.
+                Take from <spec/> the line number <item/>.
                 If this line does not exist, <break/>.
                 If this line exists, parse it according to the format `<label/>: <description/>`.
                 If <config/> is not empty, set <config><config/>, </config> (append comma).
@@ -93,7 +93,7 @@ Let the *user interactively choose* an answer.
 
             Start with <n>0</n> (set entry count to zero).
             <for items="2 3 4 5">
-                Take from <config/> the line number <item/>.
+                Take from <spec/> the line number <item/>.
                 If this line does not exist, <break/>.
                 If this line exists, parse it according to the format `<label/>: <description/>`.
                 If <config/> is not empty, set <config><config/>, </config> (append comma).
