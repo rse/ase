@@ -154,8 +154,8 @@ multi-*criteria* decision matrix.
 
     -   Then, calculate the ratings <rating-K/> (K=1-N) for all
         alternatives in a single call by invoking the `ase_decision_matrix(matrix:
-        [ [ <weight-1/>, <eval-1-1/>, ..., <eval-1-N/> ], ..., [ <weight-M/>,
-        <eval-M-1/>, ..., <eval-M-N/> ] ])` tool of the `ase` MCP server.
+        [ [ <weight-1/>, <eval-1-1/>, ..., <eval-N-1/> ], ..., [ <weight-M/>,
+        <eval-1-M/>, ..., <eval-N-M/> ] ])` tool of the `ase` MCP server.
         The tool returns an array of N numerical values, where the K-th
         entry is the product-sum of all weights <weight-L/> (L=1-M) and
         the evaluation <eval-K-L/> (L=1-M) for alternative <alternative-K/>.
@@ -173,9 +173,9 @@ multi-*criteria* decision matrix.
 
         | ⦿ *Criteria*  | ⚖ *Weight*  | ⚑ **<alternative-1/>** | [...alternatives 2-(N-1)...] | ⚑ **<alternative-N/>** |
         | :------------ | ----------: | ---------------------: | ---------------------------: | ---------------------: |
-        | <criteria-1/> | <weight-1/> | <eval-1-1/>            | [...evals 1-2..1-(N-1)...]   | <eval-1-N/>            |
+        | <criteria-1/> | <weight-1/> | <eval-1-1/>            | [...evals 2-1..(N-1)-1...]   | <eval-N-1/>            |
         [...criteria L=2-(M-1) for M>2...]
-        | <criteria-M/> | <weight-M/> | <eval-M-1/>            | [...evals M-2..M-(N-1)...]   | <eval-M-N/>            |
+        | <criteria-M/> | <weight-M/> | <eval-1-M/>            | [...evals 2-M..(N-1)-M...]   | <eval-N-M/>            |
         | **RATING**    |             | **<rating-1/>**        | [...ratings 2-(N-1)...]      | **<rating-N/>**        |
         </template>
     </step>
