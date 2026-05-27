@@ -296,9 +296,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 3.  **Iterative Plan Refinement Loop:**
 
-    *REPEAT* the following steps 3.1 to 3.4 in a *LOOP* until
-    the user selects `DONE`, `IMPLEMENT`, or `PREFLIGHT`, or
-    declines/cancels in the dialog of step 3.4:
+    *REPEAT* the following steps from 3.1 up to and including 3.4 in a
+    *LOOP* until the user selects `DONE`, `IMPLEMENT`, or `PREFLIGHT`,
+    or declines/cancels in the dialog of step 3.4:
 
     1.  *Update timestamp*:
         <if condition="<content/> contains '✎ modified:' AND <content-dirty/> is 'true'">
