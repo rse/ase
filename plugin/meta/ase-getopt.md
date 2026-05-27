@@ -20,13 +20,14 @@ set placeholders into the context as a side-effect.
     then just silently *SKIP* the following steps 3-7!
 
 3.  **MCP Call**:
-    Call the `ase_getopt(name: <getopt-skill/>, spec: <getopt-spec/>, args:
-    <getopt-args/>)` tool of the `ase` MCP server and set <text/> to the
-    `text` output field of this tool call. The `spec` syntax for each
-    option token is `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)]`,
-    where `=<default>` declares a value-taking option with a default,
-    and `=(<c1>|<c2>|...)` declares a value-taking option restricted to
-    the listed fixed choices (the first choice acts as the default).
+    Call the `ase_getopt(name: "<getopt-skill/>", spec:
+    "<getopt-spec/>", args: "<getopt-args/>"")` tool of the `ase`
+    MCP server and set <text/> to the `text` output field of
+    this tool call. The `spec` syntax for each option token is
+    `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)]`, where
+    `=<default>` declares a value-taking option with a default, and
+    `=(<c1>|<c2>|...)` declares a value-taking option restricted to the
+    listed fixed choices (the first choice acts as the default).
 
 4.  **Short-Circuit for Error**:
     If <text/> starts with `ERROR:`:
