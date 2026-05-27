@@ -413,7 +413,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         -   If <result/> matches `OTHER: <text/>`:
 
-            Set <instruction><text/></instruction> (replace existing intructions).
+            Set <instruction><text/></instruction> (replace existing instruction).
 
             Treat the <instruction/> as a *refinement instruction* for
             the plan, and update <content/> in-place by *applying* the
