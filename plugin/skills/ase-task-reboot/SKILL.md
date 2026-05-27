@@ -121,35 +121,39 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Set <instruction><text/></instruction> (set instruction to extracted text).
         </if>
 
-    4.  <if condition="<content/> contains '- **WHY**: <text/>'">
+    4.  <if condition="<content/> contains '- **WHY**: <text/>' and <instruction/> is empty">
+        Set <instruction><text/></instruction> (set instruction to extracted text).
+        </if>
+
+    5.  else <if condition="<content/> contains '- **WHY**: <text/>' and <instruction/> is NOT empty">
         Set <instruction><instruction/>, BECAUSE <text/></instruction>
         (append extracted text to instruction).
         </if>
 
-    5.  <if condition="<content/> contains 'created: **<text/>**'">
+    6.  <if condition="<content/> contains 'created: **<text/>**'">
         Set <timestamp-created><text/></timestamp-created> (set
         timestamp-created to extracted text)
         </if>
 
-    6.  Create a new plan from scratch and store the result as
+    7.  Create a new plan from scratch and store the result as
         <content/> by closely following the defined plan format
         <format/> and injecting into it all the information from
         the <instruction/> and all decisions you derived from the
         <instruction/>.
 
-    7.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+    8.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP server and use the `text` field of its response for
         <timestamp-modified/> information. Then insert the current
         <ase-task-id/>, previous <timestamp-created/>, and refreshed
         <timestamp-modified/> information and calculate the number of
         words <words/> of <content/>.
 
-    8.  Call the `ase_task_save(id: "<ase-task-id/>",
+    9.  Call the `ase_task_save(id: "<ase-task-id/>",
         text: "<content/>")` of the `ase` MCP server to save the updated
         task plan content. Do not output anything related to this MCP
         call.
 
-    9.  Only output the following <template/> and continue processing:
+    10. Only output the following <template/> and continue processing:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan rebooted**
