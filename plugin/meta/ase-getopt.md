@@ -47,14 +47,15 @@ set placeholders into the context as a side-effect.
     {
         "opts": { "<long1/>": <value1/>, "<long2/>": <value2/>, ... },
         "argv": [ "<arg1/>", "<arg2/>", ... ],
-        "args": "..."
+        "args": "...",
+        "info": "..."
     }
     ```
 
 6.  **Materializing into Context**:
-    For each *key* `<long/>` in <getopt-result/>`.opts`:
-    Set <getopt-option-<long/>/> to the corresponding value from
-    `<getopt-result/>.opts[<long/>]`.
+    For each *key* `<longN/>` in <getopt-result/>`.opts`:
+    Set <getopt-option-<longN/>/> to the corresponding value
+    `<getopt-result/>.opts[<longN/>]`.
     Set <getopt-arguments/> to the value of `<getopt-result/>.args`.
     Set <getopt-info/> to `<getopt-result/>.info`.
 
