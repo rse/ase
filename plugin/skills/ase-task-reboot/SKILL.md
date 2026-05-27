@@ -56,20 +56,31 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  React on task id:
 
-        <if condition="
-            <instruction/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
-        ">
-        Set <ase-task-id><instruction/></ase-task-id> (set task
-        id to instruction) and <instruction></instruction> (set
-        instruction empty), call the `ase_task_id(id: <ase-task-id/>,
-        session: <ase-session-id/>)` tool from the `ase` MCP
-        server to switch the task, and then only output the
-        following <template/>:
+        1.  <if condition="
+                <instruction/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+            ">
+            Set <ase-task-id><instruction/></ase-task-id> (set task
+            id to instruction) and <instruction></instruction> (set
+            instruction empty), call the `ase_task_id(id: <ase-task-id/>,
+            session: <ase-session-id/>)` tool from the `ase` MCP
+            server to switch the task, and then only output the
+            following <template/>:
 
-        <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-        </template>
-        </if>
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
+            </template>
+            </if>
+
+        2.  else <if condition="<instruction/> is NOT empty">
+            The argument is neither empty nor a valid task id. As this
+            skill only accepts an optional `[<id>]` argument and *never*
+            a free-text instruction, only output the following <template/>
+            and then immediately *STOP* processing the entire current skill:
+
+            <template>
+            ⧉ **ASE**: ☻ skill: **ase-task-reboot**, ▶ ERROR: expected single `[<id>]` argument
+            </template>
+            </if>
 
 2.  **Determine Operation:**
 
