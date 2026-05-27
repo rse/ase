@@ -89,10 +89,16 @@ explicitly requested by this procedure via outputs based on a <template/>!
 2.  **Determine Operation**:
 
     1.  Call the `ase_task_load(id: <ase-task-id/>)` tool of the `ase` MCP
-        server to load the current task plan content and set <content/> to
+        server to load the current task plan content and set <text/> to
         the `text` output field of the `ase_task_load` tool call.
 
-        Calculate the number of words <words/> of <content/>.
+        -   If <text/> starts with `ERROR:` or `WARNING:`:
+            Set <content></content> (set content to empty).
+            Set <words/> to "0".
+
+        -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
+            Set <content><text/></content> (set content to text).
+            Calculate the number of words <words/> of <content/>.
 
         Only output the following <template/>:
 
