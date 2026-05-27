@@ -136,7 +136,8 @@ for the technology stack to *provide* the *needed functionality*
         server *once* for the entire set of discovered packages.
         The tool dispatches internally on <stack/> and fetches all
         metadata in maximum parallel and returns an array of objects `{
-        name, version, time, repository, stars, downloads }`. For each
+        name, version, created, updated, repository, stars, downloads,
+        rank }`. For each
         component <component-K/> (K=1-N) read from its corresponding
         entry: <version-K/> from `version`, <updated-K/> from `updated`,
         <created-K/> from `created`, <repository-K/> from `repository`,
