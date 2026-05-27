@@ -16,12 +16,12 @@ Control Flow Constructs
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <expand name="<define-name/>" [arg1="<expand-arg1/>" [arg2="<expand-arg2/>" [...]]]><expand-content/></expand>:
 
-    This specifies the *expansion* of previous <define/>.
-    This construct is expanded into the <define-body/> of <define/>
-    with `<args/>` substituted with `<expand-arg1/> <expand-arg2/>
-    [...]`, `<arg1/>` substituted with <expand-arg1/>, and `<content/>`
-    substituted with <expand-content/>.
-    Do not output anything else.
+    This specifies the *expansion* of previous <define/>. This
+    construct is expanded to the <define-body/> of <define/> with
+    `<args/>` substituted with `<expand-arg1/> <expand-arg2/> [...]`,
+    `<arg1/>` substituted with <expand-arg1/>, `<arg2/>` substituted
+    with <expand-arg2/>, etc, and `<content/>` substituted with
+    <expand-content/>. Do not output anything else.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <flow><flow-body/></flow>:
