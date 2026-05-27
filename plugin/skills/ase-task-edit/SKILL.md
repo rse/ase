@@ -390,9 +390,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         -   If <result/> is `REFINE`:
 
-            Ask the user interactively, without a special tool, for
-            the refinement instruction with a single question `**What
-            is your instruction for refining the plan?**`. Then set
+            Ask the user interactively, without a special tool, for the
+            refinement instruction with a single question `**What is
+            your instruction for further refining the plan?**`. Then set
             <instruction/> to the response of the user.
 
             Treat the <instruction/> as a *refinement instruction* for
