@@ -59,8 +59,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <ase-task-id><instruction/></ase-task-id> (set task
             id to instruction) and <instruction></instruction> (set
-            instruction empty), call the `ase_task_id(id: <ase-task-id/>,
-            session: <ase-session-id/>)` tool from the `ase` MCP
+            instruction empty), call the `ase_task_id(id: "<ase-task-id/>",
+            session: "<ase-session-id/>")` tool from the `ase` MCP
             server to switch the task, and then only output the
             following <template/>:
 
@@ -76,8 +76,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <instruction></instruction> (set instruction to empty)
             and <ase-task-id><id/></ase-task-id> (set task id to
-            id) and call the `ase_task_id(id: <ase-task-id/>, session:
-            <ase-session-id/>)` tool from the `ase` MCP server to
+            id) and call the `ase_task_id(id: "<ase-task-id/>", session:
+            "<ase-session-id/>")` tool from the `ase` MCP server to
             switch the task, and then only output the following
             <template/>:
 
@@ -88,7 +88,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 2.  **Determine Operation:**
 
-    1.  Call the `ase_task_load(id: <ase-task-id/>)` tool of the `ase` MCP
+    1.  Call the `ase_task_load(id: "<ase-task-id/>")` tool of the `ase` MCP
         server to load the current task plan content and set <text/> to
         the `text` output field of the `ase_task_load` tool call.
 
@@ -142,8 +142,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Do not output anything.
         </if>
 
-    4.  Finally, call the `ase_task_save(id: <ase-task-id/>,
-        text: <content/>)` of the `ase` MCP server to save the updated
+    4.  Finally, call the `ase_task_save(id: "<ase-task-id/>",
+        text: "<content/>")` of the `ase` MCP server to save the updated
         task plan content. Calculate the number of words <words/> of
         <content/>. Do not output anything related to this MCP tool call
         except the following <template/>:

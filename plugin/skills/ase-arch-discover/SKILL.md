@@ -131,8 +131,8 @@ for the technology stack to *provide* the *needed functionality*
             into the already existing result set, but deduplicate
             entries by Maven coordinate.
 
-    -   Call the `ase_component_info(stack: <stack/>, components:
-        [ <package-1/>, ..., <package-N/> ])` tool of the `ase` MCP
+    -   Call the `ase_component_info(stack: "<stack/>", components:
+        [ "<package-1/>", ..., "<package-N/>" ])` tool of the `ase` MCP
         server *once* for the entire set of discovered packages.
         The tool dispatches internally on <stack/> and fetches all
         metadata in maximum parallel and returns an array of objects `{

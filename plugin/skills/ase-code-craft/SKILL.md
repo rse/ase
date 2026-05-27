@@ -61,7 +61,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         ">
         Set <ase-task-id><feature/></ase-task-id> (set task id to feature)
         and <feature></feature> (set feature empty), call the
-        `ase_task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
+        `ase_task_id(id: "<ase-task-id/>", session: "<ase-session-id/>")` tool
         from the `ase` MCP server to switch the task, and then only
         output the following <template/>:
 
@@ -73,8 +73,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     2.  If <feature/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`, then set
         <feature><text/></feature> and <ase-task-id><id/></ase-task-id>
-        and call the `ase_task_id(id: <ase-task-id/>, session:
-        <ase-session-id/>)` tool from the `ase` MCP server to
+        and call the `ase_task_id(id: "<ase-task-id/>", session:
+        "<ase-session-id/>")` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
 
     3.  If <feature/> is empty,
@@ -91,8 +91,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         ">
         Set <ase-task-id/> to a unique task id, derived from <feature/>,
         which consists of two lower-case words concatenated with a
-        `-` character. Then call the `ase_task_id(id: <ase-task-id/>,
-        session: <ase-session-id/>)` tool from the `ase` MCP server to
+        `-` character. Then call the `ase_task_id(id: "<ase-task-id/>",
+        session: "<ase-session-id/>")` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
         </if>
 
@@ -279,7 +279,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         words <words/> of <content/>.
 
     3.  You *MUST* *save* the resulting plan content with the
-        `ase_task_save(id: <ase-task-id/>, text: <content/>)`.
+        `ase_task_save(id: "<ase-task-id/>", text: "<content/>")`.
 
     4.  Output a hint with the following <template/>:
 

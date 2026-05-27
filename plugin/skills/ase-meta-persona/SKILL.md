@@ -24,7 +24,7 @@ Persona Configuration
     Do not output anything.
 
 2.  <if condition="<request/> is empty">
-    1.  Call the `ase_persona(session: <ase-session-id/>)`
+    1.  Call the `ase_persona(session: "<ase-session-id/>")`
         tool from the `ase` MCP server and set
         <ase-persona-style/> to its `text` output.
         Do not output anything.
@@ -46,8 +46,8 @@ Persona Configuration
         </template>
 
     2.  Set <ase-persona-style><request/></ase-persona-style> and
-        call the `ase_persona(style: <ase-persona-style/>, session:
-        <ase-session-id/>)` tool from the `ase` MCP server. Do not
+        call the `ase_persona(style: "<ase-persona-style/>", session:
+        "<ase-session-id/>")` tool from the `ase` MCP server. Do not
         output anything.
 
     3.  Output the following <template/>:

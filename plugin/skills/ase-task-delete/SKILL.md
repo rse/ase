@@ -78,7 +78,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  <if condition="<id/> is equal <ase-task-id/> AND <ase-task-id/> is not equal 'default'">
         Set <ase-task-id>default</ase-task-id>. Call the `ase_task_id(id:
-        <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase`
+        "<ase-task-id/>", session: "<ase-session-id/>")` tool from the `ase`
         MCP server to switch the task to the default task. Only output
         the following <template/>:
 

@@ -60,7 +60,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         identifier like `P1`, `P2`, `T1`, `T2`, ...),
         set <problem-id><problem/></problem-id> and
         <ase-task-id><problem/></ase-task-id>, call the `ase_task_id(id:
-        <ase-task-id/>, session: <ase-session-id/>)` tool from the
+        "<ase-task-id/>", session: "<ase-session-id/>")` tool from the
         `ase` MCP server to implicitly switch the task, and then
         call the `ase_kv_get(key: "ase-issue-<problem-id/>")` tool of
         the `ase` MCP server to retrieve the previously persisted
@@ -73,7 +73,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         ">
         Set <ase-task-id><problem/></ase-task-id> (set task id to problem)
         and <problem></problem> (set problem empty), call the
-        `ase_task_id(id: <ase-task-id/>, session: <ase-session-id/>)` tool
+        `ase_task_id(id: "<ase-task-id/>", session: "<ase-session-id/>")` tool
         from the `ase` MCP server to switch the task, and then only
         output the following <template/>:
 
@@ -85,8 +85,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     3.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
         the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`, then set
         <problem><text/></problem> and <ase-task-id><id/></ase-task-id>
-        and call the `ase_task_id(id: <ase-task-id/>, session:
-        <ase-session-id/>)` tool from the `ase` MCP server to
+        and call the `ase_task_id(id: "<ase-task-id/>", session:
+        "<ase-session-id/>")` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
 
     4.  If <problem/> is empty,
@@ -103,8 +103,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         ">
         Set <ase-task-id/> to a unique task id, derived from <problem/>,
         which consists of two lower-case words concatenated with a
-        `-` character. Then call the `ase_task_id(id: <ase-task-id/>,
-        session: <ase-session-id/>)` tool from the `ase` MCP server to
+        `-` character. Then call the `ase_task_id(id: "<ase-task-id/>",
+        session: "<ase-session-id/>")` tool from the `ase` MCP server to
         implicitly switch the task. Do not output anything.
         </if>
 
@@ -318,7 +318,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         words <words/> of <content/>.
 
     3.  You then *MUST* *save* the resulting plan content with the
-        `ase_task_save(id: <ase-task-id/>, text: <content/>)`.
+        `ase_task_save(id: "<ase-task-id/>", text: "<content/>")`.
 
     4.  If <problem-id/> is set (i.e. the <problem/> was retrieved from
         `ase_kv_get` in STEP 1.3 via key `ase-issue-<problem-id/>`),

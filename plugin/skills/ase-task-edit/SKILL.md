@@ -66,8 +66,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <ase-task-id><instruction/></ase-task-id> (set task
             id to instruction) and <instruction></instruction> (set
-            instruction empty), call the `ase_task_id(id: <ase-task-id/>,
-            session: <ase-session-id/>)` tool from the `ase` MCP
+            instruction empty), call the `ase_task_id(id: "<ase-task-id/>",
+            session: "<ase-session-id/>")` tool from the `ase` MCP
             server to switch the task, and then only output the
             following <template/>:
 
@@ -83,8 +83,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <instruction></instruction> (set instruction to empty)
             and <ase-task-id><id/></ase-task-id> (set task id to
-            id) and call the `ase_task_id(id: <ase-task-id/>, session:
-            <ase-session-id/>)` tool from the `ase` MCP server to
+            id) and call the `ase_task_id(id: "<ase-task-id/>", session:
+            "<ase-session-id/>")` tool from the `ase` MCP server to
             switch the task, and then only output the following
             <template/>:
 
@@ -100,8 +100,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ">
             Set <instruction><text/></instruction> (set instruction to
             text) and <ase-task-id><id/></ase-task-id> (set task id
-            to id) and call the `ase_task_id(id: <ase-task-id/>, session:
-            <ase-session-id/>)` tool from the `ase` MCP server to
+            to id) and call the `ase_task_id(id: "<ase-task-id/>", session:
+            "<ase-session-id/>")` tool from the `ase` MCP server to
             switch the task, and then only output the following
             <template/>:
 
@@ -134,7 +134,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 2.  **Determine Plan:**
 
-    1.  Call the `ase_task_load(id: <ase-task-id/>)` tool of the `ase` MCP
+    1.  Call the `ase_task_load(id: "<ase-task-id/>")` tool of the `ase` MCP
         server to load any existing plan content and set <text/> to
         the `text` output field of this `ase_task_load` tool call.
         Do not output anything related to this MCP tool call.
@@ -312,7 +312,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  *Persist plan*:
         <if condition="<content-dirty/> is 'true'">
-        Call the `ase_task_save(id: <ase-task-id/>, text: <content/>)` tool
+        Call the `ase_task_save(id: "<ase-task-id/>", text: "<content/>")` tool
         of the `ase` MCP server to persist the current plan, and then
         set <content-dirty>false</content-dirty> again. Calculate the
         number of words <words/> of <content/>. Do not output anything

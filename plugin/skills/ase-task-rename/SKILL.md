@@ -64,7 +64,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 2.  **Perform Operation**:
 
-    1.  Call the `ase_task_rename(old: <old/>, new: <new/>)` tool of the
+    1.  Call the `ase_task_rename(old: "<old/>", new: "<new/>")` tool of the
         `ase` MCP server to rename the task plan and set <text/> to the
         `text` output field of this `ase_task_rename` tool call. Do not
         output anything related to this MCP tool call.
@@ -85,7 +85,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  <if condition="<old/> is equal <ase-task-id/>">
         Set <ase-task-id><new/></ase-task-id>. Call the `ase_task_id(id:
-        <ase-task-id/>, session: <ase-session-id/>)` tool from the `ase`
+        "<ase-task-id/>", session: "<ase-session-id/>")` tool from the `ase`
         MCP server to switch the task to the renamed task. Only output
         the following <template/>:
 

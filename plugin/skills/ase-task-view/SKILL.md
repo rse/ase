@@ -57,7 +57,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 2.  **Perform Operation**:
 
-    1.  Call the `ase_task_load(id: <id/>)` tool of the `ase` MCP
+    1.  Call the `ase_task_load(id: "<id/>")` tool of the `ase` MCP
         server to load the task plan content and set <text/> to the
         `text` output field of this `ase_task_load` tool call. Do not
         output anything related to this MCP tool call.

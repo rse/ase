@@ -21,7 +21,7 @@ set placeholders into the context as a side-effect.
 
 3.  **MCP Call**:
     Call the `ase_getopt(name: "<getopt-skill/>", spec:
-    "<getopt-spec/>", args: "<getopt-args/>"")` tool of the `ase`
+    "<getopt-spec/>", args: "<getopt-args/>")` tool of the `ase`
     MCP server and set <text/> to the `text` output field of
     this tool call. The `spec` syntax for each option token is
     `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)]`, where
