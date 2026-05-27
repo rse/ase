@@ -36,13 +36,23 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Determine Task:**
 
-    1.  Set <id>$ARGUMENTS</id> initially.
+    1.  Set <id>$ARGUMENTS</id> initially, with any leading and trailing
+        whitespace stripped.
         Inherit the always existing <ase-task-id/> from the current context.
         Do not output anything.
 
     2.  <if condition="<id/> is empty">
         Set <id><ase-task-id/></id>
         Do not output anything.
+        </if>
+
+    3.  <if condition="<id/> does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`">
+        Only output the following <template/> and then immediately
+        *STOP* processing the entire current skill:
+
+        <template>
+        ⧉ **ASE**: ☻ skill: **ase-task-delete**, ▶ ERROR: expected single `[<id>]` argument
+        </template>
         </if>
 
 2.  **Perform Operation**:
