@@ -324,11 +324,12 @@ explicitly requested by this procedure via outputs based on a <template/>!
         </if>
 
     3.  *Render plan*: Only output the following <template/>, so the user
-        can read the plan and react to it. If <content/> is longer than
-        90 lines and a `※ IMPLEMENTATION DRAFT` section exists, replace
-        the entire content of the `※ IMPLEMENTATION DRAFT` section with
-        `[...]`. Else, do *not* truncate, summarize, or partially show
-        the plan. Use the following <template/>:
+        can read the plan and react to it. If <content/> is longer
+        than 90 lines and a `※ IMPLEMENTATION DRAFT` section (from the
+        companion skill `ase-task-preflight`) exists, replace the entire
+        content of the `※ IMPLEMENTATION DRAFT` section with `[...]`.
+        Else, do *not* truncate, summarize, or partially show the plan.
+        Use the following <template/>:
 
         <template>
         ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `TASK-PLAN-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
@@ -412,7 +413,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         -   If <result/> matches `OTHER: <text/>`:
 
-            Set <instruction><text/></instruction>.
+            Set <instruction><text/></instruction> (replace existing intructions).
 
             Treat the <instruction/> as a *refinement instruction* for
             the plan, and update <content/> in-place by *applying* the
