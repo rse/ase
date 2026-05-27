@@ -86,6 +86,17 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
             </if>
 
+        3.  else <if condition="<instruction/> is NOT empty">
+            The argument is neither empty nor a valid task id. As this
+            skill only accepts an optional `[<id>]` argument and *never*
+            a free-text instruction, only output the following <template/>
+            and then immediately *STOP* processing the entire current skill:
+
+            <template>
+            ⧉ **ASE**: ☻ skill: **ase-task-preflight**, ▶ ERROR: expected single `[<id>]` argument
+            </template>
+            </if>
+
 2.  **Determine Operation:**
 
     1.  Call the `ase_task_load(id: "<ase-task-id/>")` tool of the `ase` MCP
