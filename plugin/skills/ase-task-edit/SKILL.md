@@ -240,6 +240,28 @@ explicitly requested by this procedure via outputs based on a <template/>!
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan refined**
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
             </template>
+
+        -   If <result/> matches `OTHER: <text/>`:
+
+            Set <instruction><instruction/> <text/></instruction> (append
+            the user's free-text hint to the existing instruction).
+
+            Treat the <instruction/> as a *refinement instruction* for
+            the plan, and update <content/> in-place by *applying* the
+            requested <instruction/> to the *plan*. When refining the
+            plan this way, preserve the overall structure of the plan
+            and only modify what the user actually requested. Do *not*
+            rewrite unrelated sections of the plan.
+
+            Calculate the number of words <words/> of <content/>.
+            Set <content-dirty>true</content-dirty>.
+
+            Only output the following <template/> and continue processing:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan refined**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
+            </template>
         </if>
 
     4.  <if condition="<content/> does not contain '# ✪ TASK PLAN:' AND <instruction/> is empty">
