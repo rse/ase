@@ -342,8 +342,17 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   If <getopt-option-next/> matches the regex `^(DONE|IMPLEMENT|PREFLIGHT|REFINE)$`:
             Honor the pre-selection what to do as the next step.
             Set <result><getopt-option-next/></result>.
-            Then *clear* <getopt-option-next/> by setting <getopt-option-next>none</getopt-option-next>
-            so that subsequent loop iterations fall back to the interactive dialog.
+
+            Then *clear* <getopt-option-next/> by setting
+            <getopt-option-next>none</getopt-option-next> so that
+            subsequent loop iterations fall back to the interactive
+            dialog.
+
+            Set <instruction></instruction> (clear the instruction, as
+            any instruction carried in via the arguments was already
+            applied to the plan in step 2 before this loop), so that a
+            pre-selected `REFINE` correctly asks the user for a *fresh*
+            refinement instruction below.
 
         -   If <getopt-option-next/> is equal to `none`:
             Let the *user interactively choose* what to do as the next step.
