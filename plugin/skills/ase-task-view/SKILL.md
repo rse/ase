@@ -1,6 +1,6 @@
 ---
 name: ase-task-view
-argument-hint: "[<id>]"
+argument-hint: "[--help|-h] [<id>]"
 description: >
     View current or given task plan.
     Use when the user calls to "view", "show" or "see" the

@@ -1,6 +1,6 @@
 ---
 name: ase-code-refactor
-argument-hint: "[--auto|-a] [--next|-n <option>] [<task-id>:] <request>"
+argument-hint: "[--help|-h] [--auto|-a] [--next|-n <option>] [<task-id>:] <request>"
 description: >
     Refactor Code Base:
     Use when user wants to refactor the code base.

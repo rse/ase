@@ -1,6 +1,6 @@
 ---
 name: ase-code-explain
-argument-hint: "<source-reference>"
+argument-hint: "[--help|-h] <source-reference>"
 description: >
     Explains code with WHAT, WHY, ANALOGY, DIAGRAM, CRUXES, and GOTCHAS.
     Use when you want to know how code works or when the user asks "how does this work?"

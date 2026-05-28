@@ -1,6 +1,6 @@
 ---
 name: ase-code-resolve
-argument-hint: "[--auto|-a] [--next|-n <option>] [<task-id>:] <problem>"
+argument-hint: "[--help|-h] [--auto|-a] [--next|-n <option>] [<task-id>:] <problem>"
 description: >
     Resolve Problem:
     Use when user wants a bug fixed or problem resolved.

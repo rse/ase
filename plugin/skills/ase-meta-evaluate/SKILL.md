@@ -1,6 +1,6 @@
 ---
 name: ase-meta-evaluate
-argument-hint: "<request>"
+argument-hint: "[--help|-h] <request>"
 description: >
     Evaluate alternatives through a weighted multi-criteria decision
     matrix. Use when the user calls for the *evaluation* of

@@ -1,6 +1,6 @@
 ---
 name: ase-task-delete
-argument-hint: "[<id>]"
+argument-hint: "[--help|-h] [<id>]"
 description: >
     Delete the current or given task plan.
     Use when the user calls to "delete", "remove" or "clear" the

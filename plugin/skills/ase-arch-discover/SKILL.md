@@ -1,6 +1,6 @@
 ---
 name: ase-arch-discover
-argument-hint: "<functionality>"
+argument-hint: "[--help|-h] <functionality>"
 description: >
     Discover additional, third-party components (libraries/frameworks) for
     the technology stack to provide needed functionality.

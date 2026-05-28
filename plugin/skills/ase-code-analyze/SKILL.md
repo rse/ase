@@ -1,6 +1,6 @@
 ---
 name: ase-code-analyze
-argument-hint: "<source-reference>"
+argument-hint: "[--help|-h] <source-reference>"
 description: >
     Analyze the source code for problems in the logic and semantics and its related control flow.
 user-invocable: true

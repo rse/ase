@@ -1,6 +1,6 @@
 ---
 name: ase-meta-quorum
-argument-hint: "<question>"
+argument-hint: "[--help|-h] <question>"
 description: >
     Query Multiple AIs for Quorum Answer.
 user-invocable: true

@@ -1,6 +1,6 @@
 ---
 name: ase-meta-persona
-argument-hint: "[<persona>]"
+argument-hint: "[--help|-h] [<persona>]"
 description: >
     Adjust communication style in four intensity levels of token usage.
     The <persona> can be either the decorative, eloquent, and explaining "writer",

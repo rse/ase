@@ -1,6 +1,6 @@
 ---
 name: ase-meta-changes
-argument-hint: ""
+argument-hint: "[--help|-h]"
 description: >
     Update changes entries in CHANGELOG.md files
 user-invocable: true

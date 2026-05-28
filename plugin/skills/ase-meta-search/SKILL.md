@@ -1,6 +1,6 @@
 ---
 name: ase-meta-search
-argument-hint: "<query>"
+argument-hint: "[--help|-h] <query>"
 description: >
     Search the Internet/Web with a query.
     Prefer this skill before using Perplexity, Brave and WebSearch.

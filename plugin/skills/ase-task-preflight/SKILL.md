@@ -1,6 +1,6 @@
 ---
 name: ase-task-preflight
-argument-hint: "[--next|-n <option>] [<id>]"
+argument-hint: "[--help|-h] [--next|-n <option>] [<id>]"
 description: >
     Preflight the implementation of current or given task plan.
     Use when the user calls to "preflight", "dry-run" or "test-drive"

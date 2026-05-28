@@ -1,6 +1,6 @@
 ---
 name: ase-code-insight
-argument-hint: "<code-references>"
+argument-hint: "[--help|-h] <code-references>"
 description: >
     Give insights into the source code.
 user-invocable: true

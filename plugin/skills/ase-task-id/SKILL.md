@@ -1,6 +1,6 @@
 ---
 name: ase-task-id
-argument-hint: "[<id>]"
+argument-hint: "[--help|-h] [<id>]"
 description: >
     Get or set unique task id <id>.
     Use when user requests to work on a certain task

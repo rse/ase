@@ -1,6 +1,6 @@
 ---
 name: ase-meta-chat
-argument-hint: "<llm> <query>"
+argument-hint: "[--help|-h] <llm> <query>"
 description: >
     Query foreign LLM for chat.
     Use this skill if a foreign LLM like OpenAI ChatGPT, Google Gemini,

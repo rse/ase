@@ -1,6 +1,6 @@
 ---
 name: ase-task-rename
-argument-hint: "[<old>] <new>"
+argument-hint: "[--help|-h] [<old>] <new>"
 description: >
     Rename the current or given task plan.
     Use when the user calls to "rename", "move" or "relabel" the
