@@ -5,6 +5,7 @@ ChangeLog
 0.0.58 (2026-05-28)
 -------------------
 
+- IMPROVEMENT: speed up option parsing by skipping MCP tool use when arguments do not start with any option
 - IMPROVEMENT: reduce "ase-task-edit" skill by 2K by factoring out equal text blocks into <define>
 
 0.0.57 (2026-05-28)

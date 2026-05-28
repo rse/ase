@@ -10,14 +10,27 @@ set placeholders into the context as a side-effect.
 1.  **Determine Parameters**:
     Set <getopt-skill><arg1/></getopt-skill>.
     Set <getopt-spec>--help|-h <arg2/></getopt-spec>.
-    Set <getopt-opts><arg3/></getopt-opts>.
     Set <getopt-args><content/></getopt-args>.
 
-2.  **Short-Circuit for Quick Processing**:
-    If <getopt-opts/> contains `quick` *AND*
-    <getopt-args/> does *NOT* match the regexp `^\s*-`:
-    Set <getopt-arguments><getopt-args/></getopt-arguments> and
-    then just silently *SKIP* the following steps 3-7!
+2.  **Short-Circuit Processing**:
+    If <getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e.
+    contains no options at all):
+
+    For each option token in <getopt-spec/> of the form
+    `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)]`, set
+    <getopt-option-<long/>/> to <default/> (for `=<default/>`
+    form), or to <c1/> (the first choice, for `=(<c1/>|<c2>/|...)`
+    form), or to `false` (for value-less options). Then set
+    <getopt-arguments><getopt-args/></getopt-arguments>.
+
+    Additionally, simulate <getopt-info/> as a comma-separated
+    markdown rendering of the parsed options in the form `<longN/>:
+    **<valueN/>**, [...]` (joined with `, `, with each value
+    shell-quoted if value contains spaces or special characters, and
+    excluding the `help` option).
+
+    Then silently *SKIP* only the following steps 3-6
+    and proceed directly to step 7 to display the results.
 
 3.  **MCP Call**:
     Call the `ase_getopt(name: "<getopt-skill/>", spec:
