@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--plan|-p=<option>] [--next|-n=<option>] [<id> | <id>: <instruction> | <instruction>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--next|-n <option>] [<id> | <id>: <instruction> | <instruction>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. Each round, the current plan is shown and the
