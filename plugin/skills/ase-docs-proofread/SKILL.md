@@ -15,7 +15,7 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-docs-proofread">
-Analyze the documents for spelling, punctuation, or grammar errors.
+Analyze documents for spelling, punctuation, or grammar errors
 </skill>
 
 <expand name="getopt"
