@@ -161,17 +161,19 @@ Skill Identification
 - *IMPORTANT*: Set <skill></skill> (set to empty)
   and <skill-name></skill-name> (set name to empty).
 
-  In case <skill/> later becomes *not* empty
-  by defining it as <skill name="<name/>"><body/></skill>,
-  set <skill-name><name/></skill-name> (set skill name to name),
-  and then you *MUST* once output the following output <template/>:
+  In case <skill/> later becomes *not* empty by defining it as <skill
+  name="<name/>"><body/></skill>, set <skill-name><name/></skill-name>
+  (set skill name to name), and then (but only if `$1` is *NOT* equal
+  to `-h` or `--help`) you *MUST* once output the following output
+  <template/>:
 
   <template>
   ⧉ **ASE**: ✪ skill: **<skill-name/>**, ✦ purpose: **<skill/>**, ▶ status: **skill started**
   </template>
 
-  Later, once this skill finally will stop processing, you *MUST* once
-  output the following output <template/>:
+  Later (but only if `$1` is *NOT* equal to `-h` or `--help`), once
+  this skill finally will stop processing, you *MUST* once output the
+  following output <template/>:
 
   <template>
   ⧉ **ASE**: ✪ skill: **<skill-name/>**, status: **skill finished**
@@ -185,3 +187,11 @@ Skill Identification
   ⧉ **ASE**: ✪ skill: **<skill-name/>**, ◎ objective: **<objective/>**
   </template>
 
+- *IMPORTANT*:
+  If `$1` (the first token of the skill arguments) is equal to `-h` or
+  `--help`, you *MUST* once output the following output <template/> and
+  then *IMMEDIATELY* *STOP* the further skill processing:
+
+  <template>
+  @${CLAUDE_SKILL_DIR}/help.md
+  </template>
