@@ -1,5 +1,6 @@
 ---
 name: ase-meta-commit
+argument-hint: ""
 description: >
     Determine commit message for staged Git changes.
 user-invocable: true
