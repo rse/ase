@@ -15,4 +15,5 @@ no-space-in-code:   false
 ul-indent:          false
 ol-indent:          false
 heading-style:      false
+no-multiple-space-atx: false
 
