@@ -29,7 +29,7 @@ Iteratively Edit a Task Plan
 
 <objective>
 Establish and refine the *task plan* purely through a *chat-driven
-loop*. The user steers each round via interactive dialog that offers
+loop*. The user steers each round via an interactive dialog that offers
 continued refinement, finalization, or hand-off to implementation or
 preflight.
 </objective>
