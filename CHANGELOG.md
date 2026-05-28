@@ -5,6 +5,8 @@ ChangeLog
 0.0.57 (2026-05-28)
 -------------------
 
+- IMPROVEMENT: speed up `ase-code-{craft,refactor,resolve}` skills by going directly to implementation/preflight if requested
+
 0.0.56 (2026-05-28)
 -------------------
 
