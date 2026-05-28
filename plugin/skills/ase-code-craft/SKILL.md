@@ -1,6 +1,6 @@
 ---
 name: ase-code-craft
-argument-hint: "[--help|-h] [--auto|-a] [--next|-n <option>] [<task-id>:] <feature>"
+argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--next|-n <option>] [<task-id>:] <feature>"
 description: >
     Craft Source Code:
     Use when user wants to create or craft a new feature from scratch.
@@ -23,7 +23,7 @@ Craft Source Code
 
 <expand name="getopt"
     arg1="ase-code-craft"
-    arg2="--auto|-a --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)">
+    arg2="--auto|-a --dry|-d --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)">
     $ARGUMENTS
 </expand>
 
@@ -260,6 +260,12 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         code base. Use the <format/> defined for a task plan and inject
         the information from feature A<n/> and all derived realization
         decisions into it. Store the resulting task plan in <content/>.
+
+        <if condition="<getopt-option-dry/> is equal `true`">
+        You *MUST* completely omit the `## ※ VERIFICATION` section
+        (including its heading and all of its bullet points) from
+        <content/>.
+        </if>
 
         You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
         filesystem-modifying tool during this step.

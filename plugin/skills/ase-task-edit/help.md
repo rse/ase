@@ -8,6 +8,7 @@
 `ase-task-edit`
     [`--help`|`-h`]
     [`--plan`|`-p` *option*]
+    [`--dry`|`-d`]
     [`--next`|`-n` *option*]
     [*id* | *id*: *instruction* | *instruction*]
 
@@ -31,6 +32,14 @@ command from outside the agent tool.
     with *instruction*), `REFINE` (refine the existing plan with
     *instruction*), or `PRESERVE` (preserve the existing plan by
     ignoring *instruction* and stopping skill processing).
+
+`--dry`|`-d`:
+    Generate any *new* plan *without* the `※ VERIFICATION` section.
+    Applies only to freshly generated plans, not to existing plans
+    loaded from disk. When `ase-task-implement` later applies such
+    a plan, it strictly skips the entire verification phase (no
+    build, tests, linter, type-checker, or program execution) once
+    the source files have been modified.
 
 `--next`|`-n` *option*:
     Automatically answer the user dialog for the next step (at the end

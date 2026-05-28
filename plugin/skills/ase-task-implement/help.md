@@ -19,6 +19,13 @@ complete *change set*. The plan is loaded from
 section produced by `ase-task-preflight` is used as a hint — the
 plain plan content always overrules the draft.
 
+If the task plan deliberately *omits* the `※ VERIFICATION` section
+(as produced by `ase-code-craft`, `ase-code-refactor`,
+`ase-code-resolve`, or `ase-task-edit` when invoked with `--dry`),
+the entire verification phase is strictly skipped: no build, tests,
+linter, type-checker, or program execution is performed once the
+source files have been modified.
+
 After implementation, the user is asked whether to preserve or
 delete the task plan, unless `--next` pre-selects this choice.
 

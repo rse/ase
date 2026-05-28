@@ -129,6 +129,16 @@ explicitly requested by this procedure via outputs based on a <template/>!
         overrules the implementation draft in the `IMPLEMENTATION DRAFT`
         section of <content/>.
 
+        <if condition="<content/> does NOT contain a `## ※ VERIFICATION` section heading">
+        The task plan deliberately *omits* the `## ※ VERIFICATION`
+        section. You *MUST* therefore *strictly skip* the entire
+        verification phase after modifying the source files: do *NOT*
+        run any build, do *NOT* run any tests, do *NOT* run any linter,
+        do *NOT* run any type-checker, do *NOT* execute the modified
+        program, and do *NOT* otherwise verify the change set in any
+        way.
+        </if>
+
     2.  Only output the following <template/>:
 
         <template>

@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--next|-n <option>] [<id> | <id>: <instruction> | <instruction>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--dry|-d] [--next|-n <option>] [<id> | <id>: <instruction> | <instruction>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. Each round, the current plan is shown and the
@@ -23,7 +23,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --next|-n=(none|DONE|IMPLEMENT|PREFLIGHT|REFINE)">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --dry|-d --next|-n=(none|DONE|IMPLEMENT|PREFLIGHT|REFINE)">
     $ARGUMENTS
 </expand>
 
@@ -63,6 +63,12 @@ Create a new plan from scratch and store the result as
 <format/> and injecting into it all the information from
 the <instruction/> and all decisions you derived from the
 <instruction/>.
+
+<if condition="<getopt-option-dry/> is equal `true`">
+You *MUST* completely omit the `## ※ VERIFICATION` section
+(including its heading and all of its bullet points) from
+<content/>.
+</if>
 
 Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
 `ase` MCP server and use the `text` field of its response

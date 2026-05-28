@@ -8,6 +8,7 @@
 `ase-code-resolve`
     [`--help`|`-h`]
     [`--auto`|`-a`]
+    [`--dry`|`-d`]
     [`--next`|`-n` *option*]
     [*task-id*:] *problem*
 
@@ -35,6 +36,13 @@ plan via `ase_task_save` and then hands off to `ase-task-edit`,
 `--auto`|`-a`:
     Automatically pick the recommended resolution approach without
     asking the user via the interactive dialog.
+
+`--dry`|`-d`:
+    Compose the plan *without* the `※ VERIFICATION` section. When
+    `ase-task-implement` later applies such a plan, it strictly skips
+    the entire verification phase (no build, tests, linter,
+    type-checker, or program execution) once the source files have
+    been modified.
 
 `--next`|`-n` *option*:
     Automatically choose the next step after composing the plan,
