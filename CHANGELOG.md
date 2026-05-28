@@ -5,10 +5,14 @@ ChangeLog
 0.0.57 (2026-05-28)
 -------------------
 
+- FEATURE: add `--help`/`-h` option infrastructure with per-skill `help.md` files for all skills
 - IMPROVEMENT: speed up `ase-code-{craft,refactor,resolve}` skills by going directly to implementation/preflight if requested
+- IMPROVEMENT: announce `--help`/`-h` option in argument-hint and frontmatter across all skills
+- IMPROVEMENT: use space as option separator in argument-hint across skills
 - CLEANUP: remove <role/> information from all skills as it makes no real effect for the skills
 - CLEANUP: remove all H1 headers from all skills as it makes no real effect for the skills
 - CLEANUP: show skill options also in frontmatter "argument-hint"
+- CLEANUP: small cleanups to `ase-constitution.md`, `ase-skill.md`, and `ase-getopt.md`
 
 0.0.56 (2026-05-28)
 -------------------
