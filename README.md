@@ -104,6 +104,10 @@ see whether **ASE** is right for you:
   punctuation, and grammar errors?
   &rarr; `/ase-docs-proofread @README.md`
 
+- **Direct Skill Usage Help**:
+  You want usage help for skills directly within your agent tool sessions?
+  &rarr; `/ase-xxx-xxx --help`
+
 </td>
 <td width="50%" valign="top">
 
