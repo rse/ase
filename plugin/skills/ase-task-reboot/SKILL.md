@@ -1,6 +1,6 @@
 ---
 name: ase-task-reboot
-argument-hint: "[--next|-n=<option>] [<id>]"
+argument-hint: "[--next|-n <option>] [<id>]"
 description: >
     Reboot the current or given task plan by re-creating it from scratch.
     Use when the user calls to "reboot", "recreate" or "refresh"
