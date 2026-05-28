@@ -287,9 +287,26 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan created**
         </template>
 
-    5.  Directly pass-through control to the `ase:ase-task-edit` skill.
-        Set <args></args> (set args to empty). If <getopt-option-next/>
-        is not equal `none`, set <args><args/> --next
-        <getopt-option-next/></args> (append to args). Then call the
-        tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`.
+    5.  Directly pass-through control to the next skill:
+
+        1.  <if condition="<getopt-option-next/> is equal `IMPLEMENT`">
+            Call the tool `Skill(skill: "ase:ase-task-implement")` to
+            *implement* the freshly composed plan, bypassing `ase-task-edit`.
+            </if>
+
+        2.  <if condition="<getopt-option-next/> is equal `PREFLIGHT`">
+            Call the tool `Skill(skill: "ase:ase-task-preflight")` to
+            *preflight* the freshly composed plan, bypassing `ase-task-edit`.
+            </if>
+
+        3.  <if condition="
+                <getopt-option-next/> is not equal `IMPLEMENT` AND
+                <getopt-option-next/> is not equal `PREFLIGHT`
+            ">
+            Set <args></args> (set args to empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args><args/> --next <getopt-option-next/></args> (append to args).
+            </if>
+            Then call the tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`.
+            </if>
 
