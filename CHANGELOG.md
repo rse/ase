@@ -9,6 +9,7 @@ ChangeLog
 - IMPROVEMENT: speed up `ase-code-{craft,refactor,resolve}` skills by going directly to implementation/preflight if requested
 - IMPROVEMENT: announce `--help`/`-h` option in argument-hint and frontmatter across all skills
 - IMPROVEMENT: use space as option separator in argument-hint across skills
+- IMPROVEMENT: wrap all skill objectives in `<objective>` XML tag and add missing objective blocks
 - CLEANUP: remove <role/> information from all skills as it makes no real effect for the skills
 - CLEANUP: remove all H1 headers from all skills as it makes no real effect for the skills
 - CLEANUP: show skill options also in frontmatter "argument-hint"
