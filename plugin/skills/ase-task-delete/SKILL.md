@@ -17,7 +17,9 @@ effort: low
 Delete a Task Plan
 </skill>
 
+<objective>
 *Delete* the task plan.
+</objective>
 
 Procedure
 ---------

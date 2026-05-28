@@ -25,8 +25,10 @@ Preflight a Task Plan
     $ARGUMENTS
 </expand>
 
+<objective>
 *Preflight* the implementation of a task plan by creating a draft
 for a corresponding, *complete source code change set*.
+</objective>
 
 Procedure
 ---------

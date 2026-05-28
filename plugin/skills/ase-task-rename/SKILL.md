@@ -17,7 +17,9 @@ effort: low
 Rename a Task Plan
 </skill>
 
+<objective>
 *Rename* the task plan.
+</objective>
 
 Procedure
 ---------

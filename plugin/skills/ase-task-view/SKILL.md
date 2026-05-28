@@ -17,7 +17,9 @@ effort: low
 View a Task Plan
 </skill>
 
+<objective>
 *View* the task plan.
+</objective>
 
 Procedure
 ---------

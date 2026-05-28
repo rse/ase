@@ -25,8 +25,10 @@ Reboot a Task Plan
     $ARGUMENTS
 </expand>
 
+<objective>
 *Reboot* the task plan by crafting it from scratch,
 based on the existing *WHAT* and *WHY*.
+</objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
 

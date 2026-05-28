@@ -25,8 +25,10 @@ Implement a Task Plan
     $ARGUMENTS
 </expand>
 
+<objective>
 *Implement* the task plan by modifying the *artifacts*
 with a corresponding, complete *change set*.
+</objective>
 
 Procedure
 ---------
