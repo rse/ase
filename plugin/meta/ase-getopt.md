@@ -58,7 +58,8 @@ set placeholders into the context as a side-effect.
     Set <getopt-option-<longN/>/> to the corresponding value
     `<getopt-result/>.opts[<longN/>]`.
     Set <getopt-arguments/> to the value of `<getopt-result/>.args`.
-    Set <getopt-info/> to `<getopt-result/>.info`.
+    Set <getopt-info/> to `<getopt-result/>.info`, but remove
+    information about the `help` option.
 
 7.  **Display Results**:
     Just output the following <template/>:
