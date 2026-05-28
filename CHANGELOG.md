@@ -2,8 +2,20 @@
 ChangeLog
 =========
 
-0.0.56 (2026-05-27)
+0.0.56 (2026-05-28)
 -------------------
+
+- IMPROVEMENT: validate task `id` parameter in `ase-task-{delete,implement,preflight,reboot,view}` skills
+- IMPROVEMENT: properly quote string parameters in MCP tool calls across multiple skills and `ase-getopt.md`
+- IMPROVEMENT: handle error responses in `ase-task-{implement,preflight,reboot}` skills
+- IMPROVEMENT: refine `ase-task-edit` skill (clearer questions, looping, OTHER option on plan dialog, inherited session id, precision)
+- IMPROVEMENT: make `<expand>` control construct more robust in `ase-control.md`
+- BUGFIX: handle WHY-only case in `ase-task-reboot` skill
+- BUGFIX: fix transposed decision matrix evaluation in `ase-meta-evaluate` skill
+- BUGFIX: fix references to search MCP servers in `ase-meta-search` agent
+- BUGFIX: fix destructuring information in `ase-arch-discover` skill
+- BUGFIX: fix wrong placeholder reference in `ase-dialog.md`
+- BUGFIX: fix typo in `ase-task-edit` skill
 
 0.0.55 (2026-05-27)
 -------------------
