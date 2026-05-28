@@ -9,7 +9,7 @@ set placeholders into the context as a side-effect.
 
 1.  **Determine Parameters**:
     Set <getopt-skill><arg1/></getopt-skill>.
-    Set <getopt-spec><arg2/></getopt-spec>.
+    Set <getopt-spec>--help|-h <arg2/></getopt-spec>.
     Set <getopt-opts><arg3/></getopt-opts>.
     Set <getopt-args><content/></getopt-args>.
 
