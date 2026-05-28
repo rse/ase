@@ -111,31 +111,6 @@ The following ASE commands/skills exist on the code-level:
 - **/ase-code-lint** *source-reference*:<br/>
   Lint the source code in an interactive review loop.
 
-    - **/ase-code-lint:nope**:<br/>
-      During lint: reject the last proposed code change and continue
-      with the review.
-
-    - **/ase-code-lint:explain** *issue*:<br/>
-      During lint: ask the assistant to improve its explanation of the
-      last proposed code change.
-
-    - **/ase-code-lint:reassess** *question*:<br/>
-      During lint: ask the assistant to re-assess and reason on its
-      last proposed code change.
-
-    - **/ase-code-lint:refine** *hint*:<br/>
-      During lint: ask the assistant to refine its last proposed code
-      change.
-
-    - **/ase-code-lint:complete**:<br/>
-      During lint: tell the assistant that its last proposed code change
-      set was not complete and ask it to re-propose the entire change set.
-
-    - **/ase-code-lint:recheck**:<br/>
-      During lint: tell the assistant that the source code was updated
-      externally and ask it to re-propose its last code change against
-      the latest source code.
-
 ### Documentation Commands
 
 The following ASE commands/skills exist on the documentation-level:

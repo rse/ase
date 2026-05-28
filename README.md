@@ -267,8 +267,8 @@ Features
   Recurring tasks are supported with dedicated skills, based on the
   configured parameters. This allows controlling the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
-  (`ase-code-*`), architecture (`ase-arch-*`), and task (`ase-task-*`)
-  families, covering 26 skills in total.
+  (`ase-code-*`), architecture (`ase-arch-*`), task (`ase-task-*`), and
+  documentation (`ase-docs-*`) families, covering 27 skills in total.
 
 </td>
 <td width="50%" valign="top">
