@@ -36,7 +36,7 @@ set placeholders into the context as a side-effect.
     then immediately *STOP* processing the entire current skill:
 
     <template>
-    ⧉ **ASE**: ☻ skill: **<getopt-skill/>**, ▶ ERROR: option parsing failed: **<text/>**
+    ⧉ **ASE**: ✪ skill: **<getopt-skill/>**, ▶ ERROR: option parsing failed: **<text/>**
     </template>
 
 5.  **Parsing JSON Result**:
@@ -64,7 +64,7 @@ set placeholders into the context as a side-effect.
     Just output the following <template/>:
 
     <template>
-    ⧉ **ASE**: ☻ skill: **<getopt-skill/>**, ▶ options: <getopt-info/>
+    ⧉ **ASE**: ✪ skill: **<getopt-skill/>**, ▶ options: <getopt-info/>
     </template>
 </define>
 

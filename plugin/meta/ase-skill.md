@@ -160,14 +160,21 @@ Skill Identification
 
 - *IMPORTANT*: Set <skill></skill> (set to empty)
   and <skill-name></skill-name> (set name to empty).
-  Then, in case <skill/> later becomes *not* empty
+
+  In case <skill/> later becomes *not* empty
   by defining it as <skill name="<name/>"><body/></skill>,
   set <skill-name><name/></skill-name> (set skill name to name),
-  set <skill><body/></skill> (set skill to body), and
-  then you *MUST* once output the following output <template/>:
+  and then you *MUST* once output the following output <template/>:
 
   <template>
-  ⧉ **ASE**: ☻ skill: **<skill-name/>**, ✦ purpose: **<skill/>**, ▶ status: **skill started**
+  ⧉ **ASE**: ✪ skill: **<skill-name/>**, ✦ purpose: **<skill/>**, ▶ status: **skill started**
+  </template>
+
+  Later, once this skill finally will stop processing, you *MUST* once
+  output the following output <template/>:
+
+  <template>
+  ⧉ **ASE**: ✪ skill: **<skill-name/>**, status: **skill finished**
   </template>
 
 - *IMPORTANT*: Set <objective></objective> (set to empty).
@@ -175,6 +182,6 @@ Skill Identification
   you *MUST* once output the following output <template/>:
 
   <template>
-  ⧉ **ASE**: ◎ objective: **<objective/>**
+  ⧉ **ASE**: ✪ skill: **<skill-name/>**, ◎ objective: **<objective/>**
   </template>
 
