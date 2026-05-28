@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: speed up `ase-code-{craft,refactor,resolve}` skills by going directly to implementation/preflight if requested
+- CLEANUP: remove <role/> information from all skills as it makes no real effect for the skills
 
 0.0.56 (2026-05-28)
 -------------------

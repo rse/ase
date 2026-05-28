@@ -21,11 +21,6 @@ Evaluate Alternatives
 Evaluate Alternatives
 </skill>
 
-<role>
-Your role is an experienced, *expert-level assistant*,
-specialized in *evaluating alternatives*.
-</role>
-
 <objective>
 *Evaluate* *alternatives* through a weighted
 multi-*criteria* decision matrix.

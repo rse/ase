@@ -27,14 +27,8 @@ Analyze the documents for spelling, punctuation, or grammar errors.
     $ARGUMENTS
 </expand>
 
-<role>
-Your role is an experienced, *expert-level proofreader*, specialized in
-checking and correcting the *spelling*, *punctuation* and *grammar* of
-documents.
-</role>
-
 <objective>
-*Analyze* the documents of `<getopt-arguments/>` for problems in their
+*Proofread* the documents of `<getopt-arguments/>` for problems in their
 *spelling*, *punctuation*, or *grammar* and propose corrections.
 </objective>
 

@@ -21,10 +21,6 @@ Query Multiple AIs for Quorum Answer
 Query Multiple AIs for Quorum Answer
 </skill>
 
-<role>
-Your role is an *expert-level assistant*.
-</role>
-
 <objective>
 Find a *quorum answer* on an arbitrary question,
 by querying *multiple* AIs for an *optimal consensus*.

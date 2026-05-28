@@ -28,11 +28,6 @@ Preflight a Task Plan
     $ARGUMENTS
 </expand>
 
-<role>
-Your role is an experienced, *expert-level assistant*,
-specialized in the *implementation* of changes.
-</role>
-
 *Preflight* the implementation of a task plan by creating a draft
 for a corresponding, *complete source code change set*.
 

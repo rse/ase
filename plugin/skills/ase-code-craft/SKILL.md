@@ -30,10 +30,6 @@ Craft Source Code
     $ARGUMENTS
 </expand>
 
-<role>
-Your role is an experienced, *expert-level software developer*.
-</role>
-
 <objective>
 From scratch *craft* the following feature:
 <feature><getopt-arguments/></feature>

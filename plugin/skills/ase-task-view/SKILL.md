@@ -20,9 +20,6 @@ View a Task Plan
 View a Task Plan
 </skill>
 
-<role>
-Your role is an experienced, *expert-level assistant*.
-</role>
 *View* the task plan.
 
 Procedure

@@ -19,11 +19,6 @@ Git Commit
 Git Commit
 </skill>
 
-<role>
-Your role is an experienced, *expert-level software developer*,
-specialized in *Git commit messages*.
-</role>
-
 <objective>
 Help to *craft* a *concise commit message* for the
 currently staged Git changes.

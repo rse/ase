@@ -22,10 +22,6 @@ Query Foreign LLM for Chat
 Query Foreign LLM for Chat
 </skill>
 
-<role>
-Your role is to act as a proxy to query a foreign LLM for a single chat message.
-</role>
-
 <objective>
 Query foreign LLM for: <query>$ARGUMENTS</query>
 </objective>

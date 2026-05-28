@@ -109,13 +109,9 @@ Review Software Architecture
 Review Software Architecture
 </skill>
 
-<role>
-Your role is an experienced, *expert-level software architect*,
-specialized in *reviewing software architecture*.
-</role>
-
 <objective>
-*Review* the *software architecture* of $ARGUMENTS, and its directly
+With the mindset of an *expert-level software architect*,
+*review* the *software architecture* of $ARGUMENTS, and its directly
 related source code, for *potential problems* across component
 boundaries, structural organization, architecture principles,
 interface quality, quality attributes, and architecture governance.

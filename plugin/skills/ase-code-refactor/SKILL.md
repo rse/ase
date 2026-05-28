@@ -30,10 +30,6 @@ Refactor Artifacts
     $ARGUMENTS
 </expand>
 
-<role>
-Your role is an experienced, *expert-level software developer*.
-</role>
-
 <objective>
 *Refactor* existing artifacts the following way:
 <request><getopt-arguments/></request>

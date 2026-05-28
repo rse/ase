@@ -25,10 +25,6 @@ Search the Internet/Web
 Search the Internet/Web
 </skill>
 
-<role>
-Your role is an expert-level *web specialist*.
-</role>
-
 <objective>
 Your objective is to *search* the *Internet*/*Web* for the following query:
 <query>$ARGUMENTS</query>

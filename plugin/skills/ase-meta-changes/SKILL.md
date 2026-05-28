@@ -24,11 +24,6 @@ Update ChangeLog Entries
 Update ChangeLog Entries
 </skill>
 
-<role>
-Your role is an experienced, *expert-level software developer*,
-specialized in *Git version control*.
-</role>
-
 <objective>
 Help to complete, consolidate and sort *ChangeLog* entries of the most
 recent *ChangeLog* section, based on underlying *Git* commits and staged

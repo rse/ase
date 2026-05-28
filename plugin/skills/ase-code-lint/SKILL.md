@@ -27,11 +27,6 @@ Lint Source Code
     $ARGUMENTS
 </expand>
 
-<role>
-Your role is an experienced, *expert-level software developer*,
-specialized in *analyzing source code*.
-</role>
-
 <objective>
 *Analyze* the code of `<getopt-arguments/>` for *potential problems*
 related to a set of code quality aspects.

@@ -30,10 +30,6 @@ Resolve Problem
     $ARGUMENTS
 </expand>
 
-<role>
-Your role is an experienced, *expert-level software developer*.
-</role>
-
 <objective>
 *Resolve* the following problem:
 <problem><getopt-arguments/></problem>

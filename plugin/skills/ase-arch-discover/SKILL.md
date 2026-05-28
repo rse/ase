@@ -24,11 +24,6 @@ Discover Components
 Discover Components
 </skill>
 
-<role>
-Your role is an experienced, *expert-level software architect*,
-specialized in *finding components* (libraries/frameworks) for the technology stack.
-</role>
-
 <objective>
 *Discover* additional, *third-party components* (libraries/frameworks)
 for the technology stack to *provide* the *needed functionality*

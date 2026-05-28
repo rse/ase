@@ -20,9 +20,6 @@ Delete a Task Plan
 Delete a Task Plan
 </skill>
 
-<role>
-Your role is an experienced, *expert-level assistant*.
-</role>
 *Delete* the task plan.
 
 Procedure
