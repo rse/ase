@@ -20,6 +20,11 @@ effort: medium
 Persona Configuration
 </skill>
 
+<objective>
+*Configure* the *persona style* of the agent to adjust the communication
+style and token usage intensity.
+</objective>
+
 1.  Determine request:
     <request>$ARGUMENTS</request>
     Do not output anything.

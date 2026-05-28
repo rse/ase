@@ -17,6 +17,10 @@ effort: low
 Configure Task Id
 </skill>
 
+<objective>
+*Get* or *set* the unique *task id* of the current session.
+</objective>
+
 1.  Determine request:
     <request>$ARGUMENTS</request>
 
