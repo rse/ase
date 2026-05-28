@@ -1,6 +1,6 @@
 ---
 name: ase-code-lint
-argument-hint: "<source-reference>"
+argument-hint: "[--auto|-a] <source-reference>"
 description: >
     Lint source code for potential code quality problems.
     Use when the user wants to "lint" or "check" source code.

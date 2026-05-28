@@ -1,6 +1,6 @@
 ---
 name: ase-code-craft
-argument-hint: "[<task-id>:] <feature>"
+argument-hint: "[--auto|-a] [--next|-n=<option>] [<task-id>:] <feature>"
 description: >
     Craft Source Code:
     Use when user wants to create or craft a new feature from scratch.

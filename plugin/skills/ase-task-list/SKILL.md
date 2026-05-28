@@ -1,6 +1,6 @@
 ---
 name: ase-task-list
-argument-hint: "[-v|--verbose]"
+argument-hint: "[--verbose|-v]"
 description: >
     List all available task ids.
     Use when user wants to see all tasks.

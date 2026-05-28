@@ -1,6 +1,6 @@
 ---
 name: ase-task-implement
-argument-hint: "[<id>]"
+argument-hint: "[--next|-n=<option>] [<id>]"
 description: >
     Implement current or given task plan.
     Use when the user calls to "implement", "realize" or "apply" the

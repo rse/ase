@@ -1,6 +1,6 @@
 ---
 name: ase-docs-proofread
-argument-hint: "<docs-reference>"
+argument-hint: "[--auto|-a] <docs-reference>"
 description: >
     Analyze the documents for spelling, punctuation, or grammar errors.
     Use when the user wants to "proofread" or "spellcheck" a document.
