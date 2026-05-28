@@ -1,0 +1,54 @@
+
+##  NAME
+
+`ase-code-lint` - Lint Source Code
+
+##  SYNOPSIS
+
+`ase-code-lint`
+    [`--help`|`-h`]
+    [`--auto`|`-a`]
+    *source-reference*
+
+##  DESCRIPTION
+
+The `ase-code-lint` skill lints the source code of the referenced
+location for *potential code quality problems* related to a fixed set
+of code quality aspects. The investigation is dispatched to a
+sub-agent (`ase:ase-code-lint`) so that scanning details do not leak
+into the user-visible transcript.
+
+For each detected problem, the skill renders a unified-diff *SOLUTION*
+preview and either asks the user to `ACCEPT` or `REJECT` the proposed
+correction interactively or — with `--auto` — applies all corrections
+automatically.
+
+##  OPTIONS
+
+`--auto`|`-a`:
+    Automatically apply every proposed correction without asking the
+    user via the interactive dialog.
+
+##  ARGUMENTS
+
+*source-reference*:
+    A file, directory, or other reference to the source code to lint.
+
+##  EXAMPLES
+
+Lint a source file interactively:
+
+```text
+❯ /ase-code-lint src/server.ts
+```
+
+Lint a directory and automatically apply all corrections:
+
+```text
+❯ /ase-code-lint --auto src/handlers/
+```
+
+##  SEE ALSO
+
+`ase-code-analyze`, `ase-code-resolve`, `ase-code-refactor`,
+`ase-docs-proofread`.

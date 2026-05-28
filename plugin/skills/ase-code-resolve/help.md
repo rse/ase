@@ -1,0 +1,73 @@
+
+##  NAME
+
+`ase-code-resolve` - Resolve Problem
+
+##  SYNOPSIS
+
+`ase-code-resolve`
+    [`--help`|`-h`]
+    [`--auto`|`-a`]
+    [`--next`|`-n` *option*]
+    [*task-id*:] *problem*
+
+##  DESCRIPTION
+
+The `ase-code-resolve` skill resolves a *bug* or *problem* by
+investigating the related code, internalizing resolution tenets
+(Surgical Changes, No Cleanups, Minimum Flags, Code Adequacy, Origin
+Proximity, ...), proposing one or more *resolution approaches* with
+pros and cons, letting the user pick the preferred approach, and
+composing a corresponding *task plan*.
+
+The *problem* may also be given as a bare issue identifier (e.g. `P1`
+or `T1`) previously produced by `ase-code-analyze` or
+`ase-arch-analyze` and persisted in the `ase` MCP key/value store
+under `ase-issue-<id>`.
+
+The skill does *not* directly modify source files. It persists the
+plan via `ase_task_save` and then hands off to `ase-task-edit`,
+`ase-task-preflight`, or `ase-task-implement`, as selected by
+`--next`.
+
+##  OPTIONS
+
+`--auto`|`-a`:
+    Automatically pick the recommended resolution approach without
+    asking the user via the interactive dialog.
+
+`--next`|`-n` *option*:
+    Automatically choose the next step after composing the plan,
+    where *option* is either `none` (default, hand-off to
+    `ase-task-edit` interactively), `DONE` (stop), `EDIT` (hand off
+    to `ase-task-edit`), `PREFLIGHT` (hand off to
+    `ase-task-preflight`), or `IMPLEMENT` (hand off to
+    `ase-task-implement`).
+
+##  ARGUMENTS
+
+[*task-id*:] *problem*:
+    Description of the *problem* to resolve, or a bare issue
+    identifier like `P1` or `T1` previously produced by an analyzer
+    skill. Optionally prefixed with a *task-id* followed by a colon
+    to bind the resulting plan to a specific task id.
+
+##  EXAMPLES
+
+Resolve a free-text problem:
+
+```text
+❯ /ase-code-resolve fix race condition in cache invalidation
+```
+
+Resolve a previously analyzed issue and hand off to implementation:
+
+```text
+❯ /ase-code-resolve --next IMPLEMENT P1
+```
+
+##  SEE ALSO
+
+`ase-code-craft`, `ase-code-refactor`, `ase-code-analyze`,
+`ase-arch-analyze`, `ase-task-edit`, `ase-task-preflight`,
+`ase-task-implement`.
