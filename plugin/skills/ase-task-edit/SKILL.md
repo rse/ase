@@ -45,6 +45,34 @@ You *MUST* not skip any numbered item during processing!
 You *MUST* *NOT* output anything in this entire procedure, *except* when
 explicitly requested by this procedure via outputs based on a <template/>!
 
+<define name="apply-refinement">
+Treat the <instruction/> as a *refinement instruction* for
+the plan, and update <content/> in-place by *applying* the
+requested <instruction/> to the *plan*. When refining the
+plan this way, preserve the overall structure of the plan
+and only modify what the user actually requested. Do *not*
+rewrite unrelated sections of the plan.
+
+Calculate the number of words <words/> of <content/>.
+Set <content-dirty>true</content-dirty>.
+</define>
+
+<define name="generate-plan">
+Create a new plan from scratch and store the result as
+<content/> by closely following the defined plan format
+<format/> and injecting into it all the information from
+the <instruction/> and all decisions you derived from the
+<instruction/>.
+
+Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+`ase` MCP server and use the `text` field of its response
+for fresh <timestamp-created/> and <timestamp-modified/>
+information. Then insert the current <ase-task-id/>,
+<timestamp-created/>, and <timestamp-modified/> information
+and calculate the number of words <words/> of <content/>.
+Set <content-dirty>true</content-dirty>.
+</define>
+
 1.  **Determine Task and Instruction:**
 
     1.  Set <instruction><getopt-arguments/></instruction> initially.
@@ -194,19 +222,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         -   If <result/> is `OVERWRITE`:
 
-            Create a new plan from scratch and store the result as
-            <content/> by closely following the defined plan format
-            <format/> and injecting into it all the information from
-            the <instruction/> and all decisions you derived from the
-            <instruction/>.
-
-            Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-            `ase` MCP server and use the `text` field of its response
-            for fresh <timestamp-created/> and <timestamp-modified/>
-            information. Then insert the current <ase-task-id/>,
-            <timestamp-created/>, and <timestamp-modified/> information
-            and calculate the number of words <words/> of <content/>.
-            Set <content-dirty>true</content-dirty>.
+            <expand name="generate-plan"/>
 
             Only output the following <template/> and continue processing:
 
@@ -217,15 +233,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         -   If <result/> is `REFINE`:
 
-            Treat the <instruction/> as a *refinement instruction* for
-            the plan, and update <content/> in-place by *applying* the
-            requested <instruction/> to the *plan*. When refining the
-            plan this way, preserve the overall structure of the plan
-            and only modify what the user actually requested. Do *not*
-            rewrite unrelated sections of the plan.
-
-            Calculate the number of words <words/> of <content/>.
-            Set <content-dirty>true</content-dirty>.
+            <expand name="apply-refinement"/>
 
             Only output the following <template/> and continue processing:
 
@@ -239,15 +247,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             Set <instruction><instruction/> <text/></instruction> (append
             the user's free-text hint to the existing instruction).
 
-            Treat the <instruction/> as a *refinement instruction* for
-            the plan, and update <content/> in-place by *applying* the
-            requested <instruction/> to the *plan*. When refining the
-            plan this way, preserve the overall structure of the plan
-            and only modify what the user actually requested. Do *not*
-            rewrite unrelated sections of the plan.
-
-            Calculate the number of words <words/> of <content/>.
-            Set <content-dirty>true</content-dirty>.
+            <expand name="apply-refinement"/>
 
             Only output the following <template/> and continue processing:
 
@@ -265,19 +265,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         </if>
 
     5.  <if condition="<content/> is empty AND <instruction/> is not empty">
-        Create a new plan from scratch and store the result as
-        <content/> by closely following the defined plan format
-        <format/> and injecting into it all the information from
-        the <instruction/> and all decisions you derived from the
-        <instruction/>.
-
-        Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-        `ase` MCP server and use the `text` field of its response
-        for fresh <timestamp-created/> and <timestamp-modified/>
-        information. Then insert the current <ase-task-id/>,
-        <timestamp-created/>, and <timestamp-modified/> information
-        and calculate the number of words <words/> of <content/>.
-        Set <content-dirty>true</content-dirty>.
+        <expand name="generate-plan"/>
 
         Only output the following <template/> and continue processing:
 
@@ -398,13 +386,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             your instruction for further refining the plan?**`. Then set
             <instruction/> to the response of the user.
 
-            Treat the <instruction/> as a *refinement instruction* for
-            the plan, and update <content/> in-place by *applying* the
-            requested <instruction/> to the *plan*. When refining the
-            plan this way, preserve the overall structure of the plan
-            and only modify what the user actually requested. Do *not*
-            rewrite unrelated sections of the plan.
-            Set <content-dirty>true</content-dirty>.
+            <expand name="apply-refinement"/>
 
             Finally, only output the following <template/> and then
             *continue* the *loop* at step **3.1**!
@@ -417,13 +399,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
             Set <instruction><text/></instruction> (replace existing instruction).
 
-            Treat the <instruction/> as a *refinement instruction* for
-            the plan, and update <content/> in-place by *applying* the
-            requested <instruction/> to the *plan*. When refining the
-            plan this way, preserve the overall structure of the plan
-            and only modify what the user actually requested. Do *not*
-            rewrite unrelated sections of the plan.
-            Set <content-dirty>true</content-dirty>.
+            <expand name="apply-refinement"/>
 
             Finally, only output the following <template/> and then
             *continue* the *loop* at step **3.1**!
