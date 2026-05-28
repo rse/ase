@@ -261,6 +261,12 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         the information from feature A<n/> and all derived realization
         decisions into it. Store the resulting task plan in <content/>.
 
+        If a `CHANGELOG.md` file exists in the project (or in any
+        affected sub-package), the plan *MUST* include, as part of its
+        `## ※ CHANGES` section, an explicit bullet point describing
+        the addition of a corresponding new entry to that `CHANGELOG.md`
+        file, aligned with its existing style and conventions.
+
         <if condition="<getopt-option-dry/> is equal `true`">
         You *MUST* completely omit the `## ※ VERIFICATION` section
         (including its heading and all of its bullet points) from
