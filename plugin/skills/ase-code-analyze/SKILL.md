@@ -13,9 +13,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Analyze Source Code
-===================
-
 <skill name="ase-code-analyze">
 Analyze Source Code
 </skill>

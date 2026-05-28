@@ -13,9 +13,6 @@ effort: low
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Delete a Task Plan
-==================
-
 <skill name="ase-task-delete">
 Delete a Task Plan
 </skill>

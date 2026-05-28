@@ -15,9 +15,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Explain Source Code
-===================
-
 <skill name="ase-code-explain">
 Explain Source Code
 </skill>

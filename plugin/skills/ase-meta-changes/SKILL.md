@@ -17,9 +17,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Update ChangeLog Entries
-========================
-
 <skill name="ase-meta-changes">
 Update ChangeLog Entries
 </skill>

@@ -17,9 +17,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Discover Components
-===================
-
 <skill name="ase-arch-discover">
 Discover Components
 </skill>

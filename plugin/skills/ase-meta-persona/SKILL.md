@@ -16,8 +16,9 @@ effort: medium
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
+<skill name="ase-meta-persona">
 Persona Configuration
-=====================
+</skill>
 
 1.  Determine request:
     <request>$ARGUMENTS</request>

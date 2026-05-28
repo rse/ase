@@ -13,9 +13,6 @@ effort: low
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Rename a Task Plan
-==================
-
 <skill name="ase-task-rename">
 Rename a Task Plan
 </skill>

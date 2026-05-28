@@ -18,9 +18,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Search the Internet/Web
-=======================
-
 <skill name="ase-meta-search">
 Search the Internet/Web
 </skill>

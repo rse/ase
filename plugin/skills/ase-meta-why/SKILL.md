@@ -11,9 +11,6 @@ effort: medium
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Five-Whys Root-Cause Analysis
-=============================
-
 <skill name="ase-meta-why">
 Five-Whys Root-Cause Analysis
 </skill>

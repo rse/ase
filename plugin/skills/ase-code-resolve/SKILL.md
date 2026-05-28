@@ -17,9 +17,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-Resolve Problem
-===============
-
 <skill name="ase-code-resolve">
 Resolve Problem
 </skill>

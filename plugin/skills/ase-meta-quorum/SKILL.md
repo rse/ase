@@ -14,9 +14,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Query Multiple AIs for Quorum Answer
-====================================
-
 <skill name="ase-meta-quorum">
 Query Multiple AIs for Quorum Answer
 </skill>

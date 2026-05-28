@@ -15,9 +15,6 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-Implement a Task Plan
-=====================
-
 <skill name="ase-task-implement">
 Implement a Task Plan
 </skill>

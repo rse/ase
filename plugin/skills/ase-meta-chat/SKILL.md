@@ -15,9 +15,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Query Foreign LLM for Chat
-==========================
-
 <skill name="ase-meta-chat">
 Query Foreign LLM for Chat
 </skill>

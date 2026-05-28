@@ -13,9 +13,6 @@ effort: low
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-Task List
-=========
-
 <skill name="ase-task-list">
 List Task Plans
 </skill>

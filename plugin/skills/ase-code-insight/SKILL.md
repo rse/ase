@@ -18,9 +18,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Project Insight
-===============
-
 <skill name="ase-code-insight">
 Project Insight
 </skill>

@@ -17,9 +17,6 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-Iteratively Edit a Task Plan
-============================
-
 <skill name="ase-task-edit">
 Iteratively Edit a Task Plan
 </skill>

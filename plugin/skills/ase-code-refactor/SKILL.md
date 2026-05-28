@@ -17,9 +17,6 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-Refactor Artifacts
-==================
-
 <skill name="ase-code-refactor">
 Refactor Artifacts
 </skill>

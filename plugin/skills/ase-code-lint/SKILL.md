@@ -14,9 +14,6 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-Lint Source Code
-================
-
 <skill name="ase-code-lint">
 Lint Source Code
 </skill>

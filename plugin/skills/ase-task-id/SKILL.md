@@ -13,9 +13,6 @@ effort: low
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-Task Configuration
-==================
-
 <skill name="ase-task-id">
 Configure Task Id
 </skill>

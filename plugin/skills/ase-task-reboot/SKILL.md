@@ -15,9 +15,6 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-Reboot a Task Plan
-==================
-
 <skill name="ase-task-reboot">
 Reboot a Task Plan
 </skill>
