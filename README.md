@@ -30,6 +30,9 @@ Development*.
 > from pre-defined skills which incorporate reasonable methodology and
 > automation aspects to boost their productivity.
 
+Notices
+-------
+
 > [!NOTE]
 > The discipline of [*Agentic Software Engineering*](docs/agentic-software-engineering.md)
 > in *general* is *Software Engineering*, supported by autonomous *AI
