@@ -359,7 +359,7 @@ task-driven skills, and funnel skills.
 
 <table>
 <tr>
-<td width="50%" valign="top">
+<td width="33%" valign="top">
 
 Meta:
 - [`ase-meta-why`](plugin/skills/ase-meta-why/help.md)
@@ -371,6 +371,9 @@ Meta:
 - [`ase-meta-changes`](plugin/skills/ase-meta-changes/help.md)
 - [`ase-meta-commit`](plugin/skills/ase-meta-commit/help.md)
 - [`ase-meta-persona`](plugin/skills/ase-meta-persona/help.md)
+
+</td>
+<td width="33%" valign="top">
 
 Task Mode:
 - [`ase-task-id`](plugin/skills/ase-task-id/help.md)
@@ -384,9 +387,9 @@ Task Mode:
 - [`ase-task-delete`](plugin/skills/ase-task-delete/help.md)
 
 </td>
-<td width="50%" valign="top">
+<td width="33%" valign="top">
 
-Code:
+Code/Docs/Arch:
 - [`ase-code-craft`](plugin/skills/ase-code-craft/help.md)
 - [`ase-code-resolve`](plugin/skills/ase-code-resolve/help.md)
 - [`ase-code-refactor`](plugin/skills/ase-code-refactor/help.md)
@@ -394,11 +397,7 @@ Code:
 - [`ase-code-insight`](plugin/skills/ase-code-insight/help.md)
 - [`ase-code-explain`](plugin/skills/ase-code-explain/help.md)
 - [`ase-code-lint`](plugin/skills/ase-code-lint/help.md)
-
-Docs:
 - [`ase-docs-proofread`](plugin/skills/ase-docs-proofread/help.md)
-
-Arch:
 - [`ase-arch-analyze`](plugin/skills/ase-arch-analyze/help.md)
 - [`ase-arch-discover`](plugin/skills/ase-arch-discover/help.md)
 
