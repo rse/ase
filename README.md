@@ -267,7 +267,7 @@ Features
   Additionally, skills load more meta descriptions on demand. This
   allows skills to reuse definitions.
 
-- [**Task Skills**](plugin/skills/) (MANDATORY, 85% done):
+- [**Task Skills**](plugin/skills/) (MANDATORY, 90% done):
   Recurring tasks are supported with dedicated skills, based on the
   configured parameters. This allows controlling the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
@@ -360,7 +360,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 
 [![workflow](docs/workflow.svg)](docs/workflow.pdf)
 
-<table width="100%">
+<table style="width: 100%;">
 <tr>
 <td width="33%" valign="top">
 
