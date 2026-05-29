@@ -22,6 +22,14 @@ the most important, recurring work-steps in the primary disciplines
 of *Software Engineering*, especially in the discipline *Software
 Development*.
 
+**ASE** is primarily motivated by the following statement of *Dr. Ralf S. Engelschall*:
+
+> Software developers in the industrial Software Engineering context,
+> using the Agentic AI Coding tools *Claude Code* (or alternatively
+> *Github Copilot CLI*), in their daily recurring tasks, should leverage
+> from pre-defined skills which incorporate reasonable methodology and
+> automation aspects to boost their productivity.
+
 > [!NOTE]
 > The discipline of [*Agentic Software Engineering*](docs/agentic-software-engineering.md)
 > in *general* is *Software Engineering*, supported by autonomous *AI
@@ -49,17 +57,6 @@ Development*.
 > again once we have reached at least version 0.9.x! Otherwise, feel
 > free to join us on our journey towards [*Agentic Software
 > Engineering*](docs/agentic-software-engineering.md).
-
-Motivation
-----------
-
-**ASE** is primarily motivated by the following statement of *Dr. Ralf S. Engelschall*:
-
-> Software developers in the industrial Software Engineering context,
-> using the Agentic AI Coding tools *Claude Code* (or alternatively
-> *Github Copilot CLI*), in their daily recurring tasks, should leverage
-> from pre-defined skills which incorporate reasonable methodology and
-> automation aspects to boost their productivity.
 
 Unique Selling Points
 ---------------------
