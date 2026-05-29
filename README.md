@@ -249,7 +249,11 @@ can leverage all paid "Chat" AI services by just providing the
 Features
 --------
 
-**ASE** provides the following six distinct features:
+**ASE** will provide the following six distinct features. Currently,
+as **ASE** is still under heavy development, not all of them are
+already implemented. Nevertheless, all existing features are already
+fully functional and can be used independent of the still missing
+implementation aspects.
 
 <table>
 <tr>
