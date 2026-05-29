@@ -59,7 +59,7 @@ Motivation
 > using the Agentic AI Coding tools *Claude Code* (or alternatively
 > *Github Copilot CLI*), in their daily recurring tasks, should leverage
 > from pre-defined skills which incorporate reasonable methodology and
-> automation aspects and boost their productivity.
+> automation aspects to boost their productivity.
 
 Unique Selling Points
 ---------------------
