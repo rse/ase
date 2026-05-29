@@ -482,6 +482,7 @@ See Also
 --------
 
 - [claudeX](https://github.com/rse/claudex) (convenience wrapper for Claude Code)
+- [mcp-to-openai](https://github.com/rse/mcp-to-openai) (gateway between MCP and OpenAI-compatible APIs)
 
 Support
 -------
