@@ -360,8 +360,8 @@ mode skills, funnel mode skills and other skills. Each skill is named
 
 [![workflow](docs/workflow.svg)](docs/workflow.pdf)
 
-<table>
-<tr>
+<table width="100%">
+<tr width="100%">
 <td width="25%" valign="top">
 
 Meta:<br/>
