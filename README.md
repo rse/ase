@@ -422,7 +422,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 ### Agent Harness &amp; Operation Modes
 
 When working with **ASE**, the user decides (usually based on the estimated extent
-and complexity of the task to perform) which operation mode to choose:
+and complexity of the particular task to perform) which operation mode to choose:
 
 [![operation-modes](docs/operation-modes.svg)](docs/operation-modes.pdf)
 
@@ -454,19 +454,14 @@ and complexity of the task to perform) which operation mode to choose:
 ### Architecture &amp; Building Blocks
 
 **ASE** primarily consists of a constitution, various skills, and
-corresponding (CLI or MCP driven) tools.
+corresponding (CLI or MCP driven) tools. The **ASE** tricks are: (1)
+hooks are used to enforce the pre-loading of information (constitution),
+(2) the skills share common meta information for advanced features, (3)
+the skills partially delegate operations to the underlying MCP service,
+and (4) the MCP service connects to an automatically started background
+service process per project.
 
 [![building-blocks](docs/building-blocks.svg)](docs/building-blocks.pdf)
-
-Documentation
--------------
-
-- [Setup: Installation, Update, Uninstallation](docs/setup.md)
-- [Configuration: Parameters](docs/configuration.md)
-- [Architecture: Building Blocks](docs/building-blocks.md)
-- [Usage: Plugin Skills](docs/usage-plugin.md)
-- [Usage: Plugin Tool](docs/usage-tool.md)
-- [Workflow](docs/workflow.md)
 
 See Also
 --------
