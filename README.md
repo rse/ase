@@ -63,50 +63,50 @@ see whether **ASE** is right for you:
 - **Boosted Sessions**:
   You want to speed up your interactive sessions and at the same time
   reduce costs by reducing the amount of produced LLM output tokens?
-  &rarr; `/ase-meta-persona engineer` or even `/ase-meta-persona caveman`
+  &rarr; [`/ase-meta-persona`](plugin/skills/ase-meta-persona/help.md) `engineer` or even [`/ase-meta-persona`](plugin/skills/ase-meta-persona/help.md) `caveman`
 
 - **Alternative Approach Funnel**:
   You prefer a plan-driven approach, but the agent harness's
   Plan Mode is too unstructured and too direct because you want to
   leverage a funnel of alternative approaches first?
-  &rarr; `/ase-code-craft hello: "ase hello" CLI command which prints a nice "Hello World" in red`
+  &rarr; [`/ase-code-craft`](plugin/skills/ase-code-craft/help.md) `hello: "ase hello" CLI command which prints a nice "Hello World" in red`
 
 - **Named and Persisted Plans**:
   You prefer a plan-driven approach, but the agent harness's Plan Mode is
   regularly too weak, because you want named, persisted, cross-session
   reachable, and strictly structured plans?
-  &rarr; `/ase-task-edit hello`
+  &rarr; [`/ase-task-edit`](plugin/skills/ase-task-edit/help.md) `hello`
 
 - **Implementation Preflights**:
   You prefer a plan-driven approach, but want to pre-flight the
   implementation without later having to rewind artifacts via the version
   control system or the agent harness's session history?
-  &rarr; `/ase-task-preflight hello`
+  &rarr; [`/ase-task-preflight`](plugin/skills/ase-task-preflight/help.md) `hello`
 
 - **Project Insights**:
   You want to get a quick insight into a project by determining
   the author, the source files with the most churn, and the module
   structure?
-  &rarr; `/ase-code-insight @tool`
+  &rarr; [`/ase-code-insight`](plugin/skills/ase-code-insight/help.md) `@tool`
 
 - **Code Comprehension**:
   You want to better comprehend code by finding focused information on
   What, Why, Analogy, Diagram, Cruxes, and Gotchas?
-  &rarr; `/ase-code-explain @tool/src/*.ts`
+  &rarr; [`/ase-code-explain`](plugin/skills/ase-code-explain/help.md) `@tool/src/*.ts`
 
 - **Lexical Code Analysis**:
   You want to analyze code for potential problems
   related to a standard set of code quality aspects?
-  &rarr; `/ase-code-lint @tool/src/*.ts`
+  &rarr; [`/ase-code-lint`](plugin/skills/ase-code-lint/help.md) `@tool/src/*.ts`
 
 - **Document Proofreading**:
   You want your text documents checked and corrected for spelling,
   punctuation, and grammar errors?
-  &rarr; `/ase-docs-proofread @README.md`
+  &rarr; [`/ase-docs-proofread`](plugin/skills/ase-docs-proofread/help.md) `@README.md`
 
 - **Direct Skill Usage Help**:
   You want usage help for skills directly within your agent tool sessions?
-  &rarr; `/ase-xxx-xxx --help`
+  &rarr; `/ase-xxx-xxx` `--help`
 
 </td>
 <td width="50%" valign="top">
@@ -114,41 +114,41 @@ see whether **ASE** is right for you:
 - **Logical Code Analysis**:
   You want to analyze code for potential problems
   in its logic, semantics, and control flow?
-  &rarr; `/ase-code-analyze @tool/src/*.ts`
+  &rarr; [`/ase-code-analyze`](plugin/skills/ase-code-analyze/help.md) `@tool/src/*.ts`
 
 - **Automated Change Logs**:
   You want to get your `CHANGELOG.md` entries
   automatically derived from your recent Git commits?
-  &rarr; `/ase-meta-changes`
+  &rarr; [`/ase-meta-changes`](plugin/skills/ase-meta-changes/help.md)
 
 - **Root-Cause Analysis**:
   You want to understand the reason for a fact with the help of the
   "Five-Whys" root-cause determination method?
-  &rarr; `/ase-meta-why is the Decibel (dB) unit a logarithmic one?`
+  &rarr; [`/ase-meta-why`](plugin/skills/ase-meta-why/help.md) `is the Decibel (dB) unit a logarithmic one?`
 
 - **Research Quorum**:
   You want to research a fact by asking multiple (potentially available)
   foreign LLMs and methodologically derive a quorum answer?
-  &rarr; `/ase-meta-quorum What is Agentic Software Engineering?`
+  &rarr; [`/ase-meta-quorum`](plugin/skills/ase-meta-quorum/help.md) `What is Agentic Software Engineering?`
 
 - **Search Engine Consolidation**:
   You want to query multiple (potentially available) search engines
   and derive a consolidated result?
-  &rarr; `/ase-meta-search What is Agentic Software Engineering?`
+  &rarr; [`/ase-meta-search`](plugin/skills/ase-meta-search/help.md) `What is Agentic Software Engineering?`
 
 - **Foreign LLM Query**:
   You want to directly query a (potentially available) foreign LLM?
-  &rarr; `/ase-meta-chat gemini What is Agentic Software Engineering?`
+  &rarr; [`/ase-meta-chat`](plugin/skills/ase-meta-chat/help.md) `gemini What is Agentic Software Engineering?`
 
 - **Package Discovery**:
   You want to be supported in the discovery of suitable packages
   for the establishment of your technology stack?
-  &rarr; `/ase-arch-discover reactive UI DOM rendering`
+  &rarr; [`/ase-arch-discover`](plugin/skills/ase-arch-discover/help.md) `reactive UI DOM rendering`
 
 - **Multi-Criteria Decision Matrices**:
   You want to be supported in the evaluation of alternatives with the
   methodological help of a weighted multi-criteria decision matrix?
-  &rarr; `/ase-meta-evaluate Vue vs. React vs. Angular, focus on TypeScript support and extensibility`
+  &rarr; [`/ase-meta-evaluate`](plugin/skills/ase-meta-evaluate/help.md) `Vue vs. React vs. Angular, focus on TypeScript support and extensibility`
 
 - **Convenient Foreign MCP Server Setup**:
   You have API keys for popular AI chat services and/or Web search services
