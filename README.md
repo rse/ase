@@ -357,7 +357,7 @@ task-driven skills, and funnel skills.
 
 [![workflow](docs/workflow.svg)](docs/workflow.pdf)
 
-<table>
+<table width="100%">
 <tr>
 <td width="33%" valign="top">
 
