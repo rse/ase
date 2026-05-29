@@ -346,14 +346,17 @@ The following gives a short overview of the concepts and building blocks of **AS
 We can distinguish multiple levels of Agentic AI Coding. **ASE**
 focuses on the levels 1-3, i.e., it supports the assisted, agentic, and
 delegated modes of operation best. **ASE** is especially not intended
-for the fully autonomous agent mode of operation.
+for the fully autonomous agent mode of operation, although the `--auto`
+and `--next` options of various skills allow non-interactive use.
 
 [![building-blocks](docs/agentic-levels.svg)](docs/agentic-levels.pdf)
 
 ### Skills &amp; Workflow
 
-The **ASE** skills can be classified into standalone/meta skills,
-task-driven skills, and funnel skills.
+The **ASE** skills can be classified into standalone/meta skills, task
+mode skills, funnel mode skills and other skills. Each skill is named
+`ase-xxx-xxx` and can be directly called with `/ase-xxx-xxx [options]
+[arguments]` from within the agent tool.
 
 [![workflow](docs/workflow.svg)](docs/workflow.pdf)
 
@@ -389,17 +392,19 @@ Task Mode:
 </td>
 <td width="33%" valign="top">
 
-Code/Docs/Arch:
+Funnel Mode:
+- [`ase-arch-analyze`](plugin/skills/ase-arch-analyze/help.md)
+- [`ase-code-analyze`](plugin/skills/ase-code-analyze/help.md)
 - [`ase-code-craft`](plugin/skills/ase-code-craft/help.md)
 - [`ase-code-resolve`](plugin/skills/ase-code-resolve/help.md)
 - [`ase-code-refactor`](plugin/skills/ase-code-refactor/help.md)
-- [`ase-code-analyze`](plugin/skills/ase-code-analyze/help.md)
+
+Others:
+- [`ase-arch-discover`](plugin/skills/ase-arch-discover/help.md)
 - [`ase-code-insight`](plugin/skills/ase-code-insight/help.md)
 - [`ase-code-explain`](plugin/skills/ase-code-explain/help.md)
 - [`ase-code-lint`](plugin/skills/ase-code-lint/help.md)
 - [`ase-docs-proofread`](plugin/skills/ase-docs-proofread/help.md)
-- [`ase-arch-analyze`](plugin/skills/ase-arch-analyze/help.md)
-- [`ase-arch-discover`](plugin/skills/ase-arch-discover/help.md)
 
 </td>
 </tr>
