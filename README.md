@@ -430,6 +430,10 @@ and complexity of the particular task to perform) which operation mode to choose
 
 [![operation-modes](docs/operation-modes.svg)](docs/operation-modes.pdf)
 
+<table>
+<tr>
+<td width="50%" valign="top">
+
 1. **Ad-Hoc Mode** (**Claude Code**):
    The default mode of the agent harness where the user just ad-hoc
    enters a prompt with an instruction. The instructions are persisted only
@@ -440,6 +444,9 @@ and complexity of the particular task to perform) which operation mode to choose
    dedicated "plan mode" to initially craft and then continuously refine
    a plan. The plan has an ad-hoc format and is persisted internally
    by the agent, but is available in the current session only.
+
+</td>
+<td width="50%" valign="top">
 
 3. **Task Mode** (**ASE**):
    The more advanced mode of **ASE** where the user initially crafts and
@@ -454,6 +461,10 @@ and complexity of the particular task to perform) which operation mode to choose
    and then finally this switches over to the regular **Task Mode**.
    The task plan has a fixed format and is persisted by **ASE** and
    hence is available across agent sessions.
+
+</td>
+</tr>
+</table>
 
 ### Architecture &amp; Building Blocks
 
