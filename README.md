@@ -373,46 +373,46 @@ mode skills, funnel mode skills and other skills. Each skill is named
 <tr width="100%">
 <td width="25%" valign="top">
 
-[**ase-meta-why**](plugin/skills/ase-meta-why/help.md)<br/>
-[**ase-meta-evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
-[**ase-meta-quorum**](plugin/skills/ase-meta-quorum/help.md)<br/>
-[**ase-meta-chat**](plugin/skills/ase-meta-chat/help.md)<br/>
-[**ase-meta-search**](plugin/skills/ase-meta-search/help.md)<br/>
-[**ase-meta-diagram**](plugin/skills/ase-meta-diagram/help.md)<br/>
-[**ase-meta-changes**](plugin/skills/ase-meta-changes/help.md)<br/>
-[**ase-meta-commit**](plugin/skills/ase-meta-commit/help.md)<br/>
-[**ase-meta-persona**](plugin/skills/ase-meta-persona/help.md)<br/>
+[ase-meta-**why**](plugin/skills/ase-meta-why/help.md)<br/>
+[ase-meta-**evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
+[ase-meta-**quorum**](plugin/skills/ase-meta-quorum/help.md)<br/>
+[ase-meta-**chat**](plugin/skills/ase-meta-chat/help.md)<br/>
+[ase-meta-**search**](plugin/skills/ase-meta-search/help.md)<br/>
+[ase-meta-**diagram**](plugin/skills/ase-meta-diagram/help.md)<br/>
+[ase-meta-**changes**](plugin/skills/ase-meta-changes/help.md)<br/>
+[ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
+[ase-meta-**persona**](plugin/skills/ase-meta-persona/help.md)<br/>
 
 </td>
 <td width="25%" valign="top">
 
-[**ase-task-id**](plugin/skills/ase-task-id/help.md)<br/>
-[**ase-task-edit**](plugin/skills/ase-task-edit/help.md)<br/>
-[**ase-task-reboot**](plugin/skills/ase-task-reboot/help.md)<br/>
-[**ase-task-preflight**](plugin/skills/ase-task-preflight/help.md)<br/>
-[**ase-task-implement**](plugin/skills/ase-task-implement/help.md)<br/>
-[**ase-task-view**](plugin/skills/ase-task-view/help.md)<br/>
-[**ase-task-list**](plugin/skills/ase-task-list/help.md)<br/>
-[**ase-task-rename**](plugin/skills/ase-task-rename/help.md)<br/>
-[**ase-task-delete**](plugin/skills/ase-task-delete/help.md)<br/>
+[ase-task-**id**](plugin/skills/ase-task-id/help.md)<br/>
+[ase-task-**edit**](plugin/skills/ase-task-edit/help.md)<br/>
+[ase-task-**reboot**](plugin/skills/ase-task-reboot/help.md)<br/>
+[ase-task-**preflight**](plugin/skills/ase-task-preflight/help.md)<br/>
+[ase-task-**implement**](plugin/skills/ase-task-implement/help.md)<br/>
+[ase-task-**view**](plugin/skills/ase-task-view/help.md)<br/>
+[ase-task-**list**](plugin/skills/ase-task-list/help.md)<br/>
+[ase-task-**rename**](plugin/skills/ase-task-rename/help.md)<br/>
+[ase-task-**delete**](plugin/skills/ase-task-delete/help.md)<br/>
 
 </td>
 <td width="25%" valign="top">
 
-[**ase-arch-analyze**](plugin/skills/ase-arch-analyze/help.md)<br/>
-[**ase-code-analyze**](plugin/skills/ase-code-analyze/help.md)<br/>
-[**ase-code-craft**](plugin/skills/ase-code-craft/help.md)<br/>
-[**ase-code-resolve**](plugin/skills/ase-code-resolve/help.md)<br/>
-[**ase-code-refactor**](plugin/skills/ase-code-refactor/help.md)<br/>
+[ase-arch-**analyze**](plugin/skills/ase-arch-analyze/help.md)<br/>
+[ase-code-**analyze**](plugin/skills/ase-code-analyze/help.md)<br/>
+[ase-code-**craft**](plugin/skills/ase-code-craft/help.md)<br/>
+[ase-code-**resolve**](plugin/skills/ase-code-resolve/help.md)<br/>
+[ase-code-**refactor**](plugin/skills/ase-code-refactor/help.md)<br/>
 
 </td>
 <td width="25%" valign="top">
 
-[**ase-arch-discover**](plugin/skills/ase-arch-discover/help.md)<br/>
-[**ase-code-insight**](plugin/skills/ase-code-insight/help.md)<br/>
-[**ase-code-explain**](plugin/skills/ase-code-explain/help.md)<br/>
-[**ase-code-lint**](plugin/skills/ase-code-lint/help.md)<br/>
-[**ase-docs-proofread**](plugin/skills/ase-docs-proofread/help.md)<br/>
+[ase-arch-**discover**](plugin/skills/ase-arch-discover/help.md)<br/>
+[ase-code-**insight**](plugin/skills/ase-code-insight/help.md)<br/>
+[ase-code-**explain**](plugin/skills/ase-code-explain/help.md)<br/>
+[ase-code-**lint**](plugin/skills/ase-code-lint/help.md)<br/>
+[ase-docs-**proofread**](plugin/skills/ase-docs-proofread/help.md)<br/>
 
 </td>
 </tr>
