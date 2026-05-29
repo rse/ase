@@ -25,7 +25,7 @@ Development*.
 **ASE** is primarily motivated by the following statement of *Dr. Ralf S. Engelschall*:
 
 > "Software developers in the industrial Software Engineering context,
-> using the Agentic AI Coding tools *Claude Code* (or alternatively
+> using the Agentic AI Coding tool *Claude Code* (or alternatively
 > *Github Copilot CLI*), in their daily recurring tasks, should leverage
 > from pre-manufactured skills which incorporate reasonable methodology
 > and automation aspects to boost their productivity."
