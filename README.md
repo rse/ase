@@ -361,10 +361,18 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [![workflow](docs/workflow.svg)](docs/workflow.pdf)
 
 <table width="100%">
+<thead>
+<tr>
+<th width="25%">Meta:</th>
+<th width="25%">Task Mode:</th>
+<th width="25%">Funnel Mode:</th>
+<th width="25%">Other:</th>
+</tr>
+</thead>
+<tbody>
 <tr width="100%">
 <td width="25%" valign="top">
 
-Meta:<br/>
 [**ase-meta-why**](plugin/skills/ase-meta-why/help.md)<br/>
 [**ase-meta-evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
 [**ase-meta-quorum**](plugin/skills/ase-meta-quorum/help.md)<br/>
@@ -378,7 +386,6 @@ Meta:<br/>
 </td>
 <td width="25%" valign="top">
 
-Task Mode:<br/>
 [**ase-task-id**](plugin/skills/ase-task-id/help.md)<br/>
 [**ase-task-edit**](plugin/skills/ase-task-edit/help.md)<br/>
 [**ase-task-reboot**](plugin/skills/ase-task-reboot/help.md)<br/>
@@ -392,7 +399,6 @@ Task Mode:<br/>
 </td>
 <td width="25%" valign="top">
 
-Funnel Mode:<br/>
 [**ase-arch-analyze**](plugin/skills/ase-arch-analyze/help.md)<br/>
 [**ase-code-analyze**](plugin/skills/ase-code-analyze/help.md)<br/>
 [**ase-code-craft**](plugin/skills/ase-code-craft/help.md)<br/>
@@ -402,7 +408,6 @@ Funnel Mode:<br/>
 </td>
 <td width="25%" valign="top">
 
-Others:<br/>
 [**ase-arch-discover**](plugin/skills/ase-arch-discover/help.md)<br/>
 [**ase-code-insight**](plugin/skills/ase-code-insight/help.md)<br/>
 [**ase-code-explain**](plugin/skills/ase-code-explain/help.md)<br/>
@@ -411,6 +416,7 @@ Others:<br/>
 
 </td>
 </tr>
+</tbody>
 </table>
 
 ### Agent Harness &amp; Operation Modes
