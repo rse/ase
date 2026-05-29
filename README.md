@@ -34,7 +34,7 @@ Notices
 -------
 
 > [!NOTE]
-> The discipline of [*Agentic Software Engineering*](docs/agentic-software-engineering.md)
+> **TERMINOLOGY**: The discipline of [*Agentic Software Engineering*](docs/agentic-software-engineering.md)
 > in *general* is *Software Engineering*, supported by autonomous *AI
 > Agents* to perform tasks across the software development lifecycle.
 > This **ASE** product in *particular* is also *agentic*, but not
@@ -44,7 +44,7 @@ Notices
 > but still strongly focuses on Human-in-the-Loop.
 
 > [!NOTE]
-> The primary focus of **ASE** is on the Agentic AI Coding tool [*Claude
+> **TOOL SUPPORT FOCUS**: The primary focus of **ASE** is on the Agentic AI Coding tool [*Claude
 > Code*](https://code.claude.com). The secondary focus is on the support
 > for [*GitHub Copilot CLI*](https://github.com/features/copilot/cli)
 > (just set environment variable `ASE_TOOL=copilot`). In the future,
@@ -53,7 +53,7 @@ Notices
 > user dialog tool, etc.) realistically allow it.
 
 > [!CAUTION]
-> **ASE** is still under active initial development and
+> **DEVELOPMENT STATE**: **ASE** is still under active initial development and
 > somewhat incomplete. All existing functionality is already
 > stable and used on a daily basis in production. If you are not
 > a steadfast early adopter, it is perhaps better to visit this project
