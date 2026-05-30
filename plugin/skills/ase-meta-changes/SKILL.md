@@ -5,7 +5,7 @@ description: >
     Update changes entries in CHANGELOG.md files
 user-invocable: true
 disable-model-invocation: false
-effort: medium
+effort: high
 allowed-tools:
     - "Bash(git log *)"
     - "Bash(git diff *)"

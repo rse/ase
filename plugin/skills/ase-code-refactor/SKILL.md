@@ -6,7 +6,7 @@ description: >
     Use when user wants to refactor the code base.
 user-invocable: true
 disable-model-invocation: false
-effort: high
+effort: xhigh
 allowed-tools:
     - "Skill"
     - "Agent"

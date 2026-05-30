@@ -10,7 +10,7 @@ description: >
     Use when user says "persona <persona>" or "be <persona>".
 user-invocable: true
 disable-model-invocation: false
-effort: medium
+effort: high
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md

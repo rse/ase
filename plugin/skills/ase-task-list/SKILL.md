@@ -6,7 +6,7 @@ description: >
     Use when user wants to see all tasks.
 user-invocable: true
 disable-model-invocation: false
-effort: low
+effort: high
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md

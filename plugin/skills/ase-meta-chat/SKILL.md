@@ -7,7 +7,7 @@ description: >
     DeepSeek or xAI Grok should be queried with a single chat message.
 user-invocable: true
 disable-model-invocation: false
-effort: low
+effort: medium
 allowed-tools:
     - "Agent"
 ---

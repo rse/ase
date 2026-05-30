@@ -6,7 +6,7 @@ description: >
     Use when user wants to create or craft a new feature from scratch.
 user-invocable: true
 disable-model-invocation: false
-effort: high
+effort: xhigh
 allowed-tools:
     - "Skill"
     - "Agent"

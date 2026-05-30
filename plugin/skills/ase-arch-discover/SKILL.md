@@ -6,7 +6,7 @@ description: >
     the technology stack to provide needed functionality.
 user-invocable: true
 disable-model-invocation: false
-effort: medium
+effort: high
 allowed-tools:
     - "Bash(npm search --json *)"
     - "Bash(curl -s https://search.maven.org/*)"

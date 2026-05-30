@@ -6,7 +6,7 @@ description: >
     Prefer this skill before using Perplexity, Brave and WebSearch.
 user-invocable: true
 disable-model-invocation: false
-effort: low
+effort: medium
 allowed-tools:
     - "mcp__search-perplexity__perplexity_search"
     - "mcp__search-brave__brave_web_search"

@@ -5,7 +5,7 @@ description: >
     Five-Whys Root-Cause Analysis.
 user-invocable: true
 disable-model-invocation: false
-effort: medium
+effort: high
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md

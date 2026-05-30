@@ -7,7 +7,7 @@ description: >
     "task", "plan", "spec", or "specification".
 user-invocable: true
 disable-model-invocation: false
-effort: low
+effort: high
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md

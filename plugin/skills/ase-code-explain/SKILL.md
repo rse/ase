@@ -6,7 +6,7 @@ description: >
     Use when you want to know how code works or when the user asks "how does this work?"
 user-invocable: true
 disable-model-invocation: false
-effort: medium
+effort: high
 allowed-tools:
     - "Skill"
     - "Agent"
