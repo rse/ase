@@ -25,6 +25,10 @@ The following ASE commands/skills exist on the meta-level:
   Evaluate alternatives through an ad-hoc weighted multi-criteria
   decision matrix.
 
+- **/ase-meta-diaboli** *thesis*:<br/>
+  Challenge a thesis by relentlessly playing *Devil's Advocate* (latin:
+  *Advocatus Diaboli*), then derive a *Hegelian* synthesis.
+
 - **/ase-meta-persona** \[*persona*\]:<br/>
   Adjust communication style in four intensity levels of token usage.
   The *persona* can be either a decorative, eloquent, and explaining
@@ -64,6 +68,10 @@ The following ASE commands/skills exist on the task-level:
 - **/ase-task-edit** \[*id*\]:<br/>
   Iteratively craft and refine a named task plan through a
   conversational loop, without using *Claude Code Plan Mode*.
+
+- **/ase-task-grill** \[*id*\]:<br/>
+  Relentlessly interview the user about every essential aspect of the
+  task plan until a shared understanding is reached.
 
 - **/ase-task-view** \[*id*\]:<br/>
   View the current or given task plan.

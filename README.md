@@ -92,6 +92,13 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-task-edit`](plugin/skills/ase-task-edit/help.md)
   `hello`
 
+- **Plan Stress-Testing**:
+  You have a task plan, but want to be relentlessly grilled about every
+  essential aspect of it until you and the agent reach a shared
+  understanding and no open decisions remain?
+  &rarr; [`/ase-task-grill`](plugin/skills/ase-task-grill/help.md)
+  `hello`
+
 - **Implementation Preflights**:
   You prefer a plan-driven approach, but want to pre-flight the
   implementation without later having to rewind artifacts via the version
@@ -153,6 +160,12 @@ see whether **ASE** is right for you:
   foreign LLMs and methodologically derive a quorum answer?
   &rarr; [`/ase-meta-quorum`](plugin/skills/ase-meta-quorum/help.md)
   `What is Agentic Software Engineering?`
+
+- **Devil's Advocate Challenge**:
+  You want a thesis or statement relentlessly challenged and criticised,
+  and finally resolved into a balanced Hegelian synthesis?
+  &rarr; [`/ase-meta-diaboli`](plugin/skills/ase-meta-diaboli/help.md)
+  `The Decibel (dB) is an intuitive unit.`
 
 - **Search Engine Consolidation**:
   You want to query multiple (potentially available) search engines
@@ -405,6 +418,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 <td width="25%" valign="top">
 
 [ase-meta-**why**](plugin/skills/ase-meta-why/help.md)<br/>
+[ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md)<br/>
 [ase-meta-**evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
 [ase-meta-**quorum**](plugin/skills/ase-meta-quorum/help.md)<br/>
 [ase-meta-**chat**](plugin/skills/ase-meta-chat/help.md)<br/>
@@ -419,6 +433,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 
 [ase-task-**id**](plugin/skills/ase-task-id/help.md)<br/>
 [ase-task-**edit**](plugin/skills/ase-task-edit/help.md)<br/>
+[ase-task-**grill**](plugin/skills/ase-task-grill/help.md)<br/>
 [ase-task-**reboot**](plugin/skills/ase-task-reboot/help.md)<br/>
 [ase-task-**preflight**](plugin/skills/ase-task-preflight/help.md)<br/>
 [ase-task-**implement**](plugin/skills/ase-task-implement/help.md)<br/>
