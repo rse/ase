@@ -6,8 +6,8 @@ description: >
     Use when the user calls to "delete", "remove" or "clear" the
     "task", "plan", "spec", or "specification".
 user-invocable: true
-disable-model-invocation: false
-effort: low
+disable-model-invocation: true
+effort: medium
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md

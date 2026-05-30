@@ -17,10 +17,11 @@ set placeholders into the context as a side-effect.
     contains no options at all):
 
     For each option token in <getopt-spec/> of the form
-    `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)]`, set
+    `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)[...]]`, set
     <getopt-option-<long/>/> to <default/> (for `=<default/>`
     form), or to <c1/> (the first choice, for `=(<c1/>|<c2>/|...)`
-    form), or to `false` (for value-less options). Then set
+    form, or for the list form `=(<c1/>|<c2>/|...)...`),
+    or to `false` (for value-less options). Then set
     <getopt-arguments><getopt-args/></getopt-arguments>.
 
     Additionally, simulate <getopt-info/> as a comma-separated
@@ -37,10 +38,16 @@ set placeholders into the context as a side-effect.
     "<getopt-spec/>", args: "<getopt-args/>")` tool of the `ase`
     MCP server and set <text/> to the `text` output field of
     this tool call. The `spec` syntax for each option token is
-    `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)]`, where
-    `=<default>` declares a value-taking option with a default, and
+    `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)[...]]`, where
+    `=<default>` declares a value-taking option with a default,
     `=(<c1>|<c2>|...)` declares a value-taking option restricted to the
-    listed fixed choices (the first choice acts as the default).
+    listed fixed choices (the first choice acts as the default), and the
+    trailing `...` (as in `=(<c1>|<c2>|...)...`) declares a value-taking
+    option whose value is a *comma-separated list* of choice tokens
+    (the first choice still acts as the default; only the *first*
+    token of the list is validated by the parser against the choice
+    set -- subsequent tokens are *not* validated, and skills validate
+    each remaining token themselves as they consume it).
 
 4.  **Short-Circuit for Error**:
     If <text/> starts with `ERROR:`:
