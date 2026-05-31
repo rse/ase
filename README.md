@@ -41,25 +41,29 @@ impression of **ASE**.
 <tr>
 <td width="25%" valign="top">
 
-*Mix of Skills*:<br/>
+*Mix of Skills*:
+
 [![ase-mix-1](https://rse.github.io/ase-media/ase-mix-1.jpg)](https://rse.github.io/ase-media/ase-mix-1.mp4)
 
 </td>
 <td width="25%" valign="top">
 
-[ase-arch-**discover**](plugin/skills/ase-arch-discover/help.md)<br/>
+[ase-arch-**discover**](plugin/skills/ase-arch-discover/help.md):
+
 [![ase-arch-discover](https://rse.github.io/ase-media/ase-arch-discover.jpg)](https://rse.github.io/ase-media/ase-arch-discover.mp4)
 
 </td>
 <td width="25%" valign="top">
 
-[ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md)<br/>
+[ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md):
+
 [![ase-meta-diaboli](https://rse.github.io/ase-media/ase-meta-diaboli.jpg)](https://rse.github.io/ase-media/ase-meta-diaboli.mp4)
 
 </td>
 <td width="25%" valign="top">
 
-[ase-code-**analyze**](plugin/skills/ase-code-analyze/help.md)<br/>
+[ase-code-**analyze**](plugin/skills/ase-code-analyze/help.md):
+
 [![ase-code-analyze](https://rse.github.io/ase-media/ase-code-analyze.jpg)](https://rse.github.io/ase-media/ase-code-analyze.mp4)
 
 </td>
