@@ -52,14 +52,12 @@ get an impression of **ASE**.
 
 [![ase-mix-2](https://rse.github.io/ase-media/ase-mix-2.jpg)](https://rse.github.io/ase-media/ase-mix-2.mp4)
 
-[ase-arch-**discover**](plugin/skills/ase-arch-discover/help.md):
-
 </td>
 <td width="33%" valign="top">
 
-[ase-code-**analyze**](plugin/skills/ase-code-analyze/help.md):
+*Mix of Skills #3*:
 
-[![ase-code-analyze](https://rse.github.io/ase-media/ase-code-analyze.jpg)](https://rse.github.io/ase-media/ase-code-analyze.mp4)
+[![ase-mix-3](https://rse.github.io/ase-media/ase-mix-3.jpg)](https://rse.github.io/ase-media/ase-mix-3.mp4)
 
 </td>
 </tr>
