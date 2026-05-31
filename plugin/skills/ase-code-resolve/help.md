@@ -9,6 +9,7 @@
     [`--help`|`-h`]
     [`--auto`|`-a`]
     [`--dry`|`-d`]
+    [`--quick`|`-Q`]
     [`--next`|`-n` *option*[,...]]
     [*task-id*:] *problem*
 
@@ -43,6 +44,13 @@ plan via `ase_task_save` and then hands off to `ase-task-edit`,
     the entire verification phase (no build, tests, linter,
     type-checker, or program execution) once the source files have
     been modified.
+
+`--quick`|`-Q`:
+    Shorthand alias for `-a -d -n IMPLEMENT,DELETE`: automatically pick
+    the recommended resolution approach, compose the plan *without* the
+    `※ VERIFICATION` section, immediately hand off to `ase-task-implement`,
+    and finally `ase-task-delete` the now-consumed plan. This gives a
+    single, fast *one-shot* resolution mode.
 
 `--next`|`-n` *option*[,...]:
     Automatically choose the next step after composing the plan.

@@ -1,6 +1,6 @@
 ---
 name: ase-code-resolve
-argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--next|-n <option>[,...]] [<task-id>:] <problem>"
+argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--quick|-Q] [--next|-n <option>[,...]] [<task-id>:] <problem>"
 description: >
     Resolve Problem:
     Use when user wants a bug fixed or problem resolved.
@@ -23,9 +23,15 @@ Resolve Problem
 
 <expand name="getopt"
     arg1="ase-code-resolve"
-    arg2="--auto|-a --dry|-d --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)...">
+    arg2="--auto|-a --dry|-d --quick|-Q --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)...">
     $ARGUMENTS
 </expand>
+
+<if condition="<getopt-option-quick/> is equal `true`">
+The `--quick`/`-Q` flag is a *shorthand alias*: set <getopt-option-auto/>
+to `true`, <getopt-option-dry/> to `true`, and <getopt-option-next/> to
+`IMPLEMENT,DELETE`. Do not output anything.
+</if>
 
 <objective>
 *Resolve* the following problem:

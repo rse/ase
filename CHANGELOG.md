@@ -2,8 +2,11 @@
 ChangeLog
 =========
 
-0.0.60 (2026-06-01)
+0.0.60 (2026-05-31)
 -------------------
+
+- IMPROVEMENT: add -Q/--quick option as an alias for "-a -d -n IMPLEMENT,DELETE" in ase-code-{craft,refactor,resolve} skills
+- BUGFIX: allow once again the "ase-task-delete" to be called from other skills
 
 0.0.59 (2026-05-31)
 -------------------

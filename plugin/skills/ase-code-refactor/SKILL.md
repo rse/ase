@@ -1,6 +1,6 @@
 ---
 name: ase-code-refactor
-argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--next|-n <option>[,...]] [<task-id>:] <request>"
+argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--quick|-Q] [--next|-n <option>[,...]] [<task-id>:] <request>"
 description: >
     Refactor Code Base:
     Use when user wants to refactor the code base.
@@ -23,9 +23,15 @@ Refactor Artifacts
 
 <expand name="getopt"
     arg1="ase-code-refactor"
-    arg2="--auto|-a --dry|-d --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)...">
+    arg2="--auto|-a --dry|-d --quick|-Q --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)...">
     $ARGUMENTS
 </expand>
+
+<if condition="<getopt-option-quick/> is equal `true`">
+The `--quick`/`-Q` flag is a *shorthand alias*: set <getopt-option-auto/>
+to `true`, <getopt-option-dry/> to `true`, and <getopt-option-next/> to
+`IMPLEMENT,DELETE`. Do not output anything.
+</if>
 
 <objective>
 *Refactor* existing artifacts the following way:

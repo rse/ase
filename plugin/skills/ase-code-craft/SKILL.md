@@ -1,6 +1,6 @@
 ---
 name: ase-code-craft
-argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--next|-n <option>[,...]] [<task-id>:] <feature>"
+argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--quick|-Q] [--next|-n <option>[,...]] [<task-id>:] <feature>"
 description: >
     Craft Source Code:
     Use when user wants to create or craft a new feature from scratch.
@@ -23,9 +23,15 @@ Craft Source Code
 
 <expand name="getopt"
     arg1="ase-code-craft"
-    arg2="--auto|-a --dry|-d --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)...">
+    arg2="--auto|-a --dry|-d --quick|-Q --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)...">
     $ARGUMENTS
 </expand>
+
+<if condition="<getopt-option-quick/> is equal `true`">
+The `--quick`/`-Q` flag is a *shorthand alias*: set <getopt-option-auto/>
+to `true`, <getopt-option-dry/> to `true`, and <getopt-option-next/> to
+`IMPLEMENT,DELETE`. Do not output anything.
+</if>
 
 <objective>
 From scratch *craft* the following feature:
