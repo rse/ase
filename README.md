@@ -33,9 +33,10 @@ Development*.
 Sneak Preview
 -------------
 
-The following are sneak previews of **ASE** skills in action. Click onto
-the screenshots to watch the scripted and pre-recorded demo sessions to
-get an impression of **ASE**.
+The following are sneak previews of **ASE** skills in action. Click
+onto the screenshots to watch the scripted and pre-recorded demo
+sessions to get an impression of **ASE**. Find more such demo sessions
+[here](https://rse.github.io/ase-media/).
 
 <table>
 <tr>
