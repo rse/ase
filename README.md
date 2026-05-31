@@ -30,6 +30,13 @@ Development*.
 > from pre-manufactured skills which incorporate reasonable methodology
 > and automation aspects to boost their productivity."
 
+Sneak Preview
+-------------
+
+The following is a sneak preview of **ASE** skills in action. Click onto
+the animated image to discover more pre-recorded demo sessions to get an
+impression of **ASE**.
+
 [![sample](https://rse.github.io/ase-media/ase-meta-diaboli.gif)](https://rse.github.io/ase-media/)
 
 Notices
