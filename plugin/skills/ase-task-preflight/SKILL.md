@@ -30,6 +30,8 @@ Preflight a Task Plan
 for a corresponding, *complete source code change set*.
 </objective>
 
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
+
 Procedure
 ---------
 

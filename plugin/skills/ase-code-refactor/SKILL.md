@@ -32,7 +32,7 @@ Refactor Artifacts
 <request><getopt-arguments/></request>
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
 
 Procedure
 ---------

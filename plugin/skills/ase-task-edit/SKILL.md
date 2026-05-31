@@ -34,7 +34,7 @@ continued refinement, finalization, or hand-off to implementation or
 preflight.
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
 
 Procedure
 ---------

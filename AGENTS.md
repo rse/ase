@@ -55,7 +55,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     `ase-skill.md` (skill-authoring guide), `ase-control.md`
     (skill control flow), `ase-dialog.md` (user-dialog conventions),
     `ase-getopt.md` (skill option parsing), `ase-persona.md`
-    (persona definitions), and `ase-plan.md` (task-plan conventions).
+    (persona definitions), and `ase-format-plan.md` (task-plan conventions).
 
 The root `README.md` is user-facing install docs;
 `pages/` is the GitHub Pages site (`.github/workflows/static.yml`).
