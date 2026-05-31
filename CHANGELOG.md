@@ -2,13 +2,19 @@
 ChangeLog
 =========
 
-0.0.59 (2026-05-29)
+0.0.59 (2026-05-31)
 -------------------
 
+- FEATURE: add (still unused) ADR format definition in `plugin/meta/ase-format-adr.md`
 - IMPROVEMENT: let -n/--next in ase-code-{craft,resolve,refactor}, ase-task-{edit,implement,preflight,reboot,grill} accept a comma-separated chronological list of tokens
 - IMPROVEMENT: add new "ase-task-grill" skill for challenging the task aspects
 - IMPROVEMENT: add new "ase-meta-diaboli" skill for playing Devil's Advocate (Advocatus Diaboli)
 - IMPROVEMENT: increase "effort" level in various skills to improve precise operation
+- IMPROVEMENT: substantially rework README (skill mix, sample-session GIF/video, section sorting, rendering)
+- IMPROVEMENT: document `ase-task-grill` and `ase-meta-diaboli` skills (AGENTS.md, README, usage-plugin.md, help)
+- BUGFIX: prevent `ase-getopt` skill from being automatically called by the model
+- UPDATE: refresh workflow diagram for diaboli/grill skills (Graffle/SVG/PDF)
+- CLEANUP: align `ase-meta-why` skill style to other skills
 - CLEANUP: rename plugin/meta/ase-plan.md to plugin/meta/ase-format-plan.md
 
 0.0.58 (2026-05-29)
