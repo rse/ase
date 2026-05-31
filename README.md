@@ -30,6 +30,8 @@ Development*.
 > from pre-manufactured skills which incorporate reasonable methodology
 > and automation aspects to boost their productivity."
 
+[![sample](https://rse.github.io/ase-media/ase-meta-diaboli.gif)](https://rse.github.io/ase-media/)
+
 Notices
 -------
 
