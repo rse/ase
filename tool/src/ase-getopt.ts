@@ -61,7 +61,7 @@ export class GetoptMCP {
 
                 /*  tokenize spec and add one option per token  */
                 const tokens = args.spec.split(/\s+/).filter((e) => e.length > 0)
-                const re = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)|.*))?$/
+                const re = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)(\.\.\.)?|.*))?$/
                 for (const tok of tokens) {
                     const m = re.exec(tok)
                     if (m === null)
@@ -70,14 +70,16 @@ export class GetoptMCP {
                     const short      = m[2] ?? null
                     const valuePart  = m[3] ?? null
                     const choicePart = m[4] ?? null
+                    const listMarker = m[5] ?? null
                     const takesValue = valuePart !== null
                     const choices    = choicePart !== null ? choicePart.split("|") : null
+                    const isList     = listMarker !== null
                     const dflt       = choices !== null ? choices[0] : valuePart
                     const head       = short !== null ? `-${short}, --${long}` : `--${long}`
                     const flags      = takesValue ? `${head} <value>` : head
                     const opt        = new Option(flags)
                     if (takesValue) {
-                        if (choices !== null)
+                        if (choices !== null && !isList)
                             opt.choices(choices)
                         opt.default(dflt)
                     }
@@ -88,6 +90,33 @@ export class GetoptMCP {
 
                 /*  parse args  */
                 cmd.parse(argsVec, { from: "user" })
+
+                /*  validate comma-separated list-of-choices options  */
+                const listOpts: Array<{ long: string, choices: string[] }> = []
+                for (const tok of tokens) {
+                    const m = re.exec(tok)
+                    if (m === null)
+                        continue
+                    const long       = m[1]
+                    const choicePart = m[4] ?? null
+                    const listMarker = m[5] ?? null
+                    if (choicePart !== null && listMarker !== null)
+                        listOpts.push({ long, choices: choicePart.split("|") })
+                }
+                if (listOpts.length > 0) {
+                    const opts = cmd.opts() as Record<string, unknown>
+                    for (const { long, choices } of listOpts) {
+                        const v = opts[long]
+                        if (typeof v !== "string")
+                            continue
+                        const items = v.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
+                        if (items.length > 0 && !choices.includes(items[0]))
+                            throw new Error(
+                                `invalid token "${items[0]}" for --${long} ` +
+                                `(allowed: ${choices.join(", ")})`
+                            )
+                    }
+                }
 
                 /*  compute verbatim trailing argument string  */
                 let argsVerbatim = ""

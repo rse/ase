@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--dry|-d] [--next|-n <option>] [<id> | <id>: <instruction> | <instruction>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--dry|-d] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. Each round, the current plan is shown and the
@@ -23,7 +23,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --dry|-d --next|-n=(none|DONE|IMPLEMENT|PREFLIGHT|REFINE)">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --dry|-d --next|-n=(none|DONE|IMPLEMENT|PREFLIGHT|REFINE)...">
     $ARGUMENTS
 </expand>
 
@@ -333,20 +333,31 @@ Set <content-dirty>true</content-dirty>.
 
     4.  *Determine next step*:
 
-        -   If <getopt-option-next/> matches the regex `^(DONE|IMPLEMENT|PREFLIGHT|REFINE)$`:
-            Honor the pre-selection what to do as the next step.
-            Set <result><getopt-option-next/></result>.
+        -   If <getopt-option-next/> is not equal to `none`:
+            Treat <getopt-option-next/> as a comma-separated chronological
+            list of pre-selected next-step tokens. *Split* it on `,`,
+            take the *first* token as <head/>, and store the remaining
+            tokens (joined back with `,`, or `none` if empty) into
+            <getopt-option-next/> so subsequent loop iterations or
+            downstream skills can consume the tail.
 
-            Then *clear* <getopt-option-next/> by setting
-            <getopt-option-next>none</getopt-option-next> so that
-            subsequent loop iterations fall back to the interactive
-            dialog.
+            -   If <head/> matches the regex `^(DONE|IMPLEMENT|PREFLIGHT|REFINE)$`:
+                Honor the pre-selected token.
+                Set <result><head/></result>.
 
-            Set <instruction></instruction> (clear the instruction, as
-            any instruction carried in via the arguments was already
-            applied to the plan in step 2 before this loop), so that a
-            pre-selected `REFINE` correctly asks the user for a *fresh*
-            refinement instruction below.
+                Set <instruction></instruction> (clear the instruction, as
+                any instruction carried in via the arguments was already
+                applied to the plan in step 2 before this loop), so that a
+                pre-selected `REFINE` correctly asks the user for a *fresh*
+                refinement instruction below.
+
+            -   else:
+                Only output the following <template/> and then immediately
+                *STOP* processing the entire current skill:
+
+                <template>
+                ⧉ **ASE**: ☻ skill: **ase-task-edit**, ▶ ERROR: invalid `--next` token: **<head/>**
+                </template>
 
         -   If <getopt-option-next/> is equal to `none`:
             Let the *user interactively choose* what to do as the next step.
@@ -372,10 +383,14 @@ Set <content-dirty>true</content-dirty>.
 
         -   If <result/> is `IMPLEMENT`:
 
-            *Break* out of the *loop*, only output the following
-            <template/> and then call the `Skill(skill:
-            "ase:ase-task-implement")` tool to *apply* the finalized
-            plan.
+            *Break* out of the *loop*. Set <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
+            Only output the following <template/> and then call the
+            `Skill(skill: "ase:ase-task-implement", args: <args/>)` tool
+            to *apply* the finalized plan.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to implementation**
@@ -383,10 +398,14 @@ Set <content-dirty>true</content-dirty>.
 
         -   If <result/> is `PREFLIGHT`:
 
-            *Break* out of the *loop*, only output the following
-            <template/> and then call the `Skill(skill:
-            "ase:ase-task-preflight")` tool to *apply* the finalized
-            plan.
+            *Break* out of the *loop*. Set <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
+            Only output the following <template/> and then call the
+            `Skill(skill: "ase:ase-task-preflight", args: <args/>)` tool
+            to *apply* the finalized plan.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to pre-flight**

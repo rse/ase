@@ -7,7 +7,7 @@
 
 `ase-task-grill`
     [`--help`|`-h`]
-    [`--next`|`-n` *list*]
+    [`--next`|`-n` *option*[,...]]
     [*id*]
 
 ##  DESCRIPTION
@@ -33,15 +33,17 @@ command from outside the agent tool.
 
 ##  OPTIONS
 
-`--next`|`-n` *list*:
+`--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end
-    of this skill). *list* is a single token or a *comma-separated
+    of this skill). *option* is a single token or a *comma-separated
     chronological list* of tokens; the *first* token is consumed by
     this skill and any remaining tokens are *forwarded* (via `--next`)
     to the downstream skill on hand-off so an entire pipeline can be
     pre-scripted in one shot. Recognized tokens at this skill: `none`
-    (default, interactive answer required), `DONE` (no next step), or
-    `EDIT` (hand-over to `ase-task-edit`).
+    (default, interactive answer required), `DONE` (no next step),
+    `EDIT` (hand-over to `ase-task-edit`), `IMPLEMENT` (hand-over to
+    `ase-task-implement`), or `PREFLIGHT` (hand-over to
+    `ase-task-preflight`).
 
 ##  ARGUMENTS
 

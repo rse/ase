@@ -7,7 +7,7 @@
 
 `ase-task-implement`
     [`--help`|`-h`]
-    [`--next`|`-n` *option*]
+    [`--next`|`-n` *option*[,...]]
     [*id*]
 
 ##  DESCRIPTION
@@ -31,9 +31,13 @@ delete the task plan, unless `--next` pre-selects this choice.
 
 ##  OPTIONS
 
-`--next`|`-n` *option*:
-    Automatically answer the user dialog for the next step with
-    *option*, which can be either `none` (default, interactive
+`--next`|`-n` *option*[,...]:
+    Automatically answer the user dialog for the next step. *option*
+    is a single token or a *comma-separated chronological list* of
+    tokens; the *first* token is consumed by this skill, and any
+    remaining tokens are *forwarded* (via `--next`) to the downstream
+    skill so an entire pipeline can be pre-scripted in one shot.
+    Recognized tokens at this skill: `none` (default, interactive
     answer required), `DONE` (preserve task plan and stop), or
     `DELETE` (hand off to `ase-task-delete`).
 

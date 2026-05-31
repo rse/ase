@@ -5,6 +5,7 @@ ChangeLog
 0.0.59 (2026-05-29)
 -------------------
 
+- IMPROVEMENT: let -n/--next in ase-code-{craft,resolve,refactor}, ase-task-{edit,implement,preflight,reboot,grill} accept a comma-separated chronological list of tokens
 - IMPROVEMENT: add new "ase-task-grill" skill for challenging the task aspects
 - IMPROVEMENT: add new "ase-meta-diaboli" skill for playing Devil's Advocate (Advocatus Diaboli)
 - IMPROVEMENT: increase "effort" level in various skills to improve precise operation

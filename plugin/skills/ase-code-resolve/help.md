@@ -9,7 +9,7 @@
     [`--help`|`-h`]
     [`--auto`|`-a`]
     [`--dry`|`-d`]
-    [`--next`|`-n` *option*]
+    [`--next`|`-n` *option*[,...]]
     [*task-id*:] *problem*
 
 ##  DESCRIPTION
@@ -44,13 +44,21 @@ plan via `ase_task_save` and then hands off to `ase-task-edit`,
     type-checker, or program execution) once the source files have
     been modified.
 
-`--next`|`-n` *option*:
-    Automatically choose the next step after composing the plan,
-    where *option* is either `none` (default, hand-off to
-    `ase-task-edit` interactively), `DONE` (stop), `EDIT` (hand off
-    to `ase-task-edit`), `PREFLIGHT` (hand off to
-    `ase-task-preflight`), or `IMPLEMENT` (hand off to
-    `ase-task-implement`).
+`--next`|`-n` *option*[,...]:
+    Automatically choose the next step after composing the plan.
+    *option* is a single token or a *comma-separated chronological
+    list* of tokens; an `IMPLEMENT` or `PREFLIGHT` head token is
+    consumed by this skill (bypassing `ase-task-edit`), and any
+    remaining tokens are *forwarded* (via `--next`) to the downstream
+    skill. For all other head tokens, the *entire* list is forwarded
+    to `ase-task-edit`, which consumes its head itself. This lets an
+    entire pipeline be pre-scripted in one shot. Recognized tokens at
+    this skill: `none` (default, hand-off to `ase-task-edit`
+    interactively), `DONE` (stop), `EDIT` (hand off to
+    `ase-task-edit`), `PREFLIGHT` (hand off to `ase-task-preflight`),
+    or `IMPLEMENT` (hand off to `ase-task-implement`). Example:
+    `--next IMPLEMENT,DONE` resolves the problem, implements it, and
+    exits without further dialog.
 
 ##  ARGUMENTS
 

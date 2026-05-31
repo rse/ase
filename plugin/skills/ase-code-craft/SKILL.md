@@ -1,6 +1,6 @@
 ---
 name: ase-code-craft
-argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--next|-n <option>] [<task-id>:] <feature>"
+argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--next|-n <option>[,...]] [<task-id>:] <feature>"
 description: >
     Craft Source Code:
     Use when user wants to create or craft a new feature from scratch.
@@ -23,7 +23,7 @@ Craft Source Code
 
 <expand name="getopt"
     arg1="ase-code-craft"
-    arg2="--auto|-a --dry|-d --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)">
+    arg2="--auto|-a --dry|-d --next|-n=(none|DONE|EDIT|PREFLIGHT|IMPLEMENT)...">
     $ARGUMENTS
 </expand>
 
@@ -172,7 +172,10 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
     You *MUST* perform the following sub-steps *internally* and *without
     any output* until and including the recommendation decision. Only
-    sub-step 4 below is allowed to produce output.
+    sub-steps 4-6 below are allowed to produce output, and only if
+    <getopt-option-auto/> is equal `false`. If <getopt-option-auto/> is
+    equal `true`, *skip* the reporting sub-steps 4-6 entirely (perform
+    no output at all) to speed up processing.
 
     1.  *Propose* corresponding *feature approach*, including optionally,
         some *alternative* feature approaches. Do *not* output anything
@@ -294,23 +297,42 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
     5.  Directly pass-through control to the next skill:
 
-        1.  <if condition="<getopt-option-next/> is equal `IMPLEMENT`">
-            Call the tool `Skill(skill: "ase:ase-task-implement")` to
-            *implement* the freshly composed plan, bypassing `ase-task-edit`.
+        Treat <getopt-option-next/> as a comma-separated chronological
+        list of pre-selected next-step tokens. *Peek* the *first* token
+        as <head/> (or `none` if the list is `none`/empty).
+
+        1.  <if condition="<head/> is equal `IMPLEMENT`">
+            Consume the head: set <getopt-option-next/> to the remaining
+            tokens (joined back with `,`, or `none` if empty). Set
+            <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
+            Call the tool `Skill(skill: "ase:ase-task-implement", args: <args/>)`
+            to *implement* the freshly composed plan, bypassing `ase-task-edit`.
             </if>
 
-        2.  <if condition="<getopt-option-next/> is equal `PREFLIGHT`">
-            Call the tool `Skill(skill: "ase:ase-task-preflight")` to
-            *preflight* the freshly composed plan, bypassing `ase-task-edit`.
+        2.  <if condition="<head/> is equal `PREFLIGHT`">
+            Consume the head: set <getopt-option-next/> to the remaining
+            tokens (joined back with `,`, or `none` if empty). Set
+            <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
+            Call the tool `Skill(skill: "ase:ase-task-preflight", args: <args/>)`
+            to *preflight* the freshly composed plan, bypassing `ase-task-edit`.
             </if>
 
         3.  <if condition="
-                <getopt-option-next/> is not equal `IMPLEMENT` AND
-                <getopt-option-next/> is not equal `PREFLIGHT`
+                <head/> is not equal `IMPLEMENT` AND
+                <head/> is not equal `PREFLIGHT`
             ">
-            Set <args></args> (set args to empty).
+            Forward the *entire* (unshifted) list to `ase-task-edit`, which
+            will consume its head itself. Set <args></args> (empty).
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args><args/> --next <getopt-option-next/></args> (append to args).
+            Set <args>--next <getopt-option-next/></args> (append to args).
             </if>
             Then call the tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`.
             </if>

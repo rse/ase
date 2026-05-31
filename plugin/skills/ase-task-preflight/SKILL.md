@@ -1,6 +1,6 @@
 ---
 name: ase-task-preflight
-argument-hint: "[--help|-h] [--next|-n <option>] [<id>]"
+argument-hint: "[--help|-h] [--next|-n <option>[,...]] [<id>]"
 description: >
     Preflight the implementation of current or given task plan.
     Use when the user calls to "preflight", "dry-run" or "test-drive"
@@ -21,7 +21,7 @@ Preflight a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-preflight"
-    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT)">
+    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT)...">
     $ARGUMENTS
 </expand>
 
@@ -161,9 +161,24 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     1.  *Determine next step*:
 
-        -   If <getopt-option-next/> matches the regex `^(DONE|EDIT|IMPLEMENT)$`:
-            Honor the pre-selection what to do as the next step.
-            Set <result><getopt-option-next/></result>.
+        -   If <getopt-option-next/> is not equal to `none`:
+            Treat <getopt-option-next/> as a comma-separated chronological
+            list of pre-selected next-step tokens. *Split* it on `,`,
+            take the *first* token as <head/>, and store the remaining
+            tokens (joined back with `,`, or `none` if empty) into
+            <getopt-option-next/> so downstream skills can consume the tail.
+
+            -   If <head/> matches the regex `^(DONE|EDIT|IMPLEMENT)$`:
+                Honor the pre-selected token.
+                Set <result><head/></result>.
+
+            -   else:
+                Only output the following <template/> and then immediately
+                *STOP* processing the entire current skill:
+
+                <template>
+                ⧉ **ASE**: ☻ skill: **ase-task-preflight**, ▶ ERROR: invalid `--next` token: **<head/>**
+                </template>
 
         -   If <getopt-option-next/> is equal to `none`:
             Let the *user interactively choose* what to do as the next step.
@@ -185,22 +200,32 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
         -   If <result/> is `EDIT`:
+            Set <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
             Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-edit")` to invoke the
-            `ase:ase-task-edit` skill in order to *edit* the updated
-            plan. Immediately stop processing the current skill once the
-            `Skill` tool was used.
+            tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`
+            to invoke the `ase:ase-task-edit` skill in order to *edit*
+            the updated plan. Immediately stop processing the current
+            skill once the `Skill` tool was used.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to edit**
             </template>
 
         -   If <result/> is `IMPLEMENT`:
+            Set <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
             Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-implement")` to invoke the
-            `ase:ase-task-implement` skill in order to *implement* the
-            updated plan. Immediately stop processing the current skill
-            once the `Skill` tool was used.
+            tool `Skill(skill: "ase:ase-task-implement", args: <args/>)`
+            to invoke the `ase:ase-task-implement` skill in order to
+            *implement* the updated plan. Immediately stop processing
+            the current skill once the `Skill` tool was used.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to implement**

@@ -1,6 +1,6 @@
 ---
 name: ase-task-grill
-argument-hint: "[--help|-h] [--next|-n <list>] [<id>]"
+argument-hint: "[--help|-h] [--next|-n <option>[,...]] [<id>]"
 description: >
     Interview the user relentlessly about the task plan until reaching a
     shared understanding, resolving each branch of the question decision
@@ -198,7 +198,7 @@ Procedure
             tokens (joined back with `,`, or `none` if empty) into
             <getopt-option-next/> so downstream skills can consume the tail.
 
-            -   If <head/> matches the regex `^(DONE|EDIT)$`:
+            -   If <head/> matches the regex `^(DONE|EDIT|IMPLEMENT|PREFLIGHT)$`:
                 Honor the pre-selected token.
                 Set <result><head/></result>.
 
@@ -207,7 +207,7 @@ Procedure
                 *STOP* processing the entire current skill:
 
                 <template>
-                ⧉ **ASE**: ☻ skill: **ase-task-grill**, ▶ **ERROR**: invalid `--next` token: **<head/>**
+                ⧉ **ASE**: ☻ skill: **ase-task-grill**, ▶ ERROR: invalid `--next` token: **<head/>**
                 </template>
 
         -   If <getopt-option-next/> is equal to `none`:

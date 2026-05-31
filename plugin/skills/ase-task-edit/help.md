@@ -9,7 +9,7 @@
     [`--help`|`-h`]
     [`--plan`|`-p` *option*]
     [`--dry`|`-d`]
-    [`--next`|`-n` *option*]
+    [`--next`|`-n` *option*[,...]]
     [*id* | *id*: *instruction* | *instruction*]
 
 ##  DESCRIPTION
@@ -41,13 +41,19 @@ command from outside the agent tool.
     build, tests, linter, type-checker, or program execution) once
     the source files have been modified.
 
-`--next`|`-n` *option*:
+`--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end
-    of this skill) with *option*, which can be either `none` (default,
+    of this skill). *option* is a single token or a *comma-separated
+    chronological list* of tokens; each iteration of the planning loop
+    consumes the *first* token of the list, and on hand-off (`IMPLEMENT`
+    / `PREFLIGHT`) any remaining tokens are *forwarded* (via `--next`)
+    to the downstream skill so an entire pipeline can be pre-scripted
+    in one shot. Recognized tokens at this skill: `none` (default,
     interactive answer required), `DONE` (no next step), `IMPLEMENT`
     (hand-over to `ase-task-implement`), `PREFLIGHT` (hand-over to
     `ase-task-preflight`), or `REFINE` (refine the plan with subsequent
-    instruction).
+    instruction). Example: `--next REFINE,DONE` first refines once,
+    then exits the loop without asking.
 
 ##  ARGUMENTS
 
