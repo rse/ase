@@ -33,11 +33,29 @@ Development*.
 Sneak Preview
 -------------
 
-The following is a sneak preview of **ASE** skills in action. Click onto
-the animated image to discover more pre-recorded demo sessions to get an
+The following are sneak previews of **ASE** skills in action. Click
+onto the screenshots to watch the pre-recorded demo sessions to get an
 impression of **ASE**.
 
-[![sample](https://rse.github.io/ase-media/ase-mix-1.jpg)](https://rse.github.io/ase-media/ase-mix-1.mp4)
+<table>
+<tr>
+<td width="33%" valign="top">
+
+[![ase-arch-discover](https://rse.github.io/ase-media/ase-arch-discover.jpg)](https://rse.github.io/ase-media/ase-arch-discover.mp4)
+
+</td>
+<td width="33%" valign="top">
+
+[![ase-meta-diaboli](https://rse.github.io/ase-media/ase-meta-diaboli.jpg)](https://rse.github.io/ase-media/ase-meta-diaboli.mp4)
+
+</td>
+<td width="33%" valign="top">
+
+[![ase-code-analyze](https://rse.github.io/ase-media/ase-code-analyze.jpg)](https://rse.github.io/ase-media/ase-code-analyze.mp4)
+
+</td>
+</tr>
+</table>
 
 Notices
 -------
