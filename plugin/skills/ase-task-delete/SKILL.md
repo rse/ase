@@ -6,7 +6,7 @@ description: >
     Use when the user calls to "delete", "remove" or "clear" the
     "task", "plan", "spec", or "specification".
 user-invocable: true
-disable-model-invocation: true
+disable-model-invocation: false
 effort: high
 ---
 
