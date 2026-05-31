@@ -33,34 +33,29 @@ Development*.
 Sneak Preview
 -------------
 
-The following are sneak previews of **ASE** skills in action. Click
-onto the screenshots to watch the pre-recorded demo sessions to get an
-impression of **ASE**.
+The following are sneak previews of **ASE** skills in action. Click onto
+the screenshots to watch the scripted and pre-recorded demo sessions to
+get an impression of **ASE**.
 
 <table>
 <tr>
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
-*Mix of Skills*:
+*Mix of Skills #1*:
 
 [![ase-mix-1](https://rse.github.io/ase-media/ase-mix-1.jpg)](https://rse.github.io/ase-media/ase-mix-1.mp4)
 
 </td>
-<td width="25%" valign="top">
+<td width="33%" valign="top">
+
+*Mix of Skills #2*:
+
+[![ase-mix-2](https://rse.github.io/ase-media/ase-mix-2.jpg)](https://rse.github.io/ase-media/ase-mix-2.mp4)
 
 [ase-arch-**discover**](plugin/skills/ase-arch-discover/help.md):
 
-[![ase-arch-discover](https://rse.github.io/ase-media/ase-arch-discover.jpg)](https://rse.github.io/ase-media/ase-arch-discover.mp4)
-
 </td>
-<td width="25%" valign="top">
-
-[ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md):
-
-[![ase-meta-diaboli](https://rse.github.io/ase-media/ase-meta-diaboli.jpg)](https://rse.github.io/ase-media/ase-meta-diaboli.mp4)
-
-</td>
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 [ase-code-**analyze**](plugin/skills/ase-code-analyze/help.md):
 
