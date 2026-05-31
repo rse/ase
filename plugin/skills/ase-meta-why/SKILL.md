@@ -27,7 +27,7 @@ addressing surface-level symptoms.
 </objective>
 
 <flow>
-1.  <step id="STEP 1: PROBLEM">
+1.  <step id="STEP 1: Determine Problem">
     State the problem statement.
 
     <template>
@@ -35,7 +35,7 @@ addressing surface-level symptoms.
     </template>
     </step>
 
-2.  <step id="STEP 2: ROOT-CAUSE ANALYSIS">
+2.  <step id="STEP 2: Root-Cause Analysis">
     Find the root-cause of <problem/> by following the following iteration cycle.
     Start with a <question/> set equal to the <problem/>.
 
@@ -55,7 +55,7 @@ addressing surface-level symptoms.
     </for>
     </step>
 
-3.  <step id="STEP 3: SOLUTION">
+3.  <step id="STEP 3: Report Solution">
     Validate the root-cause by working backwards the causality chain.
     Propose a solution that addresses and solves the root-cause.
     For the proposed solution, optionally directly propose corresponding source code changes.
