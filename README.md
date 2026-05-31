@@ -30,40 +30,6 @@ Development*.
 > from pre-manufactured skills which incorporate reasonable methodology
 > and automation aspects to boost their productivity."
 
-Sneak Preview
--------------
-
-The following are sneak previews of **ASE** skills in action. Click
-onto the screenshots to watch the scripted and pre-recorded demo
-sessions to get an impression of **ASE**. Find more such demo sessions
-[here](https://rse.github.io/ase-media/).
-
-<table>
-<tr>
-<td width="33%" valign="top">
-
-*Mix of Skills #1*:
-
-[![ase-mix-1](https://rse.github.io/ase-media/ase-mix-1.jpg)](https://rse.github.io/ase-media/ase-mix-1.mp4)
-
-</td>
-<td width="33%" valign="top">
-
-*Mix of Skills #2*:
-
-[![ase-mix-2](https://rse.github.io/ase-media/ase-mix-2.jpg)](https://rse.github.io/ase-media/ase-mix-2.mp4)
-
-</td>
-<td width="33%" valign="top">
-
-*Mix of Skills #3*:
-
-[![ase-mix-3](https://rse.github.io/ase-media/ase-mix-3.jpg)](https://rse.github.io/ase-media/ase-mix-3.mp4)
-
-</td>
-</tr>
-</table>
-
 Notices
 -------
 
@@ -228,6 +194,40 @@ see whether **ASE** is right for you:
   You have API keys for popular AI chat services and/or Web search services
   which ASE could *optionally* leverage in various skills?
   &rarr; `ase setup mcp activate`
+
+</td>
+</tr>
+</table>
+
+Sneak Preview
+-------------
+
+The following are sneak previews of **ASE** skills in action. Click
+onto the screenshots to watch the scripted and pre-recorded demo
+sessions to get an impression of **ASE**. Find more such demo sessions
+[here](https://rse.github.io/ase-media/).
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+*Mix of Skills #1*:
+
+[![ase-mix-1](https://rse.github.io/ase-media/ase-mix-1.jpg)](https://rse.github.io/ase-media/ase-mix-1.mp4)
+
+</td>
+<td width="33%" valign="top">
+
+*Mix of Skills #2*:
+
+[![ase-mix-2](https://rse.github.io/ase-media/ase-mix-2.jpg)](https://rse.github.io/ase-media/ase-mix-2.mp4)
+
+</td>
+<td width="33%" valign="top">
+
+*Mix of Skills #3*:
+
+[![ase-mix-3](https://rse.github.io/ase-media/ase-mix-3.jpg)](https://rse.github.io/ase-media/ase-mix-3.mp4)
 
 </td>
 </tr>
