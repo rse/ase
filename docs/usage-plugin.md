@@ -42,6 +42,13 @@ The following ASE commands/skills exist on the meta-level:
 - **/ase-meta-commit**:<br/>
   Determine commit message for staged Git changes.
 
+- **/ase-meta-diff** \[`--risk`|`-r`\] \[`--blast`|`-b`\]:<br/>
+  Summarize the staged Git changes as a human-readable, intent-grouped
+  narrative. With `--risk`, additionally grade the diff against a
+  coupling/criticality/coverage/reversibility rubric and emit a banded
+  risk report with mitigations. With `--blast`, additionally render a
+  blast-radius map of the touched modules and their reverse dependencies.
+
 ### Architecture Commands
 
 The following ASE commands/skills exist on the architecture-level:

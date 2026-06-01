@@ -149,6 +149,13 @@ see whether **ASE** is right for you:
   automatically derived from your recent Git commits?
   &rarr; [`/ase-meta-changes`](plugin/skills/ase-meta-changes/help.md)
 
+- **Diff Summary**:
+  You want a raw Git diff turned into a concise, human-readable
+  narrative of what changed and why, grouped by intent, and with
+  optional risk grading and blast radius?
+  &rarr; [`/ase-meta-diff`](plugin/skills/ase-meta-diff/help.md)
+  `-r -b`
+
 - **Root-Cause Analysis**:
   You want to understand the reason for a fact with the help of the
   "Five-Whys" root-cause determination method?
@@ -473,6 +480,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**diagram**](plugin/skills/ase-meta-diagram/help.md)<br/>
 [ase-meta-**changes**](plugin/skills/ase-meta-changes/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
+[ase-meta-**diff**](plugin/skills/ase-meta-diff/help.md)<br/>
 
 </td>
 <td width="25%" valign="top">
