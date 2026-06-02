@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.0.61 (2026-06-02)
+0.0.61 (2026-06-03)
 -------------------
 
 - FEATURE: add new `ase-meta-diff` skill summarizing staged Git changes as intents with optional risks and blast radius
