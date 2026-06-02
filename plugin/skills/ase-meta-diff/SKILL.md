@@ -91,7 +91,6 @@ explicitly requested by this procedure via outputs based on a <template/>!
         1.  First, output the following header <template/>:
 
             <template>
-            ╭──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
 
             &#x1F535; **CHANGE INTENT REPORT**:
 
@@ -102,17 +101,19 @@ explicitly requested by this procedure via outputs based on a <template/>!
             table header <template/>:
 
             <template>
-            | Intent | Changes |
-            | ------ | ------- |
+            | Intent | Changes (LoC) | Files &amp; Description |
+            | ------ | ------------- | ----------------------- |
             </template>
 
         3.  For each discovered *intent group*, emit the following row
-            <template/>, where <intent/> is the intent label, <files/> is
-            the list of affected file references, and <description/> is a
-            *brief* one-to-two-sentence narrative of what changed and why:
+            <template/>, where <intent/> is the intent label, <changes/>
+            is the total number of lines changes per feature in format
+            `+N/-M`, <files/> is the list of affected file references,
+            and <description/> is a *brief* one-to-two-sentence
+            narrative of what changed and why:
 
             <template>
-            | **<intent/>** | <files/>: <description/> |
+            | **<intent/>** | <changes/> | <files/>: <description/> |
             </template>
 
             In the <files/> part of the second column, markup all file
@@ -124,13 +125,6 @@ explicitly requested by this procedure via outputs based on a <template/>!
             Keep the overall report *concise* and *brief*. Try to keep the
             number of intent groups (table rows) in the range of 1-10. Do
             *not* output any further explanation.
-
-        4.  Finally, output the following footer <template/>:
-
-            <template>
-
-            ╰──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
-            </template>
         </if>
 
     </step>
@@ -192,33 +186,38 @@ explicitly requested by this procedure via outputs based on a <template/>!
         → **HIGH**, *4.0-5.0* → **CRITICAL**.
 
         Then emit the following <template/>, with the overall band and
-        aggregate score and with one rubric block per axis (showing
-        the score, evidence and mitigation). If an axis did not
-        reach the mitigation threshold of '>= 4', just omit the
-        `○ **Mitigation**: <mitigation/>` part. Keep the overall
-        <evidence/> and <mitigation/> texts *concise* and *ultra brief*.
-        Do *not* output any further explanation.
+        aggregate score, followed by a *three-column table* with one row
+        per axis: column 1 is the *axis*, column 2 is the *score*, and
+        column 3 is the *evidence* (as a `●` bullet point) plus —
+        *only* if the axis reached the mitigation threshold of '>= 4' —
+        the *mitigation* (as a second `●` bullet point). If an axis did
+        not reach that threshold, omit the ` ● **MITIGATION**:
+        <mitigation/>` part from its row. Keep the overall <evidence/>
+        and <mitigation/> texts *concise* and *ultra brief*. Do *not*
+        output any further explanation.
 
         In <evidence/> markup all file references as code (with
         backticks), prepend them with `▢ ` and append ` [+N/-M]` (based
         on the information in <stat/>) to them.
 
         <template>
-        ╭──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
 
         &#x1F7E0; **CHANGE RISK REPORT**: Overall: **<band/>** (<aggregate/>/5)
 
-        ● **<axis/>** (<score/>/5):
-        ○ **Evidence**: <evidence/>
-        ○ **Mitigation**: <mitigation/>
+        | Axis | Score | Findings |
+        | ---- | ----- | -------- |
+        </template>
 
-        ● **<axis/>** (<score/>/5):
-        ○ **Evidence**: <evidence/>
-        ○ **Mitigation**: <mitigation/>
+        For each axis, emit the following row <template/>:
 
-        [...]
+        <template>
+        | **<axis/>** | <score/>/5 | ● **EVIDENCE**: <evidence/>, ● **MITIGATION**: <mitigation/> |
+        </template>
 
-        ╰──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+        Finally, output the following footer <template/>:
+
+        <template>
+
         </template>
 
         </if>
