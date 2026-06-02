@@ -211,7 +211,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         For each axis, emit the following row <template/>:
 
         <template>
-        | **<axis/>** | <score/>/5 | ● **EVIDENCE**: <evidence/>, ● **MITIGATION**: <mitigation/> |
+        | **<axis/>** | <score/>/5 | ● **EVIDENCE**: <evidence/> ● **MITIGATION**: <mitigation/> |
         </template>
 
         Finally, output the following footer <template/>:
