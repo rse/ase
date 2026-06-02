@@ -129,7 +129,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     </step>
 
-3.  <step id="STEP 3: Score Against Risk Rubric">
+3.  <step id="STEP 3: Score Against Risk Rubric (optional)">
 
     1.  <if condition="<getopt-option-risk/> is NOT equal `true`">
         Silently *SKIP* this entire step.
@@ -224,7 +224,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     </step>
 
-4.  <step id="STEP 4: Render Blast-Radius Map">
+4.  <step id="STEP 4: Render Blast-Radius Map (optional)">
 
     1.  <if condition="<getopt-option-blast/> is NOT equal `true`">
         Silently *SKIP* this entire step.
@@ -241,11 +241,10 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         Then, for each touched module, *scan its reverse dependencies*
         — the other first-party files that *import* or *reference* it
-        — using `git grep` / `grep` across the repository (e.g. by the
-        module's basename, exported symbol, or import path). Keep the
-        scan *read-only* and *heuristic*; restrict it to first-party
-        code within the repository. Do not output anything during the
-        scan.
+        across the current project (e.g. by the module's basename,
+        exported symbol, or import path). Keep the scan *read-only*
+        and *heuristic*; restrict it to first-party code within the
+        repository. Do not output anything during the scan.
 
         Then build a *blast-radius graph* and render it as a diagram:
 
@@ -256,18 +255,18 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
             Flag each *touched* node as a problem node per the
             `ase-meta-diagram` anomaly convention — prefix its label
-            with `!` inside quotes, e.g. `T1["!src/core.ts"]`. Keep
-            labels short (basenames or module names).
+            with `⚑ ` inside quotes, e.g. `T1["⚑ src/core.ts"]`. Keep
+            labels ultra short (basenames or module names only).
 
         2.  Dispatch the rendering to the `ase-meta-diagram` sub-agent by
             calling the tool `Agent(name: "ase:ase-meta-diagram",
             description: "Diagram Rendering", subagent_type:
-            "ase:ase-meta-diagram", prompt: <mermaid-spec/>)` and capture
-            its returned fenced code block as <diagram/>.
+            "ase:ase-meta-diagram", prompt: "<mermaid-spec/>")` and capture
+            its returned `text` field as <diagram/>.
 
         Then emit the following <template/>, showing <diagram/> and
-        appending a *brief impact summary* of 1-5 bullets, where each
-        <module/> is a touched module and <impact/> is a one-sentence
+        appending a *brief impact summary* of bullets, where each
+        <module/> is a *touched* module and <impact/> is a one-sentence
         note on *what depends on it* and *how far the blast reaches*.
 
         In <module/> and <impact/>, markup all file references as code
@@ -283,9 +282,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
         <diagram/>
         ```
 
-        **<module/>**: <impact/>
+        &#x1F7E0; **BLAST**: **<module/>**: <impact/>
 
-        **<module/>**: <impact/>
+        &#x1F7E0; **BLAST**: **<module/>**: <impact/>
 
         [...]
 
