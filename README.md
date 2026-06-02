@@ -478,13 +478,13 @@ mode skills, funnel mode skills and other skills. Each skill is named
 <td width="25%" valign="top">
 
 [ase-meta-**persona**](plugin/skills/ase-meta-persona/help.md)<br/>
-[ase-meta-**brainstorm**](plugin/skills/ase-meta-brainstorm/help.md)<br/>
 [ase-meta-**why**](plugin/skills/ase-meta-why/help.md)<br/>
 [ase-meta-**evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
 [ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md)<br/>
 [ase-meta-**quorum**](plugin/skills/ase-meta-quorum/help.md)<br/>
 [ase-meta-**chat**](plugin/skills/ase-meta-chat/help.md)<br/>
 [ase-meta-**search**](plugin/skills/ase-meta-search/help.md)<br/>
+[ase-meta-**brainstorm**](plugin/skills/ase-meta-brainstorm/help.md)<br/>
 [ase-meta-**diagram**](plugin/skills/ase-meta-diagram/help.md)<br/>
 [ase-meta-**changes**](plugin/skills/ase-meta-changes/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
