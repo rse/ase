@@ -42,12 +42,12 @@ code and *explain* it in a *brief*, *standardized*, and *concise* way.
     Output the result with the following <template/>:
 
     <template>
-    &#x1F535; **WHAT** (You should know what):
+    <ase-tpl-bullet-normal/> **WHAT** (You should know what):
     - [...]
     - [...]
     - [...]
 
-    &#x1F535; **WHY** (You should know why):
+    <ase-tpl-bullet-normal/> **WHY** (You should know why):
     - [...]
     - [...]
     - [...]
@@ -80,12 +80,12 @@ code and *explain* it in a *brief*, *standardized*, and *concise* way.
     Output the result with the following <template/>:
 
     <template>
-    &#x26AA; **ANALOGY** (You should imagine):
+    <ase-tpl-bullet-secondary/> **ANALOGY** (You should imagine):
     - [...]
     - [...]
     - [...]
 
-    &#x26AA; **DIAGRAM** (You should grasp):
+    <ase-tpl-bullet-secondary/> **DIAGRAM** (You should grasp):
     [...]
     </template>
     </step>
@@ -103,12 +103,12 @@ code and *explain* it in a *brief*, *standardized*, and *concise* way.
     Output the result with the following <template/>:
 
     <template>
-    &#x1F7E0; **CRUXES** (You should notice):
+    <ase-tpl-bullet-signal/> **CRUXES** (You should notice):
     - [...]
     - [...]
     - [...]
 
-    &#x1F7E0; **GOTCHAS** (You should not stumble over):
+    <ase-tpl-bullet-signal/> **GOTCHAS** (You should not stumble over):
     - [...]
     - [...]
     - [...]

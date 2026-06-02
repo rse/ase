@@ -39,7 +39,7 @@ for the technology stack to *provide* the *needed functionality*
         <template/>:
 
         <template>
-        &#x1F535; **FUNCTIONALITY**: <functionality/>
+        <ase-tpl-bullet-normal/> **FUNCTIONALITY**: <functionality/>
         </template>
     </step>
 
@@ -73,7 +73,7 @@ for the technology stack to *provide* the *needed functionality*
         following <template/>:
 
         <template>
-        &#x1F535; **TECHNOLOGY STACK**: <stack/>
+        <ase-tpl-bullet-normal/> **TECHNOLOGY STACK**: <stack/>
         </template>
     </step>
 
@@ -157,7 +157,7 @@ for the technology stack to *provide* the *needed functionality*
         anything else:
 
         <template>
-        &#x1F535; **COMPONENT HINTS**:
+        <ase-tpl-bullet-normal/> **COMPONENT HINTS**:
 
         | ⚑ *Component*      | ▣ *Package*    | ⚖ *Hint*  |
         | :----------------- | :------------- | :-------- |
@@ -170,7 +170,7 @@ for the technology stack to *provide* the *needed functionality*
         with just the following <template/>:
 
         <template>
-        &#x1F535; **COMPONENT RANKING**:
+        <ase-tpl-bullet-normal/> **COMPONENT RANKING**:
 
         | ⚑ *Component*      | ▣ *Package*    | ❖ *Version*  | ↓ *Downloads*      | ⎈ *Stars*      | ⏲ *Updated*      | ☆ *Created*  |
         | :----------------- | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- |

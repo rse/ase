@@ -125,11 +125,11 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         Report those details with the following <template/>:
 
         <template>
-        &#x1F7E0; **PROBLEM CONTEXT**: *<context/>*
+        <ase-tpl-bullet-signal/> **PROBLEM CONTEXT**: *<context/>*
         <affected-code-excerpt/>
         <optional-diagram/>
 
-        &#x1F7E0; **PROBLEM DETAILS**: *<summary/>*
+        <ase-tpl-bullet-signal/> **PROBLEM DETAILS**: *<summary/>*
         ● [...]
         ● [...]
         ● [...]

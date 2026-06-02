@@ -31,7 +31,7 @@ addressing surface-level symptoms.
     State the problem statement.
 
     <template>
-    &#x1F7E0; **PROBLEM**: <problem/>
+    <ase-tpl-bullet-signal/> **PROBLEM**: <problem/>
     </template>
     </step>
 
@@ -46,7 +46,7 @@ addressing surface-level symptoms.
         Consider technical, domain-specific, process-related, or organizational causes.
 
         <template>
-        &#x26AA; **WHY <item/>**: <answer/>
+        <ase-tpl-bullet-secondary/> **WHY <item/>**: <answer/>
         </template>
 
         Then, for the next iteration set <question/> now to be the last <answer/>.
@@ -61,7 +61,7 @@ addressing surface-level symptoms.
     For the proposed solution, optionally directly propose corresponding source code changes.
 
     <template>
-    &#x1F7E0; **SOLUTION**: <solution/>
+    <ase-tpl-bullet-signal/> **SOLUTION**: <solution/>
     </template>
     </step>
 </flow>

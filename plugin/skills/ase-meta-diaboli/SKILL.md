@@ -27,7 +27,7 @@ effort: xhigh
     Output the thesis with the following <template/>:
 
     <template>
-    &#x26AA; **THESIS**: <thesis/>
+    <ase-tpl-bullet-secondary/> **THESIS**: <thesis/>
     </template>
 
 2.  **Determine Anti-Thesis**:
@@ -117,7 +117,7 @@ effort: xhigh
     <template/>:
 
     <template>
-    &#x1F7E0; **ANTITHESIS**: <antithesis-N/>
+    <ase-tpl-bullet-signal/> **ANTITHESIS**: <antithesis-N/>
     </template>
 
 3.  **Dialectical Reasoning**:
@@ -147,6 +147,6 @@ effort: xhigh
     in <synthesis/>, and then finally output the following <template/>:
 
     <template>
-    &#x1F535; **SYNTHESIS**: <synthesis/>
+    <ase-tpl-bullet-normal/> **SYNTHESIS**: <synthesis/>
     </template>
 

@@ -143,7 +143,7 @@ Procedure
         1.  Output the following <template/>:
 
             <template>
-            &#x1F7E0; ASPECT <N/>/<n/>: **<aspect-N/>**, QUESTION: **<question-N/>**
+            <ase-tpl-bullet-signal/> ASPECT <N/>/<n/>: **<aspect-N/>**, QUESTION: **<question-N/>**
             </template>
 
         2.  Determine the answer alternatives:
@@ -164,7 +164,7 @@ Procedure
             4.  Output the following <template/>:
 
                 <template>
-                &#x1F535; ASPECT <N/>/<n/>: **<aspect-N/>**, ANSWER: **<answer-N/>**
+                <ase-tpl-bullet-normal/> ASPECT <N/>/<n/>: **<aspect-N/>**, ANSWER: **<answer-N/>**
                 </template>
 
     3.  Finally, update the in <plan/> based on all answers <answer-N/>.

@@ -36,7 +36,7 @@ related to a set of code quality aspects.
     First, use the following <template/> to give a hint on this step:
 
     <template>
-    &#x26AA; **LINT INVESTIGATION**
+    <ase-tpl-bullet-secondary/> **LINT INVESTIGATION**
     </template>
 
     Dispatch the investigation to a *sub-agent* via the `Agent`
@@ -70,10 +70,10 @@ related to a set of code quality aspects.
     ordering `A01 - XXX`...`A20 - XXX`.
 
     <template>
-    &#x26AA; **LINT SUMMARY**:
+    <ase-tpl-bullet-secondary/> **LINT SUMMARY**:
 
-    &#x1F7E0; **AX - XXX**: N issues
-    &#x1F7E0; **AX - XXX**: N issues
+    <ase-tpl-bullet-signal/> **AX - XXX**: N issues
+    <ase-tpl-bullet-signal/> **AX - XXX**: N issues
     [...]
     </template>
 
@@ -81,7 +81,7 @@ related to a set of code quality aspects.
     output the summary instead:
 
     <template>
-    &#x26AA; **LINT SUMMARY**:
+    <ase-tpl-bullet-secondary/> **LINT SUMMARY**:
 
     *(no problems detected)*
     </template>
@@ -162,7 +162,7 @@ related to a set of code quality aspects.
         4.  Report the problem with the following <template/>:
 
             <template>
-            &#x1F7E0; **<aspect/> PROBLEM** (`<severity/>`): <context/>
+            <ase-tpl-bullet-signal/> **<aspect/> PROBLEM** (`<severity/>`): <context/>
 
             <description/>
 
@@ -173,7 +173,7 @@ related to a set of code quality aspects.
             Report the solution with the following <template/>:
 
             <template>
-            &#x1F535; **<aspect/> SOLUTION**:
+            <ase-tpl-bullet-normal/> **<aspect/> SOLUTION**:
 
             ```diff
             <diff/>
@@ -187,7 +187,7 @@ related to a set of code quality aspects.
             Report the solution with the following <template/>:
 
             <template>
-            &#x1F535; **<aspect/> SOLUTION**:
+            <ase-tpl-bullet-normal/> **<aspect/> SOLUTION**:
 
             *(corresponding change automatically applied)*
 
@@ -250,7 +250,7 @@ related to a set of code quality aspects.
         following final <template/>:
 
         <template>
-        &#x26AA; **LINT FINISHED**
+        <ase-tpl-bullet-secondary/> **LINT FINISHED**
         </template>
 
     </step>

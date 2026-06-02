@@ -36,7 +36,7 @@ Analyze documents for spelling, punctuation, or grammar errors
     First, use the following <template/> to give a hint on this step:
 
     <template>
-    &#x26AA; **PROOFREADING INVESTIGATION**
+    <ase-tpl-bullet-secondary/> **PROOFREADING INVESTIGATION**
     </template>
 
     Dispatch the investigation to a *sub-agent* via the `Agent`
@@ -69,7 +69,7 @@ Analyze documents for spelling, punctuation, or grammar errors
     problems in <problems/>:
 
     <template>
-    &#x26AA; **PROOFREADING SUMMARY**:
+    <ase-tpl-bullet-secondary/> **PROOFREADING SUMMARY**:
 
     | *Proofread Type* | *Proofread Result*      |
     | ---------------- | ----------------------- |
@@ -109,7 +109,7 @@ Analyze documents for spelling, punctuation, or grammar errors
         2.  Report the problem with the following <template/>:
 
             <template>
-            &#x1F7E0; **<type/> PROBLEM**: `<file/>`:<line/>:
+            <ase-tpl-bullet-signal/> **<type/> PROBLEM**: `<file/>`:<line/>:
 
             <description/>
             </template>
@@ -121,7 +121,7 @@ Analyze documents for spelling, punctuation, or grammar errors
 
             <template>
 
-            &#x1F535; **<type/> CORRECTION**:
+            <ase-tpl-bullet-normal/> **<type/> CORRECTION**:
 
             ```diff
             --- <file/> (original)
@@ -201,7 +201,7 @@ Analyze documents for spelling, punctuation, or grammar errors
         following final <template/>:
 
         <template>
-        &#x26AA; **PROOFREAD FINISHED**
+        <ase-tpl-bullet-secondary/> **PROOFREAD FINISHED**
         </template>
 
     </step>

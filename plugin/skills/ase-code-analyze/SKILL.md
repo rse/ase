@@ -51,7 +51,7 @@ code, for problems in its *logic* and *semantics* and its related
     points.
 
     <template>
-    &#x1F7E0; PROBLEM (Severity: **<severity/>**): **P<n/>**: **<title/>**
+    <ase-tpl-bullet-signal/> PROBLEM (Severity: **<severity/>**): **P<n/>**: **<title/>**
 
     <description/>
     </template>

@@ -357,7 +357,7 @@ interface quality, quality attributes, and architecture governance.
     Report each unpaired finding with the following <template/>:
 
     <template>
-    &#x1F7E0; **PROBLEM** P<n/> (Severity: <severity/>, Aspect: <aspect-id/>): **<title/>**
+    <ase-tpl-bullet-signal/> **PROBLEM** P<n/> (Severity: <severity/>, Aspect: <aspect-id/>): **<title/>**
 
     <description/>
     </template>
@@ -365,7 +365,7 @@ interface quality, quality attributes, and architecture governance.
     Report each paired or clustered finding with the following <template/>:
 
     <template>
-    &#x1F535; **TRADEOFF** T<n/> (Severity: <severity/>): **<title/>**
+    <ase-tpl-bullet-normal/> **TRADEOFF** T<n/> (Severity: <severity/>): **<title/>**
 
     - *Focal aspect*: <focal-aspect/> — <focal-state/>
     - *In tension with*: <partner-list/>

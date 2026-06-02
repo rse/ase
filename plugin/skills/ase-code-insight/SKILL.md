@@ -35,7 +35,7 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     Display the results with the following <template/>:
 
     <template>
-    &#x1F535; **PROJECT ABSTRACT**:
+    <ase-tpl-bullet-normal/> **PROJECT ABSTRACT**:
 
     <abstract/>
     </template>
@@ -52,7 +52,7 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     ...and then display the results with the following <template/>:
 
     <template>
-    &#x1F535; **PROJECT AUTHOR**:
+    <ase-tpl-bullet-normal/> **PROJECT AUTHOR**:
 
     <author/>
     </template>
@@ -64,7 +64,7 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     Display the following <template/>:
 
     <template>
-    &#x1F535; **SOURCE CHURN**:
+    <ase-tpl-bullet-normal/> **SOURCE CHURN**:
     </template>
 
     Then run the following command...
@@ -82,7 +82,7 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     Display the following <template/>:
 
     <template>
-    &#x1F535; **MODULE STRUCTURE**:
+    <ase-tpl-bullet-normal/> **MODULE STRUCTURE**:
     </template>
 
     Find all modules (or OOP classes) and build a Mermaid specification
