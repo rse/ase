@@ -16,4 +16,6 @@ ul-indent:          false
 ol-indent:          false
 heading-style:      false
 no-multiple-space-atx: false
+blanks-around-tables: false
+code-block-style:   false
 
