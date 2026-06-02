@@ -5,6 +5,9 @@ ChangeLog
 0.0.62 (2026-06-03)
 -------------------
 
+- IMPROVEMENT: document new `ase-meta-brainstorm` skill and `ase-format-adr.md` ADR conventions (AGENTS.md, README, usage-plugin.md)
+- CLEANUP: adjust README skill-table layout to balance columns
+
 0.0.61 (2026-06-03)
 -------------------
 
