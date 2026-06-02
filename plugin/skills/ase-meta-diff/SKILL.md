@@ -282,9 +282,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
         <diagram/>
         ```
 
-        &#x1F7E0; **BLAST**: **<module/>**: <impact/>
+        &#x1F7E0; **BLAST**: ⚑ **<module/>**: <impact/>
 
-        &#x1F7E0; **BLAST**: **<module/>**: <impact/>
+        &#x1F7E0; **BLAST**: ⚑ **<module/>**: <impact/>
 
         [...]
 
