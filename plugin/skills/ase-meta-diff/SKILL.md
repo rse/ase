@@ -278,7 +278,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <ase-tpl-bullet-signal/> **CHANGE BLAST RADIUS MAP**:
 
-        ```
+        ```text
         <diagram/>
         ```
 
