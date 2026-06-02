@@ -82,9 +82,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
         <content/> here.
 
         <template>
-        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `TASK-PLAN-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        <ase-tpl-head title="TASK-PLAN"/>
         <content/>
-        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(**  `TASK-PLAN-END`  **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        <ase-tpl-foot title="TASK-PLAN"/>
         </template>
         </if>
 

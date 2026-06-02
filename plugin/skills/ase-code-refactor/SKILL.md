@@ -188,7 +188,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     4.  Indicate start of reporting by showing the following <template/>:
 
         <template>
-        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `APPROACHES-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        <ase-tpl-head title="APPROACHES"/>
         </template>
 
     5.  Now report each approach with the following <template/>,
@@ -230,7 +230,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     6.  Indicate end of reporting by showing the following <template/>:
 
         <template>
-        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(**  `APPROACHES-END`  **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        <ase-tpl-foot title="APPROACHES"/>
         </template>
 
 5.  **Choose Refactoring Approach**:

@@ -326,9 +326,9 @@ Set <content-dirty>true</content-dirty>.
         Use the following <template/>:
 
         <template>
-        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(** `TASK-PLAN-BEGIN` **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        <ase-tpl-head title="TASK-PLAN"/>
         <content/>
-        ⧉ **ASE**: ┈┈┈┈┈┈┈┈────────━━━━━━━━**(**  `TASK-PLAN-END`  **)**━━━━━━━━────────┈┈┈┈┈┈┈┈
+        <ase-tpl-foot title="TASK-PLAN"/>
         </template>
 
     4.  *Determine next step*:
