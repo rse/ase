@@ -88,38 +88,49 @@ explicitly requested by this procedure via outputs based on a <template/>!
          -   `REFACTOR`:    refactored functionality or configuration
 
     3.  <if condition="<diff/> is NOT empty">
-        First, output the following header <template/>:
+        1.  First, output the following header <template/>:
 
-        <template>
-        ╭──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+            <template>
+            ╭──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
 
-        &#x1F535; **CHANGE INTENT REPORT**:
+            &#x1F535; **CHANGE INTENT REPORT**:
 
-        </template>
+            </template>
 
-        For each discovered *intent group* present in the <diff/>, emit
-        the following <template/>, where <intent/> is the intent label
-        and <narrative/> is a *brief* one-to-two-sentence narrative of
-        what changed and why, naming the affected files in backticks:
+        2.  Render a *two-column table* with one row per discovered
+            *intent group* present in the <diff/>. Output the following
+            table header <template/>:
 
-        <template>
-        ● **<intent/>**: <narrative/>
-        </template>
+            <template>
+            | Intent | Changes |
+            | ------ | ------- |
+            </template>
 
-        Markup all file references as code (with backticks), prepend
-        them with `▢ ` and append ` [+N/-M]` (based on the information
-        in <stat/>) to them.
+        3.  For each discovered *intent group*, emit the following row
+            <template/>, where <intent/> is the intent label, <files/> is
+            the list of affected file references, and <description/> is a
+            *brief* one-to-two-sentence narrative of what changed and why:
 
-        Keep the overall report *concise* and *brief*. Try to keep the
-        number of intent groups in the range of 1-10. Do *not* output
-        any further explanation.
+            <template>
+            | **<intent/>** | <files/>: <description/> |
+            </template>
 
-        Finally, output the following footer <template/>:
+            In the <files/> part of the second column, markup all file
+            references as code (with backticks), prepend them with `▢ `,
+            append ` [+N/-M]` (based on the information in <stat/>) to them,
+            and separate them with `, ` (a comma and space). Do *not* repeat
+            file references in the <description/>.
 
-        <template>
+            Keep the overall report *concise* and *brief*. Try to keep the
+            number of intent groups (table rows) in the range of 1-10. Do
+            *not* output any further explanation.
 
-        ╰──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
-        </template>
+        4.  Finally, output the following footer <template/>:
+
+            <template>
+
+            ╰──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+            </template>
         </if>
 
     </step>
