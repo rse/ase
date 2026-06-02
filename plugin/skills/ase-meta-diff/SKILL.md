@@ -92,7 +92,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
             <template>
 
-            &#x1F535; **CHANGE INTENT REPORT**:
+            <ase-tpl-bullet-normal/> **CHANGE INTENT REPORT**:
 
             </template>
 
@@ -202,7 +202,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <template>
 
-        &#x1F7E0; **CHANGE RISK REPORT**: Overall: **<band/>** (<aggregate/>/5)
+        <ase-tpl-bullet-signal/> **CHANGE RISK REPORT**: Overall: **<band/>** (<aggregate/>/5)
 
         | Axis | Score | Findings |
         | ---- | ----- | -------- |
@@ -274,21 +274,21 @@ explicitly requested by this procedure via outputs based on a <template/>!
         (based on the information in <stat/>) to them.
 
         <template>
-        ╭──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+        <ase-tpl-head title="Hello World"/>
 
-        &#x1F7E0; **CHANGE BLAST RADIUS MAP**:
+        <ase-tpl-bullet-signal/> **CHANGE BLAST RADIUS MAP**:
 
         ```
         <diagram/>
         ```
 
-        &#x1F7E0; **BLAST**: ⚑ **<module/>**: <impact/>
+        <ase-tpl-bullet-signal/> **BLAST**: ⚑ **<module/>**: <impact/>
 
-        &#x1F7E0; **BLAST**: ⚑ **<module/>**: <impact/>
+        <ase-tpl-bullet-signal/> **BLAST**: ⚑ **<module/>**: <impact/>
 
         [...]
 
-        ╰──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+        <ase-tpl-foot/>
         </template>
 
         Keep the overall report *concise* and *brief*. Do *not* output
