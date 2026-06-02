@@ -131,6 +131,12 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-docs-proofread`](plugin/skills/ase-docs-proofread/help.md)
   `@README.md`
 
+- **Research Quorum**:
+  You want to research a fact by asking multiple (potentially available)
+  foreign LLMs and methodologically derive a quorum answer?
+  &rarr; [`/ase-meta-quorum`](plugin/skills/ase-meta-quorum/help.md)
+  `What is Agentic Software Engineering?`
+
 - **Direct Skill Usage Help**:
   You want usage help for skills directly within your agent tool sessions?
   &rarr; `/ase-xxx-xxx` `--help`
@@ -168,12 +174,6 @@ see whether **ASE** is right for you:
   "Five-Whys" root-cause determination method?
   &rarr; [`/ase-meta-why`](plugin/skills/ase-meta-why/help.md)
   `is the Decibel (dB) unit a logarithmic one?`
-
-- **Research Quorum**:
-  You want to research a fact by asking multiple (potentially available)
-  foreign LLMs and methodologically derive a quorum answer?
-  &rarr; [`/ase-meta-quorum`](plugin/skills/ase-meta-quorum/help.md)
-  `What is Agentic Software Engineering?`
 
 - **Devil's Advocate Challenge**:
   You want a thesis or statement relentlessly challenged and criticised,
