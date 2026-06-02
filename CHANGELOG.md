@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - FEATURE: add new `ase-meta-diff` skill summarizing staged Git changes as intents with optional risks and blast radius
+- FEATURE: add new `ase-meta-brainstorm` skill for finding ideas with a single-diamond (diverge/converge) method
 - CLEANUP: replace the sometimes not expanded HTML entities for the colored bullets with XML placeholders of direct Unicode characters
 
 0.0.60 (2026-05-31)
