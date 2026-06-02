@@ -227,6 +227,10 @@ Template Patterns
     ╰────━━━━**(** `<title/>` **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
     </template>
 
+-   When `<ase-tpl-bullet-secondary/>` should be expanded, use:
+
+    <template>⚪</template>
+
 -   When `<ase-tpl-bullet-normal/>` should be expanded, use:
 
     <template>🔵</template>
