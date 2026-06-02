@@ -37,12 +37,12 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
 - `plugin/` — the Claude Code plugin published via the marketplace
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
   `plugin/.claude-plugin/plugin.json`. Layout:
-  - `plugin/skills/<name>/SKILL.md` — the skill set (30 skills total),
-    grouped by `ase-meta-*` (changes, chat, commit, diaboli, diff,
-    evaluate, persona, quorum, search, why), `ase-code-*` (analyze, craft,
-    explain, insight, lint, refactor, resolve), `ase-arch-*` (analyze,
-    discover), `ase-task-*` (id, list, edit, grill, view, reboot,
-    rename, preflight, implement, delete), and `ase-docs-*`
+  - `plugin/skills/<name>/SKILL.md` — the skill set (31 skills total),
+    grouped by `ase-meta-*` (brainstorm, changes, chat, commit, diaboli,
+    diff, evaluate, persona, quorum, search, why), `ase-code-*` (analyze,
+    craft, explain, insight, lint, refactor, resolve), `ase-arch-*`
+    (analyze, discover), `ase-task-*` (id, list, edit, grill, view,
+    reboot, rename, preflight, implement, delete), and `ase-docs-*`
     (proofread).
   - `plugin/agents/<name>.md` — sub-agent definitions (`ase-meta-chat`,
     `ase-meta-search`, `ase-meta-diagram`, `ase-code-lint`,
@@ -55,7 +55,8 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     `ase-skill.md` (skill-authoring guide), `ase-control.md`
     (skill control flow), `ase-dialog.md` (user-dialog conventions),
     `ase-getopt.md` (skill option parsing), `ase-persona.md`
-    (persona definitions), and `ase-format-plan.md` (task-plan conventions).
+    (persona definitions), `ase-format-plan.md` (task-plan conventions),
+    and `ase-format-adr.md` (architecture-decision-record conventions).
 
 The root `README.md` is user-facing install docs;
 `pages/` is the GitHub Pages site (`.github/workflows/static.yml`).

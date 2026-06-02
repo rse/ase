@@ -156,6 +156,13 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-meta-diff`](plugin/skills/ase-meta-diff/help.md)
   `-r -b`
 
+- **Collaborative Brainstorming**:
+  You want to figure out *what* to build before *how*, by diverging on
+  a broad space of ideas and then converging through clustering and
+  scoring into a recommended direction?
+  &rarr; [`/ase-meta-brainstorm`](plugin/skills/ase-meta-brainstorm/help.md)
+  `an offline-first sync layer for the mobile app`
+
 - **Root-Cause Analysis**:
   You want to understand the reason for a fact with the help of the
   "Five-Whys" root-cause determination method?
@@ -369,7 +376,7 @@ implementation aspects.
   configured parameters. This allows controlling the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
   (`ase-code-*`), architecture (`ase-arch-*`), task (`ase-task-*`), and
-  documentation (`ase-docs-*`) families, covering 27 skills in total.
+  documentation (`ase-docs-*`) families, covering 31 skills in total.
 
 </td>
 <td width="50%" valign="top">
@@ -471,6 +478,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 <td width="25%" valign="top">
 
 [ase-meta-**persona**](plugin/skills/ase-meta-persona/help.md)<br/>
+[ase-meta-**brainstorm**](plugin/skills/ase-meta-brainstorm/help.md)<br/>
 [ase-meta-**why**](plugin/skills/ase-meta-why/help.md)<br/>
 [ase-meta-**evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
 [ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md)<br/>

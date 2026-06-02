@@ -8,6 +8,12 @@ Usage of Plugin
 
 The following ASE commands/skills exist on the meta-level:
 
+- **/ase-meta-brainstorm** *topic*:<br/>
+  Collaboratively brainstorm a topic by clarifying intent, diverging
+  into a broad space of candidate ideas, then converging through
+  clustering and scoring into a shortlist with a single recommended
+  direction. Helps figure out *what* to build before *how* to build it.
+
 - **/ase-meta-search** *query*:<br/>
   Search the Internet/Web with a query.
 
