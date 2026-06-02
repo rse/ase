@@ -14,6 +14,7 @@ Primary
 - [GitHub Spec-Kit](https://github.com/github/spec-kit)
 - [BMAD Method](https://github.com/bmad-code-org/BMAD-METHOD)
 - [Get-Shit-Done (GSD)](https://github.com/gsd-build/get-shit-done)
+- [Ruflo](https://github.com/ruvnet/ruflo)
 - [Aperant/AutoClaude](https://github.com/AndyMik90/Aperant)
 - [Oh-My-ClaudeCode](https://github.com/yeachan-heo/oh-my-claudecode)
 - [Superpowers](https://github.com/obra/superpowers)
