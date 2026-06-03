@@ -456,11 +456,11 @@ export default class StatuslineCommand {
                         emit(`${prefix("◔", "context")}${bar} ${pct}%`)
                     },
                     C: () => {
-                        const context = Math.floor(data.context_window?.used_percentage ?? 0)
+                        const pct     = Math.floor(data.context_window?.used_percentage ?? 0)
                         const tokensCur =
                             (data.context_window?.total_input_tokens  ?? 0) +
                             (data.context_window?.total_output_tokens ?? 0)
-                        const tokensLim = context > 0 && tokensCur > 0 ? Math.round(tokensCur * 100 / context) : 0
+                        const tokensLim = pct > 0 && tokensCur > 0 ? Math.round(tokensCur * 100 / pct) : 0
                         if (tokensLim > 0)
                             emit(`${prefix("◆", "tokens")}${c.bold(formatTokens(tokensCur) + "/" + formatTokens(tokensLim))}`)
                     },
