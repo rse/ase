@@ -501,6 +501,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-task-**view**](plugin/skills/ase-task-view/help.md)<br/>
 [ase-task-**list**](plugin/skills/ase-task-list/help.md)<br/>
 [ase-task-**rename**](plugin/skills/ase-task-rename/help.md)<br/>
+[ase-task-**condense**](plugin/skills/ase-task-condense/help.md)<br/>
 [ase-task-**delete**](plugin/skills/ase-task-delete/help.md)<br/>
 
 </td>
