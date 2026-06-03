@@ -290,9 +290,9 @@ Set <content-dirty>true</content-dirty>.
 
 3.  **Iterative Plan Refinement Loop:**
 
-    *REPEAT* the following steps from 3.1 up to and including 3.4 in a
-    *LOOP* until the user selects `DONE`, `IMPLEMENT`, or `PREFLIGHT`,
-    or declines/cancels in the dialog of step 3.4:
+    *REPEAT* the following steps from 3.1 up to and including 3.4 in
+    a *LOOP* until the user selects `DONE`, `GRILL`, `IMPLEMENT`, or
+    `PREFLIGHT`, or declines/cancels in the dialog of step 3.4:
 
     1.  *Update timestamp*:
         <if condition="<content/> contains '✎ modified:' AND <content-dirty/> is 'true'">
@@ -341,7 +341,7 @@ Set <content-dirty>true</content-dirty>.
             <getopt-option-next/> so subsequent loop iterations or
             downstream skills can consume the tail.
 
-            -   If <head/> matches the regex `^(DONE|IMPLEMENT|PREFLIGHT|REFINE)$`:
+            -   If <head/> matches the regex `^(DONE|GRILL|IMPLEMENT|PREFLIGHT)$`:
                 Honor the pre-selected token.
                 Set <result><head/></result>.
 
