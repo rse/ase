@@ -347,11 +347,11 @@ can leverage all paid "Chat" AI services by just providing the
 Features
 --------
 
-**ASE** will provide the following six distinct features. Currently,
-as **ASE** is still under heavy development, not all of them are
-already implemented. Nevertheless, all existing features are already
-fully functional and can be used independent of the still missing
-implementation aspects.
+**ASE** will finally provide the following six distinct features.
+Currently, as **ASE** is still under active development, not all of them
+are already implemented. Nevertheless, all existing features are already
+fully functional and can be used independent of the still forthcoming
+features.
 
 <table>
 <tr>
