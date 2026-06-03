@@ -56,6 +56,16 @@ const parseColorMode = (name: string) => (value: string): "none" | "ansi16" | "a
     return value
 }
 
+/*  scan a CSI escape sequence starting at line[i] (where line[i]===ESC and
+    line[i+1]==="["); return the index just past the terminating letter, or
+    -1 if the sequence is unterminated within the line  */
+const scanAnsiSeq = (line: string, i: number): number => {
+    let j = i + 2
+    while (j < line.length && !/[A-Za-z]/.test(line[j]!))
+        j++
+    return j < line.length ? j + 1 : -1
+}
+
 /*  truncate a single rendered line to a maximum visible column,
     preserving ANSI escape sequences (CSI ...m) and appending an ANSI
     reset sequence if any styling was active at the truncation point  */
@@ -69,11 +79,9 @@ const truncateAnsiLine = (line: string, budget: number): string => {
     while (i < line.length) {
         const ch = line[i]!
         if (ch === "\x1b" && line[i + 1] === "[") {
-            let j = i + 2
-            while (j < line.length && !/[A-Za-z]/.test(line[j]!))
-                j++
-            if (j < line.length) {
-                const seq = line.slice(i, j + 1)
+            const j = scanAnsiSeq(line, i)
+            if (j >= 0) {
+                const seq = line.slice(i, j)
                 out += seq
                 if (seq.endsWith("m")) {
                     const body = seq.slice(2, -1)
@@ -82,7 +90,7 @@ const truncateAnsiLine = (line: string, budget: number): string => {
                     else
                         styled = true
                 }
-                i = j + 1
+                i = j
                 continue
             }
             i++
@@ -107,11 +115,9 @@ const visibleWidth = (line: string): number => {
     while (i < line.length) {
         const ch = line[i]!
         if (ch === "\x1b" && line[i + 1] === "[") {
-            let j = i + 2
-            while (j < line.length && !/[A-Za-z]/.test(line[j]!))
-                j++
-            if (j < line.length) {
-                i = j + 1
+            const j = scanAnsiSeq(line, i)
+            if (j >= 0) {
+                i = j
                 continue
             }
             i++
