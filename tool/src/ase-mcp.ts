@@ -69,7 +69,7 @@ export default class MCPCommand {
     }
 
     /*  bridge stdio to a Streamable HTTP MCP endpoint on the local service  */
-    private async runBridge (): Promise<number> {
+    private async runBridge (): Promise<void> {
         /*  ensure the service is running  */
         let { port } = await this.ensureService()
 
@@ -196,7 +196,6 @@ export default class MCPCommand {
         /*  shutdown services  */
         clearInterval(healthTimer)
         await shutdown()
-        return 0 /*  unreachable, kept only to satisfy the Promise<number> return type  */
     }
 
     /*  register commands  */
@@ -205,7 +204,8 @@ export default class MCPCommand {
             .command("mcp")
             .description("Bridge stdio MCP to the per-project background service over Streamable HTTP")
             .action(async () => {
-                process.exit(await this.runBridge())
+                await this.runBridge()
+                process.exit(0)
             })
     }
 }
