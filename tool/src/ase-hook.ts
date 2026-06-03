@@ -23,32 +23,58 @@ type Tool = "claude" | "copilot"
 /*  per-tool dispatch table for the parts that actually differ between
     Claude Code and GitHub Copilot CLI hook integrations.  */
 type ToolSpec = {
-    toolNameField:          "tool_name"  | "toolName"
-    toolInputField:         "tool_input" | "toolArgs"
-    toolInputIsString:      boolean
-    bashToolName:           "Bash" | "bash"
-    mcpToolNamePattern:     RegExp
-    preToolUseWrapped:      boolean
-    preToolUseEvent:        "PreToolUse" | "preToolUse"
+    toolNameField:           "tool_name"  | "toolName"
+    toolInputField:          "tool_input" | "toolArgs"
+    toolInputIsString:       boolean
+    bashToolName:            "Bash" | "bash"
+    mcpToolNamePattern:      RegExp
+    addonMcpToolNamePattern: RegExp
+    preToolUseWrapped:       boolean
+    preToolUseEvent:         "PreToolUse" | "preToolUse"
 }
+const addonMcpServers = [
+    "chat-alibaba-qwen",
+    "chat-deepseek",
+    "chat-google-gemini",
+    "chat-openai-chatgpt",
+    "chat-xai-grok",
+    "chat-zai-glm",
+    "search-brave",
+    "search-exa",
+    "search-perplexity"
+]
+
+/*  build a per-tool regular expression matching the tool names exposed
+    by the addon MCP servers: Claude Code prefixes them as
+    "mcp__<server>__<tool>", whereas Copilot CLI prefixes them as
+    "<server>-<tool>"  */
+const addonMcpToolNamePattern = (prefix: string, suffix: string): RegExp => {
+    const alternatives = addonMcpServers
+        .map((server) => server.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join("|")
+    return new RegExp(`^${prefix}(?:${alternatives})${suffix}`)
+}
+
 const toolSpecs: Record<Tool, ToolSpec> = {
     "claude": {
-        toolNameField:      "tool_name",
-        toolInputField:     "tool_input",
-        toolInputIsString:  false,
-        bashToolName:       "Bash",
-        mcpToolNamePattern: /^mcp__plugin_ase_ase__.+/,
-        preToolUseWrapped:  true,
-        preToolUseEvent:    "PreToolUse"
+        toolNameField:           "tool_name",
+        toolInputField:          "tool_input",
+        toolInputIsString:       false,
+        bashToolName:            "Bash",
+        mcpToolNamePattern:      /^mcp__plugin_ase_ase__.+/,
+        addonMcpToolNamePattern: addonMcpToolNamePattern("mcp__", "__.+"),
+        preToolUseWrapped:       true,
+        preToolUseEvent:         "PreToolUse"
     },
     "copilot": {
-        toolNameField:      "toolName",
-        toolInputField:     "toolArgs",
-        toolInputIsString:  true,
-        bashToolName:       "bash",
-        mcpToolNamePattern: /^ase-.+/,
-        preToolUseWrapped:  false,
-        preToolUseEvent:    "preToolUse"
+        toolNameField:           "toolName",
+        toolInputField:          "toolArgs",
+        toolInputIsString:       true,
+        bashToolName:            "bash",
+        mcpToolNamePattern:      /^ase-.+/,
+        addonMcpToolNamePattern: addonMcpToolNamePattern("", "-.+"),
+        preToolUseWrapped:       false,
+        preToolUseEvent:         "preToolUse"
     }
 }
 
@@ -400,6 +426,10 @@ export default class HookCommand {
         else if (spec.mcpToolNamePattern.test(toolName)) {
             approve = true
             reason  = "ASE MCP tool invocation auto-approved"
+        }
+        else if (spec.addonMcpToolNamePattern.test(toolName)) {
+            approve = true
+            reason  = "ASE addon MCP tool invocation auto-approved"
         }
         else if (toolName === "Edit") {
             const sessionId   = this.pickSessionId(input)

@@ -5,6 +5,7 @@ ChangeLog
 0.9.1 (2026-06-03)
 ------------------
 
+- FEATURE: auto-approve addon MCP (chat-*/search-*) tool invocations in pre-tool-use hook (`ase-hook.ts`)
 - IMPROVEMENT: refine README wording on result quality and feature-status notices
 - CLEANUP: change README status notice admonition from CAUTION to NOTE
 
