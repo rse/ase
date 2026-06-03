@@ -33,6 +33,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   `<project>/.ase/task/<id>/plan.md` (subcommands: `list`, `load`,
   `edit`, `save`, `delete`, `purge`); `ase diagram` renders Mermaid
   diagrams as Unicode/ASCII art.
+  The `tool/plugin` is a build-time copy of `plugin` and can be ignored.
 
 - `plugin/` — the Claude Code plugin published via the marketplace
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
