@@ -85,10 +85,7 @@ const truncateAnsiLine = (line: string, budget: number): string => {
                 out += seq
                 if (seq.endsWith("m")) {
                     const body = seq.slice(2, -1)
-                    if (body === "" || body === "0")
-                        styled = false
-                    else
-                        styled = true
+                    styled = !(body === "" || body === "0")
                 }
                 i = j
                 continue
