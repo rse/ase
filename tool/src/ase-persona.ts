@@ -59,7 +59,7 @@ export default class PersonaMCP {
                 "If `session` is provided, the operation is scoped to that session, " +
                 "otherwise it operates on the strongest/closest scope (user/project cascade). " +
                 "Allowed styles: \"writer\" (decorative, eloquent, explaining), " +
-                "\"engineer\" (brief, factual, accurate), " +
+                "\"engineer\" (concise, factual, accurate), " +
                 "\"telegrapher\" (very brief, factual, abbreviating), " +
                 "\"caveman\" (ultra brief, rough, stuttering).",
             inputSchema: {
