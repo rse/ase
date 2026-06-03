@@ -2,8 +2,8 @@
 ChangeLog
 =========
 
-0.0.63 (2026-06-03)
--------------------
+0.9.0 (2026-06-03)
+------------------
 
 - REFACTOR: consolidate MCP bridge reconnect handling into idempotent `triggerReconnect` helper in `ase-mcp.ts`
 - CLEANUP: simplify `runBridge` return handling and `loadContext` identity loading in `ase-mcp.ts`
