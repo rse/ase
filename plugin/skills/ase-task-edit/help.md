@@ -44,16 +44,16 @@ command from outside the agent tool.
 `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end
     of this skill). *option* is a single token or a *comma-separated
-    chronological list* of tokens; each iteration of the planning loop
-    consumes the *first* token of the list, and on hand-off (`IMPLEMENT`
-    / `PREFLIGHT`) any remaining tokens are *forwarded* (via `--next`)
-    to the downstream skill so an entire pipeline can be pre-scripted
-    in one shot. Recognized tokens at this skill: `none` (default,
-    interactive answer required), `DONE` (no next step), `IMPLEMENT`
-    (hand-over to `ase-task-implement`), `PREFLIGHT` (hand-over to
-    `ase-task-preflight`), or `REFINE` (refine the plan with subsequent
-    instruction). Example: `--next REFINE,DONE` first refines once,
-    then exits the loop without asking.
+    chronological list* of tokens; each iteration of the planning
+    loop consumes the *first* token of the list, and on hand-off
+    (`IMPLEMENT` / `PREFLIGHT`) any remaining tokens are *forwarded*
+    (via `--next`) to the downstream skill so an entire pipeline can
+    be pre-scripted in one shot. Recognized tokens at this skill:
+    `none` (default, interactive answer required), `DONE` (no next
+    step), `GRILL` (hand-over to `ase-task-grill`), `PREFLIGHT`
+    (hand-over to `ase-task-preflight`), or `IMPLEMENT` (hand-over to
+    `ase-task-implement`). Example: `--next GRILL,DONE` first refines
+    once, then exits the loop without asking.
 
 ##  ARGUMENTS
 
