@@ -7,6 +7,7 @@ ChangeLog
 
 - REFACTOR: consolidate MCP bridge reconnect handling into idempotent `triggerReconnect` helper in `ase-mcp.ts`
 - CLEANUP: simplify `runBridge` return handling and `loadContext` identity loading in `ase-mcp.ts`
+- UPDATE: upgrade NPM dependencies
 
 0.0.62 (2026-06-03)
 -------------------
