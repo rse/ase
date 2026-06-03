@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+0.9.1 (2026-06-03)
+------------------
+
+- IMPROVEMENT: refine README wording on result quality and feature-status notices
+- CLEANUP: change README status notice admonition from CAUTION to NOTE
+
 0.9.0 (2026-06-03)
 ------------------
 
