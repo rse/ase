@@ -48,10 +48,11 @@ explicitly requested by this procedure via outputs based on a <template/>!
 <define name="apply-refinement">
 Treat the <instruction/> as a *refinement instruction* for
 the plan, and update <content/> in-place by *applying* the
-requested <instruction/> to the *plan*. When refining the
-plan this way, preserve the overall structure of the plan
-and only modify what the user actually requested. Do *not*
-rewrite unrelated sections of the plan.
+requested <instruction/> to the *plan*.
+
+When refining the plan this way, preserve the overall structure of the
+plan and only modify what the user actually requested. Do *not* rewrite
+unrelated sections of the plan.
 
 Calculate the number of words <words/> of <content/>.
 Set <content-dirty>true</content-dirty>.
