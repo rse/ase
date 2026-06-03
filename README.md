@@ -53,12 +53,10 @@ Notices
 > user dialog tool, etc.) realistically allow it.
 
 > [!CAUTION]
-> **DEVELOPMENT STATE**: **ASE** is still under active initial development and
-> somewhat incomplete. All existing functionality is already
-> stable and used on a daily basis in production. If you are not
-> a steadfast early adopter, it is perhaps better to visit this project
-> again once we have reached at least version 0.9.x! Otherwise, feel
-> free to join us on our journey towards [*Agentic Software
+> **STATUS QUO**: **ASE** is still under active initial development
+> and somewhat incomplete. All existing functionality is already
+> stable and used on a daily basis in production. Feel free to
+> already join us on our journey towards [*Agentic Software
 > Engineering*](docs/agentic-software-engineering.md).
 
 Unique Selling Points
