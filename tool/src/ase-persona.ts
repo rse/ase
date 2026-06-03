@@ -66,7 +66,7 @@ export default class PersonaMCP {
                 style: z.enum(Persona.styles).optional()
                     .describe("persona style to set; if omitted, the current persona style is returned"),
                 session: z.string().optional()
-                    .describe("session identifier (allowed characters: A-Z, a-z, 0-9, '-'); " +
+                    .describe("session identifier (allowed characters: A-Z, a-z, 0-9, '.', '_', '-'); " +
                         "if omitted, the operation is not scoped to a specific session")
             }
         }, async (args) => {
