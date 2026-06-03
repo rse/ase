@@ -22,17 +22,23 @@ import { SERVICE_HOST as HOST, serviceSchema, probe } from "./ase-service.js"
 export default class MCPCommand {
     constructor (private log: Log) {}
 
-    /*  load service identity context  */
-    private loadContext (): { projectId: string, port: number | null } {
+    /*  load project identity (invariant across the bridge lifetime)  */
+    private loadProjectId (): string {
         const cfg = new Config("config", configSchema, this.log)
         cfg.read()
+        return (cfg.get("project.id") as string | null | undefined) ?? path.basename(process.cwd())
+    }
+
+    /*  load the freshly persisted service port (volatile)  */
+    private loadPort (): number | null {
         const svc = new Config("service", serviceSchema, this.log)
         svc.read()
-        const rawId     = cfg.get("project.id") as string | null | undefined
-        const projectId = rawId ?? path.basename(process.cwd())
-        const rawPort   = svc.get("port") as number | null | undefined
-        const port: number | null = rawPort ?? null
-        return { projectId, port }
+        return (svc.get("port") as number | null | undefined) ?? null
+    }
+
+    /*  load service identity context  */
+    private loadContext (): { projectId: string, port: number | null } {
+        return { projectId: this.loadProjectId(), port: this.loadPort() }
     }
 
     /*  run "ase service start" and wait for the service to come up  */
@@ -71,7 +77,7 @@ export default class MCPCommand {
     /*  bridge stdio to a Streamable HTTP MCP endpoint on the local service  */
     private async runBridge (): Promise<void> {
         /*  ensure the service is running  */
-        let { port } = await this.ensureService()
+        let { projectId, port } = await this.ensureService()
 
         /*  create MCP STDIO server (lives for the entire bridge lifetime)  */
         const server = new StdioServerTransport()
@@ -114,9 +120,7 @@ export default class MCPCommand {
             next.onclose = () => {
                 if (client !== next || closedByUs || bridgeDone || reconnecting)
                     return
-                reconnecting = true
-                this.log.write("warning", "mcp: http connection lost — reconnecting")
-                reconnect(0, () => { reconnecting = false }).catch(() => {})
+                triggerReconnect("http connection lost")
             }
 
             await next.start()
@@ -124,11 +128,11 @@ export default class MCPCommand {
         }
 
         /*  reconnect loop: restart service if needed, then reconnect client  */
-        const reconnect = async (attempt = 0, done?: () => void) => {
+        const reconnect = async (attempt = 0) => {
             const delay = Math.min(500 * 2 ** attempt, 10000)
             await new Promise<void>((resolve) => setTimeout(resolve, delay))
             if (bridgeDone) {
-                done?.()
+                reconnecting = false
                 return
             }
             try {
@@ -138,14 +142,21 @@ export default class MCPCommand {
                 await client?.close()
                 await connectClient()
                 closedByUs = false
+                reconnecting = false
                 this.log.write("info", "mcp: reconnected to service")
-                done?.()
             }
             catch (err: unknown) {
                 closedByUs = false
                 this.log.write("error", `mcp: reconnect failed: ${this.asError(err).message}`)
-                reconnect(attempt + 1, done).catch(() => {})
+                reconnect(attempt + 1).catch(() => {})
             }
+        }
+
+        /*  trigger a reconnect chain (idempotent while one is active)  */
+        const triggerReconnect = (reason: string) => {
+            reconnecting = true
+            this.log.write("warning", `mcp: ${reason} — reconnecting`)
+            reconnect(0).catch(() => {})
         }
 
         /*  wire stdio server  */
@@ -171,16 +182,12 @@ export default class MCPCommand {
             if (bridgeDone || reconnecting)
                 return
             try {
-                const { projectId } = this.loadContext()
                 const match = await probe(port, projectId)
-                if (match !== true) {
-                    reconnecting = true
-                    this.log.write("warning", "mcp: health check failed — reconnecting")
-                    reconnect(0, () => { reconnecting = false }).catch(() => {})
-                }
+                if (match !== true)
+                    triggerReconnect("health check failed")
             }
             catch (err: unknown) {
-                /*  ignore transient probe/context errors but record them  */
+                /*  ignore transient probe errors but record them  */
                 this.log.write("debug", `mcp: health check error: ${this.asError(err).message}`)
             }
         }, HEALTH_INTERVAL_MS)
