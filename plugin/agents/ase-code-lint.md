@@ -269,6 +269,7 @@ Workflow
 
         <template>
         ● **WHAT**: [...]
+
         ○ **WHY**:  [...]
         </template>
 
@@ -278,6 +279,11 @@ Workflow
         <words/> from the code as quoted strings containing monospaced
         text with Markdown based on the following <template/>:
         <template>"`<words/>`"</template>.
+
+        For all code references, always use a relative filename and
+        append the related single 1-based line number N as `:N` or the
+        related 1-based line number range as `:N-M` to the end of the
+        filename.
 
     4.  Create the change set.
         For this, set <change-set></change-set> (set changes to empty).
