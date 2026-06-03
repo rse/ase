@@ -52,7 +52,7 @@ Notices
 > &mdash; if their agent harness features (especially hooks, interactive
 > user dialog tool, etc.) realistically allow it.
 
-> [!CAUTION]
+> [!NOTE]
 > **STATUS QUO**: **ASE** is still under active initial development
 > and somewhat incomplete. All existing functionality is already
 > stable and used on a daily basis in production. Feel free to
