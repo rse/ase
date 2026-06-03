@@ -217,8 +217,8 @@ Procedure
                 Next Step: How would you like to proceed with the plan?
                 DONE: Stop processing.
                 EDIT: Hand off plan to editing.
-                IMPLEMENT: Hand off plan to implementation.
                 PREFLIGHT: Hand off plan to pre-flighting.
+                IMPLEMENT: Hand off plan to implementation.
             </expand>
 
     2.  Check the tool <result/> and dispatch accordingly:
@@ -246,20 +246,6 @@ Procedure
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to edit**
             </template>
 
-        -   If <result/> is `IMPLEMENT`:
-            Set <args></args> (empty).
-            <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
-            </if>
-            Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-implement", args: <args/>)` tool
-            to *apply* the plan.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to implementation**
-            </template>
-
         -   If <result/> is `PREFLIGHT`:
             Set <args></args> (empty).
             <if condition="<getopt-option-next/> is not equal `none`">
@@ -272,4 +258,18 @@ Procedure
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to pre-flight**
+            </template>
+
+        -   If <result/> is `IMPLEMENT`:
+            Set <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
+            Only output the following <template/> and then call the
+            `Skill(skill: "ase:ase-task-implement", args: <args/>)` tool
+            to *apply* the plan.
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to implementation**
             </template>
