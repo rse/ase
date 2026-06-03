@@ -125,46 +125,35 @@ const visibleWidth = (line: string): number => {
 
 /*  reusable functionality: Mermaid diagram rendering as Unicode/ASCII art  */
 export class Diagram {
-    /*  detect terminal column width  */
-    static detectTermWidth (): number {
-        let width = 0
+    static detectTermDimension (envVar: string, stdoutProp: "columns" | "rows"): number {
+        let value = 0
 
         /*  attempt 1: query environment variable  */
-        if (process.env.ASE_TERM_WIDTH !== undefined) {
-            const cols = Number.parseInt(process.env.ASE_TERM_WIDTH, 10)
-            if (Number.isFinite(cols) && cols > 0)
-                width = cols
+        const env = process.env[envVar]
+        if (env !== undefined) {
+            const n = Number.parseInt(env, 10)
+            if (Number.isFinite(n) && n > 0)
+                value = n
         }
 
         /*  attempt 2: query stdout  */
-        if (width === 0 && process.stdout.isTTY) {
-            const cols = process.stdout.columns
-            if (typeof cols === "number" && cols > 0)
-                width = cols
+        if (value === 0 && process.stdout.isTTY) {
+            const n = process.stdout[stdoutProp]
+            if (typeof n === "number" && n > 0)
+                value = n
         }
 
-        return width
+        return value
+    }
+
+    /*  detect terminal column width  */
+    static detectTermWidth (): number {
+        return Diagram.detectTermDimension("ASE_TERM_WIDTH", "columns")
     }
 
     /*  detect terminal row height  */
     static detectTermHeight (): number {
-        let height = 0
-
-        /*  attempt 1: query environment variable  */
-        if (process.env.ASE_TERM_HEIGHT !== undefined) {
-            const rows = Number.parseInt(process.env.ASE_TERM_HEIGHT, 10)
-            if (Number.isFinite(rows) && rows > 0)
-                height = rows
-        }
-
-        /*  attempt 2: query stdout  */
-        if (height === 0 && process.stdout.isTTY) {
-            const rows = process.stdout.rows
-            if (typeof rows === "number" && rows > 0)
-                height = rows
-        }
-
-        return height
+        return Diagram.detectTermDimension("ASE_TERM_HEIGHT", "rows")
     }
 
     /*  detect terminal color capability  */
