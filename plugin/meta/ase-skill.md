@@ -202,7 +202,9 @@ Template Patterns
 -   When `<ase-tpl-head/>` (no title attribute) should be expanded, use:
 
     <template>
+
     ╭──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+
     </template>
 
 -   When `<ase-tpl-head title="<title/>"/>` should be expanded, use
@@ -210,13 +212,17 @@ Template Patterns
     the "─" character repeated (70 - 16 - length("<title/>")) times):
 
     <template>
+
     ╭────━━━━**(** `<title/>` **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+
     </template>
 
 -   When `<ase-tpl-foot/>` (no title attribute) should be expanded, use:
 
     <template>
+
     ╰──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+
     </template>
 
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
@@ -224,7 +230,9 @@ Template Patterns
     the "─" character repeated (70 - 16 - length("<title/>")) times):
 
     <template>
+
     ╰────━━━━**(** `<title/>` **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+
     </template>
 
 -   When `<ase-tpl-bullet-secondary/>` should be expanded, use:
