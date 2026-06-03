@@ -6,7 +6,12 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: document new `ase-meta-brainstorm` skill and `ase-format-adr.md` ADR conventions (AGENTS.md, README, usage-plugin.md)
+- IMPROVEMENT: improve `ase-code-lint` skill with `file:line` references and optical WHAT/WHY separation
+- REFACTOR: factor out ANSI-sequence scanning and reduce redundancy in `ase-diagram.ts`
+- CLEANUP: simplify `ase-diagram.ts` and `ase-statusline.ts` code
+- CLEANUP: align `ase-persona` MCP tool description and session-id validation with skill
 - CLEANUP: adjust README skill-table layout to balance columns
+- CLEANUP: fix vendor name "GitHub" in README
 
 0.0.61 (2026-06-03)
 -------------------
