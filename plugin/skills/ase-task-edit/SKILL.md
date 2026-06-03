@@ -365,9 +365,9 @@ Set <content-dirty>true</content-dirty>.
             <expand name="user-dialog">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Mark plan finalized, exit planning loop.
-                IMPLEMENT: Hand off plan to implementation.
+                GRILL: Hand off plan to grilling.
                 PREFLIGHT: Hand off plan to pre-flighting.
-                REFINE: Further refine plan with instructions.
+                IMPLEMENT: Hand off plan to implementation.
             </expand>
 
         Check the tool <result/> and dispatch accordingly:
@@ -381,7 +381,7 @@ Set <content-dirty>true</content-dirty>.
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- done**
             </template>
 
-        -   If <result/> is `IMPLEMENT`:
+        -   If <result/> is `GRILL`:
 
             *Break* out of the *loop*. Set <args></args> (empty).
             <if condition="<getopt-option-next/> is not equal `none`">
@@ -389,11 +389,11 @@ Set <content-dirty>true</content-dirty>.
             remaining list tokens to the downstream skill).
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-implement", args: <args/>)` tool
-            to *apply* the finalized plan.
+            `Skill(skill: "ase:ase-task-grill", args: <args/>)` tool
+            to *grill* the finalized plan.
 
             <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to implementation**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to grilling**
             </template>
 
         -   If <result/> is `PREFLIGHT`:
@@ -411,20 +411,19 @@ Set <content-dirty>true</content-dirty>.
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to pre-flight**
             </template>
 
-        -   If <result/> is `REFINE`:
+        -   If <result/> is `IMPLEMENT`:
 
-            Ask the user interactively, without a special tool, for the
-            refinement instruction with a single question `**What is
-            your instruction for further refining the plan?**`. Then set
-            <instruction/> to the response of the user.
-
-            <expand name="apply-refinement"/>
-
-            Finally, only output the following <template/> and then
-            *continue* the *loop* at step **3.1**!
+            *Break* out of the *loop*. Set <args></args> (empty).
+            <if condition="<getopt-option-next/> is not equal `none`">
+            Set <args>--next <getopt-option-next/></args> (forward
+            remaining list tokens to the downstream skill).
+            </if>
+            Only output the following <template/> and then call the
+            `Skill(skill: "ase:ase-task-implement", args: <args/>)` tool
+            to *apply* the finalized plan.
 
             <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **plan refined**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- hand-off to implementation**
             </template>
 
         -   If <result/> matches `OTHER: <text/>`:

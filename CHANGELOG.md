@@ -7,6 +7,7 @@ ChangeLog
 
 - FEATURE: auto-approve addon MCP (chat-*/search-*) tool invocations in pre-tool-use hook (`ase-hook.ts`)
 - IMPROVEMENT: refine README wording on result quality and feature-status notices
+- IMPROVEMENT: ase-task-edit: replace explicit REFINE option with GRILL option (more useful)
 - CLEANUP: change README status notice admonition from CAUTION to NOTE
 
 0.9.0 (2026-06-03)
