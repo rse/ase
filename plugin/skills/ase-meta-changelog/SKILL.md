@@ -1,5 +1,5 @@
 ---
-name: ase-meta-changes
+name: ase-meta-changelog
 argument-hint: "[--help|-h]"
 description: >
     Update changes entries in CHANGELOG.md files
@@ -17,7 +17,7 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 
-<skill name="ase-meta-changes">
+<skill name="ase-meta-changelog">
 Update ChangeLog Entries
 </skill>
 

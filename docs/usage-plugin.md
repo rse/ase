@@ -42,7 +42,7 @@ The following ASE commands/skills exist on the meta-level:
   very brief, factual, and abbreviating `telegrapher`, or an ultra
   brief, rough and stuttering `caveman`.
 
-- **/ase-meta-changes**:<br/>
+- **/ase-meta-changelog**:<br/>
   Update changes entries in `CHANGELOG.md` files from Git commit information.
 
 - **/ase-meta-commit**:<br/>

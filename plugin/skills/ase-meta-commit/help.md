@@ -28,4 +28,4 @@ Craft a commit message for the currently staged changes:
 
 ##  SEE ALSO
 
-`ase-meta-changes`.
+`ase-meta-changelog`.

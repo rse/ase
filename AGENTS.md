@@ -39,7 +39,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
   `plugin/.claude-plugin/plugin.json`. Layout:
   - `plugin/skills/<name>/SKILL.md` — the skill set (31 skills total),
-    grouped by `ase-meta-*` (brainstorm, changes, chat, commit, diaboli,
+    grouped by `ase-meta-*` (brainstorm, changelog, chat, commit, diaboli,
     diff, evaluate, persona, quorum, search, why), `ase-code-*` (analyze,
     craft, explain, insight, lint, refactor, resolve), `ase-arch-*`
     (analyze, discover), `ase-task-*` (id, list, edit, grill, view,

@@ -153,7 +153,7 @@ see whether **ASE** is right for you:
 - **Automated Change Logs**:
   You want to get your `CHANGELOG.md` entries
   automatically derived from your recent Git commits?
-  &rarr; [`/ase-meta-changes`](plugin/skills/ase-meta-changes/help.md)
+  &rarr; [`/ase-meta-changelog`](plugin/skills/ase-meta-changelog/help.md)
 
 - **Diff Summary**:
   You want a raw Git diff turned into a concise, human-readable
@@ -486,7 +486,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**search**](plugin/skills/ase-meta-search/help.md)<br/>
 [ase-meta-**brainstorm**](plugin/skills/ase-meta-brainstorm/help.md)<br/>
 [ase-meta-**diagram**](plugin/skills/ase-meta-diagram/help.md)<br/>
-[ase-meta-**changes**](plugin/skills/ase-meta-changes/help.md)<br/>
+[ase-meta-**changelog**](plugin/skills/ase-meta-changelog/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
 [ase-meta-**diff**](plugin/skills/ase-meta-diff/help.md)<br/>
 
