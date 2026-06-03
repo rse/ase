@@ -26,7 +26,7 @@ Development*.
 
 > "Software developers in the industrial Software Engineering context,
 > using the Agentic AI Coding tool *Claude Code* (or alternatively
-> *Github Copilot CLI*), in their daily recurring tasks, should leverage
+> *GitHub Copilot CLI*), in their daily recurring tasks, should leverage
 > from pre-manufactured skills which incorporate reasonable methodology
 > and automation aspects to boost their productivity."
 
