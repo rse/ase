@@ -22,23 +22,15 @@ import { SERVICE_HOST as HOST, serviceSchema, probe } from "./ase-service.js"
 export default class MCPCommand {
     constructor (private log: Log) {}
 
-    /*  load project identity (invariant across the bridge lifetime)  */
-    private loadProjectId (): string {
-        const cfg = new Config("config", configSchema, this.log)
-        cfg.read()
-        return (cfg.get("project.id") as string | null | undefined) ?? path.basename(process.cwd())
-    }
-
-    /*  load the freshly persisted service port (volatile)  */
-    private loadPort (): number | null {
-        const svc = new Config("service", serviceSchema, this.log)
-        svc.read()
-        return (svc.get("port") as number | null | undefined) ?? null
-    }
-
     /*  load service identity context  */
     private loadContext (): { projectId: string, port: number | null } {
-        return { projectId: this.loadProjectId(), port: this.loadPort() }
+        const cfg = new Config("config", configSchema, this.log)
+        cfg.read()
+        const svc = new Config("service", serviceSchema, this.log)
+        svc.read()
+        const projectId = (cfg.get("project.id") as string | null | undefined) ?? path.basename(process.cwd())
+        const port      = (svc.get("port")       as number | null | undefined) ?? null
+        return { projectId, port }
     }
 
     /*  run "ase service start" and wait for the service to come up  */
