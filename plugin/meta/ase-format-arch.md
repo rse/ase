@@ -61,6 +61,10 @@ distinct **Artifact**s (listed under their <artifact-name/> and their
 -   **Quality Perspectives (QP)**:
     How the Non-Functional Requirements (NR) are addressed.
 
+-   **Decision Record (DR)**:
+    The major decisions related to the architecture, each recording the
+    forces at play, the chosen response, and the reasoning that justifies it.
+
 Context View (CV)
 -----------------
 
@@ -665,3 +669,189 @@ How the Non-Functional Requirements (NR) are addressed.
 
     -   In case the rationale is not present, the
         entire `(why: [...])` chunk is omitted.
+
+Decision Record (DR)
+--------------------
+
+The major decisions related to the architecture, each recording the
+forces at play, the chosen response, and the reasoning that justifies it.
+
+-   Format:
+
+    <format>
+
+    #   ARCHITECTURE: DECISION RECORD (ARCH-DR)
+
+    ✳   Created:  **<timestamp-created/>**
+    ✎   Modified: **<timestamp-modified/>**
+
+    <arch-dr-decision/>
+    <arch-dr-decision/>
+    [...]
+
+    </format>
+
+-   <arch-dr-decision/> format:
+
+    <format>
+
+    ##  DECISION ARCH-DR-<arch-dr-decision-id/>: <arch-dr-decision-name/>
+
+    -   Status:    <arch-dr-decision-status/>
+    -   Affects:   <arch-dr-decision-element/>, [...]
+    -   Created:   <arch-dr-decision-created/>
+    -   Modified:  <arch-dr-decision-modified/>
+
+    -   WHEN (Context):
+        <arch-dr-decision-context/>
+
+    -   WHAT (Decision):
+        <arch-dr-decision-decision/>
+
+    -   WHY (Rationale):
+        <arch-dr-decision-rationale/>
+
+    -   NOTES (Background):
+        <arch-dr-decision-notes/>
+
+    </format>
+
+-   <arch-dr-decision/> details:
+
+    -   <arch-dr-decision-id/>: per-artifact unique "slug" of always 1-3
+        lower-cased words (concatenated with "-" characters and
+        in total not longer than 30 characters), derived from
+        <arch-dr-decision-name/>.
+
+    -   <arch-dr-decision-name/> is a short summary of the
+        <arch-dr-decision-decision/>, not longer than 80 characters.
+
+    -   <arch-dr-decision-status/> is one of `proposed`, `accepted`,
+        `deprecated`, or `superseded by ARCH-DR-<arch-dr-decision-id/>`.
+
+    -   <arch-dr-decision-element/> is an `ARCH-FV-<arch-fv-element-id/>`
+        or `ARCH-DP-<arch-dp-node-id/>` reference to the functional
+        element or deployment node the decision affects.
+
+    -   <arch-dr-decision-created/> is the timestamp when this decision was
+        created, and <arch-dr-decision-modified/> is the timestamp when
+        this decision was last modified, both in the same ISO-style format
+        as the **Artifact**'s own timestamps.
+
+    -   <arch-dr-decision-context/> captures the situation that forces the
+        decision — the "why are we even talking about this" part. It
+        describes the situation as it is, before the decision is made. The
+        following usually goes into it: the problem or need (what's broken,
+        missing, or about to change that requires a decision); the forces at
+        play (technical constraints, business requirements, deadlines, team
+        skills, existing systems, regulatory/compliance pressures — often
+        competing, and that tension is the whole point); relevant facts
+        (current architecture, prior decisions, assumptions, what's known
+        and what's uncertain); and scope/boundaries (what this decision is
+        and isn't about). It is written neutrally and factually. It should
+        not contain the decision itself, nor advocate for an option — a
+        reader should be able to read it, pause, and arrive at the decision
+        themselves because the forces make it (nearly) inevitable.
+
+    -   <arch-dr-decision-decision/> states what is actually going to be
+        done — the chosen response to the forces laid out in the context. It
+        is written in active, assertive voice, in the present or imperative
+        tense, as a committed position rather than a discussion. The
+        following usually goes into it: the choice itself (clearly and
+        unambiguously) and the essence of how (enough of the approach to
+        make the choice concrete — the mechanism, pattern, or technology —
+        but not a full implementation specification). It is a declaration,
+        not a deliberation, usually using the wording "We use..." or "We
+        do...", active, definite, owning the choice. Avoid hedging ("we
+        might", "we could consider") — the deliberation already happened,
+        the decision records the verdict.
+
+    -   <arch-dr-decision-rationale/> is the reasoning that justifies the
+        decision — the bridge that explains why this choice, given those
+        forces. It answers "Of all the things we could have done, why was
+        this the right one?". Where the context states the forces and the
+        decision states the choice, the rationale is the logical connective
+        tissue between them — it shows that the decision actually follows
+        from the context. The following usually goes into it: the deciding
+        factors (which forces from the context carried the most weight, and
+        how the chosen option satisfies them best); the trade-off reasoning
+        (what was optimized for and what was knowingly sacrificed — naming
+        the trade-off is the heart of rationale); why the alternatives lost
+        (the comparative argument: "option B failed on X, option C cost too
+        much on Y"); and assumptions and evidence (benchmarks, prior
+        experience, constraints, or principles the reasoning rests on).
+
+    -   <arch-dr-decision-notes/> is *OPTIONAL* and can be omitted when it
+        does not add genuine value — most decisions won't need it. The
+        following usually goes into it: information of the decision *process*
+        (e.g. a weighted decision matrix of considered alternatives);
+        consequences of the decision (but only when non-obvious downstream
+        effects need to be called out); and links to strongly related
+        decisions.
+
+    -   <arch-dr-decision-context/>, <arch-dr-decision-decision/>, and
+        <arch-dr-decision-rationale/> are each just a single paragraph of
+        concise and brief prose text, usually comprised of just 1 to 3
+        sentences. The value of a decision is in recording *that* a decision
+        was made and *why* — not in filling out sections of a document.
+
+    -   For the relationship between context, decision, and rationale, good
+        checks are: the "litmus test" is that context = forces, decision =
+        response to those forces, rationale = why the decision answers the
+        forces in the context. The decision should feel like the natural,
+        almost inevitable answer to the context — if a reader is surprised
+        by the decision, either the context is missing a force, or the
+        decision is under-justified. The rationale should make the decision
+        feel earned, not asserted — if you would delete the rationale and
+        the decision suddenly looks arbitrary, the rationale was doing its
+        job.
+
+    -   In case the element reference is not present, the
+        entire `- Affects:` bullet point is omitted.
+
+    -   In case the `NOTES (Background)` content is not present, the
+        entire `NOTES (Background)` chunk is omitted.
+
+-   A decision *MUST* qualify on all of the following three tenets:
+
+    -   **Hard to Reverse**: the cost of changing it later is meaningful
+        ("Oh my god, this would result in a dramatic refactoring!"). So,
+        if a decision is easy to reverse, just skip it.
+
+    -   **Surprising without Context**: a future architect will look at
+        the code and wonder ("Why on earth did they do it this way?").
+        So, if a decision is not surprising, nobody will wonder why.
+
+    -   **Result of a Real Trade-Off**: there were genuine alternatives
+        and one was picked for specific reasons ("We deliberately chose
+        this, because..."). So, if there was no real alternative,
+        there's nothing to record beyond "we did the obvious thing."
+
+-   The following typically qualify as a decision:
+
+    -   **Architectural shape.** "We're using a monorepo." "The write
+        model is event-sourced, the read model is projected into PostgreSQL."
+
+    -   **Integration patterns between contexts.** "Ordering and Billing
+        communicate via domain events, not synchronous HTTP."
+
+    -   **Technology choices that carry lock-in.** Database, message bus,
+        auth provider, deployment target. Not every library — just the
+        ones that would take a quarter to swap out.
+
+    -   **Boundary and scope decisions.** "Customer data is owned by the
+        Customer context; other contexts reference it by ID only." The explicit
+        no-s are as valuable as the yes-s.
+
+    -   **Deliberate deviations from the obvious path.** "We're using
+        manual SQL instead of an ORM because X." Anything where a reasonable
+        reader would assume the opposite. These stop the next engineer from
+        "fixing" something that was deliberate.
+
+    -   **Constraints not visible in the code.** "We can't use AWS because
+        of compliance requirements." "Response times must be under 200ms because
+        of the partner API contract."
+
+    -   **Rejected alternatives when the rejection is non-obvious.** If
+        you considered GraphQL and picked REST for subtle reasons, record it —
+        otherwise someone will suggest GraphQL again in six months.

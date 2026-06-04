@@ -5,6 +5,8 @@ ChangeLog
 0.9.2 (2026-06-05)
 ------------------
 
+- CLEANUP: merge ase-format-adr.md into the newer ase-format-arch.md
+
 0.9.1 (2026-06-05)
 ------------------
 
