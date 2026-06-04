@@ -114,7 +114,7 @@ Honor the following tenets throughout the brainstorming:
                 <answer-M-1/>: (first grounded candidate answer)
                 <answer-M-2/>: (second grounded candidate answer)
                 <answer-M-3/>: (third grounded candidate answer)
-                <answer-M-4/>: (forth grounded candidate answer)
+                <answer-M-4/>: (fourth grounded candidate answer)
             </expand>
 
         4.  Output the following <template/>:
@@ -164,7 +164,7 @@ Honor the following tenets throughout the brainstorming:
 4.  <step id="STEP 4: Converge Idea Space">
 
     Converge the candidate ideas <idea-N/> into a smaller, structured
-    sets and finally into a recommendation.
+    set and finally into a recommendation.
 
     1.  *Cluster*: group the candidate ideas into <c/> coherent clusters
         <cluster-C/> (a short 1-4 word label, C=1...</c>), collapsing

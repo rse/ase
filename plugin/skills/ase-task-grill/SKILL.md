@@ -167,7 +167,7 @@ Procedure
                 <ase-tpl-bullet-normal/> ASPECT <N/>/<n/>: **<aspect-N/>**, ANSWER: **<answer-N/>**
                 </template>
 
-    3.  Finally, update the in <plan/> based on all answers <answer-N/>.
+    3.  Finally, update the plan in <plan/> based on all answers <answer-N/>.
 
     4.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP server and use the `text` field of its response for
