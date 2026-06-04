@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.9.1 (2026-06-03)
+0.9.1 (2026-06-05)
 ------------------
 
 - FEATURE: add new `ase-task-condense` skill for condensing task plan texts (telegrapher-like, semantics-preserving)
@@ -10,7 +10,10 @@ ChangeLog
 - FEATURE: provide the first cut for Specification and Architecture format definitions
 - IMPROVEMENT: refine README wording on result quality and feature-status notices
 - IMPROVEMENT: ase-task-edit: replace explicit REFINE option with GRILL option (more useful)
+- IMPROVEMENT: make approach output more concise in `ase-code-{craft,refactor,resolve}` skills
+- UPDATE: refresh workflow diagram for `ase-task-condense` skill (Graffle/SVG/PDF)
 - CLEANUP: change README status notice admonition from CAUTION to NOTE
+- CLEANUP: fix proofreading typos in `ase-meta-brainstorm` and `ase-task-grill` skills
 
 0.9.0 (2026-06-03)
 ------------------
