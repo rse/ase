@@ -207,9 +207,10 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
         Hints:
 
-        -   Give a short one-sentence <summary/> of the refactoring approach plus
-            *precise* and *brief* refactoring information. Try to keep the
-            number of bullet points (●) in the range of 1-4.
+        -   Give a short one-sentence <summary/> of the refactoring
+            approach plus *precise* and *ultra brief and concise*
+            refactoring information. Try to keep the number of bullet
+            points (●) in the range of 1-4.
 
         -   In case of a *complex refactoring situation* only,
             visualize it with an optional diagram <optional-diagram/>
