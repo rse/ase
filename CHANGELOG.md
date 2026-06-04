@@ -7,6 +7,7 @@ ChangeLog
 
 - FEATURE: add new `ase-task-condense` skill for condensing task plan texts (telegrapher-like, semantics-preserving)
 - FEATURE: auto-approve addon MCP (chat-*/search-*) tool invocations in pre-tool-use hook (`ase-hook.ts`)
+- FEATURE: provide the first cut for Specification and Architecture format definitions
 - IMPROVEMENT: refine README wording on result quality and feature-status notices
 - IMPROVEMENT: ase-task-edit: replace explicit REFINE option with GRILL option (more useful)
 - CLEANUP: change README status notice admonition from CAUTION to NOTE
