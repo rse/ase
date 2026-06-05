@@ -629,9 +629,7 @@ State Model (SM)
 
 For each entity with a non-trivial lifecycle, the legal states it can
 occupy and the permitted transitions between them over its lifetime,
-making the forbidden moves as explicit as the allowed ones. Only
-entities whose lifecycle has three or more states warrant an Aspect;
-entities with a trivial lifecycle are omitted entirely.
+making the forbidden moves as explicit as the allowed ones.
 
 -   Format:
 
