@@ -55,56 +55,53 @@ distinct **Artifact**s (listed under their <artifact-name/> and their
     manages, defining how information is organized and connected.
 
 06. **Use Cases (UC)**:
-    The discrete goals users pursue with the solution, each describing an
-    actor's interaction to achieve a specific outcome.
+    The discrete goals users pursue with the solution, each describing
+    an actor's interaction to achieve a specific outcome. For each Use
+    Case, also the concrete step-by-step flows, detailing the sequence
+    of actions for main, alternative, and exceptional paths.
 
-07. **Use Case Scenarios (US)**:
-    The concrete step-by-step flows through a **Use Case**, detailing the
-    sequence of actions for main, alternative, and exceptional paths.
-
-08. **Personas (PE)**:
+07. **Personas (PE)**:
     The *archetypal* user profiles representing distinct user groups,
     capturing their goals, needs, behaviors, and context.
 
-09. **Test Cases (TC)**:
+08. **Test Cases (TC)**:
     The verifiable conditions and steps used to confirm that requirements
     are correctly implemented, with mandatory defined inputs, mandatory
     expected outcomes, and optional pre- and post-conditions.
 
-10. **Interaction Concept (IC)**:
+09. **Interaction Concept (IC)**:
     The overarching idea of how users interact with the solution,
     describing the intended workflows and interaction philosophy (e.g.
     auto-save behavior).
 
-11. **Language Conventions (LC)**:
+10. **Language Conventions (LC)**:
     The terminology, naming, tone, and wording standards used consistently
     across the solution and its content.
 
-12. **Dialog Patterns (DP)**:
+11. **Dialog Patterns (DP)**:
     The reusable interaction structures governing how the system and user
     exchange information across recurring conversational or UI flows (e.g.
     master-detail dialog).
 
-13. **Dialog Storyboard (SB)**:
+12. **Dialog Storyboard (DS)**:
     The sequenced visual or textual depiction of a specific dialog flow,
     illustrating how an interaction unfolds screen by screen or turn by
     turn.
 
-14. **Visual Design (VD)**:
+13. **Visual Design (VD)**:
     The aesthetic and layout aspects of the solution, defining colors,
     typography, spacing, imagery, and overall look and feel.
 
 The **Artifact**s have the following cross-references:
 
 ```text
-SPEC-01-CJ Customer Journey   ──(step actor)─►     SPEC-08-PE Personas
-SPEC-06-UC Use Cases          ──(use case actor)─► SPEC-08-PE Personas
+SPEC-01-CJ Customer Journey   ──(step actor)─►     SPEC-07-PE Personas
+SPEC-06-UC Use Cases          ──(use case actor)─► SPEC-07-PE Personas
 SPEC-06-UC Use Cases          ──(realizes)─►       SPEC-03-FR Functional Requirements
-SPEC-07-US Use Case Scenarios ──(scenario)─►       SPEC-06-UC Use Cases
-SPEC-09-TC Test Cases         ──(verifies)─►       SPEC-03-FR Functional Requirements
-SPEC-09-TC Test Cases         ──(verifies)─►       SPEC-04-NR Non-Functional Requirements
-SPEC-13-SB Dialog Storyboard  ──(scenario)─►       SPEC-07-US Use Case Scenarios
-SPEC-13-SB Dialog Storyboard  ──(pattern)─►        SPEC-12-DP Dialog Patterns
+SPEC-08-TC Test Cases         ──(verifies)─►       SPEC-03-FR Functional Requirements
+SPEC-08-TC Test Cases         ──(verifies)─►       SPEC-04-NR Non-Functional Requirements
+SPEC-12-DS Dialog Storyboard  ──(scenario)─►       SPEC-06-UC Use Cases
+SPEC-12-DS Dialog Storyboard  ──(pattern)─►        SPEC-11-DP Dialog Patterns
 ```
 
 Customer Journey (CJ)
@@ -133,7 +130,7 @@ over time.
 
     <format>
 
-    ##  STEP SPEC-CJ-<spec-cj-step-id/>: <spec-cj-step-name/>
+    ##  STEP: <spec-cj-step-name/> <a id="SPEC-CJ-<spec-cj-step-id/>"></a>
 
     -   Stage:      <spec-cj-step-stage/>
     -   Actor:      <spec-cj-step-actor/>
@@ -209,7 +206,7 @@ to achieve.
 
     <format>
 
-    ##  ASPECT SPEC-SV-<spec-sv-aspect-id/>: <spec-sv-aspect-name/>
+    ##  ASPECT: <spec-sv-aspect-name/> <a id="SPEC-SV-<spec-sv-aspect-id/>"></a>
 
     <spec-sv-aspect-statement/>
 
@@ -259,7 +256,7 @@ operations.
 
     <format>
 
-    ##  REQUIREMENT SPEC-FR-<spec-fr-requirement-id/>: <spec-fr-requirement-name/>
+    ##  REQUIREMENT: <spec-fr-requirement-name/> <a id="SPEC-FR-<spec-fr-requirement-id/>"></a>
 
     -   Priority: <spec-fr-requirement-priority/>
 
@@ -320,7 +317,7 @@ as performance, security, scalability, reliability, and usability.
 
     <format>
 
-    ##  REQUIREMENT SPEC-NR-<spec-nr-requirement-id/>: <spec-nr-requirement-name/>
+    ##  REQUIREMENT: <spec-nr-requirement-name/> <a id="SPEC-NR-<spec-nr-requirement-id/>"></a>
 
     -   Priority: <spec-nr-requirement-priority/>
     -   Category: <spec-nr-requirement-category/>
@@ -396,7 +393,7 @@ manages, defining how information is organized and connected.
 
     <format>
 
-    ##  ENTITY <a id="SPEC-DM-<spec-dm-entity-id/>">`<spec-dm-entity-name/>`</a>
+    ##  ENTITY: `<spec-dm-entity-name/>` <a id="SPEC-DM-<spec-dm-entity-id/>"></a>
 
     <spec-dm-entity-description/>,
     **BECAUSE** <spec-dm-entity-rationale/>.
@@ -481,7 +478,9 @@ Use Cases (UC)
 --------------
 
 The discrete goals users pursue with the solution, each describing an
-actor's interaction to achieve a specific outcome.
+actor's interaction to achieve a specific outcome. For each Use Case,
+also the concrete step-by-step flows, detailing the sequence of actions
+for main, alternative, and exceptional paths.
 
 -   Format:
 
@@ -502,15 +501,19 @@ actor's interaction to achieve a specific outcome.
 
     <format>
 
-    ##  USE CASE SPEC-UC-<spec-uc-usecase-id/>: <spec-uc-usecase-name/>
+    ##  USE CASE: <spec-uc-usecase-name/> <a id="SPEC-UC-<spec-uc-usecase-id/>"></a>
 
-    -   Actor:        <spec-uc-usecase-actor/>
-    -   Requirements: <spec-uc-usecase-requirements/>
-    -   Goal:         <spec-uc-usecase-goal/>
-    -   Precondition: <spec-uc-usecase-precondition/>
-    -   Postcondition: <spec-uc-usecase-postcondition/>
+    -   Actor:          <spec-uc-usecase-actor/>
+    -   Requirements:   <spec-uc-usecase-requirements/>
+    -   Goal:           <spec-uc-usecase-goal/>
+    -   Pre-Condition:  <spec-uc-usecase-precondition/>
+    -   Post-Condition: <spec-uc-usecase-postcondition/>
 
     <spec-uc-usecase-description/>
+
+    <spec-uc-usecase-scenario/>
+    <spec-uc-usecase-scenario/>
+    [...]
 
     </format>
 
@@ -553,62 +556,29 @@ actor's interaction to achieve a specific outcome.
     -   In case a precondition or postcondition is not present, the
         respective bullet point is omitted.
 
-Use Case Scenarios (US)
------------------------
-
-The concrete step-by-step flows through a **Use Case**, detailing the
-sequence of actions for main, alternative, and exceptional paths.
-
--   Format:
+-   <spec-uc-usecase-scenario/> format:
 
     <format>
 
-    #   SPECIFICATION: USE CASE SCENARIOS (SPEC-US)
+    ### SCENARIO: <spec-uc-usecase-scenario-name/> (<spec-uc-usecase-scenario-type/>)
 
-    ✳   Created:  **<timestamp-created/>**
-    ✎   Modified: **<timestamp-modified/>**
-
-    <spec-us-scenario/>
-    <spec-us-scenario/>
+    1.  <spec-uc-usecase-scenario-step/>
+    2.  <spec-uc-usecase-scenario-step/>
     [...]
 
     </format>
 
--   <spec-us-scenario/> format:
+-   <spec-uc-usecase-scenario/> details:
 
-    <format>
-
-    ##  SCENARIO SPEC-US-<spec-us-scenario-id/>: <spec-us-scenario-name/>
-
-    -   Use Case: <spec-us-scenario-usecase/>
-    -   Type:     <spec-us-scenario-type/>
-
-    1.  <spec-us-scenario-step/>
-    2.  <spec-us-scenario-step/>
-    [...]
-
-    </format>
-
--   <spec-us-scenario/> details:
-
-    -   <spec-us-scenario-id/>: per-artifact unique "slug" of always 1-3
-        lower-cased words (concatenated with "-" characters and
-        in total not longer than 30 characters), derived from
-        <spec-us-scenario-name/>.
-
-    -   <spec-us-scenario-name/>: a short (3-8 word) summary of the
+    -   <spec-uc-usecase-scenario-name/>: a short (3-8 word) summary of the
         scenario.
 
-    -   <spec-us-scenario-usecase/> is a `SPEC-UC-<spec-uc-usecase-id/>`
-        reference to the corresponding **Aspect** of the Use Cases
-        **Artifact** this scenario flows through.
-
-    -   <spec-us-scenario-type/>: the path the scenario represents, one
+    -   <spec-uc-usecase-scenario-type/>: the path the scenario represents, one
         of `Main` (the primary, happy-path flow), `Alternative` (a
         valid but secondary flow), or `Exceptional` (an error or
         failure-handling flow).
 
-    -   <spec-us-scenario-step/>: a single, imperative step in the flow,
+    -   <spec-uc-usecase-scenario-step/>: a single, imperative step in the flow,
         naming the acting party (actor or system) and the action taken
         (e.g. `The user submits the login form.`). Steps are numbered
         sequentially to convey their order.
@@ -638,12 +608,13 @@ capturing their goals, needs, behaviors, and context.
 
     <format>
 
-    ##  PERSONA SPEC-PE-<spec-pe-persona-id/>: <spec-pe-persona-name/>
+    ##  PERSONA: <spec-pe-persona-name/> <a id="SPEC-PE-<spec-pe-persona-id/>"></a>
 
     -   Gender: <spec-pe-persona-gender/>
     -   Age:    <spec-pe-persona-age/>
     -   Role:   <spec-pe-persona-role/>
-    -   Quote:  "<spec-pe-persona-quote/>"
+
+    "<spec-pe-persona-quote/>"
 
     </format>
 
@@ -664,7 +635,7 @@ capturing their goals, needs, behaviors, and context.
 
     -   <spec-pe-persona-role/>: the role of the persona.
 
-    -   <spec-pe-persona-quote/>: a short, first-person statement —
+    -   <spec-pe-persona-quote/>: a short and bold, first-person statement —
         written in the persona's own voice — that captures their core
         attitude, motivation, frustration, or need in a single memorable line.
         It's sometimes called the persona's "tagline," "mantra," or "defining
@@ -696,13 +667,13 @@ expected outcomes, and optional pre- and post-conditions.
 
     <format>
 
-    ##  TEST CASE SPEC-TC-<spec-tc-testcase-id/>: <spec-tc-testcase-name/>
+    ##  TEST CASE: <spec-tc-testcase-name/> <a id="SPEC-TC-<spec-tc-testcase-id/>"></a>
 
-    -   Verifies:      <spec-tc-testcase-verifies/>
-    -   Precondition:  <spec-tc-testcase-precondition/>
-    -   Input:         <spec-tc-testcase-input/>
-    -   Expected:      <spec-tc-testcase-expected/>
-    -   Postcondition: <spec-tc-testcase-postcondition/>
+    -   Verifies:       <spec-tc-testcase-verifies/>
+    -   Pre-Condition:  <spec-tc-testcase-precondition/>
+    -   Input:          <spec-tc-testcase-input/>
+    -   Expected:       <spec-tc-testcase-expected/>
+    -   Post-Condition: <spec-tc-testcase-postcondition/>
 
     </format>
 
@@ -733,7 +704,7 @@ expected outcomes, and optional pre- and post-conditions.
     -   <spec-tc-testcase-postcondition/>: the state that must hold after
         the test completes (optional).
 
-    -   In case a precondition or postcondition is not present, the
+    -   In case a pre-condition or post-condition is not present, the
         respective bullet point is omitted.
 
 Interaction Concept (IC)
@@ -762,7 +733,7 @@ auto-save behavior).
 
     <format>
 
-    ##  PRINCIPLE SPEC-IC-<spec-ic-principle-id/>: <spec-ic-principle-name/>
+    ##  PRINCIPLE: <spec-ic-principle-name/> <a id="SPEC-IC-<spec-ic-principle-id/>"></a>
 
     <spec-ic-principle-statement/>,
     **BECAUSE** <spec-ic-principle-rationale/>.
@@ -815,7 +786,7 @@ across the solution and its content.
 
     <format>
 
-    ##  CONVENTION SPEC-LC-<spec-lc-convention-id/>: <spec-lc-convention-name/>
+    ##  CONVENTION: <spec-lc-convention-name/> <a id="SPEC-LC-<spec-lc-convention-id/>"></a>
 
     -   Category: <spec-lc-convention-category/>
 
@@ -875,9 +846,10 @@ master-detail dialog).
 
     <format>
 
-    ##  PATTERN SPEC-DP-<spec-dp-pattern-id/>: <spec-dp-pattern-name/>
+    ##  PATTERN: <spec-dp-pattern-name/> <a id="SPEC-DP-<spec-dp-pattern-id/>"></a>
 
     -   Context: <spec-dp-pattern-context/>
+    -   Problem: <spec-dp-pattern-problem/>
 
     <spec-dp-pattern-description/>,
     **BECAUSE** <spec-dp-pattern-rationale/>.
@@ -897,17 +869,27 @@ master-detail dialog).
     -   <spec-dp-pattern-context/>: the recurring situation or flow in
         which the pattern is applied.
 
+    -   <spec-dp-pattern-problem/>: the 1-sentence tension or difficulty
+        the pattern resolves ("why is the pattern needed"),
+        stated independently of its solution (which belongs to
+        <spec-dp-pattern-description/>) and its rationale (which belongs
+        to <spec-dp-pattern-rationale/>).
+
     -   <spec-dp-pattern-description/>: a concise paragraph (1-3
         sentences) of prose describing the reusable interaction structure
         and how the system and user exchange information within it.
 
-    -   <spec-dp-pattern-rationale/>: the 1-sentence rationale ("why") of
-        the dialog pattern.
+    -   <spec-dp-pattern-rationale/>: the 1-sentence justification for why
+        the structure in <spec-dp-pattern-description/> is the right
+        response — the benefit it secures or the trade-off it wins.
+        Unlike <spec-dp-pattern-problem/> (which states *why the pattern
+        is needed*, independent of any solution), the rationale states
+        *why this particular solution is worth adopting*.
 
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
 
-Dialog Storyboard (SB)
+Dialog Storyboard (DS)
 ----------------------
 
 The sequenced visual or textual depiction of a specific dialog flow,
@@ -918,59 +900,66 @@ turn.
 
     <format>
 
-    #   SPECIFICATION: DIALOG STORYBOARD (SPEC-SB)
+    #   SPECIFICATION: DIALOG STORYBOARD (SPEC-DS)
 
     ✳   Created:  **<timestamp-created/>**
     ✎   Modified: **<timestamp-modified/>**
 
-    <spec-sb-storyboard/>
-    <spec-sb-storyboard/>
+    <spec-ds-storyboard/>
+    <spec-ds-storyboard/>
     [...]
 
     </format>
 
--   <spec-sb-storyboard/> format:
+-   <spec-ds-storyboard/> format:
 
     <format>
 
-    ##  STORYBOARD SPEC-SB-<spec-sb-storyboard-id/>: <spec-sb-storyboard-name/>
+    ##  STORYBOARD: <spec-ds-storyboard-name/> <a id="SPEC-DS-<spec-ds-storyboard-id/>"></a>
 
-    -   Pattern:  <spec-sb-storyboard-pattern/>
-    -   Scenario: <spec-sb-storyboard-scenario/>
+    -   Pattern:  <spec-ds-storyboard-pattern/>
+    -   Use Case: <spec-ds-storyboard-usecase/>
+    -   Scenario: <spec-ds-storyboard-scenario/>
 
-    1.  **<spec-sb-frame-name/>**: <spec-sb-frame-description/>
-    2.  **<spec-sb-frame-name/>**: <spec-sb-frame-description/>
+    1.  **<spec-ds-frame-name/>**: <spec-ds-frame-description/>
+    2.  **<spec-ds-frame-name/>**: <spec-ds-frame-description/>
     [...]
 
     </format>
 
--   <spec-sb-storyboard/> details:
+-   <spec-ds-storyboard/> details:
 
-    -   <spec-sb-storyboard-id/>: per-artifact unique "slug" of always
+    -   <spec-ds-storyboard-id/>: per-artifact unique "slug" of always
         1-3 lower-cased words (concatenated with "-" characters and
         in total not longer than 30 characters), derived from
-        <spec-sb-storyboard-name/>.
+        <spec-ds-storyboard-name/>.
 
-    -   <spec-sb-storyboard-name/>: a short (3-8 word) summary of the
+    -   <spec-ds-storyboard-name/>: a short (3-8 word) summary of the
         depicted dialog flow.
 
-    -   <spec-sb-storyboard-pattern/> is a `SPEC-DP-<spec-dp-pattern-id/>`
+    -   <spec-ds-storyboard-pattern/> is a `SPEC-DP-<spec-dp-pattern-id/>`
         reference to the corresponding **Aspect** of the Dialog Patterns
         **Artifact** the storyboard instantiates (optional).
 
-    -   <spec-sb-storyboard-scenario/> is a `SPEC-US-<spec-us-scenario-id/>`
-        reference to the corresponding **Aspect** of the Use Case
-        Scenarios **Artifact** the storyboard visualizes (optional).
+    -   <spec-ds-storyboard-usecase/> is a
+        `SPEC-UC-<spec-uc-usecase-id/>` reference to the corresponding
+        **Aspect** of the Use Case **Artifact** the storyboard
+        visualizes (optional).
 
-    -   <spec-sb-frame-name/>: a short (2-5 word) label for the screen,
+    -   <spec-ds-storyboard-scenario/> is a
+        Use Case scenario type `<spec-uc-usecase-scenario-type/>` of
+        the corresponding **Aspect** of the Use Case **Artifact** the
+        storyboard visualizes (optional).
+
+    -   <spec-ds-frame-name/>: a short (2-5 word) label for the screen,
         turn, or state depicted by the storyboard frame. Frames are
         numbered sequentially to convey their order.
 
-    -   <spec-sb-frame-description/>: a concise (1-2 sentence) description
+    -   <spec-ds-frame-description/>: a concise (1-2 sentence) description
         of what the user sees and does at this frame of the interaction.
 
-    -   In case a pattern or scenario reference is not present, the
-        respective bullet point is omitted.
+    -   In case a pattern, use case, or scenario reference is not present,
+        the respective bullet point is omitted.
 
 Visual Design (VD)
 ------------------
@@ -997,7 +986,7 @@ typography, spacing, imagery, and overall look and feel.
 
     <format>
 
-    ##  ELEMENT SPEC-VD-<spec-vd-element-id/>: <spec-vd-element-name/>
+    ##  ELEMENT: <spec-vd-element-name/> <a id="SPEC-VD-<spec-vd-element-id/>"></a>
 
     -   Category: <spec-vd-element-category/>
 
@@ -1017,8 +1006,8 @@ typography, spacing, imagery, and overall look and feel.
         design element.
 
     -   <spec-vd-element-category/>: the aspect of visual design the
-        element governs, one of `Color`, `Typography`, `Spacing`,
-        `Layout`, `Iconography`, `Imagery`, `Motion`, or `Branding`.
+        element governs, one of `Color`, `Typography`, `Iconography`,
+        `Imagery`, `Layout`, or `Animation`.
 
     -   <spec-vd-element-specification/>: a concise paragraph (1-3
         sentences) of prose specifying the concrete values, tokens, or
