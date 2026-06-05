@@ -17,6 +17,11 @@ zero-padded, two-digit sequence number of the **Artifact** (starting at
 Pascal-casing each word (upper-casing its first letter) and using `-`
 characters instead of spaces (e.g. `Context-View`).
 
+Each **Artifact** file *MUST* begin with a single blank line before its
+`#` heading and end with a single blank line after its last content line
+(followed by the trailing newline), mirroring the blank lines shown
+inside the `<format>` blocks below.
+
 Each **Artifact** contains two timestamps: the <timestamp-created/>
 is the timestamp when this **Artifact** was created. The
 <timestamp-modified/> is the timestamp when this **Artifact** was last
