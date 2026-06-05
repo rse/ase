@@ -30,6 +30,13 @@ Artifact Meta Information
     an upper-case, two-letter identifier (e.g. `CJ` for `Customer
     Journey`) derived from the **Artifact** name.
 
+    Each **Artifact** also has a sequence number <artifact-no/>, which
+    is the zero-padded, two-digit position of the **Artifact** (starting
+    at `01`) within the ordered list of **Artifact**s of its **Artifact
+    Set**. The <artifact-no/> is used only in the **Artifact**'s file
+    name (for stable ordering) and is *not* part of the **Artifact**'s
+    or its **Aspect**s' identifiers.
+
 -   **Aspect**:
 
     At level 3, each **Artifact** is composed of many **Aspect**s.

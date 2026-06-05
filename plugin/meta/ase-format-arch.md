@@ -7,11 +7,14 @@ Architecture (ARCH)
 The **Artifact Set** **Architecture (ARCH)** specifies the "input"
 and the "how" of the Software Engineering project.
 
-Each **Artifact** of the **Artifact Set** **Architecture (ARCH)**
-is stored under `docs/arch/ARCH-<artifact-id/>-<artifact-slug/>.md`,
-relative to the project root directory, and with <artifact-slug/> being
-derived from <artifact-name/> (see below) by lower-casing and using `-`
-characters instead of spaces.
+Each **Artifact** of the **Artifact Set**
+**Architecture (ARCH)** is stored under
+`docs/arch/ARCH-<artifact-no/>-<artifact-id/>-<artifact-slug/>.md`,
+relative to the project root directory, with <artifact-no/> being the
+zero-padded, two-digit sequence number of the **Artifact** (starting at
+`01`) according to the order of the **Artifact** list below, and with
+<artifact-slug/> being derived from <artifact-name/> (see below) by
+lower-casing and using `-` characters instead of spaces.
 
 Each **Artifact** contains two timestamps: the <timestamp-created/>
 is the timestamp when this **Artifact** was created. The

@@ -7,11 +7,14 @@ Specification (SPEC)
 The **Artifact Set** **Specification (SPEC)** specifies the "input"
 and the "what" of the Software Engineering project.
 
-Each **Artifact** of the **Artifact Set** **Specification (SPEC)**
-is stored under `docs/spec/SPEC-<artifact-id/>-<artifact-slug/>.md`,
-relative to the project root directory, and with <artifact-slug/> being
-derived from <artifact-name/> (see below) by lower-casing and using `-`
-characters instead of spaces.
+Each **Artifact** of the **Artifact Set**
+**Specification (SPEC)** is stored under
+`docs/spec/SPEC-<artifact-no/>-<artifact-id/>-<artifact-slug/>.md`,
+relative to the project root directory, with <artifact-no/> being the
+zero-padded, two-digit sequence number of the **Artifact** (starting at
+`01`) according to the order of the **Artifact** list below, and with
+<artifact-slug/> being derived from <artifact-name/> (see below) by
+lower-casing and using `-` characters instead of spaces.
 
 Each **Artifact** contains two timestamps: the <timestamp-created/>
 is the timestamp when this **Artifact** was created. The
