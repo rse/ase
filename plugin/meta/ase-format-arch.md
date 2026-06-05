@@ -69,6 +69,23 @@ distinct **Artifact**s (listed under their <artifact-name/> and their
     The major decisions related to the architecture, each recording the
     forces at play, the chosen response, and the reasoning that justifies it.
 
+The **Artifact**s have the following cross-references:
+
+```text
+ARCH-02-FV Functionality View   ──(depends on)─► ARCH-02-FV Functionality View
+ARCH-03-IV Information View     ──(entity)─►     SPEC-05-DM Data Model
+ARCH-03-IV Information View     ──(owner)─►      ARCH-02-FV Functionality View
+ARCH-04-CO Concurrency View     ──(hosts)─►      ARCH-02-FV Functionality View
+ARCH-06-DP Deployment View      ──(hosts)─►      ARCH-02-FV Functionality View
+ARCH-07-OV Operations View      ──(element)─►    ARCH-02-FV Functionality View
+ARCH-07-OV Operations View      ──(element)─►    ARCH-06-DP Deployment View
+ARCH-08-QP Quality Perspectives ──(addresses)─►  SPEC-04-NR Non-Functional Requirements
+ARCH-08-QP Quality Perspectives ──(affects)─►    ARCH-02-FV Functionality View
+ARCH-08-QP Quality Perspectives ──(affects)─►    ARCH-06-DP Deployment View
+ARCH-09-DR Decision Record      ──(affects)─►    ARCH-02-FV Functionality View
+ARCH-09-DR Decision Record      ──(affects)─►    ARCH-06-DP Deployment View
+```
+
 Context View (CV)
 -----------------
 

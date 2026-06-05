@@ -94,6 +94,18 @@ distinct **Artifact**s (listed under their <artifact-name/> and their
     The aesthetic and layout aspects of the solution, defining colors,
     typography, spacing, imagery, and overall look and feel.
 
+The **Artifact**s have the following cross-references:
+
+```text
+SPEC-01-CJ Customer Journey   ──(step actor)─►     SPEC-08-PE Personas
+SPEC-06-UC Use Cases          ──(use case actor)─► SPEC-08-PE Personas
+SPEC-07-US Use Case Scenarios ──(scenario)─►       SPEC-06-UC Use Cases
+SPEC-09-TC Test Cases         ──(verifies)─►       SPEC-03-FR Functional Requirements
+SPEC-09-TC Test Cases         ──(verifies)─►       SPEC-04-NR Non-Functional Requirements
+SPEC-13-SB Dialog Storyboard  ──(scenario)─►       SPEC-07-US Use Case Scenarios
+SPEC-13-SB Dialog Storyboard  ──(pattern)─►        SPEC-12-DP Dialog Patterns
+```
+
 Customer Journey (CJ)
 ---------------------
 
