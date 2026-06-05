@@ -30,79 +30,199 @@ The **Artifact Set** **Specification (SPEC)** consists of the following
 distinct **Artifact**s (listed under their <artifact-name/> and their
 <artifact-id/>):
 
-01. **Customer Journey (CJ)**:
-    The end-to-end experience a customer has while discovering, adopting,
-    and using the solution, mapping their steps, touchpoints, and emotions
-    over time.
-
-02. **Solution Vision (SV)**:
+01. **Solution Vision (SV)**:
     The high-level, aspirational description of the solution, capturing
     its purpose, value proposition, and the desired future state it aims
     to achieve.
 
-03. **Functional Requirements (FR)**:
+02. **Personas (PE)**:
+    The *archetypal* user profiles representing distinct user groups,
+    capturing their goals, needs, behaviors, and context.
+
+03. **Customer Journey (CJ)**:
+    The end-to-end experience a customer has while discovering, adopting,
+    and using the solution, mapping their steps, touchpoints, and emotions
+    over time.
+
+04. **Functional Requirements (FR)**:
     The concrete behaviors and capabilities the solution must provide,
     describing *what* the system does in terms of functions, features, and
     operations.
 
-04. **Non-Functional Requirements (NR)**:
+05. **Non-Functional Requirements (NR)**:
     The quality attributes and constraints the solution must satisfy, such
     as performance, security, scalability, reliability, and usability.
 
-05. **Data Model (DM)**:
+06. **Business Rules (BR)**:
+    The domain invariants, policies, and decision logic that must always
+    hold true in the problem domain, independent of any single feature,
+    constraining the Functional and Non-Functional Requirements.
+
+07. **Data Model (DM)**:
     The structure of named entities, named attributes, and named directed
     relationships (including a cardinality) of the data the solution
     manages, defining how information is organized and connected.
 
-06. **Use Cases (UC)**:
+08. **Glossary (GL)**:
+    The ubiquitous language of the domain, defining the meaning of each
+    domain term in business language, together with its synonyms and the
+    ambiguities to avoid, shared consistently across all Artifacts.
+
+09. **Use Cases (UC)**:
     The discrete goals users pursue with the solution, each describing
     an actor's interaction to achieve a specific outcome. For each Use
     Case, also the concrete step-by-step flows, detailing the sequence
     of actions for main, alternative, and exceptional paths.
 
-07. **Personas (PE)**:
-    The *archetypal* user profiles representing distinct user groups,
-    capturing their goals, needs, behaviors, and context.
-
-08. **Test Cases (TC)**:
+10. **Test Cases (TC)**:
     The verifiable conditions and steps used to confirm that requirements
     are correctly implemented, with mandatory defined inputs, mandatory
     expected outcomes, and optional pre- and post-conditions.
 
-09. **Interaction Concept (IC)**:
+11. **Interaction Concept (IC)**:
     The overarching idea of how users interact with the solution,
     describing the intended workflows and interaction philosophy (e.g.
     auto-save behavior).
 
-10. **Language Conventions (LC)**:
+12. **Language Conventions (LC)**:
     The terminology, naming, tone, and wording standards used consistently
     across the solution and its content.
 
-11. **Dialog Patterns (DP)**:
+13. **Dialog Patterns (DP)**:
     The reusable interaction structures governing how the system and user
     exchange information across recurring conversational or UI flows (e.g.
     master-detail dialog).
 
-12. **Dialog Storyboard (DS)**:
+14. **Dialog Storyboard (DS)**:
     The sequenced visual or textual depiction of a specific dialog flow,
     illustrating how an interaction unfolds screen by screen or turn by
     turn.
 
-13. **Visual Design (VD)**:
+15. **Visual Design (VD)**:
     The aesthetic and layout aspects of the solution, defining colors,
     typography, spacing, imagery, and overall look and feel.
 
 The **Artifact**s have the following cross-references:
 
 ```text
-SPEC-01-CJ Customer Journey   ──(step actor)─►     SPEC-07-PE Personas
-SPEC-06-UC Use Cases          ──(use case actor)─► SPEC-07-PE Personas
-SPEC-06-UC Use Cases          ──(realizes)─►       SPEC-03-FR Functional Requirements
-SPEC-08-TC Test Cases         ──(verifies)─►       SPEC-03-FR Functional Requirements
-SPEC-08-TC Test Cases         ──(verifies)─►       SPEC-04-NR Non-Functional Requirements
-SPEC-12-DS Dialog Storyboard  ──(scenario)─►       SPEC-06-UC Use Cases
-SPEC-12-DS Dialog Storyboard  ──(pattern)─►        SPEC-11-DP Dialog Patterns
+SPEC-03-CJ Customer Journey   ──(step actor)─►     SPEC-02-PE Personas
+SPEC-06-BR Business Rules     ──(constrains)─►     SPEC-04-FR Functional Requirements
+SPEC-06-BR Business Rules     ──(constrains)─►     SPEC-05-NR Non-Functional Requirements
+SPEC-09-UC Use Cases          ──(use case actor)─► SPEC-02-PE Personas
+SPEC-09-UC Use Cases          ──(realizes)─►       SPEC-04-FR Functional Requirements
+SPEC-10-TC Test Cases         ──(verifies)─►       SPEC-04-FR Functional Requirements
+SPEC-10-TC Test Cases         ──(verifies)─►       SPEC-05-NR Non-Functional Requirements
+SPEC-14-DS Dialog Storyboard  ──(scenario)─►       SPEC-09-UC Use Cases
+SPEC-14-DS Dialog Storyboard  ──(pattern)─►        SPEC-13-DP Dialog Patterns
 ```
+
+Solution Vision (SV)
+--------------------
+
+The high-level, aspirational description of the solution, capturing
+its purpose, value proposition, and the desired future state it aims
+to achieve.
+
+-   Format:
+
+    <format>
+
+    #   SPECIFICATION: SOLUTION VISION (SPEC-SV)
+
+    ✳   Created:  **<timestamp-created/>**
+    ✎   Modified: **<timestamp-modified/>**
+
+    <spec-sv-aspect/>
+    <spec-sv-aspect/>
+    [...]
+
+    </format>
+
+-   <spec-sv-aspect/> format:
+
+    <format>
+
+    ##  ASPECT: <spec-sv-aspect-name/> <a id="SPEC-SV-<spec-sv-aspect-id/>"></a>
+
+    <spec-sv-aspect-statement/>
+
+    </format>
+
+-   <spec-sv-aspect/> details:
+
+    -   <spec-sv-aspect-id/>: per-artifact unique "slug" of always 1-3
+        lower-cased words (concatenated with "-" characters and
+        in total not longer than 30 characters), derived from
+        <spec-sv-aspect-name/>.
+
+    -   <spec-sv-aspect-name/>: a short (2-5 word) summary of the vision
+        aspect. The recommended aspects are `Purpose` (why the solution
+        exists), `Target Audience` (who it serves), `Value Proposition`
+        (the unique benefit offered), `Differentiators` (how it stands
+        apart from alternatives), and `Future State` (the desired
+        outcome once adopted).
+
+    -   <spec-sv-aspect-statement/>: a concise paragraph (1-3 sentences)
+        of prose describing the vision aspect in an aspirational but
+        unambiguous tone.
+
+Personas (PE)
+-------------
+
+The *archetypal* user profiles representing distinct user groups,
+capturing their goals, needs, behaviors, and context.
+
+-   Format:
+
+    <format>
+
+    #   SPECIFICATION: PERSONAS (SPEC-PE)
+
+    ✳   Created:  **<timestamp-created/>**
+    ✎   Modified: **<timestamp-modified/>**
+
+    <spec-pe-persona/>
+    <spec-pe-persona/>
+    [...]
+
+    </format>
+
+-   <spec-pe-persona/> format:
+
+    <format>
+
+    ##  PERSONA: <spec-pe-persona-name/> <a id="SPEC-PE-<spec-pe-persona-id/>"></a>
+
+    -   Gender: <spec-pe-persona-gender/>
+    -   Age:    <spec-pe-persona-age/>
+    -   Role:   <spec-pe-persona-role/>
+
+    "<spec-pe-persona-quote/>"
+
+    </format>
+
+-   <spec-pe-persona/> details:
+
+    -   <spec-pe-persona-id/>: per-artifact unique "slug" of always 1-3
+        lower-cased words (concatenated with "-" characters and
+        in total not longer than 30 characters), derived from
+        <spec-pe-persona-name/>.
+
+    -   <spec-pe-persona-name/>: per-artifact unique first name of fictional
+        described person.
+
+    -   <spec-pe-persona-gender/>: the gender of the persona: `male`,
+        `female`, or `diverse`.
+
+    -   <spec-pe-persona-age/>: the age in years of the persona.
+
+    -   <spec-pe-persona-role/>: the role of the persona.
+
+    -   <spec-pe-persona-quote/>: a short and bold, first-person statement —
+        written in the persona's own voice — that captures their core
+        attitude, motivation, frustration, or need in a single memorable line.
+        It's sometimes called the persona's "tagline," "mantra," or "defining
+        statement."
 
 Customer Journey (CJ)
 ---------------------
@@ -179,56 +299,6 @@ over time.
 
     -   In case a <spec-cj-step/> has no pain point at all, the
         entire `- Pain Point:` bullet point is omitted.
-
-Solution Vision (SV)
---------------------
-
-The high-level, aspirational description of the solution, capturing
-its purpose, value proposition, and the desired future state it aims
-to achieve.
-
--   Format:
-
-    <format>
-
-    #   SPECIFICATION: SOLUTION VISION (SPEC-SV)
-
-    ✳   Created:  **<timestamp-created/>**
-    ✎   Modified: **<timestamp-modified/>**
-
-    <spec-sv-aspect/>
-    <spec-sv-aspect/>
-    [...]
-
-    </format>
-
--   <spec-sv-aspect/> format:
-
-    <format>
-
-    ##  ASPECT: <spec-sv-aspect-name/> <a id="SPEC-SV-<spec-sv-aspect-id/>"></a>
-
-    <spec-sv-aspect-statement/>
-
-    </format>
-
--   <spec-sv-aspect/> details:
-
-    -   <spec-sv-aspect-id/>: per-artifact unique "slug" of always 1-3
-        lower-cased words (concatenated with "-" characters and
-        in total not longer than 30 characters), derived from
-        <spec-sv-aspect-name/>.
-
-    -   <spec-sv-aspect-name/>: a short (2-5 word) summary of the vision
-        aspect. The recommended aspects are `Purpose` (why the solution
-        exists), `Target Audience` (who it serves), `Value Proposition`
-        (the unique benefit offered), `Differentiators` (how it stands
-        apart from alternatives), and `Future State` (the desired
-        outcome once adopted).
-
-    -   <spec-sv-aspect-statement/>: a concise paragraph (1-3 sentences)
-        of prose describing the vision aspect in an aspirational but
-        unambiguous tone.
 
 Functional Requirements (FR)
 ----------------------------
@@ -367,6 +437,79 @@ as performance, security, scalability, reliability, and usability.
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
 
+Business Rules (BR)
+-------------------
+
+The domain invariants, policies, and decision logic that must always
+hold true in the problem domain, independent of any single feature,
+constraining the Functional and Non-Functional Requirements.
+
+-   Format:
+
+    <format>
+
+    #   SPECIFICATION: BUSINESS RULES (SPEC-BR)
+
+    ✳   Created:  **<timestamp-created/>**
+    ✎   Modified: **<timestamp-modified/>**
+
+    <spec-br-rule/>
+    <spec-br-rule/>
+    [...]
+
+    </format>
+
+-   <spec-br-rule/> format:
+
+    <format>
+
+    ##  RULE: <spec-br-rule-name/> <a id="SPEC-BR-<spec-br-rule-id/>"></a>
+
+    -   Category:   <spec-br-rule-category/>
+    -   Constrains: <spec-br-rule-constrains/>
+
+    <spec-br-rule-statement/>,
+    **BECAUSE** <spec-br-rule-rationale/>.
+
+    </format>
+
+-   <spec-br-rule/> details:
+
+    -   <spec-br-rule-id/>: per-artifact unique "slug" of always 1-3
+        lower-cased words (concatenated with "-" characters and
+        in total not longer than 30 characters), derived from
+        <spec-br-rule-name/>.
+
+    -   <spec-br-rule-name/>: a short (3-8 word) summary of the business
+        rule.
+
+    -   <spec-br-rule-category/>: the kind of rule, one of `Invariant`
+        (a condition that must always hold), `Constraint` (a limit on
+        allowed values or actions), `Derivation` (a value computed from
+        others), or `Policy` (a deliberate business decision or
+        guideline).
+
+    -   <spec-br-rule-constrains/>: a comma-separated list of zero or more
+        `SPEC-FR-<spec-fr-requirement-id/>` or
+        `SPEC-NR-<spec-nr-requirement-id/>` references to the
+        corresponding **Aspect**s of the Functional or Non-Functional
+        Requirements **Artifact** the rule constrains.
+
+    -   <spec-br-rule-statement/>: a concise paragraph (1-3 sentences) of
+        prose stating the rule declaratively as a condition that must
+        hold, written with the keyword `MUST`, `SHOULD`, or `MUST NOT`
+        to indicate the obligation level, and naming the domain terms it
+        governs (defined in the Glossary **Artifact**).
+
+    -   <spec-br-rule-rationale/>: the 1-sentence rationale ("why") of the
+        business rule.
+
+    -   In case the rule constrains no specific requirement, the
+        entire `- Constrains:` bullet point is omitted.
+
+    -   In case the rationale is not present, the
+        entire `, **BECAUSE** [...]` clause is omitted.
+
 Data Model (DM)
 ---------------
 
@@ -473,6 +616,62 @@ manages, defining how information is organized and connected.
 
     -   In case any rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
+
+Glossary (GL)
+-------------
+
+The ubiquitous language of the domain, defining the meaning of each
+domain term in business language, together with its synonyms and the
+ambiguities to avoid, shared consistently across all Artifacts.
+
+-   Format:
+
+    <format>
+
+    #   SPECIFICATION: GLOSSARY (SPEC-GL)
+
+    ✳   Created:  **<timestamp-created/>**
+    ✎   Modified: **<timestamp-modified/>**
+
+    <spec-gl-term/>
+    <spec-gl-term/>
+    [...]
+
+    </format>
+
+-   <spec-gl-term/> format:
+
+    <format>
+
+    ##  TERM: <spec-gl-term-name/> <a id="SPEC-GL-<spec-gl-term-id/>"></a>
+
+    -   Synonyms: <spec-gl-term-synonyms/>
+
+    <spec-gl-term-definition/>
+
+    </format>
+
+-   <spec-gl-term/> details:
+
+    -   <spec-gl-term-id/>: per-artifact unique "slug" of always 1-3
+        lower-cased words (concatenated with "-" characters and
+        in total not longer than 30 characters), derived from
+        <spec-gl-term-name/>.
+
+    -   <spec-gl-term-name/>: the canonical, preferred name of the domain
+        term, capitalized as it should appear in all Artifacts.
+
+    -   <spec-gl-term-synonyms/>: a comma-separated list of one or more
+        alternative names or abbreviations that refer to the same term
+        but are *not* the preferred form.
+
+    -   <spec-gl-term-definition/>: a concise paragraph (1-3 sentences) of
+        prose defining the term in business language, independent of any
+        implementation, and referencing other terms by their
+        <spec-gl-term-name/> where helpful.
+
+    -   In case a term has no synonyms, the
+        entire `- Synonyms:` bullet point is omitted.
 
 Use Cases (UC)
 --------------
@@ -582,64 +781,6 @@ for main, alternative, and exceptional paths.
         naming the acting party (actor or system) and the action taken
         (e.g. `The user submits the login form.`). Steps are numbered
         sequentially to convey their order.
-
-Personas (PE)
--------------
-
-The *archetypal* user profiles representing distinct user groups,
-capturing their goals, needs, behaviors, and context.
-
--   Format:
-
-    <format>
-
-    #   SPECIFICATION: PERSONAS (SPEC-PE)
-
-    ✳   Created:  **<timestamp-created/>**
-    ✎   Modified: **<timestamp-modified/>**
-
-    <spec-pe-persona/>
-    <spec-pe-persona/>
-    [...]
-
-    </format>
-
--   <spec-pe-persona/> format:
-
-    <format>
-
-    ##  PERSONA: <spec-pe-persona-name/> <a id="SPEC-PE-<spec-pe-persona-id/>"></a>
-
-    -   Gender: <spec-pe-persona-gender/>
-    -   Age:    <spec-pe-persona-age/>
-    -   Role:   <spec-pe-persona-role/>
-
-    "<spec-pe-persona-quote/>"
-
-    </format>
-
--   <spec-pe-persona/> details:
-
-    -   <spec-pe-persona-id/>: per-artifact unique "slug" of always 1-3
-        lower-cased words (concatenated with "-" characters and
-        in total not longer than 30 characters), derived from
-        <spec-pe-persona-name/>.
-
-    -   <spec-pe-persona-name/>: per-artifact unique first name of fictional
-        described person.
-
-    -   <spec-pe-persona-gender/>: the gender of the persona: `male`,
-        `female`, or `diverse`.
-
-    -   <spec-pe-persona-age/>: the age in years of the persona.
-
-    -   <spec-pe-persona-role/>: the role of the persona.
-
-    -   <spec-pe-persona-quote/>: a short and bold, first-person statement —
-        written in the persona's own voice — that captures their core
-        attitude, motivation, frustration, or need in a single memorable line.
-        It's sometimes called the persona's "tagline," "mantra," or "defining
-        statement."
 
 Test Cases (TC)
 ---------------
