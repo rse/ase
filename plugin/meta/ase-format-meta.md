@@ -37,6 +37,11 @@ Artifact Meta Information
     name (for stable ordering) and is *not* part of the **Artifact**'s
     or its **Aspect**s' identifiers.
 
+    Each **Artifact** *MUST* have an initial blank line and a trailing
+    blank line. All its lines should be kept below 140 characters,
+    whenever possible by line-breaking with newlines after about 120
+    characters per line.
+
 -   **Aspect**:
 
     At level 3, each **Artifact** is composed of many **Aspect**s.
