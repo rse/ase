@@ -364,9 +364,16 @@ plans under `<project>/.ase/task/`*id*`/plan.md`:
   `<project>/.ase/task/`*id*`/` directory). Exits with status 1 if no such
   task existed.
 
-- `ase task purge` \[*days*\]:
+- `ase task rename` *old-id* *new-id*:
+  Rename the task plan with the given *old-id* to *new-id* (moving the
+  entire `<project>/.ase/task/`*old-id*`/` directory). Exits with status 1
+  if no such task existed or the target id is already in use.
+
+- `ase task purge` \[*age*\]:
   Remove all persisted tasks whose modification time is older than
-  *days* (default: 31).
+  *age* (default: `31d`). The *age* argument is a `<number><unit>`
+  value, where *unit* is one of `h` (hour), `d` (day), `m` (month), or
+  `y` (year).
 
 The following top-level commands exist for *Claude Code* hook
 integration:

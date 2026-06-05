@@ -101,6 +101,10 @@ The following ASE commands/skills exist on the task-level:
 - **/ase-task-implement** \[*id*\]:<br/>
   Implement the current or given task plan.
 
+- **/ase-task-condense** \[*id*\]:<br/>
+  Condense the current or given task plan by compressing its wording
+  without losing essential content.
+
 - **/ase-task-delete** \[*id*\]:<br/>
   Delete the current or given task plan.
 

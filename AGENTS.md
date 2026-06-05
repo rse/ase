@@ -31,8 +31,14 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   `ase statusline` renders the *Claude Code* (or *GitHub Copilot CLI*)
   status line; `ase task` manages persisted task plans under
   `<project>/.ase/task/<id>/plan.md` (subcommands: `list`, `load`,
-  `edit`, `save`, `delete`, `purge`); `ase diagram` renders Mermaid
-  diagrams as Unicode/ASCII art.
+  `edit`, `save`, `delete`, `rename`, `purge`); `ase diagram` renders
+  Mermaid diagrams as Unicode/ASCII art.
+  Supporting modules backing the MCP service include `ase-kv.ts`
+  (in-memory, per-project key/value store shared across sessions),
+  `ase-skills.ts` (package metadata gathering for component discovery),
+  `ase-timestamp.ts` (Luxon-formatted timestamps), `ase-persona.ts`,
+  `ase-getopt.ts` (skill option parsing), `ase-log.ts` (logging), and
+  `ase-version.ts` (current/latest version determination).
   The `tool/plugin` is a build-time copy of `plugin` and can be ignored.
 
 - `plugin/` — the Claude Code plugin published via the marketplace
@@ -57,7 +63,10 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     (skill control flow), `ase-dialog.md` (user-dialog conventions),
     `ase-getopt.md` (skill option parsing), `ase-persona.md`
     (persona definitions), `ase-format-plan.md` (task-plan conventions),
-    and `ase-format-adr.md` (architecture-decision-record conventions).
+    `ase-format-meta.md` (artifact-set/artifact meta-information
+    conventions), and the artifact-set format definitions
+    `ase-format-spec.md` (Specification / SPEC) and `ase-format-arch.md`
+    (Architecture / ARCH).
 
 The root `README.md` is user-facing install docs;
 `pages/` is the GitHub Pages site (`.github/workflows/static.yml`).
