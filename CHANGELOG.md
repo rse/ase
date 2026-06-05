@@ -5,7 +5,13 @@ ChangeLog
 0.9.2 (2026-06-05)
 ------------------
 
+- FEATURE: add State Model, Glossary, and Business Rules artifacts to Specification format (`ase-format-spec.md`)
+- FEATURE: add `upd` build target for updating package.json files in `etc/stx.conf`
+- IMPROVEMENT: improve Specification format rendering and add cross-reference information across SPEC/ARCH format definitions
+- IMPROVEMENT: add sequence-number filename prefix, Pascal-cased slugs, and numbered Artifact lists to SPEC/ARCH formats
+- IMPROVEMENT: align `ase-format-arch.md` formatting and conventions with the newer SPEC format
 - CLEANUP: merge ase-format-adr.md into the newer ase-format-arch.md
+- CLEANUP: enforce consistent line-breaking, blank lines, and spacing in format definitions
 
 0.9.1 (2026-06-05)
 ------------------
