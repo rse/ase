@@ -99,6 +99,7 @@ The **Artifact**s have the following cross-references:
 ```text
 SPEC-01-CJ Customer Journey   ──(step actor)─►     SPEC-08-PE Personas
 SPEC-06-UC Use Cases          ──(use case actor)─► SPEC-08-PE Personas
+SPEC-06-UC Use Cases          ──(realizes)─►       SPEC-03-FR Functional Requirements
 SPEC-07-US Use Case Scenarios ──(scenario)─►       SPEC-06-UC Use Cases
 SPEC-09-TC Test Cases         ──(verifies)─►       SPEC-03-FR Functional Requirements
 SPEC-09-TC Test Cases         ──(verifies)─►       SPEC-04-NR Non-Functional Requirements
@@ -262,8 +263,8 @@ operations.
 
     -   Priority: <spec-fr-requirement-priority/>
 
-    <spec-fr-requirement-statement/>
-    (why: <spec-fr-requirement-rationale/>)
+    <spec-fr-requirement-statement/>,
+    **BECAUSE** <spec-fr-requirement-rationale/>.
 
     </format>
 
@@ -278,18 +279,21 @@ operations.
         functional requirement.
 
     -   <spec-fr-requirement-priority/>: the MoSCoW priority of the
-        requirement: `MUST`, `SHOULD`, `COULD`, or `WONT`.
+        requirement: `MUST`, `SHOULD`, `COULD`, or `WONT`. The `WONT`
+        priority records a requirement deliberately excluded from the
+        current scope ("won't have this time"), preserving the conscious
+        decision rather than silently dropping it.
 
     -   <spec-fr-requirement-statement/>: a concise paragraph (1-3
         sentences) of prose describing *what* the solution must do,
-        written with the keyword `MUST`, `SHOULD`, `COULD`, or `WILL
-        NOT` to indicate the obligation level.
+        written with the keyword `MUST`, `SHOULD`, `COULD`, or `WONT`
+        to indicate the obligation level.
 
     -   <spec-fr-requirement-rationale/>: the 1-sentence rationale ("why")
         of the functional requirement.
 
     -   In case the rationale is not present, the
-        entire `(why: [...])` chunk is omitted.
+        entire `, **BECAUSE** [...]` clause is omitted.
 
 Non-Functional Requirements (NR)
 --------------------------------
@@ -318,12 +322,11 @@ as performance, security, scalability, reliability, and usability.
 
     ##  REQUIREMENT SPEC-NR-<spec-nr-requirement-id/>: <spec-nr-requirement-name/>
 
-    -   Category: <spec-nr-requirement-category/>
     -   Priority: <spec-nr-requirement-priority/>
-    -   Metric:   <spec-nr-requirement-metric/>
+    -   Category: <spec-nr-requirement-category/>
 
-    <spec-nr-requirement-statement/>
-    (why: <spec-nr-requirement-rationale/>)
+    <spec-nr-requirement-statement/>,
+    **BECAUSE** <spec-nr-requirement-rationale/>.
 
     </format>
 
@@ -337,28 +340,35 @@ as performance, security, scalability, reliability, and usability.
     -   <spec-nr-requirement-name/>: a short (3-8 word) summary of the
         non-functional requirement.
 
-    -   <spec-nr-requirement-category/>: the quality attribute category
-        the requirement addresses, one of `Performance`, `Scalability`,
-        `Reliability`, `Availability`, `Security`, `Privacy`,
-        `Usability`, `Accessibility`, `Maintainability`, `Portability`,
-        `Compatibility`, or `Compliance`.
-
     -   <spec-nr-requirement-priority/>: the MoSCoW priority of the
-        requirement: `MUST`, `SHOULD`, `COULD`, or `WONT`.
+        requirement: `MUST`, `SHOULD`, `COULD`, or `WONT`. The `WONT`
+        priority records a requirement deliberately excluded from the
+        current scope ("won't have this time"), preserving the conscious
+        decision rather than silently dropping it.
 
-    -   <spec-nr-requirement-metric/>: the measurable, verifiable
-        threshold or target by which the requirement is judged satisfied
-        (e.g. `p95 latency < 200ms`, `99.9% uptime`).
+    -   <spec-nr-requirement-category/>: the quality attribute category
+        the requirement addresses, one of `Performance`,
+        `Compatibility`, `Usability`, `Reliability`, `Security`,
+        `Safety`, `Maintainability`, `Flexibility`, and `Compliance`,
+        according to the top-level characteristics in the ISO/IEC
+        25010:2023 Software-Quality Model (except for `Functional
+        Suitability` which are described by our Functional Requirements
+        (FR)).
 
     -   <spec-nr-requirement-statement/>: a concise paragraph (1-3
         sentences) of prose describing the quality attribute or
-        constraint the solution must satisfy.
+        constraint the solution must satisfy. It especially *MUST*
+        contain a *METRIC* within the <spec-nr-requirement-category/>,
+        which (according to the SMART principle) is the *specific*,
+        *measurable*, *achievable*, *relevant* and *time-bound*
+        threshold or target by which the requirement is judged satisfied
+        (e.g. `p95 latency < 200ms`, `99.9% uptime`).
 
     -   <spec-nr-requirement-rationale/>: the 1-sentence rationale ("why")
         of the non-functional requirement.
 
     -   In case the rationale is not present, the
-        entire `(why: [...])` chunk is omitted.
+        entire `, **BECAUSE** [...]` clause is omitted.
 
 Data Model (DM)
 ---------------
@@ -386,24 +396,24 @@ manages, defining how information is organized and connected.
 
     <format>
 
-    ##  ENTITY SPEC-DM-<spec-dm-entity-id/>: <spec-dm-entity-name/>
+    ##  ENTITY <a id="SPEC-DM-<spec-dm-entity-id/>">`<spec-dm-entity-name/>`</a>
 
-    <spec-dm-entity-description/>
-    (why: <spec-dm-entity-rationale/>)
+    <spec-dm-entity-description/>,
+    **BECAUSE** <spec-dm-entity-rationale/>.
 
     ### ATTRIBUTES
 
-    -   **<spec-dm-attribute-id/>**: <spec-dm-attribute-qualifier/><spec-dm-attribute-type/>:
-        <spec-dm-attribute-description/>
-        (why: <spec-dm-attribute-rationale/>)
+    -   `<spec-dm-attribute-id/>`: `<spec-dm-attribute-qualifier/><spec-dm-attribute-type/>`:<br/>
+        <spec-dm-attribute-description/>,
+        **BECAUSE** <spec-dm-attribute-rationale/>.
 
     -   [...]
 
     ### RELATIONS
 
-    -   **<spec-dm-relation-id/>**: <spec-dm-relation-target/>(<spec-dm-relation-cardinality/>):
-        <spec-dm-relation-description/>
-        (why: <spec-dm-relation-rationale/>)
+    -   `<spec-dm-relation-id/>`: [`<spec-dm-relation-target/>`](#<spec-dm-relation-id/>)(`<spec-dm-relation-cardinality/>`):<br/>
+        <spec-dm-relation-description/>,
+        **BECAUSE** <spec-dm-relation-rationale/>.
 
     -   [...]
 
@@ -453,6 +463,9 @@ manages, defining how information is organized and connected.
     -   <spec-dm-relation-target/>: the <spec-dm-entity-name/> of the
         entity the directed relation targets.
 
+    -   <spec-dm-relation-id/>: the <spec-dm-entity-id/> of the
+        entity the directed relation targets.
+
     -   <spec-dm-relation-cardinality/>: the cardinality of the entity
         relation at the target entity: `0..1` for zero or one
         ("optional"), `1` for exactly one ("mandatory"), `0..n` for
@@ -462,7 +475,7 @@ manages, defining how information is organized and connected.
         entire `### RELATIONS` block is omitted.
 
     -   In case any rationale is not present, the
-        entire `(why: [...])` chunk is omitted.
+        entire `, **BECAUSE** [...]` clause is omitted.
 
 Use Cases (UC)
 --------------
@@ -492,6 +505,7 @@ actor's interaction to achieve a specific outcome.
     ##  USE CASE SPEC-UC-<spec-uc-usecase-id/>: <spec-uc-usecase-name/>
 
     -   Actor:        <spec-uc-usecase-actor/>
+    -   Requirements: <spec-uc-usecase-requirements/>
     -   Goal:         <spec-uc-usecase-goal/>
     -   Precondition: <spec-uc-usecase-precondition/>
     -   Postcondition: <spec-uc-usecase-postcondition/>
@@ -514,6 +528,11 @@ actor's interaction to achieve a specific outcome.
         reference to the corresponding **Aspect** of the Personas
         **Artifact**, denoting the primary actor pursuing the goal.
 
+    -   <spec-uc-usecase-requirements/> is a comma-separated list of one
+        or more `SPEC-FR-<spec-fr-requirement-id/>` references to the
+        corresponding **Aspect**s of the Functional Requirements
+        **Artifact** the use case realizes.
+
     -   <spec-uc-usecase-goal/>: the 1-sentence statement of what the
         actor wants to achieve through this use case.
 
@@ -527,6 +546,9 @@ actor's interaction to achieve a specific outcome.
         sentences) of prose describing the use case at a glance, without
         prescribing the step-by-step flow (which belongs to the **Use
         Case Scenarios** **Artifact**).
+
+    -   In case the use case realizes no specific functional requirement,
+        the entire `- Requirements:` bullet point is omitted.
 
     -   In case a precondition or postcondition is not present, the
         respective bullet point is omitted.
@@ -742,8 +764,8 @@ auto-save behavior).
 
     ##  PRINCIPLE SPEC-IC-<spec-ic-principle-id/>: <spec-ic-principle-name/>
 
-    <spec-ic-principle-statement/>
-    (why: <spec-ic-principle-rationale/>)
+    <spec-ic-principle-statement/>,
+    **BECAUSE** <spec-ic-principle-rationale/>.
 
     </format>
 
@@ -766,7 +788,7 @@ auto-save behavior).
         of the interaction principle.
 
     -   In case the rationale is not present, the
-        entire `(why: [...])` chunk is omitted.
+        entire `, **BECAUSE** [...]` clause is omitted.
 
 Language Conventions (LC)
 -------------------------
@@ -857,8 +879,8 @@ master-detail dialog).
 
     -   Context: <spec-dp-pattern-context/>
 
-    <spec-dp-pattern-description/>
-    (why: <spec-dp-pattern-rationale/>)
+    <spec-dp-pattern-description/>,
+    **BECAUSE** <spec-dp-pattern-rationale/>.
 
     </format>
 
@@ -883,7 +905,7 @@ master-detail dialog).
         the dialog pattern.
 
     -   In case the rationale is not present, the
-        entire `(why: [...])` chunk is omitted.
+        entire `, **BECAUSE** [...]` clause is omitted.
 
 Dialog Storyboard (SB)
 ----------------------
@@ -979,8 +1001,8 @@ typography, spacing, imagery, and overall look and feel.
 
     -   Category: <spec-vd-element-category/>
 
-    <spec-vd-element-specification/>
-    (why: <spec-vd-element-rationale/>)
+    <spec-vd-element-specification/>,
+    **BECAUSE** <spec-vd-element-rationale/>.
 
     </format>
 
@@ -1007,4 +1029,4 @@ typography, spacing, imagery, and overall look and feel.
         the visual design element.
 
     -   In case the rationale is not present, the
-        entire `(why: [...])` chunk is omitted.
+        entire `, **BECAUSE** [...]` clause is omitted.
