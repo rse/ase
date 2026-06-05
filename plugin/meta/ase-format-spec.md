@@ -63,42 +63,47 @@ distinct **Artifact**s (listed under their <artifact-name/> and their
     relationships (including a cardinality) of the data the solution
     manages, defining how information is organized and connected.
 
-08. **Glossary (GL)**:
+08. **State Model (SM)**:
+    For each entity with a non-trivial lifecycle, the legal states it can
+    occupy and the permitted transitions between them over its lifetime,
+    making the forbidden moves as explicit as the allowed ones.
+
+09. **Glossary (GL)**:
     The ubiquitous language of the domain, defining the meaning of each
     domain term in business language, together with its synonyms and the
     ambiguities to avoid, shared consistently across all Artifacts.
 
-09. **Use Cases (UC)**:
+10. **Use Cases (UC)**:
     The discrete goals users pursue with the solution, each describing
     an actor's interaction to achieve a specific outcome. For each Use
     Case, also the concrete step-by-step flows, detailing the sequence
     of actions for main, alternative, and exceptional paths.
 
-10. **Test Cases (TC)**:
+11. **Test Cases (TC)**:
     The verifiable conditions and steps used to confirm that requirements
     are correctly implemented, with mandatory defined inputs, mandatory
     expected outcomes, and optional pre- and post-conditions.
 
-11. **Interaction Concept (IC)**:
+12. **Interaction Concept (IC)**:
     The overarching idea of how users interact with the solution,
     describing the intended workflows and interaction philosophy (e.g.
     auto-save behavior).
 
-12. **Language Conventions (LC)**:
+13. **Language Conventions (LC)**:
     The terminology, naming, tone, and wording standards used consistently
     across the solution and its content.
 
-13. **Dialog Patterns (DP)**:
+14. **Dialog Patterns (DP)**:
     The reusable interaction structures governing how the system and user
     exchange information across recurring conversational or UI flows (e.g.
     master-detail dialog).
 
-14. **Dialog Storyboard (DS)**:
+15. **Dialog Storyboard (DS)**:
     The sequenced visual or textual depiction of a specific dialog flow,
     illustrating how an interaction unfolds screen by screen or turn by
     turn.
 
-15. **Visual Design (VD)**:
+16. **Visual Design (VD)**:
     The aesthetic and layout aspects of the solution, defining colors,
     typography, spacing, imagery, and overall look and feel.
 
@@ -108,12 +113,14 @@ The **Artifact**s have the following cross-references:
 SPEC-03-CJ Customer Journey   ──(step actor)─►     SPEC-02-PE Personas
 SPEC-06-BR Business Rules     ──(constrains)─►     SPEC-04-FR Functional Requirements
 SPEC-06-BR Business Rules     ──(constrains)─►     SPEC-05-NR Non-Functional Requirements
-SPEC-09-UC Use Cases          ──(use case actor)─► SPEC-02-PE Personas
-SPEC-09-UC Use Cases          ──(realizes)─►       SPEC-04-FR Functional Requirements
-SPEC-10-TC Test Cases         ──(verifies)─►       SPEC-04-FR Functional Requirements
-SPEC-10-TC Test Cases         ──(verifies)─►       SPEC-05-NR Non-Functional Requirements
-SPEC-14-DS Dialog Storyboard  ──(scenario)─►       SPEC-09-UC Use Cases
-SPEC-14-DS Dialog Storyboard  ──(pattern)─►        SPEC-13-DP Dialog Patterns
+SPEC-08-SM State Model        ──(of entity)─►      SPEC-07-DM Data Model
+SPEC-10-UC Use Cases          ──(use case actor)─► SPEC-02-PE Personas
+SPEC-10-UC Use Cases          ──(realizes)─►       SPEC-04-FR Functional Requirements
+SPEC-10-UC Use Cases          ──(transitions)─►    SPEC-08-SM State Model
+SPEC-11-TC Test Cases         ──(verifies)─►       SPEC-04-FR Functional Requirements
+SPEC-11-TC Test Cases         ──(verifies)─►       SPEC-05-NR Non-Functional Requirements
+SPEC-15-DS Dialog Storyboard  ──(scenario)─►       SPEC-10-UC Use Cases
+SPEC-15-DS Dialog Storyboard  ──(pattern)─►        SPEC-14-DP Dialog Patterns
 ```
 
 Solution Vision (SV)
@@ -616,6 +623,112 @@ manages, defining how information is organized and connected.
 
     -   In case any rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
+
+State Model (SM)
+----------------
+
+For each entity with a non-trivial lifecycle, the legal states it can
+occupy and the permitted transitions between them over its lifetime,
+making the forbidden moves as explicit as the allowed ones. Only
+entities whose lifecycle has three or more states warrant an Aspect;
+entities with a trivial lifecycle are omitted entirely.
+
+-   Format:
+
+    <format>
+
+    #   SPECIFICATION: STATE MODEL (SPEC-SM)
+
+    ✳   Created:  **<timestamp-created/>**
+    ✎   Modified: **<timestamp-modified/>**
+
+    <spec-sm-lifecycle/>
+    <spec-sm-lifecycle/>
+    [...]
+
+    </format>
+
+-   <spec-sm-lifecycle/> format:
+
+    <format>
+
+    ##  LIFECYCLE: <spec-sm-lifecycle-name/> <a id="SPEC-SM-<spec-sm-lifecycle-id/>"></a>
+
+    -   Entity:  <spec-sm-lifecycle-entity/>
+    -   Initial: <spec-sm-lifecycle-initial/>
+    -   Final:   <spec-sm-lifecycle-final/>
+
+    ### STATES
+
+    -   `<spec-sm-state-name/>`:
+        <spec-sm-state-description/>.
+
+    -   [...]
+
+    ### TRANSITIONS
+
+    -   `<spec-sm-transition-from/>` ─(<spec-sm-transition-event/>)─► `<spec-sm-transition-to/>`:
+        <spec-sm-transition-effect/>,
+        **WHEN** <spec-sm-transition-guard/>.
+
+    -   [...]
+
+    </format>
+
+-   <spec-sm-lifecycle/> details:
+
+    -   <spec-sm-lifecycle-id/>: per-artifact unique "slug" of always 1-3
+        lower-cased words (concatenated with "-" characters and
+        in total not longer than 30 characters), derived from
+        <spec-sm-lifecycle-name/>.
+
+    -   <spec-sm-lifecycle-name/>: a short (1-3 word) name of the lifecycle,
+        normally the name of the entity it governs.
+
+    -   <spec-sm-lifecycle-entity/> is a `SPEC-DM-<spec-dm-entity-id/>`
+        reference to the corresponding **Aspect** of the Data Model
+        **Artifact** whose lifecycle this models.
+
+    -   <spec-sm-lifecycle-initial/>: the <spec-sm-state-name/> of the
+        single state every instance of the entity enters upon creation.
+
+    -   <spec-sm-lifecycle-final/>: a comma-separated list of one or more
+        <spec-sm-state-name/>s in which the entity may legally come to
+        rest permanently (terminal states).
+
+    -   <spec-sm-state-name/>: a short, Pascal-cased, per-lifecycle unique
+        name of one state the entity can occupy (e.g. `Draft`,
+        `Shipped`).
+
+    -   <spec-sm-state-description/>: the 1-sentence description ("what
+        holds true") of the state.
+
+    -   <spec-sm-transition-from/>: the <spec-sm-state-name/> the
+        transition departs from.
+
+    -   <spec-sm-transition-to/>: the <spec-sm-state-name/> the transition
+        arrives at.
+
+    -   <spec-sm-transition-event/>: a short, lower-cased verb naming the
+        event or action that triggers the transition (e.g. `submit`,
+        `ship`, `cancel`).
+
+    -   <spec-sm-transition-effect/>: the 1-sentence description ("what
+        happens") of the side effect the transition produces.
+
+    -   <spec-sm-transition-guard/>: the condition that must hold for the
+        transition to be permitted; any move not listed as a transition
+        is implicitly forbidden.
+
+    -   Every <spec-sm-state-name/> used in a transition *MUST* be
+        declared in the `### STATES` block, and every non-final state
+        *MUST* have at least one outgoing transition.
+
+    -   In case a transition has no side effect, the
+        entire `<spec-sm-transition-effect/>,` clause is omitted.
+
+    -   In case a transition has no guard, the
+        entire `, **WHEN** [...]` clause is omitted.
 
 Glossary (GL)
 -------------
