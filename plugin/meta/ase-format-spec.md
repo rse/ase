@@ -30,67 +30,67 @@ The **Artifact Set** **Specification (SPEC)** consists of the following
 distinct **Artifact**s (listed under their <artifact-name/> and their
 <artifact-id/>):
 
--   **Customer Journey (CJ)**:
+01. **Customer Journey (CJ)**:
     The end-to-end experience a customer has while discovering, adopting,
     and using the solution, mapping their steps, touchpoints, and emotions
     over time.
 
--   **Solution Vision (SV)**:
+02. **Solution Vision (SV)**:
     The high-level, aspirational description of the solution, capturing
     its purpose, value proposition, and the desired future state it aims
     to achieve.
 
--   **Functional Requirements (FR)**:
+03. **Functional Requirements (FR)**:
     The concrete behaviors and capabilities the solution must provide,
     describing *what* the system does in terms of functions, features, and
     operations.
 
--   **Non-Functional Requirements (NR)**:
+04. **Non-Functional Requirements (NR)**:
     The quality attributes and constraints the solution must satisfy, such
     as performance, security, scalability, reliability, and usability.
 
--   **Data Model (DM)**:
+05. **Data Model (DM)**:
     The structure of named entities, named attributes, and named directed
     relationships (including a cardinality) of the data the solution
     manages, defining how information is organized and connected.
 
--   **Use Cases (UC)**:
+06. **Use Cases (UC)**:
     The discrete goals users pursue with the solution, each describing an
     actor's interaction to achieve a specific outcome.
 
--   **Use Case Scenarios (US)**:
+07. **Use Case Scenarios (US)**:
     The concrete step-by-step flows through a **Use Case**, detailing the
     sequence of actions for main, alternative, and exceptional paths.
 
--   **Personas (PE)**:
+08. **Personas (PE)**:
     The *archetypal* user profiles representing distinct user groups,
     capturing their goals, needs, behaviors, and context.
 
--   **Test Cases (TC)**:
+09. **Test Cases (TC)**:
     The verifiable conditions and steps used to confirm that requirements
     are correctly implemented, with mandatory defined inputs, mandatory
     expected outcomes, and optional pre- and post-conditions.
 
--   **Interaction Concept (IC)**:
+10. **Interaction Concept (IC)**:
     The overarching idea of how users interact with the solution,
     describing the intended workflows and interaction philosophy (e.g.
     auto-save behavior).
 
--   **Language Conventions (LC)**:
+11. **Language Conventions (LC)**:
     The terminology, naming, tone, and wording standards used consistently
     across the solution and its content.
 
--   **Dialog Patterns (DP)**:
+12. **Dialog Patterns (DP)**:
     The reusable interaction structures governing how the system and user
     exchange information across recurring conversational or UI flows (e.g.
     master-detail dialog).
 
--   **Dialog Storyboard (SB)**:
+13. **Dialog Storyboard (SB)**:
     The sequenced visual or textual depiction of a specific dialog flow,
     illustrating how an interaction unfolds screen by screen or turn by
     turn.
 
--   **Visual Design (VD)**:
+14. **Visual Design (VD)**:
     The aesthetic and layout aspects of the solution, defining colors,
     typography, spacing, imagery, and overall look and feel.
 

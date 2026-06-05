@@ -30,42 +30,42 @@ The **Artifact Set** **Architecture (ARCH)** consists of the following
 distinct **Artifact**s (listed under their <artifact-name/> and their
 <artifact-id/>):
 
--   **Context View (CV)**:
+01. **Context View (CV)**:
     The relationships, dependencies, and interactions between the solution
     and its environment, defining the system's scope, external entities,
     and boundaries.
 
--   **Functionality View (FV)**:
+02. **Functionality View (FV)**:
     The functional elements of the solution, their responsibilities,
     interfaces, and primary interactions, describing *what* the system does
     at runtime.
 
--   **Information View (IV)**:
+03. **Information View (IV)**:
     The way the solution stores, manages, manipulates, and distributes
     information, defining the static data structure and dynamic information
     flow.
 
--   **Concurrency View (CO)**:
+04. **Concurrency View (CO)**:
     The concurrency structure of the solution, mapping functional elements
     to processes and threads, and defining how they coordinate and
     communicate.
 
--   **Development View (DV)**:
+05. **Development View (DV)**:
     The architecture supporting the software development process, defining
     the module organization, build approach, and codeline conventions.
 
--   **Deployment View (DP)**:
+06. **Deployment View (DP)**:
     The environment into which the solution is deployed, mapping software
     elements to the runtime platform, hardware, and network topology.
 
--   **Operations View (OV)**:
+07. **Operations View (OV)**:
     The way the solution is operated, administered, and supported in
     production, defining installation, monitoring, and management concerns.
 
--   **Quality Perspectives (QP)**:
+08. **Quality Perspectives (QP)**:
     How the Non-Functional Requirements (NR) are addressed.
 
--   **Decision Record (DR)**:
+09. **Decision Record (DR)**:
     The major decisions related to the architecture, each recording the
     forces at play, the chosen response, and the reasoning that justifies it.
 
