@@ -110,17 +110,17 @@ distinct **Artifact**s (listed under their <artifact-name/> and their
 The **Artifact**s have the following cross-references:
 
 ```text
-SPEC-03-CJ Customer Journey   ──(step actor)─►     SPEC-02-PE Personas
-SPEC-06-BR Business Rules     ──(constrains)─►     SPEC-04-FR Functional Requirements
-SPEC-06-BR Business Rules     ──(constrains)─►     SPEC-05-NR Non-Functional Requirements
-SPEC-08-SM State Model        ──(of entity)─►      SPEC-07-DM Data Model
-SPEC-10-UC Use Cases          ──(use case actor)─► SPEC-02-PE Personas
-SPEC-10-UC Use Cases          ──(realizes)─►       SPEC-04-FR Functional Requirements
-SPEC-10-UC Use Cases          ──(transitions)─►    SPEC-08-SM State Model
-SPEC-11-TC Test Cases         ──(verifies)─►       SPEC-04-FR Functional Requirements
-SPEC-11-TC Test Cases         ──(verifies)─►       SPEC-05-NR Non-Functional Requirements
-SPEC-15-DS Dialog Storyboard  ──(scenario)─►       SPEC-10-UC Use Cases
-SPEC-15-DS Dialog Storyboard  ──(pattern)─►        SPEC-14-DP Dialog Patterns
+SPEC-03-CJ Customer Journey  ──(step actor)─►     SPEC-02-PE Personas
+SPEC-06-BR Business Rules    ──(constrains)─►     SPEC-04-FR Functional Requirements
+SPEC-06-BR Business Rules    ──(constrains)─►     SPEC-05-NR Non-Functional Requirements
+SPEC-08-SM State Model       ──(of entity)─►      SPEC-07-DM Data Model
+SPEC-10-UC Use Cases         ──(use case actor)─► SPEC-02-PE Personas
+SPEC-10-UC Use Cases         ──(realizes)─►       SPEC-04-FR Functional Requirements
+SPEC-10-UC Use Cases         ──(transitions)─►    SPEC-08-SM State Model
+SPEC-11-TC Test Cases        ──(verifies)─►       SPEC-04-FR Functional Requirements
+SPEC-11-TC Test Cases        ──(verifies)─►       SPEC-05-NR Non-Functional Requirements
+SPEC-15-DS Dialog Storyboard ──(scenario)─►       SPEC-10-UC Use Cases
+SPEC-15-DS Dialog Storyboard ──(pattern)─►        SPEC-14-DP Dialog Patterns
 ```
 
 Solution Vision (SV)
