@@ -431,7 +431,7 @@ as performance, security, scalability, reliability, and usability.
         `Safety`, `Maintainability`, `Flexibility`, and `Compliance`,
         according to the top-level characteristics in the ISO/IEC
         25010:2023 Software-Quality Model (except for `Functional
-        Suitability` which are described by our Functional Requirements
+        Suitability` which is described by our Functional Requirements
         (FR)).
 
     -   <spec-nr-requirement-statement/>: a concise paragraph (1-3
