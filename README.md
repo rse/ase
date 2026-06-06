@@ -401,7 +401,7 @@ features.
 </td>
 <td width="50%" valign="top">
 
-- [**Artifact Formats**](plugin/meta/) (OPTIONAL, 30% done):
+- [**Artifact Formats**](plugin/meta/) (OPTIONAL, 60% done):
   The format of the primary deliveries of Software Engineering
   (requirements specification, architecture description, documentation,
   and source code) and their artifacts are strictly defined. This allows
