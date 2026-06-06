@@ -1,11 +1,11 @@
 ---
 name: ase-meta-diff
-argument-hint: "[--help|-h] [--risk|-r] [--blast|-b]"
+argument-hint: "[--help|-h] [--coherence|-c] [--risk|-r] [--blast|-b]"
 description: >
     Summarize the currently staged Git changes as a human-readable,
     intent-grouped narrative. Use when the user wants a concise and
-    brief report of what changed and why. Optionally can show a risk and
-    blast radius report.
+    brief report of what changed and why. Optionally can check the diff
+    for intent coherence and show a risk and blast radius report.
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -27,16 +27,18 @@ Summarize Diff
 
 <expand name="getopt"
     arg1="ase-meta-diff"
-    arg2="--risk|-r --blast|-b">
+    arg2="--coherence|-c --risk|-r --blast|-b">
     $ARGUMENTS
 </expand>
 
 <objective>
 Summarize the currently staged Git changes into a *concise*,
-*human-readable* narrative of what changed and why, *grouped by
-intent* rather than by file. Optionally *score* the diff against a
-*coupling-criticality-coverage- reversibility* rubric and emit a *graded
-risk report* with *mitigations*. Optionally render a *blast-radius map*.
+*human-readable* narrative of what changed and why, *grouped by intent*
+rather than by file. Optionally *reconstruct the change's single
+intended purpose* and *flag hunks that do not serve it*. Optionally
+*score* the diff against a *coupling-criticality-coverage-reversibility*
+rubric and emit a *graded risk report* with *mitigations*. Optionally
+render a *blast-radius map*.
 </objective>
 
 Procedure
@@ -129,19 +131,86 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     </step>
 
-3.  <step id="STEP 3: Score Against Risk Rubric (optional)">
+3.  <step id="STEP 3: Assess Intent Coherence"
+        condition="<getopt-option-coherence/> is equal `true` and <diff/> is NOT empty">
 
-    1.  <if condition="<getopt-option-risk/> is NOT equal `true`">
-        Silently *SKIP* this entire step.
-        </if>
+    1.  From the *same* captured <diff/> and <stat/>, *reconstruct the
+        single intended change* as a thesis — the one logical, coherent purpose
+        the diff *as a whole* is trying to accomplish.
 
-    2.  <if condition="<diff/> is empty">
-        Silently *SKIP* this entire step (STEP 2 already reported it).
-        </if>
+        If the <diff/> genuinely spans *several* unrelated purposes,
+        pick the *dominant* one as the thesis (the residue will surface
+        as flagged hunks below).
 
-    3.  <if condition="<getopt-option-risk/> is equal `true` and <diff/> is NOT empty">
+        Multiple intents discovered in STEP 2 are a strong indicator of
+        incoherence. In this case, be very sceptical and do *NOT* form a
+        thesis which is just the superset of all those intents.
 
-        Score the *same* captured <diff/> and <stat/> information
+        Finally, phrase the thesis as a *single* crisp sentence and
+        capture it as <thesis/>.
+
+    2.  Walk *every* hunk in the <diff/> and *classify* each one as
+        either *serving* <thesis/> or *not serving* it. A hunk does *not*
+        serve the thesis when it is one of the following <deviation/> kinds:
+
+        -   `SCOPE-CREEP`: an unrelated change riding along (e.g. a second
+            feature, a drive-by refactor, an opportunistic rename, a
+            reformatting sweep) that should be its own commit.
+
+        -   `STRAY-DEBUG`: leftover debug/diagnostic residue (e.g. debug
+            prints, `console.log`, commented-out code, temporary
+            logging, `TODO`/`FIXME` scaffolding, disabled tests), which
+            should be just removed and not part of any commit.
+
+    3.  A hunk that *serves* <thesis/> will be *not* reported. Only hunks that
+        do *not* serve it will be reported. If *every* hunk serves the thesis,
+        the diff is *coherent* and you report *no* flagged hunks.
+
+        Judge overall *coherence* from the flagged hunks: the diff
+        is `COHERENT` when there are *no* `SCOPE-CREEP` and *no*
+        `STRAY-DEBUG` deviations, otherwise it is `INCOHERENT`. Store
+        the result is <verdict/>.
+
+    4.  Emit the following header <template/>:
+
+        <template>
+
+        <ase-tpl-bullet-normal/> **CHANGE COHERENCE THESIS**: <thesis/>
+
+        <ase-tpl-bullet-signal/> **CHANGE COHERENCE REPORT**: Verdict: **<verdict/>**
+
+        </template>
+
+    5.  <if condition="<verdict/> is `INCOHERENT`">
+        Render a *three-column table* with one row per hunk, flagged
+        for *not serving* the <thesis/> above. Output the following table in <template/>.
+
+        For each flagged hunk, repeat the third line, where <deviation/>
+        is the deviation kind label, <location/> is the affected file
+        reference, and <reason/> is a *brief* one-sentence note on why
+        the hunk does not serve <thesis/> and what to do with it (e.g.
+        split into its own commit, drop the debug residue).
+
+        In the <location/> column, markup all file references as code
+        (with backticks), prepend them with `▢ ` and append ` [+N/-M]`
+        (based on the information in <stat/>) to them.
+
+        Keep the overall texts in <reason/> *very concise* and *brief*.
+        Do *not* output any further explanation.
+
+        <template>
+
+        | Deviation        | Location    | Why it does not serve the thesis? |
+        | ---------------- | ----------- | --------------------------------- |
+        | **<deviation/>** | <location/> | <reason/>                         |
+
+        </template>
+    </step>
+
+4.  <step id="STEP 4: Score Against Risk Rubric"
+        condition="<getopt-option-risk/> is equal `true` and <diff/> is NOT empty">
+
+    1.  Score the *same* captured <diff/> and <stat/> information
         against the four-axis rubric below. Each axis is scored on an
         integer scale of *1* (lowest risk) to *5* (highest risk) against
         the *fixed anchors* given, and *every* score *MUST* be backed
@@ -154,7 +223,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         axes (e.g. who imports a touched module, whether touched code has
         adjacent tests). Do not output anything during the probe.
 
-        Score each axis against these anchors:
+    2.  Score each axis against these anchors:
 
         1.  **COUPLING** — how widely the touched code is depended upon.
             *1*: self-contained, no first-party importers.
@@ -179,13 +248,13 @@ explicitly requested by this procedure via outputs based on a <template/>!
             *5*: irreversible-by-revert (schema/data migration, released
             artifact, external side effect).
 
-        Compute the *aggregate risk* as the *equal-weighted* mean of
+    3.  Compute the *aggregate risk* as the *equal-weighted* mean of
         the four risk contributions (Coupling, Criticality, Coverage,
         Reversibility), rounded to one decimal, and map it to a *graded
         band*: *1.0-1.9* → **LOW**, *2.0-2.9* → **MODERATE**, *3.0-3.9*
         → **HIGH**, *4.0-5.0* → **CRITICAL**.
 
-        Then emit the following <template/>, with the overall band and
+    4.  Emit the following <template/>, with the overall band and
         aggregate score, followed by a *three-column table* with one row
         per axis: column 1 is the *axis*, column 2 is the *score*, and
         column 3 is the *evidence* (as a `●` bullet point) plus —
@@ -204,49 +273,27 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <ase-tpl-bullet-signal/> **CHANGE RISK REPORT**: Overall: **<band/>** (<aggregate/>/5)
 
-        | Axis | Score | Findings |
-        | ---- | ----- | -------- |
-        </template>
-
-        For each axis, emit the following row <template/>:
-
-        <template>
+        | Axis        | Score      | Findings                                                    |
+        | ----------- | ---------- | ----------------------------------------------------------- |
         | **<axis/>** | <score/>/5 | ● **EVIDENCE**: <evidence/> ● **MITIGATION**: <mitigation/> |
         </template>
-
-        Finally, output the following footer <template/>:
-
-        <template>
-
-        </template>
-
-        </if>
-
     </step>
 
-4.  <step id="STEP 4: Render Blast-Radius Map (optional)">
+5.  <step id="STEP 5: Render Blast-Radius Map"
+        condition="<getopt-option-blast/> is equal `true` and <diff/> is NOT empty">
 
-    1.  <if condition="<getopt-option-blast/> is NOT equal `true`">
-        Silently *SKIP* this entire step.
-        </if>
-
-    2.  <if condition="<diff/> is empty">
-        Silently *SKIP* this entire step (STEP 2 already reported it).
-        </if>
-
-    3.  <if condition="<getopt-option-blast/> is equal `true` and <diff/> is NOT empty">
-        From the *same* captured <diff/> and <stat/>, *extract the
+    1.  From the *same* captured <diff/> and <stat/>, *extract the
         touched modules* — the distinct changed source files (or their
         enclosing modules/ packages, according to the language idiom).
 
-        Then, for each touched module, *scan its reverse dependencies*
+    2.  Then, for each touched module, *scan its reverse dependencies*
         — the other first-party files that *import* or *reference* it
         across the current project (e.g. by the module's basename,
         exported symbol, or import path). Keep the scan *read-only*
         and *heuristic*; restrict it to first-party code within the
         repository. Do not output anything during the scan.
 
-        Then build a *blast-radius graph* and render it as a diagram:
+    3.  Then build a *blast-radius graph* and render it as a diagram:
 
         1.  Build a Mermaid specification <mermaid-spec/> for a `flowchart
             TB` whose *touched* modules are the origin nodes and whose
@@ -264,7 +311,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             "ase:ase-meta-diagram", prompt: "<mermaid-spec/>")` and capture
             its returned `text` field as <diagram/>.
 
-        Then emit the following <template/>, showing <diagram/> and
+    4.  Then emit the following <template/>, showing <diagram/> and
         appending a *brief impact summary* of bullets, where each
         <module/> is a *touched* module and <impact/> is a one-sentence
         note on *what depends on it* and *how far the blast reaches*.
@@ -273,8 +320,11 @@ explicitly requested by this procedure via outputs based on a <template/>!
         (with backticks), prepend them with `▢ ` and append ` [+N/-M]`
         (based on the information in <stat/>) to them.
 
+        Keep the overall report *concise* and *brief*. Do *not* output
+        any further explanation.
+
         <template>
-        <ase-tpl-head title="Hello World"/>
+        <ase-tpl-head title="CHANGE BLAST RADIUS"/>
 
         <ase-tpl-bullet-signal/> **CHANGE BLAST RADIUS MAP**:
 
@@ -290,10 +340,6 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <ase-tpl-foot/>
         </template>
-
-        Keep the overall report *concise* and *brief*. Do *not* output
-        any further explanation.
-        </if>
 
     </step>
 

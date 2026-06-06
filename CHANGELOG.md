@@ -5,6 +5,8 @@ ChangeLog
 0.9.3 (2026-06-06)
 ------------------
 
+- FEATURE: add `--coherence` option to `ase-meta-diff` to reconstruct the single intended change and flag hunks that do not serve it
+
 0.9.2 (2026-06-05)
 ------------------
 
