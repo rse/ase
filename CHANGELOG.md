@@ -5,6 +5,8 @@ ChangeLog
 0.9.4 (2026-06-06)
 ------------------
 
+- FEATURE: add `--performance`/`-p` and `--security`/`-s` lens options to `ase-code-analyze` for additional analyze lenses
+
 0.9.3 (2026-06-06)
 ------------------
 
