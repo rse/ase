@@ -172,7 +172,7 @@ background service as a *Claude Code* MCP server:
 The following top-level command exists for rendering the *Claude Code*
 or *GitHub Copilot CLI* statusline:
 
-- `ase statusline` \[`-t`|`--tool` `claude`|`copilot`\] \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[`--no-icons`\] \[`--no-labels`\] \[*line* \[...\]\]:
+- `ase statusline` \[`-t`|`--tool` `claude`|`copilot`\] \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[`--no-icons`\] \[`--no-labels`\] \[`--month-cost-ttl` *n*\] \[*line* \[...\]\]:
   Render the *Claude Code* or *GitHub Copilot CLI* statusline from a
   JSON payload read on standard input. Intended to be configured as
   the `statusLine` command in *Claude Code* settings (or the
@@ -207,7 +207,9 @@ or *GitHub Copilot CLI* statusline:
   e.g. `4hr 27m`), `%W` (7-day rate-limit window used percentage),
   `%Q` (7-day window time-until-reset), `%H` (session wall-clock
   duration, e.g. `92hr 40m`), `%X` (session cost in USD, e.g.
-  `$54.44`), `%b` (git branch, or `no git`), `%g` (git status:
+  `$54.44`), `%Y` (cumulative cost in USD across *all* Claude Code
+  sessions of the current calendar month, e.g. `$1102.11`), `%b`
+  (git branch, or `no git`), `%g` (git status:
   `clean` or `dirty`), `%G` (git untracked file count), `%d` (full
   current working directory path), `%M` (memory used/total, e.g.
   `33.2G/64.0G`), `%V` (*Claude Code* version), and `%O`
@@ -243,7 +245,22 @@ or *GitHub Copilot CLI* statusline:
     - \[`--no-labels`\]:
       disable the textual label (e.g. `user:`, `project:`, `model:`)
       in front of the bold value of each placeholder rendering.
-  When run inside a *tmux* pane, the resolved task id is also
+    - \[`--month-cost-ttl` *n*\]:
+      seconds the `%Y` current-month total cost is cached before a
+      non-blocking background refresh is triggered (default: `300`).
+  The `%Y` placeholder reports the cumulative cost (in USD) of *all*
+  *Claude Code* sessions within the current calendar month (local
+  time), unlike `%X` which only reflects the current session. The
+  figure is computed locally from the *Claude Code* session transcripts
+  under `~/.claude/projects/**/*.jsonl` (honoring `CLAUDE_CONFIG_DIR`)
+  by summing each entry's `message.usage` token counts times the
+  per-model price (input, output, and 5-minute / 1-hour cache-write and
+  cache-read tokens, cross-checked against the *LiteLLM* price table).
+  To keep rendering fast, the result is cached in the temporary
+  directory and recomputed at most once per *--month-cost-ttl* window
+  by a detached background process, so a render never blocks on the
+  transcript scan; missing or empty logs simply suppress the
+  placeholder. When run inside a *tmux* pane, the resolved task id is also
   published as the per-pane user option `@ase_task_id`, so external
   tools (like the *claudeX* sister project) can pick it up via
   `#{@ase_task_id}`.
