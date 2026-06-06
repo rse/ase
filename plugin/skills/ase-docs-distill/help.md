@@ -1,18 +1,18 @@
 
 ##  NAME
 
-`ase-meta-distill` - Distill Key Points
+`ase-docs-distill` - Distill Document Key Points
 
 ##  SYNOPSIS
 
-`ase-meta-distill`
+`ase-docs-distill`
     [`--help`|`-h`]
     [`--top`|`-t` *N*]
-    *docs-reference*
+    *document-reference*
 
 ##  DESCRIPTION
 
-The `ase-meta-distill` skill reads a *provided document* and distills it
+The `ase-docs-distill` skill reads a *provided document* and distills it
 into a *flat*, *importance-ranked* list of its *key points*. The
 *docs-reference* is resolved *probe-as-file-first*: if the argument names
 a *readable file* it is read from disk, otherwise the argument is taken
@@ -55,21 +55,22 @@ non-numeric value falls back to the default *10*.
 Distill the key points of a document file:
 
 ```text
-❯ /ase-meta-distill doc/architecture.md
+❯ /ase-docs-distill doc/architecture.md
 ```
 
 Distill only the top 5 key points:
 
 ```text
-❯ /ase-meta-distill --top 5 doc/architecture.md
+❯ /ase-docs-distill --top 5 doc/architecture.md
 ```
 
 Distill a pasted block of text:
 
 ```text
-❯ /ase-meta-distill The system shall accept payments in EUR and USD only.
+❯ /ase-docs-distill The system shall accept payments in EUR and USD only.
 ```
 
 ##  SEE ALSO
 
 `ase-meta-search`, `ase-docs-proofread`, `ase-meta-why`.
+

@@ -1,5 +1,5 @@
 ---
-name: ase-meta-distill
+name: ase-docs-distill
 argument-hint: "[--help|-h] [--top|-t <N>] <document-reference>"
 description: >
     Distill a provided document into a flat, importance-ranked list

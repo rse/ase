@@ -39,11 +39,6 @@ The following ASE commands/skills exist on the meta-level:
   Strengthen a thesis by building the strongest possible *Steelman* case
   for it, then derive a fortification.
 
-- **/ase-meta-distill** \[*--top N*\] *docs-reference*:<br/>
-  Distill a document into a flat, importance-ranked list of its key
-  points, each with a salience rank, a rationale, and a verbatim
-  line-cited evidence snippet.
-
 - **/ase-meta-persona** \[*persona*\]:<br/>
   Adjust communication style in four intensity levels of token usage.
   The *persona* can be either a decorative, eloquent, and explaining
@@ -159,4 +154,9 @@ The following ASE commands/skills exist on the documentation-level:
 - **/ase-docs-proofread** *docs-reference*:<br/>
   Analyze the documents for spelling, punctuation, or grammar errors
   and immediately correct all found problems.
+
+- **/ase-docs-distill** \[*--top N*\] *docs-reference*:<br/>
+  Distill a document into a flat, importance-ranked list of its key
+  points, each with a salience rank, a rationale, and a verbatim
+  line-cited evidence snippet.
 

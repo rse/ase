@@ -197,7 +197,7 @@ see whether **ASE** is right for you:
   You want a document distilled into a flat, importance-ranked list of
   its key points, each with a salience rank, a rationale, and a verbatim
   line-cited evidence snippet?
-  &rarr; [`/ase-meta-distill`](plugin/skills/ase-meta-distill/help.md)
+  &rarr; [`/ase-docs-distill`](plugin/skills/ase-docs-distill/help.md)
   `doc/architecture.md`
 
 - **Search Engine Consolidation**:
@@ -510,7 +510,6 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**changelog**](plugin/skills/ase-meta-changelog/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
 [ase-meta-**diff**](plugin/skills/ase-meta-diff/help.md)<br/>
-[ase-meta-**distill**](plugin/skills/ase-meta-distill/help.md)<br/>
 
 </td>
 <td width="25%" valign="top">
@@ -544,6 +543,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-code-**explain**](plugin/skills/ase-code-explain/help.md)<br/>
 [ase-code-**lint**](plugin/skills/ase-code-lint/help.md)<br/>
 [ase-docs-**proofread**](plugin/skills/ase-docs-proofread/help.md)<br/>
+[ase-docs-**distill**](plugin/skills/ase-docs-distill/help.md)<br/>
 
 </td>
 </tr>
