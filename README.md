@@ -381,7 +381,7 @@ features.
   configured parameters. This allows controlling the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
   (`ase-code-*`), architecture (`ase-arch-*`), task (`ase-task-*`), and
-  documentation (`ase-docs-*`) families, covering 32 skills in total.
+  documentation (`ase-docs-*`) families, covering 33 skills in total.
 
 </td>
 <td width="50%" valign="top">
@@ -490,7 +490,6 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**chat**](plugin/skills/ase-meta-chat/help.md)<br/>
 [ase-meta-**search**](plugin/skills/ase-meta-search/help.md)<br/>
 [ase-meta-**brainstorm**](plugin/skills/ase-meta-brainstorm/help.md)<br/>
-[ase-meta-**diagram**](plugin/skills/ase-meta-diagram/help.md)<br/>
 [ase-meta-**review**](plugin/skills/ase-meta-review/help.md)<br/>
 [ase-meta-**changelog**](plugin/skills/ase-meta-changelog/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
