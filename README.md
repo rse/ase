@@ -136,13 +136,6 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-meta-quorum`](plugin/skills/ase-meta-quorum/help.md)
   `What is Agentic Software Engineering?`
 
-- **Direct Skill Usage Help**:
-  You want usage help for skills directly within your agent tool sessions?
-  &rarr; `/ase-xxx-xxx` `--help`
-
-</td>
-<td width="50%" valign="top">
-
 - **Logical Code Analysis**:
   You want to analyze code for potential problems
   in its logic, semantics, and control flow?
@@ -153,6 +146,13 @@ see whether **ASE** is right for you:
   You want to get your `CHANGELOG.md` entries
   automatically derived from your recent Git commits?
   &rarr; [`/ase-meta-changelog`](plugin/skills/ase-meta-changelog/help.md)
+
+- **Direct Skill Usage Help**:
+  You want usage help for skills directly within your agent tool sessions?
+  &rarr; `/ase-xxx-xxx` `--help`
+
+</td>
+<td width="50%" valign="top">
 
 - **Diff Summary**:
   You want a raw Git diff turned into a concise, human-readable
