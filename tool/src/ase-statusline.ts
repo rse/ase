@@ -78,11 +78,11 @@ interface StatuslineInput {
     rate_limits?: {
         five_hour?: {
             used_percentage?: number,
-            resets_at?: string
+            resets_at?: string | number
         }
         seven_day?: {
             used_percentage?: number,
-            resets_at?: string
+            resets_at?: string | number
         }
     }
 }
@@ -178,9 +178,19 @@ const formatHoursMinutes = (ms: number): string => {
     return `${hours}hr ${mins}m`
 }
 
-/*  format an ISO timestamp as a remaining-time relative to now (e.g. 4hr 27m, 6d 12hr 7m)  */
-const formatTimeUntil = (iso: string): string => {
-    const target = Date.parse(iso)
+/*  format an ISO timestamp or numeric Unix timestamp as a remaining-time relative to now (e.g. 4hr 27m, 6d 12hr 7m)  */
+const formatTimeUntil = (when: string | number | undefined): string => {
+    let target: number
+    if (typeof when === "number") {
+        if (!Number.isFinite(when))
+            return ""
+        /*  values below 1e12 are Unix seconds, otherwise milliseconds  */
+        target = when < 1e12 ? when * 1000 : when
+    }
+    else if (typeof when === "string")
+        target = Date.parse(when)
+    else
+        return ""
     if (!Number.isFinite(target))
         return ""
     const delta = target - Date.now()
@@ -472,7 +482,7 @@ export default class StatuslineCommand {
                             emit(`${prefix("⏲", "session-usage")}${c.bold(`${pct5h.toFixed(1)}%`)}`)
                     },
                     D: () => {
-                        const until5h = data.rate_limits?.five_hour?.resets_at ?? ""
+                        const until5h = data.rate_limits?.five_hour?.resets_at
                         const s       = formatTimeUntil(until5h)
                         if (s !== "")
                             emit(`${prefix("⏱", "session-resets")}${c.bold(s)}`)
@@ -483,7 +493,7 @@ export default class StatuslineCommand {
                             emit(`${prefix("⏲", "weekly-usage")}${c.bold(`${pctWk.toFixed(1)}%`)}`)
                     },
                     Q: () => {
-                        const untilWk = data.rate_limits?.seven_day?.resets_at ?? ""
+                        const untilWk = data.rate_limits?.seven_day?.resets_at
                         const s       = formatTimeUntil(untilWk)
                         if (s !== "")
                             emit(`${prefix("⏱", "weekly-resets")}${c.bold(s)}`)
