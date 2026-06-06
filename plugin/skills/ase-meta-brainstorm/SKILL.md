@@ -83,9 +83,15 @@ Honor the following tenets throughout the brainstorming:
 
     Before generating any ideas, *explore the project context* (review
     relevant existing files, documentation, and recent changes) and
-    determine the <m/> *essential unknowns* about the topic — the
-    purpose, constraints, scope boundaries, and success criteria that
-    must be pinned down for the brainstorming to be reasonably grounded.
+    determine the <m/> (<m/>=1-3) *essential unknowns* about the topic
+    — the purpose, constraints, scope boundaries, and success criteria
+    that must be pinned down for the brainstorming to be reasonably
+    grounded.
+
+    Notice: you are intentionally constraint to just 1-3 unknowns, as
+    too much upfront intent clarification kills the brainstorming of
+    ideas alter. So, reduce the clarifications of the unknowns to the
+    absolute minimum.
 
     For each essential unknown, derive a short 1-3 word facet <facet-M/>
     and a corresponding question <question-M/> whose answer materially
