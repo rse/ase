@@ -88,10 +88,10 @@ Honor the following tenets throughout the brainstorming:
     that must be pinned down for the brainstorming to be reasonably
     grounded.
 
-    Notice: you are intentionally constraint to just 1-3 unknowns, as
-    too much upfront intent clarification kills the brainstorming of
-    ideas alter. So, reduce the clarifications of the unknowns to the
-    absolute minimum.
+    Notice: you are intentionally constraint to just 1-3 unknowns,
+    as too much upfront intent clarification kills the brainstorming
+    of ideas later. So, you *MUST* reduce the clarifications of the
+    unknowns to the absolute minimum!
 
     For each essential unknown, derive a short 1-3 word facet <facet-M/>
     and a corresponding question <question-M/> whose answer materially
