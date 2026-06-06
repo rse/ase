@@ -32,11 +32,16 @@ Control Flow Constructs
     Do not output anything else.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
-    <step id="<id/>"><step-body/></step>:
+    <step id="<id/>" [condition="<step-condition/>"]><step-body/></step>:
 
     This specifies a distinct *single step* in a <flow/>.
     This construct is expanded to its <step-body/>.
-    Do not output anything else.
+    The optional `condition` attribute *enables* the step only if
+    <step-condition/> is met: if <step-condition/> is met, this construct
+    is expanded to its <step-body/>; if <step-condition/> is *not* met,
+    the entire step is silently *skipped* and this construct is expanded
+    to the empty string. When the `condition` attribute is *absent*, the
+    step is *always* enabled. Do not output anything else.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <if condition="<if-condition/>"><if-body/></if>:
