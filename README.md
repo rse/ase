@@ -157,9 +157,15 @@ see whether **ASE** is right for you:
 - **Diff Summary**:
   You want a raw Git diff turned into a concise, human-readable
   narrative of what changed and why, grouped by intent, and with
-  optional risk grading and blast radius?
+  optional intent-coherence check, risk grading and blast radius?
   &rarr; [`/ase-meta-diff`](plugin/skills/ase-meta-diff/help.md)
-  `-r -b`
+  `-c -r -b`
+
+- **Change Review**:
+  You want the staged Git changes reviewed the way a human reviewer
+  would on a pull request, with an approve/reject verdict and
+  prioritized, severity-tagged, line-cited findings?
+  &rarr; [`/ase-meta-review`](plugin/skills/ase-meta-review/help.md)
 
 - **Collaborative Brainstorming**:
   You want to figure out *what* to build before *how*, by diverging on
@@ -485,6 +491,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**search**](plugin/skills/ase-meta-search/help.md)<br/>
 [ase-meta-**brainstorm**](plugin/skills/ase-meta-brainstorm/help.md)<br/>
 [ase-meta-**diagram**](plugin/skills/ase-meta-diagram/help.md)<br/>
+[ase-meta-**review**](plugin/skills/ase-meta-review/help.md)<br/>
 [ase-meta-**changelog**](plugin/skills/ase-meta-changelog/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
 [ase-meta-**diff**](plugin/skills/ase-meta-diff/help.md)<br/>

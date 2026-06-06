@@ -44,16 +44,16 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
 - `plugin/` — the Claude Code plugin published via the marketplace
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
   `plugin/.claude-plugin/plugin.json`. Layout:
-  - `plugin/skills/<name>/SKILL.md` — the skill set (32 skills total),
+  - `plugin/skills/<name>/SKILL.md` — the skill set (33 skills total),
     grouped by `ase-meta-*` (brainstorm, changelog, chat, commit, diaboli,
-    diff, evaluate, persona, quorum, search, why), `ase-code-*` (analyze,
-    craft, explain, insight, lint, refactor, resolve), `ase-arch-*`
+    diff, evaluate, persona, quorum, review, search, why), `ase-code-*`
+    (analyze, craft, explain, insight, lint, refactor, resolve), `ase-arch-*`
     (analyze, discover), `ase-task-*` (id, list, edit, grill, view,
     reboot, rename, condense, preflight, implement, delete), and `ase-docs-*`
     (proofread).
   - `plugin/agents/<name>.md` — sub-agent definitions (`ase-meta-chat`,
-    `ase-meta-search`, `ase-meta-diagram`, `ase-code-lint`,
-    `ase-docs-proofread`).
+    `ase-meta-search`, `ase-meta-diagram`, `ase-meta-review`,
+    `ase-code-lint`, `ase-docs-proofread`).
   - `plugin/commands/` — slash commands directory (currently empty).
   - `plugin/hooks/hooks.json` and `plugin/hooks/hooks-copilot.json` —
     hook wirings into *Claude Code* / Copilot.
