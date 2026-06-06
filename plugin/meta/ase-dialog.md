@@ -132,6 +132,8 @@ Let the *user interactively choose* an answer.
                 (prefix result with "OTHER").
 
             Do not output anything in this step!
+
         </if>
+
 </define>
 

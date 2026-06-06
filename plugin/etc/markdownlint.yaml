@@ -6,16 +6,18 @@
 
 no-multiple-blanks:
     maximum: 2
-no-inline-html:     false
-line-length:        false
-ol-prefix:          false
-list-marker-space:  false
-first-line-heading: false
-no-space-in-code:   false
-ul-indent:          false
-ol-indent:          false
-heading-style:      false
+no-inline-html:        false
+line-length:           false
+ol-prefix:             false
+list-marker-space:     false
+first-line-heading:    false
+no-space-in-code:      false
+ul-indent:             false
+ol-indent:             false
+heading-style:         false
 no-multiple-space-atx: false
-blanks-around-tables: false
-code-block-style:   false
+blanks-around-tables:  false
+code-block-style:      false
+no-duplicate-heading:  false
+link-fragments:        false
 
