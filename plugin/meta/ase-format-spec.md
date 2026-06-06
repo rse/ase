@@ -230,8 +230,8 @@ capturing their goals, needs, behaviors, and context.
 
     -   <spec-pe-persona-role/>: the role of the persona.
 
-    -   <spec-pe-persona-quote/>: a short and bold, first-person statement —
-        written in the persona's own voice — that captures their core
+    -   <spec-pe-persona-quote/>: a short and bold, first-person statement -
+        written in the persona's own voice - that captures their core
         attitude, motivation, frustration, or need in a single memorable line.
         It's sometimes called the persona's "tagline," "mantra," or "defining
         statement."
@@ -1138,7 +1138,7 @@ master-detail dialog).
 
     -   <spec-dp-pattern-rationale/>: the 1-sentence justification for why
         the structure in <spec-dp-pattern-description/> is the right
-        response — the benefit it secures or the trade-off it wins.
+        response - the benefit it secures or the trade-off it wins.
         Unlike <spec-dp-pattern-problem/> (which states *why the pattern
         is needed*, independent of any solution), the rationale states
         *why this particular solution is worth adopting*.

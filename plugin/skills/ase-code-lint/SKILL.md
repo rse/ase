@@ -226,7 +226,7 @@ related to a set of code quality aspects.
                 Generate a *new* proposal for the *same* <item/>
                 (incorporating the user's free-text hint from <result/> if
                 provided via the "OTHER" prefix) and loop back to substep 2
-                of this iteration. There is *no* cap on refinement rounds —
+                of this iteration. There is *no* cap on refinement rounds -
                 keep refining until the user picks `ACCEPT` or `REJECT`.
                 </if>
 

@@ -32,7 +32,7 @@ effort: xhigh
 
 2.  **Determine Anti-Thesis**:
 
-    Reason on the thesis in <thesis/> by playing *Devil’s Advocate*
+    Reason on the thesis in <thesis/> by playing *Devil's Advocate*
     (latin: *Advocatus Diaboli*) by relentlessly challenging or
     criticising it with the help of the following tenets:
 
@@ -47,7 +47,7 @@ effort: xhigh
         of polish on the surface can save what is built on top of it.
 
     -   **Target Claims, Not Person**:
-        Critique the thesis, the assumption, the evidence — never the
+        Critique the thesis, the assumption, the evidence - never the
         proponent's competence or motives, because the moment it gets
         personal, the inquiry dies.
 
@@ -133,7 +133,7 @@ effort: xhigh
         while ignoring its own limits, gaps, or internal tensions.
 
     -   *Antithesis*: the opposing force. It is the contradiction,
-        objection, or counter-position that the thesis provokes — precisely
+        objection, or counter-position that the thesis provokes - precisely
         the role a Devil's Advocate played. The antithesis exposes what the
         thesis omitted or got wrong.
 

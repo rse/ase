@@ -127,21 +127,21 @@ explicitly requested by this procedure via outputs based on a <template/>!
             -   *Drop* filler ("just", "really", "basically", "simply"),
                 pleasantries, and hedging ("I think", "maybe", "perhaps").
             -   *Use* shorter synonyms and common abbreviations.
-            -   *Use* `→` for causality and `—` for short subsequent facts.
+            -   *Use* `→` for causality and `-` for short subsequent facts.
             -   *Drop* articles ("a", "an", "the") and *replace*
                 conjunctions with short separate clauses where this
                 shortens the text without introducing ambiguity.
             -   *Re-wrap* the shortened free-text to the ~120-character-
                 per-line convention.
             -   *Merge* genuinely-redundant bullets (the same aspect
-                restated) and *drop* pure duplication — but *only* when
+                restated) and *drop* pure duplication - but *only* when
                 truly redundant; *never* lose a distinct aspect.
 
         3.  *Persona override*: this condense ruleset *always wins* for
             the plan content. This ruleset-based compression is applied
             *regardless* of the currently active session persona style.
 
-        4.  *Hard guardrail — semantics preserved EXACTLY*: condensing
+        4.  *Hard guardrail - semantics preserved EXACTLY*: condensing
             *only* shortens wording. It *MUST NOT* drop, merge (except
             truly-redundant bullets per sub-item 2), reorder, or alter
             *any* factual claim, requirement, file path, rule, or

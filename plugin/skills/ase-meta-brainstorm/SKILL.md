@@ -33,8 +33,8 @@ Guiding Tenets
 Honor the following tenets throughout the brainstorming:
 
 -   **No Assumption of Simplicity**:
-    Every topic goes through the full process — a one-line config
-    change as much as a new subsystem — because the simplest-looking
+    Every topic goes through the full process - a one-line config
+    change as much as a new subsystem - because the simplest-looking
     topics often hide the most harmful assumptions.
 
 -   **Explore Intent First**:
@@ -84,7 +84,7 @@ Honor the following tenets throughout the brainstorming:
     Before generating any ideas, *explore the project context* (review
     relevant existing files, documentation, and recent changes) and
     determine the <m/> (<m/>=1-3) *essential unknowns* about the topic
-    — the purpose, constraints, scope boundaries, and success criteria
+    - the purpose, constraints, scope boundaries, and success criteria
     that must be pinned down for the brainstorming to be reasonably
     grounded.
 
@@ -145,10 +145,10 @@ Honor the following tenets throughout the brainstorming:
     <topic/> within the constraints established by the answers
     <answer-M/>.
 
-    Deliberately pursue *diverse angles* — e.g. the minimal/MVP-first
+    Deliberately pursue *diverse angles* - e.g. the minimal/MVP-first
     angle, the robustness/risk-first angle, the user-experience-first
     angle, the reuse-existing-machinery angle, the coolness angle, and
-    the unconventional/wildcard angle — because variety in origin yields
+    the unconventional/wildcard angle - because variety in origin yields
     variety in outcome.
 
     Do still *not* judge, rank, or prune ideas in this step. Generate
@@ -183,7 +183,7 @@ Honor the following tenets throughout the brainstorming:
         statement of not more than 40 words):
 
         <template>
-        <ase-tpl-bullet-secondary/> **IDEA CLUSTER <C/>/<c/>**: <cluster-C/> — <cluster-summary-C/>,
+        <ase-tpl-bullet-secondary/> **IDEA CLUSTER <C/>/<c/>**: <cluster-C/> - <cluster-summary-C/>,
         **IDEAS**: <N/>, <M/>[, ...]
         </template>
 
@@ -197,7 +197,7 @@ Honor the following tenets throughout the brainstorming:
         3-4 options, sorted by rank from highest to lowest.
 
         For this, draw the shortlist from *distinct* clusters <cluster-C/>
-        wherever possible — prefer a diverse shortlist spanning different
+        wherever possible - prefer a diverse shortlist spanning different
         clusters over several high-ranked variations of the same cluster,
         unless one cluster clearly dominates on rank.
 
@@ -211,9 +211,9 @@ Honor the following tenets throughout the brainstorming:
         <ase-tpl-bullet-normal/> **DISTILLED IDEA <N/>**: <option-N/>
         </template>
 
-    4.  Finally, derive a single *recommended idea* — the highest-ranked
+    4.  Finally, derive a single *recommended idea* - the highest-ranked
         option, or a principled synthesis of the option shortlist that preserves
-        what is strongest in each — store its one-sentence rationale (not
+        what is strongest in each - store its one-sentence rationale (not
         more than 40 words) in <recommendation/>, and output the following
         <template/>:
 

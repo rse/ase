@@ -26,7 +26,7 @@ Skill Output
     to the currently defined persona style.
 
 -   *IMPORTANT*: The active *persona style* (see `ase-persona.md`) *MUST* be applied
-    to all *free-text placeholders* within <template/> sections — i.e. any placeholder
+    to all *free-text placeholders* within <template/> sections - i.e. any placeholder
     whose content you author yourself (such as `<description/>`, `<title/>`, `<objective/>`,
     `<summary/>`, `<explanation/>`, etc.). The *structure* of the template (fixed keywords,
     punctuation, labels) remains unchanged; only the *authored content* inside free
@@ -51,7 +51,7 @@ Skill Output
         padding, draw the top edge to that width, then keep every
         inner line (including annotations like `!`, `?`, `*`)
         within it. Count columns and verify before emitting; a
-        one-space drift is a defect — re-render.
+        one-space drift is a defect - re-render.
 
 -   *IMPORTANT*: For *Findings* (problems, tradeoffs, warnings
     emitted by analysis skills):
@@ -61,18 +61,18 @@ Skill Output
         snippet must prove the claim *verbatim*. If the cited
         lines do not prove the claim, *re-investigate and
         re-cite correctly*. Drop the finding *only* if no code
-        location in the scanned files proves it — never drop
+        location in the scanned files proves it - never drop
         due to sloppy citation alone.
 
     -   *Documented-context alignment*: cross-check each
-        finding against documented context — interface
+        finding against documented context - interface
         contracts, docstrings (Javadoc, JSDoc, Python
         docstring, ...), adjacent code comments, and
         project-level AI guidance files (`CLAUDE.md`,
         `AGENTS.md`, `GEMINI.md`, `MEMORY.md`,
         `.github/copilot-instructions.md`, `.cursor/rules/`,
         or similar). Two cases resolve via the same
-        mechanism — do *not* drop, keep the finding visible
+        mechanism - do *not* drop, keep the finding visible
         for traceability:
 
         -   *Problem already addressed*: the finding's
@@ -136,7 +136,7 @@ MCP Tool Calls
         error), output the following and stop immediately:
 
         <template>
-        ⧉ **ASE**: **ERROR:** MCP server not running — please start it via `ase service start` and reconnect via `/mcp`, then retry.
+        ⧉ **ASE**: **ERROR:** MCP server not running - please start it via `ase service start` and reconnect via `/mcp`, then retry.
         </template>
 
     -   If the call fails for any other reason (timeout, transport error,

@@ -13,7 +13,7 @@
 
 The `ase-meta-why` skill applies the *Five-Whys* *root-cause
 analysis* technique to the supplied *fact*. The skill iteratively
-asks "why" — up to five times — to drill down from surface symptoms
+asks "why" - up to five times - to drill down from surface symptoms
 to the underlying root cause, considering technical, domain-specific,
 process-related, and organizational causes. After identifying the
 root cause it proposes a *SOLUTION* that addresses it, optionally

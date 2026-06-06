@@ -14,10 +14,10 @@
 The `ase-meta-diaboli` skill plays *Devil's Advocate* (latin:
 *Advocatus Diaboli*) by relentlessly challenging or criticising a
 supplied *thesis*. It applies a disciplined set of critical-thinking
-tenets — steelmanning, stress-testing fundamentals, surfacing implicit
+tenets - steelmanning, stress-testing fundamentals, surfacing implicit
 assumptions, demanding proportional evidence, seeking disconfirming
 cases, *Reductio Ad Absurdum*, exposing hidden costs, and pre-mortem
-thinking — while targeting the claim rather than its proponent and
+thinking - while targeting the claim rather than its proponent and
 yielding where the argument genuinely holds.
 
 The skill iterates until it has found at least ten anti-theses

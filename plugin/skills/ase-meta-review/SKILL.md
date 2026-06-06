@@ -24,9 +24,9 @@ Review Staged Changes
 
 <objective>
 Review the currently staged Git changes the way an *experienced human
-reviewer* would — judging them *holistically* against the change's *own
+reviewer* would - judging them *holistically* against the change's *own
 intent* and against *correctness*, *design fit*, *clarity*, *robustness*,
-and *project-convention conformance* — and emit a single *approve /
+and *project-convention conformance* - and emit a single *approve /
 request-changes verdict* backed by *prioritized*, *severity-tagged*,
 *line-cited* findings. This is a *synthesizing critique*, not a mechanical
 scan: it complements `ase-code-lint` (mechanical quality), `ase-code-analyze`
@@ -48,7 +48,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     1.  Determine *whether there are staged changes at all* by running the
         corresponding command (taken exactly as given) and capturing its
-        output — the bare *list of staged file names* — into <diff/>. This
+        output - the bare *list of staged file names* - into <diff/>. This
         is a lightweight gate; the full diff is fetched by the sub-agent
         in STEP 2, so capturing only the file-name list here is sufficient:
 
@@ -142,7 +142,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         `location` field, and set <finding/> to its `finding` field.
 
         In the <location/> column, markup the `file:line` reference
-        as code (with backticks) and prepend it with `▢ ` — keep the
+        as code (with backticks) and prepend it with `▢ ` - keep the
         sub-agent's own `:N` / `:N-M` line citation intact and do *not*
         append any further line-count decoration.
 

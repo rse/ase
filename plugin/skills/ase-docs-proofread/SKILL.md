@@ -175,7 +175,7 @@ Analyze documents for spelling, punctuation, or grammar errors
                 Generate a *new* proposal for the *same* <item/>,
                 incorporating the user's free-text hint from <result/>
                 after the "OTHER:" prefix, and loop back to substep 2 of
-                this iteration. There is *no* cap on refinement rounds —
+                this iteration. There is *no* cap on refinement rounds -
                 keep refining until the user picks `ACCEPT` or `REJECT`.
 
                 </if>

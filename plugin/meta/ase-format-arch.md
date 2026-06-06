@@ -219,11 +219,11 @@ at runtime.
         Processor`, `Notification Dispatcher`).
 
     -   <arch-fv-component-kind/> is one of:
-        -   `Component`:  Cohesive unit of functionality with a defined interface.
-        -   `Service`:    Independently deployable provider of functionality.
-        -   `Module`:     Logical grouping of related functionality within a component.
-        -   `Connector`:  Mediator that conveys interactions between components (e.g. bus, gateway).
-        -   `Subsystem`:  Larger composite grouping several components.
+        -   `Component`: Cohesive unit of functionality with a defined interface.
+        -   `Service`:   Independently deployable provider of functionality.
+        -   `Module`:    Logical grouping of related functionality within a component.
+        -   `Connector`: Mediator that conveys interactions between components (e.g. bus, gateway).
+        -   `Subsystem`: Larger composite grouping several components.
 
     -   <arch-fv-component-responsibility/> is the 1-sentence statement of
         the single, primary responsibility the component owns.
@@ -377,11 +377,11 @@ communicate.
 
     -   <arch-co-unit-kind/> is one of:
 
-        -   `Process`:    An independent OS process with its own address space.
-        -   `Thread`:     A thread of execution within a process.
-        -   `Pool`:       A managed group of interchangeable workers.
-        -   `Queue`:      An asynchronous buffer decoupling producers and consumers.
-        -   `EventLoop`:  A single-threaded cooperative scheduler of tasks.
+        -   `Process`:   An independent OS process with its own address space.
+        -   `Thread`:    A thread of execution within a process.
+        -   `Pool`:      A managed group of interchangeable workers.
+        -   `Queue`:     An asynchronous buffer decoupling producers and consumers.
+        -   `EventLoop`: A single-threaded cooperative scheduler of tasks.
 
     -   <arch-co-unit-element/> is an `ARCH-FV-<arch-fv-component-id/>`
         reference to a functional component that runs inside this
@@ -518,12 +518,12 @@ elements to the runtime platform, hardware, and network topology.
 
     -   <arch-dp-node-kind/> is one of:
 
-        -   `Server`:     A physical or virtual machine.
-        -   `Container`:  A containerized runtime (e.g. Docker, OCI).
-        -   `Cluster`:    A managed group of nodes (e.g. Kubernetes cluster).
-        -   `Function`:   A serverless / function-as-a-service runtime.
-        -   `Device`:     An edge or client device.
-        -   `Managed`:    A managed cloud service (e.g. managed database, queue).
+        -   `Server`:    A physical or virtual machine.
+        -   `Container`: A containerized runtime (e.g. Docker, OCI).
+        -   `Cluster`:   A managed group of nodes (e.g. Kubernetes cluster).
+        -   `Function`:  A serverless / function-as-a-service runtime.
+        -   `Device`:    An edge or client device.
+        -   `Managed`:   A managed cloud service (e.g. managed database, queue).
 
     -   <arch-dp-node-platform/> is the runtime platform of the node
         (e.g. `Linux x86-64`, `Kubernetes 1.30`, `AWS Lambda (Node.js)`).
@@ -764,50 +764,50 @@ forces at play, the chosen response, and the reasoning that justifies it.
         as the **Artifact**'s own timestamps.
 
     -   <arch-dr-decision-context/> captures the situation that forces the
-        decision — the "why are we even talking about this" part. It
+        decision - the "why are we even talking about this" part. It
         describes the situation as it is, before the decision is made. The
         following usually goes into it: the problem or need (what's broken,
         missing, or about to change that requires a decision); the forces at
         play (technical constraints, business requirements, deadlines, team
-        skills, existing systems, regulatory/compliance pressures — often
+        skills, existing systems, regulatory/compliance pressures - often
         competing, and that tension is the whole point); relevant facts
         (current architecture, prior decisions, assumptions, what's known
         and what's uncertain); and scope/boundaries (what this decision is
         and isn't about). It is written neutrally and factually. It should
-        not contain the decision itself, nor advocate for an option — a
+        not contain the decision itself, nor advocate for an option - a
         reader should be able to read it, pause, and arrive at the decision
         themselves because the forces make it (nearly) inevitable.
 
     -   <arch-dr-decision-decision/> states what is actually going to be
-        done — the chosen response to the forces laid out in the context. It
+        done - the chosen response to the forces laid out in the context. It
         is written in active, assertive voice, in the present or imperative
         tense, as a committed position rather than a discussion. The
         following usually goes into it: the choice itself (clearly and
         unambiguously) and the essence of how (enough of the approach to
-        make the choice concrete — the mechanism, pattern, or technology —
+        make the choice concrete - the mechanism, pattern, or technology -
         but not a full implementation specification). It is a declaration,
         not a deliberation, usually using the wording "We use..." or "We
         do...", active, definite, owning the choice. Avoid hedging ("we
-        might", "we could consider") — the deliberation already happened,
+        might", "we could consider") - the deliberation already happened,
         the decision records the verdict.
 
     -   <arch-dr-decision-rationale/> is the reasoning that justifies the
-        decision — the bridge that explains why this choice, given those
+        decision - the bridge that explains why this choice, given those
         forces. It answers "Of all the things we could have done, why was
         this the right one?". Where the context states the forces and the
         decision states the choice, the rationale is the logical connective
-        tissue between them — it shows that the decision actually follows
+        tissue between them - it shows that the decision actually follows
         from the context. The following usually goes into it: the deciding
         factors (which forces from the context carried the most weight, and
         how the chosen option satisfies them best); the trade-off reasoning
-        (what was optimized for and what was knowingly sacrificed — naming
+        (what was optimized for and what was knowingly sacrificed - naming
         the trade-off is the heart of rationale); why the alternatives lost
         (the comparative argument: "option B failed on X, option C cost too
         much on Y"); and assumptions and evidence (benchmarks, prior
         experience, constraints, or principles the reasoning rests on).
 
     -   <arch-dr-decision-notes/> is *OPTIONAL* and can be omitted when it
-        does not add genuine value — most decisions won't need it. The
+        does not add genuine value - most decisions won't need it. The
         following usually goes into it: information of the decision *process*
         (e.g. a weighted decision matrix of considered alternatives);
         consequences of the decision (but only when non-obvious downstream
@@ -818,16 +818,16 @@ forces at play, the chosen response, and the reasoning that justifies it.
         <arch-dr-decision-rationale/> are each just a single paragraph of
         concise and brief prose text, usually comprised of just 1 to 3
         sentences. The value of a decision is in recording *that* a decision
-        was made and *why* — not in filling out sections of a document.
+        was made and *why* - not in filling out sections of a document.
 
     -   For the relationship between context, decision, and rationale, good
         checks are: the "litmus test" is that context = forces, decision =
         response to those forces, rationale = why the decision answers the
         forces in the context. The decision should feel like the natural,
-        almost inevitable answer to the context — if a reader is surprised
+        almost inevitable answer to the context - if a reader is surprised
         by the decision, either the context is missing a force, or the
         decision is under-justified. The rationale should make the decision
-        feel earned, not asserted — if you would delete the rationale and
+        feel earned, not asserted - if you would delete the rationale and
         the decision suddenly looks arbitrary, the rationale was doing its
         job.
 
@@ -861,7 +861,7 @@ forces at play, the chosen response, and the reasoning that justifies it.
         communicate via domain events, not synchronous HTTP."
 
     -   **Technology choices that carry lock-in.** Database, message bus,
-        auth provider, deployment target. Not every library — just the
+        auth provider, deployment target. Not every library - just the
         ones that would take a quarter to swap out.
 
     -   **Boundary and scope decisions.** "Customer data is owned by the
@@ -878,5 +878,5 @@ forces at play, the chosen response, and the reasoning that justifies it.
         of the partner API contract."
 
     -   **Rejected alternatives when the rejection is non-obvious.** If
-        you considered GraphQL and picked REST for subtle reasons, record it —
+        you considered GraphQL and picked REST for subtle reasons, record it -
         otherwise someone will suggest GraphQL again in six months.

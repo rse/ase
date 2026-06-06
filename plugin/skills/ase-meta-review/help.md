@@ -14,7 +14,7 @@ The `ase-meta-review` skill performs a *holistic*,
 single *approve* / *reject* **verdict** backed by *prioritized*,
 *severity-tagged*, *line-cited* **findings**. Rather than scanning the
 code mechanically, it first *reconstructs the change's own intent* and
-then judges the diff *as a whole* against that intent — the way an
+then judges the diff *as a whole* against that intent - the way an
 experienced reviewer would on a pull request.
 
 The critique spans a fixed set of reviewer *dimensions*: **intent**
@@ -25,17 +25,17 @@ naming, abstraction level), **clarity** (readability and
 self-documentation for a future reader), **robustness** (error handling,
 resource and concurrency safety), **security** and **performance** (risks
 introduced by the change), **convention** (conformance to the
-project's documented conventions — code style and the plan/spec/arch
+project's documented conventions - code style and the plan/spec/arch
 formats described in `AGENTS.md` and the `ase-format-*` meta documents),
-**testing** (inadequate coverage for the change — new or fixed behavior
+**testing** (inadequate coverage for the change - new or fixed behavior
 left untested, adjacent tests not updated, or existing tests silently
 broken, disabled, or weakened), and **documentation** (user- or
-developer-facing docs — `README`, `CHANGELOG`, help text, or AI
-guidance/meta documents — left stale by the change).
+developer-facing docs - `README`, `CHANGELOG`, help text, or AI
+guidance/meta documents - left stale by the change).
 
-Each finding carries a *severity* — **HIGH**, **MEDIUM**, **LOW**, or
+Each finding carries a *severity* - **HIGH**, **MEDIUM**, **LOW**, or
 **ACCEPTED** (a concern that is contractually addressed or accepted as a
-documented priority conflict) — and is *evidence-grounded*: it cites the
+documented priority conflict) - and is *evidence-grounded*: it cites the
 exact `file:line` location it stems from. The overall verdict is
 **REJECT - DEMANDS CHANGES** when any *HIGH* finding remains, and
 **APPROVE** otherwise. The work is performed by a dedicated `ase-meta-review`
@@ -47,7 +47,7 @@ The skill *complements* rather than duplicates its neighbours:
 `ase-code-lint` flags *mechanical* code-quality issues, `ase-code-analyze`
 inspects *logic and semantics*, `ase-meta-diff` narrates *what changed*
 (with optional coherence, risk, and blast-radius reports), and
-`ase-meta-diaboli` *adversarially challenges a thesis* — whereas
+`ase-meta-diaboli` *adversarially challenges a thesis* - whereas
 `ase-meta-review` renders a *reviewer's judgement* on a concrete diff
 before it is committed.
 

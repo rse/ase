@@ -20,7 +20,7 @@ into the user-visible transcript.
 
 For each detected problem, the skill renders a unified-diff *SOLUTION*
 preview and either asks the user to `ACCEPT` or `REJECT` the proposed
-correction interactively or — with `--auto` — applies all corrections
+correction interactively or - with `--auto` - applies all corrections
 automatically.
 
 ##  OPTIONS

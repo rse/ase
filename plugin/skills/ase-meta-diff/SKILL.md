@@ -135,7 +135,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         condition="<getopt-option-coherence/> is equal `true` and <diff/> is NOT empty">
 
     1.  From the *same* captured <diff/> and <stat/>, *reconstruct the
-        single intended change* as a thesis — the one logical, coherent purpose
+        single intended change* as a thesis - the one logical, coherent purpose
         the diff *as a whole* is trying to accomplish.
 
         If the <diff/> genuinely spans *several* unrelated purposes,
@@ -225,24 +225,24 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  Score each axis against these anchors:
 
-        1.  **COUPLING** — how widely the touched code is depended upon.
+        1.  **COUPLING** - how widely the touched code is depended upon.
             *1*: self-contained, no first-party importers.
             *3*: a handful of dependent modules.
             *5*: a hub touched by many modules or a public interface.
 
-        2.  **CRITICALITY** — how essential the touched path is.
+        2.  **CRITICALITY** - how essential the touched path is.
             *1*: docs, comments, dead/peripheral code.
             *3*: ordinary feature logic.
             *5*: core/security/auth/data-integrity/money path.
 
-        3.  **COVERAGE** — how well the change is exercised by tests.
+        3.  **COVERAGE** - how well the change is exercised by tests.
             *1*: tests touched in this diff or directly covering the
             changed hunks.
             *3*: adjacent tests exist but are not clearly exercising the
             changed hunks.
             *5*: no tests anywhere near the touched code.
 
-        4.  **REVERSIBILITY** — how easily the change can be undone.
+        4.  **REVERSIBILITY** - how easily the change can be undone.
             *1*: pure code change, revert restores prior state.
             *3*: needs coordinated revert or a config rollback.
             *5*: irreversible-by-revert (schema/data migration, released
@@ -257,8 +257,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
     4.  Emit the following <template/>, with the overall band and
         aggregate score, followed by a *three-column table* with one row
         per axis: column 1 is the *axis*, column 2 is the *score*, and
-        column 3 is the *evidence* (as a `●` bullet point) plus —
-        *only* if the axis reached the mitigation threshold of '>= 4' —
+        column 3 is the *evidence* (as a `●` bullet point) plus -
+        *only* if the axis reached the mitigation threshold of '>= 4' -
         the *mitigation* (as a second `●` bullet point). If an axis did
         not reach that threshold, omit the ` ● **MITIGATION**:
         <mitigation/>` part from its row. Keep the overall <evidence/>
@@ -283,11 +283,11 @@ explicitly requested by this procedure via outputs based on a <template/>!
         condition="<getopt-option-blast/> is equal `true` and <diff/> is NOT empty">
 
     1.  From the *same* captured <diff/> and <stat/>, *extract the
-        touched modules* — the distinct changed source files (or their
+        touched modules* - the distinct changed source files (or their
         enclosing modules/ packages, according to the language idiom).
 
     2.  Then, for each touched module, *scan its reverse dependencies*
-        — the other first-party files that *import* or *reference* it
+        - the other first-party files that *import* or *reference* it
         across the current project (e.g. by the module's basename,
         exported symbol, or import path). Keep the scan *read-only*
         and *heuristic*; restrict it to first-party code within the
@@ -301,7 +301,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             (origin → dependent).
 
             Flag each *touched* node as a problem node per the
-            `ase-meta-diagram` anomaly convention — prefix its label
+            `ase-meta-diagram` anomaly convention - prefix its label
             with `⚑ ` inside quotes, e.g. `T1["⚑ src/core.ts"]`. Keep
             labels ultra short (basenames or module names only).
 
