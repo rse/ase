@@ -35,6 +35,10 @@ The following ASE commands/skills exist on the meta-level:
   Challenge a thesis by relentlessly playing *Devil's Advocate* (latin:
   *Advocatus Diaboli*), then derive a *Hegelian* synthesis.
 
+- **/ase-meta-steelman** *thesis*:<br/>
+  Strengthen a thesis by building the strongest possible *Steelman* case
+  for it, then derive a fortification.
+
 - **/ase-meta-persona** \[*persona*\]:<br/>
   Adjust communication style in four intensity levels of token usage.
   The *persona* can be either a decorative, eloquent, and explaining

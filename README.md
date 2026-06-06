@@ -186,6 +186,13 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-meta-diaboli`](plugin/skills/ase-meta-diaboli/help.md)
   `The Decibel (dB) is an intuitive unit.`
 
+- **Steelman Argument**:
+  You want a thesis or statement charitably strengthened with the
+  strongest possible case, and finally consolidated into a fortification
+  argument?
+  &rarr; [`/ase-meta-steelman`](plugin/skills/ase-meta-steelman/help.md)
+  `ASE is one of the best Claude Code add-ons.`
+
 - **Search Engine Consolidation**:
   You want to query multiple (potentially available) search engines
   and derive a consolidated result?
@@ -237,6 +244,7 @@ sessions to get an impression of **ASE**. Find more such demo sessions
 [ase-arch-**discover**](plugin/skills/ase-arch-discover/help.md)<br/>
 [ase-meta-**evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
 [ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md)<br/>
+[ase-meta-**steelman**](plugin/skills/ase-meta-steelman/help.md)<br/>
 [ase-meta-**why**](plugin/skills/ase-meta-why/help.md)<br/>
 [ase-meta-**quorum**](plugin/skills/ase-meta-quorum/help.md)
 
@@ -486,6 +494,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**why**](plugin/skills/ase-meta-why/help.md)<br/>
 [ase-meta-**evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
 [ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md)<br/>
+[ase-meta-**steelman**](plugin/skills/ase-meta-steelman/help.md)<br/>
 [ase-meta-**quorum**](plugin/skills/ase-meta-quorum/help.md)<br/>
 [ase-meta-**chat**](plugin/skills/ase-meta-chat/help.md)<br/>
 [ase-meta-**search**](plugin/skills/ase-meta-search/help.md)<br/>

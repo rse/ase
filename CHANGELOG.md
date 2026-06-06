@@ -5,6 +5,7 @@ ChangeLog
 0.9.3 (2026-06-06)
 ------------------
 
+- FEATURE: add `ase-meta-steelman` skill for constructing the strongest possible case for a thesis
 - FEATURE: add `ase-meta-review` skill for holistic, human-reviewer-style critique of staged Git changes
 - FEATURE: add `--coherence` option to `ase-meta-diff` to reconstruct the single intended change and flag hunks that do not serve it
 - FEATURE: add ESLint-based Markdown linting and fix all Markdown files accordingly
