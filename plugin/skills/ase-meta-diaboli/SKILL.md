@@ -30,7 +30,7 @@ effort: xhigh
     <ase-tpl-bullet-secondary/> **THESIS**: <thesis/>
     </template>
 
-2.  **Determine Anti-Thesis**:
+2.  **Determine Anti-Theses**:
 
     Reason on the thesis in <thesis/> by playing *Devil's Advocate*
     (latin: *Advocatus Diaboli*) by relentlessly challenging or
