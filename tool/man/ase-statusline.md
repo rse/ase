@@ -10,6 +10,7 @@
 \[`-p`|`--padding` *n*\]
 \[`--no-icons`\]
 \[`--no-labels`\]
+\[`--month-cost-ttl` *n*\]
 \[*line* \[...\]\]
 
 ## DESCRIPTION
@@ -84,6 +85,11 @@ up via `#{@ase_task_id}`.
 - \[`--no-labels`\]:
   Disable the textual label (e.g., `user:`, `project:`, or `model:`)
   in front of the bold value of each placeholder rendering.
+
+- \[`--month-cost-ttl` *n*\]:
+  Cache the `%Y` current-month total cost for *n* seconds, a
+  non-negative integer, before a non-blocking background refresh is
+  triggered (default: `300`).
 
 ## ARGUMENTS
 
@@ -207,6 +213,20 @@ Costs:
   The session costs in USD (`cost.total_cost_usd`), e.g., `$54.44`,
   with icon `$`, *suppressed*.
 
+- `%Y`:
+  The cumulative costs in USD of *all* *Anthropic Claude Code CLI*
+  sessions within the current calendar month (local time), e.g.,
+  `$1102.11`, *suppressed* if no session transcripts exist. Unlike
+  `%X`, which only reflects the current session, the figure is
+  computed locally from the session transcripts under
+  `~/.claude/projects/**/*.jsonl` (honoring `CLAUDE_CONFIG_DIR`) by
+  summing the token counts of each entry times the per-model price
+  (input, output, and 5-minute / 1-hour cache-write and cache-read
+  tokens, cross-checked against the *LiteLLM* price table). To keep
+  rendering fast, the result is cached and recomputed at most once per
+  `--month-cost-ttl` window by a detached background process, so a
+  rendering never blocks on the transcript scan.
+
 Version control:
 
 - `%a`:
@@ -296,6 +316,9 @@ Invalid JSON is an error.
   The *tmux* pane to publish the task id `@ase_task_id` to.
 
 ## FILES
+
+- *temporary directory*`/ase-statusline-month-cost-`*user*`.json`:
+  The cache of the `%Y` current-month total cost.
 
 - *per-user state directory*`/statusline-codex-usage.json`:
   The cache of the rate-limit windows fetched for the `gpt-*` models.
