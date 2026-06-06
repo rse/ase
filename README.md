@@ -384,11 +384,7 @@ features.
   The format of the primary deliveries of Software Engineering
   (requirements specification, architecture description, documentation,
   and source code) and their artifacts are strictly defined. This allows
-  *both* humans *and* agents to operate on them concurrently. The
-  artifact-set meta conventions and the *Specification (SPEC)* and
-  *Architecture (ARCH)* artifact-set formats are already defined; the
-  *Software (SOFT)* artifact set and the skill/tool integration are still
-  forthcoming.
+  *both* humans *and* agents to operate on them concurrently.
 
 - **Context Gathering** (OPTIONAL, 0% done):
   The agent context is loaded with individual information for all
