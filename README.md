@@ -193,6 +193,13 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-meta-steelman`](plugin/skills/ase-meta-steelman/help.md)
   `ASE is one of the best Claude Code add-ons.`
 
+- **Key Point Distillation**:
+  You want a document distilled into a flat, importance-ranked list of
+  its key points, each with a salience rank, a rationale, and a verbatim
+  line-cited evidence snippet?
+  &rarr; [`/ase-meta-distill`](plugin/skills/ase-meta-distill/help.md)
+  `doc/architecture.md`
+
 - **Search Engine Consolidation**:
   You want to query multiple (potentially available) search engines
   and derive a consolidated result?
@@ -503,6 +510,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**changelog**](plugin/skills/ase-meta-changelog/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
 [ase-meta-**diff**](plugin/skills/ase-meta-diff/help.md)<br/>
+[ase-meta-**distill**](plugin/skills/ase-meta-distill/help.md)<br/>
 
 </td>
 <td width="25%" valign="top">
