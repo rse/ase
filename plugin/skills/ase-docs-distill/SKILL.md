@@ -16,12 +16,12 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-<skill name="ase-meta-distill">
+<skill name="ase-docs-distill">
     Distill Key Points
 </skill>
 
 <expand name="getopt"
-    arg1="ase-meta-distill"
+    arg1="ase-docs-distill"
     arg2="--top|-t=5">
     $ARGUMENTS
 </expand>
@@ -55,7 +55,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Only output the following <template/> and then *STOP* immediately:
 
         <template>
-        ⧉ **ASE**: ✪ skill: **ase-meta-distill**, ▶ status: **no document to distill**
+        ⧉ **ASE**: ✪ skill: **ase-docs-distill**, ▶ status: **no document to distill**
         </template>
 
         </if>
@@ -78,7 +78,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Only output the following <template/> and then *STOP* immediately:
 
         <template>
-        ⧉ **ASE**: ✪ skill: **ase-meta-distill**, ▶ status: **no document to distill**
+        ⧉ **ASE**: ✪ skill: **ase-docs-distill**, ▶ status: **no document to distill**
         </template>
 
         </if>
