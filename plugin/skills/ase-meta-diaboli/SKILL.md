@@ -35,7 +35,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 
 <flow>
 
-1.  <step id="STEP 1: Repeat Thesis">
+1.  <step id="STEP 1: Restate Thesis">
 
     Output the thesis with the following <template/>:
 

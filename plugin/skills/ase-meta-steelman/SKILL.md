@@ -39,7 +39,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 
 <flow>
 
-1.  <step id="STEP 1: Repeat Thesis">
+1.  <step id="STEP 1: Restate Thesis">
 
     Begin a *round* of fortification and consolidating reasoning. On
     the first visit, set <i>1</i> (set round counter to one); on each
