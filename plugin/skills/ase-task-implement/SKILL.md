@@ -30,7 +30,7 @@ Implement a Task Plan
 with a corresponding, complete *change set*.
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 
 Procedure
 ---------

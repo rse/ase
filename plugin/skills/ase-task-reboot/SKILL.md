@@ -30,7 +30,7 @@ Reboot a Task Plan
 based on the existing *WHAT* and *WHY*.
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 
 Procedure
 ---------

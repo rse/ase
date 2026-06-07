@@ -34,7 +34,7 @@ continued refinement, finalization, or hand-off to implementation or
 preflight.
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 
 Procedure
 ---------
@@ -271,7 +271,7 @@ Set <content-dirty>true</content-dirty>.
             </template>
         </if>
 
-    4.  <if condition="<content/> does not contain '# ✪ TASK PLAN:' AND <instruction/> is empty">
+    4.  <if condition="<content/> does not contain '# ✪ TASK' AND <instruction/> is empty">
         Set <instruction><content/></instruction> (set instruction to content).
         Set <content></content> (set content to empty).
         Set <content-dirty>true</content-dirty>.
@@ -327,9 +327,9 @@ Set <content-dirty>true</content-dirty>.
         Use the following <template/>:
 
         <template>
-        <ase-tpl-head title="TASK-PLAN"/>
+        <ase-tpl-head title="TASK"/>
         <content/>
-        <ase-tpl-foot title="TASK-PLAN"/>
+        <ase-tpl-foot title="TASK"/>
         </template>
 
     4.  *Determine next step*:

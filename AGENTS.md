@@ -63,7 +63,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     `ase-skill.md` (skill-authoring guide), `ase-control.md`
     (skill control flow), `ase-dialog.md` (user-dialog conventions),
     `ase-getopt.md` (skill option parsing), `ase-persona.md`
-    (persona definitions), `ase-format-plan.md` (task-plan conventions),
+    (persona definitions), `ase-format-task.md` (task format),
     `ase-format-meta.md` (artifact-set/artifact meta-information
     conventions), and the artifact-set format definitions
     `ase-format-spec.md` (Specification / SPEC) and `ase-format-arch.md`

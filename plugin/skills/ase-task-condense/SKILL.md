@@ -30,7 +30,7 @@ Condense a Task Plan
 semantics exactly.
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 
 Procedure
 ---------

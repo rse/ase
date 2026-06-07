@@ -31,7 +31,7 @@ Interview the user relentlessly about every essential aspect of the
 task plan until reaching a shared understanding.
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 
 Procedure
 ---------

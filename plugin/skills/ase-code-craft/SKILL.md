@@ -38,7 +38,7 @@ From scratch *craft* the following feature:
 <feature><getopt-arguments/></feature>
 </objective>
 
-@${CLAUDE_SKILL_DIR}/../../meta/ase-format-plan.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 
 Procedure
 ---------

@@ -11,6 +11,7 @@ ChangeLog
 - FEATURE: add `project.artifact.{spec,arch,code,docs,infr}.{basedir,files}` config vars
 - REFACTOR: add `project.artifact.task.{basedir,files}` config vars and store tasks as `<basedir>/TASK-<id>.md` files
 - CLEANUP: add automatic migration of legacy `<basedir>/<id>/plan.md` task files to `<basedir>/TASK-<id>.md`
+- CLEANUP: rename plugin/meta/ase-format-plan.md to plugin/meta/ase-format-task.md
 
 0.9.5 (2026-06-07)
 ------------------

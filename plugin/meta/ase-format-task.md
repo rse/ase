@@ -1,14 +1,15 @@
 
-Plan Format
------------
+Task
+----
 
-Every *task plan* uses a strict and fixed format:
+Every *task* uses a strict and fixed format:
 
 <format>
 
-# ✪ TASK PLAN: **<title/>**
+# ✪ TASK <task-id/>: <title/>
 
-◉ task id: **<task-id/>** // ✳ created: **<timestamp-created/>** // ✎ modified: **<timestamp-modified/>**
+✳ Created:  **<timestamp-created/>**
+✎ Modified: **<timestamp-modified/>**
 
 ## ※ CONTEXT
 
@@ -30,7 +31,7 @@ Every *task plan* uses a strict and fixed format:
 
 </format>
 
-You *MUST* honor the following hints on this *task plan* format:
+You *MUST* honor the following hints on this *task* format:
 
 -   You *MUST* always keep the first empty line and the last empty line.
     If one of them is missing, add it back.
