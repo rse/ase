@@ -5,6 +5,7 @@ ChangeLog
 0.9.5 (2026-06-07)
 ------------------
 
+- FEATURE: add `--max-clarify`, `--min-rank`, and `--max-shortlist` options to `ase-meta-brainstorm` to control internals
 - FEATURE: add `--width`/`-w` option to `ase-meta-why` to weigh several candidate sub-causes per level and backtrack
 - FEATURE: add `--models`/`-m` model-selection option to `ase-meta-quorum` to choose which foreign LLMs are queried
 - FEATURE: add `--services`/`-s` backend-selection option to `ase-meta-search` to choose which search services are queried

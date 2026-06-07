@@ -1,6 +1,6 @@
 ---
 name: ase-meta-brainstorm
-argument-hint: "[--help|-h] [--count|-c=12] <topic>"
+argument-hint: "[--help|-h] [--max-clarify|-c=3] [--min-ideas|-i=12] [--min-rank|-r=7] [--max-shortlist|-s=4] <topic>"
 description: >
     Collaboratively brainstorm a topic by diverging on ideas, converging
     through clustering and scoring, and distilling a shortlist with
@@ -23,15 +23,15 @@ Collaboratively Brainstorm a Topic
 
 <expand name="getopt"
     arg1="ase-meta-brainstorm"
-    arg2="--count|-c=12">
+    arg2="--max-clarify|-c=3 --min-ideas|-i=12 --min-rank|-r=7 --max-shortlist|-s=4">
     $ARGUMENTS
 </expand>
 
 <objective>
-Collaboratively brainstorm the topic <topic><getopt-arguments/></topic> by first
-*diverging* into a broad space of candidate ideas, then *converging*
-through clustering and scoring, and finally distilling a *shortlist*
-with a single recommended direction.
+Collaboratively brainstorm the topic <topic><getopt-arguments/></topic>
+by first *diverging* into a broad space of candidate ideas, then
+*converging* through clustering and scoring, and finally distilling a
+*shortlist* with a single recommended direction.
 </objective>
 
 Guiding Tenets
@@ -90,19 +90,20 @@ Honor the following tenets throughout the brainstorming:
 
     Before generating any ideas, *explore the project context* (review
     relevant existing files, documentation, and recent changes) and
-    determine the <m/> (<m/>=1-3) *essential unknowns* about the topic
-    - the purpose, constraints, scope boundaries, and success criteria
-    that must be pinned down for the brainstorming to be reasonably
-    grounded.
+    determine the <m/> (<m/> = 1..<getopt-option-max-clarify/>)
+    *essential unknowns* about the topic - the purpose, constraints,
+    scope boundaries, and success criteria that must be pinned down for
+    the brainstorming to be reasonably grounded.
 
-    Notice: you are intentionally constrained to just 1-3 unknowns,
-    as too much upfront intent clarification kills the brainstorming
-    of ideas later. So, you *MUST* reduce the clarifications of the
-    unknowns to the absolute minimum!
+    Notice: you are intentionally constrained to just
+    1..<getopt-option-max-clarify/> unknowns, as too much upfront intent
+    clarification kills the brainstorming of ideas later. So, you *MUST*
+    reduce the clarifications of the unknowns to the absolute minimum in
+    general and cap it at <getopt-option-max-clarify/>!
 
-    For each essential unknown, derive a short 1-3 word facet <facet-M/>
-    and a corresponding question <question-M/> whose answer materially
-    changes which ideas make sense at all.
+    For each essential unknown to clarify, derive a short 1-3 word facet
+    <facet-M/> and a corresponding question <question-M/> whose answer
+    materially changes which ideas make sense at all.
 
     1.  For each <question-M/> in the iteration cycle <M/> (<M/>=1...<m/>):
 
@@ -159,7 +160,7 @@ Honor the following tenets throughout the brainstorming:
     variety in outcome.
 
     Do still *not* judge, rank, or prune ideas in this step. Generate
-    ideas until you either reach at least <getopt-option-count/> distinct
+    ideas until you either reach at least <getopt-option-min-ideas/> distinct
     candidate ideas or have clearly exhausted the meaningfully distinct
     space.
 
@@ -199,10 +200,10 @@ Honor the following tenets throughout the brainstorming:
         purpose and constraints on a Likert scale of 0 (poor) to 10
         (excellent), considering *value*, *uniqueness*, *risk*, and
         *alignment with the existing code base*. Keep only ideas in the
-        clusters with a rank of at least 7.
+        clusters with a rank of at least <getopt-option-min-rank/>.
 
     3.  From the scored ideas <idea-N/>, distill a *shortlist* of the top
-        3-4 options, sorted by rank from highest to lowest.
+        <getopt-option-max-shortlist/> options, sorted by rank from highest to lowest.
 
         For this, draw the shortlist from *distinct* clusters <cluster-C/>
         wherever possible - prefer a diverse shortlist spanning different
@@ -216,7 +217,7 @@ Honor the following tenets throughout the brainstorming:
         and its primary trade-off), and output the following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **DISTILLED IDEA <N/>**: <option-N/>
+        <ase-tpl-bullet-normal/> **DISTILLED IDEA**: <option-N/>
         </template>
 
     4.  Finally, derive a single *recommended idea* - the highest-ranked
