@@ -1,6 +1,6 @@
 ---
 name: ase-meta-diaboli
-argument-hint: "[--help|-h] <thesis>"
+argument-hint: "[--help|-h] [--count|-c <count>] <thesis>"
 description: >
     Challenge a thesis by playing "Devil’s Advocate" (latin: "Advocatus
     Diaboli"). Use when the user wants a thesis or statement
@@ -12,15 +12,26 @@ effort: xhigh
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-diaboli">
     Play "Devil's Advocate"
 </skill>
 
+<expand name="getopt"
+    arg1="ase-meta-diaboli"
+    arg2="--count|-c=10">
+    $ARGUMENTS
+</expand>
+
 <objective>
     Play "Devil’s Advocate" (latin: "Advocatus Diaboli") by relentlessly
-    challenging or criticising the thesis: <thesis>$ARGUMENTS</thesis>
+    challenging or criticising the thesis: <thesis><getopt-arguments/></thesis>
 </objective>
+
+Determine the minimum number of *anti-theses* to surface: set <count/>
+to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
+*less than or equal to 0*, use the default *10* instead.
 
 1.  **Repeat Thesis**:
 
@@ -103,11 +114,11 @@ effort: xhigh
     For each Anti-Thesis or Counter-Argument rank it on a Likert scale
     of 0 (weak) to 10 (strong). Repeat the process of finding more
     Anti-Theses or Counter-Arguments until you EITHER have found at
-    least 10 Anti-Theses or Counter-Arguments with at least a rank
-    of 7 OR you have already checked a total of 50 Anti-Theses or
-    Counter-Arguments.
+    least <count/> Anti-Theses or Counter-Arguments with at least a rank
+    of 7 OR you have already checked a total of <count/> x 5 Anti-Theses
+    or Counter-Arguments.
 
-    Then, for the top-10 highest-ranked Anti-Theses or
+    Then, for the top-<count/> highest-ranked Anti-Theses or
     Counter-Arguments, sort them by their rank from highest to lowest,
     store each in <antithesis-N/> with the format `**<aspect-N/>**
     (rank: <rank-N/>/10): <statement-N/>` (where <aspect-N/> is a short

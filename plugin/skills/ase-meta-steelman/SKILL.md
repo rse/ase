@@ -1,6 +1,6 @@
 ---
 name: ase-meta-steelman
-argument-hint: "[--help|-h] <thesis>"
+argument-hint: "[--help|-h] [--count|-c <count>] [--rounds|-r <rounds>] <thesis>"
 description: >
     Build the strongest possible case for a thesis by playing
     "Steelman" (Latin spirit: "Advocatus Dei"). Use when the user
@@ -12,15 +12,30 @@ effort: xhigh
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-steelman">
     Build the "Steelman" Argument
 </skill>
 
+<expand name="getopt"
+    arg1="ase-meta-steelman"
+    arg2="--count|-c=10 --rounds|-r=1">
+    $ARGUMENTS
+</expand>
+
 <objective>
     Build the "Steelman" argument by constructing the strongest
-    possible case for the thesis: <thesis>$ARGUMENTS</thesis>
+    possible case for the thesis: <thesis><getopt-arguments/></thesis>
 </objective>
+
+Determine the number of *rounds* to perform: set <rounds/> to
+<getopt-option-rounds/>; if <getopt-option-rounds/> is *non-numeric* or
+*less than or equal to 0*, use the default *1* instead.
+
+Determine the minimum number of *pro-theses* to surface: set <count/>
+to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
+*less than or equal to 0*, use the default *10* instead.
 
 1.  **Repeat Thesis**:
 
@@ -30,7 +45,22 @@ effort: xhigh
     <ase-tpl-bullet-secondary/> **THESIS**: <thesis/>
     </template>
 
-2.  **Determine Pro-Theses**:
+2.  **Begin Round**:
+
+    Begin a *round* of fortification and consolidating reasoning. On the
+    first visit, set <i>1</i> (set round counter to one); on each
+    subsequent visit (via the jump back in the last step), <i/> has
+    already been incremented.
+
+    <if condition="<rounds/> is greater than 1">
+    Indicate the current round with the following <template/>:
+
+    <template>
+    <ase-tpl-bullet-secondary/> **ROUND**: <i/>/<rounds/>
+    </template>
+    </if>
+
+3.  **Determine Pro-Theses**:
 
     Reason on the thesis in <thesis/> by playing *Steelman* (Latin
     spirit: "Advocatus Dei") - building the strongest possible case
@@ -108,11 +138,11 @@ effort: xhigh
     For each Pro-Thesis or Supporting-Argument rank it on a Likert
     scale of 0 (weak) to 10 (strong). Repeat the process of finding
     more Pro-Theses or Supporting-Arguments until you EITHER have found
-    at least 10 Pro-Theses or Supporting-Arguments with at least a rank
-    of 7 OR you have already checked a total of 50 Pro-Theses or
-    Supporting-Arguments.
+    at least <count/> Pro-Theses or Supporting-Arguments with at least a
+    rank of 7 OR you have already checked a total of <count/> x 5
+    Pro-Theses or Supporting-Arguments.
 
-    Then, for the top-10 highest-ranked Pro-Theses or
+    Then, for the top-<count/> highest-ranked Pro-Theses or
     Supporting-Arguments, sort them by their rank from highest to lowest,
     store each in <prothesis-N/> with the format `**<aspect-N/>**
     (rank: <rank-N/>/10): <statement-N/>` (where <aspect-N/> is a short
@@ -125,7 +155,7 @@ effort: xhigh
     <ase-tpl-bullet-signal/> **PRO-THESIS**: <prothesis-N/>
     </template>
 
-3.  **Consolidating Reasoning**:
+4.  **Consolidating Reasoning**:
 
     Following the consolidation of...
 
@@ -157,3 +187,15 @@ effort: xhigh
     <template>
     <ase-tpl-bullet-normal/> **FORTIFICATION**: <fortification/>
     </template>
+
+5.  **Next Round**:
+
+    <if condition="<i/> is less than <rounds/>">
+    Carry the result forward to the next round: set
+    <thesis><fortification/></thesis> (the fortification becomes the
+    thesis to be strengthened next), set <i/> to <i/> + 1 (increment the
+    round counter), and then *continue* the *loop* at step **2**!
+    </if>
+    <if condition="<i/> is greater than or equal to <rounds/>">
+    All <rounds/> rounds are complete; *stop* the loop here.
+    </if>

@@ -7,6 +7,7 @@
 
 `ase-meta-diaboli`
     [`--help`|`-h`]
+    [`--count`|`-c` *count*]
     *thesis*
 
 ##  DESCRIPTION
@@ -20,19 +21,30 @@ cases, *Reductio Ad Absurdum*, exposing hidden costs, and pre-mortem
 thinking - while targeting the claim rather than its proponent and
 yielding where the argument genuinely holds.
 
-The skill iterates until it has found at least ten anti-theses
+The skill iterates until it has found at least *count* anti-theses
 (counter-arguments) each ranked at least 7 on a 0 (weak) to 10
-(strong) Likert scale, reports the top ten sorted from strongest to
+(strong) Likert scale, reports the top *count* sorted from strongest to
 weakest, and finally applies *Hegelian dialectics* (*Thesis* +
 *Antithesis* → *Synthesis*) to derive a single-sentence *SYNTHESIS*
 that preserves what is true in both the thesis and its antitheses
 while discarding what is false.
+
+The `--count`/`-c` *count* option sets the minimum number of strong
+anti-theses to surface (default *10*), raising or lowering the floor of
+counter-arguments hunted for, sorted, and reported in the single
+challenge pass. A `0`, negative, or non-numeric value falls back to the
+default *10*.
 
 The intent is constructive: stress-testing the thesis in good faith to
 arrive at a better final decision, not obstructing or merely being
 contrarian.
 
 ##  ARGUMENTS
+
+`--count`, `-c` *count*:
+    Surface at least *count* strong anti-theses (default *10*) before
+    sorting and reporting the top *count* and deriving the *SYNTHESIS*. An
+    invalid or non-positive *count* reverts to the default *10*.
 
 *thesis*:
     The statement, claim, or position to be relentlessly challenged.
@@ -51,6 +63,12 @@ Stress-test a design decision:
 
 ```text
 ❯ /ase-meta-diaboli We should rewrite the service in Rust.
+```
+
+Surface at least fifteen anti-theses:
+
+```text
+❯ /ase-meta-diaboli --count 15 We should rewrite the service in Rust.
 ```
 
 ##  SEE ALSO

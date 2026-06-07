@@ -10,6 +10,8 @@ ChangeLog
 - FEATURE: add `--performance`/`-p` and `--security`/`-s` lens options to `ase-code-analyze` for additional analyze lenses
 - FEATURE: add `--depth`/`-d` option to `ase-meta-why` to make the Five-Whys chain length tunable
 - FEATURE: add `--count`/`-c=12` option to `ase-meta-brainstorm` controlling the minimum number of candidate ideas in the diverge phase
+- FEATURE: add `--rounds`/`-r` option to `ase-meta-steelman` for iterative fortification rounds
+- FEATURE: add `--count`/`-c=10` option to `ase-meta-diaboli` and `ase-meta-steelman` for the number of anti-theses/pro-theses surfaced
 
 0.9.3 (2026-06-06)
 ------------------
