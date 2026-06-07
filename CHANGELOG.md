@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.9.4 (2026-06-06)
+0.9.4 (2026-06-07)
 ------------------
 
 - FEATURE: add `--severity`/`-S` severity-floor option to `ase-meta-review` to suppress sub-threshold findings
@@ -12,6 +12,11 @@ ChangeLog
 - FEATURE: add `--count`/`-c=12` option to `ase-meta-brainstorm` controlling the minimum number of candidate ideas in the diverge phase
 - FEATURE: add `--rounds`/`-r` option to `ase-meta-steelman` for iterative fortification rounds
 - FEATURE: add `--count`/`-c=10` option to `ase-meta-diaboli` and `ase-meta-steelman` for the number of anti-theses/pro-theses surfaced
+- FEATURE: add `tokei` build target for project statistics in `etc/stx.conf`
+- IMPROVEMENT: refactor `ase-meta-diaboli` and `ase-meta-steelman` to use flow/step control structures
+- IMPROVEMENT: clarify analysis hints are non-exhaustive indicators in `ase-code-analyze`
+- UPDATE: link to sibling project `bash-authorize` and bump Artifact Formats progress in README
+- CLEANUP: apply proofread fixes in `ase-docs-distill`, `ase-meta-brainstorm`, `ase-task-grill` skills
 
 0.9.3 (2026-06-06)
 ------------------
