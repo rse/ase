@@ -109,7 +109,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             where `Ls` is the start line and `Le` is the end line.
 
         -   A *verbatim* <evidence/> snippet, copied exactly from
-            <source/> (but with all newlines replaces with spaces
+            <source/> (but with all newlines replaced with spaces
             and multiple spaces collapsed into a single space), that
             *proves* the point. The cited snippet *MUST* prove the
             point verbatim. If it does not, *re-investigate and re-cite

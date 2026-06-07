@@ -117,7 +117,7 @@ Procedure
 
     -   **Fuzzy Language**:
         When the user uses vague or overloaded terms instead of a precise
-        or canonical terms.
+        or canonical term.
 
     -   **Conflicting Terminology**:
         When the user uses a term that conflicts with the existing

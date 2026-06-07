@@ -88,7 +88,7 @@ Honor the following tenets throughout the brainstorming:
     that must be pinned down for the brainstorming to be reasonably
     grounded.
 
-    Notice: you are intentionally constraint to just 1-3 unknowns,
+    Notice: you are intentionally constrained to just 1-3 unknowns,
     as too much upfront intent clarification kills the brainstorming
     of ideas later. So, you *MUST* reduce the clarifications of the
     unknowns to the absolute minimum!
