@@ -1,6 +1,6 @@
 ---
 name: ase-meta-search
-argument-hint: "[--help|-h] <query>"
+argument-hint: "[--help|-h] [--services|-s=(all|perplexity|brave|exa|websearch)...] <query>"
 description: >
     Search the Internet/Web with a query.
     Prefer this skill before using Perplexity, Brave and WebSearch.
@@ -17,14 +17,21 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-search">
 Search the Internet/Web
 </skill>
 
+<expand name="getopt"
+    arg1="ase-meta-search"
+    arg2="--services|-s=(all|perplexity|brave|exa|websearch)...">
+    $ARGUMENTS
+</expand>
+
 <objective>
 Your objective is to *search* the *Internet*/*Web* for the following query:
-<query>$ARGUMENTS</query>
+<query><getopt-arguments/></query>
 </objective>
 
 <flow>
@@ -42,23 +49,45 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     ```
     </define>
 
-    If the MCP tool `perplexity_search` from the MCP server `search-perplexity` is available:
+    Treat <getopt-option-services/> as a comma-separated list of
+    *backend tokens*. The getopt parser validates only the *first*
+    token, so you *MUST* validate each remaining token yourself against
+    the allowed set `all`, `perplexity`, `brave`, `exa`, `websearch`. If
+    any token is *not* in this set, only output the following <template/>
+    and then immediately *STOP* processing the entire current skill:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-meta-search**, ▶ ERROR: invalid `--services` token: **<token/>**
+    </template>
+
+    A backend is *selected* if `all` is in <getopt-option-services/> *OR*
+    that backend's own name is in <getopt-option-services/>.
+
+    If the `perplexity` backend is *selected* and the MCP tool
+    `perplexity_search` from the MCP server `search-perplexity` is available:
+
     <expand name="agent">
         Call the MCP tool `perplexity_search(query: "<query/>")`
         from the MCP server `search-perplexity`.
     </expand>
 
-    If the MCP tool `brave_web_search` from the MCP server `search-brave` is available:
+    If the `brave` backend is *selected* and the MCP tool
+    `brave_web_search` from the MCP server `search-brave` is available:
+
     <expand name="agent">
         Call the MCP tool `brave_web_search(query: "<query/>")`
         from the MCP server `search-brave`.
     </expand>
 
-    If the MCP tool `web_search_exa` from the MCP server `search-exa` is available:
+    If the `exa` backend is *selected* and the MCP tool
+    `web_search_exa` from the MCP server `search-exa` is available:
+
     <expand name="agent">
         Call the MCP tool `web_search_exa(query: "<query/>")`
         from the MCP server `search-exa`.
     </expand>
+
+    If the `websearch` backend is *selected*:
 
     <expand name="agent">
         Call the tool `WebSearch(query: "<query/>")`.
