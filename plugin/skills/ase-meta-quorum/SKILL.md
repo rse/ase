@@ -1,6 +1,6 @@
 ---
 name: ase-meta-quorum
-argument-hint: "[--help|-h] <question>"
+argument-hint: "[--help|-h] [--models|-m <model>[,...]] <question>"
 description: >
     Query Multiple AIs for Quorum Answer.
 user-invocable: true
@@ -13,10 +13,17 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-quorum">
 Query Multiple AIs for Quorum Answer
 </skill>
+
+<expand name="getopt"
+    arg1="ase-meta-quorum"
+    arg2="--models|-m=(all|chatgpt|gemini|deepseek|grok|glm|qwen)...">
+    $ARGUMENTS
+</expand>
 
 <objective>
 Find a *quorum answer* on an arbitrary question,
@@ -30,7 +37,7 @@ by querying *multiple* AIs for an *optimal consensus*.
     Prepare the LLM query by setting <query/> to the following <template/>:
 
     <template>
-    $ARGUMENTS.
+    <getopt-arguments/>.
     Please respond with facts and very concise and brief only,
     usually with just 1 to 7 corresponding bullet points and with short sentences.
     Optionally, mention potential cruxes which should be noticed.
@@ -53,12 +60,20 @@ by querying *multiple* AIs for an *optimal consensus*.
 
 2.  <step id="STEP 2: Query Foreign AIs">
 
+    The user-selectable foreign models are restricted by the
+    `--models`/`-m` option, parsed into <getopt-option-models/>
+    as a comma-separated list of model tokens. The default is
+    the single token `all`. If <getopt-option-models/> contains
+    the token `all`, you *MUST* treat it as the full list
+    `chatgpt,gemini,deepseek,grok,glm,qwen` (all models). Anthropic
+    Claude (yourself) is *always* included, independent of this option.
+
     <define name="agent">
     Call the `Agent` tool:
 
     ```text
         Agent(
-            name:          "ase:ase-meta-chat",
+            name:          "ase-meta-chat-<arg2/>",
             description:   "Query Foreign LLM: <arg1/>",
             subagent_type: "ase:ase-meta-chat",
             prompt:        "<arg2/> <query/>"
@@ -67,12 +82,28 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     </define>
 
+    Query only those foreign models whose token is contained in
+    <getopt-option-models/> (where `all` selects every model); silently
+    skip all others:
+
+    <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `chatgpt`">
     <expand name="agent" arg1="OpenAI ChatGPT" arg2="chatgpt"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `gemini`">
     <expand name="agent" arg1="Google Gemini"  arg2="gemini"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `deepseek`">
     <expand name="agent" arg1="DeepSeek"       arg2="deepseek"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `grok`">
     <expand name="agent" arg1="xAI Grok"       arg2="grok"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `glm`">
     <expand name="agent" arg1="Z.AI GLM"       arg2="glm"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `qwen`">
     <expand name="agent" arg1="Alibaba Qwen"   arg2="qwen"></expand>
+    </if>
 
     You *MUST* *NOT* output anything in this step.
 
@@ -116,7 +147,7 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     <template>
     **QUESTION**:
-    $ARGUMENTS
+    <getopt-arguments/>
 
     &#x25CF; **CONSENSUS ANSWER**:
     - [...]
@@ -153,7 +184,8 @@ by querying *multiple* AIs for an *optimal consensus*.
     - [...]
     </template>
 
-    In this output, remove the sections of those AIs which were not available.
+    In this output, remove the sections of those AIs which were not
+    queried (excluded via `--models`/`-m`) or were not available.
     You *MUST* *NOT* output any further explanations yourself.
 
     </step>

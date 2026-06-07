@@ -5,6 +5,8 @@ ChangeLog
 0.9.5 (2026-06-07)
 ------------------
 
+- FEATURE: add `--models`/`-m` model-selection option to `ase-meta-quorum` to choose which foreign LLMs are queried
+
 0.9.4 (2026-06-07)
 ------------------
 
