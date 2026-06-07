@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - FEATURE: add `--models`/`-m` model-selection option to `ase-meta-quorum` to choose which foreign LLMs are queried
+- BUGFIX: ensure that the "name" field of "Agent" calls are valid strings
 
 0.9.4 (2026-06-07)
 ------------------

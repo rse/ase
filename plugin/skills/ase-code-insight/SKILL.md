@@ -89,7 +89,7 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     <mermaid-spec/> for a `flowchart TB` diagram with all modules as
     boxes and the imports between modules as the directed edges. Then
     dispatch the rendering to the `ase-meta-diagram` sub-agent by
-    calling the tool `Agent(name: "ase:ase-meta-diagram", description:
+    calling the tool `Agent(name: "ase-meta-diagram", description:
     "Diagram Rendering", subagent_type: "ase:ase-meta-diagram", prompt:
     <mermaid-spec/>)` and reproduce its returned fenced code block
     verbatim in the response text. Do not display any further

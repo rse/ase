@@ -299,7 +299,7 @@ interface quality, quality attributes, and architecture governance.
       specification <mermaid-spec/> for a `flowchart TB` of the
       high-level component or layer structure and dispatch the rendering
       to the `ase-meta-diagram` sub-agent by calling the tool
-      `Agent(name: "ase:ase-meta-diagram", description: "Diagram Rendering",
+      `Agent(name: "ase-meta-diagram", description: "Diagram Rendering",
       subagent_type: "ase:ase-meta-diagram", prompt: <mermaid-spec/>)`,
       using its returned fenced code block verbatim. Show layers /
       slices / major components and their dependency direction.

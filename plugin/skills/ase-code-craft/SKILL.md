@@ -228,7 +228,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             TB`, `stateDiagram-v2`, `sequenceDiagram`, `classDiagram`,
             or `erDiagram`, depending on intent) and dispatching the
             rendering to the `ase-meta-diagram` sub-agent by calling
-            the tool `Agent(name: "ase:ase-meta-diagram", description:
+            the tool `Agent(name: "ase-meta-diagram", description:
             "Diagram Rendering", subagent_type: "ase:ase-meta-diagram",
             prompt: <mermaid-spec/>)`, reproducing its returned fenced
             code block verbatim. For *current vs. proposed* comparisons,

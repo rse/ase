@@ -48,7 +48,7 @@ Analyze documents for spelling, punctuation, or grammar errors
 
     ```text
         Agent(
-            name:          "ase:ase-docs-proofread",
+            name:          "ase-docs-proofread",
             description:   "Proofread Investigation",
             subagent_type: "ase:ase-docs-proofread",
             mode:          "plan",

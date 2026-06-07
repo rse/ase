@@ -48,7 +48,7 @@ related to a set of code quality aspects.
 
     ```text
         Agent(
-            name:          "ase:ase-code-lint",
+            name:          "ase-code-lint",
             description:   "Lint Investigation",
             subagent_type: "ase:ase-code-lint",
             mode:          "plan",

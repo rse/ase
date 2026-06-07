@@ -90,7 +90,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     ```text
         Agent(
-            name:          "ase:ase-meta-review",
+            name:          "ase-meta-review",
             description:   "Review Investigation",
             subagent_type: "ase:ase-meta-review",
             mode:          "plan",

@@ -34,7 +34,7 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     <define name="agent">
     ```text
         Agent(
-            name:          "ase:ase-meta-search",
+            name:          "ase-meta-search",
             description:   "Query Web Search Service",
             subagent_type: "ase:ase-meta-search",
             prompt:        <content/>

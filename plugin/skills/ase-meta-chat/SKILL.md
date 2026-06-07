@@ -28,7 +28,7 @@ Query foreign LLM for: <query>$ARGUMENTS</query>
 
     ```text
         Agent(
-            name:          "ase:ase-meta-chat",
+            name:          "ase-meta-chat",
             description:   "Query Foreign LLM for Chat",
             subagent_type: "ase:ase-meta-chat",
             prompt:        <query/>
