@@ -1,6 +1,6 @@
 ---
 name: ase-arch-discover
-argument-hint: "[--help|-h] <functionality>"
+argument-hint: "[--help|-h] [--limit|-l=12] <functionality>"
 description: >
     Discover additional, third-party components (libraries/frameworks) for
     the technology stack to provide needed functionality.
@@ -16,15 +16,23 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-arch-discover">
 Discover Components
 </skill>
 
+<expand name="getopt"
+    arg1="ase-arch-discover"
+    arg2="--limit|-l=12">
+    $ARGUMENTS
+</expand>
+
 <objective>
 *Discover* additional, *third-party components* (libraries/frameworks)
 for the technology stack to *provide* the *needed functionality*
-<request>$ARGUMENTS</request>.
+<request><getopt-arguments/></request>.
 </objective>
 
 <flow>
@@ -93,13 +101,13 @@ for the technology stack to *provide* the *needed functionality*
 
         -   Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
-            discover an initial set of a maximum of 12 *NPM packages*
+            discover an initial set of a maximum of <getopt-option-limit/> *NPM packages*
             <component-K/> and at least their real name <name-K/> and
             their unique package names <package-K/>.
 
-        -   Use the shell command `npm search --json --searchlimit 12
+        -   Use the shell command `npm search --json --searchlimit <getopt-option-limit/>
             "<keyword-1/>" [...] "<keyword-M/>"` to *specifically*
-            discover an additional set of a maximum of 12 *NPM packages*
+            discover an additional set of a maximum of <getopt-option-limit/> *NPM packages*
             <component-K/> and at least their unique package names
             <package-K/>, based on the essential keywords <keyword-L/>
             (L=1-M). Merge the results into the already existing result
@@ -109,14 +117,14 @@ for the technology stack to *provide* the *needed functionality*
 
         -   Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
-            discover an initial set of a maximum of 12 *Maven packages*
+            discover an initial set of a maximum of <getopt-option-limit/> *Maven packages*
             <component-K/> and at least their real name <name-K/> and
             their unique Maven coordinates <package-K/> of the form
             `groupId:artifactId`.
 
-        -   Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+<keyword-M/>&rows=12&wt=json'`
+        -   Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+<keyword-M/>&rows=<getopt-option-limit/>&wt=json'`
             to *specifically* discover an additional set of a maximum
-            of 12 *Maven packages* <component-K/> and at least their
+            of <getopt-option-limit/> *Maven packages* <component-K/> and at least their
             unique Maven coordinates <package-K/> (i.e. `<g/>:<a/>` from
             each result document's `g` and `a` fields), based on the
             essential keywords <keyword-L/> (L=1-M). Merge the results
@@ -139,7 +147,7 @@ for the technology stack to *provide* the *needed functionality*
 
     -   Sort, in descending order, the discovered components
         <component-K/> (K=1-N) by their `rank` field and trim the result
-        list to just a maximum of 12 total components.
+        list to just a maximum of <getopt-option-limit/> total components.
 
     -   For each component <component-K/> (K=1-N), research and then
         decide which *one* of *USP* (Unique Selling Point -- what makes

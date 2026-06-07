@@ -8,6 +8,7 @@ ChangeLog
 - FEATURE: add `--width`/`-w` option to `ase-meta-why` to weigh several candidate sub-causes per level and backtrack
 - FEATURE: add `--models`/`-m` model-selection option to `ase-meta-quorum` to choose which foreign LLMs are queried
 - FEATURE: add `--services`/`-s` backend-selection option to `ase-meta-search` to choose which search services are queried
+- FEATURE: add `--limit`/`-l=12` option to `ase-arch-discover` to make the component discovery search and result cap user-controlled
 - BUGFIX: ensure that the "name" field of "Agent" calls are valid strings
 
 0.9.4 (2026-06-07)
