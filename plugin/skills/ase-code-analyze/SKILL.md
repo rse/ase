@@ -81,7 +81,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
         investigate logic, semantics, control flow, or security
         problems.
 
-        Analysis Hints:
+        Analysis Hints (not exhaustive, just indicators):
         -   high algorithmic complexity
         -   needless resource allocations/copies
         -   redundant recomputation
@@ -97,7 +97,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
         Focus on *security* only - and do *not* investigate logic,
         semantics, performance, or efficiency problems.
 
-        Analysis Hints:
+        Analysis Hints (not exhaustive, just indicators):
         -   unsafe data deserialization
         -   missing input data validation/sanitization
         -   broken authentication/authorization
@@ -116,7 +116,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
         *control flow* only - and do *not* investigate performance,
         efficiency, or security problems.
 
-        Analysis Hints:
+        Analysis Hints (not exhaustive, just indicators):
         -   incorrect conditionals and boolean logic
         -   off-by-one and boundary errors
         -   operator misuse
