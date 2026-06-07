@@ -7,6 +7,7 @@ ChangeLog
 
 - FEATURE: add `--severity`/`-S` severity-floor option to `ase-code-lint` and `ase-code-analyze` to suppress sub-threshold findings
 - FEATURE: add `--performance`/`-p` and `--security`/`-s` lens options to `ase-code-analyze` for additional analyze lenses
+- FEATURE: add `--depth`/`-d` option to `ase-meta-why` to make the Five-Whys chain length tunable
 
 0.9.3 (2026-06-06)
 ------------------
