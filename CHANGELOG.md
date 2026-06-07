@@ -2,7 +2,10 @@
 ChangeLog
 =========
 
-0.9.6 (2026-06-07)
+0.9.7 (2026-06-08)
+------------------
+
+0.9.6 (2026-06-08)
 ------------------
 
 - FEATURE: add `ase_artifact_name(kind, name)` MCP tool and `ase artifact name --kind <kind> <name>` CLI to create artifact filenames
