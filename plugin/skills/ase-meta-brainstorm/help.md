@@ -7,6 +7,7 @@
 
 `ase-meta-brainstorm`
     [`--help`|`-h`]
+    [`--count`|`-c=12`]
     *topic*
 
 ##  DESCRIPTION
@@ -16,9 +17,9 @@ session on a *topic* *before* any implementation begins. It first
 *clarifies intent* by exploring the project context and interviewing
 the user - one grounded, multiple-choice question at a time - about
 purpose, constraints, scope, and success criteria. It then *diverges*
-into a broad space of candidate ideas pursued from deliberately diverse
-angles (MVP-first, risk-first, UX-first, reuse-first, and wildcard),
-without judging them.
+into a broad space of candidate ideas (at least `--count`, default 12)
+pursued from deliberately diverse angles (MVP-first, risk-first,
+UX-first, reuse-first, and wildcard), without judging them.
 
 Next it *converges* by clustering the ideas into coherent themes,
 pruning speculative or out-of-scope ones via *YAGNI*, and scoring the
@@ -32,6 +33,13 @@ On completion the skill offers a *next step*: stop, or hand the
 recommended direction off to the `ase-task-edit`, `ase-code-craft`, or
 `ase-task-preflight` skills.
 
+##  OPTIONS
+
+`--count`|`-c=12`:
+    The *minimum* number of candidate ideas to generate in the *diverge*
+    phase before converging (default: 12). Raise it for a broader idea
+    space, lower it for a quicker, narrower session.
+
 ##  ARGUMENTS
 
 *topic*:
@@ -44,6 +52,12 @@ Brainstorm an approach for a new feature:
 
 ```text
 ❯ /ase-meta-brainstorm an offline-first sync layer for the mobile app
+```
+
+Brainstorm with a broader idea space of at least 20 candidates:
+
+```text
+❯ /ase-meta-brainstorm --count 20 an offline-first sync layer
 ```
 
 ##  SEE ALSO

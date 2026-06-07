@@ -1,6 +1,6 @@
 ---
 name: ase-meta-brainstorm
-argument-hint: "[--help|-h] <topic>"
+argument-hint: "[--help|-h] [--count|-c=12] <topic>"
 description: >
     Collaboratively brainstorm a topic by diverging on ideas, converging
     through clustering and scoring, and distilling a shortlist with
@@ -15,13 +15,20 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-brainstorm">
 Collaboratively Brainstorm a Topic
 </skill>
 
+<expand name="getopt"
+    arg1="ase-meta-brainstorm"
+    arg2="--count|-c=12">
+    $ARGUMENTS
+</expand>
+
 <objective>
-Collaboratively brainstorm the topic <topic>$ARGUMENTS</topic> by first
+Collaboratively brainstorm the topic <topic><getopt-arguments/></topic> by first
 *diverging* into a broad space of candidate ideas, then *converging*
 through clustering and scoring, and finally distilling a *shortlist*
 with a single recommended direction.
@@ -152,8 +159,9 @@ Honor the following tenets throughout the brainstorming:
     variety in outcome.
 
     Do still *not* judge, rank, or prune ideas in this step. Generate
-    ideas until you either reach at least 12 distinct candidate ideas or
-    have clearly exhausted the meaningfully distinct space.
+    ideas until you either reach at least <getopt-option-count/> distinct
+    candidate ideas or have clearly exhausted the meaningfully distinct
+    space.
 
     Store each candidate idea in <idea-N/> with the format
     `**<idea-name-N/>**: <idea-statement-N/>` (where <idea-name-N/> is a
