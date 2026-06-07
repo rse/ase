@@ -34,29 +34,34 @@ export const agentClassification = {
 /*  classification presets  */
 export const projectClassificationPresets: Record<string, Record<string, string>> = {
     vibe: {
+        "agent.persona":   "writer",
         "project.id":      "example",
         "project.name":    "Example Project",
-        "project.boxing":  "black",
-        "agent.persona":   "writer"
+        "project.boxing":  "black"
     },
     pro: {
+        "agent.persona":   "engineer",
         "project.id":      "example",
         "project.name":    "Example Project",
-        "project.boxing":  "white",
-        "agent.persona":   "engineer"
+        "project.boxing":  "white"
     },
     default: {
-        "project.id":      "example",
-        "project.name":    "Example Project",
-        "project.boxing":  "white",
-        "agent.persona":   "engineer",
-        "agent.task":      "default"
+        "agent.task":            "default",
+        "agent.persona":         "engineer",
+        "project.id":            "example",
+        "project.name":          "Example Project",
+        "project.boxing":        "white",
+        "project.artifact.spec": "docs/spec/*.{md,txt}",
+        "project.artifact.arch": "docs/arch/*.{md,txt}",
+        "project.artifact.soft": "src/** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
+        "project.artifact.docs": "docs/** **/{README,LICENSE,CHANGELOG}.{md,txt} !docs/{spec,arch}/**",
+        "project.artifact.infr": "**/{.github,.claude*,etc}/** **/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}"
     },
     industry: {
+        "agent.persona":   "engineer",
         "project.id":      "example",
         "project.name":    "Example Project",
-        "project.boxing":  "grey",
-        "agent.persona":   "engineer"
+        "project.boxing":  "grey"
     }
 }
 
@@ -72,8 +77,13 @@ type ScopeTerm =
     (reads always cascade through the full chain; this restricts writes only);
     keys absent from this map default to all non-"default" scope kinds  */
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
-    "agent.task":  [ "session" ],
-    "agent.skill": [ "session" ]
+    "agent.task":            [ "session" ],
+    "agent.skill":           [ "session" ],
+    "project.artifact.spec": [ "user", "project" ],
+    "project.artifact.arch": [ "user", "project" ],
+    "project.artifact.soft": [ "user", "project" ],
+    "project.artifact.docs": [ "user", "project" ],
+    "project.artifact.infr": [ "user", "project" ]
 }
 
 /*  default set of scope kinds writable for any unrestricted key  */
@@ -159,7 +169,14 @@ export const configSchema = v.nullish(v.strictObject({
     project: v.optional(v.strictObject({
         id:      v.optional(v.pipe(v.string(), v.minLength(1))),
         name:    v.optional(v.pipe(v.string(), v.minLength(1))),
-        boxing:  v.optional(v.picklist(projectClassification.boxing))
+        boxing:  v.optional(v.picklist(projectClassification.boxing)),
+        artifact: v.optional(v.strictObject({
+            spec: v.optional(v.string()),
+            arch: v.optional(v.string()),
+            soft: v.optional(v.string()),
+            docs: v.optional(v.string()),
+            infr: v.optional(v.string())
+        }))
     })),
     agent: v.optional(v.strictObject({
         persona: v.optional(v.picklist(agentClassification.persona)),
