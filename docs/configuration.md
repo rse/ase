@@ -24,15 +24,21 @@ The following configuration parameters control the project:
     -   `grey`:      ...grey  box, i.e., the code is intentionally partially intransparent or not understood.
     -   `black`:     ...black box, i.e., the code is intentionally fully intransparent and not understood.
 
--   **project.artifact.build**: glob pattern matching the project *build-time artifact* files.
+The project *artifacts* are partitioned into five kinds (`spec`,
+`arch`, `soft`, `docs`, `infr`), each configured by a `.basedir` anchor
+and a `.files` miniglob spec. The `.basedir` is a directory resolved
+relative to the project root (empty means the project root itself); the
+`.files` whitespace-separated glob spec resolves relative to `.basedir`:
 
--   **project.artifact.code**: glob pattern matching the project *source code* files.
+-   **project.artifact.spec.{basedir,files}**: anchor directory and glob spec matching the project *specification* files.
 
--   **project.artifact.docs**: glob pattern matching the project *documentation* files.
+-   **project.artifact.arch.{basedir,files}**: anchor directory and glob spec matching the project *architecture* files.
 
--   **project.artifact.spec**: glob pattern matching the project *specification* files.
+-   **project.artifact.soft.{basedir,files}**: anchor directory and glob spec matching the project *source code* files.
 
--   **project.artifact.arch**: glob pattern matching the project *architecture* files.
+-   **project.artifact.docs.{basedir,files}**: anchor directory and glob spec matching the project *documentation* files.
+
+-   **project.artifact.infr.{basedir,files}**: anchor directory and glob spec matching the project *infrastructure* files.
 
 The following configuration parameters control the agent:
 

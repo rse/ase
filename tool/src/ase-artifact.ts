@@ -144,14 +144,42 @@ export class Artifact {
         return result
     }
 
-    /*  read the configured spec string for a single kind  */
-    private static spec (log: Log, kind: Exclude<ArtifactKind, "othr">): string {
-        const cfg = new Config("config", configSchema, log)
-        cfg.read()
-        const val = cfg.get(`project.artifact.${kind}`)
+    /*  read a single scalar configuration value as a plain string  */
+    private static configString (cfg: Config, key: string): string {
+        const val = cfg.get(key)
         if (val === undefined)
             return ""
         return String(isScalar(val) ? val.value : val)
+    }
+
+    /*  read the configured "basedir" anchor and "files" miniglob spec
+        for a single kind; "basedir" is project-root-relative (POSIX,
+        "" ≡ project root) and "files" resolves relative to "basedir"  */
+    private static spec (log: Log, kind: Exclude<ArtifactKind, "othr">): { basedir: string, files: string } {
+        const cfg = new Config("config", configSchema, log)
+        cfg.read()
+        const basedir = Artifact.configString(cfg, `project.artifact.${kind}.basedir`)
+            .replace(/\\/g, "/").replace(/^\/+|\/+$/g, "")
+            .replace(/^\.$/, "")
+        const files   = Artifact.configString(cfg, `project.artifact.${kind}.files`)
+        return { basedir, files }
+    }
+
+    /*  raw-resolve a single kind's "basedir"/"files" spec against the
+        file universe: the "files" miniglob resolves relative to
+        "basedir", then matches are re-prefixed with "basedir" to stay
+        project-relative  */
+    private static resolveKind (basedir: string, files: string, all: string[]): Set<string> {
+        if (basedir === "")
+            return Artifact.rawResolve(files, all)
+        const prefix = `${basedir}/`
+        const local  = all
+            .filter((file) => file.startsWith(prefix))
+            .map((file) => file.slice(prefix.length))
+        const result = new Set<string>()
+        for (const file of Artifact.rawResolve(files, local))
+            result.add(`${prefix}${file}`)
+        return result
     }
 
     /*  resolve the requested kinds to project-relative file lists  */
@@ -160,8 +188,10 @@ export class Artifact {
 
         /*  raw-resolve all five configured kinds  */
         const raw = new Map<Exclude<ArtifactKind, "othr">, Set<string>>()
-        for (const kind of configuredKinds)
-            raw.set(kind, Artifact.rawResolve(Artifact.spec(log, kind), all))
+        for (const kind of configuredKinds) {
+            const { basedir, files } = Artifact.spec(log, kind)
+            raw.set(kind, Artifact.resolveKind(basedir, files, all))
+        }
 
         /*  partition the universe by descending precedence  */
         const claimed = new Set<string>()
@@ -183,6 +213,19 @@ export class Artifact {
             kind,
             files: part.get(kind) ?? []
         }))
+    }
+
+    /*  resolve a base-relative "filename" within a kind's "basedir" to a
+        project-root-relative POSIX path; the implicit "othr" catch-all
+        has no configured "basedir" and is therefore rejected  */
+    static name (log: Log, kind: ArtifactKind, filename: string): string {
+        if (kind === "othr")
+            throw new Error("artifact: kind \"othr\" has no configured basedir")
+        const file = filename.replace(/\\/g, "/").replace(/^\/+/, "")
+        if (file === "")
+            throw new Error("artifact: filename must not be empty")
+        const { basedir } = Artifact.spec(log, kind)
+        return basedir === "" ? file : `${basedir}/${file}`
     }
 }
 
@@ -221,6 +264,21 @@ export default class ArtifactCommand {
                 }
                 process.exit(0)
             })
+
+        /*  register CLI sub-command "ase artifact name"  */
+        artifact
+            .command("name")
+            .description("Resolve a base-relative filename within an artifact kind to a project-relative path")
+            .argument("<filename>", "base-relative filename within the kind's basedir")
+            .option("--kind <kind>",
+                "artifact kind " +
+                `(${configuredKinds.join("|")})`,
+                "soft")
+            .action((filename: string, opts: { kind: string }) => {
+                const kind = Artifact.validateKind(opts.kind.trim())
+                process.stdout.write(`${Artifact.name(this.log, kind, filename)}\n`)
+                process.exit(0)
+            })
     }
 }
 
@@ -254,6 +312,42 @@ export class ArtifactMCP {
                     args.kind : [ ...artifactKinds ]
                 const kinds  = requested.map((k) => Artifact.validateKind(k))
                 const result = { artifacts: Artifact.list(this.log, kinds) }
+                return {
+                    structuredContent: result,
+                    content: [ { type: "text", text: JSON.stringify(result) } ]
+                }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return {
+                    isError: true,
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
+                }
+            }
+        })
+
+        mcp.registerTool("ase_artifact_name", {
+            title: "ASE artifact name",
+            description:
+                "Resolve a base-relative `filename` within an artifact `kind` to a project-relative path " +
+                "by prefixing it with the kind's configured `basedir`. " +
+                "Recognized kinds are `spec`, `arch`, `soft`, `docs`, and `infr` " +
+                "(the implicit `othr` catch-all has no basedir and is rejected). " +
+                "If `kind` is omitted, it defaults to `soft`. " +
+                "Returns the resolved path as `name`.",
+            inputSchema: {
+                kind: z.string().optional()
+                    .describe("artifact kind (`spec`, `arch`, `soft`, `docs`, `infr`); defaults to `soft`"),
+                filename: z.string()
+                    .describe("base-relative filename within the kind's basedir")
+            },
+            outputSchema: {
+                name: z.string().describe("project-relative file path")
+            }
+        }, async (args) => {
+            try {
+                const kind   = Artifact.validateKind(args.kind ?? "soft")
+                const result = { name: Artifact.name(this.log, kind, args.filename) }
                 return {
                     structuredContent: result,
                     content: [ { type: "text", text: JSON.stringify(result) } ]

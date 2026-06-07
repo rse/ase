@@ -46,16 +46,21 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "project.boxing":  "white"
     },
     default: {
-        "agent.task":            "default",
-        "agent.persona":         "engineer",
-        "project.id":            "example",
-        "project.name":          "Example Project",
-        "project.boxing":        "white",
-        "project.artifact.spec": "docs/spec/*.{md,txt}",
-        "project.artifact.arch": "docs/arch/*.{md,txt}",
-        "project.artifact.soft": "src/** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
-        "project.artifact.docs": "docs/** **/{README,LICENSE,CHANGELOG}.{md,txt} !docs/{spec,arch}/**",
-        "project.artifact.infr": "**/{.github,.claude*,etc}/** **/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}"
+        "agent.task":      "default",
+        "agent.persona":   "engineer",
+        "project.id":      "example",
+        "project.name":    "Example Project",
+        "project.boxing":  "white",
+        "project.artifact.spec.basedir": "doc/spec",
+        "project.artifact.spec.files":   "*.{md,txt}",
+        "project.artifact.arch.basedir": "doc/arch",
+        "project.artifact.arch.files":   "*.{md,txt}",
+        "project.artifact.soft.basedir": "src",
+        "project.artifact.soft.files":   "** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
+        "project.artifact.docs.basedir": "doc",
+        "project.artifact.docs.files":   "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**",
+        "project.artifact.infr.basedir": "",
+        "project.artifact.infr.files":   "**/{.github,.claude*,etc}/** **/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}"
     },
     industry: {
         "agent.persona":   "engineer",
@@ -77,13 +82,18 @@ type ScopeTerm =
     (reads always cascade through the full chain; this restricts writes only);
     keys absent from this map default to all non-"default" scope kinds  */
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
-    "agent.task":            [ "session" ],
-    "agent.skill":           [ "session" ],
-    "project.artifact.spec": [ "user", "project" ],
-    "project.artifact.arch": [ "user", "project" ],
-    "project.artifact.soft": [ "user", "project" ],
-    "project.artifact.docs": [ "user", "project" ],
-    "project.artifact.infr": [ "user", "project" ]
+    "agent.task":                    [ "session" ],
+    "agent.skill":                   [ "session" ],
+    "project.artifact.spec.basedir": [ "user", "project" ],
+    "project.artifact.spec.files":   [ "user", "project" ],
+    "project.artifact.arch.basedir": [ "user", "project" ],
+    "project.artifact.arch.files":   [ "user", "project" ],
+    "project.artifact.soft.basedir": [ "user", "project" ],
+    "project.artifact.soft.files":   [ "user", "project" ],
+    "project.artifact.docs.basedir": [ "user", "project" ],
+    "project.artifact.docs.files":   [ "user", "project" ],
+    "project.artifact.infr.basedir": [ "user", "project" ],
+    "project.artifact.infr.files":   [ "user", "project" ]
 }
 
 /*  default set of scope kinds writable for any unrestricted key  */
@@ -171,11 +181,11 @@ export const configSchema = v.nullish(v.strictObject({
         name:    v.optional(v.pipe(v.string(), v.minLength(1))),
         boxing:  v.optional(v.picklist(projectClassification.boxing)),
         artifact: v.optional(v.strictObject({
-            spec: v.optional(v.string()),
-            arch: v.optional(v.string()),
-            soft: v.optional(v.string()),
-            docs: v.optional(v.string()),
-            infr: v.optional(v.string())
+            spec: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
+            arch: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
+            soft: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
+            docs: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
+            infr: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) }))
         }))
     })),
     agent: v.optional(v.strictObject({
