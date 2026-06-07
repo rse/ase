@@ -1,6 +1,6 @@
 ---
 name: ase-meta-review
-argument-hint: "[--help|-h]"
+argument-hint: "[--help|-h] [--severity|-S=(LOW|MEDIUM|HIGH)]"
 description: >
     Perform a holistic, human-reviewer-style critique of the currently
     staged Git changes and emit an approve/reject verdict with
@@ -17,10 +17,18 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-review">
 Review Staged Changes
 </skill>
+
+<expand name="getopt"
+    arg1="ase-meta-review"
+    arg2="--severity|-S=(LOW|MEDIUM|HIGH)">
+    $ARGUMENTS
+</expand>
 
 <objective>
 Review the currently staged Git changes the way an *experienced human
@@ -98,7 +106,17 @@ explicitly requested by this procedure via outputs based on a <template/>!
     Then *derive* the overall <verdict/> from <findings/>: set
     <verdict/> to `REJECT - DEMANDS CHANGES` if *any* finding in
     <findings/> has a `severity` field of `HIGH`; otherwise set
-    <verdict/> to `APPROVE`.
+    <verdict/> to `APPROVE`. The verdict is derived *before* the
+    severity floor below, so a suppressed `HIGH` finding still drives the
+    verdict.
+
+    Then *apply the severity floor* selected via <getopt-option-severity/>
+    (default `LOW`): define the ordinal rank `LOW`=1, `MEDIUM`=2,
+    `HIGH`=3. *Keep* a finding in <findings/> if and only if its
+    `severity` field is `ACCEPTED` *or* `rank(severity)` is greater than
+    or equal to `rank(<getopt-option-severity/>)`; *silently drop* all
+    other findings. With the default floor `LOW`, all findings are kept.
+    `ACCEPTED` findings are *never* dropped.
 
     You *MUST* *NOT* output anything else in this STEP 2.
 

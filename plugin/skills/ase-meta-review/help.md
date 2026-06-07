@@ -6,6 +6,8 @@
 ##  SYNOPSIS
 
 `ase-meta-review`
+    [`--help`|`-h`]
+    [`--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`)]
 
 ##  DESCRIPTION
 
@@ -51,10 +53,20 @@ inspects *logic and semantics*, `ase-meta-diff` narrates *what changed*
 `ase-meta-review` renders a *reviewer's judgement* on a concrete diff
 before it is committed.
 
+##  OPTIONS
+
+`--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`):
+    Set the *severity floor* (default `LOW`): findings below the chosen
+    threshold are silently suppressed, ordered `LOW` < `MEDIUM` <
+    `HIGH`. The default `LOW` keeps all findings; `ACCEPTED` findings are
+    never suppressed. The floor only affects the rendered findings table;
+    the overall *verdict* is still derived from all findings, so a
+    suppressed `HIGH` finding still yields a *REJECT* verdict.
+
 ##  ARGUMENTS
 
-The `ase-meta-review` skill takes no arguments; it always reviews the
-currently *staged* Git changes.
+The `ase-meta-review` skill takes no positional arguments; it always
+reviews the currently *staged* Git changes.
 
 ##  EXAMPLES
 
@@ -62,6 +74,12 @@ Review the currently staged changes before committing:
 
 ```text
 ❯ /ase-meta-review
+```
+
+Review the staged changes, reporting only `MEDIUM` and `HIGH` findings:
+
+```text
+❯ /ase-meta-review -S MEDIUM
 ```
 
 ##  SEE ALSO

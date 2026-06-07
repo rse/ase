@@ -5,6 +5,7 @@ ChangeLog
 0.9.4 (2026-06-06)
 ------------------
 
+- FEATURE: add `--severity`/`-S` severity-floor option to `ase-meta-review` to suppress sub-threshold findings
 - FEATURE: add `--severity`/`-S` severity-floor option to `ase-code-lint` and `ase-code-analyze` to suppress sub-threshold findings
 - FEATURE: add `--performance`/`-p` and `--security`/`-s` lens options to `ase-code-analyze` for additional analyze lenses
 - FEATURE: add `--depth`/`-d` option to `ase-meta-why` to make the Five-Whys chain length tunable
