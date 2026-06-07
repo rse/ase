@@ -677,6 +677,21 @@ export default class ConfigCommand {
                     cfg.write()
                 })
             })
+
+        /*  register CLI sub-command "ase config delete"  */
+        configCmd
+            .command("delete")
+            .description("delete the value at a dotted configuration key")
+            .argument("<key>", "configuration key (dotted path)")
+            .action((key: string, _opts: unknown, cmd: Command) => {
+                const scope = parseScope(cmd.optsWithGlobals().scope as string | undefined)
+                const cfg   = new Config("config", configSchema, this.log, scope)
+                cfg.lock(() => {
+                    cfg.read()
+                    cfg.delete(key)
+                    cfg.write()
+                })
+            })
     }
 }
 

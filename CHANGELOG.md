@@ -5,6 +5,8 @@ ChangeLog
 0.9.6 (2026-06-07)
 ------------------
 
+- FEATURE: add missing `ase config delete` CLI sub-command to delete a configuration key
+
 0.9.5 (2026-06-07)
 ------------------
 
