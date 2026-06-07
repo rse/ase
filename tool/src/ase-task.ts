@@ -154,9 +154,10 @@ export class Task {
     }
 
     /*  rename a task by moving its <project>/<basedir>/TASK-<oldId>.md file
-        to <project>/<basedir>/TASK-<newId>.md; returns true on success,
-        false if the source task does not exist; throws if the target id
-        already exists  */
+        to <project>/<basedir>/TASK-<newId>.md; the embedded
+        "# ✪ TASK <id>:" heading inside the plan content is rewritten to
+        the new id; returns true on success, false if the source task does
+        not exist; throws if the target id already exists  */
     static rename (log: Log, oldId: string, newId: string): boolean {
         const oldFile = Task.path(log, oldId)
         const newFile = Task.path(log, newId)
@@ -164,8 +165,11 @@ export class Task {
             return false
         if (fs.existsSync(newFile))
             throw new Error(`task: target id "${newId}" already exists`)
+        const text    = fs.readFileSync(oldFile, "utf8")
+        const updated = text.replace(/(^#\s+(?:✪\s+)?TASK\s+)[A-Za-z0-9-]+(\s*:)/m, `$1${newId}$2`)
         fs.mkdirSync(path.dirname(newFile), { recursive: true })
-        fs.renameSync(oldFile, newFile)
+        fs.writeFileSync(newFile, updated, "utf8")
+        fs.rmSync(oldFile, { force: true })
         return true
     }
 
