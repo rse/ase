@@ -19,12 +19,12 @@ import { Task }                 from "./ase-task.js"
 
 /*  the recognized artifact kinds, in descending precedence order;
     "othr" is the implicit catch-all and is always resolved last  */
-export const artifactKinds = [ "spec", "arch", "soft", "docs", "infr", "othr" ] as const
+export const artifactKinds = [ "spec", "arch", "code", "docs", "infr", "othr" ] as const
 export type ArtifactKind = (typeof artifactKinds)[number]
 
 /*  the five configured kinds (i.e. all kinds except the implicit "othr")  */
 const configuredKinds: ReadonlyArray<Exclude<ArtifactKind, "othr">> =
-    [ "spec", "arch", "soft", "docs", "infr" ]
+    [ "spec", "arch", "code", "docs", "infr" ]
 
 /*  a single ".gitignore" rule, pre-compiled into a picomatch matcher  */
 type IgnoreRule = { matcher: (p: string) => boolean, negated: boolean, dirOnly: boolean }
@@ -273,7 +273,7 @@ export default class ArtifactCommand {
             .option("--kind <kind>",
                 "artifact kind " +
                 `(${configuredKinds.join("|")})`,
-                "soft")
+                "code")
             .action((filename: string, opts: { kind: string }) => {
                 const kind = Artifact.validateKind(opts.kind.trim())
                 process.stdout.write(`${Artifact.name(this.log, kind, filename)}\n`)
@@ -292,12 +292,12 @@ export class ArtifactMCP {
             title: "ASE artifact list",
             description:
                 "Resolve one or more artifact `kind`s to project-relative file lists. " +
-                "Recognized kinds are `spec`, `arch`, `soft`, `docs`, `infr`, and `othr`. " +
+                "Recognized kinds are `spec`, `arch`, `code`, `docs`, `infr`, and `othr`. " +
                 "Returns an `artifacts` array of `{ kind, files }` objects. " +
                 "If `kind` is omitted or empty, all kinds are resolved.",
             inputSchema: {
                 kind: z.array(z.string()).optional()
-                    .describe("list of artifact kinds (`spec`, `arch`, `soft`, `docs`, `infr`, " +
+                    .describe("list of artifact kinds (`spec`, `arch`, `code`, `docs`, `infr`, " +
                         "`othr`); if omitted or empty, all kinds are resolved")
             },
             outputSchema: {
@@ -331,13 +331,13 @@ export class ArtifactMCP {
             description:
                 "Resolve a base-relative `filename` within an artifact `kind` to a project-relative path " +
                 "by prefixing it with the kind's configured `basedir`. " +
-                "Recognized kinds are `spec`, `arch`, `soft`, `docs`, and `infr` " +
+                "Recognized kinds are `spec`, `arch`, `code`, `docs`, and `infr` " +
                 "(the implicit `othr` catch-all has no basedir and is rejected). " +
-                "If `kind` is omitted, it defaults to `soft`. " +
+                "If `kind` is omitted, it defaults to `code`. " +
                 "Returns the resolved path as `name`.",
             inputSchema: {
                 kind: z.string().optional()
-                    .describe("artifact kind (`spec`, `arch`, `soft`, `docs`, `infr`); defaults to `soft`"),
+                    .describe("artifact kind (`spec`, `arch`, `code`, `docs`, `infr`); defaults to `code`"),
                 filename: z.string()
                     .describe("base-relative filename within the kind's basedir")
             },
@@ -346,7 +346,7 @@ export class ArtifactMCP {
             }
         }, async (args) => {
             try {
-                const kind   = Artifact.validateKind(args.kind ?? "soft")
+                const kind   = Artifact.validateKind(args.kind ?? "code")
                 const result = { name: Artifact.name(this.log, kind, args.filename) }
                 return {
                     structuredContent: result,

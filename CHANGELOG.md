@@ -6,7 +6,7 @@ ChangeLog
 ------------------
 
 - FEATURE: add `ase_artifact_name(kind, name)` MCP tool and `ase artifact name --kind <kind> <name>` CLI to create artifact filenames
-- FEATURE: add `project.artifact.{spec,arch,soft,docs,infr}.{basedir,files}` config vars
+- FEATURE: add `project.artifact.{spec,arch,code,docs,infr}.{basedir,files}` config vars
 - FEATURE: add `ase_artifact_list(kind)` MCP tool and `ase artifact list --kind` CLI to resolve artifact kinds to project files
 - FEATURE: add missing `ase config delete` CLI sub-command to delete a configuration key
 

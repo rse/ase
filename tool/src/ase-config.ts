@@ -55,8 +55,8 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "project.artifact.spec.files":   "*.{md,txt}",
         "project.artifact.arch.basedir": "doc/arch",
         "project.artifact.arch.files":   "*.{md,txt}",
-        "project.artifact.soft.basedir": "src",
-        "project.artifact.soft.files":   "** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
+        "project.artifact.code.basedir": "src",
+        "project.artifact.code.files":   "** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
         "project.artifact.docs.basedir": "doc",
         "project.artifact.docs.files":   "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**",
         "project.artifact.infr.basedir": "",
@@ -88,8 +88,8 @@ export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"
     "project.artifact.spec.files":   [ "user", "project" ],
     "project.artifact.arch.basedir": [ "user", "project" ],
     "project.artifact.arch.files":   [ "user", "project" ],
-    "project.artifact.soft.basedir": [ "user", "project" ],
-    "project.artifact.soft.files":   [ "user", "project" ],
+    "project.artifact.code.basedir": [ "user", "project" ],
+    "project.artifact.code.files":   [ "user", "project" ],
     "project.artifact.docs.basedir": [ "user", "project" ],
     "project.artifact.docs.files":   [ "user", "project" ],
     "project.artifact.infr.basedir": [ "user", "project" ],
@@ -183,7 +183,7 @@ export const configSchema = v.nullish(v.strictObject({
         artifact: v.optional(v.strictObject({
             spec: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
             arch: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
-            soft: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
+            code: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
             docs: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
             infr: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) }))
         }))

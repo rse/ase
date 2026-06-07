@@ -25,7 +25,7 @@ The following configuration parameters control the project:
     -   `black`:     ...black box, i.e., the code is intentionally fully intransparent and not understood.
 
 The project *artifacts* are partitioned into five kinds (`spec`,
-`arch`, `soft`, `docs`, `infr`), each configured by a `.basedir` anchor
+`arch`, `code`, `docs`, `infr`), each configured by a `.basedir` anchor
 and a `.files` miniglob spec. The `.basedir` is a directory resolved
 relative to the project root (empty means the project root itself); the
 `.files` whitespace-separated glob spec resolves relative to `.basedir`:
@@ -34,7 +34,7 @@ relative to the project root (empty means the project root itself); the
 
 -   **project.artifact.arch.{basedir,files}**: anchor directory and glob spec matching the project *architecture* files.
 
--   **project.artifact.soft.{basedir,files}**: anchor directory and glob spec matching the project *source code* files.
+-   **project.artifact.code.{basedir,files}**: anchor directory and glob spec matching the project *source code* files.
 
 -   **project.artifact.docs.{basedir,files}**: anchor directory and glob spec matching the project *documentation* files.
 
