@@ -33,15 +33,19 @@ Determine the minimum number of *anti-theses* to surface: set <count/>
 to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 *less than or equal to 0*, use the default *10* instead.
 
-1.  **Repeat Thesis**:
+<flow>
+
+1.  <step id="STEP 1: Repeat Thesis">
 
     Output the thesis with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **THESIS**: <thesis/>
+    <ase-tpl-bullet-normal/> **THESIS**: <thesis/>
     </template>
 
-2.  **Determine Anti-Theses**:
+    </step>
+
+2.  <step id="STEP 2: Determine Anti-Theses">
 
     Reason on the thesis in <thesis/> by playing *Devil's Advocate*
     (latin: *Advocatus Diaboli*) by relentlessly challenging or
@@ -131,7 +135,9 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     <ase-tpl-bullet-signal/> **ANTITHESIS**: <antithesis-N/>
     </template>
 
-3.  **Dialectical Reasoning**:
+    </step>
+
+3.  <step id="STEP 3: Dialectical Reasoning">
 
     Following the Hegelian dialectics of...
 
@@ -160,4 +166,10 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     <template>
     <ase-tpl-bullet-normal/> **SYNTHESIS**: <synthesis/>
     </template>
+
+    Do not output any further explanations.
+
+    </step>
+
+</flow>
 

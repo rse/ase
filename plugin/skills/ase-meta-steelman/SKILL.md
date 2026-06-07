@@ -37,18 +37,12 @@ Determine the minimum number of *pro-theses* to surface: set <count/>
 to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 *less than or equal to 0*, use the default *10* instead.
 
-1.  **Repeat Thesis**:
+<flow>
 
-    Output the thesis with the following <template/>:
+1.  <step id="STEP 1: Repeat Thesis">
 
-    <template>
-    <ase-tpl-bullet-secondary/> **THESIS**: <thesis/>
-    </template>
-
-2.  **Begin Round**:
-
-    Begin a *round* of fortification and consolidating reasoning. On the
-    first visit, set <i>1</i> (set round counter to one); on each
+    Begin a *round* of fortification and consolidating reasoning. On
+    the first visit, set <i>1</i> (set round counter to one); on each
     subsequent visit (via the jump back in the last step), <i/> has
     already been incremented.
 
@@ -60,7 +54,15 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     </template>
     </if>
 
-3.  **Determine Pro-Theses**:
+    Output the thesis with the following <template/>:
+
+    <template>
+    <ase-tpl-bullet-normal/> **THESIS**: <thesis/>
+    </template>
+
+    </step>
+
+2.  <step id="STEP 2: Determine Pro-Theses">
 
     Reason on the thesis in <thesis/> by playing *Steelman* (Latin
     spirit: "Advocatus Dei") - building the strongest possible case
@@ -154,8 +156,9 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     <template>
     <ase-tpl-bullet-signal/> **PRO-THESIS**: <prothesis-N/>
     </template>
+    </step>
 
-4.  **Consolidating Reasoning**:
+3.  <step id="STEP 3: Consolidating Reasoning">
 
     Following the consolidation of...
 
@@ -179,7 +182,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
         while honestly bounding where it holds. The fortification reinforces
         the position by sharpening it.
 
-    ...finally derive a strong single-sentence (not more than 40 words)
+    ...then derive a strong single-sentence (not more than 40 words)
     fortification of the <thesis/> and all found <prothesis-N/> - the
     strongest defensible form of the thesis - store it in <fortification/>,
     and then finally output the following <template/>:
@@ -188,14 +191,20 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     <ase-tpl-bullet-normal/> **FORTIFICATION**: <fortification/>
     </template>
 
-5.  **Next Round**:
+    Finally, decide whether to perform a further round:
 
     <if condition="<i/> is less than <rounds/>">
     Carry the result forward to the next round: set
     <thesis><fortification/></thesis> (the fortification becomes the
     thesis to be strengthened next), set <i/> to <i/> + 1 (increment the
-    round counter), and then *continue* the *loop* at step **2**!
+    round counter), and then *CONTINUE* the *LOOP* at **STEP 1**!
     </if>
+
     <if condition="<i/> is greater than or equal to <rounds/>">
-    All <rounds/> rounds are complete; *stop* the loop here.
+    All <rounds/> rounds are complete; *STOP* the loop here.
+    Do not output any further explanations.
     </if>
+
+    </step>
+
+</flow>
