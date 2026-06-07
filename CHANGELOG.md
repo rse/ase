@@ -5,6 +5,7 @@ ChangeLog
 0.9.5 (2026-06-07)
 ------------------
 
+- FEATURE: add `--width`/`-w` option to `ase-meta-why` to weigh several candidate sub-causes per level and backtrack
 - FEATURE: add `--models`/`-m` model-selection option to `ase-meta-quorum` to choose which foreign LLMs are queried
 - BUGFIX: ensure that the "name" field of "Agent" calls are valid strings
 
