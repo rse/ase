@@ -9,6 +9,7 @@
     [`--help`|`-h`]
     [`--performance`|`-p`]
     [`--security`|`-s`]
+    [`--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`)]
     *source-reference*
 
 ##  DESCRIPTION
@@ -27,6 +28,13 @@ The *analysis lens* depends on the selected options:
 - `--security`|`-s`: problems in *security*.
 
 The `--performance` and `--security` options are *mutually exclusive*.
+
+The `--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`) option sets a *severity
+floor* (default `LOW`): problems below the chosen threshold are silently
+suppressed (neither reported nor persisted), ordered `LOW` < `MEDIUM` <
+`HIGH`. The default `LOW` keeps all problems; `ACCEPTED` problems are
+never suppressed. Surviving problems are renumbered contiguously as
+`P<n>`.
 
 The skill investigates the code base silently, reports each detected
 problem as a `PROBLEM` entry with severity (`LOW`, `MEDIUM`, `HIGH`) and
@@ -65,6 +73,12 @@ Analyze a source file for security aspects only:
 
 ```text
 ❯ /ase-code-analyze -s src/handlers/
+```
+
+Analyze a directory, reporting only `MEDIUM` and `HIGH` problems:
+
+```text
+❯ /ase-code-analyze -S MEDIUM src/handlers/
 ```
 
 ##  SEE ALSO

@@ -1,6 +1,6 @@
 ---
 name: ase-code-lint
-argument-hint: "[--help|-h] [--auto|-a] <source-reference>"
+argument-hint: "[--help|-h] [--auto|-a] [--severity|-S=(LOW|MEDIUM|HIGH)] <source-reference>"
 description: >
     Lint source code for potential code quality problems.
     Use when the user wants to "lint" or "check" source code.
@@ -20,7 +20,7 @@ Lint Source Code
 
 <expand name="getopt"
     arg1="ase-code-lint"
-    arg2="--auto|-a">
+    arg2="--auto|-a --severity|-S=(LOW|MEDIUM|HIGH)">
     $ARGUMENTS
 </expand>
 
@@ -58,6 +58,14 @@ related to a set of code quality aspects.
 
     Parse the single result message of the `Agent` tool as a JSON array
     and set <problems/> to that list.
+
+    Then *apply the severity floor* selected via <getopt-option-severity/>
+    (default `LOW`): define the ordinal rank `LOW`=1, `MEDIUM`=2,
+    `HIGH`=3. *Keep* a problem in <problems/> if and only if its
+    `severity` field is `ACCEPTED` *or* `rank(severity)` is greater than
+    or equal to `rank(<getopt-option-severity/>)`; *silently drop* all
+    other problems. With the default floor `LOW`, all problems are kept.
+    `ACCEPTED` problems are *never* dropped.
 
     You *MUST* *NOT* output anything else in this step 1.
 

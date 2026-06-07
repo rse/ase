@@ -1,6 +1,6 @@
 ---
 name: ase-code-analyze
-argument-hint: "[--help|-h] [--performance|-p] [--security|-s] <source-reference>"
+argument-hint: "[--help|-h] [--performance|-p] [--security|-s] [--severity|-S=(LOW|MEDIUM|HIGH)] <source-reference>"
 description: >
     Analyze the source code for problems in either the logic and
     semantics and its related control flow, performance and efficiency,
@@ -22,7 +22,7 @@ Analyze Source Code
 
 <expand name="getopt"
     arg1="ase-code-analyze"
-    arg2="--performance|-p --security|-s">
+    arg2="--performance|-p --security|-s --severity|-S=(LOW|MEDIUM|HIGH)">
     $ARGUMENTS
 </expand>
 
@@ -139,7 +139,19 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
 3.  <step id="STEP 3: Show Results">
 
-    In this STEP 3, for *EVERY* detected problem, immediately report
+    Before reporting, *apply the severity floor* selected via
+    <getopt-option-severity/> (default `LOW`): define the ordinal rank
+    `LOW`=1, `MEDIUM`=2, `HIGH`=3. *Keep* a detected problem if and only
+    if its <severity/> is `ACCEPTED` *or* `rank(severity)` is greater
+    than or equal to `rank(<getopt-option-severity/>)`; *silently drop*
+    all other problems (they are neither reported nor persisted). With
+    the default floor `LOW`, all problems are kept. `ACCEPTED` problems
+    are *never* dropped. Then renumber the surviving problems
+    contiguously as `P<n/>` with <n/> = 1, 2, ... in the original
+    ordering. If *all* problems are dropped, skip the per-problem report
+    but still emit the final hint <template/> below.
+
+    In this STEP 3, for *EVERY* surviving problem, immediately report
     it with the following output <template/>, based on concise bullet
     points.
 

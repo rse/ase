@@ -8,6 +8,7 @@
 `ase-code-lint`
     [`--help`|`-h`]
     [`--auto`|`-a`]
+    [`--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`)]
     *source-reference*
 
 ##  DESCRIPTION
@@ -29,6 +30,12 @@ automatically.
     Automatically apply every proposed correction without asking the
     user via the interactive dialog.
 
+`--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`):
+    Set the *severity floor* (default `LOW`): findings below the chosen
+    threshold are silently suppressed, ordered `LOW` < `MEDIUM` <
+    `HIGH`. The default `LOW` keeps all findings; `ACCEPTED` findings are
+    never suppressed.
+
 ##  ARGUMENTS
 
 *source-reference*:
@@ -46,6 +53,12 @@ Lint a directory and automatically apply all corrections:
 
 ```text
 ❯ /ase-code-lint --auto src/handlers/
+```
+
+Lint a directory, reporting only `MEDIUM` and `HIGH` findings:
+
+```text
+❯ /ase-code-lint -S MEDIUM src/handlers/
 ```
 
 ##  SEE ALSO
