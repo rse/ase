@@ -51,6 +51,8 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "project.id":      "example",
         "project.name":    "Example Project",
         "project.boxing":  "white",
+        "project.artifact.task.basedir": ".ase/task",
+        "project.artifact.task.files":   "*.md",
         "project.artifact.spec.basedir": "doc/spec",
         "project.artifact.spec.files":   "*.{md,txt}",
         "project.artifact.arch.basedir": "doc/arch",
@@ -84,6 +86,8 @@ type ScopeTerm =
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
     "agent.task":                    [ "session" ],
     "agent.skill":                   [ "session" ],
+    "project.artifact.task.basedir": [ "user", "project" ],
+    "project.artifact.task.files":   [ "user", "project" ],
     "project.artifact.spec.basedir": [ "user", "project" ],
     "project.artifact.spec.files":   [ "user", "project" ],
     "project.artifact.arch.basedir": [ "user", "project" ],
@@ -185,7 +189,8 @@ export const configSchema = v.nullish(v.strictObject({
             arch: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
             code: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
             docs: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
-            infr: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) }))
+            infr: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) })),
+            task: v.optional(v.strictObject({ basedir: v.optional(v.string()), files: v.optional(v.string()) }))
         }))
     })),
     agent: v.optional(v.strictObject({

@@ -10,6 +10,7 @@ import fs                                     from "node:fs"
 import { Command }                            from "commander"
 import { execaSync }                          from "execa"
 import { DateTime }                           from "luxon"
+import picomatch                              from "picomatch"
 import { isScalar }                           from "yaml"
 import { z }                                  from "zod"
 
@@ -19,7 +20,8 @@ import type Log                               from "./ase-log.js"
 import { Config, configSchema, parseScope }   from "./ase-config.js"
 
 /*  reusable functionality: persisted task plans under
-    <project>/.ase/task/<id>/plan.md  */
+    <project>/<basedir>/TASK-<id>.md (driven by the
+    "project.artifact.task.{basedir,files}" configuration)  */
 export class Task {
     /*  validate the task id to keep it safe as a filename component  */
     static validateId (id: string): void {
@@ -44,81 +46,151 @@ export class Task {
         return process.cwd()
     }
 
-    /*  resolve the on-disk base directory for task storage  */
-    static baseDir (): string {
-        return path.join(Task.projectRoot(), ".ase", "task")
+    /*  read the configured "basedir" anchor and "files" miniglob spec for
+        task storage; "basedir" is project-root-relative (POSIX, defaults
+        to ".ase/task") and "files" constrains the task filenames
+        (defaults to "*.md")  */
+    private static spec (log: Log): { basedir: string, files: string } {
+        const cfg = new Config("config", configSchema, log)
+        cfg.read()
+        const read = (key: string): string => {
+            const val = cfg.get(key)
+            if (val === undefined)
+                return ""
+            return String(isScalar(val) ? val.value : val)
+        }
+        const basedir = (read("project.artifact.task.basedir") || ".ase/task")
+            .replace(/\\/g, "/").replace(/^\/+|\/+$/g, "")
+        const files   = read("project.artifact.task.files") || "*.md"
+        return { basedir, files }
     }
 
-    /*  resolve the on-disk path for a given task id  */
-    static path (id: string): string {
+    /*  resolve the on-disk base directory for task storage  */
+    static baseDir (log: Log): string {
+        return path.join(Task.projectRoot(), Task.spec(log).basedir)
+    }
+
+    /*  resolve the on-disk path for a given task id; as a side effect,
+        eagerly migrate any legacy <basedir>/<id>/plan.md files to the
+        current <basedir>/TASK-<id>.md layout on first access (guarded by
+        a cheap check, so it is a no-op once the store is migrated)  */
+    static path (log: Log, id: string): string {
         Task.validateId(id)
-        return path.join(Task.baseDir(), id, "plan.md")
+        if (Task.needsMigration(log))
+            Task.migrateAll(log)
+        return path.join(Task.baseDir(log), `TASK-${id}.md`)
+    }
+
+    /*  cheaply check whether any legacy <basedir>/<id>/plan.md file still
+        exists in the task base directory and thus needs migration  */
+    private static needsMigration (log: Log): boolean {
+        const dir = Task.baseDir(log)
+        if (!fs.existsSync(dir))
+            return false
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            if (!entry.isDirectory() || !/^[A-Za-z0-9-]+$/.test(entry.name))
+                continue
+            if (fs.existsSync(path.join(dir, entry.name, "plan.md")))
+                return true
+        }
+        return false
+    }
+
+    /*  migrate all legacy <basedir>/<id>/plan.md task files to the current
+        <basedir>/TASK-<id>.md layout; an existing TASK-<id>.md is never
+        overwritten; the now-empty <id>/ directory is removed afterwards;
+        returns the list of migrated task ids in lexicographic order  */
+    static migrateAll (log: Log): string[] {
+        const dir = Task.baseDir(log)
+        if (!fs.existsSync(dir))
+            return []
+        const migrated: string[] = []
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            if (!entry.isDirectory() || !/^[A-Za-z0-9-]+$/.test(entry.name))
+                continue
+            const id      = entry.name
+            const oldFile = path.join(dir, id, "plan.md")
+            const newFile = path.join(dir, `TASK-${id}.md`)
+            if (!fs.existsSync(oldFile))
+                continue
+            if (fs.existsSync(newFile)) {
+                log.write("warning", `task: not migrating "${id}": target "TASK-${id}.md" already exists`)
+                continue
+            }
+            fs.renameSync(oldFile, newFile)
+            fs.rmSync(path.join(dir, id), { recursive: true, force: true })
+            migrated.push(id)
+        }
+        migrated.sort((a, b) => a.localeCompare(b))
+        return migrated
     }
 
     /*  load a task; returns empty string if no task exists  */
-    static load (id: string): string {
-        const file = Task.path(id)
+    static load (log: Log, id: string): string {
+        const file = Task.path(log, id)
         if (!fs.existsSync(file))
             return ""
         return fs.readFileSync(file, "utf8")
     }
 
-    /*  save a task as UTF-8 text under the given id; the task's home
-        directory <project>/.ase/task/<id>/ is owned by ASE and removed
-        in full by Task.delete, so callers must not place foreign files there  */
-    static save (id: string, text: string): void {
+    /*  save a task as UTF-8 text under the given id into the
+        <project>/<basedir>/TASK-<id>.md file  */
+    static save (log: Log, id: string, text: string): void {
         if (typeof text !== "string")
             throw new Error("task: text must be a string")
-        const file = Task.path(id)
+        const file = Task.path(log, id)
         fs.mkdirSync(path.dirname(file), { recursive: true })
         fs.writeFileSync(file, text, "utf8")
     }
 
-    /*  delete a task by id; removes the entire task home directory
-        <project>/.ase/task/<id>/ (owned by ASE); returns true if a task existed  */
-    static delete (id: string): boolean {
-        const file = Task.path(id)
+    /*  delete a task by id; removes the single
+        <project>/<basedir>/TASK-<id>.md file; returns true if a task existed  */
+    static delete (log: Log, id: string): boolean {
+        const file = Task.path(log, id)
         if (!fs.existsSync(file))
             return false
-        fs.rmSync(path.dirname(file), { recursive: true, force: true })
+        fs.rmSync(file, { force: true })
         return true
     }
 
-    /*  rename a task by moving the entire task home directory
-        <project>/.ase/task/<oldId>/ to <project>/.ase/task/<newId>/;
-        returns true on success, false if the source task does not exist;
-        throws if the target id already exists  */
-    static rename (oldId: string, newId: string): boolean {
-        const oldDir = path.dirname(Task.path(oldId))
-        const newDir = path.dirname(Task.path(newId))
-        if (!fs.existsSync(oldDir))
+    /*  rename a task by moving its <project>/<basedir>/TASK-<oldId>.md file
+        to <project>/<basedir>/TASK-<newId>.md; returns true on success,
+        false if the source task does not exist; throws if the target id
+        already exists  */
+    static rename (log: Log, oldId: string, newId: string): boolean {
+        const oldFile = Task.path(log, oldId)
+        const newFile = Task.path(log, newId)
+        if (!fs.existsSync(oldFile))
             return false
-        if (fs.existsSync(newDir))
+        if (fs.existsSync(newFile))
             throw new Error(`task: target id "${newId}" already exists`)
-        fs.mkdirSync(path.dirname(newDir), { recursive: true })
-        fs.renameSync(oldDir, newDir)
+        fs.mkdirSync(path.dirname(newFile), { recursive: true })
+        fs.renameSync(oldFile, newFile)
         return true
     }
 
     /*  list all persisted tasks in lexicographic id order; if verbose is true,
-        each entry's `mtime` is set to the `plan.md` modification time formatted
-        as "YYYY-MM-DD HH:MM", otherwise it is left undefined  */
-    static list (verbose = false): { id: string, mtime: string | undefined }[] {
-        const dir = Task.baseDir()
+        each entry's `mtime` is set to the task file's modification time
+        formatted as "YYYY-MM-DD HH:MM", otherwise it is left undefined  */
+    static list (log: Log, verbose = false): { id: string, mtime: string | undefined }[] {
+        if (Task.needsMigration(log))
+            Task.migrateAll(log)
+        const { basedir, files } = Task.spec(log)
+        const dir = path.join(Task.projectRoot(), basedir)
         if (!fs.existsSync(dir))
             return []
+        const isMatch = picomatch(files, { dot: true })
         const out: { id: string, mtime: string | undefined }[] = []
         for (const entry of fs.readdirSync(dir)) {
-            if (!/^[A-Za-z0-9-]+$/.test(entry))
+            const m = /^TASK-([A-Za-z0-9-]+)\.md$/.exec(entry)
+            if (m === null || !isMatch(entry))
                 continue
-            const file = path.join(dir, entry, "plan.md")
-            if (!fs.existsSync(file))
-                continue
+            const file = path.join(dir, entry)
             const st = fs.statSync(file)
             if (!st.isFile())
                 continue
             const mtime = verbose ? DateTime.fromJSDate(st.mtime).toFormat("yyyy-LL-dd HH:mm") : undefined
-            out.push({ id: entry, mtime })
+            out.push({ id: m[1], mtime })
         }
         out.sort((a, b) => a.id.localeCompare(b.id))
         return out
@@ -126,25 +198,27 @@ export class Task {
 
     /*  purge tasks whose modification time is older than the given cutoff in
         milliseconds; returns the list of removed task ids  */
-    static purge (maxAgeMs: number): string[] {
-        const dir = Task.baseDir()
+    static purge (log: Log, maxAgeMs: number): string[] {
+        if (Task.needsMigration(log))
+            Task.migrateAll(log)
+        const { basedir, files } = Task.spec(log)
+        const dir = path.join(Task.projectRoot(), basedir)
         if (!fs.existsSync(dir))
             return []
+        const isMatch = picomatch(files, { dot: true })
         const cutoff  = Date.now() - maxAgeMs
         const removed: string[] = []
         for (const entry of fs.readdirSync(dir)) {
-            if (!/^[A-Za-z0-9-]+$/.test(entry))
+            const m = /^TASK-([A-Za-z0-9-]+)\.md$/.exec(entry)
+            if (m === null || !isMatch(entry))
                 continue
-            const sub  = path.join(dir, entry)
-            const file = path.join(sub, "plan.md")
-            if (!fs.existsSync(file))
-                continue
+            const file = path.join(dir, entry)
             const st = fs.statSync(file)
             if (!st.isFile())
                 continue
             if (st.mtimeMs < cutoff) {
-                fs.rmSync(sub, { recursive: true, force: true })
-                removed.push(entry)
+                fs.rmSync(file, { force: true })
+                removed.push(m[1])
             }
         }
         return removed
@@ -192,7 +266,7 @@ export default class TaskCommand {
         /*  register CLI top-level command "ase task"  */
         const task = program
             .command("task")
-            .description("Manage persisted tasks under <project>/.ase/task/<id>/plan.md")
+            .description("Manage persisted tasks under <project>/<basedir>/TASK-<id>.md")
             .action(() => {
                 task.outputHelp()
                 process.exit(1)
@@ -202,9 +276,9 @@ export default class TaskCommand {
         task
             .command("list")
             .description("List all persisted task ids, one per line")
-            .option("-v, --verbose", "also show the plan.md modification time as (YYYY-MM-DD HH:MM)")
+            .option("-v, --verbose", "also show the task file modification time as (YYYY-MM-DD HH:MM)")
             .action((opts: { verbose?: boolean }) => {
-                const items = Task.list(opts.verbose ?? false)
+                const items = Task.list(this.log, opts.verbose ?? false)
                 for (const item of items) {
                     if (opts.verbose)
                         process.stdout.write(`${item.id}\t(${item.mtime})\n`)
@@ -220,7 +294,7 @@ export default class TaskCommand {
             .description("Load a task by id and write it to stdout")
             .argument("<id>", "Task identifier")
             .action((id: string) => {
-                const text = Task.load(id)
+                const text = Task.load(this.log, id)
                 process.stdout.write(text)
                 process.exit(0)
             })
@@ -231,7 +305,7 @@ export default class TaskCommand {
             .description("Edit a task by id with $EDITOR")
             .argument("<id>", "Task identifier")
             .action((id: string) => {
-                const file   = Task.path(id)
+                const file   = Task.path(this.log, id)
                 const editor = process.env.EDITOR ?? process.env.VISUAL ?? "vi"
                 fs.mkdirSync(path.dirname(file), { recursive: true })
                 if (!fs.existsSync(file))
@@ -248,7 +322,7 @@ export default class TaskCommand {
             .argument("<id>", "Task identifier")
             .action(async (id: string) => {
                 const text = await readStdin()
-                Task.save(id, text)
+                Task.save(this.log, id, text)
                 this.log.write("info", `task: saved "${id}"`)
                 process.exit(0)
             })
@@ -259,7 +333,7 @@ export default class TaskCommand {
             .description("Delete a task by id")
             .argument("<id>", "Task identifier")
             .action((id: string) => {
-                const removed = Task.delete(id)
+                const removed = Task.delete(this.log, id)
                 if (removed)
                     this.log.write("info", `task: removed "${id}"`)
                 else
@@ -274,7 +348,7 @@ export default class TaskCommand {
             .argument("<old>", "Old task identifier")
             .argument("<new>", "New task identifier")
             .action((oldId: string, newId: string) => {
-                const renamed = Task.rename(oldId, newId)
+                const renamed = Task.rename(this.log, oldId, newId)
                 if (renamed)
                     this.log.write("info", `task: renamed "${oldId}" to "${newId}"`)
                 else
@@ -303,7 +377,7 @@ export default class TaskCommand {
                         unit === "d" ? day :
                             unit === "m" ? month :
                                 year
-                const removed = Task.purge(n * factor)
+                const removed = Task.purge(this.log, n * factor)
                 if (removed.length === 0)
                     this.log.write("info", "task: no tasks to purge")
                 else
@@ -327,7 +401,7 @@ export class TaskMCP {
                 "List all persisted tasks. " +
                 "Returns a `tasks` array (in lexicographic `id` order) where each item has the " +
                 "task `id`. If `verbose` is `true`, each item additionally has an `mtime` field " +
-                "(last modification time of the task's `plan.md`, formatted as `YYYY-MM-DD HH:MM`). " +
+                "(last modification time of the task's `TASK-<id>.md` file, formatted as `YYYY-MM-DD HH:MM`). " +
                 "Returns an empty array if no tasks exist.",
             inputSchema:  {
                 verbose: z.boolean().optional()
@@ -337,13 +411,13 @@ export class TaskMCP {
                 tasks: z.array(z.object({
                     id:    z.string().describe("task identifier"),
                     mtime: z.string().optional()
-                        .describe("plan.md modification time (`YYYY-MM-DD HH:MM`); only present if `verbose` is true")
+                        .describe("`TASK-<id>.md` modification time (`YYYY-MM-DD HH:MM`); only present if `verbose` is true")
                 })).describe("all persisted tasks in lexicographic id order")
             }
         }, async (args) => {
             try {
                 const verbose = args.verbose ?? false
-                const items   = Task.list(verbose)
+                const items   = Task.list(this.log, verbose)
                 const tasks   = verbose ?
                     items.map((item) => ({ id: item.id, mtime: item.mtime ?? "" })) :
                     items.map((item) => ({ id: item.id }))
@@ -374,7 +448,7 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                const text = Task.load(args.id)
+                const text = Task.load(this.log, args.id)
                 return {
                     content: [ { type: "text", text } ]
                 }
@@ -402,7 +476,7 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                Task.save(args.id, args.text)
+                Task.save(this.log, args.id, args.text)
                 return {
                     content: [ { type: "text", text: `task_save: OK: saved task "${args.id}"` } ]
                 }
@@ -428,7 +502,7 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                const removed = Task.delete(args.id)
+                const removed = Task.delete(this.log, args.id)
                 const msg     = removed ?
                     `task_delete: OK: removed task "${args.id}"` :
                     `task_delete: WARNING: no task "${args.id}" to remove`
@@ -450,7 +524,7 @@ export class TaskMCP {
             title: "ASE task rename",
             description:
                 "Rename a previously persisted task from `old` to `new` by atomically moving the " +
-                "task home directory. Returns a status `text` indicating whether the rename succeeded. " +
+                "task `TASK-<id>.md` file. Returns a status `text` indicating whether the rename succeeded. " +
                 "Fails with an error if the target id already exists.",
             inputSchema: {
                 old: z.string()
@@ -460,7 +534,7 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                const renamed = Task.rename(args.old, args.new)
+                const renamed = Task.rename(this.log, args.old, args.new)
                 const msg     = renamed ?
                     `task_rename: OK: renamed task "${args.old}" to "${args.new}"` :
                     `task_rename: WARNING: no task "${args.old}" to rename`

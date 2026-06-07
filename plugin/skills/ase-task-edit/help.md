@@ -19,10 +19,6 @@ through a *chat-driven loop*. The user steers each round via an
 interactive dialog that offers continued refinement, finalization, or
 hand-off to implementation or preflight.
 
-The task plan is stored in `.ase/tasks/`*id*`/plan.md` files of the
-project and can be alternatively edited with the "`ase task edit` *id*"
-command from outside the agent tool.
-
 ##  OPTIONS
 
 `--plan`|`-p` *option*:

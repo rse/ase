@@ -27,10 +27,6 @@ lets the user pick via an interactive dialog. It honors checks for
 updated and persisted, and the user is offered a hand-off to editing,
 implementation, or preflight.
 
-The task plan is stored in `.ase/tasks/`*id*`/plan.md` files of the
-project and can be alternatively edited with the "`ase task edit` *id*"
-command from outside the agent tool.
-
 ##  OPTIONS
 
 `--next`|`-n` *option*[,...]:

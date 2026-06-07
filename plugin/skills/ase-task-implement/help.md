@@ -12,12 +12,11 @@
 
 ##  DESCRIPTION
 
-The `ase-task-implement` skill performs the *final implementation*
-of a task plan by modifying the corresponding *artifacts* with a
-complete *change set*. The plan is loaded from
-`.ase/tasks/`*id*`/plan.md`, and any optional `IMPLEMENTATION DRAFT`
-section produced by `ase-task-preflight` is used as a hint - the
-plain plan content always overrules the draft.
+The `ase-task-implement` skill performs the *final implementation* of
+a task plan by modifying the corresponding *artifacts* with a complete
+*change set*. The plan is loaded and any optional `IMPLEMENTATION DRAFT`
+section produced by `ase-task-preflight` is used as a hint - the plain
+plan content always overrules the draft.
 
 If the task plan deliberately *omits* the `※ VERIFICATION` section
 (as produced by `ase-code-craft`, `ase-code-refactor`,

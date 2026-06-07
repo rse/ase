@@ -17,10 +17,6 @@ session context) is used. When the deleted task is the current task
 and not the `default` task, the current task id is automatically
 switched back to `default`.
 
-The task plan is stored in `.ase/tasks/`*id*`/plan.md` files of the
-project and can be alternatively deleted with the
-"`ase task delete` *id*" command from outside the agent tool.
-
 ##  ARGUMENTS
 
 *id*:
