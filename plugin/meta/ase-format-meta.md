@@ -16,12 +16,15 @@ Artifact Meta Information
         (SAS)", "Architecture Description", or "Architecture Decision
         Record (ADR)".
 
-    -   `Software` (`SOFT`), aka "Software Implementation Results (IMP)".
+    -   `Source Code` (`CODE`), aka "Software Implementation Results (IMP)",
+        "Code", or "Software".
 
     -   `Documentation` (`DOCS`), aka "Software Documentation Results (DOC)".
 
+    -   `Tasks` (`TASK`), aka "Task Plans", "Issues", or "User Stories".
+
     Each **Artifact Set** has a unique identifier <artifact-set-id/>,
-    which is one of `SPEC`, `ARCH`, `SOFT`, or `DOCS`.
+    which is one of `SPEC`, `ARCH`, `CODE`, `DOCS`, or `TASK`.
 
 -   **Artifact**:
 
