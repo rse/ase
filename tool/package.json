@@ -37,7 +37,8 @@
         "@types/shell-quote":               "1.7.5",
         "@types/proper-lockfile":           "4.1.4",
         "@types/write-file-atomic":         "4.0.3",
-        "@types/pacote":                    "11.1.8"
+        "@types/pacote":                    "11.1.8",
+        "@types/picomatch":                 "4.0.3"
     },
     "dependencies": {
         "commander":                        "15.0.0",
@@ -60,7 +61,8 @@
         "proper-lockfile":                  "4.1.2",
         "write-file-atomic":                "8.0.0",
         "pacote":                           "21.5.0",
-        "ofetch":                           "1.5.1"
+        "ofetch":                           "1.5.1",
+        "picomatch":                        "4.0.4"
     },
     "engines": {
         "npm":                              ">=10.0.0",

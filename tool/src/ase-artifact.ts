@@ -1,0 +1,271 @@
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+import path                     from "node:path"
+import fs                       from "node:fs"
+
+import { Command }              from "commander"
+import picomatch                from "picomatch"
+import { isScalar }             from "yaml"
+import { z }                    from "zod"
+import type { McpServer }       from "@modelcontextprotocol/sdk/server/mcp.js"
+
+import type Log                 from "./ase-log.js"
+import { Config, configSchema } from "./ase-config.js"
+import { Task }                 from "./ase-task.js"
+
+/*  the recognized artifact kinds, in descending precedence order;
+    "othr" is the implicit catch-all and is always resolved last  */
+export const artifactKinds = [ "spec", "arch", "soft", "docs", "infr", "othr" ] as const
+export type ArtifactKind = (typeof artifactKinds)[number]
+
+/*  the five configured kinds (i.e. all kinds except the implicit "othr")  */
+const configuredKinds: ReadonlyArray<Exclude<ArtifactKind, "othr">> =
+    [ "spec", "arch", "soft", "docs", "infr" ]
+
+/*  a single ".gitignore" rule, pre-compiled into a picomatch matcher  */
+type IgnoreRule = { matcher: (p: string) => boolean, negated: boolean, dirOnly: boolean }
+
+/*  reusable functionality: resolve artifact kinds to project-relative
+    file lists, driven by the "project.artifact.<kind>" configuration  */
+export class Artifact {
+    /*  validate a requested kind against the known set  */
+    static validateKind (kind: string): ArtifactKind {
+        if (!(artifactKinds as ReadonlyArray<string>).includes(kind))
+            throw new Error(`artifact: unknown kind "${kind}" ` +
+                `(expected one of: ${artifactKinds.join(", ")})`)
+        return kind as ArtifactKind
+    }
+
+    /*  translate a single ".gitignore" line into a picomatch-backed rule,
+        honoring the anchored-vs-floating, directory-only, and negation
+        semantics of ".gitignore" patterns  */
+    private static compileIgnoreRule (line: string): IgnoreRule | null {
+        let pattern = line.trim()
+        if (pattern === "" || pattern.startsWith("#"))
+            return null
+        let negated = false
+        if (pattern.startsWith("!")) {
+            negated = true
+            pattern = pattern.slice(1)
+        }
+        let dirOnly = false
+        if (pattern.endsWith("/")) {
+            dirOnly = true
+            pattern = pattern.slice(0, -1)
+        }
+        const anchored = pattern.includes("/")
+        if (pattern.startsWith("/"))
+            pattern = pattern.slice(1)
+        const glob    = anchored ? pattern : `**/${pattern}`
+        const isMatch = picomatch(glob, { dot: true })
+        return { matcher: (p: string) => isMatch(p), negated, dirOnly }
+    }
+
+    /*  load the ".gitignore" rules located directly in a directory  */
+    private static loadIgnoreRules (dir: string): IgnoreRule[] {
+        const file = path.join(dir, ".gitignore")
+        if (!fs.existsSync(file))
+            return []
+        const rules: IgnoreRule[] = []
+        for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
+            const rule = Artifact.compileIgnoreRule(line)
+            if (rule !== null)
+                rules.push(rule)
+        }
+        return rules
+    }
+
+    /*  decide whether a project-relative path is ignored by the given
+        ordered ".gitignore" rule set (last matching rule wins)  */
+    private static isIgnored (rel: string, isDir: boolean, rules: IgnoreRule[]): boolean {
+        let ignored = false
+        for (const rule of rules) {
+            if (rule.dirOnly && !isDir)
+                continue
+            if (rule.matcher(rel))
+                ignored = !rule.negated
+        }
+        return ignored
+    }
+
+    /*  build the file universe by walking the project tree from the
+        project root, honoring ".gitignore" rules (root plus nested) and
+        always pruning ".git". Yields POSIX project-relative, sorted,
+        de-duplicated file paths  */
+    static universe (): string[] {
+        const root  = Task.projectRoot()
+        const files = new Set<string>()
+        const walk = (dir: string, relDir: string, inherited: IgnoreRule[]): void => {
+            const rules = [ ...inherited, ...Artifact.loadIgnoreRules(dir) ]
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+                if (entry.name === ".git")
+                    continue
+                const rel    = relDir === "" ? entry.name : `${relDir}/${entry.name}`
+                const isDir  = entry.isDirectory()
+                if (Artifact.isIgnored(rel, isDir, rules))
+                    continue
+                if (isDir)
+                    walk(path.join(dir, entry.name), rel, rules)
+                else if (entry.isFile())
+                    files.add(rel)
+            }
+        }
+        walk(root, "", [])
+        return [ ...files ].sort((a, b) => a.localeCompare(b))
+    }
+
+    /*  raw-resolve a single kind's configuration spec against the file
+        universe via "seed-then-mutate" miniglob semantics: the spec is a
+        whitespace-separated list of tokens.  */
+    private static rawResolve (spec: string, all: string[]): Set<string> {
+        const tokens = spec.split(/\s+/).filter((t) => t !== "")
+        if (tokens.length === 0)
+            return new Set<string>()
+        const result = new Set<string>(tokens[0].startsWith("!") ? all : [])
+        for (const token of tokens) {
+            const negated = token.startsWith("!")
+            const glob    = negated ? token.slice(1) : token
+            if (glob === "")
+                continue
+            const isMatch = picomatch(glob, { dot: true })
+            for (const file of all) {
+                if (!isMatch(file))
+                    continue
+                if (negated)
+                    result.delete(file)
+                else
+                    result.add(file)
+            }
+        }
+        return result
+    }
+
+    /*  read the configured spec string for a single kind  */
+    private static spec (log: Log, kind: Exclude<ArtifactKind, "othr">): string {
+        const cfg = new Config("config", configSchema, log)
+        cfg.read()
+        const val = cfg.get(`project.artifact.${kind}`)
+        if (val === undefined)
+            return ""
+        return String(isScalar(val) ? val.value : val)
+    }
+
+    /*  resolve the requested kinds to project-relative file lists  */
+    static list (log: Log, kinds: ArtifactKind[]): { kind: ArtifactKind, files: string[] }[] {
+        const all = Artifact.universe()
+
+        /*  raw-resolve all five configured kinds  */
+        const raw = new Map<Exclude<ArtifactKind, "othr">, Set<string>>()
+        for (const kind of configuredKinds)
+            raw.set(kind, Artifact.rawResolve(Artifact.spec(log, kind), all))
+
+        /*  partition the universe by descending precedence  */
+        const claimed = new Set<string>()
+        const part    = new Map<ArtifactKind, string[]>()
+        for (const kind of configuredKinds) {
+            const own: string[] = []
+            for (const file of raw.get(kind)!.size > 0 ? all : []) {
+                if (raw.get(kind)!.has(file) && !claimed.has(file)) {
+                    own.push(file)
+                    claimed.add(file)
+                }
+            }
+            part.set(kind, own)
+        }
+        part.set("othr", all.filter((file) => !claimed.has(file)))
+
+        /*  project onto the requested kinds  */
+        return kinds.map((kind) => ({
+            kind,
+            files: part.get(kind) ?? []
+        }))
+    }
+}
+
+/*  CLI command "ase artifact"  */
+export default class ArtifactCommand {
+    constructor (private log: Log) {}
+
+    /*  register commands  */
+    register (program: Command): void {
+        /*  register CLI top-level command "ase artifact"  */
+        const artifact = program
+            .command("artifact")
+            .description("Resolve project artifact kinds to project-relative file lists")
+            .action(() => {
+                artifact.outputHelp()
+                process.exit(1)
+            })
+
+        /*  register CLI sub-command "ase artifact list"  */
+        artifact
+            .command("list")
+            .description("Resolve one or more artifact kinds to project-relative file paths")
+            .option("--kind <kinds>",
+                "comma-separated list of artifact kinds " +
+                `(${artifactKinds.join("|")})`,
+                artifactKinds.join(","))
+            .action((opts: { kind: string }) => {
+                const kinds  = opts.kind.split(",").map((k) => Artifact.validateKind(k.trim()))
+                const result = Artifact.list(this.log, kinds)
+                const single = result.length === 1
+                for (const { kind, files } of result) {
+                    if (!single)
+                        process.stdout.write(`# ${kind}:\n`)
+                    for (const file of files)
+                        process.stdout.write(`- ${file}\n`)
+                }
+                process.exit(0)
+            })
+    }
+}
+
+/*  MCP registration entry point for artifact tools  */
+export class ArtifactMCP {
+    constructor (private log: Log) {}
+
+    /*  register MCP tools  */
+    register (mcp: McpServer): void {
+        mcp.registerTool("ase_artifact_list", {
+            title: "ASE artifact list",
+            description:
+                "Resolve one or more artifact `kind`s to project-relative file lists. " +
+                "Recognized kinds are `spec`, `arch`, `soft`, `docs`, `infr`, and `othr`. " +
+                "Returns an `artifacts` array of `{ kind, files }` objects. " +
+                "If `kind` is omitted or empty, all kinds are resolved.",
+            inputSchema: {
+                kind: z.array(z.string()).optional()
+                    .describe("list of artifact kinds (`spec`, `arch`, `soft`, `docs`, `infr`, " +
+                        "`othr`); if omitted or empty, all kinds are resolved")
+            },
+            outputSchema: {
+                artifacts: z.array(z.object({
+                    kind:  z.string().describe("artifact kind"),
+                    files: z.array(z.string()).describe("project-relative file paths for the kind")
+                })).describe("resolved artifacts, one entry per requested kind")
+            }
+        }, async (args) => {
+            try {
+                const requested = args.kind !== undefined && args.kind.length > 0 ?
+                    args.kind : [ ...artifactKinds ]
+                const kinds  = requested.map((k) => Artifact.validateKind(k))
+                const result = { artifacts: Artifact.list(this.log, kinds) }
+                return {
+                    structuredContent: result,
+                    content: [ { type: "text", text: JSON.stringify(result) } ]
+                }
+            }
+            catch (err: unknown) {
+                const message = err instanceof Error ? err.message : String(err)
+                return {
+                    isError: true,
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
+                }
+            }
+        })
+    }
+}
