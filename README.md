@@ -610,6 +610,7 @@ See Also
 
 - [claudeX](https://github.com/rse/claudex) (convenience wrapper for Claude Code)
 - [mcp-to-openai](https://github.com/rse/mcp-to-openai) (gateway between MCP and OpenAI-compatible APIs)
+- [bash-authorize](https://github.com/rse/bash-authorize) (pre-tool-use hook for Bash commands)
 
 Support
 -------
