@@ -15,17 +15,14 @@ About
 **Agentic Software Engineering (ASE)** is the opinionated companion
 tooling of *Dr. Ralf S. Engelschall* for combining the approach of
 *Agentic AI* and *Software Engineering* with the help of *Agentic AI
-Coding Tools* like *Claude Code*.
-
-**ASE** primarily consists of a *Claude Code* plugin (of about 14K LoC
-agent skill definitions) and a companion Command-Line Interface (CLI)
-tool, including a built-in *MCP* service (of about 6K LoC TypeScript
-code).
-
-**ASE**, on the surface, provides 33 agent skills and commands to
-support the most important, recurring work-steps in the primary
-disciplines of *Software Engineering*, especially in the discipline
-*Software Development* and *Software Architecture*.
+Coding Tools* like *Claude Code*. **ASE** primarily consists of a
+*Claude Code* plugin (of about 14K LoC agent skill definitions) and
+a companion Command-Line Interface (CLI) tool, including a built-in
+*MCP* service (of about 6K LoC TypeScript code). **ASE**, on the
+surface, provides 33 agent skills and commands to support the most
+important, recurring work-steps in the primary disciplines of *Software
+Engineering*, especially in the discipline *Software Development* and
+*Software Architecture*.
 
 **ASE** is primarily motivated by the following statement of its author, *Dr. Ralf S. Engelschall*:
 
