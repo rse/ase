@@ -108,8 +108,9 @@ Procedure
     shared understanding and no decisions/questions are left open.
 
     This especially means, you *MUST* clarify as much aspects as
-    necessary to ensure that during a subsequent implementation no
-    essential freedom of choices exist any longer.
+    necessary to ensure that for at least the most important decisions,
+    during a subsequent implementation, no essential freedom of choices
+    exist any longer.
 
     For this process, determine the <n/> essential aspects <aspect-N/>
     (a one or two word long short identifier like `Foo` or `Bar-Baz`)
@@ -228,7 +229,8 @@ Procedure
     2.  Check the tool <result/> and dispatch accordingly:
 
         -   If <result/> is `DONE` or `CANCEL`:
-            Only output the following <template/> and then *STOP*.
+            Only output the following <template/> and then *STOP*,
+            without output of any further information.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- done**
