@@ -107,6 +107,10 @@ Procedure
     *essential aspect* of the task plan in <plan/> *until* reaching a
     shared understanding and no decisions/questions are left open.
 
+    This especially means, you *MUST* clarify as much aspects as
+    necessary to ensure that during a subsequent implementation no
+    essential freedom of choices exist any longer.
+
     For this process, determine the <n/> essential aspects <aspect-N/>
     (a one or two word long short identifier like `Foo` or `Bar-Baz`)
     and the corresponding decision/question <question-N/> where a shared
