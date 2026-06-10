@@ -12,11 +12,64 @@ export class Markdown {
     /*  prepare Markdown for improved rendering by rewriting
         unordered bullet paragraphs -- replacing the "-"/"*" bullet marker with
         "◯" and splitting multi-line inline code spans into per-line single-line
-        spans (so each physical line carries its own closed backtick span) */
+        spans (so each physical line carries its own closed backtick span).
+        Fenced code blocks (``` / ~~~) are detected line-wise and passed
+        through entirely verbatim, so neither the inline-span splitting nor the
+        bullet-marker rewriting ever touches their contents.  */
     static prepare (text: string): string {
         if (typeof text !== "string")
             throw new Error("markdown: text must be a string")
 
+        /*  segment the input line-wise into alternating non-fenced and
+            fenced regions: a fenced code block opens with a line whose first
+            non-whitespace content is a run of 3+ backticks or tildes and
+            closes with a matching-or-longer run of the same marker; fenced
+            regions are emitted verbatim while only non-fenced regions are
+            handed to the rewriting passes below  */
+        const lines  = text.split("\n")
+        let result   = ""
+        let buf      = ""
+        let inFence  = false
+        let fenceCh  = ""
+        let fenceLen = 0
+        const flush  = () => {
+            if (buf !== "") {
+                result += Markdown.rewrite(buf)
+                buf = ""
+            }
+        }
+        for (let li = 0; li < lines.length; li++) {
+            const line = lines[li]
+            const nl   = li < lines.length - 1 ? "\n" : ""
+            const m    = line.match(/^(\s*)(`{3,}|~{3,})/)
+            if (!inFence && m) {
+                /*  a fence-opening line: flush the pending non-fenced buffer,
+                    enter fenced mode, and emit the opener verbatim  */
+                flush()
+                inFence  = true
+                fenceCh  = m[2]![0]!
+                fenceLen = m[2]!.length
+                result += line + nl
+            }
+            else if (inFence) {
+                /*  inside a fenced block: emit verbatim and, on a matching
+                    closing fence line, leave fenced mode  */
+                result += line + nl
+                const c = line.match(/^(\s*)(`{3,}|~{3,})\s*$/)
+                if (c && c[2]![0] === fenceCh && c[2]!.length >= fenceLen)
+                    inFence = false
+            }
+            else
+                /*  a regular non-fenced line: accumulate for the passes  */
+                buf += line + nl
+        }
+        flush()
+        return result
+    }
+
+    /*  apply the inline-span and bullet-marker rewriting passes to a chunk of
+        non-fenced Markdown text (see prepare() for fenced-block handling)  */
+    static rewrite (text: string): string {
         /*  PASS 1: rewrite single-backtick inline code spans that carry
             backslash-escaped backticks (`\``) into CommonMark-correct spans.  */
         {
