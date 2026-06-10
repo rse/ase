@@ -1,6 +1,6 @@
 ---
 name: ase-task-view
-argument-hint: "[--help|-h] [<id>]"
+argument-hint: "[--help|-h] [--full|-f] [<id>]"
 description: >
     View current or given task plan.
     Use when the user calls to "view", "show" or "see" the
@@ -12,10 +12,17 @@ effort: high
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-task-view">
 View a Task Plan
 </skill>
+
+<expand name="getopt"
+    arg1="ase-task-view"
+    arg2="--full|-f">
+    $ARGUMENTS
+</expand>
 
 <objective>
 *View* the task plan.
@@ -32,7 +39,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Determine Task:**
 
-    1.  Set <id>$ARGUMENTS</id> initially, with any leading and trailing
+    1.  Set <id><getopt-arguments/></id> initially, with any leading and trailing
         whitespace stripped.
         Inherit the always existing <ase-task-id/> from the current context.
         Do not output anything.
@@ -77,7 +84,13 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  <if condition="<content/> is not empty">
         Treat <content/> as *verbatim* Markdown.
-        *Render plan*: Only output the following <template/>:
+        *Render plan*: Only output the following <template/>. If
+        <getopt-option-full/> is *not* `true`, <content/> is longer than
+        90 lines, and a `##  IMPLEMENTATION DRAFT` section (from the
+        companion skill `ase-task-preflight`) exists, replace the entire
+        content of the `##  IMPLEMENTATION DRAFT` section with `[...]`.
+        Else, do *not* truncate, summarize, or partially show the plan.
+        Use the following <template/>:
 
         <template>
         <ase-tpl-head title="TASK"/>
