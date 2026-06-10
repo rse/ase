@@ -2,12 +2,17 @@
 ChangeLog
 =========
 
-0.9.7 (2026-06-08)
+0.9.7 (2026-06-10)
 ------------------
 
 - FEATURE: add `ase_markdown_prepare` MCP tool and `Markdown.prepare()` helper to improve Markdown rendering
+- FEATURE: add option `--full`/`-f` to `ase-task-view` to not truncate IMPLEMENTATION DRAFT sections by default
+- IMPROVEMENT: keep fenced code blocks as-is in `Markdown.prepare()`
+- IMPROVEMENT: improve rendering of approaches in `ase-code-{craft,refactor,resolve}` skills
+- IMPROVEMENT: strengthen and clarify the `ase-task-grill` skill
 - REFACTOR: apply `Markdown.prepare()` implicitly in `ase_task_{load,save}`
 - REFACTOR: adjust all skills for the improved task rendering
+- UPDATE: upgrade NPM dependencies
 
 0.9.6 (2026-06-08)
 ------------------
