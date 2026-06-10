@@ -482,8 +482,7 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                const text = Markdown.prepare(args.text)
-                Task.save(this.log, args.id, text)
+                Task.save(this.log, args.id, args.text)
                 return {
                     content: [ { type: "text", text: `task_save: OK: saved task "${args.id}"` } ]
                 }
