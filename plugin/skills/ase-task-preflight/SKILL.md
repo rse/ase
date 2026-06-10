@@ -126,13 +126,13 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  Append this artifact change set <unified-diff/> to the end
         of the <content/> with the following <template/>. If a section
-        named `## ※ IMPLEMENTATION DRAFT` already exists from a
+        named `##  IMPLEMENTATION DRAFT` already exists from a
         previous run of this skill, *replace* this entire existing
         section.
 
         <template>
 
-        ## ※ IMPLEMENTATION DRAFT
+        ##  IMPLEMENTATION DRAFT
 
         ```text
         <unified-diff/>

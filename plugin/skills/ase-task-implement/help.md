@@ -18,7 +18,7 @@ a task plan by modifying the corresponding *artifacts* with a complete
 section produced by `ase-task-preflight` is used as a hint - the plain
 plan content always overrules the draft.
 
-If the task plan deliberately *omits* the `※ VERIFICATION` section
+If the task plan deliberately *omits* the `##  VERIFICATION` section
 (as produced by `ase-code-craft`, `ase-code-refactor`,
 `ase-code-resolve`, or `ase-task-edit` when invoked with `--dry`),
 the entire verification phase is strictly skipped: no build, tests,

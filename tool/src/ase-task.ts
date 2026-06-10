@@ -18,6 +18,7 @@ import type { McpServer }                     from "@modelcontextprotocol/sdk/se
 
 import type Log                               from "./ase-log.js"
 import { Config, configSchema, parseScope }   from "./ase-config.js"
+import { Markdown }                           from "./ase-markdown.js"
 
 /*  reusable functionality: persisted task plans under
     <project>/<basedir>/TASK-<id>.md (driven by the
@@ -452,7 +453,8 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                const text = Task.load(this.log, args.id)
+                const raw  = Task.load(this.log, args.id)
+                const text = Markdown.prepare(raw)
                 return {
                     content: [ { type: "text", text } ]
                 }
@@ -480,7 +482,8 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                Task.save(this.log, args.id, args.text)
+                const text = Markdown.prepare(args.text)
+                Task.save(this.log, args.id, text)
                 return {
                     content: [ { type: "text", text: `task_save: OK: saved task "${args.id}"` } ]
                 }

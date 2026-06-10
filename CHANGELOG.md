@@ -5,6 +5,10 @@ ChangeLog
 0.9.7 (2026-06-08)
 ------------------
 
+- FEATURE: add `ase_markdown_prepare` MCP tool and `Markdown.prepare()` helper to improve Markdown rendering
+- REFACTOR: apply `Markdown.prepare()` implicitly in `ase_task_{load,save}`
+- REFACTOR: adjust all skills for the improved task rendering
+
 0.9.6 (2026-06-08)
 ------------------
 

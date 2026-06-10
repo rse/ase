@@ -73,7 +73,7 @@ that `CHANGELOG.md` file, aligned with its existing style
 and conventions.
 
 <if condition="<getopt-option-dry/> is equal `true`">
-You *MUST* completely omit the `## ※ VERIFICATION` section
+You *MUST* completely omit the `##  VERIFICATION` section
 (including its heading and all of its bullet points) from
 <content/>.
 </if>
@@ -318,11 +318,12 @@ Set <content-dirty>true</content-dirty>.
         </template>
         </if>
 
-    3.  *Render plan*: Only output the following <template/>, so the user
+    3.  *Render plan*: Treat <content/> as *verbatim* Markdown.
+        Only output the following <template/>, so the user
         can read the plan and react to it. If <content/> is longer
-        than 90 lines and a `※ IMPLEMENTATION DRAFT` section (from the
+        than 90 lines and a `##  IMPLEMENTATION DRAFT` section (from the
         companion skill `ase-task-preflight`) exists, replace the entire
-        content of the `※ IMPLEMENTATION DRAFT` section with `[...]`.
+        content of the `##  IMPLEMENTATION DRAFT` section with `[...]`.
         Else, do *not* truncate, summarize, or partially show the plan.
         Use the following <template/>:
 

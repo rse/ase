@@ -107,24 +107,24 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     1.  Start with <instruction></instruction> (set instruction to empty).
 
-    2.  <if condition="<content/> contains neither '- **WHAT**:' nor '- **WHY**:'">
+    2.  <if condition="<content/> contains neither '-   **WHAT**:' nor '-   **WHY**:'">
         Set <instruction><content/></instruction> (set instruction to content).
         </if>
 
-    3.  <if condition="<content/> contains '- **WHAT**: <text/>'">
+    3.  <if condition="<content/> contains '-   **WHAT**: <text/>'">
         Set <instruction><text/></instruction> (set instruction to extracted text).
         </if>
 
-    4.  <if condition="<content/> contains '- **WHY**: <text/>' and <instruction/> is empty">
+    4.  <if condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is empty">
         Set <instruction><text/></instruction> (set instruction to extracted text).
         </if>
 
-    5.  else <if condition="<content/> contains '- **WHY**: <text/>' and <instruction/> is NOT empty">
+    5.  else <if condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is NOT empty">
         Set <instruction><instruction/>, BECAUSE <text/></instruction>
         (append extracted text to instruction).
         </if>
 
-    6.  <if condition="<content/> contains 'created: **<text/>**'">
+    6.  <if condition="<content/> contains 'Created:  <text/>'">
         Set <timestamp-created><text/></timestamp-created> (set
         timestamp-created to extracted text)
         </if>

@@ -76,15 +76,13 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
     2.  <if condition="<content/> is not empty">
-        *Render plan*: Only output the following <template/>, so the user
-        can read the plan and react to it. Do *not* truncate, summarize,
-        or partially show the plan -- always show the complete plan
-        <content/> here.
+        Treat <content/> as *verbatim* Markdown.
+        *Render plan*: Only output the following <template/>:
 
         <template>
-        <ase-tpl-head title="TASK-PLAN"/>
+        <ase-tpl-head title="TASK"/>
         <content/>
-        <ase-tpl-foot title="TASK-PLAN"/>
+        <ase-tpl-foot title="TASK"/>
         </template>
         </if>
 

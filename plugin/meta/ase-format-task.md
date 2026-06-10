@@ -6,28 +6,28 @@ Every *task* uses a strict and fixed format:
 
 <format>
 
-# ✪ TASK <task-id/>: <title/>
+#   TASK <task-id/>: <title/>
 
-✳ Created:  **<timestamp-created/>**
-✎ Modified: **<timestamp-modified/>**
+Created:  <timestamp-created/>
+Modified: <timestamp-modified/>
 
-## ※ CONTEXT
+##  CONTEXT
 
-- **WHAT**: <summary-what/>
+-   **WHAT**: <summary-what/>
 
-- **WHY**: <summary-why/>
+-   **WHY**: <summary-why/>
 
-## ※ CHANGES
+##  CHANGES
 
-- [...]
+-   [...]
 
-- [...]
+-   [...]
 
-## ※ VERIFICATION
+##  VERIFICATION
 
-- [...]
+-   [...]
 
-- [...]
+-   [...]
 
 </format>
 
@@ -61,7 +61,7 @@ You *MUST* honor the following hints on this *task* format:
 -   The <title/> is a short summary of the <summary-what/>, no longer than
     50 characters.
 
--   The sections `※ CHANGES` and `※ VERIFICATION` all are just a short
+-   The sections `##  CHANGES` and `##  VERIFICATION` all are just a short
     list of 1-5 bullet points. Each bullet point is formatted as
     `- **<aspect/>**: <specification/>` where <aspect/> indicates
     the aspect of the section and <specification/> is 1-3 sentences
@@ -69,6 +69,6 @@ You *MUST* honor the following hints on this *task* format:
     description of the aspect.
 
 -   In all sections, break all lines with a newline character
-    after about 120 characters per line for better subsequent
+    after about 100 characters per line for better subsequent
     manual editing.
 

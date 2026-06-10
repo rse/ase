@@ -30,7 +30,7 @@ hand-off to implementation or preflight.
     ignoring *instruction* and stopping skill processing).
 
 `--dry`|`-d`:
-    Generate any *new* plan *without* the `※ VERIFICATION` section.
+    Generate any *new* plan *without* the `##  VERIFICATION` section.
     Applies only to freshly generated plans, not to existing plans
     loaded from disk. When `ase-task-implement` later applies such
     a plan, it strictly skips the entire verification phase (no

@@ -278,7 +278,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         file, aligned with its existing style and conventions.
 
         <if condition="<getopt-option-dry/> is equal `true`">
-        You *MUST* completely omit the `## ※ VERIFICATION` section
+        You *MUST* completely omit the `##  VERIFICATION` section
         (including its heading and all of its bullet points) from
         <content/>.
         </if>
