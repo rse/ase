@@ -196,12 +196,12 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         anything else in this step:
 
         <template>
-        ● **APPROACH A<n/>**<annotation/>: *<summary/>*
-        ○ [...]
-        ○ [...]
-        ○ [...]
-        ⊕ *pro*: [...]
-        ⊖ *con*: [...]
+        ●   **APPROACH A<n/>**<annotation/>: *<summary/>*
+        ○   [...]
+        ○   [...]
+        ○   [...]
+        ⊕   **PRO*: [...]
+        ⊖   **CON*: [...]
         <optional-diagram/>
         </template>
 

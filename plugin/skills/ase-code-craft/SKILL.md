@@ -206,12 +206,12 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         inlining its pros/cons derived in sub-step 2:
 
         <template>
-        ● **APPROACH A<n/>**<annotation/>: *<summary/>*
-        ○ [...]
-        ○ [...]
-        ○ [...]
-        ⊕ *pro*: [...]
-        ⊖ *con*: [...]
+        ●   **APPROACH A<n/>**<annotation/>: *<summary/>*
+        ○   [...]
+        ○   [...]
+        ○   [...]
+        ⊕   *PRO*: [...]
+        ⊖   *CON*: [...]
         <optional-diagram/>
         </template>
 
