@@ -3,7 +3,7 @@ name: ase-code-resolve
 argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--quick|-Q] [--next|-n <option>[,...]] [<task-id>:] <problem>"
 description: >
     Resolve Problem:
-    Use when user wants a bug fixed or problem resolved.
+    Use when user wants to "bugfix" or "fix" code or "resolve" a problem.
 user-invocable: true
 disable-model-invocation: false
 effort: xhigh

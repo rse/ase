@@ -2,8 +2,8 @@
 name: ase-code-refactor
 argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--quick|-Q] [--next|-n <option>[,...]] [<task-id>:] <request>"
 description: >
-    Refactor Code Base:
-    Use when user wants to refactor the code base.
+    Refactor Code:
+    Use when user wants to "refactor", or "change" the code base.
 user-invocable: true
 disable-model-invocation: false
 effort: xhigh
