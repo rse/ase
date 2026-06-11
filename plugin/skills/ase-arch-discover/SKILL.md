@@ -131,7 +131,7 @@ for the technology stack to *provide* the *needed functionality*
             their unique Maven coordinates <package-K/> of the form
             `groupId:artifactId`.
 
-        -   Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+<keyword-M/>&rows=<getopt-option-limit/>&wt=json'`
+        -   Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+[...]+<keyword-M/>&rows=<getopt-option-limit/>&wt=json'`
             to *specifically* discover an additional set of a maximum
             of <getopt-option-limit/> *Maven packages* <component-K/> and at least their
             unique Maven coordinates <package-K/> (i.e. `<g/>:<a/>` from
@@ -176,11 +176,11 @@ for the technology stack to *provide* the *needed functionality*
         <template>
         <ase-tpl-bullet-normal/> **COMPONENT HINTS**:
 
-        | ⚑ *Component*      | ▣ *Package*    | ⚖ *Hint*  |
-        | :----------------- | :------------- | :-------- |
-        | **<component-1/>** | `<package-1/>` | <info-1/> |
+        | ⚑ *Component* | ▣ *Package*    | ⚖ *Hint*  |
+        | :------------ | :------------- | :-------- |
+        | **<name-1/>** | `<package-1/>` | <info-1/> |
         [...]
-        | **<component-N/>** | `<package-N/>` | <info-N/> |
+        | **<name-N/>** | `<package-N/>` | <info-N/> |
         </template>
 
     -   Display the discovered components as a Markdown *table*
@@ -189,11 +189,11 @@ for the technology stack to *provide* the *needed functionality*
         <template>
         <ase-tpl-bullet-normal/> **COMPONENT RANKING**:
 
-        | ⚑ *Component*      | ▣ *Package*    | ❖ *Version*  | ↓ *Downloads*      | ⎈ *Stars*      | ⏲ *Updated*      | ☆ *Created*  |
-        | :----------------- | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- |
-        | **<component-1/>** | `<package-1/>` | <version-1/> | **<downloads-1/>** | **<stars-1/>** | **<updated-1/>** | <created-1/> |
+        | ⚑ *Component* | ▣ *Package*    | ❖ *Version*  | ↓ *Downloads*      | ⎈ *Stars*      | ⏲ *Updated*      | ☆ *Created*  |
+        | :------------ | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- |
+        | **<name-1/>** | `<package-1/>` | <version-1/> | **<downloads-1/>** | **<stars-1/>** | **<updated-1/>** | <created-1/> |
         [...]
-        | **<component-N/>** | `<package-N/>` | <version-N/> | **<downloads-N/>** | **<stars-N/>** | **<updated-N/>** | <created-N/> |
+        | **<name-N/>** | `<package-N/>` | <version-N/> | **<downloads-N/>** | **<stars-N/>** | **<updated-N/>** | <created-N/> |
         </template>
     </step>
 </flow>
