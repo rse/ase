@@ -82,6 +82,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         </if>
 
     3.  <if condition="
+            <problem-id/> is not set AND
             <problem/> has the format `<id/>: <text/>` AND
             <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
         ">
@@ -343,7 +344,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         `ase_task_save(id: "<ase-task-id/>", text: "<content/>")`.
 
     4.  If <problem-id/> is set (i.e. the <problem/> was retrieved from
-        `ase_kv_get` in STEP 1.3 via key `ase-issue-<problem-id/>`),
+        `ase_kv_get` in STEP 1.1 via key `ase-issue-<problem-id/>`),
         you *MUST* additionally call the `ase_kv_delete(key:
         "ase-issue-<problem-id/>")` tool of the `ase` MCP
         server to remove the now-resolved analyzer result from the
