@@ -205,6 +205,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         | **<deviation/>** | <location/> | <reason/>                         |
 
         </template>
+        </if>
     </step>
 
 4.  <step id="STEP 4: Score Against Risk Rubric"
