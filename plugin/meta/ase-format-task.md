@@ -8,8 +8,8 @@ Every *task* uses a strict and fixed format:
 
 #   TASK <task-id/>: <title/>
 
-Created:  <timestamp-created/>
-Modified: <timestamp-modified/>
+⎈   Created:  <timestamp-created/>
+⚙   Modified: <timestamp-modified/>
 
 ##  CONTEXT
 

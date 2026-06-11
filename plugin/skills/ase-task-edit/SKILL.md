@@ -308,7 +308,7 @@ Set <content-dirty>true</content-dirty>.
     `PREFLIGHT`, or declines/cancels in the dialog of step 3.4:
 
     1.  *Update timestamp*:
-        <if condition="<content/> contains 'Modified:' AND <content-dirty/> is 'true'">
+        <if condition="<content/> contains '⚙   Modified:' AND <content-dirty/> is 'true'">
         Update <timestamp-modified/> with the current time in
         ISO-style format, which has to be determined by calling the
         `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
