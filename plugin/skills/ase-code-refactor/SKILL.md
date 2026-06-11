@@ -328,8 +328,14 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             </elseif>
 
         3.  <else>
-            Forward the *entire* (unshifted) list to `ase-task-edit`, which
-            will consume its head itself.
+            Hand off to `ase-task-edit`.
+            <if condition="<head/> is equal `EDIT`">
+                Consume the head: set <getopt-option-next/> to the remaining
+                tokens (joined back with `,`, or `none` if empty).
+            </if>
+            All remaining tokens are `ase-task-edit`'s own vocabulary
+            and are forwarded verbatim, so `ase-task-edit` consumes its
+            head itself.
             <if condition="<getopt-option-next/> is not equal `none`">
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
