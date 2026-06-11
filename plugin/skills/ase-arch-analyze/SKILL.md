@@ -437,7 +437,6 @@ interface quality, quality attributes, and architecture governance.
     Finally, output the following <template/> to give a final hint:
 
     <template>
-    ⧉ **ASE**: ☻ skill: **<skill-name/>**, ▶ status: **skill finished**
     ⧉ **ASE**: ↪ hint: **For deeper analysis, suggestions on solution approaches and then final source code changes, use `/ase-code-resolve P{n}` or `/ase-code-resolve T{n}` in the same or even a different session.**
     </template>
     </step>
