@@ -41,8 +41,8 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     <define name="agent">
     ```text
         Agent(
-            name:          "ase-meta-search",
-            description:   "Query Web Search Service",
+            name:          "ase-meta-search-<arg1/>",
+            description:   "Query Web Search Service: <arg1/>",
             subagent_type: "ase:ase-meta-search",
             prompt:        <content/>
         )
@@ -53,8 +53,9 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     *backend tokens*. The getopt parser validates only the *first*
     token, so you *MUST* validate each remaining token yourself against
     the allowed set `all`, `perplexity`, `brave`, `exa`, `websearch`. If
-    any token is *not* in this set, only output the following <template/>
-    and then immediately *STOP* processing the entire current skill:
+    any token is *not* in this set, bind <token/> to that offending
+    token, then only output the following <template/> and then
+    immediately *STOP* processing the entire current skill:
 
     <template>
     ⧉ **ASE**: ✪ skill: **ase-meta-search**, ▶ ERROR: invalid `--services` token: **<token/>**
@@ -66,7 +67,7 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     If the `perplexity` backend is *selected* and the MCP tool
     `perplexity_search` from the MCP server `search-perplexity` is available:
 
-    <expand name="agent">
+    <expand name="agent" arg1="perplexity">
         Call the MCP tool `perplexity_search(query: "<query/>")`
         from the MCP server `search-perplexity`.
     </expand>
@@ -74,7 +75,7 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     If the `brave` backend is *selected* and the MCP tool
     `brave_web_search` from the MCP server `search-brave` is available:
 
-    <expand name="agent">
+    <expand name="agent" arg1="brave">
         Call the MCP tool `brave_web_search(query: "<query/>")`
         from the MCP server `search-brave`.
     </expand>
@@ -82,14 +83,14 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     If the `exa` backend is *selected* and the MCP tool
     `web_search_exa` from the MCP server `search-exa` is available:
 
-    <expand name="agent">
+    <expand name="agent" arg1="exa">
         Call the MCP tool `web_search_exa(query: "<query/>")`
         from the MCP server `search-exa`.
     </expand>
 
     If the `websearch` backend is *selected*:
 
-    <expand name="agent">
+    <expand name="agent" arg1="websearch">
         Call the tool `WebSearch(query: "<query/>")`.
     </expand>
 
