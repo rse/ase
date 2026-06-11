@@ -193,15 +193,15 @@ multi-*criteria* decision matrix.
 
     -   Determine rating distance percentage <percentage/> between
         <alternative-K/> and <alternative-X/> from their *raw,
-        unrounded* ratings by calculating: <percentage/> = <distance/> /
-        abs(<rating-K/>). Do not output anything.
+        unrounded* ratings as follows. If <rating-K/> is exactly zero,
+        skip the division entirely and treat <percentage/> as if it
+        were equal to <distance/> (so a true zero tie with <distance/>
+        = 0 falls into the *MULTIPLE BEST* branch below, and a non-zero
+        gap with zero best falls into the *small distance* branch
+        below). Do not output anything.
 
-    -   If <rating-K/> is exactly zero, skip the division entirely
-        and treat <percentage/> as if it were equal to <distance/>
-        (so a true zero tie with <distance/> = 0 falls into the
-        *MULTIPLE BEST* branch below, and a non-zero gap with zero
-        best falls into the *small distance* branch below).
-        Do not output anything.
+    -   Otherwise (<rating-K/> is non-zero), calculate: <percentage/> =
+        <distance/> / abs(<rating-K/>). Do not output anything.
 
     -   By construction, <rating-K/> is the maximum rating across
         all alternatives, so <distance/> >= 0 always holds; using
