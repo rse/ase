@@ -17,6 +17,7 @@ ChangeLog
 - UPDATE: refresh the agentic-levels workflow diagram (Graffle/SVG/PDF)
 - REFACTOR: adopt newer `<elseif>`/`<else>` control constructs across all skills
 - CLEANUP: adjust skills for the newer task plan format and fix minor wording/types
+- UPDATE: upgrade NPM dependencies
 
 0.9.7 (2026-06-10)
 ------------------
