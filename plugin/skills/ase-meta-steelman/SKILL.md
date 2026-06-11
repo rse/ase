@@ -197,7 +197,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     Carry the result forward to the next round: set
     <thesis><fortification/></thesis> (the fortification becomes the
     thesis to be strengthened next), set <i/> to <i/> + 1 (increment the
-    round counter), and then *CONTINUE* the *LOOP* at **STEP 1**!
+    round counter), and then *REPEAT* the operation at **STEP 1**!
     </if>
 
     <if condition="<i/> is greater than or equal to <rounds/>">
