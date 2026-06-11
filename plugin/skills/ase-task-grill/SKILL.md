@@ -192,19 +192,24 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  Finally, update the plan in <plan/> based on all answers <answer-N/>.
 
-    3.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+    3.  <if condition="<plan/> contains 'Created:  <text/>'">
+        Set <timestamp-created><text/></timestamp-created> (set
+        timestamp-created to extracted text)
+        </if>
+
+    4.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP server and use the `text` field of its response for
         <timestamp-modified/> information. Then insert the current
         <ase-task-id/>, previous <timestamp-created/>, and refreshed
         <timestamp-modified/> information and calculate the number of
         words <words/> of <plan/>.
 
-    4.  Call the `ase_task_save(id: "<ase-task-id/>",
+    5.  Call the `ase_task_save(id: "<ase-task-id/>",
         text: "<plan/>")` of the `ase` MCP server to save the updated
         task plan content. Do not output anything related to this MCP
         call.
 
-    5.  Only output the following <template/> and continue processing:
+    6.  Only output the following <template/> and continue processing:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated**
