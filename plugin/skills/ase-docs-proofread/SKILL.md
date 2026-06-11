@@ -126,7 +126,7 @@ Analyze documents for spelling, punctuation, or grammar errors
             ```diff
             --- <file/> (original)
             +++ <file/> (corrected)
-            @@ -<line/>,<n/> +<line/>,<m/> @@
+            @@ -<old-start/>,<n/> +<new-start/>,<m/> @@
              <context-before/>
             -<old-text/>
             +<new-text/>
@@ -136,8 +136,16 @@ Analyze documents for spelling, punctuation, or grammar errors
             </template>
 
             Hints:
-            -   The <n/> is the number of lines in <old-text/>.
-            -   The <m/> is the number of lines in <new-text/>.
+            -   The <old-start/> is the line of the first hunk line, i.e.,
+                the line of <context-before/> (one before <line/>).
+            -   The <new-start/> is the same as <old-start/> (the unchanged
+                <context-before/> line shares the same start in both files).
+            -   The <n/> is the total number of old-side hunk lines, i.e.,
+                the number of lines in <context-before/>, <old-text/>, and
+                <context-after/> combined.
+            -   The <m/> is the total number of new-side hunk lines, i.e.,
+                the number of lines in <context-before/>, <new-text/>, and
+                <context-after/> combined.
 
             </if>
 
