@@ -11,9 +11,9 @@ disable-model-invocation: false
 effort: high
 allowed-tools:
     - "Bash(git diff *)"
-    - "Bash(git grep:*)"
-    - "Bash(git ls-files:*)"
-    - "Bash(grep:*)"
+    - "Bash(git grep *)"
+    - "Bash(git ls-files *)"
+    - "Bash(grep *)"
     - "Agent"
 ---
 
