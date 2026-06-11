@@ -15,6 +15,7 @@ ChangeLog
 - BUGFIX: do not rewrite the Markdown task format on save, only on load (`ase-task.ts`)
 - BUGFIX: guard zero best-rating before dividing in `ase-meta-evaluate` percentage calculation
 - BUGFIX: handle `OTHER:`/`ERROR:` results in `ase-meta-brainstorm` and avoid answer starvation
+- BUGFIX: align `ase-meta-diff` help with its table rendering
 - UPDATE: refresh the agentic-levels workflow diagram (Graffle/SVG/PDF)
 - REFACTOR: adopt newer `<elseif>`/`<else>` control constructs across all skills
 - CLEANUP: adjust skills for the newer task plan format and fix minor wording/types

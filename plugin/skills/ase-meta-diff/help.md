@@ -17,10 +17,10 @@ The `ase-meta-diff` skill turns a raw Git diff into a *concise*,
 *human-readable* narrative of what changed and why, *grouped by
 intent* (such as *Feature*, *Improvement*, *Bugfix*, *Update*,
 *Cleanup*, or *Refactor*) rather than by file. It inspects the
-*staged* changes (`git diff --cached HEAD`). The result is a short
-bullet list, one bullet per intent group, each naming the affected
-files with their per-file `[+N/-M]` line counts - giving you the
-essence of the changes at a glance.
+*staged* changes (`git diff --cached HEAD`). The result is a compact
+table, one row per intent group, each naming the affected files
+with their per-file `[+N/-M]` line counts - giving you the essence
+of the changes at a glance.
 
 With `--coherence`, the skill additionally *reconstructs the single
 intended change* the diff is trying to accomplish - phrased as one crisp
@@ -34,7 +34,7 @@ diff to a *single logical and coherent change* before it is committed.
 
 With `--risk`, the skill additionally *scores* the same diff against a
 four-axis **coupling-criticality-coverage-reversibility** rubric and
-emits a *graded risk report* - one bullet per axis (each scored *1*-*5*
+emits a *graded risk report* - one table row per axis (each scored *1*-*5*
 with a one-line evidence justification drawn from the actual hunks), an
 overall risk band (**LOW**, **MODERATE**, **HIGH**, or **CRITICAL**),
 and one actionable *mitigation* per high-risk axis. The axes combine
