@@ -5,6 +5,8 @@ ChangeLog
 0.9.8 (2026-06-10)
 ------------------
 
+- IMPROVEMENT: hide internal `--int-*` options from the `ase_getopt` usage help and `info` rendering
+
 0.9.7 (2026-06-10)
 ------------------
 
