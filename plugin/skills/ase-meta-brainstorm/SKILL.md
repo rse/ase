@@ -182,7 +182,7 @@ Honor the following tenets throughout the brainstorming:
     set and finally into a recommendation.
 
     1.  *Cluster*: group the candidate ideas into <c/> coherent clusters
-        <cluster-C/> (a short 1-4 word label, C=1...</c>), collapsing
+        <cluster-C/> (a short 1-4 word label, C=1...<c/>), collapsing
         near-duplicates and discarding ideas pruned by *You Aren't Gonna
         Need It (YAGNI)* (speculative, out-of-scope, or contradicting
         documented context).
