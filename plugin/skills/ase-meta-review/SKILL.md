@@ -107,8 +107,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
     <verdict/> to `REJECT - DEMANDS CHANGES` if *any* finding in
     <findings/> has a `severity` field of `HIGH`; otherwise set
     <verdict/> to `APPROVE`. The verdict is derived *before* the
-    severity floor below, so a suppressed `HIGH` finding still drives the
-    verdict.
+    severity floor below, so the floor only affects which findings are
+    *rendered*, never the verdict.
 
     Then *apply the severity floor* selected via <getopt-option-severity/>
     (default `LOW`): define the ordinal rank `LOW`=1, `MEDIUM`=2,
