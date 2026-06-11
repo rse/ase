@@ -153,11 +153,11 @@ Analyze documents for spelling, punctuation, or grammar errors
 
             </if>
 
-            <if condition="<getopt-option-auto/> is 'true'">
+            <else>
 
             Set <result>ACCEPT</result>.
 
-            </if>
+            </else>
 
         5.  Check <result/> and dispatch accordingly:
 

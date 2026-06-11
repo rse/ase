@@ -190,7 +190,7 @@ related to a set of code quality aspects.
             </template>
 
             </if>
-            <if condition="<getopt-option-auto/> is 'true'">
+            <else>
 
             Report the solution with the following <template/>:
 
@@ -201,7 +201,7 @@ related to a set of code quality aspects.
 
             </template>
 
-            </if>
+            </else>
 
         6.  <if condition="<getopt-option-auto/> is not 'true'">
 
@@ -215,12 +215,12 @@ related to a set of code quality aspects.
 
             </if>
 
-            <if condition="<getopt-option-auto/> is 'true'">
+            <else>
 
             Set <result>ACCEPT</result>.
             You *MUST* *NOT* output anything else in this step 6.
 
-            </if>
+            </else>
 
         7.  Check <result/> and dispatch accordingly:
 
