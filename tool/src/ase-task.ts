@@ -484,7 +484,7 @@ export class TaskMCP {
             try {
                 Task.save(this.log, args.id, args.text)
                 return {
-                    content: [ { type: "text", text: `task_save: OK: saved task "${args.id}"` } ]
+                    content: [ { type: "text", text: `OK: saved task "${args.id}"` } ]
                 }
             }
             catch (err: unknown) {
@@ -510,8 +510,8 @@ export class TaskMCP {
             try {
                 const removed = Task.delete(this.log, args.id)
                 const msg     = removed ?
-                    `task_delete: OK: removed task "${args.id}"` :
-                    `task_delete: WARNING: no task "${args.id}" to remove`
+                    `OK: removed task "${args.id}"` :
+                    `WARNING: no task "${args.id}" to remove`
                 return {
                     content: [ { type: "text", text: msg } ]
                 }
@@ -542,8 +542,8 @@ export class TaskMCP {
             try {
                 const renamed = Task.rename(this.log, args.old, args.new)
                 const msg     = renamed ?
-                    `task_rename: OK: renamed task "${args.old}" to "${args.new}"` :
-                    `task_rename: WARNING: no task "${args.old}" to rename`
+                    `OK: renamed task "${args.old}" to "${args.new}"` :
+                    `WARNING: no task "${args.old}" to rename`
                 return {
                     content: [ { type: "text", text: msg } ]
                 }
@@ -575,7 +575,7 @@ export class TaskMCP {
             try {
                 if (args.id !== undefined) {
                     Task.setId(this.log, args.session, args.id)
-                    const msg = `task_id: OK: set agent.task to "${args.id}" ` +
+                    const msg = `OK: set agent.task to "${args.id}" ` +
                         `for session "${args.session}"`
                     return {
                         content: [ { type: "text", text: msg } ]
