@@ -113,15 +113,15 @@ Honor the following tenets throughout the brainstorming:
             <ase-tpl-bullet-signal/> FACET <M/>/<m/>: **<facet-M/>**, QUESTION: **<question-M/>**
             </template>
 
-        2.  Determine *up to 4* grounded candidate answers
+        2.  Determine *2 to 4* grounded candidate answers
             <answer-M-K/> (K={1,2,3,4}) from the code base, the documented
             context, and your world knowledge.
 
         3.  Use an interactive user dialog with header <facet-M/> and
             question <question-M/>, and let the user select the
-            <answer-M/> out of the candidate answers <answer-M-K/> (just
-            leave out all answers in case you have determined less than
-            4 potential answers)
+            <answer-M/> out of the candidate answers <answer-M-K/> (leave
+            out the answer lines of those candidate answers you have
+            not determined)
 
             <expand name="user-dialog">
                 <facet-M/>: <question-M/>
@@ -131,7 +131,26 @@ Honor the following tenets throughout the brainstorming:
                 <answer-M-4/>: (fourth grounded candidate answer)
             </expand>
 
-        4.  Output the following <template/>:
+        4.  Dispatch on the dialog <result/>:
+
+            -   If <result/> is `CANCEL`:
+                Skip the remaining sub-steps of this iteration cycle and
+                continue directly with sub-step 2 below (cancellation handling).
+
+            -   If <result/> starts with `ERROR:`:
+                Ask the user interactively, without a special tool, the
+                question <question-M/> directly and set <answer-M/> to the
+                response of the user.
+
+            -   If <result/> matches `OTHER: <text/>`:
+                Set <answer-M><text/></answer-M> (take the user's free-text answer).
+
+            -   Otherwise:
+                Set <answer-M><result/></answer-M> (take the selected candidate answer).
+
+            Do not output anything in this sub-step.
+
+        5.  Output the following <template/>:
 
             <template>
             <ase-tpl-bullet-normal/> FACET <M/>/<m/>: **<facet-M/>**, ANSWER: **<answer-M/>**
