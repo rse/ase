@@ -101,7 +101,7 @@ related to a set of code quality aspects.
 3.  <step id="STEP 3: Correction">
 
     1.  You *MUST* call the MCP tool `ase_config_set(key: "agent.skill", val:
-        "ase-docs-proofread", scope: "session:<ase-session-id/>")` of the
+        "ase-code-lint", scope: "session:<ase-session-id/>")` of the
         `ase` MCP server. You *MUST* *NOT* output anything related to
         this.
 
