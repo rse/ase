@@ -48,8 +48,8 @@ hand-off to implementation or preflight.
     `none` (default, interactive answer required), `DONE` (no next
     step), `GRILL` (hand-over to `ase-task-grill`), `PREFLIGHT`
     (hand-over to `ase-task-preflight`), or `IMPLEMENT` (hand-over to
-    `ase-task-implement`). Example: `--next GRILL,DONE` first refines
-    once, then exits the loop without asking.
+    `ase-task-implement`). Example: `--next GRILL,DONE` hands the plan
+    off to grilling and forwards `DONE` so grilling exits without asking.
 
 ##  ARGUMENTS
 
