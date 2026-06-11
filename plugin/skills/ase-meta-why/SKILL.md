@@ -106,13 +106,15 @@ addressing surface-level symptoms.
 
             Ask <question/> and surface up to <width/> *distinct*,
             *non-overlapping* candidate sub-causes, each documented in <answer-k/>.
+            Let <count/> be the number of candidates you actually surfaced
+            (at least one, at most <width/>).
             Don't stop at symptoms, keep digging for systemic issues.
             Explore *different* candidates -- technical, domain-specific,
             process-related, or organizational causes -- and avoid restating
             the same cause in different words.
 
             Start with <k>1</k> (set candidate counter to one).
-            <while condition="<k/> is less than or equal to <width/>">
+            <while condition="<k/> is less than or equal to <count/>">
                 <template>
                 <ase-tpl-bullet-secondary/> **WHY <n/>.<k/>**: <answer-k/>
                 </template>
@@ -150,15 +152,19 @@ addressing surface-level symptoms.
     whole chain up to the original <problem/>).
 
     When <width/> is *greater than 1* and this backward validation *fails* at
-    some level -- i.e. the chosen sub-cause does *not* adequately explain the
-    fact above it -- *backtrack*: discard the chosen sub-cause from that level
-    downward, pick the next-best candidate from that level's <fallbacks/>, set
-    <question/> to it, and re-run the STEP 2 widened descent from there. Repeat
-    until a chain survives backward validation or that level's <fallbacks/> are
-    exhausted (then report the strongest chain found and note that no candidate
-    fully validated). This is the payoff of <width/> *greater than 1*: the
-    enumerated alternatives let the analysis *recover* from a wrong turn instead
-    of committing to a mis-rooted chain.
+    some level <m/> -- i.e. the chosen sub-cause does *not* adequately explain
+    the fact above it -- *backtrack*: discard the chosen sub-cause (and every
+    chosen sub-cause below it) from level <m/> downward, pick the next-best
+    candidate from level <m/>'s <fallbacks/>, and resume the STEP 2 widened
+    descent: set <n/> to <m/> (reset the iteration counter to the failed level),
+    set <question/> to the picked candidate, and re-enter STEP 2's
+    <while condition="<n/> is less than or equal to <depth/>"/> loop at that
+    level -- so the original <depth/> budget is honored from <m/> downward.
+    Repeat until a chain survives backward validation or level <m/>'s
+    <fallbacks/> are exhausted (then report the strongest chain found and note
+    that no candidate fully validated). This is the payoff of <width/> *greater
+    than 1*: the enumerated alternatives let the analysis *recover* from a wrong
+    turn instead of committing to a mis-rooted chain.
 
     Propose a solution that addresses and solves the validated root-cause.
     For the proposed solution, optionally directly propose corresponding source code changes.
