@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.9.8 (2026-06-11)
+0.9.8 (2026-06-12)
 ------------------
 
 - FEATURE: add `<elseif>`/`<else>` control constructs and improve control flow (`ase-control.md`)
@@ -12,13 +12,38 @@ ChangeLog
 - IMPROVEMENT: let `ase-code-{craft,refactor,resolve}` skills trigger more often implicitly
 - IMPROVEMENT: match task plan `Modified:` field via icon prefix for more precise detection
 - IMPROVEMENT: allow underscores in task identifiers (`ase-task.ts`)
+- IMPROVEMENT: improve control flow and precision in `ase-meta-{why,steelman,review,quorum}` skills
+- IMPROVEMENT: align outputs across `ase-code-{craft,resolve}` skills
 - BUGFIX: do not rewrite the Markdown task format on save, only on load (`ase-task.ts`)
+- BUGFIX: list tasks with underscores in the name correctly (`ase-task.ts`)
+- BUGFIX: do not prefix result with tool name to avoid skill error-handling confusion (`ase-task.ts`)
+- BUGFIX: handle OTHER user-dialog case in `ase-task-{grill,implement,preflight,reboot,condense}` skills
+- BUGFIX: fix timestamp handling in `ase-task-{reboot,grill}` skills
+- BUGFIX: reuse plan only if it was really changed in `ase-task-edit` skill
+- BUGFIX: set `ase-task-id` only if a rename actually happened in `ase-task-rename` skill
+- BUGFIX: fix `--full` option docs and header name in `ase-task-view` help
+- BUGFIX: handle `-n EDIT` and fix id handling in `ase-code-{craft,refactor,resolve}` skills
+- BUGFIX: avoid colons in Agent names in `ase-code-explain` skill
+- BUGFIX: do not count blank lines in `ase-code-insight` skill
+- BUGFIX: fix skill name in MCP tool call in `ase-code-lint` skill
+- BUGFIX: fix unified-diff context information in `ase-code-lint` and `ase-docs-proofread` skills
+- BUGFIX: fix off-by-one error in `ase-docs-proofread` agent
+- BUGFIX: use unique Agent names in `ase-meta-search` skill
+- BUGFIX: fix option value validation in `ase-meta-quorum` skill
 - BUGFIX: guard zero best-rating before dividing in `ase-meta-evaluate` percentage calculation
+- BUGFIX: fix small-distance branch case in `ase-meta-evaluate` skill
 - BUGFIX: handle `OTHER:`/`ERROR:` results in `ase-meta-brainstorm` and avoid answer starvation
-- BUGFIX: align `ase-meta-diff` help with its table rendering
+- BUGFIX: align `ase-meta-diff` help with its table rendering and add missing close-tag
+- BUGFIX: error on unknown technology stacks in `ase-arch-discover` skill
+- BUGFIX: fix Maven URL usage and name references in `ase-arch-discover` skill
+- BUGFIX: clamp `--limit` correctly in `ase-docs-distill` skill
 - UPDATE: refresh the agentic-levels workflow diagram (Graffle/SVG/PDF)
 - REFACTOR: adopt newer `<elseif>`/`<else>` control constructs across all skills
 - CLEANUP: adjust skills for the newer task plan format and fix minor wording/types
+- CLEANUP: consistently use the space-glob pattern variant in `ase-arch-analyze` and `ase-meta-diff` skills
+- CLEANUP: remove not-implemented RIPPLE information from `ase-meta-diff` help
+- CLEANUP: remove extra output in `ase-arch-analyze` skill
+- CLEANUP: cleanup `ase-code-analyze`, `ase-task-delete`, and `ase-task-edit` skills and docs
 - UPDATE: upgrade NPM dependencies
 
 0.9.7 (2026-06-10)
