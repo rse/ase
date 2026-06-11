@@ -7,10 +7,10 @@
 
 `ase-meta-brainstorm`
     [`--help`|`-h`]
-    [`--max-clarify=3`]
+    [`--max-clarify`|`-c=3`]
     [`--min-ideas`|`-i=12`]
-    [`--min-rank=7`]
-    [`--max-shortlist=4`]
+    [`--min-rank`|`-r=7`]
+    [`--max-shortlist`|`-s=4`]
     *topic*
 
 ##  DESCRIPTION
@@ -39,7 +39,7 @@ recommended direction off to the `ase-task-edit`, `ase-code-craft`, or
 
 ##  OPTIONS
 
-`--max-clarify=3`:
+`--max-clarify`|`-c=3`:
     The *maximum* number of essential-unknown clarification questions
     asked in the *clarify intent* phase (default: 3). Lower it for a
     faster, leaner intake, raise it for more upfront grounding.
@@ -49,12 +49,12 @@ recommended direction off to the `ase-task-edit`, `ase-code-craft`, or
     phase before converging (default: 12). Raise it for a broader idea
     space, lower it for a quicker, narrower session.
 
-`--min-rank=7`:
+`--min-rank`|`-r=7`:
     The *minimum* 0-10 fit rank an idea must score to survive the
     *converge* phase (default: 7). Raise it for a stricter filter, lower
     it to retain more ideas.
 
-`--max-shortlist=4`:
+`--max-shortlist`|`-s=4`:
     The *maximum* number of distilled options on the final *shortlist*
     (default: 4). Lower it for a sharper focus, raise it for more
     finalists.
