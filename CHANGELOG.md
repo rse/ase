@@ -2,11 +2,19 @@
 ChangeLog
 =========
 
-0.9.8 (2026-06-10)
+0.9.8 (2026-06-11)
 ------------------
 
+- FEATURE: add `<elseif>`/`<else>` control constructs and improve control flow (`ase-control.md`)
 - IMPROVEMENT: avoid redundant `ase_task_load` round-trips skill hand-offs via internal `--int-reuse-task` option
 - IMPROVEMENT: hide internal `--int-*` options from the `ase_getopt` usage help and `info` rendering
+- IMPROVEMENT: speed up task-list processing via parallel `TaskCreate` plus explicit `TaskUpdate` ordering
+- IMPROVEMENT: let `ase-code-{craft,refactor,resolve}` skills trigger more often implicitly
+- IMPROVEMENT: allow underscores in task identifiers (`ase-task.ts`)
+- BUGFIX: do not rewrite the Markdown task format on save, only on load (`ase-task.ts`)
+- UPDATE: refresh the agentic-levels workflow diagram (Graffle/SVG/PDF)
+- REFACTOR: adopt newer `<elseif>`/`<else>` control constructs across all skills
+- CLEANUP: adjust skills for the newer task plan format and fix minor wording/types
 
 0.9.7 (2026-06-10)
 ------------------
