@@ -70,7 +70,7 @@ Give *insights* into the project through the source code of $ARGUMENTS.
     Then run the following command...
 
     ```
-    git log --format=format: --name-only --since="1 year ago" | sort | uniq -c | sort -nr | head -10
+    git log --format=format: --name-only --since="1 year ago" | grep -v '^$' | sort | uniq -c | sort -nr | head -10
     ```
 
     ...and then display its result as a table with a table head and
