@@ -205,8 +205,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         ○   [...]
         ○   [...]
         ○   [...]
-        ⊕   **PRO*: [...]
-        ⊖   **CON*: [...]
+        ⊕   **PRO**: [...]
+        ⊖   **CON**: [...]
         <optional-diagram/>
         </template>
 
