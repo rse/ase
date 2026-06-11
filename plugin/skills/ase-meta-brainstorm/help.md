@@ -33,10 +33,6 @@ default 7, or higher). Finally it distills a *shortlist* of the top
 wherever possible - and derives a single *RECOMMENDATION*, being either
 the highest-ranked option or a principled synthesis of the shortlist.
 
-On completion the skill offers a *next step*: stop, or hand the
-recommended direction off to the `ase-task-edit`, `ase-code-craft`, or
-`ase-task-preflight` skills.
-
 ##  OPTIONS
 
 `--max-clarify`|`-c=3`:
