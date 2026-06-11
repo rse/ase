@@ -202,9 +202,12 @@ problems in *performance* and *efficiency*, or problems in *security*.
         <template>(`<filename/>#<function-or-method/>`)</template>.
 
     -   In <description/>, classify the problem with a <severity/>
-        of <template>LOW</template>, <template>MEDIUM</template> or
-        <template>HIGH</template>, ranked by the estimated *impact* of the
-        problem.
+        of <template>LOW</template>, <template>MEDIUM</template>,
+        <template>HIGH</template>, or <template>ACCEPTED</template>,
+        ranked by the estimated *impact* of the problem. Use
+        <template>ACCEPTED</template> when the problem is a deliberate,
+        justified trade-off that should remain on record but is never
+        dropped by the severity floor (see STEP 3).
 
     -   <if condition="<getopt-option-performance/> is equal `true`">
         In <evidence/>, ground the finding by citing either the inferred
@@ -241,5 +244,3 @@ problems in *performance* and *efficiency*, or problems in *security*.
     </step>
 
 </flow>
-
-</output>
