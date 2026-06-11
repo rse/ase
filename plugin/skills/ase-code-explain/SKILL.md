@@ -71,7 +71,7 @@ code and *explain* it in a *brief*, *standardized*, and *concise* way.
     `sequenceDiagram` for actor/message flow, or `flowchart TB` for
     boxes-and-lines component layouts. Then dispatch the rendering to
     the `ase-meta-diagram` sub-agent by calling the tool `Agent(name:
-    "ase:ase-meta-diagram", description: "Diagram Rendering", subagent_type:
+    "ase-meta-diagram", description: "Diagram Rendering", subagent_type:
     "ase:ase-meta-diagram", prompt: <mermaid-spec/>)` and reproduce its
     returned fenced code block verbatim in the response text. Do *not*
     hand-draw.
