@@ -30,7 +30,7 @@ telegrapher-like even under the `writer` persona.
 
 The plan is saved *only* when condensing actually makes it smaller; if no
 further reduction is possible, the plan is left untouched (including its
-`✎ modified:` timestamp) and reported as *already condensed*.
+`⚙   Modified:` timestamp) and reported as *already condensed*.
 
 After condensing, the user is asked whether to stop or hand off to
 `ase-task-edit`, `ase-task-implement`, or `ase-task-preflight`, unless
