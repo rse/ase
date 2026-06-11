@@ -115,7 +115,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  If the <content/> is still empty, complain and tell the user to
         use the `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`,
-        or `ase-task-edit` skills first to create a task plan.
+        or `ase-task-edit` skills first to create a task plan. Then
+        immediately stop processing this skill.
 
 3.  **Create Implementation:**
 
