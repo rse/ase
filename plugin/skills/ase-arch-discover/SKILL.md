@@ -86,6 +86,15 @@ for the technology stack to *provide* the *needed functionality*
     </step>
 
 3.  <step id="STEP 3: Discover Components">
+    -   If <stack/> is "Unknown", the technology stack could not be
+        determined and no component discovery backend is available.
+        Inform the user with just the following <template/> and then
+        *STOP* the entire flow (do not perform any further steps):
+
+        <template>
+        <ase-tpl-bullet-normal/> **RESULT**: technology stack could not be determined -- component discovery is only supported for JavaScript, TypeScript, Java, and Kotlin projects.
+        </template>
+
     -   From <stack/> and <functionality/>, derive essential keywords
         <keyword-L/> (L=1-M), which allow you to search for suitable
         components.
