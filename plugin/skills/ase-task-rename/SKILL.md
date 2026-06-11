@@ -33,8 +33,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
 1.  **Determine Task:**
 
     1.  Parse <arguments>$ARGUMENTS</arguments> into a whitespace-separated
-        list of tokens. Inherit the always existing <ase-task-id/> from
-        the current context. Do not output anything.
+        list of tokens. Inherit the always existing <ase-task-id/> and
+        <ase-session-id/> from the current context. Do not output anything.
 
     2.  <if condition="<arguments/> contains two tokens">
         Set <old/> to the first token of <arguments/>.

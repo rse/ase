@@ -35,6 +35,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
     1.  Set <id>$ARGUMENTS</id> initially, with any leading and trailing
         whitespace stripped.
         Inherit the always existing <ase-task-id/> from the current context.
+        Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
 
     2.  <if condition="<id/> is empty">
