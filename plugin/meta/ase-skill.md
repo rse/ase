@@ -98,14 +98,21 @@ Skill Sequential Processing
 -   *IMPORTANT*: For each given <flow/>, you *MUST* use the
     `TaskCreate` tool to create a corresponding set of processing steps.
 
-    Each `<step id="xxx" [...]/>` corresponds to a `TaskCreate({
-    subject: "xxx", description: "xxx", activeForm: "xxx" })`. In other
-    words, use the text of the `id` attribute of <step/> for both
-    the `subject`, the `description`, and the `activeForm` fields of
+    Each `<step id="xxx" [...]>...</step>` corresponds to a
+    `TaskCreate({ subject: "xxx", description: "xxx" })`. In other
+    words, use the text of the `id` attribute of <step/> exactly
+    *as-is* for both the `subject`, and the `description` fields of
     `TaskCreate`.
 
-    Make the `TaskCreate` tool calls *sequentially*, *not* in parallel,
-    so the user can see intermediate results.
+    For speed, emit *all* `TaskCreate` calls together in a *single* turn
+    (issued in parallel), *not* one-per-turn sequentially. Do *not*
+    rely on the call order to establish the step order, as the parallel
+    results carry no guaranteed ordering. Instead, in the *immediately
+    following* turn, establish the strict order explicitly by chaining
+    the created tasks with `TaskUpdate`: for each <step/> after the
+    first one, call `TaskUpdate({ taskId: "<this/>", addBlockedBy:
+    [ "<prev/>" ] })` so that every step (with `taskId` <this/>) is
+    blocked by its predecessor step (with `taskId` <prev/>).
 
 -   *IMPORTANT*: For each <step/> you *MUST* use the `TaskUpdate` tool
     for updating its status during processing.
