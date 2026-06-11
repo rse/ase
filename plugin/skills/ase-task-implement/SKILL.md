@@ -65,7 +65,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
             </if>
 
-        2.  else <if condition="
+        2.  <elseif condition="
                 <instruction/> has the format `<id/>: <text/>` where
                 <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$` and
                 <text/> is *empty*
@@ -80,9 +80,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
             </template>
-            </if>
+            </elseif>
 
-        3.  else <if condition="<instruction/> is NOT empty">
+        3.  <elseif condition="<instruction/> is NOT empty">
             The argument is neither empty nor a valid task id. As this
             skill only accepts an optional `[<id>]` argument and *never*
             a free-text instruction, only output the following <template/>
@@ -91,7 +91,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             <template>
             ⧉ **ASE**: ☻ skill: **ase-task-implement**, ▶ ERROR: expected single `[<id>]` argument
             </template>
-            </if>
+            </elseif>
 
 2.  **Determine Operation**:
 

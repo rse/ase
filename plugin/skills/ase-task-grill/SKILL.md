@@ -65,7 +65,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
             </if>
 
-        2.  else <if condition="<id/> is NOT empty">
+        2.  <elseif condition="<id/> is NOT empty">
             The argument is neither empty nor a valid task id. As this
             skill only accepts an optional `[<id>]` argument and *never*
             a free-text instruction, only output the following <template/>
@@ -74,7 +74,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             <template>
             ⧉ **ASE**: ☻ skill: **ase-task-grill**, ▶ **ERROR**: expected single `[<id>]` argument
             </template>
-            </if>
+            </elseif>
 
 2.  **Determine Task Plan:**
 

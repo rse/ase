@@ -65,7 +65,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
             </if>
 
-        2.  else <if condition="<instruction/> is NOT empty">
+        2.  <elseif condition="<instruction/> is NOT empty">
             The argument is neither empty nor a valid task id. As this
             skill only accepts an optional `[<id>]` argument and *never*
             a free-text instruction, only output the following <template/>
@@ -74,7 +74,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             <template>
             ⧉ **ASE**: ☻ skill: **ase-task-reboot**, ▶ ERROR: expected single `[<id>]` argument
             </template>
-            </if>
+            </elseif>
 
 2.  **Determine Operation:**
 
@@ -119,10 +119,10 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Set <instruction><text/></instruction> (set instruction to extracted text).
         </if>
 
-    5.  else <if condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is NOT empty">
+    5.  <elseif condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is NOT empty">
         Set <instruction><instruction/>, BECAUSE <text/></instruction>
         (append extracted text to instruction).
-        </if>
+        </elseif>
 
     6.  <if condition="<content/> contains 'Created:  <text/>'">
         Set <timestamp-created><text/></timestamp-created> (set

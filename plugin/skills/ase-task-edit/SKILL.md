@@ -111,7 +111,7 @@ Set <content-dirty>true</content-dirty>.
             </template>
             </if>
 
-        2.  else <if condition="
+        2.  <elseif condition="
                 <instruction/> has the format `<id/>: <text/>` where
                 <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$` and
                 <text/> is *empty*
@@ -126,9 +126,9 @@ Set <content-dirty>true</content-dirty>.
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
             </template>
-            </if>
+            </elseif>
 
-        3.  else <if condition="
+        3.  <elseif condition="
                 <instruction/> has the format `<id/>: <text/>` where
                 <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$` and
                 <text/> is *not empty*
@@ -144,9 +144,9 @@ Set <content-dirty>true</content-dirty>.
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
             </template>
-            </if>
+            </elseif>
 
-        4.  else <if condition="
+        4.  <elseif condition="
                 <instruction/> is not empty
             ">
             Only output the following <template/>:
@@ -155,9 +155,9 @@ Set <content-dirty>true</content-dirty>.
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task inherited**
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
             </template>
-            </if>
+            </elseif>
 
-        5.  else <if condition="
+        5.  <elseif condition="
                 <instruction/> is empty
             ">
             Only output the following <template/>:
@@ -165,7 +165,7 @@ Set <content-dirty>true</content-dirty>.
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task inherited**
             </template>
-            </if>
+            </elseif>
 
 2.  **Determine Plan:**
 
