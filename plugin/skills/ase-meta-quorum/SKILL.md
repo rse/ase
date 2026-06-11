@@ -62,9 +62,19 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     The user-selectable foreign models are restricted by the
     `--models`/`-m` option, parsed into <getopt-option-models/>
-    as a comma-separated list of model tokens. The default is
-    the single token `all`. If <getopt-option-models/> contains
-    the token `all`, you *MUST* treat it as the full list
+    as a comma-separated list of model tokens. The getopt parser
+    validates only the *first* token, so you *MUST* validate each
+    remaining token yourself against the allowed set `all`, `chatgpt`,
+    `gemini`, `deepseek`, `grok`, `glm`, `qwen`. If any token is *not*
+    in this set, only output the following <template/> and then
+    immediately *STOP* processing the entire current skill:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-meta-quorum**, ▶ ERROR: invalid `--models` token: **<token/>**
+    </template>
+
+    The default is the single token `all`. If <getopt-option-models/>
+    contains the token `all`, you *MUST* treat it as the full list
     `chatgpt,gemini,deepseek,grok,glm,qwen` (all models). Anthropic
     Claude (yourself) is *always* included, independent of this option.
 
