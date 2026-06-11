@@ -122,7 +122,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         only*: keep at most `min(<getopt-option-top/>, number of salient
         points)` points and *never pad* the list with filler to reach
         the bound. If <getopt-option-top/> is *non-numeric* or *less
-        than or equal to 0*, use the default *10* instead.
+        than or equal to 0*, use the default *5* instead.
 
     You *MUST* *NOT* output anything in this STEP 2.
 
