@@ -16,7 +16,7 @@ The `ase-task-preflight` skill performs a *preflight* (dry-run,
 test-drive) of the *implementation* of a task plan by creating a
 draft for a corresponding, complete *artifact change set* in
 *unified diff* format. The draft is appended to the task plan as
-a `※ IMPLEMENTATION DRAFT` section (replacing any previous draft).
+an `IMPLEMENTATION DRAFT` section (replacing any previous draft).
 No source files are modified.
 
 After the preflight, the user is asked whether to stop, hand
