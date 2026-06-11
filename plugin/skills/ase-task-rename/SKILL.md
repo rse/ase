@@ -65,6 +65,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         output anything related to this MCP tool call.
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
+            Set <renamed/> to `false`.
             Only output the following <template/>:
 
             <template>
@@ -72,13 +73,14 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
         -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
+            Set <renamed/> to `true`.
             Only output the following <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<new/>**, ▶ status: **task renamed**
             </template>
 
-    2.  <if condition="<old/> is equal <ase-task-id/>">
+    2.  <if condition="<renamed/> is `true` AND <old/> is equal <ase-task-id/>">
         Set <ase-task-id><new/></ase-task-id>. Call the `ase_task_id(id:
         "<ase-task-id/>", session: "<ase-session-id/>")` tool from the `ase`
         MCP server to switch the task to the renamed task. Only output
