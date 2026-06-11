@@ -28,8 +28,8 @@ export class Task {
     static validateId (id: string): void {
         if (typeof id !== "string" || id.length === 0)
             throw new Error("task: id must be a non-empty string")
-        if (!/^[A-Za-z0-9-]+$/.test(id))
-            throw new Error("task: id must match [A-Za-z0-9-]+")
+        if (!/^[A-Za-z0-9_-]+$/.test(id))
+            throw new Error("task: id must match [A-Za-z0-9_-]+")
     }
 
     /*  determine the project root (Git top-level if inside a Git
@@ -89,7 +89,7 @@ export class Task {
         if (!fs.existsSync(dir))
             return false
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-            if (!entry.isDirectory() || !/^[A-Za-z0-9-]+$/.test(entry.name))
+            if (!entry.isDirectory() || !/^[A-Za-z0-9_-]+$/.test(entry.name))
                 continue
             if (fs.existsSync(path.join(dir, entry.name, "plan.md")))
                 return true
@@ -167,7 +167,7 @@ export class Task {
         if (fs.existsSync(newFile))
             throw new Error(`task: target id "${newId}" already exists`)
         const text    = fs.readFileSync(oldFile, "utf8")
-        const updated = text.replace(/(^#\s+(?:✪\s+)?TASK\s+)[A-Za-z0-9-]+(\s*:)/m, `$1${newId}$2`)
+        const updated = text.replace(/(^#\s+TASK\s+)[A-Za-z0-9_-]+(\s*:)/m, `$1${newId}$2`)
         fs.mkdirSync(path.dirname(newFile), { recursive: true })
         fs.writeFileSync(newFile, updated, "utf8")
         fs.rmSync(oldFile, { force: true })
@@ -449,7 +449,7 @@ export class TaskMCP {
                 "Returns the task as `text`; returns an empty string if no task exists for the `id`.",
             inputSchema: {
                 id: z.string()
-                    .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '-')")
+                    .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '_', '-')")
             }
         }, async (args) => {
             try {
@@ -476,7 +476,7 @@ export class TaskMCP {
                 "Overwrites any existing task for the same `id`.",
             inputSchema: {
                 id: z.string()
-                    .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '-')"),
+                    .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '_', '-')"),
                 text: z.string()
                     .describe("text content of the task")
             }
@@ -504,7 +504,7 @@ export class TaskMCP {
                 "Returns a status `text` indicating whether a task existed and was removed.",
             inputSchema: {
                 id: z.string()
-                    .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '-')")
+                    .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '_', '-')")
             }
         }, async (args) => {
             try {
@@ -534,9 +534,9 @@ export class TaskMCP {
                 "Fails with an error if the target id already exists.",
             inputSchema: {
                 old: z.string()
-                    .describe("old task identifier (allowed characters: A-Z, a-z, 0-9, '-')"),
+                    .describe("old task identifier (allowed characters: A-Z, a-z, 0-9, '_', '-')"),
                 new: z.string()
-                    .describe("new task identifier (allowed characters: A-Z, a-z, 0-9, '-')")
+                    .describe("new task identifier (allowed characters: A-Z, a-z, 0-9, '_', '-')")
             }
         }, async (args) => {
             try {
@@ -566,10 +566,10 @@ export class TaskMCP {
                 "otherwise it returns the current task `id` of the `session`.",
             inputSchema: {
                 id: z.string().optional()
-                    .describe("task identifier to set (allowed characters: A-Z, a-z, 0-9, '-'); " +
+                    .describe("task identifier to set (allowed characters: A-Z, a-z, 0-9, '_', '-'); " +
                         "if omitted, the current task id is returned"),
                 session: z.string()
-                    .describe("session identifier (allowed characters: A-Z, a-z, 0-9, '-')")
+                    .describe("session identifier (allowed characters: A-Z, a-z, 0-9, '_', '-')")
             }
         }, async (args) => {
             try {
