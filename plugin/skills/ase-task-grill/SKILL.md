@@ -113,7 +113,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
     *essential aspect* of the task plan in <plan/> *until* reaching a
     shared understanding and no decisions/questions are left open.
 
-    This especially means, you *MUST* clarify as much aspects as
+    This especially means, you *MUST* clarify as many aspects as
     necessary to ensure that for at least the most important decisions,
     during a subsequent implementation, no essential freedom of choices
     exist any longer.
@@ -149,7 +149,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
     decisions one-by-one. Ask the questions <question-N/> and determine
     corresponding answer <answer-N/>, one at a time.
 
-    1.  For each question <question-N/> in the iteration circle <N/>:
+    1.  For each question <question-N/> in the iteration cycle <N/>:
 
         1.  Output the following <template/>:
 
