@@ -137,7 +137,10 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     8.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP server and use the `text` field of its response for
-        <timestamp-modified/> information. Then insert the current
+        <timestamp-modified/> information. If <timestamp-created/> is
+        still unset (because the previous <content/> had no `Created:`
+        line), set <timestamp-created><timestamp-modified/></timestamp-created>
+        (fall back to the modified timestamp). Then insert the current
         <ase-task-id/>, previous <timestamp-created/>, and refreshed
         <timestamp-modified/> information and calculate the number of
         words <words/> of <content/>.
