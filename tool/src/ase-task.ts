@@ -187,7 +187,7 @@ export class Task {
         const isMatch = picomatch(files, { dot: true })
         const out: { id: string, mtime: string | undefined }[] = []
         for (const entry of fs.readdirSync(dir)) {
-            const m = /^TASK-([A-Za-z0-9-]+)\.md$/.exec(entry)
+            const m = /^TASK-([A-Za-z0-9_-]+)\.md$/.exec(entry)
             if (m === null || !isMatch(entry))
                 continue
             const file = path.join(dir, entry)
@@ -214,7 +214,7 @@ export class Task {
         const cutoff  = Date.now() - maxAgeMs
         const removed: string[] = []
         for (const entry of fs.readdirSync(dir)) {
-            const m = /^TASK-([A-Za-z0-9-]+)\.md$/.exec(entry)
+            const m = /^TASK-([A-Za-z0-9_-]+)\.md$/.exec(entry)
             if (m === null || !isMatch(entry))
                 continue
             const file = path.join(dir, entry)
