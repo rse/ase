@@ -21,7 +21,7 @@ Preflight a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-preflight"
-    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT)...">
+    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT)... --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -95,9 +95,21 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 2.  **Determine Operation:**
 
-    1.  Call the `ase_task_load(id: "<ase-task-id/>")` tool of the `ase` MCP
-        server to load the current task plan content and set <text/> to
-        the `text` output field of the `ase_task_load` tool call.
+    1.  Determine the current task plan content:
+
+        <if condition="<getopt-option-int-reuse-task/> is equal `true`">
+            Set <text/> to the `text` argument of the most recent
+            `ase_task_save(id: '<ase-task-id/>', ...)` tool call,
+            *without* calling `ase_task_load` again. Set <status>plan
+            reused</status>. Do not output anything.
+        </if>
+        <else>
+            Call the `ase_task_load(id: "<ase-task-id/>")` tool of the
+            `ase` MCP server to load the current task plan content and
+            set <text/> to the `text` output field of this `ase_task_load`
+            tool call. Do not output anything related to this MCP tool
+            call. Set <status>plan loaded</status>.
+        </else>
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
             Set <content></content> (set content to empty).
@@ -110,7 +122,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Only output the following <template/>:
 
         <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan loaded**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **<status/>**
         </template>
 
     2.  If the <content/> is still empty, complain and tell the user to
@@ -203,13 +215,12 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
         -   If <result/> is `EDIT`:
-            Set <args></args> (empty).
+            Set <args>--int-reuse-task</args>.
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`
+            tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`
             to invoke the `ase:ase-task-edit` skill in order to *edit*
             the updated plan. Immediately stop processing the current
             skill once the `Skill` tool was used.
@@ -219,13 +230,12 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
         -   If <result/> is `IMPLEMENT`:
-            Set <args></args> (empty).
+            Set <args>--int-reuse-task</args>.
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-implement", args: <args/>)`
+            tool `Skill(skill: "ase:ase-task-implement", args: "<args/>")`
             to invoke the `ase:ase-task-implement` skill in order to
             *implement* the updated plan. Immediately stop processing
             the current skill once the `Skill` tool was used.

@@ -223,13 +223,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
         -   If <result/> is `EDIT`:
-            Set <args></args> (empty).
+            Set <args></args> (set args to empty).
+            <if condition="the condensed plan was saved via `ase_task_save` in step 3">
+                Set <args>--int-reuse-task</args>.
+            </if>
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`
+            tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`
             to invoke the `ase:ase-task-edit` skill in order to *edit*
             the condensed plan. Immediately stop processing the current
             skill once the `Skill` tool was used.
@@ -239,13 +241,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
         -   If <result/> is `IMPLEMENT`:
-            Set <args></args> (empty).
+            Set <args></args> (set args to empty).
+            <if condition="the condensed plan was saved via `ase_task_save` in step 3">
+                Set <args>--int-reuse-task</args>.
+            </if>
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-implement", args: <args/>)` tool
+            `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
             to *apply* the plan.
 
             <template>
@@ -253,13 +257,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
             </template>
 
         -   If <result/> is `PREFLIGHT`:
-            Set <args></args> (empty).
+            Set <args></args> (set args to empty).
+            <if condition="the condensed plan was saved via `ase_task_save` in step 3">
+                Set <args>--int-reuse-task</args>.
+            </if>
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-preflight", args: <args/>)` tool
+            `Skill(skill: "ase:ase-task-preflight", args: "<args/>")` tool
             to *apply* the plan.
 
             <template>

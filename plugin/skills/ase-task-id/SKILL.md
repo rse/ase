@@ -24,7 +24,16 @@ Configure Task Id
 1.  Determine request:
     <request>$ARGUMENTS</request>
 
-2.  <if condition="<request/> is empty">
+2.  <if condition="<request/> is NOT empty AND <request/> does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`">
+    Only output the following <template/> and then immediately
+    *STOP* processing the entire current skill:
+
+    <template>
+    ⧉ **ASE**: ☻ skill: **ase-task-id**, ▶ ERROR: given task id `<request/>` is not a valid id
+    </template>
+    </if>
+
+3.  <if condition="<request/> is empty">
     -   Call the `ase_task_id(session: "<ase-session-id/>")`
         tool from the `ase` MCP server and set
         <ase-task-id/> to its `text` output.
@@ -35,7 +44,7 @@ Configure Task Id
         </template>
     </if>
 
-3.  <if condition="<request/> is NOT empty">
+4.  <if condition="<request/> is NOT empty">
     -   Set <ase-task-id><request/></ase-task-id> and
         call the `ase_task_id(id: "<ase-task-id/>", session: "<ase-session-id/>")`
         tool from the `ase` MCP server.

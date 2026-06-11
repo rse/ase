@@ -23,7 +23,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --dry|-d --next|-n=(none|DONE|GRILL|PREFLIGHT|IMPLEMENT)...">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --dry|-d --next|-n=(none|DONE|GRILL|PREFLIGHT|IMPLEMENT)... --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -169,10 +169,22 @@ Set <content-dirty>true</content-dirty>.
 
 2.  **Determine Plan:**
 
-    1.  Call the `ase_task_load(id: "<ase-task-id/>")` tool of the `ase` MCP
-        server to load any existing plan content and set <text/> to
-        the `text` output field of this `ase_task_load` tool call.
-        Do not output anything related to this MCP tool call.
+    1.  Determine any existing plan content:
+
+        <if condition="<getopt-option-int-reuse-task/> is equal `true`">
+            Set <text/> to the `text` argument of the most recent
+            `ase_task_save(id: '<ase-task-id/>', ...)` tool call,
+            *without* calling `ase_task_load` again. Set <status>plan
+            reused</status>. Do not output anything.
+        </if>
+        <else>
+            Call the `ase_task_load(id: "<ase-task-id/>")` tool of the
+            `ase` MCP server to load any existing plan content and set
+            <text/> to the `text` output field of this `ase_task_load`
+            tool call. Do not output anything related to this MCP tool
+            call. Set <status>plan loaded</status>.
+        </else>
+
         Set <content-dirty>false</content-dirty>.
 
         -   If <text/> starts with `ERROR:`:
@@ -187,7 +199,7 @@ Set <content-dirty>true</content-dirty>.
             Only output the following <template/>:
 
             <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan loaded**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **<status/>**
             </template>
 
     2.  <if condition="<content/> is empty AND <instruction/> is empty">
@@ -385,13 +397,13 @@ Set <content-dirty>true</content-dirty>.
 
         -   If <result/> is `GRILL`:
 
-            *Break* out of the *loop*. Set <args></args> (empty).
+            *Break* out of the *loop*.
+            Set <args>--int-reuse-task</args>.
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-grill", args: <args/>)` tool
+            `Skill(skill: "ase:ase-task-grill", args: "<args/>")` tool
             to *grill* the finalized plan.
 
             <template>
@@ -400,13 +412,13 @@ Set <content-dirty>true</content-dirty>.
 
         -   If <result/> is `PREFLIGHT`:
 
-            *Break* out of the *loop*. Set <args></args> (empty).
+            *Break* out of the *loop*.
+            Set <args>--int-reuse-task</args>.
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-preflight", args: <args/>)` tool
+            `Skill(skill: "ase:ase-task-preflight", args: "<args/>")` tool
             to *apply* the finalized plan.
 
             <template>
@@ -415,13 +427,13 @@ Set <content-dirty>true</content-dirty>.
 
         -   If <result/> is `IMPLEMENT`:
 
-            *Break* out of the *loop*. Set <args></args> (empty).
+            *Break* out of the *loop*.
+            Set <args>--int-reuse-task</args>.
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-implement", args: <args/>)` tool
+            `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
             to *apply* the finalized plan.
 
             <template>

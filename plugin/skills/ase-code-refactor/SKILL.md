@@ -298,40 +298,34 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         Treat <getopt-option-next/> as a comma-separated chronological
         list of pre-selected next-step tokens. *Peek* the *first* token
         as <head/> (or `none` if the list is `none`/empty).
+        Set <args>--int-reuse-task</args>.
 
         1.  <if condition="<head/> is equal `IMPLEMENT`">
             Consume the head: set <getopt-option-next/> to the remaining
-            tokens (joined back with `,`, or `none` if empty). Set
-            <args></args> (empty).
+            tokens (joined back with `,`, or `none` if empty).
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
-            Call the tool `Skill(skill: "ase:ase-task-implement", args: <args/>)`
+            Call the tool `Skill(skill: "ase:ase-task-implement", args: "<args/>")`
             to *implement* the freshly composed plan, bypassing `ase-task-edit`.
             </if>
 
-        2.  <if condition="<head/> is equal `PREFLIGHT`">
+        2.  <elseif condition="<head/> is equal `PREFLIGHT`">
             Consume the head: set <getopt-option-next/> to the remaining
-            tokens (joined back with `,`, or `none` if empty). Set
-            <args></args> (empty).
+            tokens (joined back with `,`, or `none` if empty).
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (forward
-            remaining list tokens to the downstream skill).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
-            Call the tool `Skill(skill: "ase:ase-task-preflight", args: <args/>)`
+            Call the tool `Skill(skill: "ase:ase-task-preflight", args: "<args/>")`
             to *preflight* the freshly composed plan, bypassing `ase-task-edit`.
-            </if>
+            </elseif>
 
-        3.  <if condition="
-                <head/> is not equal `IMPLEMENT` AND
-                <head/> is not equal `PREFLIGHT`
-            ">
+        3.  <else>
             Forward the *entire* (unshifted) list to `ase-task-edit`, which
-            will consume its head itself. Set <args></args> (empty).
+            will consume its head itself.
             <if condition="<getopt-option-next/> is not equal `none`">
-            Set <args>--next <getopt-option-next/></args> (append to args).
+                Set <args><args/> --next <getopt-option-next/></args>
             </if>
-            Then call the tool `Skill(skill: "ase:ase-task-edit", args: <args/>)`.
-            </if>
+            Then call the tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`.
+            </else>
 

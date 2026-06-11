@@ -5,6 +5,7 @@ ChangeLog
 0.9.8 (2026-06-10)
 ------------------
 
+- IMPROVEMENT: avoid redundant `ase_task_load` round-trips skill hand-offs via internal `--int-reuse-task` option
 - IMPROVEMENT: hide internal `--int-*` options from the `ase_getopt` usage help and `info` rendering
 
 0.9.7 (2026-06-10)
