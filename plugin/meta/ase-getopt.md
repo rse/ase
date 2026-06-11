@@ -28,7 +28,8 @@ set placeholders into the context as a side-effect.
     markdown rendering of the parsed options in the form `<longN/>:
     **<valueN/>**, [...]` (joined with `, `, with each value
     shell-quoted if value contains spaces or special characters, and
-    excluding the `help` option).
+    excluding the `help` option and any *internal* option whose long
+    name starts with `int-`).
 
     Then silently *SKIP* only the following steps 3-6
     and proceed directly to step 7 to display the results.
