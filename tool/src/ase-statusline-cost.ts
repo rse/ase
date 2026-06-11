@@ -139,7 +139,7 @@ function * jsonlFiles (dir: string): Generator<string> {
 export const computeMonthCost = (now: Date): number => {
     const month        = monthKeyOf(now)
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime()
-    const seen         = new Set<string>()
+    const seen         = new Map<string, number>()
     let total = 0
     for (const file of jsonlFiles(logsRoot())) {
         /*  skip whole files not touched this month: they cannot hold any
@@ -177,35 +177,42 @@ export const computeMonthCost = (now: Date): number => {
             const d = new Date(ts)
             if (Number.isNaN(d.getTime()) || monthKeyOf(d) !== month)
                 continue
-            /*  de-duplicate identical messages that appear in more than one
-                session log (e.g. after a resume/fork), keyed by message id
-                plus request id, mirroring ccusage's approach  */
-            const id  = o.message?.id ?? ""
-            const req = o.requestId   ?? ""
-            if (id !== "" && req !== "") {
-                const key = `${id} ${req}`
-                if (seen.has(key))
-                    continue
-                seen.add(key)
-            }
             const price = resolvePricing(o.message?.model ?? "")
             if (price === null)
                 continue
             const inM  = price.input  / 1_000_000
             const outM = price.output / 1_000_000
-            total += (usage.input_tokens             ?? 0) * inM
-            total += (usage.output_tokens            ?? 0) * outM
-            total += (usage.cache_read_input_tokens  ?? 0) * inM * 0.1
+            let cost = 0
+            cost += (usage.input_tokens             ?? 0) * inM
+            cost += (usage.output_tokens            ?? 0) * outM
+            cost += (usage.cache_read_input_tokens  ?? 0) * inM * 0.1
             const c5 = usage.cache_creation?.ephemeral_5m_input_tokens
             const c1 = usage.cache_creation?.ephemeral_1h_input_tokens
             if (c5 !== undefined || c1 !== undefined) {
-                total += (c5 ?? 0) * inM * 1.25
-                total += (c1 ?? 0) * inM * 2.00
+                cost += (c5 ?? 0) * inM * 1.25
+                cost += (c1 ?? 0) * inM * 2.00
             }
             else
-                total += (usage.cache_creation_input_tokens ?? 0) * inM * 1.25
+                cost += (usage.cache_creation_input_tokens ?? 0) * inM * 1.25
+            /*  de-duplicate identical messages that appear more than once,
+                within one session log (progressive usage snapshots written
+                while the response streams) or across logs (resume/fork),
+                keyed by message id plus request id. Keep the most expensive
+                snapshot per key: usage counts grow as output streams, so
+                the largest one reflects the final billed state.  */
+            const id  = o.message?.id ?? ""
+            const req = o.requestId   ?? ""
+            if (id !== "" && req !== "") {
+                const key = `${id} ${req}`
+                if (cost > (seen.get(key) ?? -1))
+                    seen.set(key, cost)
+            }
+            else
+                total += cost
         }
     }
+    for (const cost of seen.values())
+        total += cost
     return total
 }
 
