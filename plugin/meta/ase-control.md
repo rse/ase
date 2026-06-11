@@ -14,7 +14,7 @@ Control Flow Constructs
     Do not output anything.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
-    <expand name="<define-name/>" [arg1="<expand-arg1/>" [arg2="<expand-arg2/>" [...]]]><expand-content/></expand>:
+    <expand name="<define-name/>" [arg1="<expand-arg1/>" [arg2="<expand-arg2/>" [...]]]>[<expand-content/>]</expand>:
 
     This specifies the *expansion* of previous <define/>. This
     construct is expanded to the <define-body/> of <define/> with
@@ -48,14 +48,35 @@ Control Flow Constructs
 
     This specifies a simple condition which is expanded to <if-body/>
     if <if-condition/> is met, or to empty string if <if-condition/> is
-    *not* met. Do not output anything else.
+    *not* met. It can be optionally followed by one or more <elseif/>
+    constructs and/or one final <else/> construct. Do not output anything else.
+
+-   *IMPORTANT*: You *MUST* honor the following control flow construct:
+    <elseif condition="<elseif-condition/>"><elseif-body/></elseif>:
+
+    This specifies an *alternative condition* and has to directly
+    follow an <if/> or another <elseif/> construct. It is expanded
+    to <elseif-body/> if the conditions of all preceding <if/> and
+    <elseif/> constructs of the chain were *not* met and its own
+    <elseif-condition/> is met, or to the empty string otherwise.
+    Do not output anything else.
+
+-   *IMPORTANT*: You *MUST* honor the following control flow construct:
+    <else><else-body/></else>:
+
+    This specifies the *fallback alternative* and has to directly
+    follow an <if/> or <elseif/> construct. It is expanded to
+    <else-body/> if the conditions of all preceding <if/> and
+    <elseif/> constructs of the chain were *not* met, or to the empty
+    string otherwise. Do not output anything else.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <while condition="<while-condition/>"><while-body/></while>:
 
     This specifies a <while-body/> which is *repeated* as long as
     <while-condition/> is met. This construct is expanded to the
-    repetition of <while-body/>. Do not output anything else.
+    repetition of <while-body/>. A <break/> in <while-body/> can stop
+    the repetition early. Do not output anything else.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <for items="<for-item/> [...]"><for-body/></for>:
