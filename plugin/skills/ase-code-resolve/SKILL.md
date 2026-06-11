@@ -81,20 +81,25 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         </template>
         </if>
 
-    3.  If <problem/> has the format `<id/>: <text/>` where <id/> matches
-        the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`, then set
-        <problem><text/></problem> and <ase-task-id><id/></ase-task-id>
-        and call the `ase_task_id(id: "<ase-task-id/>", session:
-        "<ase-session-id/>")` tool from the `ase` MCP server to
-        implicitly switch the task. Do not output anything.
+    3.  <if condition="
+            <problem/> has the format `<id/>: <text/>` AND
+            <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+        ">
+        Set <problem><text/></problem> and
+        <ase-task-id><id/></ase-task-id> and call the `ase_task_id(id:
+        "<ase-task-id/>", session: "<ase-session-id/>")` tool from the
+        `ase` MCP server to implicitly switch the task. Do not output
+        anything.
+        </if>
 
-    4.  If <problem/> is empty,
-        ask the user interactively, without a special tool, for the
+    4.  <if condition="<problem/> is empty">
+        Ask the user interactively, without a special tool, for the
         initial problem with a single question:
 
         `**No problem details known yet. What is the problem you want to resolve?**`
 
         Then set <problem/> to the response of the user.
+        </if>
 
     5.  <if condition="
             <ase-task-id/> is equal `default` and
@@ -285,7 +290,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
 5.  **Choose Problem Resolution Approach**:
 
-    1.  If <getopt-option-auto/> is equal `false`:
+    1.  <if condition="<getopt-option-auto/> is not 'true'">
         Let the *user interactively choose* the preferred resolution
         approach A<n/> with the help of the <user-dialog-tool/> tool.
         Use the header `Select Approach`, use `A<n/>: <short-summary/>`
@@ -293,14 +298,16 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         of the approach A<n/>), and *single-selection* only and provide
         small *code change previews*. Mark your recommended resolution
         approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
+        </if>
 
-    2.  If <getopt-option-auto/> is equal `true`:
+    2.  <else>
         Set <n/> to the number of the resolution approach A<n/> you recommend.
         Output a hint with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **auto-chosen approach A<n/>**
         </template>
+        </else>
 
 6.  **Compose Problem Resolution Plan**:
 

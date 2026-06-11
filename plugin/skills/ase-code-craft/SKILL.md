@@ -69,20 +69,25 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         </template>
         </if>
 
-    2.  If <feature/> has the format `<id/>: <text/>` where <id/> matches
-        the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`, then set
-        <feature><text/></feature> and <ase-task-id><id/></ase-task-id>
-        and call the `ase_task_id(id: "<ase-task-id/>", session:
-        "<ase-session-id/>")` tool from the `ase` MCP server to
-        implicitly switch the task. Do not output anything.
+    2.  <if condition="
+            <feature/> has the format `<id/>: <text/>` AND
+            <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+        ">
+        Set <feature><text/></feature> and
+        <ase-task-id><id/></ase-task-id> and call the `ase_task_id(id:
+        "<ase-task-id/>", session: "<ase-session-id/>")` tool from the
+        `ase` MCP server to implicitly switch the task. Do not output
+        anything.
+        </if>
 
-    3.  If <feature/> is empty,
-        ask the user interactively, without a special tool, for the
+    3.  <if condition="<feature/> is empty">
+        Ask the user interactively, without a special tool, for the
         initial feature with a single question:
 
         `**No feature known yet. What is the feature you want to craft?**`
 
         Then set <feature/> to the response of the user.
+        </if>
 
     4.  <if condition="
             <ase-task-id/> is equal `default` and
@@ -246,7 +251,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
 5.  **Choose Feature Crafting Approach**:
 
-    1.  If <getopt-option-auto/> is equal `false`:
+    1.  <if condition="<getopt-option-auto/> is equal `false`">
         Let the *user interactively choose* the preferred feature
         approach A<n/> with the help of the <user-dialog-tool/> tool.
         Use the header `Select Approach`, use `A<n/>: <short-summary/>`
@@ -254,14 +259,16 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         of the approach A<n/>), and *single-selection* only and provide
         small *code change previews*. Mark your recommended feature
         approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
+        </if>
 
-    2.  If <getopt-option-auto/> is equal `true`:
+    2.  <else>
         Set <n/> to the number of the feature approach A<n/> you recommend.
         Output a hint with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **auto-chosen approach A<n/>**
         </template>
+        </else>
 
 6.  **Compose Feature Crafting Plan**:
 
