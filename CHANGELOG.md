@@ -10,6 +10,7 @@ ChangeLog
 - IMPROVEMENT: hide internal `--int-*` options from the `ase_getopt` usage help and `info` rendering
 - IMPROVEMENT: speed up task-list processing via parallel `TaskCreate` plus explicit `TaskUpdate` ordering
 - IMPROVEMENT: let `ase-code-{craft,refactor,resolve}` skills trigger more often implicitly
+- IMPROVEMENT: match task plan `Modified:` field via icon prefix for more precise detection
 - IMPROVEMENT: allow underscores in task identifiers (`ase-task.ts`)
 - BUGFIX: do not rewrite the Markdown task format on save, only on load (`ase-task.ts`)
 - BUGFIX: guard zero best-rating before dividing in `ase-meta-evaluate` percentage calculation
