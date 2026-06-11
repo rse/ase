@@ -12,6 +12,7 @@ ChangeLog
 - IMPROVEMENT: let `ase-code-{craft,refactor,resolve}` skills trigger more often implicitly
 - IMPROVEMENT: allow underscores in task identifiers (`ase-task.ts`)
 - BUGFIX: do not rewrite the Markdown task format on save, only on load (`ase-task.ts`)
+- BUGFIX: guard zero best-rating before dividing in `ase-meta-evaluate` percentage calculation
 - UPDATE: refresh the agentic-levels workflow diagram (Graffle/SVG/PDF)
 - REFACTOR: adopt newer `<elseif>`/`<else>` control constructs across all skills
 - CLEANUP: adjust skills for the newer task plan format and fix minor wording/types
