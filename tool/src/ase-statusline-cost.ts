@@ -49,11 +49,12 @@ interface LogEntry {
     prefix, so dated snapshots (e.g. "claude-haiku-4-5-20251001") map to their
     base entry. Unknown models contribute nothing (cannot be priced reliably).  */
 const PRICING: Record<string, { input: number, output: number }> = {
-    "claude-opus-4-8":   { input: 5.00, output: 25.00 },
-    "claude-opus-4-7":   { input: 5.00, output: 25.00 },
-    "claude-opus-4-6":   { input: 5.00, output: 25.00 },
-    "claude-sonnet-4-6": { input: 3.00, output: 15.00 },
-    "claude-haiku-4-5":  { input: 1.00, output:  5.00 }
+    "claude-fable-5":    { input: 10.00, output: 50.00 },
+    "claude-opus-4-8":   { input:  5.00, output: 25.00 },
+    "claude-opus-4-7":   { input:  5.00, output: 25.00 },
+    "claude-opus-4-6":   { input:  5.00, output: 25.00 },
+    "claude-sonnet-4-6": { input:  3.00, output: 15.00 },
+    "claude-haiku-4-5":  { input:  1.00, output:  5.00 }
 }
 
 const resolvePricing = (model: string): { input: number, output: number } | null => {
