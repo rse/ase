@@ -26,7 +26,9 @@ export class GetoptMCP {
                 "containing those remaining tokens (quotes preserved), and " +
                 "`info` is a markdown rendering of the parsed options in the " +
                 "form `key: **value**, key: **value**, ...` for printing at " +
-                "the top of a skill.",
+                "the top of a skill. Options whose long name starts with " +
+                "`int-` are treated as internal and are excluded from both " +
+                "the usage help and the `info` rendering.",
             inputSchema: {
                 name: z.string()
                     .describe("Name of the caller (e.g. skill name), used in error messages"),
@@ -60,8 +62,9 @@ export class GetoptMCP {
                     })
 
                 /*  tokenize spec and add one option per token  */
-                const tokens = args.spec.split(/\s+/).filter((e) => e.length > 0)
-                const re = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)(\.\.\.)?|.*))?$/
+                const tokens    = args.spec.split(/\s+/).filter((e) => e.length > 0)
+                const re        = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)(\.\.\.)?|.*))?$/
+                const internals = new Set<string>()
                 for (const tok of tokens) {
                     const m = re.exec(tok)
                     if (m === null)
@@ -85,6 +88,12 @@ export class GetoptMCP {
                     }
                     else
                         opt.default(false)
+                    if (long !== undefined && long.startsWith("int-")) {
+                        /*  internal option: hide from usage help and remember
+                            its camel-cased key for the info rendering below  */
+                        opt.hideHelp()
+                        internals.add(long.replace(/-(.)/g, (_, c: string) => c.toUpperCase()))
+                    }
                     cmd.addOption(opt)
                 }
 
@@ -160,6 +169,7 @@ export class GetoptMCP {
                 /*  build markdown info rendering of parsed options  */
                 const opts = cmd.opts()
                 const info = Object.entries(opts)
+                    .filter(([ k ]) => !internals.has(k))
                     .map(([ k, v ]) => `${k}: **${shQuote([ String(v) ])}**`)
                     .join(", ")
 
