@@ -26,9 +26,8 @@ With `--coherence`, the skill additionally *reconstructs the single
 intended change* the diff is trying to accomplish - phrased as one crisp
 *thesis* sentence - and then walks *every* hunk to *flag those that do
 not serve it*: **scope creep** (an unrelated feature or drive-by refactor
-riding along), **stray debug** (leftover prints, commented-out code, or
-disabled tests), and **ripple** (mechanical fallout edits forced by the
-core change). It emits an overall **COHERENT** / **INCOHERENT** verdict
+riding along) and **stray debug** (leftover prints, commented-out code, or
+disabled tests). It emits an overall **COHERENT** / **INCOHERENT** verdict
 plus a table of the flagged hunks with what to do with each - keeping the
 diff to a *single logical and coherent change* before it is committed.
 
@@ -57,9 +56,9 @@ giving a visual sense of *what a diff endangers* before a deeper review.
 `--coherence`, `-c`:
     In addition to the intent-grouped summary, reconstruct the diff's
     *single intended change* as one crisp *thesis* sentence and flag
-    *every* hunk that does *not* serve it - *scope creep*, *stray debug*,
-    or *ripple* fallout - then emit an overall **COHERENT** /
-    **INCOHERENT** verdict with a table of the flagged hunks.
+    *every* hunk that does *not* serve it - *scope creep* or *stray
+    debug* - then emit an overall **COHERENT** / **INCOHERENT** verdict
+    with a table of the flagged hunks.
 
 `--risk`, `-r`:
     In addition to the intent-grouped summary, score the diff against
