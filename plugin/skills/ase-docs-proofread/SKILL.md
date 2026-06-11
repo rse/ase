@@ -116,8 +116,8 @@ Analyze documents for spelling, punctuation, or grammar errors
 
         3.  <if condition="<getopt-option-auto/> is not 'true'">
 
-            Render the proposed correction as a *unified diff* with *one*
-            line of context in a fenced block based on the following <template/>:
+            Render the proposed correction as a *unified diff* with *up to
+            two* lines of context in a fenced block based on the following <template/>:
 
             <template>
 
