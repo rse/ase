@@ -114,9 +114,9 @@ explicitly requested by this procedure via outputs based on a <template/>!
         and unchanged*. Honor the following ruleset *strictly*:
 
         1.  *Preserve-exactly (never alter)*: the plan <format/>
-            structure (the headings `#`/`##`, the `※`/`◉`/`✪` markers,
-            all three `## ※ CONTEXT`, `## ※ CHANGES`, and `## ※
-            VERIFICATION` sections, the `created:`/`modified:` line, and
+            structure (the headings `#`/`##`, all three `##  CONTEXT`,
+            `##  CHANGES`, and `##  VERIFICATION` sections, the
+            `Created:`/`Modified:` lines, and
             the `- **<aspect/>**:` bullet labels), all *code spans* and
             code blocks, technical terms, file paths, identifiers,
             numbers, severities (`LOW`/`MEDIUM`/`HIGH`/`ACCEPTED`), and

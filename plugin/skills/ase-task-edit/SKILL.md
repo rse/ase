@@ -67,7 +67,7 @@ the <instruction/> and all decisions you derived from the
 
 If a `CHANGELOG.md` file exists in the project (or in any
 affected sub-package), the plan *MUST* include, as part of
-its `## ※ CHANGES` section, an explicit bullet point
+its `##  CHANGES` section, an explicit bullet point
 describing the addition of a corresponding new entry to
 that `CHANGELOG.md` file, aligned with its existing style
 and conventions.
@@ -271,7 +271,7 @@ Set <content-dirty>true</content-dirty>.
             </template>
         </if>
 
-    4.  <if condition="<content/> does not contain '# ✪ TASK' AND <instruction/> is empty">
+    4.  <if condition="<content/> does not contain '#   TASK' AND <instruction/> is empty">
         Set <instruction><content/></instruction> (set instruction to content).
         Set <content></content> (set content to empty).
         Set <content-dirty>true</content-dirty>.
@@ -296,12 +296,12 @@ Set <content-dirty>true</content-dirty>.
     `PREFLIGHT`, or declines/cancels in the dialog of step 3.4:
 
     1.  *Update timestamp*:
-        <if condition="<content/> contains '✎ modified:' AND <content-dirty/> is 'true'">
+        <if condition="<content/> contains 'Modified:' AND <content-dirty/> is 'true'">
         Update <timestamp-modified/> with the current time in
         ISO-style format, which has to be determined by calling the
         `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
         MCP server and use the `text` field of its response. Update
-        <content/> with the new `✎ modified: **<timestamp-modified/>**`.
+        <content/> with the new `Modified: <timestamp-modified/>`.
         Do not output anything.
         </if>
 
