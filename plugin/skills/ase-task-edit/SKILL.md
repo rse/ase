@@ -362,8 +362,8 @@ Set <content-dirty>true</content-dirty>.
                 Set <instruction></instruction> (clear the instruction, as
                 any instruction carried in via the arguments was already
                 applied to the plan in step 2 before this loop), so that a
-                pre-selected `REFINE` correctly asks the user for a *fresh*
-                refinement instruction below.
+                later `OTHER: <text/>` refinement correctly starts from a
+                *fresh* refinement instruction below.
 
             -   else:
                 Only output the following <template/> and then immediately
@@ -398,7 +398,10 @@ Set <content-dirty>true</content-dirty>.
         -   If <result/> is `GRILL`:
 
             *Break* out of the *loop*.
-            Set <args>--int-reuse-task</args>.
+            Set <args></args> (set args to empty).
+            <if condition="the plan was saved via `ase_task_save` in step 3.2">
+                Set <args>--int-reuse-task</args>.
+            </if>
             <if condition="<getopt-option-next/> is not equal `none`">
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
@@ -413,7 +416,10 @@ Set <content-dirty>true</content-dirty>.
         -   If <result/> is `PREFLIGHT`:
 
             *Break* out of the *loop*.
-            Set <args>--int-reuse-task</args>.
+            Set <args></args> (set args to empty).
+            <if condition="the plan was saved via `ase_task_save` in step 3.2">
+                Set <args>--int-reuse-task</args>.
+            </if>
             <if condition="<getopt-option-next/> is not equal `none`">
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
@@ -428,7 +434,10 @@ Set <content-dirty>true</content-dirty>.
         -   If <result/> is `IMPLEMENT`:
 
             *Break* out of the *loop*.
-            Set <args>--int-reuse-task</args>.
+            Set <args></args> (set args to empty).
+            <if condition="the plan was saved via `ase_task_save` in step 3.2">
+                Set <args>--int-reuse-task</args>.
+            </if>
             <if condition="<getopt-option-next/> is not equal `none`">
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
