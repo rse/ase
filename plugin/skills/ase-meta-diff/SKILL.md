@@ -98,7 +98,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
             </template>
 
-        2.  Render a *two-column table* with one row per discovered
+        2.  Render a *three-column table* with one row per discovered
             *intent group* present in the <diff/>. Output the following
             table header <template/>:
 
