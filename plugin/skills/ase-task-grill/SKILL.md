@@ -44,7 +44,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Determine Task:**
 
-    1.  Set <id>$ARGUMENTS</id> initially.
+    1.  Set <id><getopt-arguments/></id> initially.
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
