@@ -163,10 +163,11 @@ Analyze documents for spelling, punctuation, or grammar errors
 
             -   <if condition="<result/> is 'ACCEPT'">
 
-                Invoke the `Edit` tool to apply the change exactly as shown
-                in the diff. The operation will be auto-approved because of
-                the active proofread marker, so *no* interactive permission
-                prompt will appear. Then continue with the next <item/>.
+                Invoke the `Edit` tool to apply the change by replacing
+                <old-text/> with <new-text/> at <file/>:<line/>. The operation
+                will be auto-approved because of the active proofread marker,
+                so *no* interactive permission prompt will appear. Then
+                continue with the next <item/>.
 
                 </if>
 
