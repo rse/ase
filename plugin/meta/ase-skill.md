@@ -227,7 +227,7 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-head title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (70 - 8 - length("<title/>")), i.e., <bar/> is
+    (where <bar/> = "─" x (70 - 16 - length("<title/>")), i.e., <bar/> is
     the "─" character repeated (70 - 16 - length("<title/>")) times):
 
     <template>
@@ -245,8 +245,8 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (70 - 8 - length("<title/>")), i.e., <bar/> is
-    the "─" character repeated (70 - 16 - length("<title/>")) times):
+    (where <bar/> = "─" x (70 - 16 - length("<title/>")), i.e., <bar/> is
+    the "─" character repeated (71 - 16 - length("<title/>")) times):
 
     <template>
 
