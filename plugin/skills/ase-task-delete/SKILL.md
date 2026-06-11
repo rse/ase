@@ -60,20 +60,22 @@ explicitly requested by this procedure via outputs based on a <template/>!
         output anything related to this MCP tool call.
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
-            Only output the following <template/>:
+            Set <deleted>false</deleted> and only output the following
+            <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<id/>**, ▶ status: **<text/>**
             </template>
 
         -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
-            Only output the following <template/>:
+            Set <deleted>true</deleted> and only output the following
+            <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<id/>**, ▶ status: **task deleted**
             </template>
 
-    2.  <if condition="<id/> is equal <ase-task-id/> AND <ase-task-id/> is not equal 'default'">
+    2.  <if condition="<deleted/> is equal 'true' AND <id/> is equal <ase-task-id/> AND <ase-task-id/> is not equal 'default'">
         Set <ase-task-id>default</ase-task-id>. Call the `ase_task_id(id:
         "<ase-task-id/>", session: "<ase-session-id/>")` tool from the `ase`
         MCP server to switch the task to the default task. Only output
