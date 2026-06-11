@@ -13,8 +13,8 @@
 ##  DESCRIPTION
 
 The `ase-task-view` skill renders the *task plan* identified by *id*.
-The plan is loaded via the `ase_task_load` MCP tool and shown between
-`TASK-PLAN-BEGIN` and `TASK-PLAN-END` markers. If *id* is omitted, the
+The plan is loaded via the `ase_task_load` MCP tool and shown framed
+between a `( TASK )` header and footer rule. If *id* is omitted, the
 *current* task id (inherited from the session context) is used.
 
 By default, when the plan is longer than 90 lines and contains an
