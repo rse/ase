@@ -135,7 +135,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         </template>
 
-        You *MUST* *NOT* output anything else in this STEP 3.
+        You *MUST* *NOT* output anything else in this STEP 3.1.
 
     2.  <if condition="<findings/> is empty">
         Only output the following <template/> and then *SKIP* the
