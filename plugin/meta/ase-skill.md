@@ -25,6 +25,18 @@ Skill Output
     Unicode characters, and the potential reduction of prose according
     to the currently defined persona style.
 
+-   *IMPORTANT*: For *Final-Message-Only Display* ("focus mode"):
+    some agent harnesses show the user only the *final* text message of
+    a turn and *hide* all text emitted *between* tool calls. If your
+    harness instructions indicate such a mode (e.g. *Claude Code* with
+    "focus mode" enabled), you *MUST* repeat *all* <template/> outputs
+    emitted since the last shown final text message -- *verbatim*, in
+    their *original order*, and each only *once* -- at the *top* of the
+    next final text message (i.e. the text after the last tool call of
+    a turn). Never *drop* or *summarize* a <template/> output just
+    because it would land between tool calls. If no such display mode
+    is indicated, do *not* repeat anything.
+
 -   *IMPORTANT*: The active *persona style* (see `ase-persona.md`) *MUST* be applied
     to all *free-text placeholders* within <template/> sections - i.e. any placeholder
     whose content you author yourself (such as `<description/>`, `<title/>`, `<objective/>`,

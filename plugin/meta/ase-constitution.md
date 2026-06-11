@@ -16,6 +16,13 @@ you *MUST* once and immediately output the following <template/> now:
 ⧉ **ASE**: ☯ persona: **<ase-persona-style/>**
 </template>
 
+In case your harness instructions indicate that the user is shown
+only the *final* text message of each turn (e.g. *Claude Code* with
+"focus mode" enabled), you *MUST* ensure this <template/> output (and
+*every* <template/> output requested by ASE skills) lands in a final
+text message (after the last tool call of a turn) instead of between
+tool calls -- repeat it there if necessary.
+
 Prohibitions
 ------------
 
