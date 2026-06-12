@@ -544,12 +544,15 @@ export default class ServiceCommand {
             if (ctx.port === null)
                 throw new Error("service not running (no port configured after auto-start)")
         }
-        const match = await probe(ctx.port, ctx.projectId)
+        let match = await probe(ctx.port, ctx.projectId)
         if (match !== true) {
             await this.doStart()
             ctx = this.loadContext()
             if (ctx.port === null)
                 throw new Error("service not running (no port configured after auto-start)")
+            match = await probe(ctx.port, ctx.projectId)
+            if (match !== true)
+                throw new Error(`service not responding on port ${ctx.port} after auto-start`)
         }
         const r = await ofetch.raw(`http://${HOST}:${ctx.port}/command`, {
             method:              "POST",
