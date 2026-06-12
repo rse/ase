@@ -2,6 +2,21 @@
 ChangeLog
 =========
 
+0.9.9 (2026-06-12)
+------------------
+
+- IMPROVEMENT: support double-backtick code spans with escaped backticks (`ase-markdown.ts`)
+- IMPROVEMENT: allow statusline chunks to line-break within color spans (`ase-statusline.ts`)
+- IMPROVEMENT: add hyperlinks to all skill `help.md` files
+- IMPROVEMENT: handle restarts where the service port could have changed (`ase-service.ts`)
+- IMPROVEMENT: enforce `project.artifact.task.files` glob symmetrically across all task operations (`ase-task.ts`)
+- IMPROVEMENT: follow non-quiet failure handling in the quiet path on final attempt in `ase setup` (`ase-setup.ts`)
+- BUGFIX: fix mis-slicing of verbatim trailing-arg string for value-consuming options (`ase-getopt.ts`)
+- BUGFIX: make MCP HTTP close/shutdown/reconnect handling more robust (`ase-mcp.ts`)
+- BUGFIX: prevent `computeRank` from collapsing to zero on genuine `0` or unavailable metrics (`ase-skills.ts`)
+- BUGFIX: fix regexp and comment format in `ase-task.ts`
+- UPDATE: upgrade NPM dependencies
+
 0.9.8 (2026-06-12)
 ------------------
 
