@@ -166,7 +166,13 @@ export default class MCPCommand {
 
         /*  start server and initial client  */
         await server.start()
-        await connectClient()
+        try {
+            await connectClient()
+        }
+        catch (err: unknown) {
+            /*  service vanished between probe and connect — recover instead of crashing  */
+            triggerReconnect(`initial connect failed: ${this.asError(err).message}`)
+        }
 
         /*  periodically probe the service; trigger reconnect if it is gone  */
         const HEALTH_INTERVAL_MS = 30_000
