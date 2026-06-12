@@ -122,8 +122,8 @@ export default class MCPCommand {
                 triggerReconnect("http connection lost")
             }
 
-            await next.start()
             client = next
+            await next.start()
         }
 
         /*  reconnect loop: restart service if needed, then reconnect client  */
