@@ -347,12 +347,14 @@ export default class StatuslineCommand {
                     col += raw.length
                 }
 
-                /*  active <color> span state: when non-null, renderer/literal output is buffered
-                    instead of appended directly, and flushed via c[color](buf) on </color>  */
-                let span: { color: string, buf: string } | null = null
+                /*  active <color> span state: when non-null, each emitted chunk is colored
+                    individually and passed straight through appendOutput, so column
+                    accounting and line-wrapping continue to work per-chunk inside the span
+                    instead of treating the whole colored run as one atomic chunk  */
+                let span: { color: string } | null = null
                 const emit = (chunk: string): void => {
-                    if (span !== null)
-                        span.buf += chunk
+                    if (span !== null && span.color !== "default")
+                        appendOutput((c[span.color as ForegroundColorName])(chunk))
                     else
                         appendOutput(chunk)
                 }
@@ -563,13 +565,7 @@ export default class StatuslineCommand {
 
                 /*  walk each template line and render  */
                 const closeSpan = () => {
-                    if (span !== null) {
-                        const wrapped = span.color === "default" ?
-                            span.buf :
-                            (c[span.color as ForegroundColorName])(span.buf)
-                        span = null
-                        appendOutput(wrapped)
-                    }
+                    span = null
                 }
                 for (const line of tmpl) {
                     let i = 0
@@ -582,7 +578,7 @@ export default class StatuslineCommand {
                                 if (m[1] === "/")
                                     closeSpan()
                                 else if (span === null)
-                                    span = { color: m[2]!, buf: "" }
+                                    span = { color: m[2]! }
                                 i += m[0].length
                                 continue
                             }
