@@ -76,16 +76,23 @@ export default class MCPCommand {
 
         /*  track active client and bridge-level closed state  */
         let client:       StreamableHTTPClientTransport | null = null
-        let closedByUs   = false  /*  set when we initiated the client close  */
         let bridgeDone   = false  /*  set when stdio side closes              */
         let reconnecting = false  /*  set while a reconnect chain is active   */
+
+        /*  mark the individual transports we intentionally closed, so their
+            onclose is not mistaken for an unexpected connection loss; using
+            a per-transport set (instead of a single bridge-wide flag) avoids
+            suppressing a legitimate retry when a freshly-created connection
+            fails during the brief window right after we initiated a close  */
+        const closedByUs = new WeakSet<StreamableHTTPClientTransport>()
 
         /*  cleanly shut down the whole bridge  */
         const shutdown = async () => {
             if (bridgeDone)
                 return
             bridgeDone = true
-            closedByUs = true
+            if (client !== null)
+                closedByUs.add(client)
             const timeout = new Promise<void>((resolve) => setTimeout(resolve, 3000))
             await Promise.race([
                 Promise.allSettled([ server.close(), client?.close() ]),
@@ -110,7 +117,7 @@ export default class MCPCommand {
 
             /*  service closed the connection — try to recover  */
             next.onclose = () => {
-                if (client !== next || closedByUs || bridgeDone || reconnecting)
+                if (client !== next || closedByUs.has(next) || bridgeDone || reconnecting)
                     return
                 triggerReconnect("http connection lost")
             }
