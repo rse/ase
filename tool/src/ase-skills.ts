@@ -299,22 +299,25 @@ export class Skills {
     }
 
     /*  compute composite rank score from weighted metrics:
-        downloads x
-        stars x
+        (downloads + 1) x
+        (stars + 1) x
         ([lifespan =] (updated - created)) x
         ([recentness =] exp(-(now - updated) / halfLife))
-        `"N.A."` factors are treated as neutral `1` so that stacks for which
-        a particular metric is structurally unavailable (e.g. Maven Central
-        exposes no per-artifact download counts) can still be ranked by the
-        remaining metrics, instead of collapsing the entire product to zero.  */
+        Numeric count metrics are shifted by `+1` so that a genuine `0`
+        (e.g. a real package with zero downloads or stars) contributes a
+        neutral `1` instead of collapsing the entire product to zero, while
+        still ordering `0 < 1 < 2 ...`. The `"N.A."` sentinel (a metric that
+        is structurally unavailable, e.g. Maven Central exposes no
+        per-artifact download counts) is likewise treated as neutral `1`, so
+        such stacks can still be ranked by the remaining metrics.  */
     private static computeRank (
         downloads: number | "N.A.",
         stars:     number | "N.A.",
         created:   string,
         updated:   string
     ): number {
-        const d = typeof downloads === "number" ? downloads : 1
-        const s = typeof stars     === "number" ? stars     : 1
+        const d = typeof downloads === "number" ? downloads + 1 : 1
+        const s = typeof stars     === "number" ? stars     + 1 : 1
         const cMs = created !== "" ? Date.parse(created) : NaN
         const uMs = updated !== "" ? Date.parse(updated) : NaN
         const now        = Date.now()
