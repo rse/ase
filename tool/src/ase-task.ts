@@ -156,7 +156,7 @@ export class Task {
 
     /*  rename a task by moving its <project>/<basedir>/TASK-<oldId>.md file
         to <project>/<basedir>/TASK-<newId>.md; the embedded
-        "# ✪ TASK <id>:" heading inside the plan content is rewritten to
+        "#   TASK <id>:" heading inside the plan content is rewritten to
         the new id; returns true on success, false if the source task does
         not exist; throws if the target id already exists  */
     static rename (log: Log, oldId: string, newId: string): boolean {
