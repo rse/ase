@@ -122,8 +122,8 @@ export default class MCPCommand {
                 triggerReconnect("http connection lost")
             }
 
-            client = next
             await next.start()
+            client = next
         }
 
         /*  reconnect loop: restart service if needed, then reconnect client  */
@@ -137,9 +137,12 @@ export default class MCPCommand {
             try {
                 const ctx = await this.ensureService()
                 port = ctx.port
-                if (client !== null)
-                    closedByUs.add(client)
-                await client?.close()
+                const stale = client
+                client = null
+                if (stale !== null) {
+                    closedByUs.add(stale)
+                    await stale.close()
+                }
                 await connectClient()
                 reconnecting = false
                 this.log.write("info", "mcp: reconnected to service")
