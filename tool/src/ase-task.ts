@@ -107,7 +107,7 @@ export class Task {
             return []
         const migrated: string[] = []
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-            if (!entry.isDirectory() || !/^[A-Za-z0-9-]+$/.test(entry.name))
+            if (!entry.isDirectory() || !/^[A-Za-z0-9_-]+$/.test(entry.name))
                 continue
             const id      = entry.name
             const oldFile = path.join(dir, id, "plan.md")
