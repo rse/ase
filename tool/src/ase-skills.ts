@@ -317,14 +317,15 @@ export class Skills {
         const s = typeof stars     === "number" ? stars     : 1
         const cMs = created !== "" ? Date.parse(created) : NaN
         const uMs = updated !== "" ? Date.parse(updated) : NaN
-        if (Number.isNaN(cMs) || Number.isNaN(uMs))
-            return 0
         const now        = Date.now()
         const msPerDay   = 1000 * 60 * 60 * 24
         const halfLife   = 365 / 2
-        const lifespan   = Math.max(0, uMs - cMs)
-        const ageDays    = Math.max(0, (now - uMs) / msPerDay)
-        const recentness = Math.exp(-ageDays / halfLife)
+        /*  lifespan requires both timestamps; recentness requires the
+            updated timestamp -- any unavailable date-derived factor is
+            treated as neutral `1` so the entry can still be ranked by the
+            remaining metrics, instead of collapsing the product to zero  */
+        const lifespan   = (!Number.isNaN(cMs) && !Number.isNaN(uMs)) ? Math.max(0, uMs - cMs) : 1
+        const recentness = !Number.isNaN(uMs) ? Math.exp(-Math.max(0, (now - uMs) / msPerDay) / halfLife) : 1
         return d * s * lifespan * recentness
     }
 
