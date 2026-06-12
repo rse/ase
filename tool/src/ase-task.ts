@@ -71,12 +71,23 @@ export class Task {
         return path.join(Task.projectRoot(), Task.spec(log).basedir)
     }
 
+    /*  ensure a task id's "TASK-<id>.md" filename satisfies
+        the configured "files" miniglob  */
+    private static enforceFiles (log: Log, id: string): void {
+        const { files } = Task.spec(log)
+        const filename  = `TASK-${id}.md`
+        if (!picomatch(files, { dot: true })(filename))
+            throw new Error(`task: id "${id}" yields filename "${filename}" ` +
+                `which does not match the configured "files" glob "${files}"`)
+    }
+
     /*  resolve the on-disk path for a given task id; as a side effect,
         eagerly migrate any legacy <basedir>/<id>/plan.md files to the
         current <basedir>/TASK-<id>.md layout on first access (guarded by
         a cheap check, so it is a no-op once the store is migrated)  */
     static path (log: Log, id: string): string {
         Task.validateId(id)
+        Task.enforceFiles(log, id)
         if (Task.needsMigration(log))
             Task.migrateAll(log)
         return path.join(Task.baseDir(log), `TASK-${id}.md`)
