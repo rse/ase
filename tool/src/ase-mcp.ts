@@ -137,15 +137,14 @@ export default class MCPCommand {
             try {
                 const ctx = await this.ensureService()
                 port = ctx.port
-                closedByUs = true
+                if (client !== null)
+                    closedByUs.add(client)
                 await client?.close()
                 await connectClient()
-                closedByUs = false
                 reconnecting = false
                 this.log.write("info", "mcp: reconnected to service")
             }
             catch (err: unknown) {
-                closedByUs = false
                 this.log.write("error", `mcp: reconnect failed: ${this.asError(err).message}`)
                 reconnect(attempt + 1).catch(() => {})
             }
