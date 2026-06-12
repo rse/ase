@@ -42,7 +42,7 @@
     },
     "dependencies": {
         "commander":                        "15.0.0",
-        "@dotenvx/dotenvx":                 "1.71.2",
+        "@dotenvx/dotenvx":                 "1.71.3",
         "yaml":                             "2.9.0",
         "valibot":                          "1.4.1",
         "execa":                            "9.6.1",
