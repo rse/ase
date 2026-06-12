@@ -65,6 +65,7 @@ export class GetoptMCP {
                 const tokens    = args.spec.split(/\s+/).filter((e) => e.length > 0)
                 const re        = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)(\.\.\.)?|.*))?$/
                 const internals = new Set<string>()
+                const flagTakesValue = new Map<string, boolean>()
                 for (const tok of tokens) {
                     const m = re.exec(tok)
                     if (m === null)
@@ -78,6 +79,9 @@ export class GetoptMCP {
                     const choices    = choicePart !== null ? choicePart.split("|") : null
                     const isList     = listMarker !== null
                     const dflt       = choices !== null ? choices[0] : valuePart
+                    flagTakesValue.set(`--${long}`, takesValue)
+                    if (short !== null)
+                        flagTakesValue.set(`-${short}`, takesValue)
                     const head       = short !== null ? `-${short}, --${long}` : `--${long}`
                     const flags      = takesValue ? `${head} <value>` : head
                     const opt        = new Option(flags)
@@ -157,11 +161,65 @@ export class GetoptMCP {
                         }
                         ranges.push({ start, end: i })
                     }
-                    const consumed = argsVec.length - cmd.args.length
-                    if (cmd.args.length > 0 && consumed >= 0 && consumed < ranges.length) {
-                        const first = ranges[consumed].start
-                        argsVerbatim = argsRaw.slice(first)
+
+                    /* helper function: strip surrounding quotes/escapes from a raw range
+                       so it can be compared against an option flag spelling */
+                    const unquote = (s: string) => {
+                        let out = ""
+                        let j = 0
+                        while (j < s.length) {
+                            const ch = s[j]
+                            if (ch === "\"" || ch === "'") {
+                                const quote = ch
+                                j++
+                                while (j < s.length && s[j] !== quote) {
+                                    if (s[j] === "\\" && j + 1 < s.length) {
+                                        out += s[j + 1]
+                                        j += 2
+                                    }
+                                    else {
+                                        out += s[j]
+                                        j++
+                                    }
+                                }
+                                j++
+                            }
+                            else if (ch === "\\" && j + 1 < s.length) {
+                                out += s[j + 1]
+                                j += 2
+                            }
+                            else {
+                                out += ch
+                                j++
+                            }
+                        }
+                        return out
                     }
+
+                    /*  walk the raw ranges, consuming leading option tokens (and any
+                        separate value tokens they take) until the first positional
+                        is reached, then slice the original input from there -- this
+                        mirrors commander's pass-through semantics while staying on
+                        the verbatim text and is robust against value-consuming
+                        options and shell-operator characters in the input  */
+                    let idx = 0
+                    while (idx < ranges.length) {
+                        const tok = unquote(argsRaw.slice(ranges[idx].start, ranges[idx].end))
+                        if (tok === "--") {
+                            idx++
+                            break
+                        }
+                        if (!tok.startsWith("-") || tok === "-")
+                            break
+                        let consumesNext = false
+                        if (/^--[^=]+$/.test(tok) || /^-[^-]$/.test(tok))
+                            consumesNext = flagTakesValue.get(tok) === true
+                        idx++
+                        if (consumesNext && idx < ranges.length)
+                            idx++
+                    }
+                    if (idx < ranges.length)
+                        argsVerbatim = argsRaw.slice(ranges[idx].start)
                 }
                 else
                     argsVerbatim = cmd.args.join(" ")
