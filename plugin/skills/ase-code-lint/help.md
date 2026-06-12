@@ -63,5 +63,5 @@ Lint a directory, reporting only `MEDIUM` and `HIGH` findings:
 
 ##  SEE ALSO
 
-`ase-code-analyze`, `ase-code-resolve`, `ase-code-refactor`,
-`ase-docs-proofread`.
+[`ase-code-analyze`](../ase-code-analyze/help.md), [`ase-code-resolve`](../ase-code-resolve/help.md), [`ase-code-refactor`](../ase-code-refactor/help.md),
+[`ase-docs-proofread`](../ase-docs-proofread/help.md).

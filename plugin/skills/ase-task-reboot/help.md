@@ -58,5 +58,5 @@ Reboot a specific task and hand off to editing:
 
 ##  SEE ALSO
 
-`ase-task-edit`, `ase-task-preflight`, `ase-task-implement`,
-`ase-task-view`, `ase-task-delete`.
+[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-preflight`](../ase-task-preflight/help.md), [`ase-task-implement`](../ase-task-implement/help.md),
+[`ase-task-view`](../ase-task-view/help.md), [`ase-task-delete`](../ase-task-delete/help.md).

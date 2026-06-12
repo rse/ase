@@ -30,4 +30,4 @@ Update the most recent ChangeLog section:
 
 ##  SEE ALSO
 
-`ase-meta-commit`, `ase-docs-proofread`.
+[`ase-meta-commit`](../ase-meta-commit/help.md), [`ase-docs-proofread`](../ase-docs-proofread/help.md).

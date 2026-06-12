@@ -59,4 +59,4 @@ Discover a broader set of up to 20 HTTP client components:
 
 ##  SEE ALSO
 
-`ase-arch-analyze`, `ase-meta-search`, `ase-meta-evaluate`.
+[`ase-arch-analyze`](../ase-arch-analyze/help.md), [`ase-meta-search`](../ase-meta-search/help.md), [`ase-meta-evaluate`](../ase-meta-evaluate/help.md).

@@ -88,5 +88,5 @@ Strengthen across five iterative rounds:
 
 ##  SEE ALSO
 
-`ase-meta-diaboli`, `ase-meta-why`, `ase-meta-evaluate`,
-`ase-meta-quorum`.
+[`ase-meta-diaboli`](../ase-meta-diaboli/help.md), [`ase-meta-why`](../ase-meta-why/help.md), [`ase-meta-evaluate`](../ase-meta-evaluate/help.md),
+[`ase-meta-quorum`](../ase-meta-quorum/help.md).

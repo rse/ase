@@ -73,5 +73,5 @@ Condense a specific task and hand off to editing:
 
 ##  SEE ALSO
 
-`ase-task-edit`, `ase-task-reboot`, `ase-task-view`,
-`ase-task-rename`, `ase-task-delete`.
+[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md), [`ase-task-view`](../ase-task-view/help.md),
+[`ase-task-rename`](../ase-task-rename/help.md), [`ase-task-delete`](../ase-task-delete/help.md).

@@ -62,5 +62,5 @@ Implement a specific task and delete the plan when done:
 
 ##  SEE ALSO
 
-`ase-task-edit`, `ase-task-preflight`, `ase-task-reboot`,
-`ase-task-view`, `ase-task-delete`.
+[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-preflight`](../ase-task-preflight/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md),
+[`ase-task-view`](../ase-task-view/help.md), [`ase-task-delete`](../ase-task-delete/help.md).

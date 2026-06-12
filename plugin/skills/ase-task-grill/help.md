@@ -70,6 +70,6 @@ Grill the current task plan and then hand off to editing:
 
 ##  SEE ALSO
 
-`ase-task-edit`, `ase-task-reboot`, `ase-task-preflight`,
-`ase-task-implement`, `ase-task-view`, `ase-task-list`,
-`ase-task-rename`, `ase-task-delete`.
+[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md), [`ase-task-preflight`](../ase-task-preflight/help.md),
+[`ase-task-implement`](../ase-task-implement/help.md), [`ase-task-view`](../ase-task-view/help.md), [`ase-task-list`](../ase-task-list/help.md),
+[`ase-task-rename`](../ase-task-rename/help.md), [`ase-task-delete`](../ase-task-delete/help.md).

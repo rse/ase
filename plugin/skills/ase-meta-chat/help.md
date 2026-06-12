@@ -42,4 +42,4 @@ Ask Gemini for a brief comparison:
 
 ##  SEE ALSO
 
-`ase-meta-quorum`, `ase-meta-search`.
+[`ase-meta-quorum`](../ase-meta-quorum/help.md), [`ase-meta-search`](../ase-meta-search/help.md).

@@ -56,4 +56,4 @@ Ask only a subset of the foreign models:
 
 ##  SEE ALSO
 
-`ase-meta-chat`, `ase-meta-search`, `ase-meta-evaluate`.
+[`ase-meta-chat`](../ase-meta-chat/help.md), [`ase-meta-search`](../ase-meta-search/help.md), [`ase-meta-evaluate`](../ase-meta-evaluate/help.md).

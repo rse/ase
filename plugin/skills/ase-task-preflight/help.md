@@ -59,5 +59,5 @@ Preflight a specific task and hand off to implementation when done:
 
 ##  SEE ALSO
 
-`ase-task-edit`, `ase-task-implement`, `ase-task-reboot`,
-`ase-task-view`.
+[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-implement`](../ase-task-implement/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md),
+[`ase-task-view`](../ase-task-view/help.md).

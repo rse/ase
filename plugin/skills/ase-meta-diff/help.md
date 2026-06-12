@@ -101,4 +101,4 @@ Summarize the staged changes and append a blast-radius map:
 
 ##  SEE ALSO
 
-`ase-meta-commit`, `ase-meta-changelog`, `ase-arch-analyze`.
+[`ase-meta-commit`](../ase-meta-commit/help.md), [`ase-meta-changelog`](../ase-meta-changelog/help.md), [`ase-arch-analyze`](../ase-arch-analyze/help.md).

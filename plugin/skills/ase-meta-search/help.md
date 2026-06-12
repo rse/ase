@@ -48,4 +48,4 @@ Search the Web using only the Brave and Exa backends:
 
 ##  SEE ALSO
 
-`ase-meta-chat`, `ase-meta-quorum`, `ase-arch-discover`.
+[`ase-meta-chat`](../ase-meta-chat/help.md), [`ase-meta-quorum`](../ase-meta-quorum/help.md), [`ase-arch-discover`](../ase-arch-discover/help.md).

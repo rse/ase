@@ -38,5 +38,5 @@ Switch to a specific task:
 
 ##  SEE ALSO
 
-`ase-task-list`, `ase-task-edit`, `ase-task-view`,
-`ase-task-rename`, `ase-task-delete`.
+[`ase-task-list`](../ase-task-list/help.md), [`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-view`](../ase-task-view/help.md),
+[`ase-task-rename`](../ase-task-rename/help.md), [`ase-task-delete`](../ase-task-delete/help.md).

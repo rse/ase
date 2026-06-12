@@ -83,5 +83,5 @@ Analyze a directory, reporting only `MEDIUM` and `HIGH` problems:
 
 ##  SEE ALSO
 
-`ase-code-resolve`, `ase-code-refactor`, `ase-code-lint`,
-`ase-code-explain`, `ase-arch-analyze`.
+[`ase-code-resolve`](../ase-code-resolve/help.md), [`ase-code-refactor`](../ase-code-refactor/help.md), [`ase-code-lint`](../ase-code-lint/help.md),
+[`ase-code-explain`](../ase-code-explain/help.md), [`ase-arch-analyze`](../ase-arch-analyze/help.md).

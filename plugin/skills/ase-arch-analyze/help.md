@@ -46,5 +46,5 @@ Analyze a specific module:
 
 ##  SEE ALSO
 
-`ase-arch-discover`, `ase-code-analyze`, `ase-code-resolve`,
-`ase-code-refactor`, `ase-code-insight`.
+[`ase-arch-discover`](../ase-arch-discover/help.md), [`ase-code-analyze`](../ase-code-analyze/help.md), [`ase-code-resolve`](../ase-code-resolve/help.md),
+[`ase-code-refactor`](../ase-code-refactor/help.md), [`ase-code-insight`](../ase-code-insight/help.md).

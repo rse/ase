@@ -39,5 +39,5 @@ Delete a specific task plan:
 
 ##  SEE ALSO
 
-`ase-task-edit`, `ase-task-list`, `ase-task-view`,
-`ase-task-rename`, `ase-task-reboot`.
+[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-list`](../ase-task-list/help.md), [`ase-task-view`](../ase-task-view/help.md),
+[`ase-task-rename`](../ase-task-rename/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md).

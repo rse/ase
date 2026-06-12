@@ -39,5 +39,5 @@ List all task ids together with their last-modified timestamps:
 
 ##  SEE ALSO
 
-`ase-task-id`, `ase-task-view`, `ase-task-edit`,
-`ase-task-rename`, `ase-task-delete`.
+[`ase-task-id`](../ase-task-id/help.md), [`ase-task-view`](../ase-task-view/help.md), [`ase-task-edit`](../ase-task-edit/help.md),
+[`ase-task-rename`](../ase-task-rename/help.md), [`ase-task-delete`](../ase-task-delete/help.md).

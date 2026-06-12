@@ -40,4 +40,4 @@ Get insights into a specific subsystem:
 
 ##  SEE ALSO
 
-`ase-code-explain`, `ase-code-analyze`, `ase-arch-analyze`.
+[`ase-code-explain`](../ase-code-explain/help.md), [`ase-code-analyze`](../ase-code-analyze/help.md), [`ase-arch-analyze`](../ase-arch-analyze/help.md).

@@ -40,4 +40,4 @@ Explain a specific function:
 
 ##  SEE ALSO
 
-`ase-code-insight`, `ase-code-analyze`, `ase-arch-analyze`.
+[`ase-code-insight`](../ase-code-insight/help.md), [`ase-code-analyze`](../ase-code-analyze/help.md), [`ase-arch-analyze`](../ase-arch-analyze/help.md).

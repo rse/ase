@@ -51,4 +51,4 @@ Proofread an entire documentation directory automatically:
 
 ##  SEE ALSO
 
-`ase-code-lint`, `ase-meta-changelog`.
+[`ase-code-lint`](../ase-code-lint/help.md), [`ase-meta-changelog`](../ase-meta-changelog/help.md).

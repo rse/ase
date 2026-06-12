@@ -72,5 +72,5 @@ Distill a pasted block of text:
 
 ##  SEE ALSO
 
-`ase-meta-search`, `ase-docs-proofread`, `ase-meta-why`.
+[`ase-meta-search`](../ase-meta-search/help.md), [`ase-docs-proofread`](../ase-docs-proofread/help.md), [`ase-meta-why`](../ase-meta-why/help.md).
 

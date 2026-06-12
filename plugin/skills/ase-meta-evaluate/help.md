@@ -48,5 +48,5 @@ Evaluate database options with hinted criteria:
 
 ##  SEE ALSO
 
-`ase-meta-quorum`, `ase-meta-search`, `ase-arch-discover`,
-`ase-meta-why`.
+[`ase-meta-quorum`](../ase-meta-quorum/help.md), [`ase-meta-search`](../ase-meta-search/help.md), [`ase-arch-discover`](../ase-arch-discover/help.md),
+[`ase-meta-why`](../ase-meta-why/help.md).

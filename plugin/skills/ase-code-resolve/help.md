@@ -92,6 +92,6 @@ Resolve a previously analyzed issue and hand off to implementation:
 
 ##  SEE ALSO
 
-`ase-code-craft`, `ase-code-refactor`, `ase-code-analyze`,
-`ase-arch-analyze`, `ase-task-edit`, `ase-task-preflight`,
-`ase-task-implement`.
+[`ase-code-craft`](../ase-code-craft/help.md), [`ase-code-refactor`](../ase-code-refactor/help.md), [`ase-code-analyze`](../ase-code-analyze/help.md),
+[`ase-arch-analyze`](../ase-arch-analyze/help.md), [`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-preflight`](../ase-task-preflight/help.md),
+[`ase-task-implement`](../ase-task-implement/help.md).

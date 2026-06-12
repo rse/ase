@@ -86,5 +86,5 @@ Craft a feature under a named task and directly hand off to implementation:
 
 ##  SEE ALSO
 
-`ase-code-refactor`, `ase-code-resolve`, `ase-task-edit`,
-`ase-task-preflight`, `ase-task-implement`.
+[`ase-code-refactor`](../ase-code-refactor/help.md), [`ase-code-resolve`](../ase-code-resolve/help.md), [`ase-task-edit`](../ase-task-edit/help.md),
+[`ase-task-preflight`](../ase-task-preflight/help.md), [`ase-task-implement`](../ase-task-implement/help.md).

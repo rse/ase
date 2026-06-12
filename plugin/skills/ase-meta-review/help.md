@@ -84,5 +84,5 @@ Review the staged changes, reporting only `MEDIUM` and `HIGH` findings:
 
 ##  SEE ALSO
 
-`ase-meta-diff`, `ase-meta-commit`, `ase-code-lint`, `ase-code-analyze`,
-`ase-meta-diaboli`.
+[`ase-meta-diff`](../ase-meta-diff/help.md), [`ase-meta-commit`](../ase-meta-commit/help.md), [`ase-code-lint`](../ase-code-lint/help.md), [`ase-code-analyze`](../ase-code-analyze/help.md),
+[`ase-meta-diaboli`](../ase-meta-diaboli/help.md).

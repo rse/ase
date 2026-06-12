@@ -47,4 +47,4 @@ Switch to the telegrapher persona:
 
 ##  SEE ALSO
 
-`ase-task-id`.
+[`ase-task-id`](../ase-task-id/help.md).

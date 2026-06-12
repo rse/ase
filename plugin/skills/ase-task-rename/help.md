@@ -40,5 +40,5 @@ Rename a specific task:
 
 ##  SEE ALSO
 
-`ase-task-list`, `ase-task-id`, `ase-task-edit`,
-`ase-task-view`, `ase-task-delete`.
+[`ase-task-list`](../ase-task-list/help.md), [`ase-task-id`](../ase-task-id/help.md), [`ase-task-edit`](../ase-task-edit/help.md),
+[`ase-task-view`](../ase-task-view/help.md), [`ase-task-delete`](../ase-task-delete/help.md).

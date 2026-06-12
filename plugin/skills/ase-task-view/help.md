@@ -58,5 +58,5 @@ View a plan in full, including its `IMPLEMENTATION DRAFT` section:
 
 ##  SEE ALSO
 
-`ase-task-list`, `ase-task-edit`, `ase-task-id`,
-`ase-task-rename`, `ase-task-delete`.
+[`ase-task-list`](../ase-task-list/help.md), [`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-id`](../ase-task-id/help.md),
+[`ase-task-rename`](../ase-task-rename/help.md), [`ase-task-delete`](../ase-task-delete/help.md).
