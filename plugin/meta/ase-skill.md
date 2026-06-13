@@ -227,12 +227,12 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-head title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (98 - 31 - length("<title/>")), i.e., <bar/> is
-    the "─" character repeated (98 - 31 - length("<title/>")) times):
+    (where <bar/> = "─" x (67 - length("⧉ ASE: <title/>")), i.e., <bar/> is
+    the "─" character repeated (67 - length("⧉ ASE: <title/>")) times):
 
     <template>
 
-    ╭────━━━━**(** **`<title/>`** **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+    ╭────━━━━**(** `⧉ ASE`: **`<title/>`** **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
 
     </template>
 
@@ -245,12 +245,12 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (98 - 31 - length("<title/>")), i.e., <bar/> is
-    the "─" character repeated (98 - 31 - length("<title/>")) times):
+    (where <bar/> = "─" x (67 - length("⧉ ASE: <title/>")), i.e., <bar/> is
+    the "─" character repeated (67 - length("⧉ ASE: <title/>")) times):
 
     <template>
 
-    ╰────━━━━**(** **`<title/>`** **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+    ╰────━━━━**(** `⧉ ASE`: **`<title/>`** **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
 
     </template>
 
@@ -271,15 +271,15 @@ Template Patterns
     should be expanded use the following helper placeholder and then the <template/>:
 
     -   <if condition="<subtitle/> is not empty">
-            Set <raw-title><title/>: <subtitle/><raw-title>.
-            Set <render-title>**`<title/>`**: `<subtitle/>`</render-title>.
+            Set <raw-title>⧉ ASE: <title/>: <subtitle/><raw-title>.
+            Set <render-title>`⧉ ASE`: **`<title/>`**: `<subtitle/>`</render-title>.
         </if>
         <else>
-            Set <raw-title><title/><raw-title>.
-            Set <render-title>**`<title/>`**</render-title>.
+            Set <raw-title>⧉ ASE: <title/><raw-title>.
+            Set <render-title>`⧉ ASE`: **`<title/>`**</render-title>.
         </else>
-    -   Set <bar/> to ("─" x (98 - 31 - length("<raw-title/>"))),
-        i.e., set <bar/> to the "─" character repeated (98 - 31 - length("<raw-title/>")) times.
+    -   Set <bar/> to ("─" x (67 - length("<raw-title/>"))),
+        i.e., set <bar/> to the "─" character repeated (67 - length("<raw-title/>")) times.
     -   Set <body> to <content/> with all line-starts prefixed with `│ `.
 
     <template>
