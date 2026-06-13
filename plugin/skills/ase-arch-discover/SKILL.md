@@ -115,7 +115,7 @@ for the technology stack to *provide* the *needed functionality*
         <keyword-L/> (L=1-M), which allow you to search for suitable
         components.
 
-    3.. In the to be discovered result set of components <component-K/>
+    3.  In the to be discovered result set of components <component-K/>
         (K=1-N), remember the component name as <name-K/>, the
         official package name as <package-K/>, the latest version as
         <version-K/>, the stars as <stars-K/>, the created date as
