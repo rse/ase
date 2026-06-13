@@ -14,6 +14,7 @@ User Dialog
 Let the *user interactively choose* an answer.
 
 1.  Take the following question specification:
+
     <spec>
         <content/>
     </spec>
@@ -135,6 +136,99 @@ Let the *user interactively choose* an answer.
             Do not output anything in this step!
 
         </if>
+
+</define>
+
+<define name="custom-dialog">
+Let the *user interactively choose* an answer.
+
+1.  Take the following question specification:
+
+    <spec>
+        <content/>
+    </spec>
+
+    The first line of <spec/> (separated by newlines) is of the format:
+    `<question-label/>: <question-description/>`
+
+    The second and following lines of <spec/> (separated by newlines) are of the format:
+    `<label/>: <description/>`
+
+    The first line provides the question label and the question
+    description. The second and following lines each provide an
+    answer label and an answer description.
+
+    Do not output anything in this step!
+
+2.  Dispatch according to the agent tool:
+
+    1.  Set <text></text> (set to empty).
+        Set <keys></keys> (set to empty).
+        Set <n>1</n> (set entry count to one).
+
+        <for items="2 3 4 5 6 7 8 9">
+            Take from <spec/> the line number <item/>.
+            If this line does not exist, <break/>.
+            If this line exists, parse it according to the format `<label/>: <description/>`.
+            Set <label-key/> to <ase-tpl-key digit="<n/>"/>.
+            Set <label-text/> to `<ase-tpl-pad width="15" text="<label/>:"/>`.
+            Append an entry to <text/>:
+
+            <text>
+            <text/>
+            <ase-tpl-boxline><label-key/>  ▶  **<label-text/>** <description/></ase-tpl-boxline>
+            </text>
+
+            Set <n/> to <n/> + 1 (increment entry count).
+            <if condition="<keys/> is empty">
+                Set <keys><label-key/></keys>
+            </if>
+            <else>
+                Set <keys><keys/>/<label-key/></keys>
+            </else>
+        </for>
+
+        Set:
+
+        <text>
+        <ase-tpl-boxed title="USER DIALOG" subtitle="<question-label/>">
+
+        <ase-tpl-boxline>**<question-description/>**</ase-tpl-boxline>
+
+        <text/>
+
+        Please choose *one* option by typing <keys/>/**CANCEL** or free-text instruction.
+
+        </ase-tpl-boxed>
+        </text>
+
+        If <n/> is less than 3:
+        Set <result>ERROR: user-dialog requires 2-8 answer lines, got less</result>
+        and *SKIP* the following step 2 and continue with step 3 dispatch.
+
+    2.  Output the following <template/>, end the current turn, wait for the
+        user input, store the user input in <result/> and then continue with step 3:
+
+        <template>
+        <text/>
+        </template>
+
+    3.  Check the result and dispatch accordingly:
+
+        -   If <result/> indicates that the user doesn't want to proceed,
+            or the user declined to answer the question, or that the dialog
+            was cancelled, rejected or skipped, set <result>CANCEL</result>.
+
+        -   Otherwise, determine the selected <label/>
+            by mapping the <result/> (usually containing one of the
+            "key" or "label" strings) to one of the answer labels. Set
+            <result><label/></result>.
+            
+            If <result/> is then *NOT* one of the "label" values from
+            <spec/>, set <result>OTHER: <result/></result> (prefix
+            result with "OTHER").
+
+        Do not output anything in this step!
 
 </define>
 
