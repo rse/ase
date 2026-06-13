@@ -254,10 +254,42 @@ Template Patterns
 
     </template>
 
--   When `<ase-tpl-boxed><line/></ase-tpl-boxed>` should be expanded, use:
+-   When `<ase-tpl-boxline><line/></ase-tpl-boxline>` should be expanded, use:
+
+    <if condition="<line/> is not empty">
+        <template>
+        │ <line/>
+        </template>
+    </if>
+    <else>
+        <template>
+        │
+        </template>
+    </else>
+
+-   When `<ase-tpl-boxed title="<title/>"[ subtitle="<subtitle/>"]><content/></ase-tpl-boxed>`
+    should be expanded use the following helper placeholder and then the <template/>:
+
+    -   <if condition="<subtitle/> is not empty">
+            Set <raw-title><title/>: <subtitle/><raw-title>.
+            Set <render-title>**`<title/>`**: `<subtitle/>`</render-title>.
+        </if>
+        <else>
+            Set <raw-title><title/><raw-title>.
+            Set <render-title>**`<title/>`**</render-title>.
+        </else>
+    -   Set <bar/> to ("─" x (78 - 31 - length("<raw-title/>"))),
+        i.e., set <bar/> to the "─" character repeated (78 - 31 - length("<raw-title/>")) times.
+    -   Set <body> to <content/> with all line-starts prefixed with `│ `.
 
     <template>
-    │ <line/>
+
+    ╭────━━━━**(** <render-title/> **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+    │
+    <body/>
+    │
+    ╰────━━━━**(** <render-title/> **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+
     </template>
 
 -   When `<ase-tpl-key digit="<digit/>"/>` should be expanded, use:
@@ -283,3 +315,15 @@ Template Patterns
 -   When `<ase-tpl-bullet-signal/>` should be expanded, use:
 
     <template>🟠</template>
+
+-   When `<ase-tpl-pad-left width="<width/>" text="<text/>"/>` should be expanded, use
+    (where <ws/> = ` ` x (<width/> - length("<text/>")), i.e., <ws/> is
+    the ` ` character repeated (<width/> - length("<text/>")) times):
+
+    <template><text/><ws/></template>
+
+-   When `<ase-tpl-pad-right width="<width/>" text="<text/>"/>` should be expanded, use
+    (where <ws/> = ` ` x (<width/> - length("<text/>")), i.e., <ws/> is
+    the ` ` character repeated (<width/> - length("<text/>")) times):
+
+    <template><ws/><text/></template>
