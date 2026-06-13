@@ -146,10 +146,12 @@ problems in *performance* and *efficiency*, or problems in *security*.
     than or equal to `rank(<getopt-option-severity/>)`; *silently drop*
     all other problems (they are neither reported nor persisted). With
     the default floor `LOW`, all problems are kept. `ACCEPTED` problems
-    are *never* dropped. Then renumber the surviving problems
-    contiguously as `P<n/>` with <n/> = 1, 2, ... in the original
-    ordering. If *all* problems are dropped, skip the per-problem report
-    but still emit the final hint <template/> below.
+    are *never* dropped.
+
+    Then renumber the surviving problems contiguously as `P<n/>` with
+    <n/> = 1, 2, ... in the original ordering. If *all* problems are
+    dropped, skip the per-problem report but still emit the final hint
+    <template/> below.
 
     In this STEP 3, for *EVERY* surviving problem, immediately report
     it with the following output <template/>, based on concise bullet
@@ -208,6 +210,10 @@ problems in *performance* and *efficiency*, or problems in *security*.
         <template>ACCEPTED</template> when the problem is a deliberate,
         justified trade-off that should remain on record but is never
         dropped by the severity floor (see STEP 3).
+
+    -   For <title/> ultra-compress the <description/> to a concise,
+        short, single sentence. Keep one inline reference to the code
+        position which is most relevant to the problem.
 
     -   <if condition="<getopt-option-performance/> is equal `true`">
         In <evidence/>, ground the finding by citing either the inferred
