@@ -152,7 +152,7 @@ related to a set of code quality aspects.
                 3.  Append the following <template/> to <diff-file/>:
 
                     <template>
-                    @@ -<old-start/>,<n/> +<new-start/>,<m/> @@
+                    @@ -<old-start/>,<old-count/> +<new-start/>,<new-count/> @@
                      <context-before/>
                     -<old-text/>
                     +<new-text/>
@@ -164,10 +164,10 @@ related to a set of code quality aspects.
                         the line of <context-before/> (one before <line/>).
                     -   The <new-start/> is the same as <old-start/> (the unchanged
                         <context-before/> line shares the same start in both files).
-                    -   The <n/> is the total number of old-side hunk lines, i.e.,
+                    -   The <old-count/> is the total number of old-side hunk lines, i.e.,
                         the number of lines in <context-before/>, <old-text/>, and
                         <context-after/> combined.
-                    -   The <m/> is the total number of new-side hunk lines, i.e.,
+                    -   The <new-count/> is the total number of new-side hunk lines, i.e.,
                         the number of lines in <context-before/>, <new-text/>, and
                         <context-after/> combined.
 
