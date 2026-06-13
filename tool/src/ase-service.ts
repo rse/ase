@@ -54,7 +54,7 @@ export const isConnRefused = (err: unknown): boolean => {
 /*  probe the service and verify ASE identity banner  */
 export const probe = async (port: number, projectId: string): Promise<boolean | null> => {
     try {
-        const r = await ofetch.raw(`http://${SERVICE_HOST}:${port}/`, {
+        const r = await ofetch.raw(`http://${HOST}:${port}/`, {
             method:              "OPTIONS",
             signal:              AbortSignal.timeout(2000),
             ignoreResponseError: true
