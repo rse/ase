@@ -216,7 +216,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         </template>
 
     5.  Now report each approach with the following <template/>,
-        inlining its pros/cons derived in sub-step 2:
+        inlining its pros/cons derived in sub-step 2, and do not output
+        anything else in this step:
 
         <template>
         ●   **APPROACH A<n/>**<annotation/>: *<summary/>*
