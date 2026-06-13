@@ -724,12 +724,17 @@ making the forbidden moves as explicit as the allowed ones.
         is implicitly forbidden.
 
     -   Every <spec-sm-state-name/> used in a transition *MUST* be
-        declared in the `### STATES` block, and every non-final state
-        *MUST* have at least one outgoing transition. Conversely, every
-        state with no outgoing transition *MUST* be listed in
-        <spec-sm-lifecycle-final/>, i.e., the set of <spec-sm-lifecycle-final/>
-        states *MUST* be exactly the set of declared states that have no
-        outgoing transition.
+        declared in the `### STATES` block, and every state with no
+        outgoing transition *MUST* be listed in <spec-sm-lifecycle-final/>
+        (a state with no outgoing transition that is not final would be a
+        stuck dead-end). The converse does *not* hold: a
+        <spec-sm-lifecycle-final/> state *MAY* still have outgoing
+        transitions, modeling a resting state that can later be left again
+        (e.g. a `Closed` state with a `reopen` transition back to
+        `Active`). Thus <spec-sm-lifecycle-final/> designates the states in
+        which the entity may legally come to rest, which is a superset of,
+        but not necessarily equal to, the set of declared states that have
+        no outgoing transition.
 
     -   In case a transition has no side effect, the
         entire `<spec-sm-transition-effect/>,` clause is omitted.
