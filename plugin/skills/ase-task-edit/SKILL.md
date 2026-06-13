@@ -374,9 +374,11 @@ Set <content-dirty>true</content-dirty>.
                 </template>
 
         -   If <getopt-option-next/> is equal to `none`:
-            Let the *user interactively choose* what to do as the next step.
+            Let the *user interactively choose* what to do as the next
+            step. For this you *MUST* use the custom `custom-dialog` and
+            not the `AskUserQuestion` based "user-dialog"
 
-            <expand name="user-dialog">
+            <expand name="custom-dialog">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Mark plan finalized, exit planning loop.
                 GRILL: Hand off plan to grilling.
