@@ -254,6 +254,24 @@ Template Patterns
 
     </template>
 
+-   When `<ase-tpl-boxed><line/></ase-tpl-boxed>` should be expanded, use:
+
+    <template>
+    │ <line/>
+    </template>
+
+-   When `<ase-tpl-key digit="<digit/>"/>` should be expanded, use:
+
+    <if condition="<digit/> is '1'"><template>➊</template></if>
+    <if condition="<digit/> is '2'"><template>➋</template></if>
+    <if condition="<digit/> is '3'"><template>➌</template></if>
+    <if condition="<digit/> is '4'"><template>➍</template></if>
+    <if condition="<digit/> is '5'"><template>➎</template></if>
+    <if condition="<digit/> is '6'"><template>➏</template></if>
+    <if condition="<digit/> is '7'"><template>➐</template></if>
+    <if condition="<digit/> is '8'"><template>➑</template></if>
+    <if condition="<digit/> is '9'"><template>➒</template></if>
+
 -   When `<ase-tpl-bullet-secondary/>` should be expanded, use:
 
     <template>⚪</template>
