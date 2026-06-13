@@ -563,7 +563,7 @@ manages, defining how information is organized and connected.
 
     ### RELATIONS
 
-    -   `<spec-dm-relation-id/>`: [`<spec-dm-relation-target/>`](#<spec-dm-relation-id/>)(`<spec-dm-relation-cardinality/>`):<br/>
+    -   `<spec-dm-relation-id/>`: [`<spec-dm-relation-target/>`](#<spec-dm-relation-target-id/>)(`<spec-dm-relation-cardinality/>`):<br/>
         <spec-dm-relation-description/>,
         **BECAUSE** <spec-dm-relation-rationale/>.
 
@@ -615,7 +615,7 @@ manages, defining how information is organized and connected.
     -   <spec-dm-relation-target/>: the <spec-dm-entity-name/> of the
         entity the directed relation targets.
 
-    -   <spec-dm-relation-id/>: the <spec-dm-entity-id/> of the
+    -   <spec-dm-relation-target-id/>: the <spec-dm-entity-id/> of the
         entity the directed relation targets.
 
     -   <spec-dm-relation-cardinality/>: the cardinality of the entity
@@ -725,7 +725,11 @@ making the forbidden moves as explicit as the allowed ones.
 
     -   Every <spec-sm-state-name/> used in a transition *MUST* be
         declared in the `### STATES` block, and every non-final state
-        *MUST* have at least one outgoing transition.
+        *MUST* have at least one outgoing transition. Conversely, every
+        state with no outgoing transition *MUST* be listed in
+        <spec-sm-lifecycle-final/>, i.e., the set of <spec-sm-lifecycle-final/>
+        states *MUST* be exactly the set of declared states that have no
+        outgoing transition.
 
     -   In case a transition has no side effect, the
         entire `<spec-sm-transition-effect/>,` clause is omitted.
