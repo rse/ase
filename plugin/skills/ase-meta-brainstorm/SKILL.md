@@ -225,6 +225,17 @@ Honor the following tenets throughout the brainstorming:
         *alignment with the existing code base*. Keep only ideas in the
         clusters with a rank of at least <getopt-option-min-rank/>.
 
+        If *no* idea meets the <getopt-option-min-rank/> floor, the floor
+        filter would empty the set and leave the downstream steps without
+        any options. In this case, *disregard* the floor and instead keep
+        the up-to-<getopt-option-max-shortlist/> highest-ranked ideas, and
+        output the following <template/> to flag that even the strongest
+        ideas fall below the bar:
+
+        <template>
+        <ase-tpl-bullet-signal/> **NOTICE**: no idea reached the minimum rank of <getopt-option-min-rank/>/10 - shortlisting the highest-ranked ideas regardless.
+        </template>
+
     3.  From the scored ideas <idea-N/>, distill a *shortlist* of the top
         <getopt-option-max-shortlist/> options, sorted by rank from highest to lowest.
 
