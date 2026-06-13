@@ -302,7 +302,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <timestamp-modified/> information and calculate the number of
         words <words/> of <content/>.
 
-    3.  You *MUST* *save* the resulting plan content with the
+    3.  You then *MUST* *save* the resulting plan content with the
         `ase_task_save(id: "<ase-task-id/>", text: "<content/>")`.
 
     4.  Output a hint with the following <template/>:
