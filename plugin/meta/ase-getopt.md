@@ -13,26 +13,34 @@ set placeholders into the context as a side-effect.
     Set <getopt-args><content/></getopt-args>
 
 2.  **Short-Circuit Processing**:
-    If <getopt-args/> does *NOT* match the regexp `(^|\s)-`
-    (i.e. contains no option at the start at all):
+    You *MUST* decide here, via the following *mandatory* <if/> control
+    construct, whether the options are parsed *locally* (no MCP call) or
+    *remotely* (via the MCP call in steps 3-6). This is a *hard branch*,
+    not an optional optimization: when the <if/> branch is taken, steps
+    3-6 are *structurally unreachable* and you *MUST NOT* call the
+    `ase_getopt` MCP tool under any circumstances.
 
-    For each option token in <getopt-spec/> of the form
-    `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)[...]]`, set
-    <getopt-option-<long/>/> to <default/> (for `=<default/>`
-    form), or to <c1/> (the first choice, for `=(<c1/>|<c2>/|...)`
-    form, or for the list form `=(<c1/>|<c2>/|...)...`),
-    or to `false` (for value-less options). Then set
-    <getopt-arguments><getopt-args/></getopt-arguments>.
+    <if condition="<getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e. it does not start with an option)">
+        Parse the options *locally*, without any MCP call:
 
-    Additionally, simulate <getopt-info/> as a comma-separated
-    markdown rendering of the parsed options in the form `<longN/>:
-    **<valueN/>**, [...]` (joined with `, `, with each value
-    shell-quoted if value contains spaces or special characters, and
-    excluding the `help` option and any *internal* option whose long
-    name starts with `int-`).
+        For each option token in <getopt-spec/> of the form
+        `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)[...]]`, set
+        <getopt-option-<long/>/> to <default/> (for `=<default/>`
+        form), or to <c1/> (the first choice, for `=(<c1/>|<c2>/|...)`
+        form, or for the list form `=(<c1/>|<c2>/|...)...`),
+        or to `false` (for value-less options). Then set
+        <getopt-arguments><getopt-args/></getopt-arguments>.
 
-    Then silently *SKIP* only the following steps 3-6
-    and proceed directly to step 7 to display the results.
+        Additionally, simulate <getopt-info/> as a comma-separated
+        markdown rendering of the parsed options in the form `<longN/>:
+        **<valueN/>**, [...]` (joined with `, `, with each value
+        shell-quoted if value contains spaces or special characters, and
+        excluding the `help` option and any *internal* option whose long
+        name starts with `int-`).
+
+        You then *MUST* silently *SKIP* the steps 3-6 below
+        and proceed directly to step 7 to display the results.
+    </if>
 
 3.  **MCP Call**:
     Call the `ase_getopt(name: "<getopt-skill/>", spec:
