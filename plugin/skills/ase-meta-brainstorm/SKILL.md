@@ -78,7 +78,7 @@ Honor the following tenets throughout the brainstorming:
 
 1.  <step id="STEP 1: Restate Topic">
 
-    Restate the topic to be brainstormed by output the following <template/>:
+    Restate the topic to be brainstormed by outputting the following <template/>:
 
     <template>
     <ase-tpl-bullet-secondary/> **TOPIC**: <topic/>
