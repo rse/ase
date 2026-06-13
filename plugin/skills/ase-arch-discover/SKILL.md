@@ -37,13 +37,26 @@ for the technology stack to *provide* the *needed functionality*
 
 <flow>
 1.  <step id="STEP 1: Determine Functionality">
-    -   Derive the needed <functionality/> from the <request/>, but keep
+    1.  Derive the needed <functionality/> from the <request/>, but keep
         the functionality description very *brief* but still *precise*.
 
-    -   If <functionality/> is not clear or not precise enough, raise
-        questions to the user with the help of an interactive user dialog tool.
+    2.  If <functionality/> is not clear, not precise, or not specific
+        enough, let the *user interactively choose* the intended
+        functionality. For this you *MUST* use the custom `custom-dialog`
+        and *NOT* the `AskUserQuestion` based "user-dialog":
 
-    -   Display the determined final functionality with just the following
+        <expand name="custom-dialog">
+            Functionality: Which functionality should the components provide?
+            <answer-1/>: (grounded candidate functionality 1)
+            <answer-2/>: (grounded candidate functionality 2)
+            <answer-3/>: (grounded candidate functionality 2)
+            <answer-4/>: (grounded candidate functionality 3)
+        </expand>
+
+        Then use the <result/> and its corresponding grounded candidate
+        functionality to adjust <functionality/> accordingly.
+
+    3.  Display the determined final functionality with just the following
         <template/>:
 
         <template>
@@ -52,32 +65,32 @@ for the technology stack to *provide* the *needed functionality*
     </step>
 
 2.  <step id="STEP 2: Determine Technology Stack">
-    -   Determine the used technology stack:
+    1.  Determine the used technology stack:
 
-        -   If a file `package.json` is found in the top-level directory
+        1.  If a file `package.json` is found in the top-level directory
             of the project and contains an entry `typescript` under `dependencies`
             or `devDependencies`, then <stack>TypeScript</stack>.
 
-        -   Else, if a file `package.json` is found in the top-level directory
+        2.  Else, if a file `package.json` is found in the top-level directory
             of the project, then <stack>JavaScript</stack>.
 
-        -   Else, if a file `build.gradle.kts` or `settings.gradle.kts`
+        3.  Else, if a file `build.gradle.kts` or `settings.gradle.kts`
             is found in the top-level directory, then <stack>Kotlin</stack>.
 
-        -   Else, if a file `build.gradle` is found in the top-level directory and
+        4.  Else, if a file `build.gradle` is found in the top-level directory and
             is applying `kotlin`, `org.jetbrains.kotlin.jvm`, `kotlin-android`,
             or `kotlin-multiplatform` plugins, then <stack>Kotlin</stack>.
 
-        -   Else, if a file `pom.xml` is found in the top-level directory and
+        5.  Else, if a file `pom.xml` is found in the top-level directory and
             contains `kotlin-maven-plugin` or `kotlin-stdlib` dependencies, then
             <stack>Kotlin</stack>.
 
-        -   Else, if a file `pom.xml` or `build.gradle` is found in the top-level directory
+        6.  Else, if a file `pom.xml` or `build.gradle` is found in the top-level directory
             of the project, then <stack>Java</stack>.
 
-        -   Else, use <stack>Unknown</stack>.
+        7.  Else, use <stack>Unknown</stack>.
 
-    -   Display the determined final technology stack with just the
+    2.  Display the determined final technology stack with just the
         following <template/>:
 
         <template>
@@ -86,7 +99,7 @@ for the technology stack to *provide* the *needed functionality*
     </step>
 
 3.  <step id="STEP 3: Discover Components">
-    -   If <stack/> is "Unknown", the technology stack could not be
+    1.  If <stack/> is "Unknown", the technology stack could not be
         determined and no component discovery backend is available.
         Inform the user with just the following <template/> and then
         *STOP* the entire flow (do not perform any further steps):
@@ -95,26 +108,26 @@ for the technology stack to *provide* the *needed functionality*
         <ase-tpl-bullet-normal/> **RESULT**: technology stack could not be determined -- component discovery is only supported for JavaScript, TypeScript, Java, and Kotlin projects.
         </template>
 
-    -   From <stack/> and <functionality/>, derive essential keywords
+    2.  From <stack/> and <functionality/>, derive essential keywords
         <keyword-L/> (L=1-M), which allow you to search for suitable
         components.
 
-    -   In the to be discovered result set of components <component-K/>
+    3.. In the to be discovered result set of components <component-K/>
         (K=1-N), remember the component name as <name-K/>, the
         official package name as <package-K/>, the latest version as
         <version-K/>, the stars as <stars-K/>, the created date as
         <created-K/>, the last updated date as <updated-K/>, the total
         number of downloads in the last month as <downloads-K/>.
 
-    -   If <stack/> is "JavaScript" or "TypeScript":
+    4.  If <stack/> is "JavaScript" or "TypeScript":
 
-        -   Based on the essential keywords <keyword-L/> (L=1-M),
+        1.  Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
             discover an initial set of a maximum of <getopt-option-limit/> *NPM packages*
             <component-K/> and at least their real name <name-K/> and
             their unique package names <package-K/>.
 
-        -   Use the shell command `npm search --json --searchlimit <getopt-option-limit/>
+        2.  Use the shell command `npm search --json --searchlimit <getopt-option-limit/>
             "<keyword-1/>" [...] "<keyword-M/>"` to *specifically*
             discover an additional set of a maximum of <getopt-option-limit/> *NPM packages*
             <component-K/> and at least their unique package names
@@ -122,16 +135,16 @@ for the technology stack to *provide* the *needed functionality*
             (L=1-M). Merge the results into the already existing result
             set, but deduplicate entries.
 
-    -   If <stack/> is "Java" or "Kotlin":
+    5.  If <stack/> is "Java" or "Kotlin":
 
-        -   Based on the essential keywords <keyword-L/> (L=1-M),
+        1.  Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
             discover an initial set of a maximum of <getopt-option-limit/> *Maven packages*
             <component-K/> and at least their real name <name-K/> and
             their unique Maven coordinates <package-K/> of the form
             `groupId:artifactId`.
 
-        -   Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+[...]+<keyword-M/>&rows=<getopt-option-limit/>&wt=json'`
+        2.  Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+[...]+<keyword-M/>&rows=<getopt-option-limit/>&wt=json'`
             to *specifically* discover an additional set of a maximum
             of <getopt-option-limit/> *Maven packages* <component-K/> and at least their
             unique Maven coordinates <package-K/> (i.e. `<g/>:<a/>` from
@@ -140,7 +153,7 @@ for the technology stack to *provide* the *needed functionality*
             into the already existing result set, but deduplicate
             entries by Maven coordinate.
 
-    -   Call the `ase_component_info(stack: "<stack/>", components:
+    6.  Call the `ase_component_info(stack: "<stack/>", components:
         [ "<package-1/>", ..., "<package-N/>" ])` tool of the `ase` MCP
         server *once* for the entire set of discovered packages.
         The tool dispatches internally on <stack/> and fetches all
@@ -154,11 +167,11 @@ for the technology stack to *provide* the *needed functionality*
         from `downloads` (numeric or `N.A.`) and <rank-K/> from `rank`
         (numeric).
 
-    -   Sort, in descending order, the discovered components
+    7.  Sort, in descending order, the discovered components
         <component-K/> (K=1-N) by their `rank` field and trim the result
         list to just a maximum of <getopt-option-limit/> total components.
 
-    -   For each component <component-K/> (K=1-N), research and then
+    8.  For each component <component-K/> (K=1-N), research and then
         decide which *one* of *USP* (Unique Selling Point -- what makes
         it unique), *Crux* (what you should notice), or *Gotcha* (what
         you should not stumble over) is its single most distinguishing
@@ -169,7 +182,7 @@ for the technology stack to *provide* the *needed functionality*
     </step>
 
 4.  <step id="STEP 4: Report Components">
-    -   Display the determined, individual components as a Markdown
+    1.  Display the determined, individual components as a Markdown
         *table* with just the following <template/> and do not output
         anything else:
 
@@ -183,7 +196,7 @@ for the technology stack to *provide* the *needed functionality*
         | **<name-N/>** | `<package-N/>` | <info-N/> |
         </template>
 
-    -   Display the discovered components as a Markdown *table*
+    2.  Display the discovered components as a Markdown *table*
         with just the following <template/>:
 
         <template>
