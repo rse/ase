@@ -219,11 +219,11 @@ following procedure:
 
         If <n/> is less than 3:
         Set <result>ERROR: user-dialog requires 2-8 answer lines, got less</result>
-        and *SKIP* the following step 2 and continue with step 3 dispatch.
+        and *SKIP* the following step 2.2 and continue with step 2.3 dispatch.
 
     2.  Output the following <template/>, end the current turn, wait for the
         user input, store the user input in <result/> and then continue with
-        STEP 2 sub-step 3 below:
+        step 2.3 below:
 
         <template>
         <text/>
@@ -251,7 +251,7 @@ following procedure:
             </if>
             <else>
                 Output the following <template/> and then *START OVER*
-                by *GOING* to STEP 2 sub-step 2 above.
+                by *GOING* to step 2.2 above.
 
                 <template>
                 ⧉ **ASE**: ERROR: **Invalid option selected!**
