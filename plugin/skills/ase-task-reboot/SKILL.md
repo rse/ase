@@ -119,10 +119,10 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Set <instruction><text/></instruction> (set instruction to extracted text).
         </if>
 
-    5.  <elseif condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is NOT empty">
+    5.  <if condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is NOT empty">
         Set <instruction><instruction/>, BECAUSE <text/></instruction>
         (append extracted text to instruction).
-        </elseif>
+        </if>
 
     6.  <if condition="<content/> contains 'Created:  <text/>'">
         Set <timestamp-created><text/></timestamp-created> (set
