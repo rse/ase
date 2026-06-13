@@ -354,6 +354,6 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             Then call the tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`.
             </else>
 
-    <step>
+    </step>
 
 </flow>
