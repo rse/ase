@@ -226,7 +226,7 @@ Let the *user interactively choose* an answer.
             by mapping the <result/> (usually containing one of the
             "key" or "label" strings) to one of the answer labels. Set
             <result><label/></result>.
-            
+
             If <result/> is then *NOT* one of the "label" values from
             <spec/>, set <result>OTHER: <result/></result> (prefix
             result with "OTHER").
