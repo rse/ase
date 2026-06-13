@@ -312,26 +312,6 @@ export default class HookCommand {
     /*  handler for "ase hook stop" (both tools)  */
     private doStop (_tool: Tool): number {
         this.writeAgentStatus("ready")
-
-        /*  safety net: clear any lingering "agent.skill" marker so a
-            crashed or aborted skill loop does not leave information active  */
-        const sessionId = this.readSessionIdFromStdin()
-        if (this.isValidSessionId(sessionId)) {
-            try {
-                const cfg = new Config("config", configSchema, this.log,
-                    parseScope(`session:${sessionId}`))
-                cfg.lock(() => {
-                    cfg.read()
-                    if (typeof cfg.get("agent.skill") === "string") {
-                        cfg.delete("agent.skill")
-                        cfg.write()
-                    }
-                })
-            }
-            catch (_e) {
-                /*  best-effort: ignore failures  */
-            }
-        }
         return 0
     }
 
@@ -389,23 +369,6 @@ export default class HookCommand {
         }
     }
 
-    /*  write the session-scoped "agent.skill" config value  */
-    private writeActiveSkill (sessionId: string, skill: string): void {
-        if (!this.isValidSessionId(sessionId))
-            return
-        try {
-            const cfg = new Config("config", configSchema, this.log, parseScope(`session:${sessionId}`))
-            cfg.lock(() => {
-                cfg.read()
-                cfg.set("agent.skill", skill)
-                cfg.write()
-            })
-        }
-        catch (_e) {
-            /*  best-effort: ignore failures  */
-        }
-    }
-
     /*  the edit-capable skills whose active state lets the pre-tool-use
         hook auto-approve subsequent "Edit" invocations  */
     private editCapableSkills = [ "ase-code-lint", "ase-docs-proofread" ]
@@ -443,13 +406,6 @@ export default class HookCommand {
         else if (toolName === "Skill" && /^(?:ase:)?ase-.+/.test(toolInput.skill ?? "")) {
             approve = true
             reason  = "ASE skill invocation auto-approved"
-            /*  for edit-capable skills, record the active skill now so that
-                subsequent "Edit" invocations auto-approve without relying on
-                the skill body issuing ase_config_set itself (which is silent
-                and easy to skip or reorder relative to the first Edit)  */
-            const skill = (toolInput.skill ?? "").replace(/^ase:/, "")
-            if (this.editCapableSkills.includes(skill))
-                this.writeActiveSkill(this.pickSessionId(input), skill)
         }
         else if (spec.mcpToolNamePattern.test(toolName)) {
             approve = true
@@ -464,7 +420,7 @@ export default class HookCommand {
             const activeSkill = this.readActiveSkill(sessionId)
             if (this.editCapableSkills.includes(activeSkill)) {
                 approve = true
-                reason  = `${activeSkill}: user already consented via AskUserQuestion`
+                reason  = `${activeSkill}: edit auto-approved for active edit-capable skill`
             }
         }
 
