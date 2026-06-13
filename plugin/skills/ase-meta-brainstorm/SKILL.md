@@ -216,8 +216,12 @@ Honor the following tenets throughout the brainstorming:
 
         <template>
         <ase-tpl-bullet-secondary/> **IDEA CLUSTER <C/>/<c/>**: <cluster-C/> - <cluster-summary-C/>,
-        **IDEAS**: <N/>, <M/>[, ...]
+        **IDEAS**: <idea-index-C/>
         </template>
+
+        Here, <idea-index-C/> is the comma-separated list of the indices
+        <N/> of those retained ideas <idea-N/> that belong to cluster
+        <cluster-C/> (e.g. `2, 5, 9`).
 
     2.  *Score*: for each retained idea <idea-N/> in the clusters, rank its *fit* against the
         purpose and constraints on a Likert scale of 0 (poor) to 10
