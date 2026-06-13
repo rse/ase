@@ -40,7 +40,8 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     <if condition="<getopt-option-performance/> is equal `true` and <getopt-option-security/> is equal `true`">
 
-    Only output the following <template/> and then *STOP* immediately:
+    Only output the following <template/> and then *STOP* the entire flow
+    (do not perform any further steps):
 
     <template>
     ⧉ **ASE**: ✪ skill: **ase-code-analyze**, ▶ ERROR: options `--performance` and `--security` are mutually exclusive
