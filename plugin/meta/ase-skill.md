@@ -215,6 +215,11 @@ Skill Identification
     @${CLAUDE_SKILL_DIR}/help.md
     </template>
 
+-   *IMPORTANT*:
+    You *MUST* *NOT* output any summaries, explanations, or next
+    steps at the end of a skill beside the explicit outputs via any
+    <template/>.
+
 Template Patterns
 -----------------
 
