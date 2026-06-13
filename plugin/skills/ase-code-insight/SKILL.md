@@ -7,10 +7,11 @@ user-invocable: true
 disable-model-invocation: false
 effort: high
 allowed-tools:
-    - "Bash(git)"
-    - "Bash(sort)"
-    - "Bash(uniq)"
-    - "Bash(head)"
+    - "Bash(git *)"
+    - "Bash(grep *)"
+    - "Bash(sort *)"
+    - "Bash(uniq *)"
+    - "Bash(head *)"
     - "Skill"
     - "Agent"
 ---
