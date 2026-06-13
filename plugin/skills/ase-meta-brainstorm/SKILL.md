@@ -127,7 +127,7 @@ Honor the following tenets throughout the brainstorming:
             tool! Instead, you *MUST* just show a custom output, let the
             user enter input, and then you set the result accordingly.
 
-            <expand name="custom-dialog">
+            <expand name="custom-dialog" arg1="--other">
                 <facet-M/>: <question-M/>
                 <answer-M-1/>: (first grounded candidate answer)
                 <answer-M-2/>: (second grounded candidate answer)

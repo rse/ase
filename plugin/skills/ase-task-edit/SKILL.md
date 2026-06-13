@@ -231,7 +231,7 @@ Set <content-dirty>true</content-dirty>.
             tool! Instead, you *MUST* just show a custom output, let the
             user enter input, and then you set the result accordingly.
 
-            <expand name="custom-dialog">
+            <expand name="custom-dialog" arg1="--other">
                 Previous Plan: Should the previous plan content be overwritten, refined, or preserved?
                 OVERWRITE: Continue operation, overwrite previous plan.
                 REFINE: Continue operation, refine previous plan.
@@ -382,7 +382,7 @@ Set <content-dirty>true</content-dirty>.
             tool! Instead, you *MUST* just show a custom output, let the
             user enter input, and then you set the result accordingly.
 
-            <expand name="custom-dialog">
+            <expand name="custom-dialog" arg1="--other">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Mark plan finalized, exit planning loop.
                 GRILL: Hand off plan to grilling.

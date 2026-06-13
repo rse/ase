@@ -208,7 +208,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             tool! Instead, you *MUST* just show a custom output, let the
             user enter input, and then you set the result accordingly.
 
-            <expand name="custom-dialog">
+            <expand name="custom-dialog" arg1="--no-other">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Stop processing.
                 EDIT: Hand off plan to editing.

@@ -48,7 +48,7 @@ for the technology stack to *provide* the *needed functionality*
         tool! Instead, you *MUST* just show a custom output, let the
         user enter input, and then you set the result accordingly.
 
-        <expand name="custom-dialog">
+        <expand name="custom-dialog" arg1="--no-other">
             Functionality: Which functionality should the components provide?
             <answer-1/>: (grounded candidate functionality 1)
             <answer-2/>: (grounded candidate functionality 2)

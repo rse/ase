@@ -148,10 +148,10 @@ and then you set the result accordingly. For this, closely follow the
 following procedure:
 
 1.  Take the following question specification:
+    <spec><content/></spec>
 
-    <spec>
-        <content/>
-    </spec>
+    Take the following options:
+    <opts><arg1/></opts>
 
     The first line of <spec/> (separated by newlines) is of the format:
     `<question-label/>: <question-description/>`
@@ -196,6 +196,13 @@ following procedure:
             </else>
         </for>
 
+        <if condition="<opts/> contains `--other`">
+            Set <hint>Please choose *one* option by typing <keys/>/**CANCEL**, or other free-text instruction.</hint>.
+        </if>
+        <else>
+            Set <hint>Please choose *one* option by typing <keys/>/**CANCEL**.</hint>.
+        </else>
+
         Set:
 
         <text>
@@ -205,7 +212,7 @@ following procedure:
 
         <text/>
 
-        Please choose *one* option by typing <keys/>/**CANCEL** or free-text instruction.
+        <hint/>
 
         </ase-tpl-boxed>
         </text>
@@ -215,7 +222,8 @@ following procedure:
         and *SKIP* the following step 2 and continue with step 3 dispatch.
 
     2.  Output the following <template/>, end the current turn, wait for the
-        user input, store the user input in <result/> and then continue with step 3:
+        user input, store the user input in <result/> and then continue with
+        STEP 2 sub-step 3 below:
 
         <template>
         <text/>
@@ -224,19 +232,31 @@ following procedure:
     3.  Do not output anything in this step!
         Check the <result/> and dispatch accordingly:
 
-        1.  If <result/> is `CANCEL`, `REJECT`, or otherwise indicates
-            that the user doesn't want to proceed, or the user declined to
-            answer the question, or that the dialog was cancelled, rejected
-            or skipped, set <result>CANCEL</result>.
+        1.  If <result/> is `cancel`, `CANCEL`, `reject`, `REJECT`, or
+            otherwise indicates that the user doesn't want to proceed,
+            or the user declined to answer the question, or that
+            the dialog was cancelled, rejected or skipped, set
+            <result>CANCEL</result>.
 
         2.  Otherwise, determine the selected <label/>
             by mapping the <result/> (usually containing one of the
             "key" or "label" strings) to one of the answer labels in
             <spec/>. Set <result><label/></result>.
 
-        3.  If <result/> is then *NEITHER* one of the "key" *NOR*
-            "label" values from <spec/>, set <result>OTHER:
-            <result/></result> (prefix result with "OTHER").
+        3.  If <result/> is then *NEITHER* one of the "key"
+            *NOR* "label" values from <spec/>:
+            <if condition="<opts/> contains `--other`">
+                Set <result>OTHER: <result/></result>
+                (prefix result with "OTHER").
+            </if>
+            <else>
+                Output the following <template/> and then *START OVER*
+                by *GOING* to STEP 2 sub-step 2 above.
+
+                <template>
+                ⧉ **ASE**: ERROR: **Invalid option selected!**
+                </template>
+            </else>
 
 </define>
 

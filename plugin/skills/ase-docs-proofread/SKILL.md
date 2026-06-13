@@ -158,7 +158,7 @@ Analyze documents for spelling, punctuation, or grammar errors
             tool! Instead, you *MUST* just show a custom output, let the
             user enter input, and then you set the result accordingly.
 
-            <expand name="custom-dialog">
+            <expand name="custom-dialog" arg1="--other">
                 CORRECTION: How would you like to proceed with this proposed correction?
                 ACCEPT: Apply the proposed correction.
                 REJECT: Skip this proposed correction.

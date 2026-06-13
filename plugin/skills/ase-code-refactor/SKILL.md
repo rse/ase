@@ -242,7 +242,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         recommended approach plus zero or more answer options `A<n/>:
         <short-summary/>` for all other approaches:
 
-        <expand name="custom-dialog">
+        <expand name="custom-dialog" arg1="--no-other">
             Select Approach: Select your preferred refactoring approach to follow?
             A<n/>: <short-summary/>
             [...]
