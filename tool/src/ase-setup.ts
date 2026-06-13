@@ -463,6 +463,36 @@ export default class SetupCommand {
             { ignoreError: `MCP server "${name}" not registered` })
     }
 
+    /*  build a chat-model MCP handler from the per-model direct and
+        OPENROUTER url/api/model triples, factoring out the shared
+        mcp-to-openai stdio scaffold common to all chat-model servers  */
+    private chatMcpHandler (
+        direct: { url: string, api: string, model: string },
+        router: { model: string }
+    ): mcpServerSpec["handler"] {
+        return async (spec, tool, action, envKey, envVal) => {
+            if (action === "activate")
+                await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
+                    type: "stdio", command: [
+                        "npx", "-y", "mcp-to-openai",
+                        "--service",      spec.name,
+                        "--mcp-tool",     "query",
+                        ...(envKey === "OPENROUTER" ? [
+                            "--openai-url",   "https://openrouter.ai/api/v1",
+                            "--openai-api",   "completion",
+                            "--openai-model", router.model
+                        ] : [
+                            "--openai-url",   direct.url,
+                            "--openai-api",   direct.api,
+                            "--openai-model", direct.model
+                        ])
+                    ]
+                })
+            else
+                await this.mcpRemove(tool, spec.server)
+        }
+    }
+
     /*  registry of pre-defined MCP servers: maps each server id onto its
         dedicated handler which performs the activate/deactivate operation  */
     private mcpServers: mcpServerSpec[] = [
@@ -473,27 +503,9 @@ export default class SetupCommand {
             env:     [ "OPENAI_CHATGPT", "OPENROUTER" ],
             server:  "chat-openai-chatgpt",
             skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
-            handler: async (spec, tool, action, envKey, envVal) => {
-                if (action === "activate")
-                    await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
-                        type: "stdio", command: [
-                            "npx", "-y", "mcp-to-openai",
-                            "--service",      spec.name,
-                            "--mcp-tool",     "query",
-                            ...(envKey === "OPENROUTER" ? [
-                                "--openai-url",   "https://openrouter.ai/api/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "openai/gpt-5.5"
-                            ] : [
-                                "--openai-url",   "https://api.openai.com/v1",
-                                "--openai-api",   "responses",
-                                "--openai-model", "gpt-5.5"
-                            ])
-                        ]
-                    })
-                else
-                    await this.mcpRemove(tool, spec.server)
-            }
+            handler: this.chatMcpHandler(
+                { url: "https://api.openai.com/v1", api: "responses", model: "gpt-5.5" },
+                { model: "openai/gpt-5.5" })
         },
         {
             id:      "google-gemini",
@@ -502,27 +514,9 @@ export default class SetupCommand {
             env:     [ "GOOGLE_GEMINI", "OPENROUTER" ],
             server:  "chat-google-gemini",
             skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
-            handler: async (spec, tool, action, envKey, envVal) => {
-                if (action === "activate")
-                    await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
-                        type: "stdio", command: [
-                            "npx", "-y", "mcp-to-openai",
-                            "--service",      spec.name,
-                            "--mcp-tool",     "query",
-                            ...(envKey === "OPENROUTER" ? [
-                                "--openai-url",   "https://openrouter.ai/api/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "google/gemini-3.5-flash"
-                            ] : [
-                                "--openai-url",   "https://generativelanguage.googleapis.com/v1beta/openai/",
-                                "--openai-api",   "completion",
-                                "--openai-model", "gemini-3.5-flash"
-                            ])
-                        ]
-                    })
-                else
-                    await this.mcpRemove(tool, spec.server)
-            }
+            handler: this.chatMcpHandler(
+                { url: "https://generativelanguage.googleapis.com/v1beta/openai/", api: "completion", model: "gemini-3.5-flash" },
+                { model: "google/gemini-3.5-flash" })
         },
         {
             id:      "deepseek",
@@ -531,27 +525,9 @@ export default class SetupCommand {
             env:     [ "DEEPSEEK", "OPENROUTER" ],
             server:  "chat-deepseek",
             skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
-            handler: async (spec, tool, action, envKey, envVal) => {
-                if (action === "activate")
-                    await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
-                        type: "stdio", command: [
-                            "npx", "-y", "mcp-to-openai",
-                            "--service",      spec.name,
-                            "--mcp-tool",     "query",
-                            ...(envKey === "OPENROUTER" ? [
-                                "--openai-url",   "https://openrouter.ai/api/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "deepseek/deepseek-v4-flash"
-                            ] : [
-                                "--openai-url",   "https://api.deepseek.com/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "deepseek-v4-flash"
-                            ])
-                        ]
-                    })
-                else
-                    await this.mcpRemove(tool, spec.server)
-            }
+            handler: this.chatMcpHandler(
+                { url: "https://api.deepseek.com/v1", api: "completion", model: "deepseek-v4-flash" },
+                { model: "deepseek/deepseek-v4-flash" })
         },
         {
             id:      "xai-grok",
@@ -560,27 +536,9 @@ export default class SetupCommand {
             env:     [ "XAI_GROK", "OPENROUTER" ],
             server:  "chat-xai-grok",
             skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
-            handler: async (spec, tool, action, envKey, envVal) => {
-                if (action === "activate")
-                    await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
-                        type: "stdio", command: [
-                            "npx", "-y", "mcp-to-openai",
-                            "--service",      spec.name,
-                            "--mcp-tool",     "query",
-                            ...(envKey === "OPENROUTER" ? [
-                                "--openai-url",   "https://openrouter.ai/api/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "x-ai/grok-4.3"
-                            ] : [
-                                "--openai-url",   "https://api.x.ai/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "grok-4.3"
-                            ])
-                        ]
-                    })
-                else
-                    await this.mcpRemove(tool, spec.server)
-            }
+            handler: this.chatMcpHandler(
+                { url: "https://api.x.ai/v1", api: "completion", model: "grok-4.3" },
+                { model: "x-ai/grok-4.3" })
         },
         {
             id:      "alibaba-qwen",
@@ -589,27 +547,9 @@ export default class SetupCommand {
             env:     [ "ALIBABA_QWEN", "OPENROUTER" ],
             server:  "chat-alibaba-qwen",
             skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
-            handler: async (spec, tool, action, envKey, envVal) => {
-                if (action === "activate")
-                    await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
-                        type: "stdio", command: [
-                            "npx", "-y", "mcp-to-openai",
-                            "--service",      spec.name,
-                            "--mcp-tool",     "query",
-                            ...(envKey === "OPENROUTER" ? [
-                                "--openai-url",   "https://openrouter.ai/api/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "qwen/qwen3.7-max"
-                            ] : [
-                                "--openai-url",   "https://dashscope.aliyuncs.com/compatible-mode/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "qwen3.7-max"
-                            ])
-                        ]
-                    })
-                else
-                    await this.mcpRemove(tool, spec.server)
-            }
+            handler: this.chatMcpHandler(
+                { url: "https://dashscope.aliyuncs.com/compatible-mode/v1", api: "completion", model: "qwen3.7-max" },
+                { model: "qwen/qwen3.7-max" })
         },
         {
             id:      "zai-glm",
@@ -618,27 +558,9 @@ export default class SetupCommand {
             env:     [ "ZAI_GLM", "OPENROUTER" ],
             server:  "chat-zai-glm",
             skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
-            handler: async (spec, tool, action, envKey, envVal) => {
-                if (action === "activate")
-                    await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
-                        type: "stdio", command: [
-                            "npx", "-y", "mcp-to-openai",
-                            "--service",      spec.name,
-                            "--mcp-tool",     "query",
-                            ...(envKey === "OPENROUTER" ? [
-                                "--openai-url",   "https://openrouter.ai/api/v1",
-                                "--openai-api",   "completion",
-                                "--openai-model", "z-ai/glm-5.1"
-                            ] : [
-                                "--openai-url",   "https://api.z.ai/api/paas/v4/",
-                                "--openai-api",   "completion",
-                                "--openai-model", "glm-5.1"
-                            ])
-                        ]
-                    })
-                else
-                    await this.mcpRemove(tool, spec.server)
-            }
+            handler: this.chatMcpHandler(
+                { url: "https://api.z.ai/api/paas/v4/", api: "completion", model: "glm-5.1" },
+                { model: "z-ai/glm-5.1" })
         },
         {
             id:      "brave",
