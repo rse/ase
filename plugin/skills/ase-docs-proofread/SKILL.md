@@ -188,9 +188,15 @@ Analyze documents for spelling, punctuation, or grammar errors
 
                 Generate a *new* proposal for the *same* <item/>,
                 incorporating the user's free-text hint from <result/>
-                after the "OTHER:" prefix, and *go back* to substep 2 of
-                this `for`-iteration. There is *no* cap on refinement rounds -
-                keep refining until the user picks `ACCEPT` or `REJECT`.
+                after the "OTHER:" prefix. *Reassign* <description/>,
+                <old-text/>, and <new-text/> to reflect this refined
+                proposal (<old-text/> stays anchored to the existing text
+                at <file/>:<line/>; <new-text/> and <description/> carry the
+                refinement) so the subsequent rendering and any `Edit` use
+                the new proposal rather than the original. Then *go back* to
+                substep 2 of this `for`-iteration. There is *no* cap on
+                refinement rounds - keep refining until the user picks
+                `ACCEPT` or `REJECT`.
 
                 </if>
 

@@ -248,9 +248,15 @@ related to a set of code quality aspects.
             -   <if condition="<result/> starts with 'OTHER'">
                 Generate a *new* proposal for the *same* <item/>
                 (incorporating the user's free-text hint from <result/> if
-                provided via the "OTHER" prefix) and loop back to substep 2
-                of this iteration. There is *no* cap on refinement rounds -
-                keep refining until the user picks `ACCEPT` or `REJECT`.
+                provided via the "OTHER" prefix). *Reassign* <description/>
+                and <change-set/> to reflect this refined proposal (each
+                change-hunk's `old_text` stays anchored to the existing
+                text at its `file`:`line`; `new_text` carries the
+                refinement) so that the substep 2/3 rebuild renders the new
+                <diff/> and any `Edit` applies the new proposal rather than
+                the original. Then loop back to substep 2 of this iteration.
+                There is *no* cap on refinement rounds - keep refining until
+                the user picks `ACCEPT` or `REJECT`.
                 </if>
 
             -   <if condition="
