@@ -121,9 +121,11 @@ Honor the following tenets throughout the brainstorming:
             question <question-M/>, and let the user select the
             <answer-M/> out of the candidate answers <answer-M-K/> (leave
             out the answer lines of those candidate answers you have
-            not determined). For this you *MUST* use the custom
-            `custom-dialog` and *NOT* the `AskUserQuestion` based
-            "user-dialog":
+            not determined).
+
+            In the following, you *MUST* *NOT* use the <user-dialog-tool/>
+            tool! Instead, you *MUST* just show a custom output, let the
+            user enter input, and then you set the result accordingly.
 
             <expand name="custom-dialog">
                 <facet-M/>: <question-M/>

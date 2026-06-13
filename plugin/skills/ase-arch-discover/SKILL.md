@@ -42,8 +42,11 @@ for the technology stack to *provide* the *needed functionality*
 
     2.  If <functionality/> is not clear, not precise, or not specific
         enough, let the *user interactively choose* the intended
-        functionality. For this you *MUST* use the custom `custom-dialog`
-        and *NOT* the `AskUserQuestion` based "user-dialog":
+        functionality.
+
+        In the following, you *MUST* *NOT* use the <user-dialog-tool/>
+        tool! Instead, you *MUST* just show a custom output, let the
+        user enter input, and then you set the result accordingly.
 
         <expand name="custom-dialog">
             Functionality: Which functionality should the components provide?

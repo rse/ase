@@ -154,9 +154,9 @@ Analyze documents for spelling, punctuation, or grammar errors
 
         4.  <if condition="<getopt-option-auto/> is not 'true'">
 
-            Let the *user interactively choose* what to do as the next
-            step. For this you *MUST* use the custom `custom-dialog` and
-            not the `AskUserQuestion` based `user-dialog`:
+            In the following, you *MUST* *NOT* use the <user-dialog-tool/>
+            tool! Instead, you *MUST* just show a custom output, let the
+            user enter input, and then you set the result accordingly.
 
             <expand name="custom-dialog">
                 CORRECTION: How would you like to proceed with this proposed correction?

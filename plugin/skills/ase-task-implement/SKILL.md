@@ -184,9 +184,10 @@ explicitly requested by this procedure via outputs based on a <template/>!
                 </template>
 
         -   If <getopt-option-next/> is equal to `none`:
-            Let the *user interactively choose* what to do as the next
-            step. For this you *MUST* use the custom `custom-dialog` and
-            *NOT* the `AskUserQuestion` based "user-dialog":
+
+            In the following, you *MUST* *NOT* use the <user-dialog-tool/>
+            tool! Instead, you *MUST* just show a custom output, let the
+            user enter input, and then you set the result accordingly.
 
             <expand name="custom-dialog">
                 Next Step: How would you like to proceed with the plan?

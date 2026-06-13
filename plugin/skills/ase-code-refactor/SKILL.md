@@ -230,16 +230,17 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
     7.  <if condition="<getopt-option-auto/> is not `true`">
 
-        You *MUST* use the custom `custom-dialog` and *NOT* the
-        `AskUserQuestion`-based `user-dialog` to let the *user
-        interactively choose* the preferred approach A<n/>.
+        In the following, you *MUST* *NOT* use the <user-dialog-tool/>
+        tool! Instead, you *MUST* just show a custom output, let the
+        user enter input, and then you set the result accordingly.
 
-        Per approach A<n/>, use the option `A<n/>: <short-summary/>`
-        where <short-summary/> is an ultra brief summary of the approach
-        A<n/>. For your recommended approach, use
-        `A<n/>: ⚝ **RECOMMENDATION** ⚝: <short-summary/>` instead.
-
-        Now raise the user dialog:
+        Let the user choose the preferred approach A<n/> by raising
+        a question with the following custom dialog, where per
+        approach A<n/>, you determine an ultra brief summary
+        <short-summary/> and then use the answer option `A<n/>:
+        ⚝ **RECOMMENDATION** ⚝: <short-summary/>` for your
+        recommended approach plus zero or more answer options `A<n/>:
+        <short-summary/>` for all other approaches:
 
         <expand name="custom-dialog">
             Select Approach: Select your preferred refactoring approach to follow?
