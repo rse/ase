@@ -165,13 +165,14 @@ Let the *user interactively choose* an answer.
     1.  Set <text></text> (set to empty).
         Set <keys></keys> (set to empty).
         Set <n>1</n> (set entry count to one).
+        Set <width/> to the maximum length plus 3 of all <label/> strings in <spec/>.
 
         <for items="2 3 4 5 6 7 8 9">
             Take from <spec/> the line number <item/>.
             If this line does not exist, <break/>.
             If this line exists, parse it according to the format `<label/>: <description/>`.
             Set <label-key/> to <ase-tpl-key digit="<n/>"/>.
-            Set <label-text/> to `<ase-tpl-pad width="15" text="<label/>:"/>`.
+            Set <label-text/> to `<ase-tpl-pad width="<width/>" text="<label/>:"/>`.
             Append an entry to <text/>:
 
             <text>
