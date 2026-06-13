@@ -233,13 +233,22 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 5.  **Choose Feature Crafting Approach**:
 
     1.  <if condition="<getopt-option-auto/> is equal `false`">
-        Let the *user interactively choose* the preferred feature
-        approach A<n/> with the help of the <user-dialog-tool/> tool.
-        Use the header `Select Approach`, use `A<n/>: <short-summary/>`
-        for the option (where <short-summary/> is an ultra brief summary
-        of the approach A<n/>), and *single-selection* only and provide
-        small *code change previews*. Mark your recommended feature
-        approach with ` ⚝ **RECOMMENDATION** ⚝` here again.
+        You *MUST* use the custom `custom-dialog` and *NOT* the
+        `AskUserQuestion`-based `user-dialog` to let the *user
+        interactively choose* the preferred feature approach A<n/>.
+
+        Per approach A<n/>, use the option `A<n/>: <short-summary/>`
+        where <short-summary/> is an ultra brief summary of the approach
+        A<n/>. For your recommended feature approach, use
+        `A<n/>: ⚝ **RECOMMENDATION** ⚝: <short-summary/>` instead.
+
+        Now raise the user dialog:
+
+        <expand name="custom-dialog">
+            Select Approach: Select your preferred crafting approach to follow?
+            A<n/>: <short-summary/>
+            [...]
+        </expand>
         </if>
 
     2.  <else>
