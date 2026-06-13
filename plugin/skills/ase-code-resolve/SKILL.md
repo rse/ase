@@ -253,35 +253,14 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <template>
         ●   **APPROACH A<n/>**<annotation/>: *<summary/>*
         ○   [...]
-        ○   [...]
-        ○   [...]
         ⊕   **PRO**: [...]
         ⊖   **CON**: [...]
-        <optional-diagram/>
         </template>
 
         Hints:
 
         -   Give a short one-sentence <summary/> of the resolution
             approach plus *precise* and *ultra brief and concise*
-            resolution information. Try to keep the number of bullet
-            points (●) in the range of 1-4.
-
-        -   In case of a *complex resolution situation* only,
-            visualize it with an optional diagram <optional-diagram/>
-            by building a Mermaid specification <mermaid-spec/>
-            (e.g. `flowchart TB`, `stateDiagram-v2`, `sequenceDiagram`,
-            `classDiagram`, or `erDiagram`, depending on intent) and
-            dispatching the rendering to the `ase-meta-diagram`
-            sub-agent by calling the tool `Agent(name: "ase-meta-diagram",
-            description: "Diagram Rendering", subagent_type:
-            "ase:ase-meta-diagram", prompt: <mermaid-spec/>)`, reproducing
-            its returned fenced code block verbatim. For *current
-            vs. proposed* comparisons, render each side as a *separate*
-            `ase-meta-diagram` invocation and stack the rendered blocks
-            *vertically* (labels `**Before:**` / `**After:**`); never
-            side-by-side. Omit <optional-diagram/> entirely for simple
-            or purely local situations.
 
     6.  Indicate end of reporting by showing the following <template/>:
 
