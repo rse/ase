@@ -2,20 +2,33 @@
 ChangeLog
 =========
 
-0.9.9 (2026-06-12)
+0.9.9 (2026-06-13)
 ------------------
 
+- FEATURE: add focus-mode-capable `custom-dialog` construct (non-`AskUserQuestion`) for intermediate questions (`ase-dialog.md`)
+- IMPROVEMENT: migrate skills to `custom-dialog` for Claude Code focus-mode support (task-*, code-*, docs-proofread, meta-brainstorm)
+- IMPROVEMENT: migrate `ase-code-{craft,refactor,resolve}` skills to the `<flow>`/`<step>` mechanism
+- IMPROVEMENT: make steps ordered and use `custom-dialog` in `ase-arch-discover` skill
+- IMPROVEMENT: support auto-approval of the `Edit` tool for some skills (`ase-hook.ts`)
+- IMPROVEMENT: add numbered-key and box-drawing/padding render helpers (`ase-skill.md`)
+- IMPROVEMENT: strengthen the local option-parsing optimization pressure (`ase-getopt.md`)
 - IMPROVEMENT: support double-backtick code spans with escaped backticks (`ase-markdown.ts`)
 - IMPROVEMENT: allow statusline chunks to line-break within color spans (`ase-statusline.ts`)
 - IMPROVEMENT: add hyperlinks to all skill `help.md` files
 - IMPROVEMENT: handle restarts where the service port could have changed (`ase-service.ts`)
 - IMPROVEMENT: enforce `project.artifact.task.files` glob symmetrically across all task operations (`ase-task.ts`)
 - IMPROVEMENT: follow non-quiet failure handling in the quiet path on final attempt in `ase setup` (`ase-setup.ts`)
+- BUGFIX: do not set `agent.skill` from hooks as it cannot be reliably cleared again (`ase-hook.ts`)
+- BUGFIX: remove the optional diagram from `ase-code-*` skills as it conflicts with focus mode
 - BUGFIX: fix mis-slicing of verbatim trailing-arg string for value-consuming options (`ase-getopt.ts`)
 - BUGFIX: make MCP HTTP close/shutdown/reconnect handling more robust (`ase-mcp.ts`)
 - BUGFIX: prevent `computeRank` from collapsing to zero on genuine `0` or unavailable metrics (`ase-skills.ts`)
 - BUGFIX: fix regexp and comment format in `ase-task.ts`
+- BUGFIX: fix grammar in `ase-meta-brainstorm` and `ase-meta-diff` skills
 - UPDATE: upgrade NPM dependencies
+- REFACTOR: factor out similar code to shrink `ase-setup.ts`
+- REFACTOR: use the `HOST` variable for alignment and improve portability (`ase-service.ts`, `ase-hook.ts`)
+- CLEANUP: align skill style and wording across `ase-code-*`, dialog, and meta files
 
 0.9.8 (2026-06-12)
 ------------------
