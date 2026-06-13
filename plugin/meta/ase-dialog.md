@@ -194,7 +194,7 @@ Let the *user interactively choose* an answer.
         Set:
 
         <text>
-        <ase-tpl-boxed title="USER DIALOG" subtitle="<question-label/>">
+        <ase-tpl-boxed title="QUESTION" subtitle="<question-label/>">
 
         <ase-tpl-boxline>**<question-description/>**</ase-tpl-boxline>
 
