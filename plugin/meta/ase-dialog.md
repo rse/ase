@@ -11,6 +11,7 @@ User Dialog
 </if>
 
 <define name="user-dialog">
+
 Let the *user interactively choose* an answer.
 
 1.  Take the following question specification:
@@ -140,7 +141,11 @@ Let the *user interactively choose* an answer.
 </define>
 
 <define name="custom-dialog">
-Let the *user interactively choose* an answer.
+
+In the following, you *MUST* *NOT* use the <user-dialog-tool/> tool!
+Instead, you *MUST* just show a custom output, let the user enter input,
+and then you set the result accordingly. For this, closely follow the
+following procedure:
 
 1.  Take the following question specification:
 
@@ -194,7 +199,7 @@ Let the *user interactively choose* an answer.
         Set:
 
         <text>
-        <ase-tpl-boxed title="QUESTION" subtitle="<question-label/>">
+        <ase-tpl-boxed title="DIALOG" subtitle="<question-label/>">
 
         <ase-tpl-boxline>**<question-description/>**</ase-tpl-boxline>
 
@@ -216,22 +221,22 @@ Let the *user interactively choose* an answer.
         <text/>
         </template>
 
-    3.  Check the result and dispatch accordingly:
+    3.  Do not output anything in this step!
+        Check the <result/> and dispatch accordingly:
 
-        -   If <result/> indicates that the user doesn't want to proceed,
-            or the user declined to answer the question, or that the dialog
-            was cancelled, rejected or skipped, set <result>CANCEL</result>.
+        1.  If <result/> is `CANCEL`, `REJECT`, or otherwise indicates
+            that the user doesn't want to proceed, or the user declined to
+            answer the question, or that the dialog was cancelled, rejected
+            or skipped, set <result>CANCEL</result>.
 
-        -   Otherwise, determine the selected <label/>
+        2.  Otherwise, determine the selected <label/>
             by mapping the <result/> (usually containing one of the
-            "key" or "label" strings) to one of the answer labels. Set
-            <result><label/></result>.
+            "key" or "label" strings) to one of the answer labels in
+            <spec/>. Set <result><label/></result>.
 
-            If <result/> is then *NOT* one of the "label" values from
-            <spec/>, set <result>OTHER: <result/></result> (prefix
-            result with "OTHER").
-
-        Do not output anything in this step!
+        3.  If <result/> is then *NEITHER* one of the "key" *NOR*
+            "label" values from <spec/>, set <result>OTHER:
+            <result/></result> (prefix result with "OTHER").
 
 </define>
 
