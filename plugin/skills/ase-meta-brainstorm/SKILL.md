@@ -1,6 +1,6 @@
 ---
 name: ase-meta-brainstorm
-argument-hint: "[--help|-h] [--max-clarify|-c=3] [--min-ideas|-i=12] [--min-rank|-r=7] [--max-shortlist|-s=4] <topic>"
+argument-hint: "[--help|-h] [--max-clarify|-c <num>] [--min-ideas|-i <num>] [--min-rank|-r <num>] [--max-shortlist|-s <num>] <topic>"
 description: >
     Collaboratively brainstorm a topic by diverging on ideas, converging
     through clustering and scoring, and distilling a shortlist with
