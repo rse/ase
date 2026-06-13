@@ -376,7 +376,7 @@ Set <content-dirty>true</content-dirty>.
         -   If <getopt-option-next/> is equal to `none`:
             Let the *user interactively choose* what to do as the next
             step. For this you *MUST* use the custom `custom-dialog` and
-            not the `AskUserQuestion` based "user-dialog"
+            *NOT* the `AskUserQuestion` based "user-dialog":
 
             <expand name="custom-dialog">
                 Next Step: How would you like to proceed with the plan?
