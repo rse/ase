@@ -162,8 +162,8 @@ export class GetoptMCP {
                         ranges.push({ start, end: i })
                     }
 
-                    /* helper function: strip surrounding quotes/escapes from a raw range
-                       so it can be compared against an option flag spelling */
+                    /*  helper function: strip surrounding quotes/escapes from a raw
+                        range so it can be compared against an option flag spelling  */
                     const unquote = (s: string) => {
                         let out = ""
                         let j = 0
