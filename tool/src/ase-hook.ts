@@ -389,6 +389,27 @@ export default class HookCommand {
         }
     }
 
+    /*  write the session-scoped "agent.skill" config value  */
+    private writeActiveSkill (sessionId: string, skill: string): void {
+        if (!this.isValidSessionId(sessionId))
+            return
+        try {
+            const cfg = new Config("config", configSchema, this.log, parseScope(`session:${sessionId}`))
+            cfg.lock(() => {
+                cfg.read()
+                cfg.set("agent.skill", skill)
+                cfg.write()
+            })
+        }
+        catch (_e) {
+            /*  best-effort: ignore failures  */
+        }
+    }
+
+    /*  the edit-capable skills whose active state lets the pre-tool-use
+        hook auto-approve subsequent "Edit" invocations  */
+    private editCapableSkills = [ "ase-code-lint", "ase-docs-proofread" ]
+
     /*  handler for "ase hook pre-tool-use" (both tools)  */
     private doPreToolUse (tool: Tool): number {
         const spec = toolSpecs[tool]
@@ -422,6 +443,13 @@ export default class HookCommand {
         else if (toolName === "Skill" && /^(?:ase:)?ase-.+/.test(toolInput.skill ?? "")) {
             approve = true
             reason  = "ASE skill invocation auto-approved"
+            /*  for edit-capable skills, record the active skill now so that
+                subsequent "Edit" invocations auto-approve without relying on
+                the skill body issuing ase_config_set itself (which is silent
+                and easy to skip or reorder relative to the first Edit)  */
+            const skill = (toolInput.skill ?? "").replace(/^ase:/, "")
+            if (this.editCapableSkills.includes(skill))
+                this.writeActiveSkill(this.pickSessionId(input), skill)
         }
         else if (spec.mcpToolNamePattern.test(toolName)) {
             approve = true
@@ -434,7 +462,7 @@ export default class HookCommand {
         else if (toolName === "Edit") {
             const sessionId   = this.pickSessionId(input)
             const activeSkill = this.readActiveSkill(sessionId)
-            if (activeSkill === "ase-docs-proofread" || activeSkill === "ase-code-lint") {
+            if (this.editCapableSkills.includes(activeSkill)) {
                 approve = true
                 reason  = `${activeSkill}: user already consented via AskUserQuestion`
             }
