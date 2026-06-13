@@ -269,6 +269,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
         -   Give a short one-sentence <summary/> of the resolution
             approach plus *precise* and *ultra brief and concise*
+            resolution information. Try to keep the number of bullet points
+            (`○ [...]`) in the range of 1-4.
 
     6.  Indicate end of reporting by showing the following <template/>:
 
@@ -280,11 +282,11 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
         You *MUST* use the custom `custom-dialog` and *NOT* the
         `AskUserQuestion`-based `user-dialog` to let the *user
-        interactively choose* the preferred feature approach A<n/>.
+        interactively choose* the preferred approach A<n/>.
 
         Per approach A<n/>, use the option `A<n/>: <short-summary/>`
         where <short-summary/> is an ultra brief summary of the approach
-        A<n/>. For your recommended feature approach, use
+        A<n/>. For your recommended approach, use
         `A<n/>: ⚝ **RECOMMENDATION** ⚝: <short-summary/>` instead.
 
         Now raise the user dialog:
