@@ -53,7 +53,9 @@ You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
 filesystem-modifying tool during this entire skill. The *only*
 permitted way to persist artifacts is via `ase_task_save(...)`.
 
-1.  **Reason About Feature**:
+<flow>
+
+1.  <step id="STEP 1: Reason About Feature">
 
     1.  <if condition="
             <feature/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
@@ -114,7 +116,9 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
     8.  Do not output anything in this step, unless you asked the user.
 
-2.  **Investigate Code Base**:
+    </step>
+
+2.  <step id="STEP 2: Investigate Code Base">
 
     1.  Check the existing source files for all code which is related to the
         requested new <feature/>.
@@ -122,9 +126,11 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     2.  Check the architecture of the existing code base to understand the
         overall structures and dynamics.
 
-    3.  Do not output anything in this step.
+    3.  Do not output anything in this STEP 2.
 
-3.  **Internalize Crafting Tenets**:
+    </step>
+
+3.  <step id="STEP 3: Internalize Crafting Tenets">
 
     You *MUST* internalize and honor the following tenets when crafting the new feature.
     Do not output anything.
@@ -179,7 +185,9 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             Honor the non-functional requirements Performance, Security,
             Scalability, Comprehensibility.
 
-4.  **Find Feature Crafting Approaches**:
+    </step>
+
+4.  <step id="STEP 4: Choose Feature Crafting Approaches">
 
     You *MUST* perform the following sub-steps *internally* and *without
     any output* until and including the recommendation decision. Only
@@ -230,9 +238,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <ase-tpl-foot title="APPROACHES"/>
         </template>
 
-5.  **Choose Feature Crafting Approach**:
+    7.  <if condition="<getopt-option-auto/> is not equal 'true'">
 
-    1.  <if condition="<getopt-option-auto/> is equal `false`">
         You *MUST* use the custom `custom-dialog` and *NOT* the
         `AskUserQuestion`-based `user-dialog` to let the *user
         interactively choose* the preferred feature approach A<n/>.
@@ -249,18 +256,22 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             A<n/>: <short-summary/>
             [...]
         </expand>
-        </if>
 
-    2.  <else>
+        </if>
+        <else>
+
         Set <n/> to the number of the feature approach A<n/> you recommend.
         Output a hint with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **auto-chosen approach A<n/>**
         </template>
+
         </else>
 
-6.  **Compose Feature Crafting Plan**:
+    </step>
+
+5.  <step id="STEP 5: Compose Feature Crafting Plan">
 
     1.  *Compose a feature plan* for the chosen feature A<n/> by
         closely aligning to the existing architecture and the existing
@@ -341,3 +352,6 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             Then call the tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`.
             </else>
 
+    <step>
+
+</flow>

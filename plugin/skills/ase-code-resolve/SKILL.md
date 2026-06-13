@@ -53,7 +53,9 @@ You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
 filesystem-modifying tool during this entire skill. The *only*
 permitted way to persist artifacts is via `ase_task_save(...)`.
 
-1.  **Reason About Problem**:
+<flow>
+
+1.  <step id="STEP 1: Reason About Problem">
 
     1.  If <problem/> matches the regexp `^[PT]\d+$` (i.e. a bare issue
         identifier like `P1`, `P2`, `T1`, `T2`, ...),
@@ -166,7 +168,9 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
           verbatim. Omit <optional-diagram/> entirely for simple or
           purely local situations.
 
-2.  **Investigate Code Base**:
+    </step>
+
+2.  <step id="STEP 2: Investigate Code Base">
 
     1.  Check the existing source files for all code which is related to the
         requested <problem/> resolution.
@@ -174,9 +178,11 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     2.  Check the architecture of the existing code base to understand the
         overall structures and dynamics.
 
-    3.  Do not output anything in this step.
+    3.  Do not output anything in this STEP 2.
 
-3.  **Internalize Problem Resolution Tenets**:
+    </step>
+
+3.  <step id="STEP 3: Internalize Problem Resolution Tenets">
 
     You *MUST* internalize and honor the following tenets when resolving the problem.
     Do not output anything.
@@ -218,7 +224,9 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             *theoretical, fictive, or unexpected* errors *should* be
             handled more generally and in parent scopes.
 
-4.  **Find Problem Resolution Approaches**:
+    </step>
+
+4.  <step id="STEP 4: Choose Problem Resolution Approaches">
 
     You *MUST* perform the following sub-steps *internally* and *without
     any output* until and including the recommendation decision. Only
@@ -268,9 +276,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <ase-tpl-foot title="APPROACHES"/>
         </template>
 
-5.  **Choose Problem Resolution Approach**:
+    7.  <if condition="<getopt-option-auto/> is not 'true'">
 
-    1.  <if condition="<getopt-option-auto/> is not 'true'">
         You *MUST* use the custom `custom-dialog` and *NOT* the
         `AskUserQuestion`-based `user-dialog` to let the *user
         interactively choose* the preferred feature approach A<n/>.
@@ -287,18 +294,22 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             A<n/>: <short-summary/>
             [...]
         </expand>
-        </if>
 
-    2.  <else>
+        </if>
+        <else>
+
         Set <n/> to the number of the resolution approach A<n/> you recommend.
         Output a hint with the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **auto-chosen approach A<n/>**
         </template>
+
         </else>
 
-6.  **Compose Problem Resolution Plan**:
+    </step>
+
+5.  <step id="STEP 5: Compose Problem Resolution Plan">
 
     1.  *Compose a plan* with code references, a precise description of the
         problem, the chosen resolution approach, a preview of the *unified
@@ -385,4 +396,8 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             </if>
             Then call the tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`.
             </else>
+
+    <step>
+
+</flow>
 
