@@ -2,7 +2,7 @@
 name: ase-meta-diaboli
 argument-hint: "[--help|-h] [--count|-c <count>] <thesis>"
 description: >
-    Challenge a thesis by playing "Devil’s Advocate" (latin: "Advocatus
+    Challenge a thesis by playing "Devil’s Advocate" (Latin: "Advocatus
     Diaboli"). Use when the user wants a thesis or statement
     relentlessly challenged or criticised.
 user-invocable: true
@@ -25,7 +25,7 @@ effort: xhigh
 </expand>
 
 <objective>
-    Play "Devil’s Advocate" (latin: "Advocatus Diaboli") by relentlessly
+    Play "Devil’s Advocate" (Latin: "Advocatus Diaboli") by relentlessly
     challenging or criticising the thesis: <thesis><getopt-arguments/></thesis>
 </objective>
 
@@ -48,7 +48,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 2.  <step id="STEP 2: Determine Anti-Theses">
 
     Reason on the thesis in <thesis/> by playing *Devil's Advocate*
-    (latin: *Advocatus Diaboli*) by relentlessly challenging or
+    (Latin: *Advocatus Diaboli*) by relentlessly challenging or
     criticising it with the help of the following tenets:
 
     -   **Steelmanning**:
@@ -88,7 +88,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 
     -   **Push the Logic to its Conclusion**:
         Ask "If we accept this, then what?" and apply "Reduction to
-        Absurdity" (latin: "Reductio Ad Absurdum"), because this disproves
+        Absurdity" (Latin: "Reductio Ad Absurdum"), because this disproves
         the thesis by showing that accepting it leads to a logically
         absurd, contradictory, or impossible conclusion.
 

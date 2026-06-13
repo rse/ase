@@ -109,7 +109,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         3.  For each discovered *intent group*, emit the following row
             <template/>, where <intent/> is the intent label, <changes/>
-            is the total number of lines changes per feature in format
+            is the total number of lines changed per feature in format
             `+N/-M`, <files/> is the list of affected file references,
             and <description/> is a *brief* one-to-two-sentence
             narrative of what changed and why:
