@@ -171,13 +171,14 @@ following procedure:
 
         Set <text></text> (set to empty).
         Set <keys></keys> (set to empty).
-        Set <n>1</n> (set entry count to one).
+        Set <n>0</n> (set entry count to zero).
         Set <width/> to the maximum length plus 3 of all <label/> strings in <spec/>.
 
         <for items="2 3 4 5 6 7 8 9">
             Take from <spec/> the line number <item/>.
             If this line does not exist, <break/>.
             If this line exists, parse it according to the format `<label/>: <description/>`.
+            Set <n/> to <n/> + 1 (increment entry count).
             Set <label-key/> to <ase-tpl-key digit="<n/>"/>.
             Set <label-text/> to `<ase-tpl-pad width="<width/>" text="<label/>:"/>`.
             Append an entry to <text/>:
@@ -187,7 +188,6 @@ following procedure:
             <ase-tpl-boxline><label-key/>  ▶  **<label-text/>** <description/></ase-tpl-boxline>
             </text>
 
-            Set <n/> to <n/> + 1 (increment entry count).
             <if condition="<keys/> is empty">
                 Set <keys><label-key/></keys>
             </if>
@@ -217,8 +217,8 @@ following procedure:
         </ase-tpl-boxed>
         </text>
 
-        If <n/> is less than 3:
-        Set <result>ERROR: user-dialog requires 2-8 answer lines, got less</result>
+        If <n/> is less than 2:
+        Set <result>ERROR: custom-dialog requires 2-8 answer lines, got <n/></result>
         and *SKIP* the following step 2.2 and continue with step 2.3 dispatch.
 
     2.  Output the following <template/>, end the current turn, wait for the
