@@ -84,7 +84,7 @@ ARCH-04-CO Concurrency View     ──(hosts)─►      ARCH-02-FV Functionalit
 ARCH-06-DP Deployment View      ──(hosts)─►      ARCH-02-FV Functionality View
 ARCH-07-OV Operations View      ──(element)─►    ARCH-02-FV Functionality View
 ARCH-07-OV Operations View      ──(element)─►    ARCH-06-DP Deployment View
-ARCH-08-QP Quality Perspectives ──(addresses)─►  SPEC-04-NR Non-Functional Requirements
+ARCH-08-QP Quality Perspectives ──(addresses)─►  SPEC-05-NR Non-Functional Requirements
 ARCH-08-QP Quality Perspectives ──(affects)─►    ARCH-02-FV Functionality View
 ARCH-08-QP Quality Perspectives ──(affects)─►    ARCH-06-DP Deployment View
 ARCH-09-DR Decision Record      ──(affects)─►    ARCH-02-FV Functionality View
