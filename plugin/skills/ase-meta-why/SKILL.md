@@ -123,10 +123,12 @@ addressing surface-level symptoms.
 
             Then choose, among the <answer-k/>, the *most causally-significant*
             candidate -- the one most likely to lead to the true root-cause --
-            and *justify* the choice in one line (state explicitly *why* it
-            beats the other candidates, e.g. it alone also explains the timing,
-            scope, or magnitude of the level's fact). A bare "most significant"
-            is *not* sufficient; if no candidate clearly dominates, say so.
+            set <chosen-k/> to its candidate index (the <k/> of the chosen
+            <answer-k/>), and *justify* the choice in one line (state explicitly
+            *why* it beats the other candidates, e.g. it alone also explains the
+            timing, scope, or magnitude of the level's fact). A bare "most
+            significant" is *not* sufficient; if no candidate clearly dominates,
+            say so.
 
             <template>
             <ase-tpl-bullet-secondary/> **WHY <n/> → chosen <n/>.<chosen-k/>**: <justification/>
