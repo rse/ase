@@ -169,7 +169,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Judge overall *coherence* from the flagged hunks: the diff
         is `COHERENT` when there are *no* `SCOPE-CREEP` and *no*
         `STRAY-DEBUG` deviations, otherwise it is `INCOHERENT`. Store
-        the result is <verdict/>.
+        the result in <verdict/>.
 
     4.  Emit the following header <template/>:
 
