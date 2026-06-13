@@ -121,9 +121,11 @@ Honor the following tenets throughout the brainstorming:
             question <question-M/>, and let the user select the
             <answer-M/> out of the candidate answers <answer-M-K/> (leave
             out the answer lines of those candidate answers you have
-            not determined)
+            not determined). For this you *MUST* use the custom
+            `custom-dialog` and *NOT* the `AskUserQuestion` based
+            "user-dialog":
 
-            <expand name="user-dialog">
+            <expand name="custom-dialog">
                 <facet-M/>: <question-M/>
                 <answer-M-1/>: (first grounded candidate answer)
                 <answer-M-2/>: (second grounded candidate answer)

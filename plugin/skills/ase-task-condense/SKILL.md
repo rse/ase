@@ -203,9 +203,11 @@ explicitly requested by this procedure via outputs based on a <template/>!
                 </template>
 
         -   If <getopt-option-next/> is equal to `none`:
-            Let the *user interactively choose* what to do as the next step.
+            Let the *user interactively choose* what to do as the next
+            step. For this you *MUST* use the custom `custom-dialog` and
+            *NOT* the `AskUserQuestion` based "user-dialog":
 
-            <expand name="user-dialog">
+            <expand name="custom-dialog">
                 Next Step: How would you like to proceed with the plan?
                 DONE: Stop processing.
                 EDIT: Hand off plan to editing.

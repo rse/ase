@@ -226,9 +226,11 @@ Set <content-dirty>true</content-dirty>.
             Set <result><getopt-option-plan/></result>.
 
         -   If <getopt-option-plan/> is equal to `none`:
-            Let the *user interactively choose* what to do as the next step.
+            Let the *user interactively choose* what to do as the next
+            step. For this you *MUST* use the custom `custom-dialog` and
+            *NOT* the `AskUserQuestion` based "user-dialog":
 
-            <expand name="user-dialog">
+            <expand name="custom-dialog">
                 Previous Plan: Should the previous plan content be overwritten, refined, or preserved?
                 OVERWRITE: Continue operation, overwrite previous plan.
                 REFINE: Continue operation, refine previous plan.
