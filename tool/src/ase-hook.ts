@@ -117,7 +117,7 @@ export default class HookCommand {
         return text.replace(/@(\S+)/g, (match, ref: string) => {
             let resolved = ref
             if (resolved.startsWith("~/"))
-                resolved = path.join(process.env.HOME ?? "", resolved.slice(2))
+                resolved = path.join(os.homedir(), resolved.slice(2))
             const abs = path.isAbsolute(resolved) ? resolved : path.resolve(baseDir, resolved)
             if (visited.has(abs))
                 return match
