@@ -227,12 +227,12 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-head title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (70 - 16 - length("<title/>")), i.e., <bar/> is
-    the "─" character repeated (70 - 16 - length("<title/>")) times):
+    (where <bar/> = "─" x (78 - 31 - length("<title/>")), i.e., <bar/> is
+    the "─" character repeated (78 - 31 - length("<title/>")) times):
 
     <template>
 
-    ╭────━━━━**(** `<title/>` **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+    ╭────━━━━**(** **`<title/>`** **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
 
     </template>
 
@@ -245,12 +245,12 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (70 - 16 - length("<title/>")), i.e., <bar/> is
-    the "─" character repeated (70 - 16 - length("<title/>")) times):
+    (where <bar/> = "─" x (78 - 31 - length("<title/>")), i.e., <bar/> is
+    the "─" character repeated (78 - 31 - length("<title/>")) times):
 
     <template>
 
-    ╰────━━━━**(** `<title/>` **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
+    ╰────━━━━**(** **`<title/>`** **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
 
     </template>
 
