@@ -8,13 +8,13 @@ Do not output anything in the following steps. The entire purpose is to
 set placeholders into the context as a side-effect.
 
 1.  **Determine Parameters**:
-    Set <getopt-skill><arg1/></getopt-skill>.
-    Set <getopt-spec>--help|-h <arg2/></getopt-spec>.
-    Set <getopt-args><content/></getopt-args>.
+    Set <getopt-skill><arg1/></getopt-skill>
+    Set <getopt-spec>--help|-h <arg2/></getopt-spec>
+    Set <getopt-args><content/></getopt-args>
 
 2.  **Short-Circuit Processing**:
-    If <getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e.
-    contains no options at all):
+    If <getopt-args/> does *NOT* match the regexp `(^|\s)-`
+    (i.e. contains no option at the start at all):
 
     For each option token in <getopt-spec/> of the form
     `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)[...]]`, set
