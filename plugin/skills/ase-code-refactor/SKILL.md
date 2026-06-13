@@ -55,7 +55,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
 <flow>
 
-1.  <step id="STEP1: Reason About Refactoring">
+1.  <step id="STEP 1: Reason About Refactoring">
 
     1.  <if condition="
             <request/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
