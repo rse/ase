@@ -172,8 +172,10 @@ following procedure:
         Set <text></text> (set to empty).
         Set <keys></keys> (set to empty).
         Set <n>0</n> (set entry count to zero).
-        Set <width/> to the maximum length plus 3 of all <label/> strings in lines 2 to 9
-        of <spec/> (the answer labels only, excluding the question label on line 1).
+        Set <width/> to the maximum length plus 3 of the <label/> strings in the
+        contiguous answer lines of <spec/> starting at line 2 (the answer labels only,
+        excluding the question label on line 1, and stopping at the first missing line --
+        the same lines the entry loop below renders).
 
         <for items="2 3 4 5 6 7 8 9">
             Take from <spec/> the line number <item/>.
