@@ -2,8 +2,28 @@
 ChangeLog
 =========
 
-0.9.10 (2026-06-13)
+0.9.10 (2026-06-14)
 -------------------
+
+- FEATURE: distinguish dialogs that allow free-text instructions from those that do not (`ase-dialog.md`, many skills)
+- IMPROVEMENT: force the agent harness harder to no longer use its own user dialog and suppress end-of-skill summaries (many skills, `ase-skill.md`)
+- IMPROVEMENT: improve `custom-dialog`, disambiguate internal step cross-references, and restrict to 2–9 options (`ase-dialog.md`)
+- IMPROVEMENT: improve box rendering and render ASE banner in black (`ase-skill.md`)
+- IMPROVEMENT: improve rendering of approaches in `ase-code-{craft,refactor,resolve}` skills
+- IMPROVEMENT: support Copilot's `web_search` tool in `ase-meta-search` skill
+- IMPROVEMENT: allow more Bash commands for the `ase-code-insight` skill itself
+- IMPROVEMENT: avoid placeholder namespace conflicts in `ase-meta-brainstorm` skill
+- IMPROVEMENT: detect when minimum rank is not reached at all in `ase-meta-brainstorm` skill
+- BUGFIX: bind `chosen-k` placeholder to the chosen candidate index in `ase-meta-why` skill
+- BUGFIX: avoid Agent name conflicts in `ase-code-lint` and `ase-docs-proofread` skills
+- BUGFIX: fix cross-reference targets in `ase-format-arch.md`
+- BUGFIX: fix step marker in `ase-arch-discover` skill
+- BUGFIX: fix end tag in `ase-code-{craft,refactor,resolve}` skills
+- BUGFIX: fix proofread results in `ase-meta-diaboli` and `ase-meta-diff` skills
+- CLEANUP: cleanup Specification format (`ase-format-spec.md`)
+- CLEANUP: cleanup local getopt parsing in `ase-getopt.md`
+- CLEANUP: cleanup dialog processing in `ase-dialog.md`
+- CLEANUP: align syntax with other skills in `ase-meta-brainstorm` skill
 
 0.9.9 (2026-06-13)
 ------------------
