@@ -26,8 +26,10 @@ set placeholders into the context as a side-effect.
         For each option token in <getopt-spec/> of the form
         `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)[...]]`, set
         <getopt-option-<long/>/> to <default/> (for `=<default/>`
-        form), or to <c1/> (the first choice, for `=(<c1/>|<c2>/|...)`
-        form, or for the list form `=(<c1/>|<c2>/|...)...`),
+        form), or to the *single token* <c1/> (the first choice, both
+        for the choice form `=(<c1/>|<c2>/|...)` and for the list form
+        `=(<c1/>|<c2>/|...)...` -- an *unsupplied* list-option always
+        defaults to the single token <c1/>, *not* to a whole list),
         or to `false` (for value-less options). Then set
         <getopt-arguments><getopt-args/></getopt-arguments>.
 
@@ -52,11 +54,13 @@ set placeholders into the context as a side-effect.
     `=(<c1>|<c2>|...)` declares a value-taking option restricted to the
     listed fixed choices (the first choice acts as the default), and the
     trailing `...` (as in `=(<c1>|<c2>|...)...`) declares a value-taking
-    option whose value is a *comma-separated list* of choice tokens
-    (the first choice still acts as the default; only the *first*
-    token of the list is validated by the parser against the choice
-    set -- subsequent tokens are *not* validated, and skills validate
-    each remaining token themselves as they consume it).
+    option whose *supplied* value is a *comma-separated list* of choice
+    tokens (when *unsupplied*, the option defaults to the *single
+    token* `<c1>`, identical to the non-list choice form -- the list
+    semantics apply only to an explicitly supplied value; only the
+    *first* token of a supplied list is validated by the parser against
+    the choice set -- subsequent tokens are *not* validated, and skills
+    validate each remaining token themselves as they consume it).
 
 4.  **Short-Circuit for Error**:
     If <text/> starts with `ERROR:`:
