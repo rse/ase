@@ -89,9 +89,12 @@ Analyze documents for spelling, punctuation, or grammar errors
 
 3.  <step id="STEP 3: Correction">
 
-    1.  You *MUST* call the MCP tool `ase_config_set(key: "agent.skill", val:
-        "ase-docs-proofread", scope: "session:<ase-session-id/>")` of the
-        `ase` MCP server.
+    1.  *Mark this skill as the active edit-capable skill* so that the
+        ASE `pre-tool-use` hook auto-approves the subsequent `Edit`
+        invocations on *any* invocation path (slash command *or* `Skill`
+        tool). Call the `ase_config_set(key: "agent.skill", val:
+        "ase-docs-proofread", scope: "session:<ase-session-id/>")` tool
+        from the `ase` MCP server. Do not output anything in this substep.
 
     2.  Iterate over all problems:
 
@@ -151,9 +154,11 @@ Analyze documents for spelling, punctuation, or grammar errors
 
         4.  <if condition="<getopt-option-auto/> is not 'true'">
 
-            Ask the user how to proceed via an interactive user dialog:
+            Let the *user interactively choose* what to do as the next
+            step. For this you *MUST* use the custom `custom-dialog` and
+            not the `AskUserQuestion` based `user-dialog`:
 
-            <expand name="user-dialog">
+            <expand name="custom-dialog">
                 CORRECTION: How would you like to proceed with this proposed correction?
                 ACCEPT: Apply the proposed correction.
                 REJECT: Skip this proposed correction.
@@ -173,9 +178,9 @@ Analyze documents for spelling, punctuation, or grammar errors
 
                 Invoke the `Edit` tool to apply the change by replacing
                 <old-text/> with <new-text/> at <file/>:<line/>. The operation
-                will be auto-approved because of the active proofread marker,
-                so *no* interactive permission prompt will appear. Then
-                continue with the next <item/>.
+                will be auto-approved by the ASE `pre-tool-use` hook (which
+                tracks the active skill), so *no* interactive permission
+                prompt will appear. Then continue with the next <item/>.
 
                 </if>
 
@@ -202,8 +207,11 @@ Analyze documents for spelling, punctuation, or grammar errors
 
         </for>
 
-    3.  You *MUST* call the MCP tool `ase_config_delete(key: "agent.skill",
-        scope: "session:<ase-session-id/>")` of the `ase` MCP server.
+    3.  *Clear the active edit-capable skill marker* now that all `Edit`
+        invocations are done, so a later unrelated `Edit` is *not*
+        auto-approved. Call the `ase_config_delete(key: "agent.skill",
+        scope: "session:<ase-session-id/>")` tool from the `ase` MCP
+        server. Do not output anything in this substep.
 
     4.  You *MUST* *NOT* output any further additional explanations or
         summaries at the end of this skill processing, except for the
