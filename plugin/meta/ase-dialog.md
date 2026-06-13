@@ -1,5 +1,4 @@
 
-
 User Dialog
 ===========
 
@@ -19,9 +18,11 @@ Let the *user interactively choose* an answer.
         <content/>
     </spec>
 
-    Each line of <spec/> (separated by newlines) is of the format:
+    The first line of <spec/> (separated by newlines) is of the format:
+    `<question-label/>: <question-description/>`
 
-    `<label/>: <description/>`.
+    The second and following lines of <spec/> (separated by newlines) are of the format:
+    `<label/>: <description/>`
 
     The first line provides the question label and the question
     description. The second and following lines each provide an
@@ -49,8 +50,8 @@ Let the *user interactively choose* an answer.
 
             If <n/> is less than 2:
             Set <result>ERROR: user-dialog requires 2-4 answer lines, got <n/></result>
-            and *SKIP* the following step 2 (do not call `AskUserQuestion`)
-            and continue with step 3 dispatch.
+            and *SKIP* the following step 2.2 (do not call `AskUserQuestion`)
+            and continue with step 2.3 dispatch.
 
         2.  Call the `AskUserQuestion` tool of the agent harness with:
 
@@ -103,8 +104,8 @@ Let the *user interactively choose* an answer.
 
             If <n/> is less than 2:
             Set <result>ERROR: user-dialog requires 2-4 answer lines, got <n/></result>
-            and *SKIP* the following step 2 (do not call `ask_user`)
-            and continue with step 3 dispatch.
+            and *SKIP* the following step 2.2 (do not call `ask_user`)
+            and continue with step 2.3 dispatch.
 
         2.  Call the `ask_user` tool of the agent harness with:
 
