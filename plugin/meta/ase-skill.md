@@ -227,8 +227,8 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-head title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (78 - 31 - length("<title/>")), i.e., <bar/> is
-    the "─" character repeated (78 - 31 - length("<title/>")) times):
+    (where <bar/> = "─" x (98 - 31 - length("<title/>")), i.e., <bar/> is
+    the "─" character repeated (98 - 31 - length("<title/>")) times):
 
     <template>
 
@@ -245,8 +245,8 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
-    (where <bar/> = "─" x (78 - 31 - length("<title/>")), i.e., <bar/> is
-    the "─" character repeated (78 - 31 - length("<title/>")) times):
+    (where <bar/> = "─" x (98 - 31 - length("<title/>")), i.e., <bar/> is
+    the "─" character repeated (98 - 31 - length("<title/>")) times):
 
     <template>
 
@@ -278,8 +278,8 @@ Template Patterns
             Set <raw-title><title/><raw-title>.
             Set <render-title>**`<title/>`**</render-title>.
         </else>
-    -   Set <bar/> to ("─" x (78 - 31 - length("<raw-title/>"))),
-        i.e., set <bar/> to the "─" character repeated (78 - 31 - length("<raw-title/>")) times.
+    -   Set <bar/> to ("─" x (98 - 31 - length("<raw-title/>"))),
+        i.e., set <bar/> to the "─" character repeated (98 - 31 - length("<raw-title/>")) times.
     -   Set <body> to <content/> with all line-starts prefixed with `│ `.
 
     <template>
@@ -316,14 +316,8 @@ Template Patterns
 
     <template>🟠</template>
 
--   When `<ase-tpl-pad-left width="<width/>" text="<text/>"/>` should be expanded, use
+-   When `<ase-tpl-pad width="<width/>" text="<text/>"/>` should be expanded, use
     (where <ws/> = ` ` x (<width/> - length("<text/>")), i.e., <ws/> is
     the ` ` character repeated (<width/> - length("<text/>")) times):
 
     <template><text/><ws/></template>
-
--   When `<ase-tpl-pad-right width="<width/>" text="<text/>"/>` should be expanded, use
-    (where <ws/> = ` ` x (<width/> - length("<text/>")), i.e., <ws/> is
-    the ` ` character repeated (<width/> - length("<text/>")) times):
-
-    <template><ws/><text/></template>
