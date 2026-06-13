@@ -272,11 +272,11 @@ Template Patterns
 
     -   <if condition="<subtitle/> is not empty">
             Set <raw-title>⧉ ASE: <title/>: <subtitle/><raw-title>.
-            Set <render-title>`⧉ ASE`: **`<title/>`**: `<subtitle/>`</render-title>.
+            Set <render-title>⧉ ASE: **`<title/>`**: `<subtitle/>`</render-title>.
         </if>
         <else>
             Set <raw-title>⧉ ASE: <title/><raw-title>.
-            Set <render-title>`⧉ ASE`: **`<title/>`**</render-title>.
+            Set <render-title>⧉ ASE: **`<title/>`**</render-title>.
         </else>
     -   Set <bar/> to ("─" x (67 - length("<raw-title/>"))),
         i.e., set <bar/> to the "─" character repeated (67 - length("<raw-title/>")) times.
