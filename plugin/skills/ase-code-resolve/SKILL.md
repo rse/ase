@@ -276,7 +276,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <ase-tpl-foot title="APPROACHES"/>
         </template>
 
-    7.  <if condition="<getopt-option-auto/> is not 'true'">
+    7.  <if condition="<getopt-option-auto/> is not `true`">
 
         You *MUST* use the custom `custom-dialog` and *NOT* the
         `AskUserQuestion`-based `user-dialog` to let the *user
