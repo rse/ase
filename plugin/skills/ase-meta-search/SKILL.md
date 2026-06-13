@@ -88,10 +88,18 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
         from the MCP server `search-exa`.
     </expand>
 
-    If the `websearch` backend is *selected*:
+    If the `websearch` backend is *selected* and the tool
+    `WebSearch` is available:
 
     <expand name="agent" arg1="websearch">
         Call the tool `WebSearch(query: "<query/>")`.
+    </expand>
+
+    If the `websearch` backend is *selected* and the tool `web_search` is
+    available and the tool `WebSearch` is not available:
+
+    <expand name="agent" arg1="websearch">
+        Call the tool `web_search(query: "<query/>")`.
     </expand>
 
     </step>
