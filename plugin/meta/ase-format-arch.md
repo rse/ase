@@ -78,7 +78,7 @@ The **Artifact**s have the following cross-references:
 
 ```text
 ARCH-02-FV Functionality View   ──(depends on)─► ARCH-01-CV Context View
-ARCH-03-IV Information View     ──(entity)─►     SPEC-05-DM Data Model
+ARCH-03-IV Information View     ──(entity)─►     SPEC-07-DM Data Model
 ARCH-03-IV Information View     ──(owner)─►      ARCH-02-FV Functionality View
 ARCH-04-CO Concurrency View     ──(hosts)─►      ARCH-02-FV Functionality View
 ARCH-06-DP Deployment View      ──(hosts)─►      ARCH-02-FV Functionality View
