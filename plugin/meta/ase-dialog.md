@@ -162,7 +162,9 @@ Let the *user interactively choose* an answer.
 
 2.  Dispatch according to the agent tool:
 
-    1.  Set <text></text> (set to empty).
+    1.  You *MUST* not output anything in this step.
+
+        Set <text></text> (set to empty).
         Set <keys></keys> (set to empty).
         Set <n>1</n> (set entry count to one).
         Set <width/> to the maximum length plus 3 of all <label/> strings in <spec/>.
