@@ -607,7 +607,8 @@ service process per project.
 
 [![building-blocks](docs/building-blocks.svg)](docs/building-blocks.pdf)
 
-### Agent Tool &amp; LLM Compatibility
+Agent Tool &amp; LLM Compatibility
+----------------------------------
 
 **ASE** uses elaborated control structures (flow, step, if, while,
 define, expand, etc) and XML-based placeholders (constants, variables)
