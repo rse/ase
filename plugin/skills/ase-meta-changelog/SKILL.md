@@ -81,11 +81,17 @@ Processing
     the Git *commits* plus the currently already staged changes in the Git
     *index*, but *ignore* the Git *stash* and still unstaged changes.
 
-    For finding the corresponding Git *commits*, use the `N.M.K` from the
-    *second* level-2 header in the *ChangeLog* file as the corresponding
-    Git tag and then check all Git commits between `HEAD` and this tag
-    with the command `git log N.M.K..HEAD --numstat --pretty=format:'%h:
-    %s'`.
+    For finding the corresponding Git *commits*, first determine the
+    correct baseline Git tag. Take the `N.M.K` from the *first* (most
+    recent) level-2 header in the *ChangeLog* file and check whether a
+    corresponding Git tag already exists with the command `git tag --list
+    N.M.K`. If this command produces *no* output, the first section is
+    still in-progress/untagged, so use the `N.M.K` from the *second*
+    level-2 header as the baseline tag instead. If this command *does*
+    produce output, the first section is already released/tagged, so use
+    the `N.M.K` from the *first* level-2 header as the baseline tag. Then
+    check all Git commits between `HEAD` and this baseline tag with the
+    command `git log N.M.K..HEAD --numstat --pretty=format:'%h: %s'`.
 
     For finding the corresponding staged Git *changes* in the Git
     *index*, use the command `git diff --cached --numstat`, but silently
