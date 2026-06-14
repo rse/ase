@@ -343,11 +343,14 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             Hand off to `ase-task-edit`.
             <if condition="<head/> is equal `EDIT`">
                 Consume the head: set <getopt-option-next/> to the remaining
-                tokens (joined back with `,`, or `none` if empty).
+                tokens (joined back with `,`, or `none` if empty). `EDIT`
+                is this skill's own dispatch token, *not* part of
+                `ase-task-edit`'s `--next` vocabulary, so it must be
+                stripped here rather than forwarded.
             </if>
             All remaining tokens are `ase-task-edit`'s own vocabulary
             and are forwarded verbatim, so `ase-task-edit` consumes its
-            head itself.
+            own head itself.
             <if condition="<getopt-option-next/> is not equal `none`">
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
