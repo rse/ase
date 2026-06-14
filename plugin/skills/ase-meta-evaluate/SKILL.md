@@ -227,6 +227,19 @@ multi-*criteria* decision matrix.
         ⚠ *Please give some hints on the criteria to ensure a single best alternative!*
         </template>
 
+    -   Otherwise, if <rating-K/> is less than zero (i.e. all alternatives
+        rate negatively and the "best" is merely the least-bad), stop the
+        flow after you output just the following <template/> and do not
+        output anything else. This all-negative check is evaluated *before*
+        the small-distance check below, so that an all-negative alternative
+        set with a small winning gap surfaces the all-negative warning rather
+        than being masked by the small-distance branch:
+
+        <template>
+        <ase-tpl-bullet-signal/> **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
+        ⚠ *ATTENTION: all alternatives rate negatively; this is the least-bad choice, not a strong winner!*
+        </template>
+
     -   Otherwise, if <percentage/> is less than 0.10, stop the flow after
         you output just the following <template/> and do not output anything
         else:
@@ -234,16 +247,6 @@ multi-*criteria* decision matrix.
         <template>
         <ase-tpl-bullet-signal/> **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
         ⚠ *ATTENTION: small distance to second best alternative!*
-        </template>
-
-    -   Otherwise, if <rating-K/> is less than zero (i.e. all alternatives
-        rate negatively and the "best" is merely the least-bad), stop the
-        flow after you output just the following <template/> and do not
-        output anything else:
-
-        <template>
-        <ase-tpl-bullet-signal/> **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
-        ⚠ *ATTENTION: all alternatives rate negatively; this is the least-bad choice, not a strong winner!*
         </template>
 
     -   Otherwise (<percentage/> is greater than or equal to 0.10), output
