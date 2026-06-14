@@ -142,7 +142,11 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     more Pro-Theses or Supporting-Arguments until you EITHER have found
     at least <count/> Pro-Theses or Supporting-Arguments with at least a
     rank of 7 OR you have already checked a total of <count/> x 5
-    Pro-Theses or Supporting-Arguments.
+    Pro-Theses or Supporting-Arguments. If the second condition is
+    reached first and fewer than <count/> Pro-Theses or
+    Supporting-Arguments reached a rank of at least 7, nevertheless
+    surface the <count/> highest-ranked ones found so far, because
+    <count/> is the *minimum* number of Pro-Theses to surface.
 
     Then, for the top-<count/> highest-ranked Pro-Theses or
     Supporting-Arguments, sort them by their rank from highest to lowest,

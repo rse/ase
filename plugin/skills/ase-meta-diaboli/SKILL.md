@@ -120,7 +120,11 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     Anti-Theses or Counter-Arguments until you EITHER have found at
     least <count/> Anti-Theses or Counter-Arguments with at least a rank
     of 7 OR you have already checked a total of <count/> x 5 Anti-Theses
-    or Counter-Arguments.
+    or Counter-Arguments. If the second condition is reached first and
+    fewer than <count/> Anti-Theses or Counter-Arguments reached a rank
+    of at least 7, nevertheless surface the <count/> highest-ranked ones
+    found so far, because <count/> is the *minimum* number of
+    Anti-Theses to surface.
 
     Then, for the top-<count/> highest-ranked Anti-Theses or
     Counter-Arguments, sort them by their rank from highest to lowest,
