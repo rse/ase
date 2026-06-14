@@ -5,6 +5,22 @@ ChangeLog
 0.9.11 (2026-06-14)
 -------------------
 
+- IMPROVEMENT: support `-h`/`--help` option via getopt across many skills (`ase-arch-analyze`, `ase-code-explain`, `ase-code-insight`, `ase-meta-changelog`, `ase-meta-chat`, `ase-meta-commit`, `ase-meta-evaluate`, `ase-meta-persona`, `ase-task-delete`, `ase-task-id`, `ase-task-rename`)
+- IMPROVEMENT: use `custom-dialog` and improve timestamp handling in `ase-task-grill` skill
+- IMPROVEMENT: do not hard-code to 4 answers in `ase-meta-brainstorm` skill
+- IMPROVEMENT: be more precise on `-n`/EDIT in `ase-code-{craft,refactor,resolve}` skills
+- IMPROVEMENT: improve OTHER handler in `ase-code-lint` and `ase-docs-proofread` skills
+- IMPROVEMENT: handle the no-foreign-LLMs (no-quorum) case in `ase-meta-quorum` skill
+- IMPROVEMENT: validate task ids in `ase-task-rename` skill
+- IMPROVEMENT: allow missing top-level header of next version in `ase-meta-changelog` skill
+- IMPROVEMENT: be more precise and bullet-proof in `ase-task-id` and `ase-code-analyze` skills
+- BUGFIX: validate the kv lookup before switching the session task in `ase-code-resolve` skill
+- BUGFIX: surface minimum count of highest-ranked items in `ase-meta-diaboli` and `ase-meta-steelman` skills
+- BUGFIX: evaluate all-negative check before small-distance check in `ase-meta-evaluate` skill
+- BUGFIX: fix intent-group line-count reference in `ase-meta-diff` skill
+- BUGFIX: fix step numbering in `ase-arch-discover` skill
+- CLEANUP: cleanup control structure in `ase-task-reboot` skill
+
 0.9.10 (2026-06-14)
 -------------------
 
