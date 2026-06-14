@@ -134,9 +134,17 @@ by querying *multiple* AIs for an *optimal consensus*.
 
 4.  <step id="STEP 4: Determine Consensus Rating">
 
-    Determine, on a Likert scale of 0..<n/>, the amount of the overall
-    consensus <c/> of all the responses. The <n/> is the *total number of
-    responders* (yourself plus all available foreign AIs above).
+    First, count the number of *available foreign AIs* (those queried in
+    STEP 2 which did *not* return an `ERROR:` response). If this count is
+    *zero* -- i.e., every foreign AI errored out or none were reachable
+    and only yourself (Anthropic Claude) remains -- a quorum is *not*
+    possible. In this case, set <c></c> and <n></n> to empty and instead
+    set <disagreement/> to `(no quorum: no foreign AIs were available)`,
+    then skip the rest of this step.
+
+    Otherwise, determine, on a Likert scale of 0..<n/>, the amount of the
+    overall consensus <c/> of all the responses. The <n/> is the *total
+    number of responders* (yourself plus all available foreign AIs above).
     If all responses disagree, the consensus <c/> is zero.
     If all responses agree, <c/> is <n/>.
 
@@ -164,6 +172,10 @@ by querying *multiple* AIs for an *optimal consensus*.
     - [...]
 
     **CONSENSUS RATE**: **<c/>/<n/>** <disagreement/>
+
+    When a quorum was *not* possible (see STEP 4), render this line
+    instead as just `**CONSENSUS RATE**: *n/a* <disagreement/>` (omitting
+    the `<c/>/<n/>` fraction), as a single AI cannot form a consensus.
 
     &#x25CB; **Anthropic Claude**:
     - [...]
