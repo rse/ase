@@ -607,6 +607,29 @@ service process per project.
 
 [![building-blocks](docs/building-blocks.svg)](docs/building-blocks.pdf)
 
+### Agent Tool &amp; LLM Compatibility
+
+**ASE** uses elaborated control structures (flow, step, if, while,
+define, expand, etc) and XML-based placeholders (constants, variables)
+to realize its Skills plus Agent Harness hooks, built-in tools, and an
+MCP service to realize its remaining functionality. As a consequence,
+it requires the combination of a compatible Agent Harness plus a strong
+instruction following LLM.
+
+The following tables shows the current known compatibility for **ASE**:
+
+| Agent Harness            | Version | Compatibility | Goal      |
+| ------------------------ | ------- | ------------- | --------- |
+| Anthropic Claude Code    | 2.1     | 100%          | primary   |
+| GitHub Copilot CLI       | 1.0     | 95%           | secondary |
+
+| LLM                      | Version | Compatibility | Goal      |
+| ------------------------ | ------- | ------------- | --------- |
+| Anthropic Claude Haiku   | 4.5     | 10%           | none      |
+| Anthropic Claude Sonnet  | 4.6     | 80%           | secondary |
+| Anthropic Claude Opus    | 4.8     | 100%          | primary   |
+| Anthropic Claude Fable   | 5       | 80%           | secondary |
+
 See Also
 --------
 
