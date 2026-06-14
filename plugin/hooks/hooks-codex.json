@@ -1,0 +1,67 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook session-start --tool codex",
+                        "statusMessage": "Loading ASE..."
+                    }
+                ]
+            }
+        ],
+        "SessionEnd": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook session-end --tool codex",
+                        "statusMessage": "Cleaning up ASE..."
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook pre-tool-use --tool codex"
+                    }
+                ]
+            }
+        ],
+        "PermissionRequest": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook permission-request --tool codex",
+                        "statusMessage": "Approve ASE..."
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook user-prompt-submit --tool codex"
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "ase hook stop --tool codex"
+                    }
+                ]
+            }
+        ]
+    }
+}
