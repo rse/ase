@@ -28,6 +28,7 @@ Configure Task Id
 
 1.  Determine request:
     <request><getopt-arguments/></request>
+    Inherit the always existing <ase-session-id/> from the current context.
 
 2.  <if condition="<request/> is NOT empty AND <request/> does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`">
     Only output the following <template/> and then immediately
@@ -40,8 +41,9 @@ Configure Task Id
 
 3.  <if condition="<request/> is empty">
     -   Call the `ase_task_id(session: "<ase-session-id/>")`
-        tool from the `ase` MCP server and set
-        <ase-task-id/> to its `text` output.
+        tool from the `ase` MCP server and set <text/> to its
+        `text` output. Check the response as mandated above; only
+        on a clean response set <ase-task-id><text/></ase-task-id>.
 
     -   Output:
         <template>
