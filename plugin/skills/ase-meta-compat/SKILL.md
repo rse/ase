@@ -282,7 +282,7 @@ Procedure
     | Regex Matching       |        2.00 | <re-pass/>/<re-total/>       | <re-pct/>%          |
     | Arithmetic           |        1.00 | <arith-pass/>/<arith-total/> | <arith-pct/>%       |
     | **OVERALL**          |             |                              | **<overall-pct/>%** |
-    
+
     **VERDICT**: <verdict/>
 
     </template>
