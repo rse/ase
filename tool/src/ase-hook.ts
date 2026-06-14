@@ -11,6 +11,7 @@ import os                                   from "node:os"
 import { Command }                          from "commander"
 import { execaSync }                        from "execa"
 import { quote }                            from "shell-quote"
+import getStdin                             from "get-stdin"
 import * as v                               from "valibot"
 
 import type Log                             from "./ase-log.js"
@@ -85,6 +86,30 @@ export default class HookCommand {
     /*  validate a session id against the accepted character set  */
     private isValidSessionId (id: string): boolean {
         return /^[A-Za-z0-9._-]+$/.test(id)
+    }
+
+    /*  read the entire stdin payload asynchronously  */
+    private readStdin (): Promise<string> {
+        /*  best-effort: treat an unreadable/closed stdin as empty  */
+        return getStdin().catch(() => "")
+    }
+
+    /*  drain and discard the stdin event payload  */
+    private async drainStdin (): Promise<void> {
+        await this.readStdin()
+    }
+
+    /*  write to stdout and resolve only once it has been fully
+        flushed to the underlying file descriptor  */
+    private writeStdout (text: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            process.stdout.write(text, (err) => {
+                if (err)
+                    reject(err)
+                else
+                    resolve()
+            })
+        })
     }
 
     /*  best-effort JSON parse with valibot schema validation: returns
@@ -183,7 +208,7 @@ export default class HookCommand {
 
         /*  read session information (Claude Code uses snake_case fields,
             Copilot CLI uses camelCase fields)  */
-        const stdin = fs.readFileSync(0, "utf8")
+        const stdin = await this.readStdin()
         const input = this.parseJSON(stdin, v.object({
             session_id: v.optional(v.string()),
             sessionId:  v.optional(v.string()),
@@ -282,7 +307,7 @@ export default class HookCommand {
         } : {
             "additionalContext": md
         }
-        process.stdout.write(JSON.stringify(payload))
+        await this.writeStdout(JSON.stringify(payload))
         return 0
     }
 
@@ -304,21 +329,23 @@ export default class HookCommand {
     }
 
     /*  handler for "ase hook user-prompt-submit" (both tools)  */
-    private doUserPromptSubmit (_tool: Tool): number {
+    private async doUserPromptSubmit (_tool: Tool): Promise<number> {
+        await this.drainStdin()
         this.writeAgentStatus("busy")
         return 0
     }
 
     /*  handler for "ase hook stop" (both tools)  */
-    private doStop (_tool: Tool): number {
+    private async doStop (_tool: Tool): Promise<number> {
+        await this.drainStdin()
         this.writeAgentStatus("ready")
         return 0
     }
 
     /*  handler for "ase hook session-end" (both tools)  */
-    private doSessionEnd (_tool: Tool): number {
+    private async doSessionEnd (_tool: Tool): Promise<number> {
         /*  determine session id  */
-        const sessionId = this.readSessionIdFromStdin()
+        const sessionId = await this.readSessionIdFromStdin()
 
         /*  remove the session directory ~/.ase/session/<id> (only for a valid sessionId)  */
         if (this.isValidSessionId(sessionId)) {
@@ -340,8 +367,8 @@ export default class HookCommand {
     }
 
     /*  read session id from stdin JSON payload  */
-    private readSessionIdFromStdin (): string {
-        const stdin = fs.readFileSync(0, "utf8")
+    private async readSessionIdFromStdin (): Promise<string> {
+        const stdin = await this.readStdin()
         const input = this.parseJSON(stdin, v.object({
             session_id: v.optional(v.string()),
             sessionId:  v.optional(v.string())
