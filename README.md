@@ -621,15 +621,15 @@ The following tables shows the current known compatibility for **ASE**:
 
 | Agent Harness            | Version | Compatibility | Goal      |
 | ------------------------ | ------- | ------------- | --------- |
-| Anthropic Claude Code    | 2.1     | 100%          | primary   |
-| GitHub Copilot CLI       | 1.0     | 95%           | secondary |
+| Anthropic Claude Code    | 2.1     | **100%**      | primary   |
+| GitHub Copilot CLI       | 1.0     | **95%**       | secondary |
 
 | LLM                      | Version | Compatibility | Goal      |
 | ------------------------ | ------- | ------------- | --------- |
-| Anthropic Claude Haiku   | 4.5     | 10%           | none      |
-| Anthropic Claude Sonnet  | 4.6     | 80%           | secondary |
-| Anthropic Claude Opus    | 4.8     | 100%          | primary   |
-| Anthropic Claude Fable   | 5       | 80%           | secondary |
+| Anthropic Claude Haiku   | 4.5     | **10%**       | none      |
+| Anthropic Claude Sonnet  | 4.6     | **80%**       | secondary |
+| Anthropic Claude Opus    | 4.8     | **100%**      | primary   |
+| Anthropic Claude Fable   | 5       | **80%**       | secondary |
 
 See Also
 --------
