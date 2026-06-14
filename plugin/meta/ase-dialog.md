@@ -9,6 +9,9 @@ User Dialog
 <if condition="<ase-agent-tool/> is 'copilot'">
     <user-dialog-tool>ask_user</user-dialog-tool>
 </if>
+<if condition="<ase-agent-tool/> is 'codex'">
+    <user-dialog-tool>none</user-dialog-tool>
+</if>
 
 <define name="user-dialog">
 
@@ -135,6 +138,23 @@ Let the *user interactively choose* an answer.
                 (prefix result with "OTHER").
 
             Do not output anything in this step!
+
+        </if>
+
+    -   <if condition="<ase-agent-tool/> is 'codex'">
+
+        OpenAI Codex CLI has *no* interactive user-dialog tool, so you
+        *MUST* *NOT* call any tool here. Instead, render the question and
+        answers as a custom Markdown dialog and let the user reply with a
+        free-text choice -- exactly as defined by the following expansion,
+        passing <spec/> as its question specification, and set <result/> to
+        the result of that custom dialog:
+
+        <expand name="custom-dialog" arg1="--other">
+            <spec/>
+        </expand>
+
+        Do not output anything in this step!
 
         </if>
 
