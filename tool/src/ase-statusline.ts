@@ -29,7 +29,7 @@ const COLORS: ReadonlySet<string> = new Set<ForegroundColorName | "default">([
 ])
 
 /*  type of supported tool (host) systems  */
-type Tool = "claude" | "copilot"
+type Tool = "claude" | "copilot" | "codex"
 
 /*  shape of the JSON payload Claude Code / Copilot CLI passes on stdin
     (Copilot CLI's payload is mostly a subset of Claude Code's, with the
@@ -270,8 +270,8 @@ export default class StatuslineCommand {
 
     /*  parse and validate the --tool option  */
     private parseTool (value: string): Tool {
-        if (value !== "claude" && value !== "copilot")
-            throw new InvalidArgumentError(`invalid --tool value: "${value}" (expected "claude" or "copilot")`)
+        if (value !== "claude" && value !== "copilot" && value !== "codex")
+            throw new InvalidArgumentError(`invalid --tool value: "${value}" (expected "claude", "copilot", or "codex")`)
         return value
     }
 
@@ -285,7 +285,7 @@ export default class StatuslineCommand {
             .command("statusline")
             .description("Render Claude Code or GitHub Copilot CLI statusline from stdin JSON")
             .option("-t, --tool <tool>",
-                "target tool (\"claude\" or \"copilot\")", toolDflt)
+                "target tool (\"claude\" or \"copilot\"; \"codex\" is unsupported)", toolDflt)
             .option("-w, --width <n>",
                 "force terminal width to <n> characters (0 = auto-detect via /dev/tty)",
                 parseInteger("--width"), 0)
@@ -304,6 +304,11 @@ export default class StatuslineCommand {
             .action(async (lines: string[], opts: StatuslineOpts) => {
                 /*  validate target tool  */
                 const tool = this.parseTool(opts.tool)
+
+                /*  OpenAI Codex CLI has no scriptable custom statusline
+                    mechanism, so reject the request explicitly  */
+                if (tool === "codex")
+                    throw new Error("OpenAI Codex CLI does not support a custom statusline")
 
                 /*  read all of stdin  */
                 const input = await readStdin()
