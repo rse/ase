@@ -630,12 +630,12 @@ The following tables shows the current known compatibility for **ASE**:
 
 | LLM                             | Version | Compatibility | Goal        |
 | ------------------------------- | ------- | ------------- | ----------- |
-| Anthropic Claude Haiku          | 4.5     | **70%**       | none        |
-| Anthropic Claude Sonnet         | 4.6     | **95%**       | secondary   |
 | Anthropic Claude Opus           | 4.8     | **100%**      | **primary** |
-| Anthropic Claude Fable &Dagger; | 5       | **95%**       | secondary   |
-| Gemini Flash                    | 3.5     | **70%**       | none        |
+| Anthropic Claude Sonnet         | 4.6     | **95%**       | secondary   |
+| Anthropic Claude Fable &Dagger; | 5       | **90%**       | secondary   |
+| Anthropic Claude Haiku          | 4.5     | **70%**       | none        |
 | OpenAI GPT                      | 5.5     | **95%**       | none        |
+| Gemini Flash                    | 3.5     | **70%**       | none        |
 
 &dagger; *OpenAI Codex CLI* has no scriptable custom status line support at all.
 &Dagger; *Anthropic Claude Fable* suppresses intermediate outputs.
