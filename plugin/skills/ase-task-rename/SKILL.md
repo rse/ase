@@ -62,6 +62,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
         </template>
         </if>
 
+    5.  <if condition="<old/> does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$` OR <new/> does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`">
+        Only output the following <template/> and then immediately
+        *STOP* processing the entire current skill:
+
+        <template>
+        ⧉ **ASE**: ☻ skill: **ase-task-rename**, ▶ ERROR: invalid task id (expected `^[a-zA-Z][a-zA-Z0-9_-]*$`)
+        </template>
+        </if>
+
 2.  **Perform Operation**:
 
     1.  Call the `ase_task_rename(old: "<old/>", new: "<new/>")` tool of the
