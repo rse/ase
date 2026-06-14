@@ -101,14 +101,19 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-arch-analyze">
 Review Software Architecture
 </skill>
 
+<expand name="getopt" arg1="ase-arch-analyze">
+    $ARGUMENTS
+</expand>
+
 <objective>
 With the mindset of an *expert-level software architect*,
-*review* the *software architecture* of $ARGUMENTS, and its directly
+*review* the *software architecture* of <getopt-arguments/>, and its directly
 related source code, for *potential problems* across component
 boundaries, structural organization, architecture principles,
 interface quality, quality attributes, and architecture governance.

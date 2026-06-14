@@ -12,17 +12,22 @@ effort: high
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-task-id">
 Configure Task Id
 </skill>
+
+<expand name="getopt" arg1="ase-task-id">
+    $ARGUMENTS
+</expand>
 
 <objective>
 *Get* or *set* the unique *task id* of the current session.
 </objective>
 
 1.  Determine request:
-    <request>$ARGUMENTS</request>
+    <request><getopt-arguments/></request>
 
 2.  <if condition="<request/> is NOT empty AND <request/> does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`">
     Only output the following <template/> and then immediately

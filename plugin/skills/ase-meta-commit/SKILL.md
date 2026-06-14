@@ -12,10 +12,15 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-commit">
 Git Commit
 </skill>
+
+<expand name="getopt" arg1="ase-meta-commit">
+    $ARGUMENTS
+</expand>
 
 <objective>
 Help to *craft* a *concise commit message* for the

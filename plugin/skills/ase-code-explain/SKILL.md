@@ -14,13 +14,18 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-code-explain">
 Explain Source Code
 </skill>
 
+<expand name="getopt" arg1="ase-code-explain">
+    $ARGUMENTS
+</expand>
+
 <objective>
-*Analyze* the source code of $ARGUMENTS, and its directly related source
+*Analyze* the source code of <getopt-arguments/>, and its directly related source
 code and *explain* it in a *brief*, *standardized*, and *concise* way.
 </objective>
 

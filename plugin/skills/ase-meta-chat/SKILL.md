@@ -14,13 +14,18 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-chat">
 Query Foreign LLM for Chat
 </skill>
 
+<expand name="getopt" arg1="ase-meta-chat">
+    $ARGUMENTS
+</expand>
+
 <objective>
-Query foreign LLM for: <query>$ARGUMENTS</query>
+Query foreign LLM for: <query><getopt-arguments/></query>
 </objective>
 
 1.  You *MUST* *NOT* output anything in this step.

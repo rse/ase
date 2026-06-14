@@ -12,10 +12,15 @@ effort: high
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-task-delete">
 Delete a Task Plan
 </skill>
+
+<expand name="getopt" arg1="ase-task-delete">
+    $ARGUMENTS
+</expand>
 
 <objective>
 *Delete* the task plan.
@@ -32,7 +37,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Determine Task:**
 
-    1.  Set <id>$ARGUMENTS</id> initially, with any leading and trailing
+    1.  Set <id><getopt-arguments/></id> initially, with any leading and trailing
         whitespace stripped.
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.

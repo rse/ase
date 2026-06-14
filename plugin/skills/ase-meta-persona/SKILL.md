@@ -15,10 +15,15 @@ effort: high
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-persona">
 Persona Configuration
 </skill>
+
+<expand name="getopt" arg1="ase-meta-persona">
+    $ARGUMENTS
+</expand>
 
 <objective>
 *Configure* the *persona style* of the agent to adjust the communication
@@ -26,7 +31,7 @@ style and token usage intensity.
 </objective>
 
 1.  Determine request:
-    <request>$ARGUMENTS</request>
+    <request><getopt-arguments/></request>
     Do not output anything.
 
 2.  <if condition="<request/> is empty">

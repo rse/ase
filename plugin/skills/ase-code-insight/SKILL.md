@@ -18,13 +18,18 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-code-insight">
 Project Insight
 </skill>
 
+<expand name="getopt" arg1="ase-code-insight">
+    $ARGUMENTS
+</expand>
+
 <objective>
-Give *insights* into the project through the source code of $ARGUMENTS.
+Give *insights* into the project through the source code of <getopt-arguments/>.
 </objective>
 
 <flow>

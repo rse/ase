@@ -13,10 +13,15 @@ effort: high
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-evaluate">
 Evaluate Alternatives
 </skill>
+
+<expand name="getopt" arg1="ase-meta-evaluate">
+    $ARGUMENTS
+</expand>
 
 <objective>
 *Evaluate* *alternatives* through a weighted
@@ -25,7 +30,7 @@ multi-*criteria* decision matrix.
 
 <flow>
 1.  <step id="STEP 1: Determine Reason">
-    -   From the <request>$ARGUMENTS</request>, try to derive the overall
+    -   From the <request><getopt-arguments/></request>, try to derive the overall
         reason <reason/> for the evaluation. If no such reason can be
         derived, assume <reason>generic comparison</reason>.
 
@@ -38,7 +43,7 @@ multi-*criteria* decision matrix.
     </step>
 
 2.  <step id="STEP 2: Determine Alternatives">
-    -   From the <request>$ARGUMENTS</request> derive the two or more
+    -   From the <request><getopt-arguments/></request> derive the two or more
         alternatives <alternative-K/> (K=1-N) the user wants to be
         evaluated. Do not output anything.
 
@@ -105,7 +110,7 @@ multi-*criteria* decision matrix.
     </step>
 
 3.  <step id="STEP 3: Derive Criteria">
-    -   From the <request>$ARGUMENTS</request>, try to derive the criteria
+    -   From the <request><getopt-arguments/></request>, try to derive the criteria
         <criteria-L/> (L=1-M) for the evaluation. Do not output anything.
 
     -   For each criterion <criteria-L/> (L=1-M), decide on its <weight-L/>

@@ -12,10 +12,15 @@ effort: high
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-task-rename">
 Rename a Task Plan
 </skill>
+
+<expand name="getopt" arg1="ase-task-rename">
+    $ARGUMENTS
+</expand>
 
 <objective>
 *Rename* the task plan.
@@ -32,7 +37,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
 1.  **Determine Task:**
 
-    1.  Parse <arguments>$ARGUMENTS</arguments> into a whitespace-separated
+    1.  Parse <arguments><getopt-arguments/></arguments> into a whitespace-separated
         list of tokens. Inherit the always existing <ase-task-id/> and
         <ase-session-id/> from the current context. Do not output anything.
 

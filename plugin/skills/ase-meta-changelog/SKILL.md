@@ -16,10 +16,15 @@ allowed-tools:
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-changelog">
 Update ChangeLog Entries
 </skill>
+
+<expand name="getopt" arg1="ase-meta-changelog">
+    $ARGUMENTS
+</expand>
 
 <objective>
 Help to complete, consolidate and sort *ChangeLog* entries of the most
