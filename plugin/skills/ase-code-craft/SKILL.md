@@ -249,7 +249,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         a question with the following custom dialog, where per
         approach A<n/>, you determine an ultra brief summary
         <short-summary/> and then use the answer option `A<n/>:
-        ⚝ **RECOMMENDATION** ⚝: <short-summary/>` for your
+        ⚝ **RECOMMENDATION** ⚝ - <short-summary/>` for your
         recommended approach plus zero or more answer options `A<n/>:
         <short-summary/>` for all other approaches:
 
