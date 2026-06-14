@@ -19,17 +19,22 @@ import type Log          from "./ase-log.js"
 import Version           from "./ase-version.js"
 
 /*  type of supported tool (host) systems  */
-type Tool = "claude" | "copilot"
+type Tool = "claude" | "copilot" | "codex"
 
 /*  per-tool dispatch table for the parts that actually differ between
-    Claude Code and GitHub Copilot CLI plugin marketplace integrations  */
+    Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI plugin
+    marketplace integrations  */
 type ToolSpec = {
-    cli:   string
-    label: string
+    cli:       string
+    label:     string
+    pInstall:  string  /*  plugin subcommand to install   a plugin  */
+    pRemove:   string  /*  plugin subcommand to uninstall a plugin  */
+    pUpdate:   string  /*  plugin marketplace subcommand to refresh a snapshot  */
 }
 const toolSpecs: Record<Tool, ToolSpec> = {
-    "claude":  { cli: "claude",  label: "Claude Code" },
-    "copilot": { cli: "copilot", label: "Copilot CLI" }
+    "claude":  { cli: "claude",  label: "Claude Code",      pInstall: "install", pRemove: "uninstall", pUpdate: "update"  },
+    "copilot": { cli: "copilot", label: "Copilot CLI",      pInstall: "install", pRemove: "uninstall", pUpdate: "update"  },
+    "codex":   { cli: "codex",   label: "OpenAI Codex CLI", pInstall: "add",     pRemove: "remove",    pUpdate: "upgrade" }
 }
 
 /*  per-MCP dispatch table  */
@@ -198,7 +203,7 @@ export default class SetupCommand {
         const pkgdir  = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
         const source  = dev ? path.resolve(pkgdir, "..") : pkgdir
         await this.run(spec.cli, [ "plugin", "marketplace", "add", source ])
-        await this.run(spec.cli, [ "plugin", "install", "ase@ase" ], { retries: 3 })
+        await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase" ], { retries: 3 })
         return 0
     }
 
@@ -225,9 +230,9 @@ export default class SetupCommand {
                 but there is no version change in the plugin manifest,
                 so just re-install the plugin to let the tool update its copy  */
             this.log.write("info", `setup: update[dev]: re-install ASE ${spec.label} plugin (origin: local)`)
-            await this.run(spec.cli, [ "plugin", "uninstall", "ase@ase" ],
+            await this.run(spec.cli, [ "plugin", spec.pRemove,  "ase@ase" ],
                 { ignoreError: `ASE ${spec.label} plugin not installed` })
-            await this.run(spec.cli, [ "plugin", "install",   "ase@ase" ], { retries: 3 })
+            await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase" ], { retries: 3 })
         }
         else {
             /*  perform NPM version check  */
@@ -244,10 +249,18 @@ export default class SetupCommand {
             const updateCmd = await this.npmCmd([ "update", "-g", "@rse/ase" ], true)
             await this.run(updateCmd.cmd, updateCmd.args)
 
-            /*  update ASE plugin  */
+            /*  update ASE plugin (refresh the marketplace snapshot, then
+                update the plugin itself; the OpenAI Codex CLI has no
+                "plugin update" subcommand, so re-install it instead)  */
             this.log.write("info", `setup: update: updating ASE ${spec.label} plugin`)
-            await this.run(spec.cli, [ "plugin", "marketplace", "update", "ase" ])
-            await this.run(spec.cli, [ "plugin", "update", "ase@ase" ])
+            await this.run(spec.cli, [ "plugin", "marketplace", spec.pUpdate, "ase" ])
+            if (tool !== "codex")
+                await this.run(spec.cli, [ "plugin", "update", "ase@ase" ])
+            else {
+                await this.run(spec.cli, [ "plugin", spec.pRemove,  "ase@ase" ],
+                    { ignoreError: `ASE ${spec.label} plugin not installed` })
+                await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase" ], { retries: 3 })
+            }
         }
         return 0
     }
@@ -257,9 +270,11 @@ export default class SetupCommand {
         const spec = toolSpecs[tool]
         await this.ensureTool(spec.cli)
         this.log.write("info", `setup: enable: enabling ASE ${spec.label} plugin`)
+        /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
+            enable" subcommand, so (re-)install the plugin instead  */
         const args = tool === "claude" ?
-            [ "plugin", "enable",  "ase@ase" ] :
-            [ "plugin", "install", "ase@ase" ]
+            [ "plugin", "enable",   "ase@ase" ] :
+            [ "plugin", spec.pInstall, "ase@ase" ]
         await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
         return 0
     }
@@ -269,9 +284,11 @@ export default class SetupCommand {
         const spec = toolSpecs[tool]
         await this.ensureTool(spec.cli)
         this.log.write("info", `setup: disable: disabling ASE ${spec.label} plugin`)
+        /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
+            disable" subcommand, so uninstall the plugin instead  */
         const args = tool === "claude" ?
-            [ "plugin", "disable",   "ase@ase" ] :
-            [ "plugin", "uninstall", "ase@ase" ]
+            [ "plugin", "disable",  "ase@ase" ] :
+            [ "plugin", spec.pRemove, "ase@ase" ]
         await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
         return 0
     }
@@ -290,7 +307,7 @@ export default class SetupCommand {
         /*  uninstall ASE plugin  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
             `uninstalling ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote/bundled"})`)
-        await this.run(spec.cli, [ "plugin", "uninstall", "ase@ase" ],
+        await this.run(spec.cli, [ "plugin", spec.pRemove, "ase@ase" ],
             { ignoreError: `ASE ${spec.label} plugin not installed` })
         await this.run(spec.cli, [ "plugin", "marketplace", "remove", "ase" ],
             { ignoreError: `ASE ${spec.label} plugin marketplace not registered` })
@@ -413,7 +430,7 @@ export default class SetupCommand {
     /*  register an MCP server with the tool, supporting both the "stdio"
         (a local subprocess command) and "http" (a remote URL, optionally
         with HTTP headers) transports; the per-tool command line differs
-        between Claude Code and GitHub Copilot CLI  */
+        between Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI  */
     private async mcpAdd (tool: Tool, name: string, env: Record<string, string>, transport:
         { type: "stdio", command: string[] } |
         { type: "http",  url: string, headers?: Record<string, string> }): Promise<void> {
@@ -432,7 +449,7 @@ export default class SetupCommand {
                 args.push(name, transport.url)
             }
         }
-        else {
+        else if (tool === "copilot") {
             /*  GitHub Copilot CLI implies the stdio transport when the
                 command is provided after "--"; only "http"/"sse" servers
                 need an explicit "--transport" flag and take the URL as a
@@ -450,11 +467,28 @@ export default class SetupCommand {
                 args.push(name, transport.url)
             }
         }
+        else {
+            /*  OpenAI Codex CLI takes the server name as the first
+                positional argument and implies the stdio transport when the
+                command is provided after "--"; "http" servers take the URL
+                via the "--url" option (with optional "--header" flags)  */
+            if (transport.type === "stdio") {
+                args.push(name)
+                for (const [ key, val ] of Object.entries(env))
+                    args.push("--env", `${key}=${val}`)
+                args.push("--", ...transport.command)
+            }
+            else {
+                for (const [ key, val ] of Object.entries(transport.headers ?? {}))
+                    args.push("--header", `${key}: ${val}`)
+                args.push(name, "--url", transport.url)
+            }
+        }
         await this.run(toolSpecs[tool].cli, args)
     }
 
     /*  unregister an MCP server from the tool; the per-tool command line
-        differs between Claude Code and GitHub Copilot CLI  */
+        differs between Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI  */
     private async mcpRemove (tool: Tool, name: string): Promise<void> {
         const args = tool === "claude" ?
             [ "mcp", "remove", "--scope", "user", name ] :
@@ -614,8 +648,8 @@ export default class SetupCommand {
 
     /*  parse and validate the --tool option  */
     private parseTool (value: string): Tool {
-        if (value !== "claude" && value !== "copilot")
-            throw new Error(`invalid --tool value: "${value}" (expected "claude" or "copilot")`)
+        if (value !== "claude" && value !== "copilot" && value !== "codex")
+            throw new Error(`invalid --tool value: "${value}" (expected "claude", "copilot", or "codex")`)
         return value
     }
 
@@ -642,7 +676,7 @@ export default class SetupCommand {
         setupCmd
             .command("install")
             .description("install the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
             .action(async (opts: { tool: string, dev: boolean }) => {
                 process.exit(await this.doInstall(this.parseTool(opts.tool), opts.dev))
@@ -652,7 +686,7 @@ export default class SetupCommand {
         setupCmd
             .command("update")
             .description("update the ASE tool and the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .option("-f, --force",       "always perform the update, even if already at latest version", false)
             .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
             .action(async (opts: { tool: string, force: boolean, dev: boolean }) => {
@@ -663,7 +697,7 @@ export default class SetupCommand {
         setupCmd
             .command("uninstall")
             .description("uninstall the ASE plugin for a tool and the ASE tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
             .action(async (opts: { tool: string, dev: boolean }) => {
                 process.exit(await this.doUninstall(this.parseTool(opts.tool), opts.dev))
@@ -673,7 +707,7 @@ export default class SetupCommand {
         setupCmd
             .command("enable")
             .description("enable the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .action(async (opts: { tool: string }) => {
                 process.exit(await this.doEnable(this.parseTool(opts.tool)))
             })
@@ -682,7 +716,7 @@ export default class SetupCommand {
         setupCmd
             .command("disable")
             .description("disable the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .action(async (opts: { tool: string }) => {
                 process.exit(await this.doDisable(this.parseTool(opts.tool)))
             })
@@ -708,7 +742,7 @@ export default class SetupCommand {
         mcpCmd
             .command("activate [servers]")
             .description("activate pre-defined MCP servers (comma-separated list, or \"all\")")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .action(async (servers: string | undefined, opts: { tool: string }) => {
                 process.exit(await this.doMcp("activate", this.parseTool(opts.tool), servers ?? "all"))
             })
@@ -717,7 +751,7 @@ export default class SetupCommand {
         mcpCmd
             .command("deactivate [servers]")
             .description("deactivate pre-defined MCP servers (comma-separated list, or \"all\")")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .action(async (servers: string | undefined, opts: { tool: string }) => {
                 process.exit(await this.doMcp("deactivate", this.parseTool(opts.tool), servers ?? "all"))
             })
