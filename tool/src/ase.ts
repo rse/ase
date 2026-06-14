@@ -17,6 +17,7 @@ import SetupCommand                from "./ase-setup.js"
 import StatuslineCommand           from "./ase-statusline.js"
 import TaskCommand                 from "./ase-task.js"
 import ArtifactCommand             from "./ase-artifact.js"
+import CompatCommand               from "./ase-compat.js"
 import pkg                         from "../package.json" with { type: "json" }
 
 /*  type of top-level (global) options  */
@@ -65,6 +66,7 @@ const main = async (): Promise<void> => {
     new StatuslineCommand(log).register(program)
     new TaskCommand(log).register(program)
     new ArtifactCommand(log).register(program)
+    new CompatCommand().register(program)
     new DiagramCommand(log).register(program)
 
     /*  parse program arguments  */

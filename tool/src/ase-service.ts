@@ -23,6 +23,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 
 import { Config, configSchema, ConfigMCP } from "./ase-config.js"
 import type Log                          from "./ase-log.js"
+import { CompatMCP }                     from "./ase-compat.js"
 import { DiagramMCP }                    from "./ase-diagram.js"
 import { TaskMCP }                       from "./ase-task.js"
 import { MarkdownMCP }                   from "./ase-markdown.js"
@@ -265,6 +266,7 @@ export default class ServiceCommand {
         const buildMcpServer = (): McpServer => {
             const mcp = new McpServer({ name: "ase", version: pkg.version })
             new ServiceMCP({ projectId: ctx.projectId, port: ctx.port, startTime }).register(mcp)
+            new CompatMCP().register(mcp)
             new DiagramMCP().register(mcp)
             new TaskMCP(this.log).register(mcp)
             new MarkdownMCP().register(mcp)
