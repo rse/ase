@@ -52,8 +52,8 @@ for the technology stack to *provide* the *needed functionality*
             Functionality: Which functionality should the components provide?
             <answer-1/>: (grounded candidate functionality 1)
             <answer-2/>: (grounded candidate functionality 2)
-            <answer-3/>: (grounded candidate functionality 2)
-            <answer-4/>: (grounded candidate functionality 3)
+            <answer-3/>: (grounded candidate functionality 3)
+            <answer-4/>: (grounded candidate functionality 4)
         </expand>
 
         Then use the <result/> and its corresponding grounded candidate
