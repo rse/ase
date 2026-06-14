@@ -2,6 +2,16 @@
 ChangeLog
 =========
 
+0.9.12 (2026-06-14)
+-------------------
+
+- FEATURE: add support for OpenAI Codex CLI
+- FEATURE: provide `ase-meta-compat` skill to self-test agent/LLM compatibility to ASE (`ase-compat.ts`)
+- IMPROVEMENT: improve reading/writing to stdin to be more robust and Codex-ready (`ase-hook.ts`)
+- IMPROVEMENT: add OpenAI Codex compatibility table and more models to README (`README.md`)
+- IMPROVEMENT: update workflow diagram for compat skill (`docs/workflow.*`)
+- CLEANUP: avoid colons to not confuse parsing and align dialog wording (`ase-code-{craft,refactor,resolve}`, `ase-task-grill`)
+
 0.9.11 (2026-06-14)
 -------------------
 
