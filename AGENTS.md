@@ -24,12 +24,13 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   installs/updates/uninstalls/enables/disables the tool and its
   companion plugin and (de)activates pre-defined foreign MCP servers
   (subcommands: `install`, `update`, `uninstall`, `enable`, `disable`,
-  all with `--tool claude|copilot`, plus `mcp list` and `mcp
+  all with `--tool claude|copilot|codex`, plus `mcp list` and `mcp
   activate`/`mcp deactivate [<servers>]` which read per-server API keys
   from `ASE_MCP_KEY_<ID>` environment variables, also sourced from
   `.env` files);
   `ase statusline` renders the *Claude Code* (or *GitHub Copilot CLI*)
-  status line; `ase task` manages persisted task plans under
+  status line (*OpenAI Codex CLI* has no scriptable status line, so
+  `ase statusline --tool codex` errors out); `ase task` manages persisted task plans under
   `<project>/.ase/task/<id>/plan.md` (subcommands: `list`, `load`,
   `edit`, `save`, `delete`, `rename`, `purge`); `ase diagram` renders
   Mermaid diagrams as Unicode/ASCII art.
@@ -43,10 +44,13 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
 
 - `plugin/` — the Claude Code plugin published via the marketplace
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
-  `plugin/.claude-plugin/plugin.json`. Layout:
-  - `plugin/skills/<name>/SKILL.md` — the skill set (35 skills total),
-    grouped by `ase-meta-*` (brainstorm, changelog, chat, commit, diaboli,
-    diff, evaluate, persona, quorum, review, search, steelman,
+  `plugin/.claude-plugin/plugin.json` (with a *GitHub Copilot CLI*
+  variant at `plugin/.github/plugin/plugin.json` and an *OpenAI Codex
+  CLI* variant at `plugin/.codex-plugin/plugin.json`, each differing only
+  by their `hooks` wiring). Layout:
+  - `plugin/skills/<name>/SKILL.md` — the skill set (36 skills total),
+    grouped by `ase-meta-*` (brainstorm, changelog, chat, commit, compat,
+    diaboli, diff, evaluate, persona, quorum, review, search, steelman,
     why), `ase-code-*`
     (analyze, craft, explain, insight, lint, refactor, resolve), `ase-arch-*`
     (analyze, discover), `ase-task-*` (id, list, edit, grill, view,
@@ -56,8 +60,9 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     `ase-meta-search`, `ase-meta-diagram`, `ase-meta-review`,
     `ase-code-lint`, `ase-docs-proofread`).
   - `plugin/commands/` — slash commands directory (currently empty).
-  - `plugin/hooks/hooks.json` and `plugin/hooks/hooks-copilot.json` —
-    hook wirings into *Claude Code* / Copilot.
+  - `plugin/hooks/hooks.json`, `plugin/hooks/hooks-copilot.json`, and
+    `plugin/hooks/hooks-codex.json` — hook wirings into *Claude Code* /
+    *GitHub Copilot CLI* / *OpenAI Codex CLI*.
   - `plugin/meta/*.md` — meta documents injected into sessions or
     used by skills: `ase-constitution.md` (session constitution),
     `ase-skill.md` (skill-authoring guide), `ase-control.md`

@@ -50,10 +50,12 @@ Notices
 > **TOOL SUPPORT FOCUS**: The primary focus of **ASE** is on the Agentic AI Coding tool [*Claude
 > Code*](https://code.claude.com). The secondary focus is on the support
 > for [*GitHub Copilot CLI*](https://github.com/features/copilot/cli)
-> (just set environment variable `ASE_TOOL=copilot`). In the future,
-> additional support could be provided also for alternative tools
-> &mdash; if their agent harness features (especially hooks, interactive
-> user dialog tool, etc.) realistically allow it.
+> (just set environment variable `ASE_TOOL=copilot`) and [*OpenAI Codex
+> CLI*](https://github.com/openai/codex) (just set environment variable
+> `ASE_TOOL=codex`). In the future, additional support could be provided
+> also for alternative tools &mdash; if their agent harness features
+> (especially hooks, interactive user dialog tool, etc.) realistically
+> allow it.
 
 > [!NOTE]
 > **STATUS QUO**: **ASE** is still under active initial development
@@ -287,7 +289,7 @@ User Setup
 ### Prerequisites
 
 - Operating System: macOS, Linux, Windows
-- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
+- Agent Tool: [Claude Code](https://code.claude.com), [GitHub Copilot CLI](https://github.com/features/copilot/cli), or [OpenAI Codex CLI](https://github.com/openai/codex)
 - Runtime Engine: [Node.js](https://nodejs.org)
 
 ### Installation
@@ -297,21 +299,21 @@ User Setup
 npm install -g @rse/ase
 
 #   install ASE plugin into agent tool
-ase setup install [--tool claude|copilot]
+ase setup install [--tool claude|copilot|codex]
 ```
 
 ### Updating
 
 ```
 #   update ASE tool in PATH and ASE plugin in agent tool
-ase setup update [--tool claude|copilot]
+ase setup update [--tool claude|copilot|codex]
 ```
 
 ### Uninstallation
 
 ```
 #   uninstall ASE tool from PATH and ASE plugin from agent tool
-ase setup uninstall [--tool claude|copilot]
+ase setup uninstall [--tool claude|copilot|codex]
 ```
 
 Foreign MCP Servers
@@ -326,10 +328,10 @@ setup mcp`.
 ase setup mcp list
 
 #   activate MCP servers in the agent tool
-ase setup mcp activate   [--tool claude|copilot] [<server>[,...]]
+ase setup mcp activate   [--tool claude|copilot|codex] [<server>[,...]]
 
 #   deactivate MCP servers in the agent tool
-ase setup mcp deactivate [--tool claude|copilot] [<server>[,...]]
+ase setup mcp deactivate [--tool claude|copilot|codex] [<server>[,...]]
 ```
 
 Each MCP server reads its API key from an environment
@@ -434,8 +436,8 @@ Design Decisions
 <td width="50%" valign="top">
 
 - **Agent &amp; Plugin**:
-  **ASE** is a plugin for the agent tools Claude Code and GitHub Copilot
-  CLI, and can be non-intrusively installed and later also residue-free
+  **ASE** is a plugin for the agent tools Claude Code, GitHub Copilot
+  CLI, and OpenAI Codex CLI, and can be non-intrusively installed and later also residue-free
   uninstalled from those agent tools at any time. Especially, **ASE** is
   intended to be used side-by-side with other skills and MCP services.
 
@@ -512,6 +514,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-meta-**changelog**](plugin/skills/ase-meta-changelog/help.md)<br/>
 [ase-meta-**commit**](plugin/skills/ase-meta-commit/help.md)<br/>
 [ase-meta-**diff**](plugin/skills/ase-meta-diff/help.md)<br/>
+[ase-meta-**compat**](plugin/skills/ase-meta-compat/help.md)<br/>
 
 </td>
 <td width="25%" valign="top">
@@ -621,17 +624,21 @@ The following tables shows the current known compatibility for **ASE**:
 
 | Agent Harness            | Version | Compatibility | Goal        |
 | ------------------------ | ------- | ------------- | ----------- |
-| Anthropic Claude Code    | 2.1     | **100%**      | **primary** |
-| GitHub Copilot CLI       | 1.0     | **95%**       | secondary   |
+| Anthropic Claude Code    | 2.1.x   | **100%**      | **primary** |
+| GitHub Copilot CLI       | 1.0.x   | **95%**       | secondary   |
+| OpenAI Codex CLI &dagger;| 0.x.x   | **90%**       | secondary   |
 
-| LLM                      | Version | Compatibility | Goal        |
-| ------------------------ | ------- | ------------- | ----------- |
-| Anthropic Claude Haiku   | 4.5     | **10%**       | none        |
-| Anthropic Claude Sonnet  | 4.6     | **80%**       | secondary   |
-| Anthropic Claude Opus    | 4.8     | **100%**      | **primary** |
-| Anthropic Claude Fable   | 5       | **80%**       | secondary   |
-| Gemini Flash             | 3.5     | **30%**       | none        |
-| OpenAI GPT               | 5.5     | **30%**       | none        |
+| LLM                             | Version | Compatibility | Goal        |
+| ------------------------------- | ------- | ------------- | ----------- |
+| Anthropic Claude Haiku          | 4.5     | **70%**       | none        |
+| Anthropic Claude Sonnet         | 4.6     | **95%**       | secondary   |
+| Anthropic Claude Opus           | 4.8     | **100%**      | **primary** |
+| Anthropic Claude Fable &Dagger; | 5       | **95%**       | secondary   |
+| Gemini Flash                    | 3.5     | **70%**       | none        |
+| OpenAI GPT                      | 5.5     | **95%**       | none        |
+
+&dagger; *OpenAI Codex CLI* has no scriptable custom status line support at all.
+&Dagger; *Anthropic Claude Fable* suppresses intermediate outputs.
 
 See Also
 --------
