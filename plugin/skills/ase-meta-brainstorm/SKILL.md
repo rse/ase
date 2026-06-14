@@ -129,10 +129,9 @@ Honor the following tenets throughout the brainstorming:
 
             <expand name="custom-dialog" arg1="--other">
                 <facet-M/>: <question-M/>
-                <answer-M-1/>: (first grounded candidate answer)
-                <answer-M-2/>: (second grounded candidate answer)
-                <answer-M-3/>: (third grounded candidate answer)
-                <answer-M-4/>: (fourth grounded candidate answer)
+                <answer-M-1/>: (grounded candidate answer 1)
+                <answer-M-2/>: (grounded candidate answer 2)
+                [...]
             </expand>
 
         4.  Dispatch on the dialog <result/>:
