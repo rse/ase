@@ -175,14 +175,32 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
             2.  Check the code base and your world knowledge and
                 use this information to find *up to three* grounded
-                alternative answers <answer-N-K/> (K={2,3,4}).
+                alternative answers <answer-N-K/> (K={2,3,4}), so there
+                are between two and four answer options in total.
 
-            3.  Use an interactive user dialog
-                with header <aspect-N/> and question <question-N/>, and
-                let the user select the <answer-N/> out of <answer-N-K/>
-                (K={1..4}). In this dialog, mark the <answer-N-1/> by
-                appending ` ⚝ **CURRENT PLAN** ⚝` to its option name (not the
-                description).
+            3.  In the following, you *MUST* *NOT* use the
+                <user-dialog-tool/> tool! Instead, you *MUST* just show a
+                custom output, let the user enter input, and then you set
+                the result accordingly.
+
+                Let the user select the <answer-N/> out of the answer
+                alternatives <answer-N-K/> by raising a question with the
+                following custom dialog, where per alternative <answer-N-K/>
+                you determine a brief label <answer-N-K-label/> and a
+                description <answer-N-K-description/>, and you mark the
+                <answer-N-1/> by prefixing its description with
+                `⚝ **CURRENT PLAN** ⚝ `. Emit only the answer lines for the
+                alternatives <answer-N-K/> you actually determined in the
+                previous step (between two and four lines in total):
+
+                <expand name="custom-dialog" arg1="--other">
+                    <aspect-N/>: <question-N/>
+                    <answer-N-1-label/>: ⚝ **CURRENT PLAN** ⚝ <answer-N-1-description/>
+                    <answer-N-K-label/>: <answer-N-K-description/>
+                    [...]
+                </expand>
+
+                Set <answer-N/> to the selected <result/>.
 
             4.  Output the following <template/>:
 
