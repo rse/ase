@@ -195,7 +195,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
                 <expand name="custom-dialog" arg1="--other">
                     <aspect-N/>: <question-N/>
-                    <answer-N-1-label/>: ⚝ **CURRENT PLAN** ⚝ <answer-N-1-description/>
+                    <answer-N-1-label/>: ⚝ **CURRENT PLAN** ⚝ - <answer-N-1-description/>
                     <answer-N-K-label/>: <answer-N-K-description/>
                     [...]
                 </expand>
