@@ -19,10 +19,10 @@ import Version                              from "./ase-version.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
 
 /*  type of supported tool (host) systems  */
-type Tool = "claude" | "copilot"
+type Tool = "claude" | "copilot" | "codex"
 
 /*  per-tool dispatch table for the parts that actually differ between
-    Claude Code and GitHub Copilot CLI hook integrations.  */
+    Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI hook integrations.  */
 type ToolSpec = {
     toolNameField:           "tool_name"  | "toolName"
     toolInputField:          "tool_input" | "toolArgs"
@@ -32,6 +32,7 @@ type ToolSpec = {
     addonMcpToolNamePattern: RegExp
     preToolUseWrapped:       boolean
     preToolUseEvent:         "PreToolUse" | "preToolUse"
+    approvalEvent:           "PreToolUse" | "PermissionRequest"
 }
 const addonMcpServers = [
     "chat-alibaba-qwen",
@@ -65,7 +66,8 @@ const toolSpecs: Record<Tool, ToolSpec> = {
         mcpToolNamePattern:      /^mcp__plugin_ase_ase__.+/,
         addonMcpToolNamePattern: addonMcpToolNamePattern("mcp__", "__.+"),
         preToolUseWrapped:       true,
-        preToolUseEvent:         "PreToolUse"
+        preToolUseEvent:         "PreToolUse",
+        approvalEvent:           "PreToolUse"
     },
     "copilot": {
         toolNameField:           "toolName",
@@ -75,7 +77,19 @@ const toolSpecs: Record<Tool, ToolSpec> = {
         mcpToolNamePattern:      /^ase-.+/,
         addonMcpToolNamePattern: addonMcpToolNamePattern("", "-.+"),
         preToolUseWrapped:       false,
-        preToolUseEvent:         "preToolUse"
+        preToolUseEvent:         "preToolUse",
+        approvalEvent:           "PreToolUse"
+    },
+    "codex": {
+        toolNameField:           "tool_name",
+        toolInputField:          "tool_input",
+        toolInputIsString:       false,
+        bashToolName:            "Bash",
+        mcpToolNamePattern:      /^mcp__ase__.+/,
+        addonMcpToolNamePattern: addonMcpToolNamePattern("mcp__", "__.+"),
+        preToolUseWrapped:       true,
+        preToolUseEvent:         "PreToolUse",
+        approvalEvent:           "PermissionRequest"
     }
 }
 
@@ -161,13 +175,24 @@ export default class HookCommand {
         })
     }
 
-    /*  handler for "ase hook session-start" (both tools)  */
+    /*  handler for "ase hook session-start" (all tools)  */
     private async doSessionStart (tool: Tool): Promise<number> {
         /*  determine plugin root (env var name differs per tool)  */
-        const pluginRootVar = tool === "copilot" ? "COPILOT_PLUGIN_ROOT" : "CLAUDE_PLUGIN_ROOT"
-        const pluginRoot = process.env[pluginRootVar] ?? ""
+        let pluginRootVars: string[]
+        if (tool === "copilot")
+            pluginRootVars = [ "COPILOT_PLUGIN_ROOT" ]
+        else if (tool === "codex")
+            pluginRootVars = [ "PLUGIN_ROOT", "CLAUDE_PLUGIN_ROOT" ]
+        else
+            pluginRootVars = [ "CLAUDE_PLUGIN_ROOT" ]
+        let pluginRoot = ""
+        for (const pluginRootVar of pluginRootVars)
+            if ((process.env[pluginRootVar] ?? "") !== "") {
+                pluginRoot = process.env[pluginRootVar]!
+                break
+            }
         if (pluginRoot === "")
-            throw new Error(`${pluginRootVar} environment variable is not set`)
+            throw new Error(`${pluginRootVars.join("/")} environment variable is not set`)
 
         /*  determine path to external files  */
         const filePkg = path.join(pluginRoot, ".claude-plugin", "plugin.json")
@@ -297,9 +322,10 @@ export default class HookCommand {
         md = this.expandReferences(md, path.dirname(fileMd))
 
         /*  inject markdown into session context.
-            Claude Code expects the context nested in "hookSpecificOutput";
-            Copilot CLI expects a flat top-level "additionalContext" field.  */
-        const payload = tool === "claude" ? {
+            Claude Code and OpenAI Codex CLI expect the context nested in
+            "hookSpecificOutput"; Copilot CLI expects a flat top-level
+            "additionalContext" field.  */
+        const payload = tool !== "copilot" ? {
             "hookSpecificOutput": {
                 "hookEventName":     "SessionStart",
                 "additionalContext": md
@@ -400,19 +426,12 @@ export default class HookCommand {
         hook auto-approve subsequent "Edit" invocations  */
     private editCapableSkills = [ "ase-code-lint", "ase-docs-proofread" ]
 
-    /*  handler for "ase hook pre-tool-use" (both tools)  */
-    private doPreToolUse (tool: Tool): number {
-        const spec = toolSpecs[tool]
-
-        /*  read tool invocation information  */
-        const stdin = fs.readFileSync(0, "utf8")
-        const input = this.parseJSON(stdin, v.looseObject({
-            session_id: v.optional(v.string()),
-            sessionId:  v.optional(v.string())
-        }))
-
-        /*  determine whether to auto-approve the tool invocation
-            (field names and value shapes differ between tools)  */
+    /*  determine whether an ASE tool invocation described by the parsed
+        hook input should be auto-approved, and (if so) the human-readable
+        reason. The input field names and value shapes differ between
+        tools, but the decision logic is shared by the "pre-tool-use" and
+        "permission-request" handlers.  */
+    private decideApproval (spec: ToolSpec, input: Record<string, unknown>): { approve: boolean, reason: string } {
         const toolName  = typeof input[spec.toolNameField] === "string" ?
             input[spec.toolNameField] as string : ""
         let toolInput: { command?: string, skill?: string } = {}
@@ -424,32 +443,47 @@ export default class HookCommand {
             }))
         else if (!spec.toolInputIsString && typeof rawInput === "object" && rawInput !== null)
             toolInput = rawInput as { command?: string, skill?: string }
-        let approve = false
-        let reason  = ""
-        if (toolName === spec.bashToolName && /^ase(\s|$)/.test(toolInput.command ?? "")) {
-            approve = true
-            reason  = "ASE CLI invocation auto-approved"
-        }
-        else if (toolName === "Skill" && /^(?:ase:)?ase-.+/.test(toolInput.skill ?? "")) {
-            approve = true
-            reason  = "ASE skill invocation auto-approved"
-        }
-        else if (spec.mcpToolNamePattern.test(toolName)) {
-            approve = true
-            reason  = "ASE MCP tool invocation auto-approved"
-        }
-        else if (spec.addonMcpToolNamePattern.test(toolName)) {
-            approve = true
-            reason  = "ASE addon MCP tool invocation auto-approved"
-        }
+        if (toolName === spec.bashToolName && /^ase(\s|$)/.test(toolInput.command ?? ""))
+            return { approve: true, reason: "ASE CLI invocation auto-approved" }
+        else if (toolName === "Skill" && /^(?:ase:)?ase-.+/.test(toolInput.skill ?? ""))
+            return { approve: true, reason: "ASE skill invocation auto-approved" }
+        else if (spec.mcpToolNamePattern.test(toolName))
+            return { approve: true, reason: "ASE MCP tool invocation auto-approved" }
+        else if (spec.addonMcpToolNamePattern.test(toolName))
+            return { approve: true, reason: "ASE addon MCP tool invocation auto-approved" }
         else if (toolName === "Edit") {
             const sessionId   = this.pickSessionId(input)
             const activeSkill = this.readActiveSkill(sessionId)
-            if (this.editCapableSkills.includes(activeSkill)) {
-                approve = true
-                reason  = `${activeSkill}: edit auto-approved for active edit-capable skill`
-            }
+            if (this.editCapableSkills.includes(activeSkill))
+                return { approve: true, reason: `${activeSkill}: edit auto-approved for active edit-capable skill` }
         }
+        return { approve: false, reason: "" }
+    }
+
+    /*  handler for "ase hook pre-tool-use" (all tools).
+        For Claude Code and Copilot CLI this is where ASE tool
+        invocations are auto-approved (via "permissionDecision: allow").
+        OpenAI Codex CLI rejects that mechanism in "PreToolUse", so for
+        Codex this handler stays silent and approval is granted in the
+        separate "permission-request" handler instead -- the handler must
+        still drain stdin, as Codex treats a non-draining hook as a hard
+        error.  */
+    private async doPreToolUse (tool: Tool): Promise<number> {
+        const spec = toolSpecs[tool]
+
+        /*  read tool invocation information  */
+        const stdin = await this.readStdin()
+        const input = this.parseJSON(stdin, v.looseObject({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string())
+        }))
+
+        /*  Codex auto-approves through "PermissionRequest", not here  */
+        if (spec.approvalEvent !== "PreToolUse")
+            return 0
+
+        /*  determine whether to auto-approve the tool invocation  */
+        const { approve, reason } = this.decideApproval(spec, input)
 
         /*  emit permission decision (or stay silent to defer to default flow).
             Claude Code expects the decision nested in "hookSpecificOutput";
@@ -465,15 +499,47 @@ export default class HookCommand {
                 "permissionDecision":       "allow",
                 "permissionDecisionReason": reason
             }
-            process.stdout.write(JSON.stringify(payload))
+            await this.writeStdout(JSON.stringify(payload))
+        }
+        return 0
+    }
+
+    /*  handler for "ase hook permission-request" (OpenAI Codex CLI only).
+        Codex fires this event only when a tool invocation would otherwise
+        require interactive user approval, and -- unlike "PreToolUse" --
+        honors an auto-approval here through "decision.behavior: allow".
+        Staying silent (or returning a non-approval) defers to Codex's
+        normal approval flow.  */
+    private async doPermissionRequest (tool: Tool): Promise<number> {
+        const spec = toolSpecs[tool]
+
+        /*  read tool invocation information  */
+        const stdin = await this.readStdin()
+        const input = this.parseJSON(stdin, v.looseObject({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string())
+        }))
+
+        /*  determine whether to auto-approve the tool invocation  */
+        const { approve } = this.decideApproval(spec, input)
+
+        /*  emit the Codex "PermissionRequest" approval decision  */
+        if (approve) {
+            const payload = {
+                "hookSpecificOutput": {
+                    "hookEventName": "PermissionRequest",
+                    "decision":      { "behavior": "allow" }
+                }
+            }
+            await this.writeStdout(JSON.stringify(payload))
         }
         return 0
     }
 
     /*  parse and validate the --tool option  */
     private parseTool (value: string): Tool {
-        if (value !== "claude" && value !== "copilot")
-            throw new Error(`invalid --tool value: "${value}" (expected "claude" or "copilot")`)
+        if (value !== "claude" && value !== "copilot" && value !== "codex")
+            throw new Error(`invalid --tool value: "${value}" (expected "claude", "copilot", or "codex")`)
         return value
     }
 
@@ -496,45 +562,54 @@ export default class HookCommand {
         hookCmd
             .command("session-start")
             .description("handle SessionStart hook event")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .action(async (opts: { tool: string }) => {
-                process.exit(await this.doSessionStart(this.parseTool(opts.tool)))
+                process.exitCode = await this.doSessionStart(this.parseTool(opts.tool))
             })
 
         /*  register CLI sub-command "ase hook session-end"  */
         hookCmd
             .command("session-end")
             .description("handle SessionEnd hook event")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
-            .action((opts: { tool: string }) => {
-                process.exit(this.doSessionEnd(this.parseTool(opts.tool)))
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .action(async (opts: { tool: string }) => {
+                process.exitCode = await this.doSessionEnd(this.parseTool(opts.tool))
             })
 
         /*  register CLI sub-command "ase hook pre-tool-use"  */
         hookCmd
             .command("pre-tool-use")
             .description("handle tool PreToolUse hook event")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
-            .action((opts: { tool: string }) => {
-                process.exit(this.doPreToolUse(this.parseTool(opts.tool)))
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .action(async (opts: { tool: string }) => {
+                process.exitCode = await this.doPreToolUse(this.parseTool(opts.tool))
+            })
+
+        /*  register CLI sub-command "ase hook permission-request"  */
+        hookCmd
+            .command("permission-request")
+            .description("handle tool PermissionRequest hook event (Codex CLI)")
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .action(async (opts: { tool: string }) => {
+                process.exitCode = await this.doPermissionRequest(this.parseTool(opts.tool))
             })
 
         /*  register CLI sub-command "ase hook user-prompt-submit"  */
         hookCmd
             .command("user-prompt-submit")
             .description("handle UserPromptSubmit hook event (mark agent as busy)")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
-            .action((opts: { tool: string }) => {
-                process.exit(this.doUserPromptSubmit(this.parseTool(opts.tool)))
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .action(async (opts: { tool: string }) => {
+                process.exitCode = await this.doUserPromptSubmit(this.parseTool(opts.tool))
             })
 
         /*  register CLI sub-command "ase hook stop"  */
         hookCmd
             .command("stop")
             .description("handle Stop hook event (mark agent as ready)")
-            .option("-t, --tool <tool>", "target tool (\"claude\" or \"copilot\")", toolDflt)
-            .action((opts: { tool: string }) => {
-                process.exit(this.doStop(this.parseTool(opts.tool)))
+            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .action(async (opts: { tool: string }) => {
+                process.exitCode = await this.doStop(this.parseTool(opts.tool))
             })
     }
 }
