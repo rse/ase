@@ -119,7 +119,8 @@ export class GetoptMCP {
                 if (listOpts.length > 0) {
                     const opts = cmd.opts() as Record<string, unknown>
                     for (const { long, choices } of listOpts) {
-                        const v = opts[long]
+                        const key = long.replace(/-(.)/g, (_, c: string) => c.toUpperCase())
+                        const v = opts[key]
                         if (typeof v !== "string")
                             continue
                         const items = v.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
