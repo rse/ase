@@ -871,8 +871,8 @@ for main, alternative, and exceptional paths.
 
     -   <spec-uc-usecase-description/>: a concise paragraph (1-3
         sentences) of prose describing the use case at a glance, without
-        prescribing the step-by-step flow (which belongs to the **Use
-        Case Scenarios** **Artifact**).
+        prescribing the step-by-step flow (which belongs to the
+        **SCENARIO** blocks of this use case).
 
     -   In case the use case realizes no specific functional requirement,
         the entire `- Requirements:` bullet point is omitted.
