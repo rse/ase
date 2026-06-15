@@ -326,12 +326,3 @@ explicitly requested by this procedure via outputs based on a <template/>!
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to implementation**
             </template>
-
-        -   If <result/> matches `OTHER: <text/>` or is any other
-            unrecognized value:
-            Treat it as `DONE` (the updated plan is already saved):
-            only output the following <template/> and then *STOP*.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- done**
-            </template>
