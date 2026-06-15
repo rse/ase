@@ -152,7 +152,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         the <instruction/> and all decisions you derived from the
         <instruction/>.
 
-    8.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+    9.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP server and use the `text` field of its response for
         <timestamp-modified/> information. If <timestamp-created/> is
         still unset (because the previous <content/> had no `Created:`
