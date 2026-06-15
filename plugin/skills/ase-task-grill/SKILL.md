@@ -105,12 +105,11 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
             Set <plan><text/></plan> (set plan to text).
             Calculate the number of words <words/> of <plan/>.
+            Then output the following <template/>:
 
-        Output the following <template/>:
-
-        <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **<status/>**
-        </template>
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **<status/>**
+            </template>
 
     2.  <if condition="<plan/> is empty">
         Complain and tell the user to use the `ase-code-resolve`,
