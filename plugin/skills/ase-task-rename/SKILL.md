@@ -71,6 +71,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
         </template>
         </if>
 
+    6.  <if condition="<old/> is equal <new/>">
+        Only output the following <template/> and then immediately
+        *STOP* processing the entire current skill:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<old/>**, ▶ status: **task unchanged (old and new task id are equal)**
+        </template>
+        </if>
+
 2.  **Perform Operation**:
 
     1.  Call the `ase_task_rename(old: "<old/>", new: "<new/>")` tool of the
