@@ -52,9 +52,9 @@ Configure Task Id
     </if>
 
 4.  <if condition="<request/> is NOT empty">
-    -   Set <ase-task-id><request/></ase-task-id> and
-        call the `ase_task_id(id: "<ase-task-id/>", session: "<ase-session-id/>")`
-        tool from the `ase` MCP server.
+    -   Call the `ase_task_id(id: "<request/>", session: "<ase-session-id/>")`
+        tool from the `ase` MCP server. Check the response as mandated
+        above; only on a clean response set <ase-task-id><request/></ase-task-id>.
 
     -   Output:
         <template>
