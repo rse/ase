@@ -276,7 +276,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         | Axis        | Score      | Findings                                                    |
         | ----------- | ---------- | ----------------------------------------------------------- |
-        | **<axis/>** | <score/>/5 | ● **EVIDENCE**: <evidence/> ● **MITIGATION**: <mitigation/> |
+        | **<axis/>** | <score/>/5 | ● **EVIDENCE**: <evidence/><if condition="axis score is `>= 4`"> ● **MITIGATION**: <mitigation/></if> |
         </template>
     </step>
 
