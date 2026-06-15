@@ -71,6 +71,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <problem-id/> and stop processing.
 
     2.  <if condition="
+            <problem-id/> is not set AND
             <problem/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
         ">
         Set <ase-task-id><problem/></ase-task-id> (set task id to problem)
