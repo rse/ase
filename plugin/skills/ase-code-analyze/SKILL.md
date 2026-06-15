@@ -246,7 +246,8 @@ problems in *performance* and *efficiency*, or problems in *security*.
     dropped, skip the per-problem report but still purge any stale
     persisted problems with a *single* `ase_kv_batch` call to the `ase`
     MCP server with `transactional` set to `true` and a `commands`
-    parameter array holding exactly one `{ command: "clear" }` entry,
+    parameter array holding exactly one `{ command: "clear", prefix:
+    "ase-issue-" }` entry,
     and still emit the final hint <template/> below.
 
     In this STEP 3, for *EVERY* surviving problem, immediately report
