@@ -248,9 +248,11 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-head title="<title/>"/>` should be expanded, use
-    (where <title-len/> is the number of characters in the string
-    `⧉ ASE: <title/>`, and <bar/> is the `─` character repeated exactly
-    (67 - <title-len/>) times):
+    (where <raw-title/> is the visible un-styled text `⧉ ASE: <title/>`,
+    <raw-title-len/> is the number of characters in <raw-title/>, and
+    <bar/> is the `─` character repeated exactly (67 - <raw-title-len/>)
+    times -- the very same bar-width rule as `<ase-tpl-foot/>` and
+    `<ase-tpl-boxed/>`, so equal visible text yields equal total width):
 
     <template>
 
@@ -267,9 +269,11 @@ Template Patterns
     </template>
 
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
-    (where <title-len/> is the number of characters in the string
-    `⧉ ASE: <title/>`, and <bar/> is the `─` character repeated exactly
-    (67 - <title-len/>) times):
+    (where <raw-title/> is the visible un-styled text `⧉ ASE: <title/>`,
+    <raw-title-len/> is the number of characters in <raw-title/>, and
+    <bar/> is the `─` character repeated exactly (67 - <raw-title-len/>)
+    times -- the very same bar-width rule as `<ase-tpl-head/>` and
+    `<ase-tpl-boxed/>`, so equal visible text yields equal total width):
 
     <template>
 
@@ -291,7 +295,8 @@ Template Patterns
     </else>
 
 -   When `<ase-tpl-boxed title="<title/>"[ subtitle="<subtitle/>"]><content/></ase-tpl-boxed>`
-    should be expanded use the following helper placeholder and then the <template/>:
+    should be expanded use the following helper placeholders and then
+    the following <template/>:
 
     -   <if condition="<subtitle/> is not empty">
             Set <raw-title>⧉ ASE: <title/>: <subtitle/></raw-title>.
@@ -301,8 +306,11 @@ Template Patterns
             Set <raw-title>⧉ ASE: <title/></raw-title>.
             Set <render-title>⧉ ASE: **`<title/>`**</render-title>.
         </else>
-    -   Set <raw-title-len/> to the number of characters in <raw-title/>.
-    -   Set <bar/> to the `─` character repeated exactly (67 - <raw-title-len/>) times.
+    -   Set <raw-title-len/> to the number of characters in the visible
+        un-styled text <raw-title/>.
+    -   Set <bar/> to the `─` character repeated exactly (67 - <raw-title-len/>)
+        times -- the very same bar-width rule as `<ase-tpl-head/>` and
+        `<ase-tpl-foot/>`, so equal visible text yields equal total width.
     -   Set <body/> to <content/> with all line-starts prefixed with `│ `.
 
     <template>
