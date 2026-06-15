@@ -28,7 +28,10 @@ export class Persona {
         const val = cfg.get("agent.persona")
         if (val === undefined)
             return "engineer"
-        return String(isScalar(val) ? val.value : val)
+        const style = String(isScalar(val) ? val.value : val)
+        if (!(Persona.styles as readonly string[]).includes(style))
+            return "engineer"
+        return style
     }
 
     /*  set the persona style on the strongest scope of an optional session  */
