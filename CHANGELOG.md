@@ -5,7 +5,11 @@ ChangeLog
 0.9.15 (2026-06-15)
 -------------------
 
+- IMPROVEMENT: be more precise when checking Created and updating Modified time (`ase-task-condense`, `ase-task-edit`, `ase-task-grill`, `ase-task-preflight`, `ase-task-reboot` skills)
+- IMPROVEMENT: use new prefix parameter to clear only relevant KV keys, and extend the analysis lists for additional indicators (`ase-code-analyze` skill)
+- BUGFIX: avoid MCP bridge crash before reconnect machinery exists (`ase-mcp.ts`)
 - UPDATE: extend agentic-levels diagram with knowledge and skill dimensions (`docs/agentic-levels.*`)
+- UPDATE: update documentation from latest code status quo (`AGENTS.md`, `README.md`, `docs/usage-tool.md`)
 
 0.9.14 (2026-06-15)
 -------------------
