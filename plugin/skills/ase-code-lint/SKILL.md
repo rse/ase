@@ -107,6 +107,16 @@ related to a set of code quality aspects.
         "ase-code-lint", scope: "session:<ase-session-id/>")` tool
         from the `ase` MCP server. Do not output anything in this substep.
 
+        *Critical safety invariant*: the marker set here grants `Edit`
+        auto-approval and *MUST* be cleared again (substep 3 below)
+        *before* this skill yields control, *regardless* of how the
+        iteration in substep 2 ends - whether it completes normally,
+        is aborted early (e.g. an `Edit` failure, an unparseable value,
+        or any other unexpected condition), or is otherwise interrupted.
+        If you ever stop or bail out of substep 2 early, you *MUST*
+        still perform substep 3 first. Never leave this marker active
+        for a later, unrelated `Edit`.
+
     2.  Iterate over all problems:
 
         <for items="<problems/>">
