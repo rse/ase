@@ -243,7 +243,7 @@ at runtime.
         for the component's existence and boundary.
 
     -   In case a component has no dependencies at all, the
-        entire `- Depends On:` bullet point is omitted.
+        entire `-   Depends On:` bullet point is omitted.
 
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
@@ -730,10 +730,11 @@ forces at play, the chosen response, and the reasoning that justifies it.
 
     ##  DECISION: <arch-dr-decision-name/> <a id="ARCH-DR-<arch-dr-decision-id/>"></a>
 
-    -   Status:    <arch-dr-decision-status/>
-    -   Affects:   <arch-dr-decision-element/>, [...]
-    -   Created:   <arch-dr-decision-created/>
-    -   Modified:  <arch-dr-decision-modified/>
+    -   Status:        <arch-dr-decision-status/>
+    -   Affects:       <arch-dr-decision-element/>, [...]
+    -   Superseded-By: <arch-dr-decision-superseded-by/>
+    -   Created:       <arch-dr-decision-created/>
+    -   Modified:      <arch-dr-decision-modified/>
 
     -   WHEN (Context):
         <arch-dr-decision-context/>
@@ -760,11 +761,16 @@ forces at play, the chosen response, and the reasoning that justifies it.
         <arch-dr-decision-decision/>, not longer than 80 characters.
 
     -   <arch-dr-decision-status/> is one of `proposed`, `accepted`,
-        `deprecated`, or `superseded by ARCH-DR-<arch-dr-decision-id/>`.
+        `deprecated`, or `superseded`.
 
     -   <arch-dr-decision-element/> is an `ARCH-FV-<arch-fv-component-id/>`
         or `ARCH-DP-<arch-dp-node-id/>` reference to the functional
         element or deployment node the decision affects.
+
+    -   <arch-dr-decision-superseded-by/> is an
+        `ARCH-DR-<arch-dr-decision-id/>` reference to the decision that
+        supersedes this decision. It is present if and only if the
+        <arch-dr-decision-status/> is `superseded`.
 
     -   <arch-dr-decision-created/> is the timestamp when this decision was
         created, and <arch-dr-decision-modified/> is the timestamp when
@@ -840,7 +846,10 @@ forces at play, the chosen response, and the reasoning that justifies it.
         job.
 
     -   In case the element reference is not present, the
-        entire `- Affects:` bullet point is omitted.
+        entire `-   Affects:` bullet point is omitted.
+
+    -   In case the <arch-dr-decision-status/> is not `superseded`, the
+        entire `-   Superseded-By:` bullet point is omitted.
 
     -   In case the `NOTES (Background)` content is not present, the
         entire `NOTES (Background)` chunk is omitted.
