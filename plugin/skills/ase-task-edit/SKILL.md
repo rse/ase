@@ -171,7 +171,11 @@ Set <content-dirty>true</content-dirty>.
 
     1.  Determine any existing plan content:
 
-        <if condition="<getopt-option-int-reuse-task/> is equal `true`">
+        <if condition="
+            <getopt-option-int-reuse-task/> is equal `true`
+            *and* a `ase_task_save(id: '<ase-task-id/>', ...)` tool call
+            exists earlier in the current session
+        ">
             Set <text/> to the `text` argument of the most recent
             `ase_task_save(id: '<ase-task-id/>', ...)` tool call,
             *without* calling `ase_task_load` again. Set <status>plan
