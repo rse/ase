@@ -5,6 +5,7 @@ ChangeLog
 0.9.16 (2026-06-15)
 -------------------
 
+- FEATURE: add `ase-meta-update` skill to update target artifact kinds from source artifact kinds (`ase-meta-update` skill)
 - BUGFIX: revert MCP bridge startup change that broke the service (`ase-mcp.ts`)
 
 0.9.15 (2026-06-15)
