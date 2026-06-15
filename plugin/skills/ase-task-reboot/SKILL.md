@@ -124,7 +124,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         (append extracted text to instruction).
         </if>
 
-    6.  <if condition="<content/> contains 'Created:  <text/>'">
+    6.  <if condition="<content/> contains '⎈   Created:  <text/>'">
         Set <timestamp-created><text/></timestamp-created> (set
         timestamp-created to extracted text)
         </if>

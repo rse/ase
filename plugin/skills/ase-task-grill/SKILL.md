@@ -213,7 +213,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     2.  Finally, update the plan in <plan/> based on all answers <answer-N/>.
 
-    3.  <if condition="<plan/> contains 'Created:  <text/>'">
+    3.  <if condition="<plan/> contains '⎈   Created:  <text/>'">
         Set <timestamp-created><text/></timestamp-created> (set
         timestamp-created to extracted text)
         </if>
