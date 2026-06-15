@@ -666,8 +666,16 @@ How the Non-Functional Requirements (NR) are addressed.
         perspective addresses, one of `Performance`, `Scalability`,
         `Reliability`, `Availability`, `Security`, `Privacy`,
         `Usability`, `Accessibility`, `Maintainability`, `Portability`,
-        `Compatibility`, or `Compliance` (aligned with the Non-Functional
-        Requirements categories).
+        `Compatibility`, or `Compliance`. This enumeration is a
+        solution-oriented refinement of the Non-Functional Requirements
+        (NR) categories and intentionally differs from them: the NR
+        categories follow the ISO/IEC 25010:2023 top-level characteristics
+        (and include `Safety` and `Flexibility`), whereas the perspective
+        qualities decompose some of these into the finer-grained,
+        architecturally actionable attributes `Scalability`,
+        `Availability`, `Privacy`, `Accessibility`, and `Portability`. A
+        perspective's quality therefore need not match the category of the
+        `SPEC-NR-<spec-nr-requirement-id/>` it addresses.
 
     -   <arch-qp-perspective-requirement/> is a
         `SPEC-NR-<spec-nr-requirement-id/>` reference to the corresponding
