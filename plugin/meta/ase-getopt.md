@@ -27,8 +27,8 @@ set placeholders into the context as a side-effect.
         `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)[...]]`, set
         <getopt-option-<long/>/> to <default/> (for `=<default/>`
         form), or to the *single token* <c1/> (the first choice, both
-        for the choice form `=(<c1/>|<c2>/|...)` and for the list form
-        `=(<c1/>|<c2>/|...)...` -- an *unsupplied* list-option always
+        for the choice form `=(<c1/>|<c2/>|...)` and for the list form
+        `=(<c1/>|<c2/>|...)...` -- an *unsupplied* list-option always
         defaults to the single token <c1/>, *not* to a whole list),
         or to `false` (for value-less options). Then set
         <getopt-arguments><getopt-args/></getopt-arguments>.
