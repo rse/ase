@@ -637,7 +637,7 @@ The following tables shows the current known compatibility for **ASE**:
 | OpenAI GPT                      | 5.5     | **95%**       | none        |
 | Gemini Flash                    | 3.5     | **70%**       | none        |
 
-&dagger; *OpenAI Codex CLI* has no scriptable custom status line support at all.
+&dagger; *OpenAI Codex CLI* has no scriptable custom status line support at all.<br/>
 &Dagger; *Anthropic Claude Fable* suppresses intermediate outputs.
 
 See Also
