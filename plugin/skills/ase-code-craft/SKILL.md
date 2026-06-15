@@ -319,7 +319,19 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         as <head/> (or `none` if the list is `none`/empty).
         Set <args>--int-reuse-task</args>.
 
-        1.  <if condition="<head/> is equal `IMPLEMENT`">
+        1.  <if condition="<head/> is equal `DONE`">
+            Consume the head: set <getopt-option-next/> to the remaining
+            tokens (joined back with `,`, or `none` if empty). `DONE`
+            means the freshly composed plan is finalized as-is, so do
+            *not* hand off to `ase-task-edit`. Only output the following
+            <template/> and then *STOP*. Do *not* implement the plan.
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan finalized -- done**
+            </template>
+            </if>
+
+        2.  <elseif condition="<head/> is equal `IMPLEMENT`">
             Consume the head: set <getopt-option-next/> to the remaining
             tokens (joined back with `,`, or `none` if empty).
             <if condition="<getopt-option-next/> is not equal `none`">
@@ -327,9 +339,9 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             </if>
             Call the tool `Skill(skill: "ase:ase-task-implement", args: "<args/>")`
             to *implement* the freshly composed plan, bypassing `ase-task-edit`.
-            </if>
+            </elseif>
 
-        2.  <elseif condition="<head/> is equal `PREFLIGHT`">
+        3.  <elseif condition="<head/> is equal `PREFLIGHT`">
             Consume the head: set <getopt-option-next/> to the remaining
             tokens (joined back with `,`, or `none` if empty).
             <if condition="<getopt-option-next/> is not equal `none`">
@@ -339,7 +351,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             to *preflight* the freshly composed plan, bypassing `ase-task-edit`.
             </elseif>
 
-        3.  <else>
+        4.  <else>
             Hand off to `ase-task-edit`.
             <if condition="<head/> is equal `EDIT`">
                 Consume the head: set <getopt-option-next/> to the remaining
