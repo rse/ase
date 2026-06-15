@@ -16,7 +16,7 @@ const EXPECTED: Record<string, string> = {
     "xml-placeholders/overwrite":     "99",
     "xml-placeholders/indexed":       "+1,-1",
     "xml-placeholders/nested-attr":   "20",
-    "xml-placeholders/entity":        "○",
+    "xml-placeholders/entity":        "⦿",
 
     /*  control-flow  */
     "control-flow/branch":            "mid",
