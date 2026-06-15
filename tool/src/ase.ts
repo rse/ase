@@ -28,7 +28,7 @@ export type GlobalOpts = {
 }
 
 /*  globally initialize logger  */
-const log = new Log("ase", "warning", "-")
+const log = new Log("ase", "info", "-")
 
 /*  main entry point (wrapped in a regular async function to avoid
     top-level await, which would be reported as "unsettled" by Node in
