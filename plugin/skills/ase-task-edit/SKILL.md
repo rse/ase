@@ -320,7 +320,8 @@ Set <content-dirty>true</content-dirty>.
         ISO-style format, which has to be determined by calling the
         `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
         MCP server and use the `text` field of its response. Update
-        <content/> with the new `Modified: <timestamp-modified/>`.
+        the `⚙   Modified: ...` line of <content/> with the new
+        `⚙   Modified: <timestamp-modified/>`.
         Do not output anything.
         </if>
 
