@@ -162,12 +162,12 @@ explicitly requested by this procedure via outputs based on a <template/>!
         <timestamp-modified/> information and calculate the number of
         words <words/> of <content/>.
 
-    9.  Call the `ase_task_save(id: "<ase-task-id/>",
+    10. Call the `ase_task_save(id: "<ase-task-id/>",
         text: "<content/>")` of the `ase` MCP server to save the updated
         task plan content. Do not output anything related to this MCP
         call.
 
-    10. Only output the following <template/> and continue processing:
+    11. Only output the following <template/> and continue processing:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan rebooted**
