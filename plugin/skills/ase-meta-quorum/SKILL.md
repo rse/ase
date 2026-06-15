@@ -142,9 +142,9 @@ by querying *multiple* AIs for an *optimal consensus*.
     set <disagreement/> to `(no quorum: no foreign AIs were available)`,
     then skip the rest of this step.
 
-    Otherwise, determine, on a Likert scale of 0..<n/>, the amount of the
-    overall consensus <c/> of all the responses. The <n/> is the *total
-    number of responders* (yourself plus all available foreign AIs above).
+    Otherwise, let <n/> be the *total number of responders* (yourself plus
+    all available foreign AIs above). Then determine, on a Likert scale of
+    0..<n/>, the amount of the overall consensus <c/> of all the responses.
     If all responses disagree, the consensus <c/> is zero.
     If all responses agree, <c/> is <n/>.
 
