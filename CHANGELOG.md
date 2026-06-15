@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.16 (2026-06-15)
+-------------------
+
+- BUGFIX: revert MCP bridge startup change that broke the service (`ase-mcp.ts`)
+
 0.9.15 (2026-06-15)
 -------------------
 
