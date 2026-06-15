@@ -5,6 +5,20 @@ ChangeLog
 0.9.14 (2026-06-15)
 -------------------
 
+- IMPROVEMENT: be even more defensive when rebooting the task plan in `ase-task-reboot` skill
+- IMPROVEMENT: be even more defensive in `ase-task-id` skill
+- IMPROVEMENT: try harder to avoid stale Edit-auto-approve markers (`ase-code-lint`, `ase-docs-proofread` skills)
+- IMPROVEMENT: be more precise on argument parsing inside `ase-meta-chat` agent
+- IMPROVEMENT: be more precise in `ase-getopt.md`
+- BUGFIX: introduce KV namespace prefix so analyze skills no longer wipe the shared per-project KV store and clear stale issues when all problems are dropped (`ase-arch-analyze`, `ase-code-analyze` skills, `ase-kv.ts`)
+- BUGFIX: correctly produce diff hunks for multi-line changes (`ase-code-lint`, `ase-docs-proofread` skills)
+- BUGFIX: make evaluation calculation more robust in `ase-meta-evaluate` skill
+- BUGFIX: avoid self-contradictory size-2-cluster focal-aspect rule in `ase-arch-analyze` skill
+- BUGFIX: make `--limit` implementation more correct in `ase-arch-discover` skill
+- BUGFIX: unambiguously handle CANCEL situation in `ase-meta-brainstorm` skill
+- BUGFIX: clamp bar/pad lengths to zero (`ase-skill.md`)
+- CLEANUP: remove dead OTHER-response branches in custom-dialog/`--no-other` skills (`ase-task-condense`, `ase-task-grill`, `ase-task-implement`, `ase-task-preflight`, `ase-task-reboot`)
+
 0.9.13 (2026-06-15)
 -------------------
 
