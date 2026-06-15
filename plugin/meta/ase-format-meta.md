@@ -29,9 +29,13 @@ Artifact Meta Information
 -   **Artifact**:
 
     At level 2, each **Artifact Set** is composed of many **Artifact**s.
-    Each **Artifact** has a unique identifier <artifact-id/>, which is
-    an upper-case, two-letter identifier (e.g. `CJ` for `Customer
-    Journey`) derived from the **Artifact** name.
+    Each **Artifact** has an identifier <artifact-id/>, which is an
+    upper-case, two-letter identifier (e.g. `CJ` for `Customer Journey`)
+    derived from the **Artifact** name. The <artifact-id/> is unique
+    only *within* its **Artifact Set**; the globally-unique handle of an
+    **Artifact** is the qualified form <artifact-set-id/>-<artifact-id/>
+    (e.g. `SPEC-DP` and `ARCH-DP` are distinct artifacts). All
+    references to an **Artifact** *MUST* use this qualified form.
 
     Each **Artifact** also has a sequence number <artifact-no/>, which
     is the zero-padded, two-digit position of the **Artifact** (starting
