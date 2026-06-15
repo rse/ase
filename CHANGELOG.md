@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.13 (2026-06-15)
+-------------------
+
+- BUGFIX: fix "npm start publish" procedure for Codex
+
 0.9.12 (2026-06-14)
 -------------------
 
