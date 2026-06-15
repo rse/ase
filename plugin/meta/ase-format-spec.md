@@ -884,7 +884,7 @@ for main, alternative, and exceptional paths.
 
     <format>
 
-    ### SCENARIO: <spec-uc-usecase-scenario-name/> (<spec-uc-usecase-scenario-type/>)
+    ### SCENARIO: <spec-uc-usecase-scenario-name/> (<spec-uc-usecase-scenario-type/>) <a id="SPEC-UC-<spec-uc-usecase-id/>-<spec-uc-usecase-scenario-id/>"></a>
 
     1.  <spec-uc-usecase-scenario-step/>
     2.  <spec-uc-usecase-scenario-step/>
@@ -893,6 +893,11 @@ for main, alternative, and exceptional paths.
     </format>
 
 -   <spec-uc-usecase-scenario/> details:
+
+    -   <spec-uc-usecase-scenario-id/>: per-use-case unique "slug" of
+        always 1-3 lower-cased words (concatenated with "-" characters
+        and in total not longer than 30 characters), derived from
+        <spec-uc-usecase-scenario-name/>.
 
     -   <spec-uc-usecase-scenario-name/>: a short (3-8 word) summary of the
         scenario.
@@ -1213,9 +1218,9 @@ turn.
         visualizes (optional).
 
     -   <spec-ds-storyboard-scenario/> is a
-        Use Case scenario type `<spec-uc-usecase-scenario-type/>` of
-        the corresponding **Aspect** of the Use Case **Artifact** the
-        storyboard visualizes (optional).
+        `SPEC-UC-<spec-uc-usecase-id/>-<spec-uc-usecase-scenario-id/>`
+        reference to the corresponding scenario **Aspect** of the Use
+        Case **Artifact** the storyboard visualizes (optional).
 
     -   <spec-ds-frame-name/>: a short (2-5 word) label for the screen,
         turn, or state depicted by the storyboard frame. Frames are
