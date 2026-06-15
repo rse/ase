@@ -89,6 +89,27 @@ problems in *performance* and *efficiency*, or problems in *security*.
         -   many I/O and query round-trips
         -   concurrency bottlenecks
         -   mismatched data structures
+        -   N+1 query patterns (1 parent query, N child queries)
+        -   missing caching/memoization of stable results
+        -   blocking/synchronous calls on hot paths
+        -   unbounded growth (memory leaks, ever-growing collections)
+        -   inefficient string building/concatenation in loops
+        -   premature or repeated serialization/parsing
+        -   lack of batching/pagination for bulk operations
+        -   excessive logging or instrumentation overhead
+        -   chatty network protocols (no connection pooling/keep-alive)
+        -   lock contention and overly coarse-grained locking
+        -   eager/over-fetching of data that is never used
+        -   missing database indexes
+        -   repeated regex (re)compilation in hot paths
+        -   busy-waiting/polling instead of event-driven waits
+        -   transferring uncompressed or overly verbose payloads
+        -   missing short-circuit evaluation in expensive conditions
+        -   recomputing invariants inside loops (loop-invariant code)
+        -   suboptimal batch sizes (too small = overhead, too large = latency)
+        -   inefficient algorithms for sorting/searching already-ordered data
+        -   redundant validation/sanitization of trusted internal data
+        -   missing connection/resource reuse (open-close per operation)
         -   [...]
 
         </if>
@@ -107,6 +128,35 @@ problems in *performance* and *efficiency*, or problems in *security*.
         -   unsafe cryptography
         -   hard-coded secrets
         -   vulnerable dependencies
+        -   injection flaws
+        -   cross-site scripting (XSS) and output-encoding gaps
+        -   cross-site request forgery (CSRF) and missing anti-forgery tokens
+        -   insecure direct object references (IDOR)
+        -   server-side request forgery (SSRF)
+        -   insecure or missing transport encryption (TLS)
+        -   weak session management (fixation, predictable tokens)
+        -   missing rate limiting/anti-automation controls
+        -   overly permissive CORS or file permissions
+        -   verbose error messages leaking internals
+        -   unsafe randomness for security-sensitive values
+        -   mass assignment / over-binding of request parameters
+        -   security misconfiguration (default credentials, debug modes, exposed admin endpoints)
+        -   missing or misconfigured security headers (CSP, HSTS, X-Frame-Options)
+        -   improper certificate/hostname validation (TLS verification disabled)
+        -   insufficient logging and monitoring of security events
+        -   race conditions / TOCTOU (time-of-check to time-of-use) flaws
+        -   integer overflow/underflow and buffer overflows
+        -   use-after-free and memory-safety violations
+        -   privilege escalation through improper privilege dropping
+        -   insecure file upload handling (unrestricted type/size, executable storage)
+        -   unsafe handling of untrusted regular expressions (ReDoS)
+        -   caching of sensitive data in shared or client-side caches
+        -   secrets or sensitive data leaking into logs, traces, or telemetry
+        -   insecure default-deny failures (fail-open instead of fail-closed)
+        -   missing integrity verification (unsigned updates, no subresource integrity)
+        -   excessive data exposure in API responses (returning more fields than needed)
+        -   improper resource cleanup leading to exhaustion (connection/file-descriptor leaks)
+        -   business-logic flaws (bypassable workflows, negative quantities, replay)
         -   [...]
 
         </if>
@@ -130,6 +180,48 @@ problems in *performance* and *efficiency*, or problems in *security*.
         -   null/undefined mishandling
         -   type-coercion bugs
         -   faulty parsing or merge/override semantics
+        -   race conditions and unsynchronized shared state
+        -   resource leaks (unclosed files, handles, connections)
+        -   inverted or swapped function arguments
+        -   incorrect loop termination or accumulator initialization
+        -   shadowed or reassigned variables changing intent
+        -   incomplete switch/case or enum coverage
+        -   silent exception swallowing
+        -   floating-point comparison and rounding errors
+        -   integer overflow/underflow or truncating division
+        -   sign and modulo errors with negative operands
+        -   reference vs. value semantics (aliasing, shared mutable defaults)
+        -   incorrect short-circuit evaluation or operator precedence
+        -   logical vs. bitwise operator confusion
+        -   negation mistakes in compound predicates
+        -   wrong comparison operator (`==` instead of `===`, `<` vs. `<=`, etc)
+        -   inverted condition or swapped if/else branches
+        -   dead or duplicated conditional branches
+        -   fall-through where a break or return was intended
+        -   missing or misplaced base case in recursion (non-termination)
+        -   mutation of a collection while iterating over it
+        -   incorrect index, key, or bounds when accessing collections
+        -   empty-collection or single-element edge cases unhandled
+        -   wrong order of operations in initialization or teardown
+        -   missing cleanup on early return, break, or exception path
+        -   double-free, use-after-free, or double-close of resources
+        -   incorrect time-zone, date arithmetic, or unit conversions
+        -   stale cache or memoization not invalidated on change
+        -   incorrect deep vs. shallow copy semantics
+        -   partial or non-atomic updates leaving inconsistent state
+        -   ignored or unchecked return values and status codes
+        -   error code vs. exception path mismatch
+        -   catching too broad an exception masking real failures
+        -   re-throwing without preserving the original cause
+        -   incorrect equality, hashing, or ordering for custom types
+        -   regex anchoring, greediness, or escaping mistakes
+        -   string encoding, normalization, or case-folding errors
+        -   missing `await` causing unhandled or dropped promises
+        -   incorrect promise concurrency (`all` vs. `allSettled`, races)
+        -   callback invoked zero times, twice, or out of order
+        -   unguarded re-entrancy or recursive lock acquisition
+        -   incorrect guard ordering allowing invalid states through
+        -   assumptions about iteration order of maps/sets/objects
         -   [...]
 
         </if>
