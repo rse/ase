@@ -12,6 +12,7 @@ allowed-tools:
     - "Bash(sort *)"
     - "Bash(uniq *)"
     - "Bash(head *)"
+    - "Bash(git log * | grep * | sort * | uniq * | sort * | head *)"
     - "Agent"
 ---
 
