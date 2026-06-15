@@ -129,19 +129,44 @@ Analyze documents for spelling, punctuation, or grammar errors
 
         3.  <if condition="<getopt-option-auto/> is not 'true'">
 
-            Set <old-start/> to the line of the first hunk line, i.e.,
-            the line of <context-before/> (one before <line/>).
-            Set <new-start/> to the same as <old-start/> (the unchanged
-            <context-before/> line shares the same start in both files).
-            Set <old-count/> to the total number of old-side hunk lines, i.e.,
-            the number of lines in <context-before/>, <old-text/>, and
-            <context-after/> combined.
-            Set <new-count/> to the total number of new-side hunk lines, i.e.,
-            the number of lines in <context-before/>, <new-text/>, and
-            <context-after/> combined.
+            Determine the hunk *body* as an ordered list of lines, each
+            carrying a one-character prefix (` ` for context, `-` for
+            old-side, `+` for new-side). Build it by concatenating, in
+            order and *skipping any part that is empty*:
+
+            - one ` `-prefixed line for *each* line of <context-before/>
+              (if non-empty),
+            - one `-`-prefixed line for *each* line of <old-text/>
+              (if non-empty; split <old-text/> on newlines),
+            - one `+`-prefixed line for *each* line of <new-text/>
+              (if non-empty; split <new-text/> on newlines),
+            - one ` `-prefixed line for *each* line of <context-after/>
+              (if non-empty).
+
+            Set <hunk-body/> to those prefixed lines joined by newlines.
+
+            Set <old-count/> to the number of old-side hunk lines, i.e.,
+            the combined line count of <context-before/>, <old-text/>, and
+            <context-after/> (each empty part counts as `0`).
+            Set <new-count/> to the number of new-side hunk lines, i.e.,
+            the combined line count of <context-before/>, <new-text/>, and
+            <context-after/> (each empty part counts as `0`).
+
+            Set <old-start/> to the 1-based line number of the *first*
+            old-side hunk line: if <context-before/> is non-empty, that is
+            its line (one before <line/>); otherwise it is <line/> itself
+            (the first line of <old-text/>). For a hunk that *only inserts*
+            new lines (empty <old-text/> *and* empty context), set it to the
+            line *before* which the insertion happens, clamped to a minimum
+            of `0`, so a top-of-file insertion yields `@@ -0,0 ... @@`.
+            Set <new-start/> to the same value as <old-start/>, but clamped
+            to a minimum of `1` whenever <new-count/> is greater than `0`
+            (the corrected side then has a real first line).
 
             Render the proposed correction as a *unified diff* with *up to
-            two* lines of context in a fenced block based on the following <template/>:
+            two* lines of context in a fenced block based on the following
+            <template/>, emitting <hunk-body/> verbatim (one already-prefixed
+            line per line, with no extra blank or space-only lines):
 
             <template>
 
@@ -151,10 +176,7 @@ Analyze documents for spelling, punctuation, or grammar errors
             --- <file/> (original)
             +++ <file/> (corrected)
             @@ -<old-start/>,<old-count/> +<new-start/>,<new-count/> @@
-             <context-before/>
-            -<old-text/>
-            +<new-text/>
-             <context-after/>
+            <hunk-body/>
             ```
 
             </template>
