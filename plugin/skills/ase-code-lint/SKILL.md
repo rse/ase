@@ -143,13 +143,24 @@ related to a set of code quality aspects.
                     Set <new-text/>       to the `new_text`       field of <item/>.
                     Set <context-after/>  to the `context_after`  field of <item/>.
 
-                2.  If <context/> is not empty, set
+                2.  Set <old-start/> to the line of the first hunk line, i.e.,
+                    the line of <context-before/> (one before <line/>).
+                    Set <new-start/> to the same as <old-start/> (the unchanged
+                    <context-before/> line shares the same start in both files).
+                    Set <old-count/> to the total number of old-side hunk lines, i.e.,
+                    the number of lines in <context-before/>, <old-text/>, and
+                    <context-after/> combined.
+                    Set <new-count/> to the total number of new-side hunk lines, i.e.,
+                    the number of lines in <context-before/>, <new-text/>, and
+                    <context-after/> combined.
+
+                3.  If <context/> is not empty, set
                     <context><context/>,</context> (append a comma).
                     Then append the following <template/> to <context/>:
 
                     <template>`<file/>`:<line/></template>
 
-                3.  Append the following <template/> to <diff-file/>:
+                4.  Append the following <template/> to <diff-file/>:
 
                     <template>
                     @@ -<old-start/>,<old-count/> +<new-start/>,<new-count/> @@
@@ -158,18 +169,6 @@ related to a set of code quality aspects.
                     +<new-text/>
                      <context-after/>
                     </template>
-
-                    Hints:
-                    -   The <old-start/> is the line of the first hunk line, i.e.,
-                        the line of <context-before/> (one before <line/>).
-                    -   The <new-start/> is the same as <old-start/> (the unchanged
-                        <context-before/> line shares the same start in both files).
-                    -   The <old-count/> is the total number of old-side hunk lines, i.e.,
-                        the number of lines in <context-before/>, <old-text/>, and
-                        <context-after/> combined.
-                    -   The <new-count/> is the total number of new-side hunk lines, i.e.,
-                        the number of lines in <context-before/>, <new-text/>, and
-                        <context-after/> combined.
 
                 </for>
 

@@ -119,6 +119,17 @@ Analyze documents for spelling, punctuation, or grammar errors
 
         3.  <if condition="<getopt-option-auto/> is not 'true'">
 
+            Set <old-start/> to the line of the first hunk line, i.e.,
+            the line of <context-before/> (one before <line/>).
+            Set <new-start/> to the same as <old-start/> (the unchanged
+            <context-before/> line shares the same start in both files).
+            Set <old-count/> to the total number of old-side hunk lines, i.e.,
+            the number of lines in <context-before/>, <old-text/>, and
+            <context-after/> combined.
+            Set <new-count/> to the total number of new-side hunk lines, i.e.,
+            the number of lines in <context-before/>, <new-text/>, and
+            <context-after/> combined.
+
             Render the proposed correction as a *unified diff* with *up to
             two* lines of context in a fenced block based on the following <template/>:
 
@@ -137,18 +148,6 @@ Analyze documents for spelling, punctuation, or grammar errors
             ```
 
             </template>
-
-            Hints:
-            -   The <old-start/> is the line of the first hunk line, i.e.,
-                the line of <context-before/> (one before <line/>).
-            -   The <new-start/> is the same as <old-start/> (the unchanged
-                <context-before/> line shares the same start in both files).
-            -   The <old-count/> is the total number of old-side hunk lines, i.e.,
-                the number of lines in <context-before/>, <old-text/>, and
-                <context-after/> combined.
-            -   The <new-count/> is the total number of new-side hunk lines, i.e.,
-                the number of lines in <context-before/>, <new-text/>, and
-                <context-after/> combined.
 
             </if>
 
