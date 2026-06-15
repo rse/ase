@@ -5,6 +5,8 @@ ChangeLog
 0.9.15 (2026-06-15)
 -------------------
 
+- UPDATE: extend agentic-levels diagram with knowledge and skill dimensions (`docs/agentic-levels.*`)
+
 0.9.14 (2026-06-15)
 -------------------
 
