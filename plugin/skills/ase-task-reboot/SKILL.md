@@ -129,7 +129,24 @@ explicitly requested by this procedure via outputs based on a <template/>!
         timestamp-created to extracted text)
         </if>
 
-    7.  Create a new plan from scratch and store the result as
+    7.  <if condition="<instruction/> is empty or contains only whitespace">
+        The WHAT/WHY extraction yielded no usable text (e.g. a
+        `-   **WHAT**:` line existed but captured empty text, so the
+        whole-content fallback above did not fire). Fall back to the
+        full previous plan content: set <instruction><content/></instruction>
+        (set instruction to content).
+        <if condition="<instruction/> is still empty or contains only whitespace">
+            There is nothing to reboot from. Only output the following
+            <template/> and then immediately *STOP* processing the entire
+            current skill:
+
+            <template>
+            ⧉ **ASE**: ☻ skill: **ase-task-reboot**, ▶ ERROR: empty instruction -- nothing to reboot from
+            </template>
+        </if>
+        </if>
+
+    8.  Create a new plan from scratch and store the result as
         <content/> by closely following the defined plan format
         <format/> and injecting into it all the information from
         the <instruction/> and all decisions you derived from the
