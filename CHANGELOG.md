@@ -5,7 +5,37 @@ ChangeLog
 0.9.13 (2026-06-15)
 -------------------
 
+- IMPROVEMENT: speed up processing via batch KV operation in `ase-arch-analyze` skill
+- IMPROVEMENT: make conditions more robust and fail-safe for edge cases (`ase-code-resolve`, `ase-code-insight`, `ase-task-grill`, `ase-task-implement`, `ase-task-preflight`, `ase-task-edit`)
+- IMPROVEMENT: reset the task plan less easily via a regexp match in `ase-task-edit` skill
+- IMPROVEMENT: extract created timestamp so it can be inserted later correctly in `ase-task-condense` skill
+- IMPROVEMENT: be more precise in the materialization of the alternatives in `ase-meta-evaluate` skill
+- IMPROVEMENT: make bar-length calculation identical for head/foot and boxed, and clarify step-id-to-task-id mapping (`ase-skill.md`)
+- IMPROVEMENT: define the number of consensus in `ase-meta-quorum` skill
+- IMPROVEMENT: make mitigation optional in the table of `ase-meta-diff` skill
+- IMPROVEMENT: directly handle DONE as next step instead of forwarding to `ase-task-edit` (`ase-code-{craft,refactor,resolve}` skills)
+- IMPROVEMENT: make `triggerReconnect` idempotent (`ase-mcp.ts`)
+- IMPROVEMENT: honor an explicit `ASE_TERM_COLORS=none` even when running on a TTY (`ase-diagram.ts`)
 - BUGFIX: fix "npm start publish" procedure for Codex
+- BUGFIX: fix branch ordering that defeated the all-negative warning in `ase-meta-evaluate` skill
+- BUGFIX: change task id only if the MCP call succeeded in `ase-task-id` skill
+- BUGFIX: detect special case where old and new task ids are equal in `ase-task-rename` skill
+- BUGFIX: quote `args` to avoid empty-expansion breakage in `ase-task-implement` skill
+- BUGFIX: define placeholders before using them (`ase-code-lint`, `ase-docs-proofread` skills)
+- BUGFIX: fix XML tags and tag syntax (`ase-skill.md`, `ase-getopt.md`)
+- BUGFIX: roll `formatTokens` thousands tier over into the next unit (`ase-statusline.ts`)
+- BUGFIX: use floored percentage as divisor for `%C` token limit (`ase-statusline.ts`)
+- BUGFIX: whitelist `Persona.get` value against known styles (`ase-persona.ts`)
+- BUGFIX: fix getopt list-of-choices validation for hyphenated long options (`ase-getopt.ts`)
+- UPDATE: update wording in workflow diagram (`docs/workflow.*`)
+- CLEANUP: clarify superseding, mismatch, uniqueness, and use-case references in artifact-set formats (`ase-format-arch.md`, `ase-format-spec.md`, `ase-format-meta.md`)
+- CLEANUP: remove unused tool declaration (`ase-code-explain`, `ase-code-insight` skills)
+- CLEANUP: cleanup control structure in `ase-task-grill` skill
+- CLEANUP: cleanup decision matrix calculations (`ase-skills.ts`)
+- CLEANUP: use same default as in option (`ase.ts`)
+- CLEANUP: remove stray step-end tags and final cleanups in `ase-meta-compat` skill, adjust symbol (`ase-compat.ts`)
+- CLEANUP: be more precise in wording (`ase-dialog.md`)
+- CLEANUP: also commit the Codex `plugin.json` and resolve related conflicts (`etc/stx.conf`)
 
 0.9.12 (2026-06-14)
 -------------------
