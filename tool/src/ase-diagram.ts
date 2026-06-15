@@ -162,14 +162,17 @@ export class Diagram {
     /*  detect terminal color capability  */
     static detectColorMode (): "none" | "ansi16" | "ansi256" {
         let mode: "none" | "ansi16" | "ansi256" = "none"
+        let explicit = false
 
         /*  attempt 1: query environment variable (explicitly)  */
         if (process.env.ASE_TERM_COLORS !== undefined)
-            if (/^(?:none|ansi16|ansi256)$/.test(process.env.ASE_TERM_COLORS))
+            if (/^(?:none|ansi16|ansi256)$/.test(process.env.ASE_TERM_COLORS)) {
                 mode = process.env.ASE_TERM_COLORS as "none" | "ansi16" | "ansi256"
+                explicit = true
+            }
 
         /*  attempt 2: query stdout  */
-        if (mode === "none" && process.stdout.isTTY) {
+        if (!explicit && process.stdout.isTTY) {
             const depth = process.stdout.getColorDepth()
             if      (depth >= 8) mode = "ansi256"
             else if (depth >= 4) mode = "ansi16"
