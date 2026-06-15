@@ -155,6 +155,8 @@ export default class MCPCommand {
 
         /*  trigger a reconnect chain (idempotent while one is active)  */
         const triggerReconnect = (reason: string) => {
+            if (reconnecting)
+                return
             reconnecting = true
             this.log.write("warning", `mcp: ${reason} — reconnecting`)
             reconnect(0).catch(() => {})
