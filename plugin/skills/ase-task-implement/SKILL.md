@@ -210,7 +210,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
             skill accepts only an optional `[<id>]` argument and no
             `--next` option; remaining tokens are intentionally discarded.
             Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-delete", args: <args/>)`
+            tool `Skill(skill: "ase:ase-task-delete", args: "<args/>")`
             to invoke the `ase:ase-task-delete` skill in order to
             *delete* the updated plan. Immediately stop processing the
             current skill once the `Skill` tool was used.
