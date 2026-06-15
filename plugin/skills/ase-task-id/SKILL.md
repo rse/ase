@@ -28,7 +28,8 @@ Configure Task Id
 
 1.  Determine request:
     <request><getopt-arguments/></request>
-    Inherit the always existing <ase-session-id/> from the current context.
+    Inherit the always existing <ase-session-id/> and the current
+    <ase-task-id/> from the current context.
 
 2.  <if condition="<request/> is NOT empty AND <request/> does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`">
     Only output the following <template/> and then immediately
