@@ -286,7 +286,7 @@ Set <content-dirty>true</content-dirty>.
             </template>
         </if>
 
-    4.  <if condition="<content/> does not contain '#   TASK' AND <instruction/> is empty">
+    4.  <if condition="no line of <content/> matches the case-insensitive regex `^\s*#+\s*TASK\b` AND <instruction/> is empty">
         Set <instruction><content/></instruction> (set instruction to content).
         Set <content></content> (set content to empty).
         Set <content-dirty>true</content-dirty>.
