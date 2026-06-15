@@ -435,13 +435,14 @@ interface quality, quality attributes, and architecture governance.
       for the same aspect, and never emit both halves of a
       tension pair as separate PROBLEMs.
 
-    - *Additionally*, first call the `ase_kv_clear()` tool of the `ase`
-      MCP server to clear the in-memory key/value store, and then,
-      for *every* reported PROBLEM and TRADEOFF, persist its finding
-      result via the `ase_kv_set` tool of the `ase` MCP server, using
-      `key` set to `ase-issue-P<n/>` (for PROBLEMs) or
-      `ase-issue-T<n/>` (for TRADEOFFs) and `val` set to
-      `<title/>: <description/>`.
+    - *Additionally*, persist all reported findings in a *single*
+      `ase_kv_batch` call to the `ase` MCP server with `transactional`
+      set to `true`. The `commands` parameter array of this call
+      starts with one `{ command: "clear" }` entry, followed by one
+      `{ command: "set", key: "ase-issue-P<n/>", val: "<title/>:
+      <description/>" }` entry per reported PROBLEM and one
+      `{ command: "set", key: "ase-issue-T<n/>", val: "<title/>:
+      <description/>" }` entry per reported TRADEOFF.
     </step>
 
 4.  <step id="STEP 4: Give Final Hint">
