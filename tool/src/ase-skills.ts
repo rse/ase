@@ -325,10 +325,20 @@ export class Skills {
         const halfLife   = 365 / 2
         /*  lifespan requires both timestamps; recentness requires the
             updated timestamp -- any unavailable date-derived factor is
-            treated as neutral `1` so the entry can still be ranked by the
-            remaining metrics, instead of collapsing the product to zero  */
+            given a neutral default so the entry can still be ranked by the
+            remaining metrics, instead of collapsing the product to zero.
+            For `lifespan` (an unbounded duration) the multiplicative-neutral
+            `1` is also the low floor, so a missing value cannot unfairly
+            inflate the rank. For `recentness`, however, the value is an
+            exp-decay factor bounded in `(0,1]` where `1` is the *ceiling*
+            (a just-now update), not a floor -- defaulting a missing update
+            date to `1` would hand packages with absent metadata the highest
+            possible recentness and let them outrank genuinely fresh ones.
+            We therefore default a missing `recentness` to the decay value at
+            one half-life (`0.5`), a conservative midpoint that keeps the
+            entry rankable without rewarding the missing date.  */
         const lifespan   = (!Number.isNaN(cMs) && !Number.isNaN(uMs)) ? Math.max(0, uMs - cMs) : 1
-        const recentness = !Number.isNaN(uMs) ? Math.exp(-Math.max(0, (now - uMs) / msPerDay) / halfLife) : 1
+        const recentness = !Number.isNaN(uMs) ? Math.exp(-Math.max(0, (now - uMs) / msPerDay) / halfLife) : 0.5
         return d * s * lifespan * recentness
     }
 
