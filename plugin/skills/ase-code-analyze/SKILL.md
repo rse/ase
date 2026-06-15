@@ -151,8 +151,11 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     Then renumber the surviving problems contiguously as `P<n/>` with
     <n/> = 1, 2, ... in the original ordering. If *all* problems are
-    dropped, skip the per-problem report but still emit the final hint
-    <template/> below.
+    dropped, skip the per-problem report but still purge any stale
+    persisted problems with a *single* `ase_kv_batch` call to the `ase`
+    MCP server with `transactional` set to `true` and a `commands`
+    parameter array holding exactly one `{ command: "clear" }` entry,
+    and still emit the final hint <template/> below.
 
     In this STEP 3, for *EVERY* surviving problem, immediately report
     it with the following output <template/>, based on concise bullet
