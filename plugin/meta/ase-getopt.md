@@ -96,7 +96,8 @@ set placeholders into the context as a side-effect.
     `<getopt-result/>.opts[<longN/>]`.
     Set <getopt-arguments/> to the value of `<getopt-result/>.args`.
     Set <getopt-info/> to `<getopt-result/>.info`, but remove
-    information about the `help` option.
+    information about the `help` option and any *internal* option
+    whose long name starts with `int-`.
 
 7.  **Display Results**:
     Just output the following <template/>:
