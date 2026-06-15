@@ -8,7 +8,6 @@ user-invocable: true
 disable-model-invocation: false
 effort: high
 allowed-tools:
-    - "Skill"
     - "Agent"
 ---
 

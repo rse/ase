@@ -12,7 +12,6 @@ allowed-tools:
     - "Bash(sort *)"
     - "Bash(uniq *)"
     - "Bash(head *)"
-    - "Skill"
     - "Agent"
 ---
 
