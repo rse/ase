@@ -19,8 +19,11 @@ DESCRIPTION
 
 `ase`, *Agentic Software Engineering (ASE)*,
 is the command-line companion tool to the *ASE* Claude Code plugin.
-It provides project-level configuration management and a small
-per-project background HTTP service for dispatching commands.
+It provides plugin/tool setup, layered project configuration
+management, a per-project background HTTP service (bridged into the
+agent tool as an MCP server), agent hook handlers, status line
+rendering, persisted task plan management, artifact resolution,
+diagram rendering, and a compatibility self-test helper.
 
 OPTIONS
 -------
@@ -115,6 +118,10 @@ The following top-level commands exist for configuration handling:
 - `ase config set` *key* *value*:
   Set the value at the given dotted *key* (creating intermediate
   maps as needed) and persist the file.
+
+- `ase config delete` *key*:
+  Delete the value at the given dotted *key* from the target scope's
+  own file and persist the file.
 
 The following top-level commands exist for service management:
 
@@ -375,6 +382,38 @@ plans under `<project>/.ase/task/`*id*`/plan.md`:
   value, where *unit* is one of `h` (hour), `d` (day), `m` (month), or
   `y` (year).
 
+The following top-level commands exist for resolving project artifact
+kinds to project-relative file lists, driven by the
+`project.artifact.*` configuration globs:
+
+- `ase artifact`:
+  Entry point group for artifact resolution. Without a subcommand,
+  the help text is shown and the command exits with status 1.
+
+- `ase artifact list` \[`--kind` *kinds*\]:
+  Resolve one or more artifact kinds to project-relative file paths.
+  The optional `--kind` *kinds* option is a comma-separated list of
+  artifact kinds out of `spec`, `arch`, `code`, `docs`, `infr`, and
+  `othr` (default: all kinds). Each kind's files are printed as a
+  bullet list; when more than one kind is resolved, each list is
+  preceded by a `# `*kind*`:` header. The `othr` kind is the implicit
+  catch-all and is always resolved last.
+
+- `ase artifact name` *filename* \[`--kind` *kind*\]:
+  Resolve a base-relative *filename* within an artifact *kind* to a
+  project-relative path. The `--kind` option selects one of the five
+  configured kinds `spec`, `arch`, `code`, `docs`, or `infr` (default:
+  `code`).
+
+The following top-level command exists for the `ase-meta-compat`
+self-test skill:
+
+- `ase compat`:
+  Output the canonical expected probe values for the `ase-meta-compat`
+  self-test skill as `<id>: <value>` lines, one per probe. This is
+  intended to be invoked by the skill (after it has recorded all actual
+  probe results) and not directly by end users.
+
 The following top-level commands exist for *Claude Code* hook
 integration:
 
@@ -400,6 +439,11 @@ integration:
   subcommand is intended to be invoked by *Claude Code*
   internally as a configured hook handler only, not directly
   by end users.
+
+- `ase hook permission-request`:
+  Handle the *OpenAI Codex CLI* `PermissionRequest` hook event. This
+  subcommand is intended to be invoked by the agent tool internally
+  as a configured hook handler only, not directly by end users.
 
 - `ase hook user-prompt-submit`:
   Handle the *Claude Code* `UserPromptSubmit` hook event. This
