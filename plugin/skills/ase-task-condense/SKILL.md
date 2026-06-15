@@ -93,6 +93,12 @@ explicitly requested by this procedure via outputs based on a <template/>!
         Set <words-before><words/></words-before> (remember the loaded
         word count for the strictly-smaller check in step 3).
 
+        <if condition="<content/> contains 'Created:  <text/>'">
+        Set <timestamp-created><text/></timestamp-created> (extract the
+        original creation timestamp so it can be re-inserted unchanged
+        into the condensed <content/> in step 3).
+        </if>
+
         Only output the following <template/>:
 
         <template>
