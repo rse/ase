@@ -274,8 +274,8 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <ase-tpl-bullet-signal/> **CHANGE RISK REPORT**: Overall: **<band/>** (<aggregate/>/5)
 
-        | Axis        | Score      | Findings                                                    |
-        | ----------- | ---------- | ----------------------------------------------------------- |
+        | Axis        | Score      | Findings                                                                                              |
+        | ----------- | ---------- | ----------------------------------------------------------------------------------------------------- |
         | **<axis/>** | <score/>/5 | ● **EVIDENCE**: <evidence/><if condition="axis score is `>= 4`"> ● **MITIGATION**: <mitigation/></if> |
         </template>
     </step>
