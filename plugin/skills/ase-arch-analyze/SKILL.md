@@ -375,12 +375,18 @@ interface quality, quality attributes, and architecture governance.
     - *Focal aspect*: <focal-aspect/> - <focal-state/>
     - *In tension with*: <partner-list/>
 
-    **RECOMMENDED**: lean toward *<focal|partners/>*
+    **RECOMMENDED**: lean toward *<lean-toward/>*
     *Reason*: <rationale/>
     *Implies*:
-    - <partner-aspect-1/>: <partner-implication-1/>
-    - <partner-aspect-2/>: <partner-implication-2/>
+    - <partner-aspect/>: <partner-implication/>
+    - ...
     </template>
+
+    For each partner in <partner-list/>, repeat the `*Implies*` line,
+    set <partner-aspect/> to the partner aspect, and set
+    <partner-implication/> to its brief implication. Set <lean-toward/>
+    to the aspect direction the recommendation favors (the *focal
+    aspect* or the *partners*).
 
     Hints:
 
