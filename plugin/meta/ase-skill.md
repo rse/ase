@@ -119,15 +119,25 @@ Skill Sequential Processing
     For speed, emit *all* `TaskCreate` calls together in a *single* turn
     (issued in parallel), *not* one-per-turn sequentially. Do *not*
     rely on the call order to establish the step order, as the parallel
-    results carry no guaranteed ordering. Instead, in the *immediately
-    following* turn, establish the strict order explicitly by chaining
-    the created tasks with `TaskUpdate`: for each <step/> after the
-    first one, call `TaskUpdate({ taskId: "<this/>", addBlockedBy:
-    [ "<prev/>" ] })` so that every step (with `taskId` <this/>) is
-    blocked by its predecessor step (with `taskId` <prev/>).
+    results carry no guaranteed ordering.
+
+    Instead, in the *immediately single following* turn, first
+    reconstruct the step-id-to-taskId mapping: because each task's
+    `subject` equals the originating <step/> `id` (and <step/> ids are
+    unique), match every created task back to its <step/> by comparing
+    the task's `subject` to the step `id` -- read the ids straight from
+    the `TaskCreate` results, or call `TaskList` if the results are
+    no longer at hand.
+
+    Then establish the strict order explicitly by chaining the created
+    tasks with `TaskUpdate`: for each <step/> after the first one,
+    resolve <this/> and <prev/> to the mapped `taskId` values and
+    call `TaskUpdate({ taskId: "<this/>", addBlockedBy: [ "<prev/>" ]
+    })` so that every step (with `taskId` <this/>) is blocked by its
+    predecessor step (with `taskId` <prev/>).
 
 -   *IMPORTANT*: For each <step/> you *MUST* use the `TaskUpdate` tool
-    for updating its status during processing.
+    for updating its status *during* processing, once a <step/> finished.
 
 -   *IMPORTANT*: You *MUST* sequentially execute every <step/> in
     a <flow/> *EXACTLY* as the instructions specify.
