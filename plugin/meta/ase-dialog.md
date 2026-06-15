@@ -185,7 +185,7 @@ following procedure:
 
     Do not output anything in this step!
 
-2.  Dispatch according to the agent tool:
+2.  Render the custom dialog, collect the user input, and dispatch on the result:
 
     1.  You *MUST* not output anything in this step.
 
