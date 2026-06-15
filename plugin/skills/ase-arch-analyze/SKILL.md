@@ -399,9 +399,13 @@ interface quality, quality attributes, and architecture governance.
       DEPENDENCY-DIRECTION`).
 
     - The <focal-aspect/> is the aspect that participates in
-      *all* tensions of the cluster. For a size-2 cluster, pick
-      the aspect whose direction is most constrained by the
-      detected style.
+      *all* tensions of the cluster. In a size-2 cluster both
+      aspects participate equally in the single tension, so this
+      rule cannot disambiguate; instead pick the focal aspect by
+      the first applicable tiebreaker: (1) the aspect whose
+      direction is more constrained by the detected style; else
+      (2) the aspect carrying the *higher* finding severity; else
+      (3) the aspect listed *first* in the tension matrix pair.
 
     - *Brevity and precision*: all free-form placeholders
       (<description/>, <focal-state/>, partner-implications)
