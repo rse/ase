@@ -278,16 +278,16 @@ Template Patterns
     should be expanded use the following helper placeholder and then the <template/>:
 
     -   <if condition="<subtitle/> is not empty">
-            Set <raw-title>⧉ ASE: <title/>: <subtitle/><raw-title>.
+            Set <raw-title>⧉ ASE: <title/>: <subtitle/></raw-title>.
             Set <render-title>⧉ ASE: **`<title/>`**: `<subtitle/>`</render-title>.
         </if>
         <else>
-            Set <raw-title>⧉ ASE: <title/><raw-title>.
+            Set <raw-title>⧉ ASE: <title/></raw-title>.
             Set <render-title>⧉ ASE: **`<title/>`**</render-title>.
         </else>
     -   Set <raw-title-len/> to the number of characters in <raw-title/>.
     -   Set <bar/> to the `─` character repeated exactly (67 - <raw-title-len/>) times.
-    -   Set <body> to <content/> with all line-starts prefixed with `│ `.
+    -   Set <body/> to <content/> with all line-starts prefixed with `│ `.
 
     <template>
 
