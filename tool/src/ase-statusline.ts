@@ -473,7 +473,7 @@ export default class StatuslineCommand {
                         emit(`${prefix("◔", "context")}${bar} ${pct}%`)
                     },
                     C: () => {
-                        const pct     = Math.floor(data.context_window?.used_percentage ?? 0)
+                        const pct     = data.context_window?.used_percentage ?? 0
                         const tokensCur =
                             (data.context_window?.total_input_tokens  ?? 0) +
                             (data.context_window?.total_output_tokens ?? 0)
