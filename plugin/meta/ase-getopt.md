@@ -63,6 +63,10 @@ set placeholders into the context as a side-effect.
     validate each remaining token themselves as they consume it).
 
 4.  **Short-Circuit for Error**:
+    This step is the *sole* and *authoritative* handler for an
+    `ERROR:`-prefixed `ase_getopt` response; the generic MCP-Tool-Calls
+    error rule (see `ase-skill.md`) explicitly does *NOT* apply here, so
+    only the <template/> below is emitted (never both).
     If <text/> starts with `ERROR:`:
     Remove all `ERROR:` or `error:` prefixes from <text/>.
     Then only output the following <template/> and
