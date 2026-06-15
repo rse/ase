@@ -13,9 +13,9 @@ tools:
 
 @../meta/ase-control.md
 
-1.  Treat `$ARGUMENTS` as a single whitespace-separated string.
-    Set <llm/> to the *first* token.
-    Set <query/> to the *second and all following* tokens.
+1.  Set <args>$ARGUMENTS</args>, the single whitespace-separated string.
+    Set <llm/> to the *first* token of <args/>.
+    Set <query/> to the *second and all following* tokens of <args/>.
     You *MUST* *NOT* output anything related to this step.
 
 2.  Set <server></server> (set to empty).
