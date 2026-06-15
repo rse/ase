@@ -237,9 +237,11 @@ problems in *performance* and *efficiency*, or problems in *security*.
     -   *Additionally*, persist all reported problems in a *single*
         `ase_kv_batch` call to the `ase` MCP server with `transactional`
         set to `true`. The `commands` parameter array of this call
-        starts with one `{ command: "clear" }` entry, followed by one
-        `{ command: "set", key: "ase-issue-P<n/>", val: "<title/>:
-        <description/>" }` entry per reported problem.
+        starts with one `{ command: "clear", prefix: "ase-issue-" }`
+        entry (which removes only the previously persisted `ase-issue-*`
+        keys, leaving any unrelated keys in the shared store intact),
+        followed by one `{ command: "set", key: "ase-issue-P<n/>", val:
+        "<title/>: <description/>" }` entry per reported problem.
 
     Finally, output the following <template/> to give a final hint:
 

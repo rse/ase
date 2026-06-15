@@ -55,10 +55,21 @@ export class KV {
         return KV.store.delete(key)
     }
 
-    /*  clear all keys; returns the number of keys removed  */
-    static clear (): number {
-        const n = KV.store.size
-        KV.store.clear()
+    /*  clear all keys, or just those starting with the given `prefix`;
+        returns the number of keys removed  */
+    static clear (prefix?: string): number {
+        if (prefix === undefined || prefix === "") {
+            const n = KV.store.size
+            KV.store.clear()
+            return n
+        }
+        let n = 0
+        for (const key of KV.store.keys()) {
+            if (key.startsWith(prefix)) {
+                KV.store.delete(key)
+                n++
+            }
+        }
         return n
     }
 
@@ -130,12 +141,17 @@ export class KVMCP {
         mcp.registerTool("ase_kv_clear", {
             title: "ASE key/value clear",
             description:
-                "Remove all keys from the in-memory key/value store. " +
+                "Remove keys from the in-memory key/value store. " +
+                "If `prefix` is given, only keys starting with `prefix` are removed; " +
+                "otherwise all keys are removed. " +
                 "Returns a status `text` indicating how many keys were removed.",
-            inputSchema: {}
-        }, async () => {
+            inputSchema: {
+                prefix: z.string().optional()
+                    .describe("if given, only remove keys starting with this prefix (otherwise remove all keys)")
+            }
+        }, async (args) => {
             try {
-                const n = KV.clear()
+                const n = KV.clear(args.prefix)
                 return { content: [ { type: "text", text: `kv_clear: OK: removed ${n} key(s)` } ] }
             }
             catch (err: unknown) {
@@ -173,8 +189,9 @@ export class KVMCP {
             title: "ASE key/value batch",
             description:
                 "Execute an array of in-memory key/value `commands` in a single MCP call. " +
-                "Each entry is an object `{ command: \"clear\"|\"set\"|\"get\"|\"delete\", key?, val? }` " +
+                "Each entry is an object `{ command: \"clear\"|\"set\"|\"get\"|\"delete\", key?, val?, prefix? }` " +
                 "and is dispatched to the corresponding single-op tool. " +
+                "For `clear`, an optional `prefix` restricts removal to keys starting with it. " +
                 "If `transactional` is true, the store is snapshotted up-front and rolled back on the " +
                 "first per-command error (remaining commands are skipped); otherwise per-command errors " +
                 "are recorded and execution continues. " +
@@ -190,7 +207,9 @@ export class KVMCP {
                     key: z.string().optional()
                         .describe("key identifier (required for `set`/`get`/`delete`)"),
                     val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.any()), z.record(z.string(), z.any()) ]).optional()
-                        .describe("value to store (required for `set`)")
+                        .describe("value to store (required for `set`)"),
+                    prefix: z.string().optional()
+                        .describe("if given for `clear`, only remove keys starting with this prefix (otherwise remove all keys)")
                 }))
                     .describe("ordered list of KV commands to execute"),
                 transactional: z.boolean().optional()
@@ -204,7 +223,7 @@ export class KVMCP {
             for (const c of args.commands) {
                 try {
                     if (c.command === "clear") {
-                        const n = KV.clear()
+                        const n = KV.clear(c.prefix)
                         results.push(`kv_clear: OK: removed ${n} key(s)`)
                         cmdNames.push("clear")
                     }

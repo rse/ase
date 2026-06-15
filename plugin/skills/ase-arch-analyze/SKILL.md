@@ -438,9 +438,11 @@ interface quality, quality attributes, and architecture governance.
     - *Additionally*, persist all reported findings in a *single*
       `ase_kv_batch` call to the `ase` MCP server with `transactional`
       set to `true`. The `commands` parameter array of this call
-      starts with one `{ command: "clear" }` entry, followed by one
-      `{ command: "set", key: "ase-issue-P<n/>", val: "<title/>:
-      <description/>" }` entry per reported PROBLEM and one
+      starts with one `{ command: "clear", prefix: "ase-issue-" }`
+      entry (which removes only the previously persisted `ase-issue-*`
+      keys, leaving any unrelated keys in the shared store intact),
+      followed by one `{ command: "set", key: "ase-issue-P<n/>", val:
+      "<title/>: <description/>" }` entry per reported PROBLEM and one
       `{ command: "set", key: "ase-issue-T<n/>", val: "<title/>:
       <description/>" }` entry per reported TRADEOFF.
     </step>
