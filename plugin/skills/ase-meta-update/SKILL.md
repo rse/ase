@@ -125,7 +125,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         -   the artifact-set/artifact/aspect meta information of `ase-format-meta.md`,
         -   the `SPEC` format of `ase-format-spec.md`,
         -   the `ARCH` format of `ase-format-arch.md`,
-        -   the `TASK` format of `ase-format-task.md`. 
+        -   the `TASK` format of `ase-format-task.md`.
 
         Whenever a target artifact belongs to one of these formatted
         kinds, the update *MUST* keep it conformant to the
@@ -142,7 +142,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     1.  Read all <source/> artifact files resolved in STEP 2 and build a
         precise understanding of the *current state* they represent.
-    
+
     2.  Do not output anything in this STEP 4.
 
     </step>
