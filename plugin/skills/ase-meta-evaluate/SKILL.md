@@ -201,12 +201,18 @@ multi-*criteria* decision matrix.
     -   Determine rating distance percentage <percentage/> between
         <alternative-K/> and <alternative-X/> from their *raw,
         unrounded* ratings as follows. If <rating-K/> is exactly zero,
-        skip the division entirely and treat <percentage/> as if it
-        were equal to <distance/> (so a true zero tie with <distance/>
-        = 0 falls into the *MULTIPLE BEST* branch below, while a non-zero
-        gap with zero best is routed by the magnitude of <distance/>
-        through the same thresholds as <percentage/> otherwise). Do not
-        output anything.
+        skip the division entirely (it is undefined against a zero
+        anchor) and classify directly by <distance/> instead of routing a
+        raw rating magnitude through the ratio thresholds below: if
+        <distance/> is also exactly zero, both best and second best rate
+        zero, which is a genuine tie, so set <percentage/> = 0 to fall
+        into the *MULTIPLE BEST* branch below; otherwise <distance/> > 0
+        means the second best rates strictly negative (since <rating-K/>
+        is the maximum), so there is a clear positive gap to a worse
+        runner-up and <alternative-K/> is an unambiguous winner, hence set
+        <percentage/> = 1 (a sentinel exceeding all small-distance
+        thresholds) to fall through to the plain *BEST ALTERNATIVE* branch.
+        Do not output anything.
 
     -   Otherwise (<rating-K/> is non-zero), calculate: <percentage/> =
         <distance/> / abs(<rating-K/>). Do not output anything.
