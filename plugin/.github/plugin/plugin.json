@@ -1,6 +1,6 @@
 {
     "name":        "ase",
-    "version":     "0.9.13",
+    "version":     "0.9.14",
     "description": "Agentic Software Engineering (ASE)",
     "keywords":    [ "agentic", "software", "engineering" ],
     "homepage":    "https://ase.tools",
