@@ -68,8 +68,13 @@ export default class MCPCommand {
 
     /*  bridge stdio to a Streamable HTTP MCP endpoint on the local service  */
     private async runBridge (): Promise<void> {
-        /*  ensure the service is running  */
-        let { projectId, port } = await this.ensureService()
+        /*  tentatively load the service identity context; the actual service
+            start/probe happens below through ensureService() and, on failure,
+            is funnelled into the same reconnect machinery used at runtime so
+            that a transient startup failure is recoverable instead of fatal  */
+        const ctx0    = this.loadContext()
+        let projectId = ctx0.projectId
+        let port      = ctx0.port ?? 0
 
         /*  create MCP STDIO server (lives for the entire bridge lifetime)  */
         const server = new StdioServerTransport()
@@ -178,10 +183,17 @@ export default class MCPCommand {
         /*  start server and initial client  */
         await server.start()
         try {
+            /*  ensure the service is running, then connect; both the
+                service start/probe and the connect are covered here so that
+                an initial failure recovers via the reconnect machinery
+                (now in place) instead of crashing the bridge outright  */
+            const ctx = await this.ensureService()
+            projectId = ctx.projectId
+            port      = ctx.port
             await connectClient()
         }
         catch (err: unknown) {
-            /*  service vanished between probe and connect — recover instead of crashing  */
+            /*  initial service start or connect failed — recover instead of crashing  */
             triggerReconnect(`initial connect failed: ${this.asError(err).message}`)
         }
 
