@@ -71,7 +71,7 @@ Procedure
         `width="<w/>"` and read the attribute `width` back.
         Record actual result for `xml-placeholders/nested-attr`.
 
-    6.  *entity*: Evaluate the XML entity `&#x25CB;` and get the rendered
+    6.  *entity*: Evaluate the XML entity `&#x29BF;` and get the rendered
         Unicode character.
         Record actual result for `xml-placeholders/entity`.
 
@@ -269,9 +269,7 @@ Procedure
     4.  If <failures/> is not empty:
         Append to <verdict/> the suffix ` (failed: <failures/>)`.
 
-    Output the final compatibility report with the following <template/>:
-
-    <template>
+    Finally, output the compatibility report:
 
     **RESULTS**:
 
@@ -284,5 +282,3 @@ Procedure
     | **OVERALL**          |             |                              | **<overall-pct/>%** |
 
     **VERDICT**: <verdict/>
-
-    </template>
