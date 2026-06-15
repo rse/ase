@@ -152,8 +152,6 @@ Procedure
 
     Set <re-total/> to the number of regex probes above.
 
-    </step>
-
 5.  STEP 5: Probe Arithmetic
 
     Execute *all* of the following arithmetic probes (in the given
@@ -181,8 +179,6 @@ Procedure
 
     Set <arith-total/> to the number of arithmetic probes above.
 
-    </step>
-
 6.  STEP 6: Fetch Expected Values and Score
 
     Call the `ase_compat()` tool of the `ase` MCP server with an
@@ -208,8 +204,6 @@ Procedure
     -   Set <cf-pass/>    to the number of `control-flow/*`     probes that passed.
     -   Set <re-pass/>    to the number of `regex/*`            probes that passed.
     -   Set <arith-pass/> to the number of `arithmetic/*`       probes that passed.
-
-    </step>
 
 7.  STEP 7: Compute and Report Compatibility
 
