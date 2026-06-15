@@ -250,8 +250,9 @@ Template Patterns
 -   When `<ase-tpl-head title="<title/>"/>` should be expanded, use
     (where <raw-title/> is the visible un-styled text `⧉ ASE: <title/>`,
     <raw-title-len/> is the number of characters in <raw-title/>, and
-    <bar/> is the `─` character repeated exactly (67 - <raw-title-len/>)
-    times -- the very same bar-width rule as `<ase-tpl-foot/>` and
+    <bar/> is the `─` character repeated exactly max(0, 67 - <raw-title-len/>)
+    times -- clamped to zero so an over-long title never yields a negative
+    count -- the very same bar-width rule as `<ase-tpl-foot/>` and
     `<ase-tpl-boxed/>`, so equal visible text yields equal total width):
 
     <template>
@@ -271,8 +272,9 @@ Template Patterns
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
     (where <raw-title/> is the visible un-styled text `⧉ ASE: <title/>`,
     <raw-title-len/> is the number of characters in <raw-title/>, and
-    <bar/> is the `─` character repeated exactly (67 - <raw-title-len/>)
-    times -- the very same bar-width rule as `<ase-tpl-head/>` and
+    <bar/> is the `─` character repeated exactly max(0, 67 - <raw-title-len/>)
+    times -- clamped to zero so an over-long title never yields a negative
+    count -- the very same bar-width rule as `<ase-tpl-head/>` and
     `<ase-tpl-boxed/>`, so equal visible text yields equal total width):
 
     <template>
@@ -308,8 +310,9 @@ Template Patterns
         </else>
     -   Set <raw-title-len/> to the number of characters in the visible
         un-styled text <raw-title/>.
-    -   Set <bar/> to the `─` character repeated exactly (67 - <raw-title-len/>)
-        times -- the very same bar-width rule as `<ase-tpl-head/>` and
+    -   Set <bar/> to the `─` character repeated exactly max(0, 67 - <raw-title-len/>)
+        times -- clamped to zero so an over-long title never yields a negative
+        count -- the very same bar-width rule as `<ase-tpl-head/>` and
         `<ase-tpl-foot/>`, so equal visible text yields equal total width.
     -   Set <body/> to <content/> with all line-starts prefixed with `│ `.
 
@@ -348,7 +351,8 @@ Template Patterns
     <template>🟠</template>
 
 -   When `<ase-tpl-pad width="<width/>" text="<text/>"/>` should be expanded, use
-    (where <ws/> = ` ` x (<width/> - length("<text/>")), i.e., <ws/> is
-    the ` ` character repeated (<width/> - length("<text/>")) times):
+    (where <ws/> = ` ` x max(0, <width/> - length("<text/>")), i.e., <ws/> is
+    the ` ` character repeated max(0, <width/> - length("<text/>")) times --
+    clamped to zero so an over-long text never yields a negative count):
 
     <template><text/><ws/></template>
