@@ -172,6 +172,12 @@ MCP Tool Calls
         ⧉ **ASE**: **ERROR:** MCP tool failed: <info/>
         </template>
 
+        *EXCEPTION*: this rule does *NOT* apply to the `ase_getopt` tool,
+        whose `ERROR:`-prefixed output is *expected* option-parsing
+        feedback handled exclusively by step 4 of the `getopt` procedure
+        (see `ase-getopt.md`); never emit this generic template for an
+        `ase_getopt` response.
+
     -   Only on a clean response: proceed as the skill instructs.
 
 Skill Identification
