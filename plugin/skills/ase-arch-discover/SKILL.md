@@ -115,8 +115,16 @@ for the technology stack to *provide* the *needed functionality*
         <keyword-L/> (L=1-M), which allow you to search for suitable
         components.
 
-    3.  In the to be discovered result set of components <component-K/>
-        (K=1-N), remember the component name as <name-K/>, the
+    3.  Determine the *candidate pool size* <pool/> as twice the
+        <getopt-option-limit/> (i.e. <pool/> = 2 &times;
+        <getopt-option-limit/>). Each discovery source below may fetch up
+        to <pool/> candidates so that the later ranking and trimming
+        (which alone is governed by <getopt-option-limit/>) has a
+        meaningful set to choose from.
+
+        In the to be discovered candidate set of components <component-K/>
+        (K=1-C, where C is the merged and deduplicated candidate count),
+        remember the component name as <name-K/>, the
         official package name as <package-K/>, the latest version as
         <version-K/>, the stars as <stars-K/>, the created date as
         <created-K/>, the last updated date as <updated-K/>, the total
@@ -126,13 +134,13 @@ for the technology stack to *provide* the *needed functionality*
 
         1.  Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
-            discover an initial set of a maximum of <getopt-option-limit/> *NPM packages*
+            discover an initial set of a maximum of <pool/> *NPM packages*
             <component-K/> and at least their real name <name-K/> and
             their unique package names <package-K/>.
 
-        2.  Use the shell command `npm search --json --searchlimit <getopt-option-limit/>
+        2.  Use the shell command `npm search --json --searchlimit <pool/>
             "<keyword-1/>" [...] "<keyword-M/>"` to *specifically*
-            discover an additional set of a maximum of <getopt-option-limit/> *NPM packages*
+            discover an additional set of a maximum of <pool/> *NPM packages*
             <component-K/> and at least their unique package names
             <package-K/>, based on the essential keywords <keyword-L/>
             (L=1-M). Merge the results into the already existing result
@@ -142,14 +150,14 @@ for the technology stack to *provide* the *needed functionality*
 
         1.  Based on the essential keywords <keyword-L/> (L=1-M),
             use the `ase-meta-search` skill in a subagent to *generally*
-            discover an initial set of a maximum of <getopt-option-limit/> *Maven packages*
+            discover an initial set of a maximum of <pool/> *Maven packages*
             <component-K/> and at least their real name <name-K/> and
             their unique Maven coordinates <package-K/> of the form
             `groupId:artifactId`.
 
-        2.  Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+[...]+<keyword-M/>&rows=<getopt-option-limit/>&wt=json'`
+        2.  Use the shell command `curl -s 'https://search.maven.org/solrsearch/select?q=<keyword-1/>+[...]+<keyword-M/>&rows=<pool/>&wt=json'`
             to *specifically* discover an additional set of a maximum
-            of <getopt-option-limit/> *Maven packages* <component-K/> and at least their
+            of <pool/> *Maven packages* <component-K/> and at least their
             unique Maven coordinates <package-K/> (i.e. `<g/>:<a/>` from
             each result document's `g` and `a` fields), based on the
             essential keywords <keyword-L/> (L=1-M). Merge the results
@@ -157,22 +165,25 @@ for the technology stack to *provide* the *needed functionality*
             entries by Maven coordinate.
 
     6.  Call the `ase_component_info(stack: "<stack/>", components:
-        [ "<package-1/>", ..., "<package-N/>" ])` tool of the `ase` MCP
-        server *once* for the entire set of discovered packages.
+        [ "<package-1/>", ..., "<package-C/>" ])` tool of the `ase` MCP
+        server *once* for the entire candidate set of discovered packages.
         The tool dispatches internally on <stack/> and fetches all
         metadata in maximum parallel and returns an array of objects `{
         name, version, created, updated, repository, stars, downloads,
         rank }`. For each
-        component <component-K/> (K=1-N) read from its corresponding
+        component <component-K/> (K=1-C) read from its corresponding
         entry: <version-K/> from `version`, <updated-K/> from `updated`,
         <created-K/> from `created`, <repository-K/> from `repository`,
         <stars-K/> from `stars` (numeric or `N.A.`), <downloads-K/>
         from `downloads` (numeric or `N.A.`) and <rank-K/> from `rank`
         (numeric).
 
-    7.  Sort, in descending order, the discovered components
-        <component-K/> (K=1-N) by their `rank` field and trim the result
-        list to just a maximum of <getopt-option-limit/> total components.
+    7.  Sort, in descending order, the discovered candidate components
+        <component-K/> (K=1-C) by their `rank` field and trim the result
+        list to just a maximum of <getopt-option-limit/> total components,
+        which establishes the final retained set <component-K/> (K=1-N,
+        where N is at most <getopt-option-limit/>). All subsequent steps
+        operate solely on this retained set.
 
     8.  For each component <component-K/> (K=1-N), research and then
         decide which *one* of *USP* (Unique Selling Point -- what makes
