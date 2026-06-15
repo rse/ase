@@ -137,8 +137,11 @@ Honor the following tenets throughout the brainstorming:
         4.  Dispatch on the dialog <result/>:
 
             -   If <result/> is `CANCEL`:
-                Skip the remaining sub-steps of this iteration cycle and
-                continue directly with sub-step 2 below (cancellation handling).
+                Skip the remaining sub-steps of this iteration cycle, break
+                out of the iteration cycle entirely, and continue directly
+                with the outer item `2.` (cancellation handling) that
+                immediately follows this iteration cycle `1.` within this
+                STEP 2.
 
             -   If <result/> starts with `ERROR:`:
                 Ask the user interactively, without a special tool, the
