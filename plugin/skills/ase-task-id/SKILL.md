@@ -44,6 +44,8 @@ Configure Task Id
         tool from the `ase` MCP server and set <text/> to its
         `text` output. Check the response as mandated above; only
         on a clean response set <ase-task-id><text/></ase-task-id>.
+        On an `ERROR:`/`WARNING:` response, keep the <ase-task-id/>
+        inherited from the current context as the fallback.
 
     -   Output:
         <template>
