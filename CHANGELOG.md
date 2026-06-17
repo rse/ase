@@ -5,6 +5,9 @@ ChangeLog
 0.9.20 (2026-06-18)
 -------------------
 
+- IMPROVEMENT: improve examples and cross-references (`ase-sync-reconcile` skill)
+- UPDATE: update documentation from latest code status quo (`AGENTS.md`)
+
 0.9.19 (2026-06-18)
 -------------------
 
