@@ -58,11 +58,11 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   - `plugin/skills/<name>/SKILL.md` — the skill set (37 skills total),
     grouped by `ase-meta-*` (brainstorm, changelog, chat, commit, compat,
     diaboli, diff, evaluate, persona, quorum, review, search, steelman,
-    update, why), `ase-code-*`
+    why), `ase-code-*`
     (analyze, craft, explain, insight, lint, refactor, resolve), `ase-arch-*`
     (analyze, discover), `ase-task-*` (id, list, edit, grill, view,
-    reboot, rename, condense, preflight, implement, delete), and `ase-docs-*`
-    (proofread, distill).
+    reboot, rename, condense, preflight, implement, delete), `ase-docs-*`
+    (proofread, distill), and `ase-sync-*` (reconcile).
   - `plugin/agents/<name>.md` — sub-agent definitions (`ase-meta-chat`,
     `ase-meta-search`, `ase-meta-diagram`, `ase-meta-review`,
     `ase-code-lint`, `ase-docs-proofread`); 6 in total.
