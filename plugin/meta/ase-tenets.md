@@ -114,10 +114,10 @@ you *MUST* honor the following so-called "CRAFTING TENETS":
     Honor the non-functional requirements Performance, Security,
     Scalability, Comprehensibility.
 
-ALIGNING TENETS
----------------
+RECONCILIATION TENETS
+---------------------
 
-When *aligning* a set of target artifacts to a set of source artifacts,
+When *reconcile* a set of target artifacts to a set of source artifacts,
 you *MUST* honor the following so-called **ALIGNING TENETS**:
 
 -   **Directional Authority**:

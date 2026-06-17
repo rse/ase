@@ -1,11 +1,11 @@
 ---
-name: ase-meta-update
+name: ase-sync-reconcile
 argument-hint: "[--help|-h] <target>[,...] [<source>[,...]]"
 description: >
-    Update one set of artifact kinds (the target) to reflect the current
+    Reconcile one set of artifact kinds (the target) to reflect the current
     state of another set of artifact kinds (the source). Use when the
-    user wants to "update", "reconcile", or "sync" artifacts like SPEC,
-    ARCH, CODE, DOCS, TASK, INFR, or OTHR against each other.
+    user wants to "reconcile", "sync", "align", or "update" artifacts like
+    SPEC, ARCH, CODE, DOCS, TASK, INFR, or OTHR against each other.
 user-invocable: true
 disable-model-invocation: false
 effort: xhigh
@@ -15,11 +15,11 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
-<skill name="ase-meta-update">
-    Update Artifacts from Artifacts
+<skill name="ase-sync-reconcile">
+    Reconcile Artifacts from Artifacts
 </skill>
 
-<expand name="getopt" arg1="ase-meta-update">
+<expand name="getopt" arg1="ase-sync-reconcile">
     $ARGUMENTS
 </expand>
 
@@ -61,7 +61,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         processing the entire current skill:
 
         <template>
-        ⧉ **ASE**: ☻ skill: **ase-meta-update**, ▶ ERROR: missing target argument
+        ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: missing target argument
         </template>
 
         </if>
@@ -72,7 +72,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         *STOP* processing the entire current skill:
 
         <template>
-        ⧉ **ASE**: ☻ skill: **ase-meta-update**, ▶ ERROR: unknown artifact kind: **<kind/>**
+        ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: unknown artifact kind: **<kind/>**
         </template>
 
     4.  <if condition="<source/> is empty">
@@ -90,7 +90,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         processing the entire current skill:
 
         <template>
-        ⧉ **ASE**: ☻ skill: **ase-meta-update**, ▶ ERROR: empty source -- nothing to update from
+        ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: empty source -- nothing to update from
         </template>
 
     6.  Report the resolved target and source with the following <template/>:

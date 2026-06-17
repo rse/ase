@@ -5,6 +5,8 @@ ChangeLog
 0.9.19 (2026-06-17)
 -------------------
 
+- REFACTOR: rename `ase-meta-update` skill to `ase-sync-reconcile`
+
 0.9.18 (2026-06-17)
 -------------------
 
