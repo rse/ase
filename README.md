@@ -24,7 +24,8 @@ important, recurring work-steps in the primary disciplines of *Software
 Engineering*, especially in the discipline *Software Development* and
 *Software Architecture*.
 
-**ASE** is primarily motivated by the following statement of its author, *Dr. Ralf S. Engelschall*:
+**ASE** is primarily motivated by the following statement of its primary
+author, *Dr. Ralf S. Engelschall*:
 
 > "Software developers in the industrial Software Engineering context,
 > using the Agentic AI Coding tool *Claude Code* (or alternatively
