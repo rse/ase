@@ -186,45 +186,11 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
 3.  <step id="STEP 3: Internalize Problem Resolution Tenets">
 
-    You *MUST* internalize and honor the following tenets when resolving the problem.
-    Do not output anything.
+    1.  You *MUST* internalize and strictly honor the **GENERIC TENETS**,
+        and the **RESOLVING TENETS** of the **ASE Tenets** when updating
+        in the following. Do not output anything.
 
-    1.  Generic Tenets:
-
-        -   **Separation of Concerns**:
-            Clearly separate all individual concerns as well as possible.
-
-        -   **Code Base Alignment**:
-            Strictly align with the existing source code base by exactly
-            following its coding style, its structure, its naming
-            conventions, etc.
-
-    2.  Specific Tenets:
-
-        -   **Surgical Changes**:
-            Keep source code changes always as small as possible.
-
-        -   **No Cleanups**:
-            Strictly focus on resolving the problem and do not mix this
-            task with any other necessary code cleanups, unless they are
-            really necessary for resolving the task.
-
-        -   **Minimum Flags**:
-            Use the absolute minimum total number of flags (boolean
-            variables) to span the entire space of scenarios. Prefer the
-            adjustment of existing flags over the introduction of new
-            flags.
-
-        -   **Code Adequacy**:
-            As little increase in overall source code complexity as
-            possible, as much new problem resolution source code as
-            necessary.
-
-        -   **Origin Proximity**:
-            Problems for *obvious, particular, or expected* errors
-            *should* be handled *near the origin*. Problems for
-            *theoretical, fictive, or unexpected* errors *should* be
-            handled more generally and in parent scopes.
+    2.  Do not output anything in this STEP 3.
 
     </step>
 

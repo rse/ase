@@ -72,6 +72,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     *GitHub Copilot CLI* / *OpenAI Codex CLI*.
   - `plugin/meta/*.md` — meta documents injected into sessions or
     used by skills: `ase-constitution.md` (session constitution),
+    `ase-tenets.md` (generic and operation-specific tenets),
     `ase-skill.md` (skill-authoring guide), `ase-control.md`
     (skill control flow), `ase-dialog.md` (user-dialog conventions),
     `ase-getopt.md` (skill option parsing), `ase-persona.md`
