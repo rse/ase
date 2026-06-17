@@ -2,10 +2,11 @@
 ChangeLog
 =========
 
-0.9.19 (2026-06-17)
+0.9.19 (2026-06-18)
 -------------------
 
-- REFACTOR: rename `ase-meta-update` skill to `ase-sync-reconcile`
+- UPDATE: reconcile user documentation with current code status quo (`README.md`, `docs/configuration.md`, `docs/usage-plugin.md`, `docs/usage-tool.md`)
+- REFACTOR: rename `ase-meta-update` skill to `ase-sync-reconcile` (`ase-sync-reconcile` skill)
 
 0.9.18 (2026-06-17)
 -------------------
