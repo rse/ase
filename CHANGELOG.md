@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: give the `ase-meta-update` skill more power (`ase-meta-update` skill)
 - REFACTOR: factor out reusable tenets into own `meta/ase-tenets.md` file (`ase-tenets.md`, `ase-constitution.md`)
+- UPDATE: upgrade NPM dependencies
 
 0.9.17 (2026-06-15)
 -------------------
