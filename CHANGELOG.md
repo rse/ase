@@ -2,10 +2,20 @@
 ChangeLog
 =========
 
-0.9.16 (2026-06-15)
+0.9.18 (2026-06-17)
+-------------------
+
+- IMPROVEMENT: give the `ase-meta-update` skill more power (`ase-meta-update` skill)
+- REFACTOR: factor out reusable tenets into own `meta/ase-tenets.md` file (`ase-tenets.md`, `ase-constitution.md`)
+
+0.9.17 (2026-06-15)
 -------------------
 
 - FEATURE: add `ase-meta-update` skill to update target artifact kinds from source artifact kinds (`ase-meta-update` skill)
+
+0.9.16 (2026-06-15)
+-------------------
+
 - BUGFIX: revert MCP bridge startup change that broke the service (`ase-mcp.ts`)
 
 0.9.15 (2026-06-15)
