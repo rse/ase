@@ -24,11 +24,16 @@ The following configuration parameters control the project:
     -   `grey`:      ...grey  box, i.e., the code is intentionally partially intransparent or not understood.
     -   `black`:     ...black box, i.e., the code is intentionally fully intransparent and not understood.
 
-The project *artifacts* are partitioned into five kinds (`spec`,
-`arch`, `code`, `docs`, `infr`), each configured by a `.basedir` anchor
-and a `.files` miniglob spec. The `.basedir` is a directory resolved
-relative to the project root (empty means the project root itself); the
-`.files` whitespace-separated glob spec resolves relative to `.basedir`:
+The project *artifacts* are configured per kind, each kind defined by a
+`.basedir` anchor and a `.files` miniglob spec. The `.basedir` is a
+directory resolved relative to the project root (empty means the project
+root itself); the `.files` whitespace-separated glob spec resolves
+relative to `.basedir`. The six configurable kinds are `task`, `spec`,
+`arch`, `code`, `docs`, and `infr`; in addition, the implicit `othr`
+catch-all collects all remaining files and is resolved last (it has no
+configurable `.basedir`/`.files`):
+
+-   **project.artifact.task.{basedir,files}**: anchor directory and glob spec matching the project *task plan* files.
 
 -   **project.artifact.spec.{basedir,files}**: anchor directory and glob spec matching the project *specification* files.
 
@@ -49,4 +54,6 @@ The following configuration parameters control the agent:
     -    `caveman`:     ...caveman: ultra brief, rough and stuttering.
 
 -   **agent.task**: the Agentic AI *task* unique id
+
+-   **agent.skill**: the Agentic AI *skill* unique id of the currently active skill
 

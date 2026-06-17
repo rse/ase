@@ -66,6 +66,11 @@ The following ASE commands/skills exist on the meta-level:
   staged Git changes and emit an approve/reject verdict with
   prioritized, severity-tagged, line-cited findings.
 
+- **/ase-meta-compat**:<br/>
+  Run the *ASE* compatibility self-test, probing the agent harness and
+  LLM for the control structures and placeholder handling *ASE* relies
+  on and reporting the determined compatibility level.
+
 ### Architecture Commands
 
 The following ASE commands/skills exist on the architecture-level:
@@ -159,4 +164,16 @@ The following ASE commands/skills exist on the documentation-level:
   Distill a document into a flat, importance-ranked list of its key
   points, each with a salience rank, a rationale, and a verbatim
   line-cited evidence snippet.
+
+### Synchronization Commands
+
+The following ASE commands/skills exist on the synchronization-level:
+
+- **/ase-sync-reconcile** *target* \[*source*\]:<br/>
+  Reconcile one set of artifact kinds (the *target*) so it reflects the
+  current state of another set (the *source*), reading the source
+  artifacts and surgically adjusting the target artifacts. Both *target*
+  and *source* are comma-separated lists of the artifact kinds `TASK`,
+  `SPEC`, `ARCH`, `CODE`, `DOCS`, `INFR`, and `OTHR`; when *source* is
+  omitted, it defaults to all remaining kinds not present in *target*.
 

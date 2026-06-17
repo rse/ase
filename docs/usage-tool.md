@@ -38,7 +38,7 @@ The following top-level command-line options exist:
 
 - \[`-l`|`--log-level` *level*\]:
   Set the logging verbosity. Supported *level* values are
-  `error`, `warning` (default), `info`, and `debug`.
+  `error`, `warning`, `info` (default), and `debug`.
 
 - \[`-L`|`--log-file` *file*\]:
   Redirect log output to *file* (appended). Use `-` (default) to
