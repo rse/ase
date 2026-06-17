@@ -63,4 +63,5 @@ Reconcile the documentation from the code and the architecture:
 
 ##  SEE ALSO
 
-[`ase-meta-changelog`](../ase-meta-changelog/help.md), [`ase-arch-analyze`](../ase-arch-analyze/help.md), [`ase-arch-discover`](../ase-arch-discover/help.md).
+[`ase-meta-changelog`](../ase-meta-changelog/help.md),
+[`ase-task-implement`](../ase-task-implement/help.md)
