@@ -24,7 +24,7 @@ effort: xhigh
 </expand>
 
 <objective>
-    *Update* the *target* artifact kinds to *reflect* the *current
+    *Reconcile* the *target* artifact kinds to *reflect* the *current
     state* of the *source* artifact kinds, by reading the source
     artifacts and adjusting the target artifacts accordingly:
     <request><getopt-arguments/></request>.
@@ -139,7 +139,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 4.  <step id="STEP 4: Update Target Artifacts">
 
     1.  You *MUST* internalize and strictly honor the **GENERIC TENETS**,
-        the **ALIGNMENT TENETS**, the **REFACTORING TENETS**, and the
+        the **RECONCILIATION TENETS**, the **REFACTORING TENETS**, and the
         **CRAFTING TENETS** of the **ASE Tenets** when updating in the following. Do not
         output anything.
 
