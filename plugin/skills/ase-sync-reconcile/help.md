@@ -43,22 +43,19 @@ treated as free-form.
 
 ##  EXAMPLES
 
-Reconcile the specification to reflect the current source code:
+Reconcile the code and documentation
+to reflect the current specification and architecture
+in a "forward engineering" approach:
 
 ```text
-❯ /ase-sync-reconcile SPEC CODE
+❯ /ase-sync-reconcile CODE,DOCS SPEC,ARCH
 ```
 
-Reconcile specification and architecture from everything else:
+Reconcile specification and architecture from everything else
+in a "reverse engineering" approach:
 
 ```text
-❯ /ase-sync-reconcile SPEC,ARCH
-```
-
-Reconcile the documentation from the code and the architecture:
-
-```text
-❯ /ase-sync-reconcile DOCS CODE,ARCH
+❯ /ase-sync-reconcile SPEC,ARCH CODE,DOCS
 ```
 
 ##  SEE ALSO
