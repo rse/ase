@@ -636,6 +636,12 @@ and complexity of the particular task to perform) which operation mode to choose
    The task plan has a fixed format and is persisted by **ASE** and
    hence is available across agent sessions.
 
+5. **Sync Mode** (**ASE**):
+   The reconciliation mode of **ASE** where the user aligns the code
+   and documentation to the specification and architecture ("forward
+   engineering") or even aligns the specification and architecture to
+   the code and documentation ("reverse engineering").
+
 </td>
 </tr>
 </table>
