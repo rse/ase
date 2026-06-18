@@ -28,13 +28,12 @@ resolves to all seven kinds *minus* the kinds listed in *target*. Unless
 `--bidirectional` is given, a kind present in *target* is never used as
 its own source.
 
-The file lists for the kinds `SPEC`, `ARCH`, `CODE`, `DOCS`, `INFR`, and
-`OTHR` are resolved via the `ase_artifact_list` MCP tool; the `TASK` kind
-is resolved generically from the `.ase/task/*/plan.md` task plans. While
-reconciling, the skill honors the artifact-format conventions of
-`ase-format-meta.md`, `ase-format-spec.md`, `ase-format-arch.md`, and
-`ase-format-task.md`; the kinds `CODE`, `DOCS`, `INFR`, and `OTHR` are
-treated as free-form.
+The file lists for all involved kinds are resolved via the
+`ase_artifact_list` MCP tool of the `ase` MCP server. While reconciling,
+the skill honors the artifact-format conventions of `ase-format-meta.md`,
+`ase-format-spec.md`, `ase-format-arch.md`, and `ase-format-task.md`;
+the kinds `CODE`, `DOCS`, `INFR`, and `OTHR` have no dedicated format
+contract and are treated as free-form.
 
 ##  OPTIONS
 
