@@ -22,7 +22,7 @@ effort: xhigh
 
 <expand name="getopt"
     arg1="ase-sync-reconcile"
-    arg2="--bidirectional|-b --target|-t=(SPEC|ARCH|CODE|DOCS|TASK|INFR|OTHR)... --source|-s=(auto|SPEC|ARCH|CODE|DOCS|TASK|INFR|OTHR)...">
+    arg2="--bidirectional|-b --target|-t=CODE,DOCS,INFR,OTHR --source|-s=auto">
     $ARGUMENTS
 </expand>
 
@@ -69,7 +69,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         </if>
 
-    3.  If any token in <target/> or <source/> is *not* one of the seven
+    3.  <if condition="<source/> is equal 'auto'">
+
+        Set <source/> to the seven recognized kinds
+        `TASK,SPEC,ARCH,CODE,DOCS,INFR,OTHR` *minus* all kinds present
+        in <target/>. Do not output anything.
+
+        </if>
+
+    4.  If any token in <target/> or <source/> is *not* one of the seven
         recognized kinds, only output the following <template/> (with
         <kind/> set to the first offending token) and then immediately
         *STOP* processing the entire current skill:
@@ -78,15 +86,6 @@ explicitly requested by this procedure via outputs based on a <template/>!
         ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: unknown artifact kind: **<kind/>**
         </template>
 
-    4.  <if condition="<source/> is equal 'auto'">
-
-        Set <source/> to the seven recognized kinds
-        `TASK,SPEC,ARCH,CODE,DOCS,INFR,OTHR` *minus* all kinds present
-        in <target/> (preserving that fixed order). Do not output
-        anything.
-
-        </if>
-
     5.  <if condition="<getopt-bidirectional/> is not 'true'">
 
         Remove from <source/> any kind that is also present in <target/>
@@ -94,7 +93,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         <if condition="<source/> is empty">
 
-        only output the following <template/> and then immediately *STOP*
+        Only output the following <template/> and then immediately *STOP*
         processing the entire current skill:
 
         <template>
@@ -114,7 +113,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     </step>
 
-2.  <step id="STEP 2: Resolve and Read Artifact Files">
+2.  <step id="STEP 2: Resolve and Read Artifacts">
 
     1.  Do not output anything in this STEP 2.
 
@@ -138,38 +137,32 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     </step>
 
-3.  <step id="STEP 3: Internalize Artifact Formats">
+3.  <step id="STEP 3: Update Artifacts">
 
-    1.  Do not output anything in this STEP 3.
+    1.  Internalize and honor the artifact-format conventions:
 
-    2.  Internalize and honor the artifact-format conventions imported above:
+        -   the artifact-set/artifact/aspect meta information (`ase-format-meta.md`),
+        -   the `SPEC` format (`ase-format-spec.md`),
+        -   the `ARCH` format (`ase-format-arch.md`),
+        -   the `TASK` format (`ase-format-task.md`).
 
-        -   the artifact-set/artifact/aspect meta information of `ase-format-meta.md`,
-        -   the `SPEC` format of `ase-format-spec.md`,
-        -   the `ARCH` format of `ase-format-arch.md`,
-        -   the `TASK` format of `ase-format-task.md`.
-
-        Whenever a target artifact belongs to one of these formatted
+        Whenever a target artifact belongs to one of these
         kinds, the update *MUST* keep it conformant to the
         corresponding format (headings, structure, identifiers, and the
         `<timestamp-modified/>` rule). The kinds `CODE`, `DOCS`, `INFR`,
         and `OTHR` have no dedicated format contract and are treated as
         free-form.
 
-    </step>
-
-4.  <step id="STEP 4: Update Artifacts">
-
-    1.  You *MUST* internalize and strictly honor the **GENERIC TENETS**,
+    2.  You *MUST* internalize and strictly honor the **GENERIC TENETS**,
         the **RECONCILIATION TENETS**, the **REFACTORING TENETS**, and
         the **CRAFTING TENETS** of the **ASE Tenets** when updating in
         the following. Do not output anything.
 
-    2.  Once call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of
+    3.  Once call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of
         the `ase` MCP server to find out the current time and store it in
         <timestamp-modified/>.
 
-    3.  <if condition="<getopt-bidirectional/> is equal 'true'">
+    4.  <if condition="<getopt-bidirectional/> is equal 'true'">
 
         *Bidirectionally update* the <target/> and <source/> artifacts
         so that they faithfully *reflect the current state* of each
@@ -192,13 +185,13 @@ explicitly requested by this procedure via outputs based on a <template/>!
         `Write`/`Edit` tools.
 
         For each formatted output artifact kind, strictly honor its
-        format contract internalized in STEP 3.
+        format contract.
 
         Whenever an output artifact is changed and contains a `Modified:
         <timestamp-modified-old/>` line, replace this with `Modified:
         <timestamp-modified/>`.
 
-    4.  Report the performed updates with the following <template/>, listing
+    5.  Report the performed updates with the following <template/>, listing
         one bullet line per changed output file (with <file/> its
         project-relative path and <note/> an ultra-brief description of
         what was reconciled):
