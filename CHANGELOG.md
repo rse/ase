@@ -2,8 +2,16 @@
 ChangeLog
 =========
 
-0.9.21 (2026-06-18)
+0.9.21 (2026-06-19)
 -------------------
+
+- FEATURE: add Technology Stack (TS) artifact to Architecture format (`ase-format-arch.md`)
+- FEATURE: add Sync Mode to the operation-modes overview (`README.md`)
+- IMPROVEMENT: add more USP entries for sync/implement/resolve/refactor/analyze skills (`README.md`)
+- IMPROVEMENT: refine Funnel Mode and Sync Mode operation-mode wording (`README.md`)
+- BUGFIX: do not hard-code the artifact base directory (`ase-format-arch.md`, `ase-format-spec.md`)
+- BUGFIX: fix skill count from 37 to 38 (`README.md`)
+- UPDATE: refresh building-blocks and workflow diagrams (Graffle/SVG/PDF)
 
 0.9.20 (2026-06-18)
 -------------------
