@@ -55,14 +55,14 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   variant at `plugin/.github/plugin/plugin.json` and an *OpenAI Codex
   CLI* variant at `plugin/.codex-plugin/plugin.json`, each differing only
   by their `hooks` wiring). Layout:
-  - `plugin/skills/<name>/SKILL.md` — the skill set (37 skills total),
+  - `plugin/skills/<name>/SKILL.md` — the skill set (38 skills total),
     grouped by `ase-meta-*` (brainstorm, changelog, chat, commit, compat,
     diaboli, diff, evaluate, persona, quorum, review, search, steelman,
     why), `ase-code-*`
     (analyze, craft, explain, insight, lint, refactor, resolve), `ase-arch-*`
     (analyze, discover), `ase-task-*` (id, list, edit, grill, view,
     reboot, rename, condense, preflight, implement, delete), `ase-docs-*`
-    (proofread, distill), and `ase-sync-*` (reconcile).
+    (proofread, distill), and `ase-sync-*` (reconcile, import).
   - `plugin/agents/<name>.md` — sub-agent definitions (`ase-meta-chat`,
     `ase-meta-search`, `ase-meta-diagram`, `ase-meta-review`,
     `ase-code-lint`, `ase-docs-proofread`); 6 in total.

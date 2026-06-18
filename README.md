@@ -401,7 +401,7 @@ features.
   configured parameters. This allows controlling the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
   (`ase-code-*`), architecture (`ase-arch-*`), task (`ase-task-*`), and
-  documentation (`ase-docs-*`) families, covering 37 skills in total.
+  documentation (`ase-docs-*`) families, covering 38 skills in total.
 
 </td>
 <td width="50%" valign="top">
@@ -551,6 +551,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-docs-**proofread**](plugin/skills/ase-docs-proofread/help.md)<br/>
 [ase-docs-**distill**](plugin/skills/ase-docs-distill/help.md)<br/>
 [ase-sync-**reconcile**](plugin/skills/ase-sync-reconcile/help.md)<br/>
+[ase-sync-**import**](plugin/skills/ase-sync-import/help.md)<br/>
 
 </td>
 </tr>
