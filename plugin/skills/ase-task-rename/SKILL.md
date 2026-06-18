@@ -29,12 +29,6 @@ Rename a Task Plan
 Procedure
 ---------
 
-You *MUST* follow the following numbered items *strictly* *sequentially*!
-You *MUST* not skip any numbered item during processing!
-
-You *MUST* *NOT* output anything in this entire procedure, *except* when
-explicitly requested by this procedure via outputs based on a <template/>!
-
 1.  **Determine Task:**
 
     1.  Parse <arguments><getopt-arguments/></arguments> into a whitespace-separated

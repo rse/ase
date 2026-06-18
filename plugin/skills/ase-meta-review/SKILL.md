@@ -43,12 +43,6 @@ scan: it complements `ase-code-lint` (mechanical quality), `ase-code-analyze`
 Procedure
 ---------
 
-You *MUST* follow the following numbered items *strictly* *sequentially*!
-You *MUST* not skip any numbered item during processing!
-
-You *MUST* *NOT* output anything in this entire procedure, *except* when
-explicitly requested by this procedure via outputs based on a <template/>!
-
 <flow>
 
 1.  <step id="STEP 1: Determine Change Set">

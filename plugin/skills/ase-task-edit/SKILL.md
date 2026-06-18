@@ -39,12 +39,6 @@ preflight.
 Procedure
 ---------
 
-You *MUST* follow the following numbered items *strictly* *sequentially*!
-You *MUST* not skip any numbered item during processing!
-
-You *MUST* *NOT* output anything in this entire procedure, *except* when
-explicitly requested by this procedure via outputs based on a <template/>!
-
 <define name="apply-refinement">
 Treat the <instruction/> as a *refinement instruction* for
 the plan, and update <content/> in-place by *applying* the

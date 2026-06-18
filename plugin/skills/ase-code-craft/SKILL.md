@@ -43,12 +43,6 @@ From scratch *craft* the following feature:
 Procedure
 ---------
 
-You *MUST* follow the following numbered items *strictly* *sequentially*!
-You *MUST* not skip any numbered item during processing!
-
-You *MUST* *NOT* output anything in this entire procedure, *except* when
-explicitly requested by this procedure via outputs based on a <template/>!
-
 You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
 filesystem-modifying tool during this entire skill. The *only*
 permitted way to persist artifacts is via `ase_task_save(...)`.
