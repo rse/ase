@@ -139,8 +139,14 @@ Skill Sequential Processing
 -   *IMPORTANT*: For each <step/> you *MUST* use the `TaskUpdate` tool
     for updating its status *during* processing, once a <step/> finished.
 
--   *IMPORTANT*: You *MUST* sequentially execute every <step/> in
-    a <flow/> *EXACTLY* as the instructions specify.
+-   *IMPORTANT*: You *MUST* *strictly sequentially* execute every <step/> in
+    a <flow/>. You *MUST* not implicitly skip any <step/> during
+    processing, except you were explicitly requested to do this or the
+    step is a configured to be a conditional step!
+
+-   *IMPORTANT*: You *MUST* *strictly sequentially* execute every numbered
+    items in a <step/>. You *MUST* not implicitly skip any numbered item during
+    processing, except you were explicitly requested to do this!
 
 -   *IMPORTANT*: For any <step/> that specifies an *agent* in its
     `agent="[...]"` XML attribute, you *MUST* use the specified
