@@ -9,10 +9,11 @@ and the "what" of the Software Engineering project.
 
 Each **Artifact** of the **Artifact Set**
 **Specification (SPEC)** is stored under
-`docs/spec/SPEC-<artifact-no/>-<artifact-id/>-<artifact-slug/>.md`,
-relative to the project root directory, with <artifact-no/> being the
-zero-padded, two-digit sequence number of the **Artifact** (starting at
-`01`) according to the order of the **Artifact** list below, and with
+`<basedir/>/SPEC-<artifact-no/>-<artifact-id/>-<artifact-slug/>.md`,
+relative to the project root directory, with <basedir/> being the
+`project.artifact.spec.basedir` config variable, <artifact-no/> being
+the zero-padded, two-digit sequence number of the **Artifact** (starting
+at `01`) according to the order of the **Artifact** list below, and with
 <artifact-slug/> being derived from <artifact-name/> (see below) by
 Pascal-casing each word (upper-casing its first letter) and using `-`
 characters instead of spaces (e.g. `Customer-Journey`).
