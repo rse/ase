@@ -75,6 +75,12 @@ distinct **Artifact**s (listed under their <artifact-name/> and their
     The major decisions related to the architecture, each recording the
     forces at play, the chosen response, and the reasoning that justifies it.
 
+10. **Technology Stack (TS)**:
+    The concrete technology products the solution is built upon, organized
+    by tier and lifecycle phase, recording for each component its chosen
+    product, its purpose, and the alternatives that were considered but not
+    chosen.
+
 The **Artifact**s have the following cross-references:
 
 ```text
@@ -90,6 +96,8 @@ ARCH-08-QP Quality Perspectives ──(affects)─►    ARCH-02-FV Functionalit
 ARCH-08-QP Quality Perspectives ──(affects)─►    ARCH-06-DP Deployment View
 ARCH-09-DR Decision Record      ──(affects)─►    ARCH-02-FV Functionality View
 ARCH-09-DR Decision Record      ──(affects)─►    ARCH-06-DP Deployment View
+ARCH-10-TS Technology Stack     ──(realizes)─►   ARCH-02-FV Functionality View
+ARCH-10-TS Technology Stack     ──(realizes)─►   ARCH-06-DP Deployment View
 ```
 
 Context View (CV)
@@ -898,3 +906,262 @@ forces at play, the chosen response, and the reasoning that justifies it.
     -   **Rejected alternatives when the rejection is non-obvious.** If
         you considered GraphQL and picked REST for subtle reasons, record it -
         otherwise someone will suggest GraphQL again in six months.
+
+Technology Stack (TS)
+---------------------
+
+The concrete technology products the solution is built upon, organized by
+tier and lifecycle phase, recording for each component its chosen product,
+its purpose, and the alternatives that were considered but not chosen.
+
+-   Format:
+
+    <format>
+
+    #   ARCHITECTURE: TECHNOLOGY STACK (ARCH-TS)
+
+    ✳   Created:  **<timestamp-created/>**
+    ✎   Modified: **<timestamp-modified/>**
+
+    <arch-ts-component/>
+    <arch-ts-component/>
+    [...]
+
+    </format>
+
+-   <arch-ts-component/> format:
+
+    <format>
+
+    ##  COMPONENT: <arch-ts-component-name/> <a id="ARCH-TS-<arch-ts-component-id/>"></a>
+
+    -   When:         <arch-ts-component-when/>
+    -   Tier:         <arch-ts-component-tier/>
+    -   Coverage:     <arch-ts-component-coverage/>
+    -   Product:      <arch-ts-component-product/>
+    -   Realizes:     <arch-ts-component-element/>[, ...]
+    -   Alternatives: <arch-ts-component-alternative/>[, ...]
+
+    <arch-ts-component-description/>,
+    **BECAUSE** <arch-ts-component-rationale/>.
+
+    </format>
+
+-   <arch-ts-component/> details:
+
+    -   <arch-ts-component-id/>: per-artifact unique "slug" of always 1-3
+        lower-cased words (concatenated with "-" characters and
+        in total not longer than 30 characters), derived from
+        <arch-ts-component-name/>.
+
+    -   <arch-ts-component-name/> is a short (2-5 word) summary of the
+        technology component (e.g. `UI Framework`, `Web Server`, `Relational
+        Database`).
+
+    -   <arch-ts-component-when/> is the lifecycle phase in which the
+        component is relevant, one of:
+
+        -   `Build-Time`: Used during development, compilation, or packaging.
+        -   `Run-Time`:   Used while the solution executes in production.
+
+    -   <arch-ts-component-tier/> is the architectural tier the component
+        belongs to, one of:
+
+        -   `Client`: Runs on the client side (e.g. browser, desktop, mobile).
+        -   `Server`: Runs on the server side (e.g. backend, application, API).
+
+    -   <arch-ts-component-coverage/> is either one or more of the
+        *Client Aspects* or one or more of the *Server Aspects* defined
+        below. The general goal is to achieve a maximum coverage of all
+        aspects per <arch-ts-component-tier/> with the minimum total
+        number of <arch-ts-component-product/>.
+
+    -   <arch-ts-component-product/> is the concrete product, library, or
+        framework chosen for this component (e.g. `VueJS`, `Node.js`,
+        `PostgreSQL`).
+
+    -   <arch-ts-component-element/> is an `ARCH-FV-<arch-fv-component-id/>`
+        or `ARCH-DP-<arch-dp-node-id/>` reference to the functional element
+        or deployment node this product realizes.
+
+    -   <arch-ts-component-alternative/> is a product that would also fit
+        this component but was not chosen (e.g. `React`, `Svelte`).
+
+    -   <arch-ts-component-description/> is a concise paragraph (1-3
+        sentences) of prose describing how the product is used within the
+        solution and how it fits into the overall technology stack.
+
+    -   <arch-ts-component-rationale/> is the 1-sentence rationale ("why")
+        for choosing this product over the alternatives.
+
+    -   In case the element reference is not present, the
+        entire `-   Realizes:` bullet point is omitted.
+
+    -   In case no alternatives were considered, the
+        entire `-   Alternatives:` bullet point is omitted.
+
+    -   In case the rationale is not present, the
+        entire `, **BECAUSE** [...]` clause is omitted.
+
+-   The known *Client Aspects* which usually have to covered (at least for
+    clients in a Rich-Client architecture):
+
+    -   **Interface Theme**:
+        Style Reset, Shape, Color, Gradient, Shadow, Font, Icon.
+
+    -   **Interface Widgets**:
+        Icon, Label, Text Paragraph, Image, Form, Text-Field, Text-Area,
+        Date Picker, Toggle, Radio Button, Checkbox, Select List, Slider,
+        Progress Bar, Hyperlink, Popup Menu, Dropdown Menu, Toolbar, Tooltip,
+        Tab, Pill, Breadcrumb, Pagination, Badge, Alert, Panel, Modal, Table,
+        Scrollbar, Carousel.
+
+    -   **Interface Layouting**:
+        Responsive Design, Media Query, Frame, Grid, Padding, Border,
+        Margin, Alignment, Force, Magnetism.
+
+    -   **Interface Effects**:
+        Transition, Transformation, Keyframes, Easing Function, Sound
+        Effect, Physics.
+
+    -   **Interface Interactions**:
+        Mouse, Keyboard, Touchscreen, Gesture, Clipboard, Drag & Drop.
+
+    -   **Interface States**:
+        Rendered, Enabled, Visible, Focused, Warning, Error, Floating.
+
+    -   **Interface Mask**:
+        Markup Loading, Markup Generation, Virtual DOM, Text, Bitmaps,
+        Vectors, 2D/3D Canvas, Accessibility.
+
+    -   **Interface Internationalization**:
+        Text Internationalization (I18N).
+
+    -   **Data Conversion**:
+        Value Formatting, Value Parsing, Localization (L10N).
+
+    -   **Data Binding**:
+        Reactive, Observer, Unidirectional, Bidirectional, Incremental.
+
+    -   **Presentation Model**:
+        Parameter Value, Command Value, State Value, Data Value, Event
+        Value, Value Validation, Presentation Logic.
+
+    -   **Dialog Navigation**:
+        Deep Linking, Routing, Dialog Flow.
+
+    -   **Dialog Automation**:
+        Dialog Macros, Click-Through, Smoke Testing.
+
+    -   **Dialog Communication**:
+        Service, Event, Model, Socket, Hooks.
+
+    -   **Dialog Life-Cycle**:
+        Component States, Component State Transitions.
+
+    -   **Dialog Structure**:
+        Component, Model/View/Controller Roles, Hierarchical Composition.
+
+    -   **State Persistence**:
+        Local Storage, Cookies, Caching.
+
+    -   **Business Model**:
+        Entity, Field, Relationship, Universally Unique Identifiers (UUID).
+
+    -   **Use-Case Authorization**:
+        User Experience, Dialog Restriction, User, Group, Role, Use-Case,
+        Data, Access.
+
+    -   **Client Networking**:
+        Request/Response, Synchronization, Push, Pull, Pulled-Push,
+        REST, GraphQL, Authentication, Session.
+
+    -   **Environment Detection**:
+        Runtime Detection, Feature Detection.
+
+-   The known *Server Aspects* which usually have to covered (at least for
+    servers, sometimes called Thin-Servers, in a Rich-Client architecture):
+
+    -   **Environment Detection**:
+        Detect the run-time environment, like underlying operating
+        system, execution platform, network topology, feature toggles, etc.
+
+    -   **Argument Parsing**:
+        Parse options and arguments of the Command-Line Interface (CLI)
+        to bootstrap application parameters.
+
+    -   **Configuration Parsing**:
+        Load and parse directives from configuration file to bootstrap
+        application parameters.
+
+    -   **Process Daemonizing**:
+        Detach from the startup terminal and host process in order to run
+        fully independently.
+
+    -   **Process Management**:
+        (Pre-)fork child processes and/or threads of execution and monitor
+        and control them during the life-cycle of the application.
+
+    -   **Component Management**:
+        Structure the code into components, instantiate them under run-time
+        and manage them in a stateful component life-cycle.
+
+    -   **Component Communication**:
+        Provide inter-component communication mechanisms like events, hooks,
+        registry, etc.
+
+    -   **Server Networking**:
+        Listen to network sockets, accept connections and manage
+        request/response and message communication.
+
+    -   **Peer Information**:
+        Determine unique identification and add-on information about the
+        client peer.
+
+    -   **Session Handling**:
+        Manage secured per-connection sessions to keep state between
+        communication requests and/or client sessions.
+
+    -   **User Authentication**:
+        Determine and validate the unique identity of the user communicating
+        over the current network connection.
+
+    -   **Request Validation**:
+        Validate the syntactical and semantical compliance of the requests
+        and sanitize the requests.
+
+    -   **Request Processing**:
+        Process the request by dispatching execution according to the
+        provided request and determined context information.
+
+    -   **Role Authorization**:
+        Determine whether the role of the current user is allowed to execute
+        the current request.
+
+    -   **Client Networking**:
+        Provide mechanisms to connect to peers over the network and perform
+        request/response and/or publish/subscribe communication.
+
+    -   **Task Scheduling**:
+        Schedule and execute recurring tasks independent of regular I/O
+        operations.
+
+    -   **Execution Tracing**:
+        Provide mechanisms for tracing the execution by logging event and
+        measurement information at certain points of interest.
+
+    -   **Database Access**:
+        Map in-memory domain entities onto data store dependent persistent
+        data structure.
+
+    -   **Database Connectivity**:
+        Locally or remotely connect the database access layer to the
+        underlying data store.
+
+    -   **Database Schema**:
+        Create, update or downgrade the data schema inside the underlying
+        data store.
+
+    -   **Database Bootstrapping**:
+        Create, update or downgrade both mandatory bootstrapping and optional
+        domain-specific data inside the underlying data store.
