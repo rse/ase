@@ -629,7 +629,7 @@ and complexity of the particular task to perform) which operation mode to choose
    agent sessions.
 
 4. **Funnel Mode** (**ASE**):
-   The ultra-advanced mode of **ASE** where the user first sketches the
+   The even more advanced mode of **ASE** where the user first sketches the
    plan, then the agent figures out possible approaches, then the user
    selects one approach, then a task plan is created for this approach,
    and then finally this switches over to the regular **Task Mode**.
@@ -637,10 +637,10 @@ and complexity of the particular task to perform) which operation mode to choose
    hence is available across agent sessions.
 
 5. **Sync Mode** (**ASE**):
-   The reconciliation mode of **ASE** where the user aligns the code
-   and documentation to the specification and architecture ("forward
-   engineering") or even aligns the specification and architecture to
-   the code and documentation ("reverse engineering").
+   The separated reconciliation mode of **ASE** where the user aligns
+   the code and documentation to the specification and architecture
+   ("forward engineering") or even aligns the specification and
+   architecture to the code and documentation ("reverse engineering").
 
 </td>
 </tr>
