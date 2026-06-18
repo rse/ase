@@ -19,7 +19,7 @@ Coding Tools* like *Claude Code*. **ASE** primarily consists of a
 *Claude Code* plugin (of about 14K LoC agent skill definitions) and
 a companion Command-Line Interface (CLI) tool, including a built-in
 *MCP* service (of about 6K LoC TypeScript code). **ASE**, on the
-surface, provides 37 agent skills and commands to support the most
+surface, provides 38 agent skills and commands to support the most
 important, recurring work-steps in the primary disciplines of *Software
 Engineering*, especially in the discipline *Software Development* and
 *Software Architecture*.
