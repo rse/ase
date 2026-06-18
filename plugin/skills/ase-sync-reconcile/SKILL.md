@@ -1,11 +1,12 @@
 ---
 name: ase-sync-reconcile
-argument-hint: "[--help|-h] <target>[,...] [<source>[,...]]"
+argument-hint: "[--help|-h] [--bidirectional|-b] [--target|-t <target>[,...]] [--source|-s <source>[,...]] [<hint>]"
 description: >
-    Reconcile one set of artifact kinds (the target) to reflect the current
-    state of another set of artifact kinds (the source). Use when the
-    user wants to "reconcile", "sync", "align", or "update" artifacts like
-    SPEC, ARCH, CODE, DOCS, TASK, INFR, or OTHR against each other.
+    Reconcile one set of artifact kinds (the target) to reflect the
+    current state of another set of artifact kinds (the source), while
+    optionally honoring a filtering hint. Use when the user wants to
+    "reconcile", "sync", "align", or "update" artifacts like SPEC, ARCH,
+    CODE, DOCS, TASK, INFR, or OTHR against each other.
 user-invocable: true
 disable-model-invocation: false
 effort: xhigh
@@ -16,18 +17,20 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-sync-reconcile">
-    Reconcile Artifacts from Artifacts
+    Reconcile Artifact Set to Artifact Set
 </skill>
 
-<expand name="getopt" arg1="ase-sync-reconcile">
+<expand name="getopt"
+    arg1="ase-sync-reconcile"
+    arg2="--bidirectional|-b --target|-t=(SPEC|ARCH|CODE|DOCS|TASK|INFR|OTHR)... --source|-s=(auto|SPEC|ARCH|CODE|DOCS|TASK|INFR|OTHR)...">
     $ARGUMENTS
 </expand>
 
 <objective>
     *Reconcile* the *target* artifact kinds to *reflect* the *current
     state* of the *source* artifact kinds, by reading the source
-    artifacts and adjusting the target artifacts accordingly:
-    <request><getopt-arguments/></request>.
+    artifacts and aligning the target artifacts accordingly:
+    <hint><getopt-arguments/></hint>.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md
@@ -50,10 +53,10 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     1.  The recognized artifact kinds are the seven tokens `TASK`,
         `SPEC`, `ARCH`, `CODE`, `DOCS`, `INFR`, and `OTHR`. Parse
-        <getopt-arguments/> as one or two whitespace-separated fields:
-        the *first* field is the comma-separated <target/> kind list, the
-        optional *second* field is the comma-separated <source/> kind list.
-        Upper-case and trim every parsed kind token.
+        <getopt-target/> as the comma-separated <target/> kind list and
+        <getopt-source/> as the comma-separated <source/> kind list.
+        Upper-case and trim every parsed kind token. Do not output
+        anything.
 
     2.  <if condition="<target/> is empty">
 
@@ -61,7 +64,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         processing the entire current skill:
 
         <template>
-        ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: missing target argument
+        ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: empty target artifact list
         </template>
 
         </if>
@@ -75,7 +78,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
         ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: unknown artifact kind: **<kind/>**
         </template>
 
-    4.  <if condition="<source/> is empty">
+    4.  <if condition="<source/> is equal 'auto'">
 
         Set <source/> to the seven recognized kinds
         `TASK,SPEC,ARCH,CODE,DOCS,INFR,OTHR` *minus* all kinds present
@@ -84,14 +87,23 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
         </if>
 
-    5.  Remove from <source/> any kind that is also present in <target/>
-        (a kind is never its own source). If <source/> is then empty,
+    5.  <if condition="<getopt-bidirectional/> is not 'true'">
+
+        Remove from <source/> any kind that is also present in <target/>
+        (a kind is never its own source).
+
+        <if condition="<source/> is empty">
+
         only output the following <template/> and then immediately *STOP*
         processing the entire current skill:
 
         <template>
         ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: empty source -- nothing to update from
         </template>
+
+        </if>
+
+        </if>
 
     6.  Report the resolved target and source with the following <template/>:
 
@@ -112,8 +124,17 @@ explicitly requested by this procedure via outputs based on a <template/>!
         read the returned `artifacts` array of `{ kind, files }` objects
         to obtain the project-relative file list per kind.
 
-    3.  Read all <source/> artifact files previously resolved and build a
-        precise understanding of the *current state* they represent.
+    3.  <if condition="<hint/> is not empty">
+
+        Honor the filtering <hint/> to reduce the source and/or target
+        artifacts and/or the aspects of those artifacts you should take
+        into account.
+
+        </if>
+
+    4.  Read all (optionally filtered) source and target artifacts
+        previously resolved and build a precise understanding of the
+        *current state* they represent.
 
     </step>
 
@@ -122,6 +143,7 @@ explicitly requested by this procedure via outputs based on a <template/>!
     1.  Do not output anything in this STEP 3.
 
     2.  Internalize and honor the artifact-format conventions imported above:
+
         -   the artifact-set/artifact/aspect meta information of `ase-format-meta.md`,
         -   the `SPEC` format of `ase-format-spec.md`,
         -   the `ARCH` format of `ase-format-arch.md`,
@@ -136,28 +158,48 @@ explicitly requested by this procedure via outputs based on a <template/>!
 
     </step>
 
-4.  <step id="STEP 4: Update Target Artifacts">
+4.  <step id="STEP 4: Update Artifacts">
 
     1.  You *MUST* internalize and strictly honor the **GENERIC TENETS**,
-        the **RECONCILIATION TENETS**, the **REFACTORING TENETS**, and the
-        **CRAFTING TENETS** of the **ASE Tenets** when updating in the following. Do not
-        output anything.
+        the **RECONCILIATION TENETS**, the **REFACTORING TENETS**, and
+        the **CRAFTING TENETS** of the **ASE Tenets** when updating in
+        the following. Do not output anything.
 
-    2.  *Update* the <target/> artifact files so that they faithfully
-        *reflect the current state* of the <source/> artifacts. Apply the
-        update *directly* to the target files via `Write`/`Edit`, keeping
-        changes as *surgical* as possible: change only what the source
-        state actually requires, and do *not* rewrite unrelated parts of a
-        target artifact.
+    2.  Once call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of
+        the `ase` MCP server to find out the current time and store it in
+        <timestamp-modified/>.
 
-        For each formatted target kind, honor its format contract
-        internalized in STEP 3 and, whenever a target artifact is
-        changed, update its `<timestamp-modified/>` line via a call to
-        the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-        `ase` MCP server.
+    3.  <if condition="<getopt-bidirectional/> is equal 'true'">
 
-    3.  Report the performed update with the following <template/>, listing
-        one bullet line per changed target file (with <file/> its
+        *Bidirectionally update* the <target/> and <source/> artifacts
+        so that they faithfully *reflect the current state* of each
+        other.
+
+        </if>
+        <else>
+
+        *Unidirectionally update* the <target/> artifact files so that
+        they faithfully *reflect the current state* of the <source/>
+        artifacts.
+
+        </else>
+
+        Keep changes as *surgical* as possible: change only what the
+        input state actually requires, and do *not* rewrite unrelated
+        parts of an output artifact.
+
+        Apply the update directly to the output artifacts via the
+        `Write`/`Edit` tools.
+
+        For each formatted output artifact kind, strictly honor its
+        format contract internalized in STEP 3.
+
+        Whenever an output artifact is changed and contains a `Modified:
+        <timestamp-modified-old/>` line, replace this with `Modified:
+        <timestamp-modified/>`.
+
+    4.  Report the performed updates with the following <template/>, listing
+        one bullet line per changed output file (with <file/> its
         project-relative path and <note/> an ultra-brief description of
         what was reconciled):
 
@@ -165,14 +207,15 @@ explicitly requested by this procedure via outputs based on a <template/>!
         <ase-tpl-bullet-signal/> **UPDATED ARTIFACTS**:
 
         -   `<file/>`: <note/>
+        [...]
         </template>
 
-        <if condition="no target artifact required any change">
+        <if condition="no output artifact required any change">
 
-        Instead, only output the following <template/>:
+        Only output the following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **UPDATED ARTIFACTS**: none -- target already reflects source state.
+        <ase-tpl-bullet-normal/> **UPDATED ARTIFACTS**: none -- all outputs already reflected source state
         </template>
 
         </if>
