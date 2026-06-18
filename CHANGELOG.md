@@ -5,7 +5,8 @@ ChangeLog
 0.9.20 (2026-06-18)
 -------------------
 
-- IMPROVEMENT: improve examples and cross-references (`ase-sync-reconcile` skill)
+- IMPROVEMENT: use options for source/target with bidirectional sync, and improve examples and cross-references (`ase-sync-reconcile` skill)
+- UPDATE: update operation-modes matrix and diagram (`docs/operation-modes.*`)
 - UPDATE: update documentation from latest code status quo (`AGENTS.md`)
 
 0.9.19 (2026-06-18)
