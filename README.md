@@ -152,6 +152,25 @@ see whether **ASE** is right for you:
   automatically derived from your recent Git commits?
   &rarr; [`/ase-meta-changelog`](plugin/skills/ase-meta-changelog/help.md)
 
+- **Plan Implementation**:
+  You have a named, persisted task plan and now want it implemented as a
+  single, complete change set across your project artifacts?
+  &rarr; [`/ase-task-implement`](plugin/skills/ase-task-implement/help.md)
+  `hello`
+
+- **Artifact Reconciliation**:
+  You want one set of artifacts (e.g. CODE, DOCS) automatically aligned
+  to reflect the current state of another set (e.g. SPEC, ARCH), one-way
+  or bidirectionally?
+  &rarr; [`/ase-sync-reconcile`](plugin/skills/ase-sync-reconcile/help.md)
+  `-s SPEC -t DOCS`
+
+- **Foreign Source Import**:
+  You want external files, URLs, or pasted text ingested and turned into
+  structured SPEC, ARCH, CODE, DOCS, or TASK artifacts?
+  &rarr; [`/ase-sync-import`](plugin/skills/ase-sync-import/help.md)
+  `-t SPEC @requirements.txt`
+
 - **Direct Skill Usage Help**:
   You want usage help for skills directly within your agent tool sessions?
   &rarr; `/ase-xxx-xxx` `--help`
@@ -171,6 +190,26 @@ see whether **ASE** is right for you:
   would on a pull request, with an approve/reject verdict and
   prioritized, severity-tagged, line-cited findings?
   &rarr; [`/ase-meta-review`](plugin/skills/ase-meta-review/help.md)
+
+- **Guided Bug Fixing**:
+  You want a problem or bug resolved through a structured, plan-driven
+  funnel of candidate root causes and fix approaches instead of a direct,
+  unstructured patch?
+  &rarr; [`/ase-code-resolve`](plugin/skills/ase-code-resolve/help.md)
+  `the CLI crashes on an empty config file`
+
+- **Guided Refactoring**:
+  You want the code base refactored through a structured funnel of
+  alternative refactoring approaches, optionally captured as a named,
+  persisted task plan?
+  &rarr; [`/ase-code-refactor`](plugin/skills/ase-code-refactor/help.md)
+  `extract the config loading into a dedicated module`
+
+- **Architecture Analysis**:
+  You want your software architecture reviewed for package cohesion and
+  inter-package coupling to spot structural weak spots?
+  &rarr; [`/ase-arch-analyze`](plugin/skills/ase-arch-analyze/help.md)
+  `@tool/src`
 
 - **Collaborative Brainstorming**:
   You want to figure out *what* to build before *how*, by diverging on
