@@ -22,7 +22,7 @@ effort: xhigh
 
 <expand name="getopt"
     arg1="ase-sync-reconcile"
-    arg2="--bidirectional|-b --target|-t=CODE,DOCS,INFR,OTHR --source|-s=auto">
+    arg2="--bidirectional|-b --target|-t=CODE,DOCS,INFR,OTHR --source|-s=AUTO">
     $ARGUMENTS
 </expand>
 
@@ -63,7 +63,7 @@ Procedure
 
         </if>
 
-    3.  <if condition="<source/> is equal 'auto'">
+    3.  <if condition="<source/> is equal 'AUTO'">
 
         Set <source/> to the seven recognized kinds
         `TASK,SPEC,ARCH,CODE,DOCS,INFR,OTHR` *minus* all kinds present
