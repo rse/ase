@@ -935,12 +935,12 @@ its purpose, and the alternatives that were considered but not chosen.
 
     ##  COMPONENT: <arch-ts-component-name/> <a id="ARCH-TS-<arch-ts-component-id/>"></a>
 
-    -   When:         <arch-ts-component-when/>
-    -   Tier:         <arch-ts-component-tier/>
-    -   Coverage:     <arch-ts-component-coverage/>
     -   Product:      <arch-ts-component-product/>
-    -   Realizes:     <arch-ts-component-element/>[, ...]
     -   Alternatives: <arch-ts-component-alternative/>[, ...]
+    -   Coverage:     <arch-ts-component-coverage/>
+    -   Realizes:     <arch-ts-component-element/>[, ...]
+    -   Tier:         <arch-ts-component-tier/>
+    -   When:         <arch-ts-component-when/>
 
     <arch-ts-component-description/>,
     **BECAUSE** <arch-ts-component-rationale/>.
@@ -958,17 +958,12 @@ its purpose, and the alternatives that were considered but not chosen.
         technology component (e.g. `UI Framework`, `Web Server`, `Relational
         Database`).
 
-    -   <arch-ts-component-when/> is the lifecycle phase in which the
-        component is relevant, one of:
+    -   <arch-ts-component-product/> is the concrete product, library, or
+        framework chosen for this component (e.g. `VueJS`, `Node.js`,
+        `PostgreSQL`).
 
-        -   `Build-Time`: Used during development, compilation, or packaging.
-        -   `Run-Time`:   Used while the solution executes in production.
-
-    -   <arch-ts-component-tier/> is the architectural tier the component
-        belongs to, one of:
-
-        -   `Client`: Runs on the client side (e.g. browser, desktop, mobile).
-        -   `Server`: Runs on the server side (e.g. backend, application, API).
+    -   <arch-ts-component-alternative/> is a product that would also fit
+        this component but was not chosen (e.g. `React`, `Svelte`).
 
     -   <arch-ts-component-coverage/> is either one or more of the
         *Client Aspects* or one or more of the *Server Aspects* defined
@@ -976,16 +971,21 @@ its purpose, and the alternatives that were considered but not chosen.
         aspects per <arch-ts-component-tier/> with the minimum total
         number of <arch-ts-component-product/>.
 
-    -   <arch-ts-component-product/> is the concrete product, library, or
-        framework chosen for this component (e.g. `VueJS`, `Node.js`,
-        `PostgreSQL`).
-
     -   <arch-ts-component-element/> is an `ARCH-FV-<arch-fv-component-id/>`
         or `ARCH-DP-<arch-dp-node-id/>` reference to the functional element
         or deployment node this product realizes.
 
-    -   <arch-ts-component-alternative/> is a product that would also fit
-        this component but was not chosen (e.g. `React`, `Svelte`).
+    -   <arch-ts-component-tier/> is the architectural tier the component
+        belongs to, one of:
+
+        -   `Client`: Runs on the client side (e.g. browser, desktop, mobile).
+        -   `Server`: Runs on the server side (e.g. backend, application, API).
+
+    -   <arch-ts-component-when/> is the lifecycle phase in which the
+        component is relevant, one of:
+
+        -   `Build-Time`: Used during development, compilation, or packaging.
+        -   `Run-Time`:   Used while the solution executes in production.
 
     -   <arch-ts-component-description/> is a concise paragraph (1-3
         sentences) of prose describing how the product is used within the
