@@ -188,9 +188,10 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
     7.  <if condition="<getopt-option-auto/> is not `true`">
 
-        In the following, you *MUST* *NOT* use the <user-dialog-tool/>
-        tool! Instead, you *MUST* just show a custom output, let the
-        user enter input, and then you set the result accordingly.
+        In the following, you *MUST* *NOT* use your built-in
+        <user-dialog-tool/> tool! Instead, you *MUST* just show a
+        custom dialog according to the expanded `custom-dialog`
+        definition. You *MUST* closely follow this definition.
 
         Let the user choose the preferred approach A<n/> by raising
         a question with the following custom dialog, where per

@@ -185,9 +185,10 @@ Analyze documents for spelling, punctuation, or grammar errors
 
         4.  <if condition="<getopt-option-auto/> is not 'true'">
 
-            In the following, you *MUST* *NOT* use the <user-dialog-tool/>
-            tool! Instead, you *MUST* just show a custom output, let the
-            user enter input, and then you set the result accordingly.
+            In the following, you *MUST* *NOT* use your built-in
+            <user-dialog-tool/> tool! Instead, you *MUST* just show a
+            custom dialog according to the expanded `custom-dialog`
+            definition. You *MUST* closely follow this definition:
 
             <expand name="custom-dialog" arg1="--other">
                 CORRECTION: How would you like to proceed with this proposed correction?

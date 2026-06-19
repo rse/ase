@@ -225,9 +225,10 @@ Set <content-dirty>true</content-dirty>.
 
         -   If <getopt-option-plan/> is equal to `none`:
 
-            In the following, you *MUST* *NOT* use the <user-dialog-tool/>
-            tool! Instead, you *MUST* just show a custom output, let the
-            user enter input, and then you set the result accordingly.
+            In the following, you *MUST* *NOT* use your built-in
+            <user-dialog-tool/> tool! Instead, you *MUST* just show a
+            custom dialog according to the expanded `custom-dialog`
+            definition. You *MUST* closely follow this definition:
 
             <expand name="custom-dialog" arg1="--other">
                 Previous Plan: Should the previous plan content be overwritten, refined, or preserved?
@@ -377,9 +378,10 @@ Set <content-dirty>true</content-dirty>.
 
         -   If <getopt-option-next/> is equal to `none`:
 
-            In the following, you *MUST* *NOT* use the <user-dialog-tool/>
-            tool! Instead, you *MUST* just show a custom output, let the
-            user enter input, and then you set the result accordingly.
+            In the following, you *MUST* *NOT* use your built-in
+            <user-dialog-tool/> tool! Instead, you *MUST* just show a
+            custom dialog according to the expanded `custom-dialog`
+            definition. You *MUST* closely follow this definition:
 
             <expand name="custom-dialog" arg1="--other">
                 Next Step: How would you like to proceed with the plan?

@@ -117,15 +117,16 @@ Honor the following tenets throughout the brainstorming:
             <answer-M-K/> (K={1,2,3,4}) from the code base, the documented
             context, and your world knowledge.
 
-        3.  Use an interactive user dialog with header <facet-M/> and
-            question <question-M/>, and let the user select the
-            <answer-M/> out of the candidate answers <answer-M-K/> (leave
-            out the answer lines of those candidate answers you have
-            not determined).
+        3.  In the following, you *MUST* *NOT* use your built-in
+            <user-dialog-tool/> tool! Instead, you *MUST* just show a
+            custom dialog according to the expanded `custom-dialog`
+            definition. You *MUST* closely follow this definition.
 
-            In the following, you *MUST* *NOT* use the <user-dialog-tool/>
-            tool! Instead, you *MUST* just show a custom output, let the
-            user enter input, and then you set the result accordingly.
+            For this interactive dialog, use header <facet-M/> and
+            question <question-M/>, and let the user select the
+            <answer-M/> out of the candidate answers <answer-M-K/>
+            (leave out the answer lines of those candidate answers you
+            have not determined):
 
             <expand name="custom-dialog" arg1="--other">
                 <facet-M/>: <question-M/>
