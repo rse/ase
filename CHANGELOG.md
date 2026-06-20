@@ -2,6 +2,14 @@
 ChangeLog
 =========
 
+0.9.22 (2026-06-20)
+-------------------
+
+- FEATURE: add `ase-sync-export` skill to export artifact content into side-by-side files (`ase-sync-export` skill)
+- FEATURE: add per-artifact `Export:` rules and side-by-side export convention (`ase-format-meta.md`, `ase-format-spec.md`, `ase-format-arch.md`)
+- FEATURE: add SVG output format to the diagram facility via `beautiful-mermaid` (`ase-diagram.ts`)
+- UPDATE: register the new `ase-sync-export` skill and refresh the skill count from 38 to 39 (`AGENTS.md`, `README.md`)
+
 0.9.21 (2026-06-19)
 -------------------
 

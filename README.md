@@ -19,7 +19,7 @@ Coding Tools* like *Claude Code*. **ASE** primarily consists of a
 *Claude Code* plugin (of about 14K LoC agent skill definitions) and
 a companion Command-Line Interface (CLI) tool, including a built-in
 *MCP* service (of about 6K LoC TypeScript code). **ASE**, on the
-surface, provides 38 agent skills and commands to support the most
+surface, provides 39 agent skills and commands to support the most
 important, recurring work-steps in the primary disciplines of *Software
 Engineering*, especially in the discipline *Software Development* and
 *Software Architecture*.
@@ -170,6 +170,13 @@ see whether **ASE** is right for you:
   structured SPEC, ARCH, CODE, DOCS, or TASK artifacts?
   &rarr; [`/ase-sync-import`](plugin/skills/ase-sync-import/help.md)
   `-t SPEC @requirements.txt`
+
+- **Artifact Export**:
+  You want artifact content materialized into derived, side-by-side
+  files, like the Data Model rendered as an SVG diagram or the Technology
+  Stack rendered as a Markdown table?
+  &rarr; [`/ase-sync-export`](plugin/skills/ase-sync-export/help.md)
+  `-s SPEC,ARCH`
 
 - **Direct Skill Usage Help**:
   You want usage help for skills directly within your agent tool sessions?
@@ -591,6 +598,7 @@ mode skills, funnel mode skills and other skills. Each skill is named
 [ase-docs-**distill**](plugin/skills/ase-docs-distill/help.md)<br/>
 [ase-sync-**reconcile**](plugin/skills/ase-sync-reconcile/help.md)<br/>
 [ase-sync-**import**](plugin/skills/ase-sync-import/help.md)<br/>
+[ase-sync-**export**](plugin/skills/ase-sync-export/help.md)<br/>
 
 </td>
 </tr>
