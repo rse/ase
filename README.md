@@ -690,6 +690,19 @@ The following tables shows the current known compatibility for **ASE**:
 &dagger; *OpenAI Codex CLI* has no scriptable custom status line support at all.<br/>
 &Dagger; *Anthropic Claude Fable* suppresses intermediate outputs.
 
+> [!NOTE]
+> This compatibility topic doesn't mean **ASE** cannot be used with
+> other combinations than Claude Code + Claude Opus, like the cheap
+> and powerful Claude Code + Minimax-M3 or the popular alternative
+> OpenAI Codex + GPT combination. It only means that **ASE** is
+> primarily developed against Claude Code + Claude Opus and hence this
+> combination showed no incompatibilities or unexpected results. For
+> other combinations, the usual and hence expected incompatibilities are
+> that some instructions of the **ASE** skills are not 100% strictly
+> followed. This can be fully harmless in practice, but is at least not
+> as good as the mainstream combination Claude Code + Claude Opus where
+> we don't observed this.
+
 See Also
 --------
 
