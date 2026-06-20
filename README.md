@@ -448,9 +448,14 @@ features.
 - [**Task Skills**](plugin/skills/) (95% done):
   Recurring tasks are supported with dedicated skills, based on the
   configured parameters. This allows controlling the *specific* agent
-  behavior. Skills are grouped into meta (`ase-meta-*`), code
-  (`ase-code-*`), architecture (`ase-arch-*`), task (`ase-task-*`), and
-  documentation (`ase-docs-*`) families, covering 38 skills in total.
+  behavior. Skills are grouped into
+  meta (`ase-meta-*`),
+  code (`ase-code-*`),
+  architecture (`ase-arch-*`),
+  task (`ase-task-*`), and
+  documentation (`ase-docs-*`)
+  synchronization (`ase-sync-*`)
+  families, covering 39 skills in total.
 
 - [**Artifact Formats**](plugin/meta/) (80% done):
   The format of the primary deliveries of Software Engineering
