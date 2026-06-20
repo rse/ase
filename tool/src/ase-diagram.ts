@@ -7,7 +7,10 @@
 import fs                                from "node:fs"
 
 import { Command, InvalidArgumentError } from "commander"
-import { renderMermaidASCII }            from "beautiful-mermaid"
+import {
+    renderMermaidASCII,
+    renderMermaidSVG
+}                                        from "beautiful-mermaid"
 import { z }                             from "zod"
 
 import type { McpServer }                from "@modelcontextprotocol/sdk/server/mcp.js"
@@ -16,6 +19,7 @@ import type Log                          from "./ase-log.js"
 
 /*  internal command options type  */
 interface DiagramOpts {
+    format:         "ascii" | "svg"
     ascii:          boolean
     colorMode:      "none" | "ansi16" | "ansi256",
     input?:         string
@@ -30,6 +34,7 @@ interface DiagramOpts {
 
 /*  options accepted by the pure rendering helper  */
 export interface DiagramRenderOpts {
+    format:         "ascii" | "svg"
     ascii:          boolean
     colorMode:      "none" | "ansi16" | "ansi256"
     nodeMarginX:    number
@@ -53,6 +58,13 @@ const parseInteger = (name: string) => (value: string): number => {
 const parseColorMode = (name: string) => (value: string): "none" | "ansi16" | "ansi256" => {
     if (value !== "none" && value !== "ansi16" && value !== "ansi256")
         throw new InvalidArgumentError(`${name} must be "none", "ansi16", or "ansi256"`)
+    return value
+}
+
+/*  custom argument parser for Commander: output format  */
+const parseFormat = (name: string) => (value: string): "ascii" | "svg" => {
+    if (value !== "ascii" && value !== "svg")
+        throw new InvalidArgumentError(`${name} must be "ascii" or "svg"`)
     return value
 }
 
@@ -182,8 +194,15 @@ export class Diagram {
     }
 
     /*  pure rendering helper: turn a Mermaid source string plus options into
-        a rendered Unicode/ASCII diagram string. Throws on render failure.  */
+        a rendered Unicode/ASCII diagram string, or an SVG document string
+        when "svg" format is requested. Throws on render failure.  */
     static render (src: string, opts: DiagramRenderOpts): string {
+        /*  render as a self-contained SVG document using the library's
+            themed defaults (the ANSI "colorMode" and the terminal
+            clipping below are meaningful only for ASCII art)  */
+        if (opts.format === "svg")
+            return renderMermaidSVG(src)
+
         /*  create diagram rendering  */
         let out = renderMermaidASCII(src, {
             useAscii:         opts.ascii,
@@ -265,9 +284,12 @@ export default class DiagramCommand {
     register (program: Command): void {
         program
             .command("diagram")
-            .description("Render Mermaid diagram specification as Unicode/ASCII art")
+            .description("Render Mermaid diagram specification as Unicode/ASCII art or SVG")
             .option("-i, --input <file>",
                 "read Mermaid source from file instead of stdin")
+            .option("-f, --format <format>",
+                "output format (\"ascii\" or \"svg\")",
+                parseFormat("--format"), "ascii")
             .option("-a, --ascii",
                 "emit plain ASCII (+-|) instead of Unicode box-drawing",
                 false)
@@ -311,6 +333,7 @@ export default class DiagramCommand {
                 let out: string
                 try {
                     out = Diagram.render(src, {
+                        format:         opts.format,
                         ascii:          opts.ascii ?? false,
                         colorMode:      opts.colorMode,
                         nodeMarginX:    opts.nodeMarginX,
@@ -342,7 +365,7 @@ export class DiagramMCP {
         mcp.registerTool("ase_diagram", {
             title:       "ASE diagram render",
             description:
-                "Render a Mermaid diagram as Unicode/ASCII art. " +
+                "Render a Mermaid diagram as Unicode/ASCII art or SVG. " +
                 "Use for visualizing " +
                 "structure/layout/components/dependencies as a Flowchart, " +
                 "control-flow/branching/concurrency as a Flowchart, " +
@@ -352,10 +375,12 @@ export class DiagramMCP {
                 "data-model/entities/relationships as an ER Diagram, or " +
                 "metrics/distributions/time-series as an XY-Chart. " +
                 "Pass the Mermaid diagram specification as `diagram`. " +
-                "Returns the rendered art as `text`.",
+                "Returns the rendered art (or SVG document, for `format` \"svg\") as `text`.",
             inputSchema: {
                 diagram: z.string()
                     .describe("Mermaid diagram specification"),
+                format: z.enum([ "ascii", "svg" ]).default("ascii")
+                    .describe("output format: \"ascii\" for Unicode/ASCII art, \"svg\" for an SVG document"),
                 ascii: z.boolean().default(false)
                     .describe("emit plain ASCII (+-|) instead of Unicode box-drawing characters"),
                 colorMode: z.enum([ "none", "ansi16", "ansi256" ]).default("none")
@@ -378,6 +403,7 @@ export class DiagramMCP {
         }, async (args) => {
             try {
                 const out = Diagram.render(args.diagram, {
+                    format:         args.format,
                     ascii:          args.ascii,
                     colorMode:      args.colorMode,
                     nodeMarginX:    args.nodeMarginX,
