@@ -630,6 +630,59 @@ manages, defining how information is organized and connected.
     -   In case any rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
 
+-   Export: `export.md`
+
+    The entities, their attributes and their relations
+    are rendered as Markdown tables.
+
+    For this, each <spec-dm-entity/> becomes:
+
+    <format>
+
+    ##  ENTITY: <a id="SPEC-DM-<spec-dm-entity-id/>"><spec-dm-entity-name/></a>
+
+    <spec-dm-entity-description/>,
+    **BECAUSE** <spec-dm-entity-rationale/>.
+
+    ### ATTRIBUTES
+
+    <export-table-1/>
+
+    ### RELATIONS
+
+    <export-table-2/>
+
+    </format>
+
+    With:
+
+    -    <export-table-1/> is a Markdown table for the attributes with one
+         row per <spec-dm-attribute-id/>, sorted by <spec-dm-attribute-id/>
+         -- with the columns:
+
+         -   `Attribute`     (`**<spec-dm-attribute-id/>**`)
+         -   `Type`          (`<spec-dm-attribute-qualifier/><spec-dm-attribute-type/>`)
+         -   `Description`   (`<spec-dm-relation-description/>, **BECAUSE** <spec-dm-relation-rationale/>.`)
+
+    -    <export-table-2/> is a Markdown table for the relation with one
+         row per <spec-dm-relation-id/>, sorted by <spec-dm-relation-id/> --
+         with the columns:
+
+         -   `Relation`      (`**<spec-dm-relation-id/>**`)
+         -   `Target`        (`[<spec-dm-relation-target/>](#<spec-dm-relation-target-id/>) (<spec-dm-relation-cardinality/>)`)
+         -   `Description`   (`<spec-dm-relation-description/>, **BECAUSE** <spec-dm-relation-rationale/>.`)
+
+-   Export: `export.svg`
+
+    The entities, their attributes and their relations are
+    rendered as a Mermaid `classDiagram` UML diagram and
+    converted to SVG. For this, each <spec-dm-entity/> becomes
+    a class whose members are the `<spec-dm-attribute-id/>:
+    <spec-dm-attribute-qualifier/><spec-dm-attribute-type/>` attributes,
+    and each <spec-dm-relation/> becomes a directed association
+    labeled with its <spec-dm-relation-id/> and annotated with its
+    <spec-dm-relation-cardinality/> at the target end.
+
 State Model (SM)
 ----------------
 

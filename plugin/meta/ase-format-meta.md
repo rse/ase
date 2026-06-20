@@ -56,3 +56,35 @@ Artifact Meta Information
     unique "slug" of always 1-3 lower-cased words (concatenated with "-"
     characters and in total not longer than 30 characters). An example
     is `user-login`.
+
+An **Artifact** *MAY* additionally declare an **Export** -- a derived,
+ready-to-consume rendering of (part of) its content, materialized as a
+*side-by-side* file next to the **Artifact** itself. An **Artifact**
+without an `-   Export:` bullet is *not* exported.
+
+An **Export** is declared by a single `-   Export:` bullet point in the
+**Artifact**'s format definition (see `ase-format-spec.md` and
+`ase-format-arch.md`), of the following format:
+
+<format>
+
+-   Export: `<export-name/>.<export-ext/>`
+    <export-transform/>
+
+</format>
+
+with the following details:
+
+-   <export-ext/> is the file-name extension (without the leading dot,
+    e.g. `svg`, `md`) of the exported file, which also implies its
+    target format.
+
+-   <export-transform/> is a description of *how* the **Artifact**'s
+    content is transformed into the exported file (e.g. "the entities,
+    attributes, and relations rendered as a Mermaid `classDiagram` and
+    converted to SVG").
+
+The exported file is stored *side-by-side* with the **Artifact** under
+the path:
+
+`<basedir/>/<artifact-set-id/>-<artifact-no/>-<artifact-id/>-<artifact-slug/>-<export-name/>.<export-ext/>`

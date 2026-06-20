@@ -1165,3 +1165,15 @@ its purpose, and the alternatives that were considered but not chosen.
     -   **Database Bootstrapping**:
         Create, update or downgrade both mandatory bootstrapping and optional
         domain-specific data inside the underlying data store.
+
+-   Export: `export.md`
+
+    The components rendered as a single, compact Markdown table -- one
+    row per <arch-ts-component/>, sorted by <arch-ts-component-tier/>
+    then <arch-ts-component-when/> -- with the columns:
+
+    -   `Component`     (<arch-ts-component-name/>)
+    -   `Product`       (**<arch-ts-component-product/>**)
+    -   `Tier`          (<arch-ts-component-tier/>)
+    -   `When`          (<arch-ts-component-when/>)
+    -   `Coverage`      (*<arch-ts-component-coverage/>*)
