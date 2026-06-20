@@ -169,11 +169,28 @@ The following ASE commands/skills exist on the documentation-level:
 
 The following ASE commands/skills exist on the synchronization-level:
 
-- **/ase-sync-reconcile** *target* \[*source*\]:<br/>
+- **/ase-sync-reconcile** \[`--bidirectional`|`-b`\] \[`--target`|`-t` *target*\] \[`--source`|`-s` *source*\] \[*hint*\]:<br/>
   Reconcile one set of artifact kinds (the *target*) so it reflects the
   current state of another set (the *source*), reading the source
   artifacts and surgically adjusting the target artifacts. Both *target*
   and *source* are comma-separated lists of the artifact kinds `TASK`,
   `SPEC`, `ARCH`, `CODE`, `DOCS`, `INFR`, and `OTHR`; when *source* is
   omitted, it defaults to all remaining kinds not present in *target*.
+  With `--bidirectional`, the alignment is performed in both directions.
+  An optional *hint* narrows the scope of the reconciliation.
+
+- **/ase-sync-import** \[`--target`|`-t` *target*\] *hint*:<br/>
+  Import information from foreign sources (files, URLs, or pasted text)
+  into a set of artifact kinds (the *target*), generating or updating
+  them to reflect the imported information. The *target* is a
+  comma-separated list of the artifact kinds `TASK`, `SPEC`, `ARCH`,
+  `CODE`, `DOCS`, `INFR`, and `OTHR`.
+
+- **/ase-sync-export** \[`--source`|`-s` *source*\] \[*filter*\]:<br/>
+  Export artifact content into side-by-side, ready-to-consume files, one
+  per artifact that declares an export (e.g. the Data Model rendered as
+  an SVG diagram or the Technology Stack rendered as a Markdown table).
+  The *source* is a comma-separated list of the artifact kinds `TASK`,
+  `SPEC`, `ARCH`, `CODE`, `DOCS`, `INFR`, and `OTHR`; an optional
+  *filter* restricts which declared exports are materialized.
 
