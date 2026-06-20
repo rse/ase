@@ -430,44 +430,33 @@ features.
 <tr>
 <td width="50%" valign="top">
 
-- [**Configuration Scopes**](docs/configuration.md) (MANDATORY, 100% done):
+- [**Configuration Scopes**](docs/configuration.md) (100% done):
   Parameters of project and agent can be configured on the hierarchy of
   the scopes *user*, *project*, *task*, and *skill*. This allows
   the flexible configuration of **ASE**.
 
-- [**Session Constitution**](plugin/meta/) (MANDATORY, 95% done):
+- [**Session Constitution**](plugin/meta/) (95% done):
   All agent sessions have meta descriptions as some sort of a
   "constitution" preloaded all the time, based on the configured
   parameters. This allows controlling the *general* agent behavior.
   Additionally, skills load more meta descriptions on demand. This
   allows skills to reuse definitions.
 
-- [**Task Skills**](plugin/skills/) (MANDATORY, 90% done):
+</td>
+<td width="50%" valign="top">
+
+- [**Task Skills**](plugin/skills/) (95% done):
   Recurring tasks are supported with dedicated skills, based on the
   configured parameters. This allows controlling the *specific* agent
   behavior. Skills are grouped into meta (`ase-meta-*`), code
   (`ase-code-*`), architecture (`ase-arch-*`), task (`ase-task-*`), and
   documentation (`ase-docs-*`) families, covering 38 skills in total.
 
-</td>
-<td width="50%" valign="top">
-
-- [**Artifact Formats**](plugin/meta/) (OPTIONAL, 60% done):
+- [**Artifact Formats**](plugin/meta/) (80% done):
   The format of the primary deliveries of Software Engineering
   (requirements specification, architecture description, documentation,
   and source code) and their artifacts are strictly defined. This allows
   *both* humans *and* agents to operate on them concurrently.
-
-- **Context Gathering** (OPTIONAL, 0% done):
-  The agent context is loaded with individual information for all
-  particular tasks. This allows the agent to more precisely perform the
-  tasks.
-
-- **Project Templates** (OPTIONAL, 0% done):
-  The agent is equipped with reasonable templates to scaffold
-  Library/Framework, CLI, and WebUI projects. This allows the user to
-  bootstrap projects more conveniently and the agent skills to operate
-  on pre-existing artifacts from the start.
 
 </td>
 </tr>
