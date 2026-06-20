@@ -452,8 +452,8 @@ features.
   meta (`ase-meta-*`),
   code (`ase-code-*`),
   architecture (`ase-arch-*`),
-  task (`ase-task-*`), and
-  documentation (`ase-docs-*`)
+  task (`ase-task-*`),
+  documentation (`ase-docs-*`), and
   synchronization (`ase-sync-*`)
   families, covering 39 skills in total.
 
@@ -670,7 +670,7 @@ MCP service to realize its remaining functionality. As a consequence,
 it requires the combination of a compatible Agent Harness plus a strong
 instruction following LLM.
 
-The following tables shows the current known compatibility for **ASE**:
+The following tables show the current known compatibility for **ASE**:
 
 | Agent Harness            | Version | Compatibility | Goal        |
 | ------------------------ | ------- | ------------- | ----------- |
@@ -701,7 +701,7 @@ The following tables shows the current known compatibility for **ASE**:
 > that some instructions of the **ASE** skills are not 100% strictly
 > followed. This can be fully harmless in practice, but is at least not
 > as good as the mainstream combination Claude Code + Claude Opus where
-> we don't observed this.
+> we didn't observe this.
 
 See Also
 --------
