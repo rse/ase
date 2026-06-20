@@ -28,11 +28,11 @@ Engineering*, especially in the discipline *Software Development* and
 author, *Dr. Ralf S. Engelschall*:
 
 > "Software developers in the industrial Software Engineering context,
-> using the Agentic AI Coding tool *Claude Code* (or alternatively
-> *GitHub Copilot CLI*), in their recurring tasks, should leverage
-> pre-manufactured skills which incorporate reasonable methodology and
-> automation aspects to boost their daily productivity while still
-> keeping result quality stable."
+> using the Agentic AI Coding tool *Claude Code*, in their recurring
+> tasks, should leverage pre-manufactured skills which incorporate
+> reasonable methodology and automation aspects to boost their daily
+> productivity while still keeping them in the driver seat to ensure
+> stable result quality."
 
 Notices
 -------
