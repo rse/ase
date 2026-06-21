@@ -8,6 +8,7 @@
     "homepage":                                   "https://ase.tools",
     "type":                                       "module",
     "devDependencies": {
+        "@rse/stx":                               "1.1.6",
         "@astrojs/check":                         "0.9.9",
         "typescript":                             "6.0.3"
     },
@@ -29,9 +30,6 @@
         "node":                                   ">=22.0.0"
     },
     "scripts": {
-        "dev":                                    "astro dev",
-        "build":                                  "astro build",
-        "preview":                                "astro preview",
-        "check":                                  "astro check"
+        "start":                                  "stx -v4 -l warning -c etc/stx.conf"
     }
 }
