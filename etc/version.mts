@@ -31,7 +31,8 @@ for (const file of [
     "plugin/package.json",
     "plugin/.claude-plugin/plugin.json",
     "plugin/.github/plugin/plugin.json",
-    "plugin/.codex-plugin/plugin.json"
+    "plugin/.codex-plugin/plugin.json",
+    "pages/package.json"
 ] as const) {
     console.log(`++ update file: "${file}"`)
     const ast = json.parse(fs.readFileSync(file, "utf8"))
