@@ -12,14 +12,14 @@
 import SectionGlow from "./Section-Glow.astro"
 import Terminal    from "./Terminal.astro"
 ---
-<section id="setup" class="relative isolate mx-auto max-w-4xl px-6 py-12 sm:py-16">
+<section id="setup" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="left" />
 
     <header class="mx-auto max-w-2xl text-center" data-reveal>
         <h2 class="text-3xl font-bold sm:text-4xl">
             Setup <span class="text-accent">ASE</span> Easily
         </h2>
-        <p class="mt-4 text-foreground-secondary">
+        <p class="text-left mt-4 text-foreground-secondary">
             As a prerequisite, please install the Agentic AI Coding tool
             <a href="https://claude.com/products/claude-code">Claude Code</a>
             (or with reduced support the alternatives <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>
@@ -27,7 +27,7 @@ import Terminal    from "./Terminal.astro"
             the essential run-time environment
             <a href="https://nodejs.org/">Node.js</a> for your particular platform.
         </p>
-        <p class="mt-4 text-foreground-secondary">
+        <p class="text-left [text-indent:2em] mt-1 text-foreground-secondary">
             Then execute the two commands below under <b>Installation</b>. The first command installs
             the <b>ASE</b> Command-Line Interface (CLI).
             The second command uses this CLI to install
@@ -75,7 +75,7 @@ import Terminal    from "./Terminal.astro"
         <h2 class="text-3xl font-bold sm:text-2xl">
             Power-up <span class="text-accent">ASE</span> with foreign services
         </h2>
-        <p class="mt-4 text-foreground-secondary">
+        <p class="mt-4 text-foreground-secondary text-left">
             <b>ASE</b> can <i>optionally</i> leverage additional
             Model-Context-Protocol (MCP) servers for contacting foreign
             LLM services (<b>OpenAI ChatGPT</b>, <b>Google Gemini</b>, <b>DeepSeek</b>, <b>xAI
@@ -87,13 +87,18 @@ import Terminal    from "./Terminal.astro"
             tool.
         </p>
         <p class="mt-4 text-foreground-secondary">
-            NOTICE: These add-on MCP servers are <b>NOT</b> required
+            <blockquote class="text-left border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary">
+            <b class="text-accent">NOTICE:</b>
+            <p class="mt-1 text-foreground-secondary">
+            These add-on MCP servers are <b>NOT</b> required
             for <b>ASE</b> to work. They are fully
             optional when using <b>ASE</b>, but will
             power up some of the <b>ASE</b> skills (like
             <code>ase-meta-chat</code>, <code>ase-meta-search</code>,
             and <code>ase-meta-quorum</code>) with additional
             functionality.
+            </p>
+            </blockquote>
         </p>
     </header>
 

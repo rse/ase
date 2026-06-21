@@ -29,14 +29,14 @@ const llms = [
     { name: "Gemini Flash",            version: "3.5", compat: "70%",  goal: "none",      primary: false, mark: ""  }
 ]
 ---
-<section id="compat" class="relative isolate mx-auto max-w-4xl px-6 py-12 sm:py-16">
+<section id="compat" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="left" />
 
     <header class="mx-auto max-w-2xl text-center" data-reveal>
         <h2 class="text-3xl font-bold sm:text-4xl">
             Agent Tool and LLM <span class="text-accent">Compatibility</span>
         </h2>
-        <p class="mt-4 text-foreground-secondary">
+        <p class="mt-4 text-left text-foreground-secondary">
             <b>ASE</b> uses elaborated control structures (flow, step, if, while,
             define, expand, etc) and XML-based placeholders (constants, variables)
             to realize its skills plus Agent Harness hooks, built-in tools, and an
@@ -104,18 +104,27 @@ const llms = [
 
     <div class="mx-auto mt-10 max-w-2xl" data-reveal>
         <blockquote class="border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary">
-            <b class="text-accent">NOTE:</b>
-            This compatibility topic doesn't mean <b>ASE</b> cannot be used with
-            other combinations than <b>Claude Code + Claude Opus</b>, like the cheap
-            and powerful <b>Claude Code + Minimax-M3</b> or the popular alternative
-            <b>OpenAI Codex + GPT</b> combination. It only means that <b>ASE</b> is
-            primarily developed against <b>Claude Code + Claude Opus</b> and hence this
-            combination showed no incompatibilities or unexpected results. For
-            other combinations, the usual and hence expected incompatibilities are
-            that some instructions of the <b>ASE</b> skills are not 100% strictly
-            followed. This can be fully harmless in practice, but is at least not
-            as good as the mainstream combination <b>Claude Code + Claude Opus</b> where
-            we didn't observe this.
+            <b class="text-accent">NOTICE:</b>
+
+            <p class="mt-1 text-left text-foreground-secondary">
+            This compatibility topic doesn't mean <b>ASE</b> cannot be
+            used with other combinations than <b>Claude Code + Claude
+            Opus</b>, like the cheap and powerful <b>Claude Code +
+            Minimax-M3</b> or the popular alternative <b>OpenAI Codex
+            + GPT</b> combination. It only means that <b>ASE</b> is
+            primarily developed against <b>Claude Code + Claude Opus</b>
+            and hence this combination showed no incompatibilities or
+            unexpected results.
+            </p>
+
+            <p class="mt-1 text-left text-foreground-secondary [text-indent:2em]">
+            For other combinations, the usual and hence expected
+            incompatibilities are that some instructions of the
+            <b>ASE</b> skills are not 100% strictly followed. This
+            can be fully harmless in practice, but is at least not as
+            good as the mainstream combination <b>Claude Code + Claude
+            Opus</b> where we didn't observe this.
+            </p>
         </blockquote>
     </div>
 </section>
