@@ -5,15 +5,15 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-/*  scroll-spy: bold the nav link whose section is currently in view. Each
+/*  scroll-spy: highlight the nav link whose section is currently in view. Each
     [data-navlink] points at a "#id" section; links whose target is absent from
     the page are skipped. A reference line ~30% down the viewport selects the
     last section whose top has passed it, so the active link follows the scroll
     position. Reaching the page bottom forces the final section active even if
     it's too short to reach the line. Above the first section, no link is active.
 
-    Markup contract: nav links carry `data-navlink` (+ `data-label` for the bold
-    width reservation below); the active link gets the `.is-active` class.  */
+    Markup contract: nav links carry `data-navlink`; the active link gets the
+    `.is-active` class (which adopts the foreground colour).  */
 ---
 <script is:inline>
     (function () {
