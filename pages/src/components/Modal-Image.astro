@@ -26,8 +26,8 @@ import Modal from "./Modal.astro"
 {/* open on a trigger click; the Modal shell handles closing. */}
 <script is:inline>
     (function () {
-        var imageModal = document.getElementById("image-modal")
-        var imageEl    = document.getElementById("image-modal-image")
+        const imageModal = document.getElementById("image-modal")
+        const imageEl    = document.getElementById("image-modal-image")
         if (!imageModal || !imageEl) return
         function openImage(src, label) {
             imageEl.src = src

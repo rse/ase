@@ -43,13 +43,13 @@ const { id, label = "Dialog" } = Astro.props
     a "modal:close" event the caller can listen for. */}
 <script is:inline define:vars={{ id }}>
     (function () {
-        var modal = document.getElementById(id)
+        const modal = document.getElementById(id)
         if (!modal) return
-        var close = function () {
-            if (modal.style.display === "none" || getComputedStyle(modal).display === "none") return
-            modal.style.display = "none"
-            modal.dispatchEvent(new CustomEvent("modal:close", { bubbles: true }))
-        }
+        const close = function () {
+        if (modal.style.display === "none" || getComputedStyle(modal).display === "none") return
+        modal.style.display = "none"
+        modal.dispatchEvent(new CustomEvent("modal:close", { bubbles: true }))
+    }
         modal.querySelectorAll("[data-modal-close]").forEach(function (btn) {
             btn.addEventListener("click", close)
         })

@@ -15,19 +15,19 @@
 ---
 <script is:inline>
     (function () {
-        var bar  = document.getElementById("scroll-progress")
-        var btt  = document.getElementById("back-to-top")
-        var ring = document.getElementById("back-to-top-ring")
-        var ticking = false
+        const bar  = document.getElementById("scroll-progress")
+        const btt  = document.getElementById("back-to-top")
+        const ring = document.getElementById("back-to-top-ring")
+        let ticking = false
         function update() {
             ticking = false
-            var doc = document.documentElement
-            var max = doc.scrollHeight - doc.clientHeight
-            var p = max > 0 ? doc.scrollTop / max : 0
+            const doc = document.documentElement
+            const max = doc.scrollHeight - doc.clientHeight
+            const p = max > 0 ? doc.scrollTop / max : 0
             if (bar)  bar.style.transform = "scaleX(" + p + ")"
             if (ring) ring.setAttribute("stroke-dashoffset", String(1 - p))
             if (btt) {
-                var show = doc.scrollTop > 400
+                const show = doc.scrollTop > 400
                 btt.style.opacity = show ? "1" : "0"
                 btt.style.pointerEvents = show ? "auto" : "none"
             }

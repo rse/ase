@@ -17,32 +17,33 @@
 ---
 <script is:inline>
     (function () {
-        var links = Array.prototype.slice.call(document.querySelectorAll("[data-navlink]"))
+        const links = Array.prototype.slice.call(document.querySelectorAll("[data-navlink]"))
         if (!links.length) return
-        var entries = []
+        const entries = []
         links.forEach(function (link) {
-            var id = (link.getAttribute("href") || "").replace(/^#/, "")
-            var sec = id && document.getElementById(id)
+            const id = (link.getAttribute("href") || "").replace(/^#/, "")
+            const sec = id && document.getElementById(id)
             if (sec) entries.push({ link: link, sec: sec })
         })
         if (!entries.length) return
-        var active = null
+        let active = null
         function setActive(link) {
             if (active === link) return
             if (active) active.classList.remove("is-active")
             active = link
             if (active) active.classList.add("is-active")
         }
-        var ticking = false
+        let ticking = false
         function update() {
             ticking = false
-            var line = window.innerHeight * 0.3
-            var doc = document.documentElement
-            var atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2
-            var pick = null
+            const line = window.innerHeight * 0.3
+            const doc = document.documentElement
+            const atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2
+            let pick = null
             if (atBottom) {
                 pick = entries[entries.length - 1].link
-            } else {
+            }
+ else {
                 entries.forEach(function (e) {
                     if (e.sec.getBoundingClientRect().top <= line) pick = e.link
                 })

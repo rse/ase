@@ -12,13 +12,13 @@
 ---
 <script is:inline>
     (function () {
-        var btns = document.querySelectorAll("[data-copy]")
+        const btns = document.querySelectorAll("[data-copy]")
         if (!btns.length) return
         btns.forEach(function (btn) {
             btn.addEventListener("click", function () {
-                var text = btn.getAttribute("data-copy") || ""
-                var done = function () {
-                    var prev = btn.textContent
+                const text = btn.getAttribute("data-copy") || ""
+                const done = function () {
+                    const prev = btn.textContent
                     btn.textContent = "Copied"
                     setTimeout(function () { btn.textContent = prev }, 1500)
                 }

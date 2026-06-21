@@ -29,15 +29,16 @@ const { class: className = "" } = Astro.props
 {/* persist an explicit override; dark is the default. */}
 <script is:inline>
     (function () {
-        var btn = document.getElementById("color-mode-toggle")
+        const btn = document.getElementById("color-mode-toggle")
         if (!btn) return
         btn.addEventListener("click", function () {
-            var root = document.documentElement
-            var light = root.classList.toggle("light")
+            const root = document.documentElement
+            const light = root.classList.toggle("light")
             root.classList.toggle("dark", !light)
             try {
                 localStorage.setItem("ase-color-mode", light ? "light" : "dark")
-            } catch (e) {}
+            }
+            catch (e) {}
         })
     })()
 </script>
@@ -48,3 +49,4 @@ const { class: className = "" } = Astro.props
     .light .mode-light { display: inline; }
     .light .mode-dark  { display: none; }
 </style>
+
