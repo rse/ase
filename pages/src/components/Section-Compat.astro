@@ -62,9 +62,9 @@ const llms = [
                 <tbody>
                     {harnesses.map((r) => (
                         <tr class="border-b border-border/40 last:border-0">
-                            <td class="py-0 pr-3 align-top text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
-                            <td class="py-0 px-3 align-top text-foreground-secondary">{r.version}</td>
-                            <td class="py-0 px-3 align-top font-bold text-foreground">{r.compat}</td>
+                            <td class={`py-0 pr-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
+                            <td class={`py-0 px-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.version}</td>
+                            <td class={`py-0 px-3 align-top font-bold ${r.primary ? "text-accent" : "text-foreground"}`}>{r.compat}</td>
                             <td class={`py-0 pl-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
                         </tr>
                     ))}
@@ -86,9 +86,9 @@ const llms = [
                 <tbody>
                     {llms.map((r) => (
                         <tr class="border-b border-border/40 last:border-0">
-                            <td class="py-0 pr-3 align-top text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
-                            <td class="py-0 px-3 align-top text-foreground-secondary">{r.version}</td>
-                            <td class="py-0 px-3 align-top font-bold text-foreground">{r.compat}</td>
+                            <td class={`py-0 pr-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
+                            <td class={`py-0 px-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.version}</td>
+                            <td class={`py-0 px-3 align-top font-bold ${r.primary ? "text-accent" : "text-foreground"}`}>{r.compat}</td>
                             <td class={`py-0 pl-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
                         </tr>
                     ))}
