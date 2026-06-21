@@ -22,13 +22,14 @@ interface Props {
 
 const { commands, title = "Terminal", class: className = "" } = Astro.props
 
-/*  split a command into runs, flagging the shell-ish meta characters [ ] | so
-    they can be tinted in the accent colour while the rest stays plain. Keeping
-    the original string for `data-copy` ensures the copied text is unchanged.  */
+/*  split a command into runs, flagging the shell-ish meta characters [ ] | and
+    any <...> placeholder strings so they can be tinted in the accent colour
+    while the rest stays plain. Keeping the original string for `data-copy`
+    ensures the copied text is unchanged.  */
 const tokenize = (cmd: string) =>
-    cmd.split(/([[\]|])/).filter((part) => part !== "").map((part) => ({
+    cmd.split(/(<[^>]*>|[[\]|])/).filter((part) => part !== "").map((part) => ({
         text:  part,
-        meta:  part === "[" || part === "]" || part === "|"
+        meta:  part === "[" || part === "]" || part === "|" || /^<[^>]*>$/.test(part)
     }))
 ---
 <div class={className}>

@@ -44,7 +44,10 @@ import Terminal    from "./Terminal.astro"
         <Terminal
             class="mx-auto mt-12 max-w-2xl"
             title="Installation"
-            commands={[ "npm install -g @rse/ase", "ase setup install [--tool claude|copilot|codex]" ]}
+            commands={[
+                "npm install -g @rse/ase",
+                "ase setup install [--tool claude|copilot|codex]"
+            ]}
         />
     </div>
 
@@ -52,7 +55,9 @@ import Terminal    from "./Terminal.astro"
         <Terminal
             class="mx-auto mt-12 max-w-2xl"
             title="Updating"
-            commands={[ "ase setup update [--tool claude|copilot|codex]" ]}
+            commands={[
+                "ase setup update [--tool claude|copilot|codex]"
+            ]}
         />
     </div>
 
@@ -60,7 +65,58 @@ import Terminal    from "./Terminal.astro"
         <Terminal
             class="mx-auto mt-12 max-w-2xl"
             title="Uninstallation"
-            commands={[ "ase setup uninstall [--tool claude|copilot|codex]" ]}
+            commands={[
+                "ase setup uninstall [--tool claude|copilot|codex]"
+            ]}
         />
     </div>
+
+    <header class="mt-12 mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-2xl">
+            Power-up <span class="text-accent">ASE</span> with foreign services
+        </h2>
+        <p class="mt-4 text-foreground-secondary">
+            <b>ASE</b> can <i>optionally</i> leverage additional
+            Model-Context-Protocol (MCP) servers for contacting foreign
+            LLM services (OpenAI ChatGPT, Google Gemini, DeepSeek, xAI
+            Grok, Alibaba Qwen or Z.AI GLM) via MCP-to-OpenAI servers
+            and Web Search services (Brave, Perplexity or Exa) via their
+            dedicated MCP servers. You only need the access tokens
+            o those services at hand. <b>ASE</b> will just add the
+            corresponding local MCP servers to the Agentic AI Coding
+            tool.
+        </p>
+        <p class="mt-4 text-accent">
+            NOTICE: These add-on MCP servers are <b>NOT</b> required
+            for <b>ASE</b> to work. They are fully
+            optional when using <b>ASE</b>, but will
+            power up some of the <b>ASE</b> skills (like
+            <code>ase-meta-chat</code>, <code>ase-meta-search</code>,
+            and <code>ase-meta-quorum</code>) with additional
+            functionality.
+        </p>
+    </header>
+
+    <div data-reveal>
+        <Terminal
+            class="mx-auto mt-12 max-w-2xl"
+            title="MCP Installation"
+            commands={[
+                "ase setup mcp list",
+                "export ASE_MCP_KEY_<service>=\"<token>\"",
+                "ase setup mcp activate [--tool claude|copilot|codex]"
+            ]}
+        />
+    </div>
+
+    <div data-reveal>
+        <Terminal
+            class="mx-auto mt-12 max-w-2xl"
+            title="MCP Uninstallation"
+            commands={[
+                "ase setup mcp deactivate [--tool claude|copilot|codex]"
+            ]}
+        />
+    </div>
+
 </section>

@@ -1,0 +1,84 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  "Author" section: a short portrait of the primary author Dr. Ralf S.
+    Engelschall plus the motivation statement that drives ASE, rendered as a
+    styled pull-quote.  */
+
+import SectionGlow from "./Section-Glow.astro"
+import LogoGitHub  from "./Logo-GitHub.astro"
+import LogoRSE     from "./Logo-RSE.astro"
+---
+<section id="author" class="relative isolate mx-auto max-w-4xl px-6 py-12 sm:py-16">
+    <SectionGlow variant="section" side="right"/>
+
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            About the <span class="text-accent">Author</span>
+        </h2>
+    </header>
+
+    <div class="mt-12 flex w-full flex-col items-center gap-8 sm:flex-row sm:items-start" data-reveal>
+        <div class="w-full min-w-0 sm:flex-1 sm:basis-1/2">
+            <a href="https://github.com/rse" class="block overflow-hidden rounded-xl ring-1 ring-border-strong transition hover:ring-accent">
+                <img src="/assets/rse-portrait.png" alt="Dr. Ralf S. Engelschall" class="aspect-[10/9] w-full object-cover" />
+            </a>
+            <br/>
+                <a href="https://github.com/rse" class="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-border-strong px-3 py-2 font-semibold text-foreground transition-colors hover:border-accent hover:text-accent">
+                    <LogoGitHub class="h-5 w-5" />
+                    <b>Dr. Ralf S. Engelschall</b> on GitHub
+                </a>
+        </div>
+        <div class="w-full min-w-0 sm:flex-1 sm:basis-1/2">
+            <p class="text-left text-foreground-secondary">
+                <b>ASE</b> is primarily authored by
+                <b>Dr. Ralf S. Engelschall</b> (abbreviated
+                <b>RSE</b> and stilized <LogoRSE class="inline-block h-[1em] w-auto align-[-0.15em]"/>),
+                a german <i>Computer Scientist</i>, <i>Executive Manager</i>, <i>Solution Architect</i> and <i>Software Artist</i>.
+            </p>
+            <p class="mt-4 text-left text-foreground-secondary">
+                He is <b>CTO msg group</b> and <b>Director msg Research</b> at <i>msg</i>,
+                managing director and co-founder of <b>Software Engineering Academy (SEA)</b>,
+                managing director and co-founder of <b>OpenPKG</b>,
+                and also co-founder of <b>Apache Software Foundation (ASF)</b>.
+            </p>
+            <p class="mt-4 text-left text-foreground-secondary">
+                In addition, <b>RSE</b> is the founder and author of
+                numerous popular Open Source software projects, like
+                <b>Apache mod_rewrite</b>,
+                <b>Apache mod_rewrite</b>,
+                <b>Apache mod_ssl</b>,
+                <b>OpenSSL</b>,
+                <b>OpenPKG</b>,
+                <b>GNU Shtool</b>,
+                <b>GNU Pth</b>,
+                <b>OSSP uuid</b>,
+                <b>ComponentJS</b>,
+                <b>Studio-Canvas</b>,
+                <b>Studio-AI</b>,
+                <b>Rundown</b>,
+                <b>Trait-TS</b>,
+                <b>MQTT+</b>,
+                and <a href="https://github.com/rse?tab=repositories">many <i>hundreds</i> more</a>.
+            </p>
+            <p class="mt-4 text-left text-foreground-secondary">
+                You can follow <b>RSE</b> on
+                <!--
+                <i><a href="https://www.x.com/engelschall" target="_blank">X</a></i>,
+                <i><a href="https://bsky.app/profile/engelschall.bsky.social" target="_blank">Bluesky</a></i>,
+                <i><a href="https://mastodon.social/@engelschall" target="_blank">Mastodon</a></i>,
+                -->
+                <a href="https://github.com/rse" target="_blank">GitHub</a>,
+                and <a href="https://www.linkedin.com/in/engelschall" target="_blank">LinkedIn</a>,
+                see and follow his Open Source software developments on
+                <a href="https://github.com/rse" target="_blank">GitHub</a>,
+                and read many of his articles on
+                <a href="https://www.linkedin.com/in/engelschall" target="_blank">LinkedIn</a>.
+            </p>
+        </div>
+    </div>
+</section>

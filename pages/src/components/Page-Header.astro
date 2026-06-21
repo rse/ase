@@ -24,32 +24,47 @@ import ProgressBar   from "./Progress-Bar.astro"
     );"
 >
     <div class="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-        <div class="flex items-center">
-        <a href="/" class="flex items-center gap-3 font-display text-lg font-bold">
-            <LogoASE class="h-[1.0rem] w-auto" idPrefix="ase-navlogo" />
-        </a>
-        <nav class="ml-8 flex items-center gap-5 text-base text-foreground-secondary">
-            <a href="#highlights" data-navlink data-label="Highlights" class="nav-spy transition-colors hover:text-foreground">
-                Highlights
+        <div class="flex items-center gap-3">
+            <a href="/" class="flex items-center gap-3 font-display text-lg font-bold">
+                <LogoASE class="h-[1.0rem] w-auto" idPrefix="ase-navlogo" />
             </a>
-            <a href="#setup" data-navlink data-label="Setup" class="nav-spy transition-colors hover:text-foreground">
-                Setup
-            </a>
-            <a href="#usage" data-navlink data-label="Usage" class="nav-spy transition-colors hover:text-foreground">
-                Usage
-            </a>
-            <a href="#architecture" data-navlink data-label="Architecture" class="nav-spy transition-colors hover:text-foreground">
-                Architecture
-            </a>
-        </nav>
+            <nav class="ml-8 flex items-center gap-5 text-base text-foreground-secondary">
+                <a href="#highlights" data-navlink data-label="Highlights" class="nav-spy transition-colors">
+                    Highlights
+                </a>
+                <a href="#setup" data-navlink data-label="Setup" class="nav-spy transition-colors">
+                    Setup
+                </a>
+                <a href="#usage" data-navlink data-label="Usage" class="nav-spy transition-colors">
+                    Usage
+                </a>
+                <a href="#architecture" data-navlink data-label="Architecture" class="nav-spy transition-colors">
+                    Architecture
+                </a>
+            </nav>
         </div>
         <nav class="flex items-center gap-5 text-base text-foreground-secondary">
-            <a href={site.repo} class="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
-                <LogoGitHub class="h-4 w-4" />
-                GitHub
+            <span class="flex items-center gap-2">
+                <a href="https://github.com/rse" aria-label="Dr. Ralf S. Engelschall on GitHub" class="flex items-center">
+                    <img src="/assets/rse-signet.svg" alt="Dr. Ralf S. Engelschall" class="h-[1.2rem] w-auto"/>
+                </a>
+                <a href="#author" data-navlink data-label="Author" class="nav-spy transition-colors">
+                    Author
+                </a>
+            </span>
+            <a href={site.repo} class="nav-link inline-flex items-center gap-1.5 transition-colors">
+                <LogoGitHub class="h-4 w-4"/>
+                Project
             </a>
-            <ThemeSwitcher class="hidden" />
+            <ThemeSwitcher class="hidden"/>
         </nav>
     </div>
     <ProgressBar />
 </header>
+
+<style is:global>
+    /*  non-spy nav link (e.g. "Project"): on hover it adopts the foreground
+        colour (white), mirroring the .nav-spy links. The `!important` beats the
+        unlayered global `a {}` rule.  */
+    .nav-link:hover { color: var(--foreground) !important; }
+</style>

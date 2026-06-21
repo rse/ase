@@ -59,21 +59,8 @@
 </script>
 
 <style is:global>
-    /*  the link whose section is in view turns bold and adopts the foreground
-        colour. The label is reserved at its bold width (via a hidden ::after
-        carrying the same text in bold) so toggling weight never nudges the
-        surrounding links.  */
-    .nav-spy {
-        display: inline-flex;
-        flex-direction: column;
-    }
-    .nav-spy::after {
-        content: attr(data-label);
-        height: 0;
-        font-weight: 700;
-        visibility: hidden;
-        overflow: hidden;
-        pointer-events: none;
-    }
-    .nav-spy.is-active { font-weight: 700; color: var(--foreground); }
+    /*  the link whose section is in view (and any hovered link) adopts the
+        foreground colour (white); weight is left unchanged.  */
+    .nav-spy.is-active,
+    .nav-spy:hover { color: var(--foreground); }
 </style>
