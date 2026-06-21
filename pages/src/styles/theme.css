@@ -99,6 +99,10 @@ html {
         utility scales up proportionally across the whole site.  */
     font-size: 130%;
     scroll-behavior: smooth;
+    /*  offset anchor jumps (nav links) by the height of the fixed header
+        plus a little breathing room, so a section's headline lands below
+        the header instead of being hidden underneath it.  */
+    scroll-padding-top: 5rem;
     color-scheme: dark;
     background: var(--background);
     /*  clip decorative bleed (e.g. the USP background glows) so it never
