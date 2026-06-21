@@ -45,7 +45,7 @@ jobs:
         working-directory: pages
         env:
           SITE_URL: https://ase.tools
-        run: npm run build
+        run: npm start build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
