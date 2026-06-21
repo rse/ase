@@ -12,12 +12,16 @@
     selectable and styleable). The version is read from package.json at build
     time so it always stays in sync.  */
 
-import pkg from "../../package.json"
+import pkg    from "../../package.json"
+import { site } from "../data/site.ts"
 
 interface Props {
     class?: string
 }
 const { class: className } = Astro.props
+
+/*  GitHub release page for the current version (tags are unprefixed, e.g. "0.9.23")  */
+const releaseUrl = `${site.repo}/releases/tag/${pkg.version}`
 
 /*  flag geometry (SVG user units): a wide (landscape) banner with a shallow,
     double-V ("W") cut into its wide bottom edge, so the version reads straight.  */
@@ -40,11 +44,7 @@ const path = [
     "Z"
 ].join(" ")
 ---
-<div
-    class={`version-flag pointer-events-none select-none ${className ?? ""}`}
-    role="img"
-    aria-label={`Version ${pkg.version}`}
->
+<div class={`version-flag pointer-events-none select-none ${className ?? ""}`}>
     {/* inner positioning context: holds the flag SVG and the HTML overlay.
         Keeping `relative` here (not on the outer wrapper) lets the caller
         position the outer element freely (e.g. `absolute`) without conflict. */}
@@ -83,14 +83,18 @@ const path = [
         </svg>
 
         {/* version number as regular HTML text, overlaid on the flag body and
-            centred in the rectangular part above the bottom W-notch */}
-        <div
-            class="version-flag-label absolute inset-x-0 text-center leading-[1.1] text-brand-400"
+            centred in the rectangular part above the bottom W-notch. The whole
+            label links to the GitHub release for this version; pointer events
+            are re-enabled here (the outer wrapper disables them). */}
+        <a
+            href={releaseUrl}
+            aria-label={`Current release ${pkg.version} on GitHub`}
+            class="version-flag-label pointer-events-auto absolute inset-x-0 text-center leading-[1.1] text-brand-400 no-underline transition-colors hover:text-white"
             style={`bottom: ${(notch + peak) + 8}px; font-size: 20px;`}>
             Current<br/>
             Release:<br/>
             <b class="text-lg text-white">{pkg.version}</b>
-        </div>
+        </a>
     </div>
 </div>
 
