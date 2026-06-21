@@ -1,0 +1,31 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  "Highlights" section: the two-column USP/video list whose text and video
+    columns swap per row (zig-zag), driven by the highlights data. Wrapped in
+    [data-reveal-children] so each row cascades into view on scroll.  */
+
+import VideoRow         from "./Video-Row.astro"
+import { highlights }   from "../data/highlights.ts"
+---
+<section id="highlights" class="mx-auto max-w-4xl px-6 py-12 sm:py-16">
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            Boost Your Daily <span class="text-accent">Software Engineering</span>
+        </h2>
+        <p class="mt-4 text-foreground-secondary">
+            Pre-manufactured skills for the Agentic AI Tool that
+            fold reasonable methodology and automation into the
+            recurring work-steps of industrial Software Engineering
+            — with you in the loop and in the driver seat to still
+            ensure stable results quality.
+        </p>
+    </header>
+    <div class="mt-20 flex flex-col gap-24" data-reveal-children>
+        {highlights.map((usp, index) => <VideoRow usp={usp} index={index} />)}
+    </div>
+</section>

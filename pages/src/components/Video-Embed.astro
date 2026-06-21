@@ -1,0 +1,60 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  inline demo-video preview for an `ase-media` recording. Renders the
+    matching `.jpg` poster (portrait 1200/1400) as a clickable button that
+    opens the shared full-viewport modal in `BaseLayout.astro` (wired via the
+    `data-video-*` attributes) and plays the `.mp4` served from GitHub Pages.  */
+
+import { mediaBase } from "../data/highlights.ts"
+
+interface Props {
+    name:  string
+    label: string
+}
+
+const { name, label } = Astro.props
+
+const poster = `${mediaBase}/${name}.jpg`
+const src    = `${mediaBase}/${name}.mp4`
+---
+<figure class="m-0">
+    <button
+        type="button"
+        class="usp-video group relative mx-auto block w-full cursor-pointer transition-transform hover:-translate-y-0.5"
+        data-video-src={src}
+        data-video-label={label}
+        aria-label={`Play demo: ${label}`}
+    >
+        <img
+            src={poster}
+            alt={`Demo: ${label}`}
+            loading="lazy"
+            class="block aspect-[1200/700] w-full rounded-t-xl border-x border-t border-border bg-background-secondary object-cover object-top"
+        />
+        {/* centered play-button overlay (no dimming tint over the poster). */}
+        <span class="pointer-events-none absolute inset-0 grid place-items-center">
+            <span class="grid h-16 w-16 place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_60%,black)] text-2xl font-bold text-white shadow-lg backdrop-blur transition-colors group-hover:bg-[color-mix(in_oklch,var(--accent)_80%,black)]">
+                ▶
+            </span>
+        </span>
+        {/* wave-style bottom edge: an SVG ribbon, colour-matched to the page
+            background, sits over the lower rim of the poster so the video
+            appears to be torn/clipped off and to continue beyond the frame. */}
+        <svg
+            class="pointer-events-none absolute inset-x-0 bottom-0 z-10 block h-8 w-full text-background sm:h-10"
+            viewBox="0 0 1200 80"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+        >
+            <path
+                fill="currentColor"
+                d="M0,80 L0,46 C50,36 100,36 150,46 C200,56 250,56 300,46 C350,36 400,36 450,46 C500,56 550,56 600,46 C650,36 700,36 750,46 C800,56 850,56 900,46 C950,36 1000,36 1050,46 C1100,56 1150,56 1200,46 L1200,80 Z"
+            />
+        </svg>
+    </button>
+</figure>

@@ -1,0 +1,31 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  copy-to-clipboard behaviour for command boxes: any [data-copy] button writes
+    its `data-copy` text to the clipboard on click and briefly shows "Copied".
+    Markup-agnostic — drop this once on a page and add `data-copy="…"` to any
+    button.  */
+---
+<script is:inline>
+    (function () {
+        var btns = document.querySelectorAll("[data-copy]")
+        if (!btns.length) return
+        btns.forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                var text = btn.getAttribute("data-copy") || ""
+                var done = function () {
+                    var prev = btn.textContent
+                    btn.textContent = "Copied"
+                    setTimeout(function () { btn.textContent = prev }, 1500)
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done, function () {})
+                }
+            })
+        })
+    })()
+</script>

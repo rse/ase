@@ -2,8 +2,10 @@
 ChangeLog
 =========
 
-0.9.23 (2026-06-20)
+0.9.23 (2026-06-21)
 -------------------
+
+- FEATURE: first cut for a real ase.tools website based on Astro framework
 
 0.9.22 (2026-06-20)
 -------------------

@@ -1,0 +1,67 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  full-viewport video modal: the reusable Modal shell wrapped around a Plyr
+    player. Any element on the page carrying `data-video-src` (and optionally
+    `data-video-label`) opens it on click; the Modal shell handles the close
+    button and Escape, and the player is paused when the overlay closes.  */
+
+import Modal from "./Modal.astro"
+---
+<Modal id="video-modal" label="Video player">
+    <div class="w-full max-w-4xl">
+        <video id="video-modal-player" controls playsinline></video>
+    </div>
+</Modal>
+
+{/* driven by Plyr: open on a thumbnail click, close via the Modal shell (close
+    button or Escape). Each trigger carries the clip via `data-video-src` /
+    `data-video-label`. Bundled by Vite (no `is:inline`) so the Plyr import
+    resolves. */}
+<script>
+    import Plyr from "plyr"
+    import "plyr/dist/plyr.css"
+
+    const videoModal = document.getElementById("video-modal")
+    const elem       = document.getElementById("video-modal-player")
+    if (videoModal && elem) {
+        const player = new Plyr(elem, {
+            controls: [ "play-large", "play", "progress", "current-time", "fullscreen" ]
+        })
+        const openVideo = (src: string, label: string) => {
+            player.source = {
+                type:    "video",
+                title:   label,
+                sources: [ { src: src, type: "video/mp4" } ]
+            }
+            videoModal.style.display = "grid"
+            const p = player.play()
+            if (p && p.catch) p.catch(() => {})
+        }
+        document.querySelectorAll("[data-video-src]").forEach((trigger) => {
+            trigger.addEventListener("click", () => {
+                openVideo(trigger.getAttribute("data-video-src") || "", trigger.getAttribute("data-video-label") || "")
+            })
+        })
+        /*  the Modal shell handles close-button + Escape; pause the
+            player whenever the overlay reports it has closed.  */
+        videoModal.addEventListener("modal:close", () => { player.pause() })
+    }
+</script>
+
+<style is:global>
+    /*  theme Plyr to the steel-blue brand and keep the modal player within the
+        viewport (cap its width via the wrapper, its height via aspect ratio).  */
+    #video-modal .plyr {
+        --plyr-color-main: var(--accent);
+        width: 100%;
+        max-height: 90vh;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+    }
+</style>

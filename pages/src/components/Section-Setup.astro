@@ -1,0 +1,66 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  "Setup" section: prerequisites prose plus terminal-style boxes with the
+    install / update / uninstall commands (each row has a "❯" prompt and a copy
+    button wired by the Clipboard-Copy component in BaseLayout).  */
+
+import SectionGlow from "./Section-Glow.astro"
+import Terminal    from "./Terminal.astro"
+---
+<section id="setup" class="relative isolate mx-auto max-w-4xl px-6 py-12 sm:py-16">
+    <SectionGlow variant="section" side="left" />
+
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            Setup <span class="text-accent">ASE</span> Easily
+        </h2>
+        <p class="mt-4 text-foreground-secondary">
+            As a prerequisite, please install the Agentic AI Coding tool
+            <a href="https://claude.com/products/claude-code">Claude Code</a>
+            (or with reduced support the alternatives <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>
+            or <a href="https://github.com/openai/codex">OpenAI Codex</a>) and
+            the essential run-time environment
+            <a href="https://nodejs.org/">Node.js</a> for your particular platform.
+        </p>
+        <p class="mt-4 text-foreground-secondary">
+            Then execute the two commands below under <b>Installation</b>. The first command installs
+            the <b>ASE</b> Command-Line Interface (CLI).
+            The second command uses this CLI to install
+            the <b>ASE</b> Plugin into your Agentic AI Coding tool.
+            The <code>ase setup update</code> keeps <b>ASE</b> up to date and
+            the <code>ase setup uninstall</code> will residue-free reverse
+            the installation again at any time.
+            The <code>--tool claude</code> is the default and not necessary
+            for the mainstream tool <a href="https://claude.com/products/claude-code">Claude Code</a>.
+        </p>
+    </header>
+
+    <div data-reveal>
+        <Terminal
+            class="mx-auto mt-12 max-w-2xl"
+            title="Installation"
+            commands={[ "npm install -g @rse/ase", "ase setup install [--tool claude|copilot|codex]" ]}
+        />
+    </div>
+
+    <div data-reveal>
+        <Terminal
+            class="mx-auto mt-12 max-w-2xl"
+            title="Updating"
+            commands={[ "ase setup update [--tool claude|copilot|codex]" ]}
+        />
+    </div>
+
+    <div data-reveal>
+        <Terminal
+            class="mx-auto mt-12 max-w-2xl"
+            title="Uninstallation"
+            commands={[ "ase setup uninstall [--tool claude|copilot|codex]" ]}
+        />
+    </div>
+</section>

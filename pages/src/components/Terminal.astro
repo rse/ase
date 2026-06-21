@@ -1,0 +1,60 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  reusable terminal-style box: a titled "window" listing one or more shell
+    commands, each on a "❯" prompt row with a copy button (copy behaviour wired
+    globally by the Clipboard-Copy component in BaseLayout). The mono styling
+    mirrors the hero prompt for a consistent command-line look.
+
+    `commands` is the list of command strings (one prompt row each); `title` is
+    the title-bar label; `class` is forwarded to the outer wrapper so callers
+    set their own margin/width (e.g. "mx-auto mt-12 max-w-2xl").  */
+
+interface Props {
+    commands: string[]
+    title?:   string
+    class?:   string
+}
+
+const { commands, title = "Terminal", class: className = "" } = Astro.props
+
+/*  split a command into runs, flagging the shell-ish meta characters [ ] | so
+    they can be tinted in the accent colour while the rest stays plain. Keeping
+    the original string for `data-copy` ensures the copied text is unchanged.  */
+const tokenize = (cmd: string) =>
+    cmd.split(/([[\]|])/).filter((part) => part !== "").map((part) => ({
+        text:  part,
+        meta:  part === "[" || part === "]" || part === "|"
+    }))
+---
+<div class={className}>
+    <div class="overflow-hidden rounded-xl border border-border-strong bg-background-elevated/60 text-sm leading-relaxed shadow-xl sm:text-base">
+        <div class="flex items-center gap-2 border-b border-border/60 px-4 py-2.5">
+            <span class="h-3 w-3 rounded-full bg-[var(--brand-400)]"></span>
+            <span class="h-3 w-3 rounded-full bg-[var(--brand-500)]"></span>
+            <span class="h-3 w-3 rounded-full bg-[var(--brand-600)]"></span>
+            <span class="ml-2 text-foreground">Terminal:</span>
+            <span class="text-accent">{title}</span>
+        </div>
+        <div class="flex flex-col gap-1 px-4 py-4">
+            {commands.map((cmd) => (
+                <div class="group flex items-center gap-3 font-mono">
+                    <span class="select-none text-accent">❯</span>
+                    <code class="code-plain flex-1 text-foreground">{tokenize(cmd).map((t) => (
+                        t.meta ? <span class="text-accent">{t.text}</span> : t.text
+                    ))}</code>
+                    <button
+                        type="button"
+                        class="copy-cmd shrink-0 rounded-md border border-border px-2 py-1 text-xs text-foreground-muted transition hover:border-border-strong hover:text-foreground"
+                        data-copy={cmd}
+                        aria-label="Copy command"
+                    >Copy</button>
+                </div>
+            ))}
+        </div>
+    </div>
+</div>

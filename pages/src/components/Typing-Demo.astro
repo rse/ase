@@ -1,0 +1,74 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  terminal-style typing demo: a fixed-size mono "prompt" box into which
+    typed.js types a rotating list of example ASE skill invocations (the
+    `/ase-xxx-xxx` keyword bolded in the brand accent). Respects the user's
+    reduced-motion preference by showing the first command at once instead of
+    animating. Self-contained: markup + typed.js driver + cursor styling.  */
+---
+<div class="hero-prompt mt-8 block h-20 w-full max-w-[33.6rem] overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 px-4 py-3 text-left font-mono text-sm leading-relaxed tracking-[-0.03em] text-foreground-secondary sm:text-base">
+    <span class="select-none text-white">❯ </span>
+    <span id="hero-typed" class="whitespace-pre-wrap break-words"></span>
+</div>
+
+{/* drive the prompt with typed.js. Bundled by Vite (no `is:inline`) so the
+    import resolves; respects the user's reduced-motion preference by showing
+    the full command at once instead of animating. */}
+<script>
+    import Typed from "typed.js"
+
+    const target = document.getElementById("hero-typed")
+    if (target) {
+        const commands = [
+            [ "/ase-code-craft",      "--quick hello: new \"ase hello\" CLI command which prints \"Hello World\" to the terminal" ],
+            [ "/ase-code-refactor",   "move the MCP code into its own separated class" ],
+            [ "/ase-code-resolve",    "unexpected service crash when agent tool is upgraded" ],
+            [ "/ase-task-grill",      "hello" ],
+            [ "/ase-meta-diff",       "--coherence --risk --blast" ],
+            [ "/ase-docs-proofread",  "--auto @docs/SPEC-*.md" ],
+            [ "/ase-sync-reconcile",  "--source=SPEC,ARCH --target=CODE,DOCS" ],
+            [ "/ase-code-analyze",    "--performance --severity=HIGH @tool/src/**/*.ts" ],
+            [ "/ase-docs-distill",    "--top=5 @docs/architecture.md" ],
+            [ "/ase-arch-discover",   "--limit=20 command line option and argument parsing library" ],
+            [ "/ase-arch-evaluate",   "Commander.js vs Yargs vs. Optique, focus on TypeScript support, features and popularity" ],
+            [ "/ase-meta-diaboli",    "--count=5 Yargs would be better than Commander.js for the ASE CLI" ],
+            [ "/ase-meta-steelman",   "--count=10 ASE is a useful Claude Code plugin" ],
+            [ "/ase-meta-why",        "--width=2 --depth=6 is the Decibel (dB) unit a logarithmic one?" ],
+            [ "/ase-meta-brainstorm", "--max-clarify=0 --min-ideas=20 clever and useful AI skills for software engineering" ],
+            [ "/ase-meta-search",     "Who authored the ASE project?" ]
+        ]
+
+        /*  render each command with its `/ase-xxx-xxx` keyword bolded and tinted
+            in the brand accent; the rest stays in the secondary foreground.  */
+        const strings = commands.map(([ cmd, rest ]) =>
+            `<b class="font-bold text-accent">${cmd}</b> ${rest}`)
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        if (reduce)
+            target.textContent = commands[0][0] + commands[0][1]
+        else
+            new Typed(target, {
+                strings:    strings,
+                typeSpeed:  20,
+                startDelay: 1000,
+                backDelay:  3000,
+                backSpeed:  10,
+                loop:       true,
+                showCursor: true,
+                cursorChar: "█"
+            })
+    }
+</script>
+
+<style is:global>
+    /*  tint the typed.js cursor with the brand accent and nudge it slightly
+        away from the preceding character.  */
+    .hero-prompt .typed-cursor {
+        color: var(--brand-300);
+        margin-left: 0.15em;
+    }
+</style>

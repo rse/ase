@@ -1,0 +1,79 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  scroll-spy: bold the nav link whose section is currently in view. Each
+    [data-navlink] points at a "#id" section; links whose target is absent from
+    the page are skipped. A reference line ~30% down the viewport selects the
+    last section whose top has passed it, so the active link follows the scroll
+    position. Reaching the page bottom forces the final section active even if
+    it's too short to reach the line. Above the first section, no link is active.
+
+    Markup contract: nav links carry `data-navlink` (+ `data-label` for the bold
+    width reservation below); the active link gets the `.is-active` class.  */
+---
+<script is:inline>
+    (function () {
+        var links = Array.prototype.slice.call(document.querySelectorAll("[data-navlink]"))
+        if (!links.length) return
+        var entries = []
+        links.forEach(function (link) {
+            var id = (link.getAttribute("href") || "").replace(/^#/, "")
+            var sec = id && document.getElementById(id)
+            if (sec) entries.push({ link: link, sec: sec })
+        })
+        if (!entries.length) return
+        var active = null
+        function setActive(link) {
+            if (active === link) return
+            if (active) active.classList.remove("is-active")
+            active = link
+            if (active) active.classList.add("is-active")
+        }
+        var ticking = false
+        function update() {
+            ticking = false
+            var line = window.innerHeight * 0.3
+            var doc = document.documentElement
+            var atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2
+            var pick = null
+            if (atBottom) {
+                pick = entries[entries.length - 1].link
+            } else {
+                entries.forEach(function (e) {
+                    if (e.sec.getBoundingClientRect().top <= line) pick = e.link
+                })
+            }
+            setActive(pick)
+        }
+        function onScroll() {
+            if (!ticking) { ticking = true; requestAnimationFrame(update) }
+        }
+        window.addEventListener("scroll", onScroll, { passive: true })
+        window.addEventListener("resize", onScroll)
+        update()
+    })()
+</script>
+
+<style is:global>
+    /*  the link whose section is in view turns bold and adopts the foreground
+        colour. The label is reserved at its bold width (via a hidden ::after
+        carrying the same text in bold) so toggling weight never nudges the
+        surrounding links.  */
+    .nav-spy {
+        display: inline-flex;
+        flex-direction: column;
+    }
+    .nav-spy::after {
+        content: attr(data-label);
+        height: 0;
+        font-weight: 700;
+        visibility: hidden;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .nav-spy.is-active { font-weight: 700; color: var(--foreground); }
+</style>

@@ -1,0 +1,43 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  full-viewport image modal, used for diagrams. The reusable Modal shell
+    wrapped around a single <img>. Any element on the page carrying
+    `data-image-src` (and optionally `data-image-label`) opens it on click; the
+    Modal shell handles the close button and Escape. The image is grid-centered,
+    keeps its own aspect ratio, and grows as large as the viewport allows
+    (capped by both width and height).  */
+
+import Modal from "./Modal.astro"
+---
+<Modal id="image-modal" label="Image viewer">
+    <img
+        id="image-modal-image"
+        src=""
+        alt=""
+        class="max-h-[92vh] max-w-[94vw] rounded-lg object-contain"
+    />
+</Modal>
+
+{/* open on a trigger click; the Modal shell handles closing. */}
+<script is:inline>
+    (function () {
+        var imageModal = document.getElementById("image-modal")
+        var imageEl    = document.getElementById("image-modal-image")
+        if (!imageModal || !imageEl) return
+        function openImage(src, label) {
+            imageEl.src = src
+            imageEl.alt = label
+            imageModal.style.display = "grid"
+        }
+        document.querySelectorAll("[data-image-src]").forEach(function (trigger) {
+            trigger.addEventListener("click", function () {
+                openImage(trigger.getAttribute("data-image-src") || "", trigger.getAttribute("data-image-label") || "")
+            })
+        })
+    })()
+</script>

@@ -1,0 +1,16 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  scroll-progress bar: a thin brand-coloured line that fills (scales along its
+    x-axis) as the reader scrolls down the page. The scaling is driven by the
+    shared scroll logic in Progress.astro, which must also be on the page.  */
+---
+<div
+    id="scroll-progress"
+    class="h-0.5 origin-left bg-accent"
+    style="transform: scaleX(0)"
+></div>

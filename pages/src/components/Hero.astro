@@ -1,0 +1,114 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+import { site }   from "../data/site.ts"
+import LogoASE    from "./Logo-ASE.astro"
+import LogoGitHub from "./Logo-GitHub.astro"
+import TypingDemo from "./Typing-Demo.astro"
+---
+<section class="relative isolate overflow-hidden">
+    {/* radial wash */}
+    <div
+        class="pointer-events-none absolute inset-0 -z-10"
+        style="background:
+            radial-gradient(ellipse 60% 180% at 50% -20%, color-mix(in oklch, var(--brand-500) 30%, transparent), transparent 75%),
+            linear-gradient(to bottom, var(--background-secondary), var(--background));"
+        aria-hidden="true"
+    ></div>
+
+    <div class="mx-auto flex min-h-[88vh] max-w-4xl flex-col items-center justify-center px-6 pt-28 pb-20 text-center">
+        <div class="hero-stagger flex flex-col items-center">
+            {/* ASE logo (inlined component, so its two fills can be themed) */}
+            <LogoASE class="mb-8 h-auto w-32 sm:w-40" idPrefix="ase-hero-logo" />
+
+            {/* keywords */}
+            <span class="mb-6 inline-flex items-center gap-2 rounded-full border border-border-strong bg-background-elevated/60 px-4 py-1.5 text-sm font-medium text-accent">
+                Agentic AI Coding &nbsp; ✦ &nbsp; Software Engineering
+            </span>
+
+            {/* title */}
+            <h1 class="max-w-4xl text-6xl font-bold sm:text-6xl md:text-7xl">
+                <span class="bg-gradient-to-b from-[var(--neutral-grad-from)] to-[var(--neutral-grad-to)] bg-clip-text text-transparent">
+                    Agentic
+                </span>
+                <span class="bg-gradient-to-b from-brand-400 to-brand-600 bg-clip-text text-transparent">
+                    Software Engineering
+                </span>
+            </h1>
+
+            {/* sub-title */}
+            <p class="mt-6 max-w-2xl text-lg text-foreground-secondary sm:text-xl">
+                The opinionated <b>Open Source</b> companion tooling of
+                <a href="https://github.com/rse/">Dr. Ralf S. Engelschall</a>
+                for fusing the concept of <b>Agentic AI Coding</b> and traditional <b>Software Engineering</b>
+                in the software development tool <b>Anthropic Claude
+                Code</b> (or with reduced support in the alternative
+                <b>GitHub Copilot CLI</b> or <b>OpenAI Codex</b>).
+            </p>
+
+            {/* terminal-style typed out examples of ASE skill invocations */}
+            <TypingDemo />
+
+            {/* buttons */}
+            <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+                <a href="#highlights" class="rounded-lg border border-border-strong px-6 py-3 font-semibold text-foreground transition-colors hover:border-accent hover:text-accent">
+                    See it in action ↓
+                </a>
+                <a href="#setup" class="rounded-lg border border-border-strong px-6 py-3 font-semibold text-foreground transition-colors hover:border-accent hover:text-accent">
+                    Set it up for you ↓
+                </a>
+                <a href="#usage" class="rounded-lg border border-border-strong px-6 py-3 font-semibold text-foreground transition-colors hover:border-accent hover:text-accent">
+                    Use it yourself ↓
+                </a>
+            </div>
+            <div class="mt-4 flex flex-wrap items-center justify-center gap-4">
+                <a href={site.repo} class="inline-flex items-center gap-2 rounded-lg bg-[color-mix(in_oklch,var(--accent)_60%,black)] px-6 py-3 font-semibold text-white shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-[color-mix(in_oklch,var(--accent)_75%,black)]">
+                    <LogoGitHub class="h-5 w-5" />
+                    View it on GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {/* scroll-down indicator (desktop only, fades against the hero base.) */}
+    <a
+        href="#highlights"
+        aria-label="Scroll to highlights"
+        class="absolute inset-x-0 bottom-8 mx-auto hidden w-max flex-col items-center text-accent md:flex"
+    >
+        <span class="chevron-bounce text-2xl leading-none">⌄</span>
+    </a>
+</section>
+
+<style is:global>
+    /*  ==== hero entrance animations ====
+        the hero children stagger in on load; the scroll-down chevron bounces.  */
+
+    @keyframes hero-slide-up {
+        from { opacity: 0; transform: translateY(80px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-stagger > * {
+        animation: hero-slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .hero-stagger > *:nth-child(1) { animation-delay: 0ms; }
+    .hero-stagger > *:nth-child(2) { animation-delay: 90ms; }
+    .hero-stagger > *:nth-child(3) { animation-delay: 180ms; }
+    .hero-stagger > *:nth-child(4) { animation-delay: 270ms; }
+
+    @keyframes chevron-bounce {
+        0%, 100% { transform: translateY(0); opacity: 0.5; }
+        50%      { transform: translateY(8px); opacity: 1; }
+    }
+    .chevron-bounce { animation: chevron-bounce 1.8s ease-in-out infinite; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-stagger > *,
+        .chevron-bounce { animation: none; }
+    }
+</style>
+

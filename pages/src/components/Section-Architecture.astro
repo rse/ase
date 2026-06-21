@@ -1,0 +1,54 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  "Architecture" section: an overview paragraph plus one text/diagram row
+    describing the Hooks / Skills / MCP / CLI building blocks.  */
+
+import SectionGlow from "./Section-Glow.astro"
+import Diagram     from "./Diagram.astro"
+---
+<section id="architecture" class="relative isolate mx-auto max-w-4xl px-6 py-12 sm:py-16">
+    <SectionGlow variant="section" side="left" />
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            Overview of <span class="text-accent">ASE</span> Architecture
+        </h2>
+        <p class="mt-4 text-foreground-secondary">
+            <b>ASE</b> is not just a bunch of skills for the Agentic
+            AI Coding tool like <b>Claude Code</b>. Instead,
+            <b>ASE</b> is based on an integrated set of Hooks,
+            Skills, an Model-Context-Protocol (MCP) service and a
+            Command-Line Interface (CLI).
+        </p>
+    </header>
+    <div class="mt-20 flex flex-col gap-24" data-reveal-children>
+        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+            <div class="relative isolate lg:order-1">
+                <SectionGlow variant="text" side="left" />
+                <p class="text-sm font-semibold uppercase tracking-wider text-accent">Software Architecture</p>
+                <h3 class="mt-3 text-2xl font-bold sm:text-3xl">Hooks, Skills, MCP, CLI</h3>
+                <p class="mt-4 text-foreground-secondary">
+                    On first spot, <b>ASE</b> is just a plugin
+                    for the Agentic AI Coding tool. Actually,
+                    it is more. <b>ASE</b> uses Hooks of
+                    the Agentic AI Coding tool to load its
+                    constitution (important global information).
+                    Then it provides the various user-facing
+                    skills (<b><code>ase-xxx-xxx</code></b>)
+                    for the probabilistic execution of actions.
+                    Additionally, it uses an underlying
+                    (automatically started per project) MCP
+                    service (<b><code>ase_xxx</code></b> tools)
+                    for deterministic execution of actions.
+                    Finally, it provides CLI commands (<b><code>ase
+                    xxx</code></b>).
+                </p>
+            </div>
+            <Diagram class="lg:order-2" src="/assets/building-blocks.svg" label="ASE building blocks diagram" />
+        </div>
+    </div>
+</section>

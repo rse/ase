@@ -1,0 +1,45 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  one row of the two-column USP/video list. The USP text and the demo video
+    occupy the two columns; their order is *swapped* on alternating rows
+    (odd-indexed rows place the video first) to create the zig-zag rhythm.
+    On narrow screens the columns stack and the USP always leads.  */
+
+import VideoEmbed   from "./Video-Embed.astro"
+import type { Highlights } from "../data/highlights.ts"
+
+interface Props {
+    usp:   Highlights
+    index: number
+}
+
+const { usp, index } = Astro.props
+const reversed       = index % 2 === 1
+---
+<div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+    <div class={`relative isolate ${reversed ? "lg:order-2" : "lg:order-1"}`}>
+        {/* blue radial glow behind the text block, bleeding off the viewport
+            on the text's side of the row (left on normal rows, right on the
+            reversed/zig-zag rows). */}
+        <div
+            class="pointer-events-none absolute top-1/2 -z-10 h-[260%] w-[240%] -translate-y-1/2"
+            class:list={[ reversed ? "left-0 translate-x-[10%]" : "right-0 -translate-x-[10%]" ]}
+            style="background: radial-gradient(ellipse 70% 60% at center, color-mix(in oklch, var(--brand-500) 30%, transparent), transparent 80%);"
+            aria-hidden="true"
+        ></div>
+        <p class="text-sm font-semibold uppercase tracking-wider text-accent">{usp.eyebrow}</p>
+        <h3 class="mt-3 text-2xl font-bold sm:text-3xl">{usp.title}</h3>
+        <p class="mt-4 text-foreground-secondary">{usp.body}</p>
+        <code class="code-plain mt-5 inline-block rounded-md border border-border bg-background-secondary px-3 py-1.5 font-mono text-sm text-accent">
+            {usp.skill}
+        </code>
+    </div>
+    <div class={reversed ? "lg:order-1" : "lg:order-2"}>
+        <VideoEmbed name={usp.video} label={usp.title}/>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  decorative blue radial glow that bleeds off one side of its (relative,
+    isolate) parent. Two shapes:
+      - variant="section": a smaller glow anchored at the section's top start,
+        bleeding off the chosen edge (used at the top of a section).
+      - variant="text": a large glow centred behind a text block, bleeding off
+        the chosen edge (used behind the two-column row text).
+    `side` picks which edge it bleeds off.  */
+
+interface Props {
+    variant?: "section" | "text"
+    side?:    "left" | "right"
+}
+
+const { variant = "text", side = "left" } = Astro.props
+
+/*  shared gradient; the "section" shape is a touch tighter than the "text" one  */
+const gradient = variant === "section"
+    ? "radial-gradient(ellipse 60% 50% at center, color-mix(in oklch, var(--brand-500) 30%, transparent), transparent 80%)"
+    : "radial-gradient(ellipse 70% 60% at center, color-mix(in oklch, var(--brand-500) 30%, transparent), transparent 80%)"
+
+const placement = variant === "section"
+    ? `top-0 h-[120%] w-[80%] -translate-y-[20%] ${side === "left" ? "left-0 -translate-x-[70%]" : "right-0 translate-x-[70%]"}`
+    : `top-1/2 h-[260%] w-[240%] -translate-y-1/2 ${side === "left" ? "right-0 -translate-x-[10%]" : "left-0 translate-x-[10%]"}`
+---
+<div
+    class:list={[ "pointer-events-none absolute -z-10", placement ]}
+    style={`background: ${gradient};`}
+    aria-hidden="true"
+></div>

@@ -1,0 +1,60 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  reusable full-viewport modal shell: a dimmed, blurred overlay plus a close
+    button. The actual content (video, image, …) is provided via the default
+    <slot> and managed by the caller. The overlay starts hidden; callers open
+    it by setting its display to "grid" (or calling `el.dataset` helpers below).
+
+    Close behavior (close button + Escape) is wired here: it hides the overlay
+    and dispatches a bubbling "modal:close" CustomEvent on the overlay, so the
+    caller can react (e.g. pause a player) without re-implementing the chrome.  */
+
+interface Props {
+    id:    string
+    label?: string
+}
+
+const { id, label = "Dialog" } = Astro.props
+---
+<div
+    id={id}
+    class="fixed inset-0 z-[100] hidden place-items-center bg-black/20 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-label={label}
+>
+    <button
+        type="button"
+        data-modal-close
+        aria-label="Close"
+        class="fixed right-5 top-5 z-[101] grid h-12 w-12 place-items-center rounded-full bg-accent/55 text-2xl font-bold leading-none text-white shadow-lg backdrop-blur transition-colors hover:bg-accent/80"
+    >
+        ✕
+    </button>
+    <slot />
+</div>
+
+{/* generic open/close chrome: close button + Escape hide the overlay and emit
+    a "modal:close" event the caller can listen for. */}
+<script is:inline define:vars={{ id }}>
+    (function () {
+        var modal = document.getElementById(id)
+        if (!modal) return
+        var close = function () {
+            if (modal.style.display === "none" || getComputedStyle(modal).display === "none") return
+            modal.style.display = "none"
+            modal.dispatchEvent(new CustomEvent("modal:close", { bubbles: true }))
+        }
+        modal.querySelectorAll("[data-modal-close]").forEach(function (btn) {
+            btn.addEventListener("click", close)
+        })
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && getComputedStyle(modal).display !== "none") close()
+        })
+    })()
+</script>

@@ -1,0 +1,45 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  shared scroll-progress logic for the page, driving (when present) the
+    Progress-Bar (#scroll-progress), the Progress-Ring (#back-to-top-ring), and
+    the back-to-top button's visibility/click (#back-to-top). Each element is
+    optional — the logic no-ops for any it doesn't find — so this can sit
+    alongside either, both, or neither presentational component.
+
+    Throttled via requestAnimationFrame; vendored/adapted from Astro Rocket.  */
+---
+<script is:inline>
+    (function () {
+        var bar  = document.getElementById("scroll-progress")
+        var btt  = document.getElementById("back-to-top")
+        var ring = document.getElementById("back-to-top-ring")
+        var ticking = false
+        function update() {
+            ticking = false
+            var doc = document.documentElement
+            var max = doc.scrollHeight - doc.clientHeight
+            var p = max > 0 ? doc.scrollTop / max : 0
+            if (bar)  bar.style.transform = "scaleX(" + p + ")"
+            if (ring) ring.setAttribute("stroke-dashoffset", String(1 - p))
+            if (btt) {
+                var show = doc.scrollTop > 400
+                btt.style.opacity = show ? "1" : "0"
+                btt.style.pointerEvents = show ? "auto" : "none"
+            }
+        }
+        function onScroll() {
+            if (!ticking) { ticking = true; requestAnimationFrame(update) }
+        }
+        window.addEventListener("scroll", onScroll, { passive: true })
+        window.addEventListener("resize", onScroll)
+        if (btt) btt.addEventListener("click", function () {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+        })
+        update()
+    })()
+</script>

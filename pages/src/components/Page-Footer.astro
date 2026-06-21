@@ -1,0 +1,22 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  site footer: project name + tagline and the copyright/licence line.  */
+
+import { site } from "../data/site.ts"
+---
+<footer class="border-t border-border/60 bg-background-secondary">
+    <div class="mx-auto max-w-4xl px-6 py-5 text-sm text-foreground-muted">
+        <p>
+            <strong>{site.name}</strong> — {site.tagline}.
+        </p>
+        <p class="mt-2">
+            Copyright &copy; 2025-2026 {site.author}<br/>
+            Licensed under GPL-3.0
+        </p>
+    </div>
+</footer>

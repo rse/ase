@@ -1,0 +1,55 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  floating site header: the ASE logo, the in-page section nav (driven by the
+    Scroll-Spy via `data-navlink`/`nav-spy`), the GitHub link, the (hidden)
+    theme switcher, and the scroll-progress bar along its bottom edge.  */
+
+import { site }      from "../data/site.ts"
+import LogoASE       from "./Logo-ASE.astro"
+import LogoGitHub    from "./Logo-GitHub.astro"
+import ThemeSwitcher from "./Theme-Switcher.astro"
+import ProgressBar   from "./Progress-Bar.astro"
+---
+<header
+    class="fixed inset-x-0 top-0 z-50 border-b border-border/60 backdrop-blur"
+    style="background: linear-gradient(to right,
+        color-mix(in oklch, var(--background) 80%, transparent),
+        color-mix(in oklch, color-mix(in oklch, var(--background) 70%, var(--brand-600)) 80%, transparent),
+        color-mix(in oklch, var(--background) 80%, transparent)
+    );"
+>
+    <div class="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
+        <div class="flex items-center">
+        <a href="/" class="flex items-center gap-3 font-display text-lg font-bold">
+            <LogoASE class="h-[1.0rem] w-auto" idPrefix="ase-navlogo" />
+        </a>
+        <nav class="ml-8 flex items-center gap-5 text-base text-foreground-secondary">
+            <a href="#highlights" data-navlink data-label="Highlights" class="nav-spy transition-colors hover:text-foreground">
+                Highlights
+            </a>
+            <a href="#setup" data-navlink data-label="Setup" class="nav-spy transition-colors hover:text-foreground">
+                Setup
+            </a>
+            <a href="#usage" data-navlink data-label="Usage" class="nav-spy transition-colors hover:text-foreground">
+                Usage
+            </a>
+            <a href="#architecture" data-navlink data-label="Architecture" class="nav-spy transition-colors hover:text-foreground">
+                Architecture
+            </a>
+        </nav>
+        </div>
+        <nav class="flex items-center gap-5 text-base text-foreground-secondary">
+            <a href={site.repo} class="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
+                <LogoGitHub class="h-4 w-4" />
+                GitHub
+            </a>
+            <ThemeSwitcher class="hidden" />
+        </nav>
+    </div>
+    <ProgressBar />
+</header>

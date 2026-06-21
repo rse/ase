@@ -1,0 +1,22 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  set the persisted color mode before first paint to avoid a flash. "dark" is
+    the default; only an explicit "light" override (persisted by Theme-Switcher)
+    flips it. Place this in <head>, as early as possible, so it runs before the
+    body renders.  */
+---
+<script is:inline>
+    (function () {
+        try {
+            if (localStorage.getItem("ase-color-mode") === "light") {
+                document.documentElement.classList.remove("dark")
+                document.documentElement.classList.add("light")
+            }
+        } catch (e) {}
+    })()
+</script>
