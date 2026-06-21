@@ -1,0 +1,122 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  "Compatibility" section: the known Agent-Harness and LLM compatibility
+    matrices for ASE, rendered as two framed tables (mirroring the diagram
+    frame), plus footnotes and an explanatory NOTE callout.  */
+
+import { ACTION_QUERY_PARAMS } from "astro:actions"
+import SectionGlow from "./Section-Glow.astro"
+
+/*  the two compatibility matrices: each row carries the product name (with an
+    optional dagger marker), version, compatibility percentage, and the ASE
+    development goal. `primary` highlights the mainstream-target row.  */
+const harnesses = [
+    { name: "Anthropic Claude Code", version: "2.1.x", compat: "100%", goal: "primary",   primary: true,  mark: ""  },
+    { name: "GitHub Copilot CLI",    version: "1.0.x", compat: "95%",  goal: "secondary", primary: false, mark: ""  },
+    { name: "OpenAI Codex CLI",      version: "0.x.x", compat: "90%",  goal: "secondary", primary: false, mark: "†" }
+]
+
+const llms = [
+    { name: "Anthropic Claude Opus",   version: "4.8", compat: "100%", goal: "primary",   primary: true,  mark: ""  },
+    { name: "Anthropic Claude Sonnet", version: "4.6", compat: "95%",  goal: "secondary", primary: false, mark: ""  },
+    { name: "Anthropic Claude Fable",  version: "5",   compat: "90%",  goal: "secondary", primary: false, mark: "‡" },
+    { name: "Anthropic Claude Haiku",  version: "4.5", compat: "70%",  goal: "none",      primary: false, mark: ""  },
+    { name: "OpenAI GPT",              version: "5.5", compat: "95%",  goal: "none",      primary: false, mark: ""  },
+    { name: "Gemini Flash",            version: "3.5", compat: "70%",  goal: "none",      primary: false, mark: ""  }
+]
+---
+<section id="compat" class="relative isolate mx-auto max-w-4xl px-6 py-12 sm:py-16">
+    <SectionGlow variant="section" side="left" />
+
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            Agent Tool and LLM <span class="text-accent">Compatibility</span>
+        </h2>
+        <p class="mt-4 text-foreground-secondary">
+            <b>ASE</b> uses elaborated control structures (flow, step, if, while,
+            define, expand, etc) and XML-based placeholders (constants, variables)
+            to realize its skills plus Agent Harness hooks, built-in tools, and an
+            MCP service to realize its remaining functionality. As a consequence,
+            it requires the combination of a compatible Agent Harness plus a strong
+            instruction following LLM. The following tables show the current known
+            compatibility for <b>ASE</b>.
+        </p>
+    </header>
+
+    <div class="mt-12 grid gap-8 lg:grid-cols-2" data-reveal-children>
+        {/*  Agent-Harness compatibility matrix  */}
+        <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-border text-foreground">
+                        <th class="pb-2 pr-3 font-semibold">Agent Harness</th>
+                        <th class="pb-2 px-3 font-semibold">Version</th>
+                        <th class="pb-2 px-3 font-semibold">Compat.</th>
+                        <th class="pb-2 pl-3 font-semibold">Goal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {harnesses.map((r) => (
+                        <tr class="border-b border-border/40 last:border-0">
+                            <td class="py-2 pr-3 text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
+                            <td class="py-2 px-3 text-foreground-secondary">{r.version}</td>
+                            <td class="py-2 px-3 font-bold text-foreground">{r.compat}</td>
+                            <td class={`py-2 pl-3 ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
+        {/*  LLM compatibility matrix  */}
+        <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-border text-foreground">
+                        <th class="pb-2 pr-3 font-semibold">LLM</th>
+                        <th class="pb-2 px-3 font-semibold">Version</th>
+                        <th class="pb-2 px-3 font-semibold">Compat.</th>
+                        <th class="pb-2 pl-3 font-semibold">Goal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {llms.map((r) => (
+                        <tr class="border-b border-border/40 last:border-0">
+                            <td class="py-2 pr-3 text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
+                            <td class="py-2 px-3 text-foreground-secondary">{r.version}</td>
+                            <td class="py-2 px-3 font-bold text-foreground">{r.compat}</td>
+                            <td class={`py-2 pl-3 ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p class="mt-4 text-center text-xs text-foreground-muted" data-reveal>
+        <span class="text-accent">†</span> <i>OpenAI Codex CLI</i> has no scriptable custom status line support at all.<br/>
+        <span class="text-accent">‡</span> <i>Anthropic Claude Fable</i> suppresses intermediate outputs.
+    </p>
+
+    <div class="mx-auto mt-10 max-w-2xl" data-reveal>
+        <blockquote class="border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary">
+            <b class="text-accent">NOTE:</b>
+            This compatibility topic doesn't mean <b>ASE</b> cannot be used with
+            other combinations than <b>Claude Code + Claude Opus</b>, like the cheap
+            and powerful <b>Claude Code + Minimax-M3</b> or the popular alternative
+            <b>OpenAI Codex + GPT</b> combination. It only means that <b>ASE</b> is
+            primarily developed against <b>Claude Code + Claude Opus</b> and hence this
+            combination showed no incompatibilities or unexpected results. For
+            other combinations, the usual and hence expected incompatibilities are
+            that some instructions of the <b>ASE</b> skills are not 100% strictly
+            followed. This can be fully harmless in practice, but is at least not
+            as good as the mainstream combination <b>Claude Code + Claude Opus</b> where
+            we didn't observe this.
+        </blockquote>
+    </div>
+</section>

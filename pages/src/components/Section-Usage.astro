@@ -9,6 +9,7 @@
     rows (zig-zag), mirroring the highlights rows. Each text block has a brand
     glow behind it; each diagram opens the shared image modal on click.  */
 
+import { site }    from "../data/site.ts"
 import SectionGlow from "./Section-Glow.astro"
 import Diagram     from "./Diagram.astro"
 ---
@@ -68,10 +69,78 @@ import Diagram     from "./Diagram.astro"
                     chains skills them into a repeatable workflow.
                     Each skill is named <b><code>/ase-xxx-xxx</code></b>
                     and most of those skills even have useful Unix-style options
-                    for adjusting their behavior.
+                    for adjusting their behavior. Click on the skill name
+                    in the following table to see their Unix-style man-page
+                    or run <b><code>/ase-xxx-xxx --help</code></b> under run-time.
                 </p>
             </div>
             <Diagram class="lg:order-1" src="/assets/workflow.svg" label="ASE usage workflow diagram" />
+        </div>
+
+        {/*  full-width skill catalog: the four skill groups (Meta / Task Mode /
+            Funnel Mode / Other) as a 4-column grid, framed like the diagrams.  */}
+        <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
+            <div class="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-4">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wider text-accent">Meta</p>
+                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-persona/help.md`}>ase-meta-<b>persona</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-why/help.md`}>ase-meta-<b>why</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-evaluate/help.md`}>ase-meta-<b>evaluate</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-diaboli/help.md`}>ase-meta-<b>diaboli</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-steelman/help.md`}>ase-meta-<b>steelman</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-quorum/help.md`}>ase-meta-<b>quorum</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-chat/help.md`}>ase-meta-<b>chat</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-search/help.md`}>ase-meta-<b>search</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-brainstorm/help.md`}>ase-meta-<b>brainstorm</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-review/help.md`}>ase-meta-<b>review</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-changelog/help.md`}>ase-meta-<b>changelog</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-commit/help.md`}>ase-meta-<b>commit</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-diff/help.md`}>ase-meta-<b>diff</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-meta-compat/help.md`}>ase-meta-<b>compat</b></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wider text-accent">Task Mode</p>
+                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-id/help.md`}>ase-task-<b>id</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-edit/help.md`}>ase-task-<b>edit</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-grill/help.md`}>ase-task-<b>grill</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-reboot/help.md`}>ase-task-<b>reboot</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-preflight/help.md`}>ase-task-<b>preflight</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-implement/help.md`}>ase-task-<b>implement</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-view/help.md`}>ase-task-<b>view</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-list/help.md`}>ase-task-<b>list</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-rename/help.md`}>ase-task-<b>rename</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-condense/help.md`}>ase-task-<b>condense</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-task-delete/help.md`}>ase-task-<b>delete</b></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wider text-accent">Funnel Mode</p>
+                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-arch-analyze/help.md`}>ase-arch-<b>analyze</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-code-analyze/help.md`}>ase-code-<b>analyze</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-code-craft/help.md`}>ase-code-<b>craft</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-code-refactor/help.md`}>ase-code-<b>refactor</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-code-resolve/help.md`}>ase-code-<b>resolve</b></a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wider text-accent">Other</p>
+                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-arch-discover/help.md`}>ase-arch-<b>discover</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-code-insight/help.md`}>ase-code-<b>insight</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-code-explain/help.md`}>ase-code-<b>explain</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-code-lint/help.md`}>ase-code-<b>lint</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-docs-proofread/help.md`}>ase-docs-<b>proofread</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-docs-distill/help.md`}>ase-docs-<b>distill</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-sync-reconcile/help.md`}>ase-sync-<b>reconcile</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-sync-import/help.md`}>ase-sync-<b>import</b></a></li>
+                        <li><a href={`${site.repo}/blob/master/plugin/skills/ase-sync-export/help.md`}>ase-sync-<b>export</b></a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         {/*  row 3 — text left, operation-modes diagram right  */}
