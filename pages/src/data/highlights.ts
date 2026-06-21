@@ -25,52 +25,77 @@ export type Highlights = {
 
 export const highlights: Highlights[] = [
     {
+        eyebrow: "Token and Time Optimization",
+        title:   "Switch persona to cut down tokens and reading time",
+        body:    "To reduce your overall output tokens and necessary reading time, " +
+                 "switch the communication style of the LLM across four built-in intensity levels: " +
+                 "from the decorative, eloquent, and explaining <b>writer</b>, " +
+                 "the concise, factual, and accurate <b>engineer</b> (default), " +
+                 "over the brief, factual, and abbreviating <b>telegrapher</b>, " +
+                 "down to the terse, rough, and stuttering <b>caveman</b>.",
+        skill:   "/ase-meta-persona engineer",
+        video:   "ase-meta-persona"
+    },
+    {
         eyebrow: "Alternative Approach Funnel",
-        title:   "Craft features through a funnel of approaches",
-        body:    "Plan-driven, but not too direct: ASE first proposes a funnel of alternative " +
-                 "approaches, lets you pick one, and only then composes a structured task plan.",
-        skill:   "/ase-code-craft",
+        title:   "Craft through a funnel of approaches",
+        body:    "Plan-driven, but not too direct and hence with enough preliminary consideration: " +
+                 "<b>ASE</b> first proposes a \"funnel\" of crafting alternative approaches, " +
+                 "lets you pick a suitable one, and only then composes a structured task plan.",
+        skill:   "/ase-code-craft --next IMPLEMENT,DELETE hello: \"ase hello\" CLI command which " +
+                 "prints a nice \"Hello World!\" in blue to the terminal",
         video:   "ase-code-craft"
     },
     {
-        eyebrow: "Named & Persisted Plans",
-        title:   "Implement against persisted, structured plans",
-        body:    "Named, persisted, cross-session task plans in a strict, fixed format — then " +
-                 "implemented as a complete, surgical change set you stay in control of.",
-        skill:   "/ase-task-implement",
-        video:   "ase-task-implement"
-    },
-    {
-        eyebrow: "Package Discovery",
-        title:   "Discover the right packages for your stack",
+        eyebrow: "Component Discovery",
+        title:   "Discover the right components for your technology stack",
         body:    "Get methodical support in finding suitable libraries and frameworks to " +
-                 "establish or extend your technology stack — grounded, not guessed.",
-        skill:   "/ase-arch-discover",
+                 "establish or extend your technology stack — grounded, not guessed, " +
+                 "by taking into account the downloads per time, age of component, " +
+                 "last update time, and GitHub stars.",
+        skill:   "/ase-arch-discover command-line option and argument parsing library",
         video:   "ase-arch-discover"
     },
     {
-        eyebrow: "Logical Code Analysis",
-        title:   "Analyze code for logic & control-flow defects",
-        body:    "Scan source code for problems in its logic, semantics, and control flow, with " +
-                 "evidence-grounded, line-cited findings instead of vague hand-waving.",
-        skill:   "/ase-code-analyze",
-        video:   "ase-code-analyze"
-    },
-    {
         eyebrow: "Multi-Criteria Decisions",
-        title:   "Evaluate alternatives with a decision matrix",
-        body:    "Compare options the rigorous way: a weighted multi-criteria decision matrix " +
-                 "turns a fuzzy “which is best?” into a transparent, defensible verdict.",
-        skill:   "/ase-meta-evaluate",
+        title:   "Evaluate alternatives with a multi-criteria decision matrix",
+        body:    "Compare alternatives the rigorous way: a weighted multi-criteria decision matrix " +
+                 "turns a fuzzy \"which is best?\" question into a transparent, defensible verdict.",
+        skill:   "/ase-meta-evaluate Commander vs. Yargs vs. Optique, " +
+                 "focus on popularity, features and TypeScript support",
         video:   "ase-meta-evaluate"
     },
     {
-        eyebrow: "Boosted Sessions",
-        title:   "Tune the persona to cut tokens & cost",
-        body:    "Switch communication style across four intensity levels — from eloquent " +
-                 "writer down to terse caveman — to speed up sessions and reduce output tokens.",
-        skill:   "/ase-meta-persona",
-        video:   "ase-meta-persona"
+        eyebrow: "Named and Persisted Plans",
+        title:   "Implement against named, persisted, structured task plans",
+        body:    "Use named, persisted, structured and cross-session task plans in a strict, fixed format — then " +
+                 "implemented as a complete, surgical change set you stay in control of.",
+        skill:   "/ase-task-implement hello",
+        video:   "ase-task-implement"
+    },
+    {
+        eyebrow: "Logical Code Analysis",
+        title:   "Analyze code for logic and control-flow defects",
+        body:    "Scan your source code for problems in its logic, semantics, and control flow, with " +
+                 "evidence-grounded, line-cited findings instead of vague hand-wavings.",
+        skill:   "/ase-code-analyze --severity=MEDIUM @tool/src/",
+        video:   "ase-code-analyze"
+    },
+    {
+        eyebrow: "Play Advocatus Diaboli",
+        title:   "Challenge your decision with an Advocatus Diaboli",
+        body:    "Know the anti-theses to your decision before other bring them up. " +
+                 "Let the decision be challenged by a relentless Advocatus Diaboli.",
+        skill:   "/ase-meta-diaboli --count=10 We should migrate the project from TypeScript to Rust",
+        video:   "ase-meta-diaboli"
+    },
+    {
+        eyebrow: "Play Steelman",
+        title:   "Strenghen your decision with a Steelman",
+        body:    "Further improve the strength of your decision before other challenge them. " +
+                 "Let the decision be improved by a helpful Steelman.",
+        skill:   "/ase-meta-steelman -count=10 ASE is a useful Claude Code plugin",
+        video:   "ase-meta-steelman"
     }
 ]
 

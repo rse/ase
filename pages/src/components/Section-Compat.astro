@@ -9,7 +9,6 @@
     matrices for ASE, rendered as two framed tables (mirroring the diagram
     frame), plus footnotes and an explanatory NOTE callout.  */
 
-import { ACTION_QUERY_PARAMS } from "astro:actions"
 import SectionGlow from "./Section-Glow.astro"
 
 /*  the two compatibility matrices: each row carries the product name (with an
@@ -50,7 +49,7 @@ const llms = [
 
     <div class="mt-12 grid gap-8 lg:grid-cols-2" data-reveal-children>
         {/*  Agent-Harness compatibility matrix  */}
-        <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
+        <div class="overflow-hidden rounded-xl border border-border-strong p-0 shadow-xl sm:p-4">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-border text-foreground">
@@ -63,10 +62,10 @@ const llms = [
                 <tbody>
                     {harnesses.map((r) => (
                         <tr class="border-b border-border/40 last:border-0">
-                            <td class="py-2 pr-3 text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
-                            <td class="py-2 px-3 text-foreground-secondary">{r.version}</td>
-                            <td class="py-2 px-3 font-bold text-foreground">{r.compat}</td>
-                            <td class={`py-2 pl-3 ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
+                            <td class="py-0 pr-3 align-top text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
+                            <td class="py-0 px-3 align-top text-foreground-secondary">{r.version}</td>
+                            <td class="py-0 px-3 align-top font-bold text-foreground">{r.compat}</td>
+                            <td class={`py-0 pl-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -74,7 +73,7 @@ const llms = [
         </div>
 
         {/*  LLM compatibility matrix  */}
-        <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
+        <div class="overflow-hidden rounded-xl border border-border-strong p-0 shadow-xl sm:p-4">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-border text-foreground">
@@ -87,10 +86,10 @@ const llms = [
                 <tbody>
                     {llms.map((r) => (
                         <tr class="border-b border-border/40 last:border-0">
-                            <td class="py-2 pr-3 text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
-                            <td class="py-2 px-3 text-foreground-secondary">{r.version}</td>
-                            <td class="py-2 px-3 font-bold text-foreground">{r.compat}</td>
-                            <td class={`py-2 pl-3 ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
+                            <td class="py-0 pr-3 align-top text-foreground-secondary">{r.name}{r.mark && <sup class="text-accent">{r.mark}</sup>}</td>
+                            <td class="py-0 px-3 align-top text-foreground-secondary">{r.version}</td>
+                            <td class="py-0 px-3 align-top font-bold text-foreground">{r.compat}</td>
+                            <td class={`py-0 pl-3 align-top ${r.primary ? "font-bold text-accent" : "text-foreground-secondary"}`}>{r.goal}</td>
                         </tr>
                     ))}
                 </tbody>
