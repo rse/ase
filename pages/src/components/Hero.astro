@@ -5,10 +5,14 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-import LogoASE    from "./Logo-ASE.astro"
-import TypingDemo from "./Typing-Demo.astro"
+import LogoASE     from "./Logo-ASE.astro"
+import TypingDemo  from "./Typing-Demo.astro"
+import VersionFlag from "./Version-Flag.astro"
 ---
 <section class="relative isolate overflow-hidden">
+    {/* hanging version flag  */}
+    <VersionFlag class="absolute right-[5%] top-0 z-30 sm:right-[20%]"/>
+
     {/* radial wash */}
     <div
         class="pointer-events-none absolute inset-0 -z-10"
@@ -52,9 +56,11 @@ import TypingDemo from "./Typing-Demo.astro"
                 <a href="https://github.com/rse/ase" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (project stars)" />
                 </a>
+                <!--
                 <a href="https://github.com/rse/ase/releases" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/v/release/rse/ase?logo=github&label=latest%20release&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (release)" />
                 </a>
+                -->
             </div>
 
             {/* sub-title */}
