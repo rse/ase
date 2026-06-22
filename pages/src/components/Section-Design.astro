@@ -1,0 +1,98 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  "Design Decisions" section: an overview paragraph plus a two-column
+    layout describing the four distinct design decisions behind ASE.  */
+
+import SectionGlow from "./Section-Glow.astro"
+---
+<section id="design" class="relative isolate mx-auto max-w-4xl px-6 py-8">
+    <SectionGlow variant="section" side="right" />
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            <span class="text-accent">ASE</span> Design Decisions
+        </h2>
+        <p class="mt-4 text-left text-foreground-secondary">
+            <b>ASE</b> is based on the following distinct decisions
+            which inherently shaped the overall design of <b>ASE</b>:
+        </p>
+    </header>
+    <div class="mt-12 grid items-start gap-10 lg:grid-cols-2 lg:gap-16" data-reveal-children>
+        <ul class="flex flex-col gap-6 text-foreground-secondary">
+            <li>
+                <b class="text-accent uppercase">Agent &amp; Plugin</b>:
+                <b>ASE</b> is a real <i>plugin</i> for the Agentic AI Coding
+                tools <b>Claude Code</b>, <b>GitHub Copilot CLI</b>,
+                and <b>OpenAI Codex</b>, and can be non-intrusively
+                and easily installed and later also residue-free uninstalled from
+                those tools at any time.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Recurring Software Engineering Tasks</b>:
+                <b>ASE</b> targets the most important, recurring tasks in industrial
+                Software Engineering only. Especially, <b>ASE</b> is not targeting
+                the Consulting, Operations or Management disciplines.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Human in the Loop</b>:
+                <b>ASE</b> targets the scenario of a person performing
+                Software Engineering tasks and which wants to be kept in
+                the driver seat. Especially, <b>ASE</b> is not intended
+                for fully autonomous agent scenarios, although its
+                skills can be conveniently chained.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Skills &amp; MCP/CLI</b>:
+                The probabilitic LLM-based <b>ASE</b> skills are
+                strongly coupled to and work on top of the deterministic
+                TypeScript-based <b>ASE</b> MCP/CLI service. Especially,
+                the <b>ASE</b> skills are not written to be used
+                standalone or in foreign environments.
+            </li>
+        </ul>
+        <ul class="flex flex-col gap-6 text-foreground-secondary">
+            <li>
+                <b class="text-accent uppercase">Configuration Scopes</b>:
+                Parameters of the agent and the project can be
+                configured on the hierarchy of the distinct scopes
+                <i>default</i>, <i>user</i>, <i>project</i>, and
+                <i>session</i>. This allows the flexible configuration
+                of <b>ASE</b>.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Session Constitution</b>:
+                All agent sessions have meta descriptions as some sort
+                of a "constitution" preloaded all the time, based on
+                the configured parameters. This allows controlling the
+                <i>general</i> LLM behavior. Additionally, skills load
+                more meta descriptions on demand. This allows skills to
+                reuse definitions.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Task Skills</b>:
+                Recurring tasks are supported with dedicated skills,
+                which can be manually triggered as commands. This allows
+                explicitly controlling the specific agent behavior.
+                Skills are grouped into meta (<code>ase-meta-*</code>),
+                code (<code>ase-code-*</code>), architecture
+                (<code>ase-arch-*</code>), task
+                (<code>ase-task-*</code>), documentation
+                (<code>ase-docs-*</code>), and synchronization
+                (<code>ase-sync-*</code>) families.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Artifact Formats</b>:
+                The format of the primary deliveries of Software
+                Engineering (requirements specification, architecture
+                description, source code, and documentation) and
+                their artifacts are strictly defined. This allows
+                <i>both</i> humans <i>and</i> agents to operate on them
+                concurrently.
+            </li>
+        </ul>
+    </div>
+</section>
