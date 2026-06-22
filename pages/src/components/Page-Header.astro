@@ -23,12 +23,12 @@ import ProgressBar   from "./Progress-Bar.astro"
         color-mix(in oklch, var(--background) 80%, transparent)
     );"
 >
-    <div class="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-        <div class="flex items-center gap-3">
+    <div class="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 py-4">
+        <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-3">
             <a href="/" class="flex items-center gap-3 font-display text-lg font-bold">
                 <LogoASE class="h-[1.0rem] w-auto" idPrefix="ase-navlogo" />
             </a>
-            <nav class="ml-8 flex items-center gap-5 text-base text-foreground-secondary">
+            <nav class="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-2 text-base text-foreground-secondary lg:ml-8">
                 <a href="#highlights" data-navlink class="nav-spy transition-colors">
                     Highlights
                 </a>
@@ -46,7 +46,7 @@ import ProgressBar   from "./Progress-Bar.astro"
                 </a>
             </nav>
         </div>
-        <nav class="flex items-center gap-5 text-base text-foreground-secondary">
+        <nav class="flex flex-wrap items-center gap-x-5 gap-y-2 text-base text-foreground-secondary">
             <span class="flex items-center gap-2">
                 <a href="https://github.com/rse" aria-label="Dr. Ralf S. Engelschall on GitHub" class="flex items-center">
                     <img src="/assets/rse-signet.svg" alt="Dr. Ralf S. Engelschall" class="h-[1.2rem] w-auto"/>
