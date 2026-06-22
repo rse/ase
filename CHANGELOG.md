@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.24 (2026-06-22)
+-------------------
+
+- IMPROVEMENT: polish website styling and extend website content
+
 0.9.23 (2026-06-22)
 -------------------
 
