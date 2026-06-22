@@ -11,9 +11,9 @@
     reduced-motion preference by showing the first command at once instead of
     animating. Self-contained: markup + typed.js driver + cursor styling.  */
 ---
-<div class="hero-prompt mt-8 block h-20 w-full max-w-[33.6rem] overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 px-4 py-3 text-left font-mono text-sm leading-relaxed tracking-[-0.03em] text-foreground-secondary sm:text-base">
+<div class="hero-prompt mt-8 block h-20 w-full max-w-[min(33.6rem,100%)] overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 px-4 py-3 text-left font-mono text-sm leading-relaxed tracking-[-0.03em] text-foreground-secondary sm:text-base">
     <span class="select-none text-white">❯ </span>
-    <span id="hero-typed" class="whitespace-pre-wrap break-words"></span>
+    <span id="hero-typed" class="whitespace-pre-wrap [overflow-wrap:anywhere]"></span>
 </div>
 
 {/* drive the prompt with typed.js. Bundled by Vite (no `is:inline`) so the
