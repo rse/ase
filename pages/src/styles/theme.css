@@ -96,8 +96,11 @@
 
 html {
     /*  lift the root size from the 16px default so every rem-based text
-        utility scales up proportionally across the whole site.  */
-    font-size: 130%;
+        utility scales up proportionally across the whole site. Use px (a CSS
+        reference pixel, identical across browsers) rather than an absolute
+        unit like pt — pt is resolved against the device DPI differently by
+        Chrome and Firefox.  */
+    font-size: 20px;
     scroll-behavior: smooth;
     /*  offset anchor jumps (nav links) by the height of the fixed header
         plus a little breathing room, so a section's headline lands below
