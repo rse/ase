@@ -33,8 +33,8 @@
     --foreground-secondary: oklch(80% 0.040 250);
     --foreground-muted:     oklch(66% 0.035 250);
 
-    --border:               oklch(22% 0.008 250);
-    --border-strong:        oklch(30% 0.008 250);
+    --border:               oklch(22% 0.040 250);
+    --border-strong:        oklch(30% 0.040 250);
 
     --accent:               var(--brand-500);
     --accent-hover:         var(--brand-400);
