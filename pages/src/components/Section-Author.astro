@@ -14,12 +14,11 @@ import LogoGitHub  from "./Logo-GitHub.astro"
 import LogoRSE     from "./Logo-RSE.astro"
 
 const contributors = [
-    "Lars Artmann",
     "Matthias Brusdeylins",
     "Jochen Hörtreiter",
     "Michael Kagel",
     "Christian Reiber",
-    "Zoltan Rutzman",
+    "Zoltan Ruzman",
     "Michael Schäfer",
     "Markus Schnappinger",
     "Jan Tutas",
@@ -95,7 +94,7 @@ const contributors = [
     </div>
 </section>
 
-<section id="contributors" class="relative isolate mx-auto max-w-4xl px-6 py-8 mb-24">
+<section id="contributors" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="left" />
     <header class="mx-auto max-w-2xl text-center" data-reveal>
         <h2 class="text-3xl font-bold sm:text-4xl">
@@ -105,8 +104,8 @@ const contributors = [
             The <b>ASE</b> project received support from the following
             individual contributors, coming from both the industrial
             <b>Software Engineering</b> and <b>Open Source Software</b>
-            contexts. <b>Many thanks to them for their valuable feedback
-            and support!</b>
+            contexts.
+            <b>Many thanks to them for their valuable feedback and support!</b>
         </p>
     </header>
 
@@ -115,6 +114,37 @@ const contributors = [
             {contributors.map((name) => (
                 <div class="overflow-hidden rounded-xl border border-border-strong p-1 text-center text-accent">{name}</div>
             ))}
+        </div>
+    </div>
+</section>
+
+<section id="sponsors" class="relative isolate mx-auto max-w-4xl px-6 py-8 mb-24">
+    <SectionGlow variant="section" side="left" />
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            Thanks to the <span class="text-accent">Sponsors</span>
+        </h2>
+        <p class="mt-4 text-left text-foreground-secondary">
+            The <b>ASE</b> project is supported by the following
+            organizations through time, material, knowledge, or experience.
+            <b>Many thanks to them for their support!</b>
+        </p>
+    </header>
+
+    <div class="mt-12 w-full" data-reveal>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-2">
+            <div class="flex flex-col items-center gap-2 py-2 overflow-hidden rounded-xl border border-border-strong p-1 text-center text-foreground">
+                <div class="flex flex-1 items-center justify-center">
+                    <img src="/assets/msg-logo-white.svg" alt="msg systems ag" class="h-20 w-auto opacity-75" />
+                </div>
+                <div class="mb-2">msg systems ag</div>
+            </div>
+            <div class="flex flex-col items-center gap-2 py-2 overflow-hidden rounded-xl border border-border-strong p-1 text-center text-foreground">
+                <div class="flex flex-1 items-center justify-center">
+                    <img src="/assets/sea-logo-white.svg" alt="SEA Software Engineering Academy gGmbH" class="h-30 w-auto opacity-75" />
+                </div>
+                <div class="mb-2">SEA Software Engineering Academy gGmbH</div>
+            </div>
         </div>
     </div>
 </section>
