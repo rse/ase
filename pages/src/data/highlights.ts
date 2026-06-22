@@ -84,17 +84,17 @@ export const highlights: Highlights[] = [
     {
         eyebrow: "Play Advocatus Diaboli",
         title:   "Challenge your decision with an Advocatus Diaboli",
-        body:    "Know the anti-theses to your decision before other bring them up. " +
+        body:    "Know the anti-theses to your decision before others bring them up. " +
                  "Let the decision be challenged by a relentless Advocatus Diaboli.",
         skill:   "/ase-meta-diaboli --count=10 We should migrate the project from TypeScript to Rust",
         video:   "ase-meta-diaboli"
     },
     {
         eyebrow: "Play Steelman",
-        title:   "Strenghen your decision with a Steelman",
-        body:    "Further improve the strength of your decision before other challenge them. " +
+        title:   "Strengthen your decision with a Steelman",
+        body:    "Further improve the strength of your decision before others challenge them. " +
                  "Let the decision be improved by a helpful Steelman.",
-        skill:   "/ase-meta-steelman -count=10 ASE is a useful Claude Code plugin",
+        skill:   "/ase-meta-steelman --count=10 ASE is a useful Claude Code plugin",
         video:   "ase-meta-steelman"
     }
 ]
