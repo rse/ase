@@ -48,7 +48,7 @@
             `<b class="font-bold text-accent">${cmd}</b> ${rest}`)
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
         if (reduce)
-            target.textContent = commands[0][0] + commands[0][1]
+            target.textContent = `${commands[0][0]} ${commands[0][1]}`
         else
             new Typed(target, {
                 strings:    strings,
