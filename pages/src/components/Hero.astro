@@ -7,11 +7,16 @@
 
 import LogoASE     from "./Logo-ASE.astro"
 import TypingDemo  from "./Typing-Demo.astro"
-import VersionFlag from "./Version-Flag.astro"
+import Flag        from "./Flag.astro"
 ---
 <section class="relative isolate overflow-hidden">
-    {/* hanging version flag  */}
-    <VersionFlag class="absolute right-[5%] top-0 z-30 sm:right-[20%]"/>
+    {/* hanging flag, carrying the sponsor logos as its overlay content */}
+    <Flag class="absolute right-[5%] top-0 z-30 sm:right-[20%]">
+        <div class="mb-2 flex flex-col items-center justify-center gap-4">
+            <img src="/assets/sea-logo-white.svg" alt="SEA Software Engineering Academy gGmbH" class="w-25 h-auto opacity-75"/>
+            <img src="/assets/msg-logo-white.svg" alt="msg systems ag" class="w-20 h-auto opacity-75"/>
+        </div>
+    </Flag>
 
     {/* radial wash */}
     <div
@@ -56,11 +61,9 @@ import VersionFlag from "./Version-Flag.astro"
                 <a href="https://github.com/rse/ase" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (project stars)" />
                 </a>
-                <!--
                 <a href="https://github.com/rse/ase/releases" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/v/release/rse/ase?logo=github&label=latest%20release&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (release)" />
                 </a>
-                -->
             </div>
 
             {/* sub-title */}

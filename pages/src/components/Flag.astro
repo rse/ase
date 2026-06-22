@@ -5,28 +5,21 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-/*  hanging version flag: an SVG banner whose silhouette forms the letter "W"
+/*  hanging flag: an SVG banner whose silhouette forms the letter "W"
     (straight vertical sides, flat top, shallow W-notched bottom edge). It
     hangs from the top of the hero area; the SVG draws only the flag shape,
-    while the version number is overlaid as regular HTML text (so it stays
-    selectable and styleable). The version is read from package.json at build
-    time so it always stays in sync.  */
-
-import pkg    from "../../package.json"
-import { site } from "../data/site.ts"
+    while its overlay content is supplied by the caller via the default slot
+    and centred in the rectangular part above the bottom W-notch.  */
 
 interface Props {
     class?: string
 }
 const { class: className } = Astro.props
 
-/*  GitHub release page for the current version (tags are unprefixed, e.g. "0.9.23")  */
-const releaseUrl = `${site.repo}/releases/tag/${pkg.version}`
-
 /*  flag geometry (SVG user units): a wide (landscape) banner with a shallow,
-    double-V ("W") cut into its wide bottom edge, so the version reads straight.  */
+    double-V ("W") cut into its wide bottom edge, so the overlay reads straight.  */
 const W       = 132  /*  overall width                     */
-const H       = 200  /*  overall height                    */
+const H       = 220  /*  overall height                    */
 const notch   = 8    /*  depth of the two bottom V-notches */
 const peak    = 16   /*  height of the centre "W" peak     */
 
@@ -44,7 +37,7 @@ const path = [
     "Z"
 ].join(" ")
 ---
-<div class={`version-flag pointer-events-none select-none ${className ?? ""}`}>
+<div class={`flag pointer-events-none select-none ${className ?? ""}`}>
     {/* inner positioning context: holds the flag SVG and the HTML overlay.
         Keeping `relative` here (not on the outer wrapper) lets the caller
         position the outer element freely (e.g. `absolute`) without conflict. */}
@@ -60,13 +53,13 @@ const path = [
         >
             <defs>
                 {/* vertical blue gradient for the flag body */}
-                <linearGradient id="version-flag-fill" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="flag-fill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%"   stop-color="var(--brand-600)" />
                     <stop offset="100%" stop-color="var(--brand-800)" />
                 </linearGradient>
 
                 {/* soft drop shadow so the flag reads as "hanging" over the hero */}
-                <filter id="version-flag-shadow" x="-40%" y="-20%" width="180%" height="160%">
+                <filter id="flag-shadow" x="-40%" y="-20%" width="180%" height="160%">
                     <feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000000" flood-opacity="0.35" />
                 </filter>
             </defs>
@@ -74,41 +67,36 @@ const path = [
             {/* flag body */}
             <path
                 d={path}
-                fill="url(#version-flag-fill)"
+                fill="url(#flag-fill)"
                 stroke="var(--brand-300)"
                 stroke-width="0"
                 stroke-linejoin="round"
-                filter="url(#version-flag-shadow)"
+                filter="url(#flag-shadow)"
             />
         </svg>
 
-        {/* version number as regular HTML text, overlaid on the flag body and
-            centred in the rectangular part above the bottom W-notch. The whole
-            label links to the GitHub release for this version; pointer events
-            are re-enabled here (the outer wrapper disables them). */}
-        <a
-            href={releaseUrl}
-            aria-label={`Current release ${pkg.version} on GitHub`}
-            class="version-flag-label pointer-events-auto absolute inset-x-0 text-center leading-[1.1] text-brand-400 no-underline transition-colors hover:text-white"
+        {/* overlay content, supplied by the caller via the default slot and
+            centred in the rectangular part above the bottom W-notch. Pointer
+            events are re-enabled here (the outer wrapper disables them). */}
+        <div
+            class="flag-label pointer-events-auto absolute inset-x-0 text-center leading-[1.1] text-brand-400"
             style={`bottom: ${(notch + peak) + 8}px; font-size: 20px;`}>
-            Current<br/>
-            Release:<br/>
-            <b class="text-lg text-white">{pkg.version}</b>
-        </a>
+            <slot />
+        </div>
     </div>
 </div>
 
 <style>
     /*  gentle, physical "hanging" sway, pivoting from the top edge.  */
-    .version-flag {
+    .flag {
         transform-origin: top center;
-        animation: version-flag-sway 5s ease-in-out infinite;
+        animation: flag-sway 5s ease-in-out infinite;
     }
-    @keyframes version-flag-sway {
+    @keyframes flag-sway {
         0%, 100% { transform: rotate(-2.0deg); }
         50%      { transform: rotate(2.0deg); }
     }
     @media (prefers-reduced-motion: reduce) {
-        .version-flag { animation: none; }
+        .flag { animation: none; }
     }
 </style>
