@@ -12,6 +12,19 @@
 import SectionGlow from "./Section-Glow.astro"
 import LogoGitHub  from "./Logo-GitHub.astro"
 import LogoRSE     from "./Logo-RSE.astro"
+
+const contributors = [
+    "Lars Artmann",
+    "Matthias Brusdeylins",
+    "Jochen Hörtreiter",
+    "Michael Kagel",
+    "Christian Reiber",
+    "Zoltan Rutzman",
+    "Michael Schäfer",
+    "Markus Schnappinger",
+    "Jan Tutas",
+    "Linda Zeman",
+]
 ---
 <section id="author" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="right"/>
@@ -20,25 +33,25 @@ import LogoRSE     from "./Logo-RSE.astro"
         <h2 class="text-3xl font-bold sm:text-4xl">
             About the <span class="text-accent">Author</span>
         </h2>
+        <p class="mt-4 text-left text-foreground-secondary">
+            <b>ASE</b> is primarily authored by
+            <b>Dr. Ralf S. Engelschall</b> (abbreviated
+            <b>RSE</b> and stilized <LogoRSE class="inline-block h-[1em] w-auto align-[-0.15em]"/>),
+            a 53-year old german <i>Computer Scientist</i>, <i>Executive Manager</i>, <i>Solution Architect</i> and <i>Software Artist</i>.
+        </p>
     </header>
 
     <div class="mt-12 flex w-full flex-col items-center gap-8 sm:flex-row sm:items-start" data-reveal>
-        <div class="w-full min-w-0 sm:flex-1 sm:basis-1/2">
+        <div class="w-full min-w-0 sm:basis-2/8 sm:shrink-0 sm:grow-0">
             <a href="https://github.com/rse" class="block overflow-hidden rounded-xl ring-1 ring-border-strong transition hover:ring-accent">
                 <img src="/assets/rse-portrait.png" alt="Dr. Ralf S. Engelschall" class="aspect-[10/9] w-full object-cover" />
             </a>
             <a href="https://github.com/rse" class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg border border-border-strong px-3 py-2 font-semibold text-foreground transition-colors hover:border-accent hover:text-accent">
                 <LogoGitHub class="h-5 w-5" />
-                <b>Dr. Ralf S. Engelschall</b> on GitHub
+                <b>Dr. Ralf S. Engelschall</b>
             </a>
         </div>
-        <div class="w-full min-w-0 sm:flex-1 sm:basis-1/2">
-            <p class="text-left text-foreground-secondary">
-                <b>ASE</b> is primarily authored by
-                <b>Dr. Ralf S. Engelschall</b> (abbreviated
-                <b>RSE</b> and stilized <LogoRSE class="inline-block h-[1em] w-auto align-[-0.15em]"/>),
-                a 53-year old german <i>Computer Scientist</i>, <i>Executive Manager</i>, <i>Solution Architect</i> and <i>Software Artist</i>.
-            </p>
+        <div class="w-full min-w-0 sm:basis-6/8">
             <p class="mt-1 text-left text-foreground-secondary [text-indent:2em]">
                 <b>RSE</b> is <b>CTO msg group</b> and <b>Director msg Research</b> at <i>msg</i>
                 &mdash; a Software Engineering company group with more than 11,000 people &mdash;,
@@ -78,6 +91,30 @@ import LogoRSE     from "./Logo-RSE.astro"
                 and read many of his (german) articles on
                 <a href="https://www.linkedin.com/in/engelschall" target="_blank">LinkedIn</a>.
             </p>
+        </div>
+    </div>
+</section>
+
+<section id="contributors" class="relative isolate mx-auto max-w-4xl px-6 py-8 mb-24">
+    <SectionGlow variant="section" side="left" />
+    <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            Thanks to the <span class="text-accent">Contributors</span>
+        </h2>
+        <p class="mt-4 text-left text-foreground-secondary">
+            The <b>ASE</b> project received support from the following
+            individual contributors, coming from both the industrial
+            <b>Software Engineering</b> and <b>Open Source Software</b>
+            contexts. <b>Many thanks to them for their valuable feedback
+            and support!</b>
+        </p>
+    </header>
+
+    <div class="mt-12 w-full" data-reveal>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {contributors.map((name) => (
+                <div class="overflow-hidden rounded-xl border border-border-strong p-1 text-center text-accent">{name}</div>
+            ))}
         </div>
     </div>
 </section>
