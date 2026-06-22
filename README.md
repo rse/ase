@@ -1,8 +1,5 @@
 
-<img src="https://raw.githubusercontent.com/rse/ase/master/docs/ase-logo.svg" width="250" align="right" alt=""/>
-
-Agentic Software Engineering
-============================
+[![ASE](docs/ase-banner.png)](https://ase.tools)
 
 https://ase.tools
 
