@@ -23,8 +23,15 @@ Artifact Meta Information
 
     -   `Tasks` (`TASK`), aka "Task Plans", "Issues", or "User Stories".
 
+    -   `Infrastructure` (`INFR`), aka "Infrastructure as Code (IaC)",
+        "Deployment", or "Operations".
+
+    -   `Other` (`OTHR`), the implicit catch-all for any artifacts not
+        covered by the other **Artifact Set**s.
+
     Each **Artifact Set** has a unique identifier <artifact-set-id/>,
-    which is one of `SPEC`, `ARCH`, `CODE`, `DOCS`, or `TASK`.
+    which is one of `SPEC`, `ARCH`, `CODE`, `DOCS`, `TASK`, `INFR`, or
+    `OTHR`.
 
 -   **Artifact**:
 
