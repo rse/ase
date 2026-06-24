@@ -348,7 +348,7 @@ export default class HookCommand {
         /*  attach the deterministic banner as a top-level "systemMessage"
             (only for the harnesses that support it and only when not
             running headless -- mirroring the constitution box condition)  */
-        if (tool !== "copilot" && headless !== "true")
+        if ((tool === "claude" || tool === "codex") && headless !== "true")
             (payload as Record<string, unknown>).systemMessage = banner
 
         await this.writeStdout(JSON.stringify(payload))
