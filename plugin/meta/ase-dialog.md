@@ -75,6 +75,10 @@ Let the *user interactively choose* an answer.
 
         3.  Check the tool result and dispatch accordingly:
 
+            -   If <result/> already starts with `ERROR:` (set by the
+                guard in step 2.1 above), keep <result/> unchanged and
+                *SKIP* all remaining dispatch in this step.
+
             -   If the tool result contains `user doesn't want to proceed`,
                 `tool use was rejected`, or `user declined to answer
                 questions`, or the result clearly indicates that the
@@ -123,6 +127,10 @@ Let the *user interactively choose* an answer.
             })`
 
         3.  Check the tool result and dispatch accordingly:
+
+            -   If <result/> already starts with `ERROR:` (set by the
+                guard in step 2.1 above), keep <result/> unchanged and
+                *SKIP* all remaining dispatch in this step.
 
             -   If the tool result contains `User skipped question`
                 or the result clearly indicates that the
@@ -261,6 +269,10 @@ following procedure:
 
     3.  Do not output anything in this step!
         Check the <result/> and dispatch accordingly:
+
+        0.  If <result/> already starts with `ERROR:` (set by the
+            guard in step 2.1 above), keep <result/> unchanged and
+            *SKIP* all remaining sub-steps 3.1-3.3 of this dispatch.
 
         1.  If <result/> is `cancel`, `CANCEL`, `reject`, `REJECT`, or
             otherwise indicates that the user doesn't want to proceed,
