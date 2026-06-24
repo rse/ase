@@ -5,9 +5,8 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-import { site }    from "../data/site.ts"
 import SectionGlow from "./Section-Glow.astro"
-import Diagram     from "./Diagram.astro"
+import Terminal    from "./Terminal.astro"
 ---
 <section id="workflows" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <header class="mx-auto max-w-2xl text-center" data-reveal>
@@ -42,20 +41,13 @@ import Diagram     from "./Diagram.astro"
                     detail decisions. Use for simple tasks only.
                 </p>
             </div>
-            <div class="lg:order-2 relative isolate overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono text-foreground transition-colors hover:border-accent">
-                <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 text-sm">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-                    <span class="ml-2 font-sans text-foreground-secondary">Claude Code</span>
-                </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Create "hello" CLI command which prints "Hello World" in red to the terminal
-                    </div>
-                </div>
-            </div>
+            <Terminal
+                class="lg:order-2 relative isolate"
+                prefix="Claude Code"
+                commands={[
+                    "Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal"
+                ]}
+            />
         </div>
 
         <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -74,36 +66,16 @@ import Diagram     from "./Diagram.astro"
             </div>
             <div class="lg:order-2 relative isolate">
                 <SectionGlow variant="text" side="right"/>
-                <div class="overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono text-foreground transition-colors hover:border-accent">
-                <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 text-sm">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-                    <span class="ml-2 font-sans text-foreground-secondary">Claude Code</span>
-                </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">/plan</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Create "hello" CLI command which prints "Hello World" in red to the terminal
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        (3) Change output color to blue
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        (3) Use NPM package "chalk" for coloring
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">(1) (Yes, and use auto mode)</span>
-                    </div>
-                </div>
-                </div>
+                <Terminal
+                    prefix="Claude Code"
+                    commands={[
+                        "**/plan**",
+                        "Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
+                        "(3) Change output color to blue",
+                        "(3) Use NPM package \"chalk\" for coloring",
+                        "**(1) (Yes, and use auto mode)**"
+                    ]}
+                />
             </div>
         </div>
 
@@ -122,38 +94,17 @@ import Diagram     from "./Diagram.astro"
                     planning.
                 </p>
             </div>
-            <div class="lg:order-2 relative isolate overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono text-foreground transition-colors hover:border-accent">
-                <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 text-sm">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-                    <span class="ml-2 font-sans text-foreground-secondary">Claude Code</span>
-                </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span><span class="text-accent!">/ase-task-edit</span>
-                        Create "hello" CLI command which prints "Hello World" in red to the terminal
-                        </span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Change output color to blue
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Use NPM package "chalk" for coloring
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">IMPLEMENT</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">DELETE</span>
-                    </div>
-                </div>
-            </div>
+            <Terminal
+                class="lg:order-2 relative isolate"
+                prefix="Claude Code"
+                commands={[
+                    "**/ase-task-edit** Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
+                    "Change output color to blue",
+                    "Use NPM package \"chalk\" for coloring",
+                    "**IMPLEMENT**",
+                    "**DELETE**"
+                ]}
+            />
         </div>
 
         <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -171,46 +122,18 @@ import Diagram     from "./Diagram.astro"
             </div>
             <div class="lg:order-2 relative isolate">
                 <SectionGlow variant="text" side="right"/>
-                <div class="overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono text-foreground transition-colors hover:border-accent">
-                <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 text-sm">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-                    <span class="ml-2 font-sans text-foreground-secondary">Claude Code</span>
-                </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span><span class="text-accent!">/ase-task-edit</span>
-                        Create "hello" CLI command which prints "Hello World" in red to the terminal
-                        </span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Change output color to blue
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Use NPM package "chalk" for coloring
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">GRILL</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">PREFLIGHT</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">IMPLEMENT</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">DELETE</span>
-                    </div>
-                </div>
-                </div>
+                <Terminal
+                    prefix="Claude Code"
+                    commands={[
+                        "**/ase-task-edit** Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
+                        "Change output color to blue",
+                        "Use NPM package \"chalk\" for coloring",
+                        "**GRILL**",
+                        "**PREFLIGHT**",
+                        "**IMPLEMENT**",
+                        "**DELETE**"
+                    ]}
+                />
             </div>
         </div>
 
@@ -229,50 +152,20 @@ import Diagram     from "./Diagram.astro"
                     planning where the solution approach is not obvious.
                 </p>
             </div>
-            <div class="lg:order-2 relative isolate overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono text-foreground transition-colors hover:border-accent">
-                <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 text-sm">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-                    <span class="ml-2 font-sans text-foreground-secondary">Claude Code</span>
-                </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span><span class="text-accent!">/ase-code-craft</span>
-                        Create "hello" CLI command which prints "Hello World" in red to the terminal
-                        </span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">A1</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Change output color to blue
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        Use NPM package "chalk" for coloring
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">GRILL</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">PREFLIGHT</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">IMPLEMENT</span>
-                    </div>
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span class="text-accent">DELETE</span>
-                    </div>
-                </div>
-            </div>
+            <Terminal
+                class="lg:order-2 relative isolate"
+                prefix="Claude Code"
+                commands={[
+                    "**/ase-code-craft** Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
+                    "**A1**",
+                    "Change output color to blue",
+                    "Use NPM package \"chalk\" for coloring",
+                    "**GRILL**",
+                    "**PREFLIGHT**",
+                    "**IMPLEMENT**",
+                    "**DELETE**"
+                ]}
+            />
         </div>
 
         <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -293,22 +186,12 @@ import Diagram     from "./Diagram.astro"
             </div>
             <div class="lg:order-2 relative isolate">
                 <SectionGlow variant="text" side="right"/>
-                <div class="overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono text-foreground transition-colors hover:border-accent">
-                <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 text-sm">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-                    <span class="ml-2 font-sans text-foreground-secondary">Claude Code</span>
-                </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span><span class="text-accent!">/ase-code-craft</span>
-                        --quick Create "hello" CLI command which prints "Hello World" in red to the terminal
-                        </span>
-                    </div>
-                </div>
-                </div>
+                <Terminal
+                    prefix="Claude Code"
+                    commands={[
+                        "**/ase-code-craft** --quick Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal"
+                    ]}
+                />
             </div>
         </div>
 
@@ -328,22 +211,13 @@ import Diagram     from "./Diagram.astro"
                     drive the development.
                 </p>
             </div>
-            <div class="lg:order-2 relative isolate overflow-hidden rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono text-foreground transition-colors hover:border-accent">
-                <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 text-sm">
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-                    <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-                    <span class="ml-2 font-sans text-foreground-secondary">Claude Code</span>
-                </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-baseline tracking-[-0.03em]">
-                        <span class="select-none text-accent mr-2">❯ </span>
-                        <span><span class="text-accent!">/ase-sync-reconcile</span>
-                        --source SPEC,ARC --target CODE,DOCS
-                        </span>
-                    </div>
-                </div>
-            </div>
+            <Terminal
+                class="lg:order-2 relative isolate"
+                prefix="Claude Code"
+                commands={[
+                    "**/ase-sync-reconcile** --source SPEC,ARC --target CODE,DOCS"
+                ]}
+            />
         </div>
     </div>
 </section>

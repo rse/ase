@@ -43,10 +43,11 @@ import Terminal    from "./Terminal.astro"
     <div data-reveal>
         <Terminal
             class="mx-auto mt-8 max-w-2xl"
+            copy={true}
             title="Installation"
             commands={[
                 "npm install -g @rse/ase",
-                "ase setup install [--tool claude|copilot|codex]"
+                "ase setup install **[**--tool claude**|**copilot**|**codex**]**"
             ]}
         />
     </div>
@@ -54,9 +55,10 @@ import Terminal    from "./Terminal.astro"
     <div data-reveal>
         <Terminal
             class="mx-auto mt-8 max-w-2xl"
+            copy={true}
             title="Updating"
             commands={[
-                "ase setup update [--tool claude|copilot|codex]"
+                "ase setup update **[**--tool claude**|**copilot**|**codex**]**"
             ]}
         />
     </div>
@@ -64,9 +66,10 @@ import Terminal    from "./Terminal.astro"
     <div data-reveal>
         <Terminal
             class="mx-auto mt-8 max-w-2xl"
+            copy={true}
             title="Uninstallation"
             commands={[
-                "ase setup uninstall [--tool claude|copilot|codex]"
+                "ase setup uninstall **[**--tool claude**|**copilot**|**codex**]**"
             ]}
         />
     </div>
@@ -103,11 +106,12 @@ import Terminal    from "./Terminal.astro"
     <div data-reveal>
         <Terminal
             class="mx-auto mt-8 max-w-2xl"
+            copy={true}
             title="MCP Installation"
             commands={[
                 "ase setup mcp list",
-                "export ASE_MCP_KEY_<service>=\"<token>\"",
-                "ase setup mcp activate [--tool claude|copilot|codex]"
+                "export ASE_MCP_KEY_**<service>**=\"**<token>**\"",
+                "ase setup mcp activate **[**--tool claude**|**copilot**|**codex**]**"
             ]}
         />
     </div>
@@ -115,9 +119,10 @@ import Terminal    from "./Terminal.astro"
     <div data-reveal>
         <Terminal
             class="mx-auto mt-8 max-w-2xl"
+            copy={true}
             title="MCP Uninstallation"
             commands={[
-                "ase setup mcp deactivate [--tool claude|copilot|codex]"
+                "ase setup mcp deactivate **[**--tool claude**|**copilot**|**codex**]**"
             ]}
         />
     </div>

@@ -34,14 +34,16 @@ const src    = `${mediaBase}/${name}.mp4`
             src={poster}
             alt={`Demo: ${label}`}
             loading="lazy"
-            class="block aspect-[1200/700] w-full rounded-t-xl border-x border-t border-border bg-background-secondary object-cover object-top"
+            class="block aspect-[1200/1000] w-full rounded-t-xl border-x border-t border-border bg-background-secondary object-cover object-top"
         />
+
         {/* centered play-button overlay (no dimming tint over the poster). */}
         <span class="pointer-events-none absolute inset-0 grid place-items-center">
             <span class="grid h-16 w-16 place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_60%,black)] text-2xl font-bold text-white shadow-lg backdrop-blur transition-colors group-hover:bg-[color-mix(in_oklch,var(--accent)_80%,black)]">
                 ▶
             </span>
         </span>
+
         {/* wave-style bottom edge: an SVG ribbon, colour-matched to the page
             background, sits over the lower rim of the poster so the video
             appears to be torn/clipped off and to continue beyond the frame. */}

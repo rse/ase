@@ -16,44 +16,51 @@
 
 interface Props {
     commands: string[]
+    prefix?:  string
     title?:   string
+    copy?:    boolean
     class?:   string
 }
 
-const { commands, title = "Terminal", class: className = "" } = Astro.props
+const { commands, prefix = "Terminal", title = "", copy = false, class: className = "" } = Astro.props
 
-/*  split a command into runs, flagging the shell-ish meta characters [ ] | and
-    any <...> placeholder strings so they can be tinted in the accent colour
-    while the rest stays plain. Keeping the original string for `data-copy`
-    ensures the copied text is unchanged.  */
+/*  split a command into runs, flagging any **...** span so it can be tinted in
+    the accent colour while the rest stays plain. This lets callers explicitly
+    highlight arbitrary parts of a command.  */
 const tokenize = (cmd: string) =>
-    cmd.split(/(<[^>]*>|[[\]|])/).filter((part) => part !== "").map((part) => ({
-        text:  part,
-        meta:  part === "[" || part === "]" || part === "|" || /^<[^>]*>$/.test(part)
+    cmd.split(/(\*\*[^*]*\*\*)/).filter((part) => part !== "").map((part) => ({
+        text: /^\*\*[^*]*\*\*$/.test(part) ? part.slice(2, -2) : part,
+        meta: /^\*\*[^*]*\*\*$/.test(part)
     }))
+
+/*  the raw command without the **...** highlight markers, so the copied text
+    stays unchanged.  */
+const plain = (cmd: string) => cmd.replace(/\*\*([^*]*)\*\*/g, "$1")
 ---
 <div class={className}>
-    <div class="overflow-hidden rounded-xl border border-border-strong bg-background-elevated/60 text-sm leading-relaxed shadow-xl sm:text-base">
+    <div class="overflow-hidden rounded-xl border border-border-strong bg-background-elevated/60 text-[0.7875rem] leading-snug shadow-xl sm:text-[0.9rem]">
         <div class="flex items-center gap-2 border-b border-border/60 px-4 py-1 bg-accent/10">
             <span class="h-3 w-3 rounded-full bg-[var(--brand-400)]"></span>
             <span class="h-3 w-3 rounded-full bg-[var(--brand-500)]"></span>
             <span class="h-3 w-3 rounded-full bg-[var(--brand-600)]"></span>
-            <span class="ml-2 text-foreground">Terminal:</span>
-            <span class="text-accent">{title}</span>
+            <span class="ml-2 text-foreground">{prefix}{title && ":"}</span>
+            {title && <span class="text-accent">{title}</span>}
         </div>
-        <div class="flex flex-col gap-1 px-4 py-4">
+        <div class="flex flex-col gap-0 px-4 py-2">
             {commands.map((cmd) => (
-                <div class="group flex items-center gap-3 font-mono">
+                <div class="group flex items-start gap-3 font-mono tracking-[-0.03em]">
                     <span class="select-none text-accent">❯</span>
                     <code class="code-plain flex-1 text-foreground">{tokenize(cmd).map((t) => (
                         t.meta ? <span class="text-accent">{t.text}</span> : t.text
                     ))}</code>
-                    <button
-                        type="button"
-                        class="copy-cmd shrink-0 rounded-md border border-border px-2 py-1 text-xs text-foreground-muted transition hover:border-border-strong hover:text-foreground"
-                        data-copy={cmd}
-                        aria-label="Copy command"
-                    >Copy</button>
+                    {copy && (
+                        <button
+                            type="button"
+                            class="copy-cmd shrink-0 rounded-md border border-border px-2 py-1 text-xs text-foreground-muted transition hover:border-border-strong hover:text-foreground"
+                            data-copy={plain(cmd)}
+                            aria-label="Copy command"
+                        >Copy</button>
+                    )}
                 </div>
             ))}
         </div>
