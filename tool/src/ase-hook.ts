@@ -327,7 +327,7 @@ export default class HookCommand {
             Claude Code and OpenAI Codex CLI surface a top-level
             "systemMessage" field for this -- Copilot CLI has no equivalent)  */
         const banner =
-            `\n⧉ ASE: ⎈ version: **${versionCurrentPlugin}**${versionHint !== "" ? " " + versionHint : ""}` +
+            `\n⧉ ASE: ⎈ version: ${versionCurrentPlugin}${versionHint !== "" ? " " + versionHint.replaceAll(/\*/g, "") : ""}` +
             `\n⧉ ASE: ※ user: ${userId}, ⚑ project: ${projectId}` +
             `\n⧉ ASE: ◉ task: ${taskId}, ⏻ session: ${sessionId}` +
             `\n⧉ ASE: ☯ persona: ${persona}`
