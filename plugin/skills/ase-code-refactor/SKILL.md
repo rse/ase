@@ -39,6 +39,7 @@ to `true`, <getopt-option-dry/> to `true`, and <getopt-option-next/> to
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 
 Procedure
 ---------

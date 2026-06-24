@@ -39,6 +39,7 @@ From scratch *craft* the following feature:
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 
 Procedure
 ---------

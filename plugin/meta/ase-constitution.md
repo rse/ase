@@ -64,7 +64,5 @@ Commandments
   primary programming language* (e.g., TypeScript for TS/JS projects,
   Python for Python projects, Go for Go projects).
 
-@./ase-tenets.md
-
 @./ase-persona.md
 

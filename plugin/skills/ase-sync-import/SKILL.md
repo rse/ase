@@ -38,6 +38,7 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-spec.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-arch.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 
 Procedure
 ---------
