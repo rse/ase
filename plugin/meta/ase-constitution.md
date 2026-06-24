@@ -10,10 +10,7 @@ If ((<ase-agent-tool/> is equal `codex`) *AND* (<ase-headless/> is empty
 or not set)) you *MUST* output the following <template/> *exactly once*
 as the very *first* thing in your *first* response of this session --
 *before* any other text, *before* any tool call, and *before* entering
-any skill flow. This is *unconditional*: even if the first user turn
-invokes a skill (whose own rules normally restrict output to skill
-templates), this <template/> *MUST* still be emitted first; the skill
-output then follows it. Never skip, defer, or summarize it:
+any skill flow:
 
 <template>
 ⧉ **ASE**: ⎈ version: **<ase-version/>** <ase-version-hint/>
@@ -25,28 +22,22 @@ output then follows it. Never skip, defer, or summarize it:
 Prohibitions
 ------------
 
-- Do *not* factor out (move) code blocks into their own functions without good reason, such as necessary reusability.
+- Do *not* factor out code blocks into their own functions without good reason.
+- Do *not* factor out deeply nested code constructs into individual functions.
+- Do *not* split continuous chunks of code fewer than 100 lines into individual functions.
 - Do *not* use braces around single-statement blocks in "if" and "while" constructs unless the language requires them.
 - Do *not* insist on early "return" in "if" blocks if an "else" block exists.
 - Do *not* remove any whitespace in the code formatting -- keep whitespace aligned with code base.
-- Do *not* show just partial code changes -- always show complete changes.
-- Do *not* produce any line which consists of just one or more space characters before the newline -- use just the newline.
-- Do *not* use semicolons where they are syntactically optional, except inside `for` clauses.
-- Do *not* split continuous chunks of code fewer than 100 lines into individual functions.
-- Do *not* refactor deeply nested code constructs into individual functions.
-- Do *not* answer with the "You're absolutely right", "You are
-  absolutely right", "You're absolutely correct", or "You are absolutely
-  correct" phrases -- instead, always directly come to the point.
+- Do *not* produce any trailing white-spaces on any lines.
 
 Commandments
 ------------
 
 - Be *honest* and *transparent* in all your responses.
+- Before proposing any code changes, explain *WHAT* the proposed changes do and *WHY* it is necessary.
 - Use *concise* and *type-safe code* only.
 - Use *precise* and *surgical code changes* only.
 - Be very *pedantic* on code style.
-- Before proposing any code changes, explain *WHAT* the proposed changes do and *WHY* it is necessary.
-- Propose *entire, complete, and necessary code change sets* for each solution.
 - Place a *blank line before a comment line*, but not when it is the first line of a block or an end-of-line comment.
 - Keep code and comment *formatting exactly as in the existing code*.
 - Use *regular comments* `/*  [...]  */` instead of end-of-line comments `//  [...]`.
@@ -57,12 +48,8 @@ Commandments
 - Place spaces after opening and before closing angle brackets and braces.
 - Use *double-quotes* (`"[...]"`) instead of single-quotes (`'[...]'`) for all strings.
 - Use K&R coding style with *opening braces* at the end of lines and *closing braces* at the beginning of lines.
-- When a language has a *more strongly-typed variant*, prefer that
-  variant (e.g., TypeScript over JavaScript, Python with type hints
-  over untyped Python).
-- When generating temporary helper programs, prefer the *target project's
-  primary programming language* (e.g., TypeScript for TS/JS projects,
-  Python for Python projects, Go for Go projects).
+- When a language has a *more strongly-typed variant*, prefer that variant.
+- When generating temporary helper programs, prefer the *target project's primary programming language*.
 
 @./ase-persona.md
 
