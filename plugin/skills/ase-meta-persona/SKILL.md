@@ -65,8 +65,14 @@ style and token usage intensity.
 
     3.  Set <ase-persona-style><request/></ase-persona-style> and
         call the `ase_persona(style: "<ase-persona-style/>", session:
-        "<ase-session-id/>")` tool from the `ase` MCP server. Do not
-        output anything.
+        "<ase-session-id/>")` tool from the `ase` MCP server.
+
+        Then you *MUST* re-evaluate and internalize the conditional
+        rules provided under `Persona Communication Style` in the
+        constitution in order to immediately honor the changed
+        communication style in all following outputs!
+
+        Do not output anything.
 
     4.  Output the following <template/>:
 
