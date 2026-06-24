@@ -66,5 +66,5 @@ Commandments
 
 @./ase-tenets.md
 
-@./ase-control.md
 @./ase-persona.md
+
