@@ -662,7 +662,7 @@ manages, defining how information is organized and connected.
 
          -   `Attribute`     (`**<spec-dm-attribute-id/>**`)
          -   `Type`          (`<spec-dm-attribute-qualifier/><spec-dm-attribute-type/>`)
-         -   `Description`   (`<spec-dm-relation-description/>, **BECAUSE** <spec-dm-relation-rationale/>.`)
+         -   `Description`   (`<spec-dm-attribute-description/>, **BECAUSE** <spec-dm-attribute-rationale/>.`)
 
     -    <export-table-2/> is a Markdown table for the relation with one
          row per <spec-dm-relation-id/>, sorted by <spec-dm-relation-id/> --
