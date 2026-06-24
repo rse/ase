@@ -2,6 +2,19 @@
 ChangeLog
 =========
 
+0.9.26 (2026-06-24)
+-------------------
+
+- FEATURE: add deterministic session-start banner via `systemMessage` (`ase-hook.ts`, `ase-constitution.md`)
+- IMPROVEMENT: build out website Workflows section and apply terminal-styled boxes (`pages/` Astro components)
+- IMPROVEMENT: rewrite Persona ruleset without control structures and force re-evaluation of persona rules (`ase-persona.md`, `ase-meta-persona` skill)
+- IMPROVEMENT: report when the persona did not change (`ase-meta-persona` skill)
+- IMPROVEMENT: load tenets on-demand from skills again to shrink the constitution (`ase-constitution.md`, `ase-tenets.md`, 5 `SKILL.md` files)
+- BUGFIX: fix waves rendering on Safari and improve Terminal/Hero/Author rendering (`pages/` Astro components)
+- BUGFIX: fix typo in author name (`Section-Author.astro`)
+- CLEANUP: reduce constitution size and avoid persona-conflicting style hints (`ase-constitution.md`)
+- CLEANUP: polish website texts, wording, and English (`pages/` Astro components)
+
 0.9.25 (2026-06-23)
 -------------------
 
