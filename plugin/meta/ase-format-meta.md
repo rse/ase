@@ -88,3 +88,9 @@ The exported file is stored *side-by-side* with the **Artifact** under
 the path:
 
 `<basedir/>/<artifact-set-id/>-<artifact-no/>-<artifact-id/>-<artifact-slug/>-<export-name/>.<export-ext/>`
+
+where <artifact-slug/> is the same slug used in the **Artifact**'s own
+file name -- derived from the **Artifact** name by Pascal-casing each
+word and joining the words with `-` characters (e.g. `Customer-Journey`)
+-- as defined by the **Artifact Set**'s own format definition (see
+`ase-format-spec.md` and `ase-format-arch.md`).
