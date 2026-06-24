@@ -56,12 +56,19 @@ style and token usage intensity.
         ⧉ **ASE**: **ERROR:** invalid persona: "<request/>" (expected `writer`, `engineer`, `telegrapher`, or `caveman`)
         </template>
 
-    2.  Set <ase-persona-style><request/></ase-persona-style> and
+    2.  If <request/> is equal <ase-persona-style/> report this with the
+        following <template/> and then *STOP* immediately:
+
+        <template>
+        ⧉ **ASE**: ☯ persona: **<ase-persona-style/>** (*unchanged*)
+        </template>
+
+    3.  Set <ase-persona-style><request/></ase-persona-style> and
         call the `ase_persona(style: "<ase-persona-style/>", session:
         "<ase-session-id/>")` tool from the `ase` MCP server. Do not
         output anything.
 
-    3.  Output the following <template/>:
+    4.  Output the following <template/>:
 
         <template>
         ⧉ **ASE**: ☯ persona: **<ase-persona-style/>** (*updated*)
