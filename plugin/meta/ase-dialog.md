@@ -219,11 +219,18 @@ following procedure:
             </else>
         </for>
 
-        <if condition="<opts/> contains `--other`">
-            Set <hint>Please choose *one* option by typing <keys/>/**CANCEL**, or other free-text instruction.</hint>.
+        <if condition="<keys/> is empty">
+            Set <keys>**CANCEL**</keys>.
         </if>
         <else>
-            Set <hint>Please choose *one* option by typing <keys/>/**CANCEL**.</hint>.
+            Set <keys><keys/>/**CANCEL**</keys>.
+        </else>
+
+        <if condition="<opts/> contains `--other`">
+            Set <hint>Please choose *one* option by typing <keys/>, or other free-text instruction.</hint>.
+        </if>
+        <else>
+            Set <hint>Please choose *one* option by typing <keys/>.</hint>.
         </else>
 
         Set:
