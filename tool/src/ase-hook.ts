@@ -321,6 +321,17 @@ export default class HookCommand {
         /*  expand all @<file> references manually  */
         md = this.expandReferences(md, path.dirname(fileMd))
 
+        /*  build the deterministic ASE banner (rendered directly by the
+            agent harness, independent of any model decision, so it is
+            guaranteed to appear once in every non-headless session;
+            Claude Code and OpenAI Codex CLI surface a top-level
+            "systemMessage" field for this -- Copilot CLI has no equivalent)  */
+        const banner =
+            `\n⧉ ASE: ⎈ version: **${versionCurrentPlugin}**${versionHint !== "" ? " " + versionHint : ""}` +
+            `\n⧉ ASE: ※ user: ${userId}, ⚑ project: ${projectId}` +
+            `\n⧉ ASE: ◉ task: ${taskId}, ⏻ session: ${sessionId}` +
+            `\n⧉ ASE: ☯ persona: ${persona}`
+
         /*  inject markdown into session context.
             Claude Code and OpenAI Codex CLI expect the context nested in
             "hookSpecificOutput"; Copilot CLI expects a flat top-level
@@ -333,6 +344,13 @@ export default class HookCommand {
         } : {
             "additionalContext": md
         }
+
+        /*  attach the deterministic banner as a top-level "systemMessage"
+            (only for the harnesses that support it and only when not
+            running headless -- mirroring the constitution box condition)  */
+        if (tool !== "copilot" && headless !== "true")
+            (payload as Record<string, unknown>).systemMessage = banner
+
         await this.writeStdout(JSON.stringify(payload))
         return 0
     }
