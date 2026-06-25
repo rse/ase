@@ -2,6 +2,22 @@
 ChangeLog
 =========
 
+0.9.27 (2026-06-26)
+-------------------
+
+- IMPROVEMENT: add Design Assumptions section and reorder highlights on website (`Section-Design.astro`, `highlights.ts`)
+- IMPROVEMENT: render skill manpages as HTML help modal instead of GitHub links (`Modal-Help.astro`, `Section-Usage.astro`, `skills.ts`)
+- IMPROVEMENT: improve Copilot dialog result mapping, no-key case, and start-over precision (`ase-dialog.md`)
+- IMPROVEMENT: align box drawing and be more precise (`ase-skill.md`)
+- IMPROVEMENT: provide default for invalid persona (`ase-persona.md`)
+- IMPROVEMENT: complete the kinds of artifacts (`ase-format-meta.md`)
+- BUGFIX: fix ERROR result falling through to label-mapping in all dialog branches (`ase-dialog.md`)
+- BUGFIX: explicitly define `<break/>` control construct (`ase-control.md`)
+- BUGFIX: omit empty relations in export and fix cross-references (`ase-format-spec.md`)
+- BUGFIX: fix name reference (`ase-tenets.md`)
+- CLEANUP: cleanup persona wording (`ase-persona.md`)
+- CLEANUP: define placeholders before use (`ase-format-meta.md`)
+
 0.9.26 (2026-06-24)
 -------------------
 
