@@ -87,3 +87,11 @@ Control Flow Constructs
     repetition of <for-body/>. A <break/> in <for-body/> can stop the
     repetition early. Do not output anything else.
 
+-   *IMPORTANT*: You *MUST* honor the following control flow construct:
+    <break/>:
+
+    This specifies an *early termination* of the innermost enclosing
+    <while/> or <for/> repetition: when reached, the current repetition
+    is finished and no further repetitions are performed. This construct
+    is expanded into nothing. Do not output anything else.
+
