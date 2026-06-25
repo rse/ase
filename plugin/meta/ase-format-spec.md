@@ -679,7 +679,7 @@ manages, defining how information is organized and connected.
     converted to SVG. For this, each <spec-dm-entity/> becomes
     a class whose members are the `<spec-dm-attribute-id/>:
     <spec-dm-attribute-qualifier/><spec-dm-attribute-type/>` attributes,
-    and each <spec-dm-relation/> becomes a directed association
+    and each <spec-dm-relation-id/> becomes a directed association
     labeled with its <spec-dm-relation-id/> and annotated with its
     <spec-dm-relation-cardinality/> at the target end.
 
