@@ -9,9 +9,9 @@
     rows (zig-zag), mirroring the highlights rows. Each text block has a brand
     glow behind it; each diagram opens the shared image modal on click.  */
 
-import { site }    from "../data/site.ts"
-import SectionGlow from "./Section-Glow.astro"
-import Diagram     from "./Diagram.astro"
+import SectionGlow     from "./Section-Glow.astro"
+import Diagram         from "./Diagram.astro"
+import { skillGroups } from "../data/skills.ts"
 ---
 <section id="usage" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <header class="mx-auto max-w-2xl text-center" data-reveal>
@@ -70,8 +70,8 @@ import Diagram     from "./Diagram.astro"
                     Each skill is named <b><code>/ase-xxx-xxx</code></b>
                     and most of those skills even have useful Unix-style options
                     for adjusting their behavior. Click on the skill name
-                    in the following table to see its Unix-style man-page
-                    or run <b><code>/ase-xxx-xxx --help</code></b> at run-time.
+                    in the following table to open its Unix-style man-page
+                    in an in-page popup or run <b><code>/ase-xxx-xxx --help</code></b> at run-time.
                 </p>
             </div>
             <Diagram class="lg:order-1" src="/assets/workflow.svg" label="ASE usage workflow diagram" />
@@ -81,70 +81,32 @@ import Diagram     from "./Diagram.astro"
             Funnel Mode / Other) as a 4-column grid, framed like the diagrams.  */}
         <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
             <div class="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-5">
-                <div>
-                    <p class="text-sm font-bold uppercase tracking-wider text-accent">Standalone<br/>Mode <span class="font-light">1/2</span></p>
-                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-persona/help.md`}><b class="text-accent">persona</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-why/help.md`}><b class="text-accent">why</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-evaluate/help.md`}><b class="text-accent">evaluate</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-diaboli/help.md`}><b class="text-accent">diaboli</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-steelman/help.md`}><b class="text-accent">steelman</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-quorum/help.md`}><b class="text-accent">quorum</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-chat/help.md`}><b class="text-accent">chat</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-search/help.md`}><b class="text-accent">search</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-brainstorm/help.md`}><b class="text-accent">brainstorm</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-compat/help.md`}><b class="text-accent">compat</b></a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-sm font-bold uppercase tracking-wider text-accent">Standalone<br/>Mode <span class="font-light">2/2</span></p>
-                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
-                        <li>ase-arch-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-arch-discover/help.md`}><b class="text-accent">discover</b></a></li>
-                        <li>ase-code-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-code-insight/help.md`}><b class="text-accent">insight</b></a></li>
-                        <li>ase-code-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-code-explain/help.md`}><b class="text-accent">explain</b></a></li>
-                        <li>ase-code-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-code-lint/help.md`}><b class="text-accent">lint</b></a></li>
-                        <li>ase-docs-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-docs-distill/help.md`}><b class="text-accent">distill</b></a></li>
-                        <li>ase-docs-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-docs-proofread/help.md`}><b class="text-accent">proofread</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-review/help.md`}><b class="text-accent">review</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-diff/help.md`}><b class="text-accent">diff</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-changelog/help.md`}><b class="text-accent">changelog</b></a></li>
-                        <li>ase-meta-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-meta-commit/help.md`}><b class="text-accent">commit</b></a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-sm font-bold uppercase tracking-wider text-accent">Task<br/>Mode</p>
-                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-id/help.md`}><b class="text-accent">id</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-edit/help.md`}><b class="text-accent">edit</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-grill/help.md`}><b class="text-accent">grill</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-reboot/help.md`}><b class="text-accent">reboot</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-preflight/help.md`}><b class="text-accent">preflight</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-implement/help.md`}><b class="text-accent">implement</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-view/help.md`}><b class="text-accent">view</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-list/help.md`}><b class="text-accent">list</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-rename/help.md`}><b class="text-accent">rename</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-condense/help.md`}><b class="text-accent">condense</b></a></li>
-                        <li>ase-task-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-task-delete/help.md`}><b class="text-accent">delete</b></a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-sm font-bold uppercase tracking-wider text-accent">Funnel<br/>Mode</p>
-                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
-                        <li>ase-arch-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-arch-analyze/help.md`}><b class="text-accent">analyze</b></a></li>
-                        <li>ase-code-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-code-analyze/help.md`}><b class="text-accent">analyze</b></a></li>
-                        <li>ase-code-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-code-craft/help.md`}><b class="text-accent">craft</b></a></li>
-                        <li>ase-code-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-code-refactor/help.md`}><b class="text-accent">refactor</b></a></li>
-                        <li>ase-code-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-code-resolve/help.md`}><b class="text-accent">resolve</b></a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-sm font-bold uppercase tracking-wider text-accent">Sync<br/>Mode</p>
-                    <ul class="mt-3 space-y-1 text-sm leading-none text-foreground-secondary">
-                        <li>ase-sync-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-sync-reconcile/help.md`}><b class="text-accent">reconcile</b></a></li>
-                        <li>ase-sync-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-sync-import/help.md`}><b class="text-accent">import</b></a></li>
-                        <li>ase-sync-<a class="text-foreground-secondary" href={`${site.repo}/blob/master/plugin/skills/ase-sync-export/help.md`}><b class="text-accent">export</b></a></li>
-                    </ul>
-                </div>
+                {skillGroups.map((group) => {
+                    /*  split a group label like "Standalone Mode 1/2" around
+                        " Mode" into the leading word and an optional trailing
+                        "1/2" fraction, so the header keeps its original
+                        two-line "<word><br/>Mode [fraction]" layout while the
+                        label text lives solely in the shared catalog.  */
+                    const [ word, fraction ] = group.label.split(" Mode")
+                    return (
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-wider text-accent">{word}<br/>Mode {fraction.trim() && <span class="font-light">{fraction.trim()}</span>}</p>
+                            <ul class="mt-3 space-y-1 text-[0.90625rem] leading-none text-foreground-secondary">
+                                {group.skills.map((id) => {
+                                    /*  split "ase-<area>-<name>" into the dim
+                                        "ase-<area>-" prefix and the accented
+                                        clickable "<name>" trigger.  */
+                                    const idx    = id.lastIndexOf("-")
+                                    const prefix = id.slice(0, idx + 1)
+                                    const name   = id.slice(idx + 1)
+                                    return (
+                                        <li>{prefix}<button type="button" class="cursor-grab text-accent transition-colors hover:text-white" data-help-id={id}><b>{name}</b></button></li>
+                                    )
+                                })}
+                            </ul>
+                        </div>
+                    )
+                })}
             </div>
         </div>
 

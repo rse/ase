@@ -40,11 +40,25 @@ const { id, label = "Dialog" } = Astro.props
 </div>
 
 {/* generic open/close chrome: close button + Escape hide the overlay and emit
-    a "modal:close" event the caller can listen for. */}
+    a "modal:close" event the caller can listen for. While the overlay is
+    visible, body scrolling is locked so the wheel can't scroll the page behind
+    it; the lock is released once it hides again. Callers open the overlay by
+    setting its display directly, so a MutationObserver watches that change and
+    toggles the lock for both open paths uniformly. */}
 <script is:inline define:vars={{ id }}>
     (function () {
         const modal = document.getElementById(id)
         if (!modal) return
+        const isOpen = function () {
+            return getComputedStyle(modal).display !== "none"
+        }
+        const lockScroll = function (lock) {
+            /*  the document scrolls on <html> (because `overflow-x: hidden`
+                on it makes the vertical axis compute to `auto`), so the lock
+                must target the document element, not just <body>.  */
+            document.documentElement.style.overflow = lock ? "hidden" : ""
+            document.body.style.overflow            = lock ? "hidden" : ""
+        }
         const close = function () {
         if (modal.style.display === "none" || getComputedStyle(modal).display === "none") return
         modal.style.display = "none"
@@ -54,7 +68,12 @@ const { id, label = "Dialog" } = Astro.props
             btn.addEventListener("click", close)
         })
         document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape" && getComputedStyle(modal).display !== "none") close()
+            if (e.key === "Escape" && isOpen()) close()
         })
+        /*  mirror the body scroll-lock to the overlay's visibility, regardless
+            of whether it was opened/closed via the shell or directly by a caller.  */
+        new MutationObserver(function () {
+            lockScroll(isOpen())
+        }).observe(modal, { attributes: true, attributeFilter: [ "style" ] })
     })()
 </script>

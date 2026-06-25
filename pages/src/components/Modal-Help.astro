@@ -1,0 +1,197 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+*/
+
+/*  full-viewport help modal: a build-time-assembled, scrollable man-page
+    browser for all ASE skills. The reusable Modal shell wraps a two-pane
+    layout — a sticky, grouped skill-index sidebar plus a scrollable rendered
+    pane. At build time we read every `plugin/skills/<skill>/help.md`, render
+    it to HTML via `marked`, and inline the result. Any element on the page
+    carrying `data-help-id` opens the modal and jumps to the matching skill;
+    the Modal shell handles the close button and Escape.  */
+
+import fs              from "node:fs"
+import path            from "node:path"
+import { marked }      from "marked"
+import Modal           from "./Modal.astro"
+import { skillGroups } from "../data/skills.ts"
+
+/*  locate the in-repo skills directory relative to the `pages/` project root
+    (`pages/etc/astro.config.mjs` runs from there), mirroring the `node:fs` +
+    `node:path` style already used by the Astro config.  */
+const skillsDir = path.resolve(process.cwd(), "..", "plugin", "skills")
+
+/*  assemble a map of skill-id -> { id, title, html } by reading and rendering
+    each skill's `help.md`. The content is trusted, build-time, in-repo
+    material, so it is rendered without an HTML sanitizer.  */
+interface HelpDoc {
+    id:    string
+    title: string
+    html:  string
+}
+
+const helpDocs: Record<string, HelpDoc> = {}
+for (const id of fs.readdirSync(skillsDir)) {
+    const file = path.join(skillsDir, id, "help.md")
+    if (!fs.existsSync(file)) continue
+    const md = fs.readFileSync(file, "utf8")
+
+    /*  derive the title from the `##  NAME` line of the form
+        "`<id>` - <Title>"; fall back to the bare skill id.  */
+    let title = id
+    const m = md.match(/^##\s+NAME\s*\n+`[^`]+`\s*-\s*(.+)$/m)
+    if (m) title = m[1].trim()
+
+    /*  rewrite the relative `SEE ALSO` cross-links ("../ase-<id>/help.md")
+        into in-modal `data-help-id` triggers, so they reuse the existing
+        click handler and jump within the open modal instead of pointing at
+        a non-existent off-site page.  */
+    const html = (marked.parse(md) as string).replace(
+        /href="\.\.\/([a-z0-9_-]+)\/help\.md"/g,
+        (_m, ref) => `data-help-id="${ref}"`
+    )
+
+    helpDocs[id] = { id, title, html }
+}
+
+/*  flatten the shared catalog into the rendered-pane order (groups, then the
+    skills within each group), skipping any id without a readable help.md.  */
+const orderedDocs: HelpDoc[] = []
+for (const group of skillGroups)
+    for (const id of group.skills)
+        if (helpDocs[id]) orderedDocs.push(helpDocs[id])
+---
+<Modal id="help-modal" label="Skill help">
+    <div class="grid h-[85vh] w-[94vw] max-w-6xl grid-cols-1 overflow-hidden rounded-lg border border-border-strong bg-background shadow-2xl sm:grid-cols-[16rem_1fr]">
+        {/* sticky grouped skill-index sidebar */}
+        <nav class="hidden self-start overflow-y-auto border-r border-border-strong bg-background-secondary p-4 sm:block sm:max-h-[85vh]" aria-label="Skill index">
+            {skillGroups.map((group) => (
+                <div class="mb-4">
+                    <p class="text-xs font-bold uppercase tracking-wider text-accent">{group.label}</p>
+                    <ul class="mt-2 space-y-0.5 text-sm leading-tight text-foreground-secondary">
+                        {group.skills.filter((id) => helpDocs[id]).map((id) => (
+                            <li>
+                                <button
+                                    type="button"
+                                    data-help-id={id}
+                                    class="block w-full cursor-grab text-left text-foreground-secondary transition-colors hover:text-white"
+                                >{id}</button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
+        </nav>
+
+        {/* scrollable man-page pane: every doc is assembled at build time but
+            only the currently selected one is shown (the rest carry `hidden`);
+            the open/click script toggles which `#help-<id>` article is visible. */}
+        <div id="help-modal-pane" class="max-h-[85vh] overflow-y-auto p-6 sm:p-8">
+            {orderedDocs.map((doc) => (
+                <article id={`help-${doc.id}`} class="help-md hidden" set:html={doc.html} />
+            ))}
+        </div>
+    </div>
+</Modal>
+
+{/* open on a trigger click and show only the chosen skill; the Modal shell
+    handles closing. Sidebar and `SEE ALSO` links switch the shown doc within
+    the already-open modal. */}
+<script is:inline>
+    (function () {
+        const helpModal = document.getElementById("help-modal")
+        const helpPane  = document.getElementById("help-modal-pane")
+        if (!helpModal || !helpPane) return
+        function select (id) {
+            const target = document.getElementById("help-" + id)
+            if (!target) return
+            /*  show only the selected article, hide all the others.  */
+            helpPane.querySelectorAll(".help-md").forEach(function (a) {
+                a.classList.toggle("hidden", a !== target)
+            })
+            /*  highlight the matching sidebar entry as active (white + bold).  */
+            helpModal.querySelectorAll("nav [data-help-id]").forEach(function (b) {
+                const active = b.getAttribute("data-help-id") === id
+                b.classList.toggle("text-white", active)
+                b.classList.toggle("font-bold", active)
+            })
+            /*  reset the pane to the top of the freshly shown man-page.  */
+            helpPane.scrollTop = 0
+        }
+        document.querySelectorAll("[data-help-id]").forEach(function (trigger) {
+            trigger.addEventListener("click", function () {
+                const id     = trigger.getAttribute("data-help-id") || ""
+                const inside = helpModal.contains(trigger)
+                if (!inside) helpModal.style.display = "grid"
+                select(id)
+            })
+        })
+    })()
+</script>
+
+<style is:global>
+    /*  styled man-page typography for the rendered help.md, aligned with the
+        theme tokens in `theme.css`/Tailwind so the Markdown reads as a clean,
+        framed man-page rather than raw text.  */
+    .help-md {
+        color: var(--foreground-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    .help-md h1,
+    .help-md h2,
+    .help-md h3 {
+        color: var(--foreground);
+        font-family: var(--font-display);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+    .help-md h1 { font-size: 1.5rem;  margin: 0 0 0.75rem; }
+    .help-md h2 { font-size: 1.15rem; margin: 1.5rem 0 0.5rem; color: var(--accent); }
+    .help-md h3 { font-size: 1.0rem;  margin: 1.0rem 0 0.4rem; }
+    .help-md p { margin: 0.5rem 0; }
+    .help-md a { color: var(--accent); }
+    .help-md a:hover { color: var(--accent-hover); }
+    /*  the rewritten `SEE ALSO` cross-links carry `data-help-id` instead of an
+        `href`, so give them the same grab cursor and white hover as the other
+        in-modal skill triggers.  */
+    .help-md a[data-help-id] {
+        cursor: grab;
+        transition: color 0.15s;
+    }
+    .help-md a[data-help-id]:hover,
+    .help-md a[data-help-id]:hover code { color: #fff; }
+    .help-md ul {
+        margin: 0.5rem 0;
+        padding-left: 1.25rem;
+        list-style: disc;
+    }
+    .help-md li { margin: 0.2rem 0; }
+    .help-md code {
+        border: 1px solid var(--border);
+        border-radius: 0.3rem;
+        background: var(--background-elevated);
+        color: var(--foreground);
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+        padding: 0.05em 0.35em;
+    }
+    .help-md pre {
+        margin: 0.75rem 0;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        background: var(--background-elevated);
+        overflow-x: auto;
+    }
+    .help-md pre code {
+        border: 0;
+        padding: 0;
+        background: transparent;
+    }
+</style>
+
