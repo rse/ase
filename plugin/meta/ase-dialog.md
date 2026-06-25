@@ -137,12 +137,18 @@ Let the *user interactively choose* an answer.
                 dialog was cancelled, rejected or skipped, set
                 <result>CANCEL</result>.
 
-            -   Otherwise, extract the selected answer from the tool result
-                set <result/> accordingly. If <result/> is of the
-                expected format `<label/>: <description/>`, set
-                <result><label/></result> (set result to label). Else,
-                if <result/> is NOT of the expected format `<label/>:
-                <description/>`, set <result>OTHER: <result/></result>
+            -   Otherwise, extract the selected answer from the tool
+                result and set <result/> accordingly. The harness may
+                return either the full `<label/>: <description/>` line or
+                just the bare `<label/>`. Determine the selected
+                <label/> by mapping the <result/> to one of the answer
+                labels parsed from <spec/> (lines 2 and following): if
+                <result/> is of the format `<label/>: <description/>`,
+                take its `<label/>` part; otherwise, if <result/> already
+                equals one of the answer labels, take it as-is. Set
+                <result><label/></result>. If <result/> is then NOT one
+                of the answer labels parsed from <spec/>, set
+                <result>OTHER: <result/></result>
                 (prefix result with "OTHER").
 
             Do not output anything in this step!
