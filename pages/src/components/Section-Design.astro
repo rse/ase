@@ -11,8 +11,60 @@
 import SectionGlow from "./Section-Glow.astro"
 ---
 <section id="design" class="relative isolate mx-auto max-w-4xl px-6 py-8">
-    <SectionGlow variant="section" side="right" />
+    <SectionGlow variant="section" side="left"/>
+
     <header class="mx-auto max-w-2xl text-center" data-reveal>
+        <h2 class="text-3xl font-bold sm:text-4xl">
+            <span class="text-accent">ASE</span> Design Assumptions
+        </h2>
+        <p class="mt-4 text-left text-foreground-secondary">
+            <b>ASE</b> is based on the following assumptions
+            which inherently drive whether <b>ASE</b> is for you or not:
+        </p>
+    </header>
+    <div class="mt-6 grid items-start gap-10 lg:grid-cols-2 lg:gap-16" data-reveal-children>
+        <ul class="flex flex-col gap-6 text-foreground-secondary">
+            <li>
+                <b class="text-accent uppercase">You are in the Driver's Seat</b>:<br/>
+                <b>ASE</b> assumes you want to still be in the driver's
+                seat, i.e., you decide and trigger the next operations
+                and you are reviewing the results. This means <b>ASE</b>
+                is neither about plain "vibe coding" nor driving fully
+                autonomous software engineering agents.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Thinking before Acting</b>:<br/>
+                <b>ASE</b> assumes you are an engineer, which means that
+                you prefer thinking long enough instead of immediately
+                acting to increase the overall result quality and
+                at least avoid unnecessary post-adjustments to your
+                results.
+            </li>
+        </ul>
+        </ul>
+        <ul class="flex flex-col gap-6 text-foreground-secondary">
+            <li>
+                <b class="text-accent uppercase">Flexible Operation Modes</b>:<br/>
+                <b>ASE</b> assumes your job as a Software Developer
+                and Software Architect inherently requires multiple
+                operation modes, ranging from ad-hoc LLM prompting,
+                over user-story based planning mode, over an approach
+                selecting funnel mode, up to an artifact reconciliation
+                mode. You are free to choose per task the mode which
+                fits best.
+            </li>
+            <li>
+                <b class="text-accent uppercase">Unix CLI-style Skills</b>:<br/>
+                <b>ASE</b> assumes you like the style of the Unix
+                command-line interface (CLI) and appreciate skills which
+                are intended to be explicitly called as commands and
+                which can be parametrized through Unix-style options.
+            </li>
+        </ul>
+    </div>
+
+    <SectionGlow variant="section" side="right"/>
+    <header class="mt-12 mx-auto max-w-2xl text-center" data-reveal>
         <h2 class="text-3xl font-bold sm:text-4xl">
             <span class="text-accent">ASE</span> Design Decisions
         </h2>
@@ -21,7 +73,7 @@ import SectionGlow from "./Section-Glow.astro"
             which inherently shaped the overall design of <b>ASE</b>:
         </p>
     </header>
-    <div class="mt-12 grid items-start gap-10 lg:grid-cols-2 lg:gap-16" data-reveal-children>
+    <div class="mt-6 grid items-start gap-10 lg:grid-cols-2 lg:gap-16" data-reveal-children>
         <ul class="flex flex-col gap-6 text-foreground-secondary">
             <li>
                 <b class="text-accent uppercase">Agent &amp; Plugin</b>:<br/>
@@ -38,12 +90,11 @@ import SectionGlow from "./Section-Glow.astro"
                 the Consulting, Operations or Management disciplines.
             </li>
             <li>
-                <b class="text-accent uppercase">Human in the Loop</b>:<br/>
-                <b>ASE</b> targets the scenario of a person performing
-                Software Engineering tasks who wants to be kept in
-                the driver's seat. In particular, <b>ASE</b> is not intended
-                for fully autonomous agent scenarios, although its
-                skills can be conveniently chained.
+                <b class="text-accent uppercase">Built-In Methodology</b>:<br/>
+                <b>ASE</b> tries to ship out-of-the-box with built-in
+                well-known methodology aspects to make them more
+                accessible to the average software developer and
+                software architect.
             </li>
             <li>
                 <b class="text-accent uppercase">Skills &amp; MCP/CLI</b>:<br/>
