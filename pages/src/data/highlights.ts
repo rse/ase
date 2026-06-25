@@ -37,16 +37,6 @@ export const highlights: Highlights[] = [
         video:   "ase-meta-persona"
     },
     {
-        eyebrow: "Alternative Approach Funnel",
-        title:   "Craft through a funnel of approaches",
-        body:    "Plan-driven, but not too direct and hence with enough preliminary consideration: " +
-                 "<b>ASE</b> first proposes a \"funnel\" of crafting alternative approaches, " +
-                 "lets you pick a suitable one, and only then composes a structured task plan.",
-        skill:   "/ase-code-craft --next IMPLEMENT,DELETE hello: \"ase hello\" CLI command which " +
-                 "prints a nice \"Hello World!\" in blue to the terminal",
-        video:   "ase-code-craft"
-    },
-    {
         eyebrow: "Component Discovery",
         title:   "Discover the right components for your technology stack",
         body:    "Get methodical support in finding suitable libraries and frameworks to " +
@@ -64,6 +54,16 @@ export const highlights: Highlights[] = [
         skill:   "/ase-meta-evaluate Commander vs. Yargs vs. Optique, " +
                  "focus on popularity, features and TypeScript support",
         video:   "ase-meta-evaluate"
+    },
+    {
+        eyebrow: "Alternative Approach Funnel",
+        title:   "Craft through a funnel of approaches",
+        body:    "Plan-driven, but not too direct and hence with enough preliminary consideration: " +
+                 "<b>ASE</b> first proposes a \"funnel\" of crafting alternative approaches, " +
+                 "lets you pick a suitable one, and only then composes a structured task plan.",
+        skill:   "/ase-code-craft --next IMPLEMENT,DELETE hello: \"ase hello\" CLI command which " +
+                 "prints a nice \"Hello World!\" in blue to the terminal",
+        video:   "ase-code-craft"
     },
     {
         eyebrow: "Named and Persisted Plans",
