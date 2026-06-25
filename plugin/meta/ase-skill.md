@@ -130,8 +130,9 @@ Skill Sequential Processing
     no longer at hand.
 
     Then establish the strict order explicitly by chaining the created
-    tasks with `TaskUpdate`: for each <step/> after the first one,
-    resolve <this/> and <prev/> to the mapped `taskId` values and
+    tasks with `TaskUpdate`: for each <step/> after the first one, set
+    <this/> to the mapped taskId of this step and <prev/> to the mapped
+    taskId of the predecessor step from the reconstructed mapping, and
     call `TaskUpdate({ taskId: "<this/>", addBlockedBy: [ "<prev/>" ]
     })` so that every step (with `taskId` <this/>) is blocked by its
     predecessor step (with `taskId` <prev/>).
