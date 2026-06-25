@@ -26,9 +26,9 @@ const reversed       = index % 2 === 1
     Terminal component's `**...**` highlight markers, so it is tinted in the
     brand accent while the arguments stay in the foreground.  */
 const spaceIdx = usp.skill.indexOf(" ")
-const skillCmd = spaceIdx === -1
-    ? `**${usp.skill}**`
-    : `**${usp.skill.slice(0, spaceIdx)}**${usp.skill.slice(spaceIdx)}`
+const skillCmd = spaceIdx === -1 ?
+    `**${usp.skill}**` :
+    `**${usp.skill.slice(0, spaceIdx)}**${usp.skill.slice(spaceIdx)}`
 ---
 <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
     <div class={`relative isolate ${reversed ? "lg:order-2" : "lg:order-1"}`}>
