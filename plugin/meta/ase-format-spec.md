@@ -672,6 +672,9 @@ manages, defining how information is organized and connected.
          -   `Target`        (`[<spec-dm-relation-target/>](#<spec-dm-relation-target-id/>) (<spec-dm-relation-cardinality/>)`)
          -   `Description`   (`<spec-dm-relation-description/>, **BECAUSE** <spec-dm-relation-rationale/>.`)
 
+    -    In case a <spec-dm-entity/> has no relations at all, the
+         entire `### RELATIONS` block (including <export-table-2/>) is omitted.
+
 -   Export: `export.svg`
 
     The entities, their attributes and their relations are
