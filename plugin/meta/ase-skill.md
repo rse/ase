@@ -250,7 +250,7 @@ Template Patterns
 
     <template>
 
-    ╭──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+    ╭────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈
 
     </template>
 
@@ -272,17 +272,16 @@ Template Patterns
 
     <template>
 
-    ╰──────────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
+    ╰───────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
 
     </template>
 
 -   When `<ase-tpl-foot title="<title/>"/>` should be expanded, use
     (where <raw-title/> is the visible un-styled text `⧉ ASE: <title/>`,
-    <raw-title-len/> is the number of characters in <raw-title/>, and
-    <bar/> is the `─` character repeated exactly max(0, 67 - <raw-title-len/>)
-    times -- clamped to zero so an over-long title never yields a negative
-    count -- the very same bar-width rule as `<ase-tpl-head/>` and
-    `<ase-tpl-boxed/>`, so equal visible text yields equal total width):
+    <raw-title-len/> is the number of characters in <raw-title/>,
+    and <bar/> is the `─` character repeated exactly max(0, 67 -
+    <raw-title-len/>) times -- clamped to zero so an over-long title
+    never yields a negative count.
 
     <template>
 
@@ -318,9 +317,7 @@ Template Patterns
     -   Set <raw-title-len/> to the number of characters in the visible
         un-styled text <raw-title/>.
     -   Set <bar/> to the `─` character repeated exactly max(0, 67 - <raw-title-len/>)
-        times -- clamped to zero so an over-long title never yields a negative
-        count -- the very same bar-width rule as `<ase-tpl-head/>` and
-        `<ase-tpl-foot/>`, so equal visible text yields equal total width.
+        times -- clamped to zero so an over-long title never yields a negative count.
     -   Set <body/> to <content/> with all line-starts prefixed with `│ `.
 
     <template>
