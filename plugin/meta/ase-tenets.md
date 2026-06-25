@@ -121,7 +121,7 @@ RECONCILIATION TENETS
 ---------------------
 
 When *reconcile* a set of target artifacts to a set of source artifacts,
-you *MUST* honor the following so-called **ALIGNING TENETS**:
+you *MUST* honor the following so-called **RECONCILIATION TENETS**:
 
 -   **Directional Authority**:
     The *source* artifacts are the single source of truth; only the
