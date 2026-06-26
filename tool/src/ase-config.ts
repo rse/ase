@@ -28,7 +28,7 @@ export const projectClassification = {
 
 /*  agent classification taxonomy  */
 export const agentClassification = {
-    persona: [ "writer", "engineer", "telegrapher", "caveman" ]
+    persona: [ "writer", "engineer", "journalist", "telegrapher", "caveman" ]
 } as const
 
 /*  classification presets  */

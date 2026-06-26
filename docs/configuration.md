@@ -50,6 +50,7 @@ The following configuration parameters control the agent:
 -   **agent.persona**: the Agentic AI *persona* has the communication style of a...
     -    `writer`:      ...writer: decorative, eloquent, and explaining.
     -    `engineer`:    ...engineer: brief, factual and accurate.
+    -    `journalist`:  ...journalist: layered, pyramid-structured (title, terse core, bracketed detail).
     -    `telegrapher`: ...telegrapher: very brief, factual, and abbreviating.
     -    `caveman`:     ...caveman: ultra brief, rough and stuttering.
 

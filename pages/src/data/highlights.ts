@@ -28,9 +28,10 @@ export const highlights: Highlights[] = [
         eyebrow: "Token and Time Optimization",
         title:   "Switch persona to cut down tokens and reading time",
         body:    "To reduce your overall output tokens and necessary reading time, " +
-                 "switch the communication style of the LLM across four built-in intensity levels: " +
+                 "switch the communication style of the LLM across five built-in intensity levels: " +
                  "from the decorative, eloquent, and explaining <b>writer</b>, " +
                  "the concise, factual, and accurate <b>engineer</b> (default), " +
+                 "the layered, pyramid-structured <b>journalist</b>, " +
                  "over the brief, factual, and abbreviating <b>telegrapher</b>, " +
                  "down to the terse, rough, and stuttering <b>caveman</b>.",
         skill:   "/ase-meta-persona engineer",

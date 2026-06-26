@@ -2,9 +2,10 @@
 name: ase-meta-persona
 argument-hint: "[--help|-h] [<persona>]"
 description: >
-    Adjust communication style in four intensity levels of token usage.
+    Adjust communication style in five intensity levels of token usage.
     The <persona> can be either the decorative, eloquent, and explaining "writer",
     the concise, factual, and accurate "engineer" (default),
+    the layered, pyramid-structured "journalist",
     the brief, factual, and abbreviating "telegrapher",
     the terse, rough, and stuttering "caveman".
     Use when user says "persona <persona>" or "be <persona>".
@@ -48,12 +49,12 @@ style and token usage intensity.
     </if>
 
 3.  <if condition="<request/> is NOT empty">
-    1.  If <request/> is NEITHER 'writer', 'engineer', 'telegrapher',
-        NOR 'caveman', report this with the following <template/> and then
-        *STOP* immediately:
+    1.  If <request/> is NEITHER 'writer', 'engineer', 'journalist',
+        'telegrapher', NOR 'caveman', report this with the following
+        <template/> and then *STOP* immediately:
 
         <template>
-        ⧉ **ASE**: **ERROR:** invalid persona: "<request/>" (expected `writer`, `engineer`, `telegrapher`, or `caveman`)
+        ⧉ **ASE**: **ERROR:** invalid persona: "<request/>" (expected `writer`, `engineer`, `journalist`, `telegrapher`, or `caveman`)
         </template>
 
     2.  If <request/> is equal <ase-persona-style/> report this with the

@@ -5,6 +5,7 @@ ChangeLog
 0.9.28 (2026-06-26)
 -------------------
 
+- FEATURE: add fifth `journalist` persona with pyramid-structured title/core/detail bullets (`ase-persona.md`, `ase-meta-persona`, `ase-persona.ts`, `ase-config.ts`)
 - IMPROVEMENT: refine persona rules and default invalid persona to engineer (`ase-persona.md`)
 - IMPROVEMENT: add fade-in/out stargazer scripting-hint annotation and swipe through multiple quotes on Hero (`Annotation.astro`, `Hero.astro`, `package.json`)
 - IMPROVEMENT: darken modal background (`Modal.astro`)

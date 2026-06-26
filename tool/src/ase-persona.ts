@@ -15,7 +15,7 @@ import { Config, configSchema, parseScope }   from "./ase-config.js"
 /*  reusable functionality: ASE agent persona style get/set  */
 export class Persona {
     /*  allowed persona style values  */
-    static styles = [ "writer", "engineer", "telegrapher", "caveman" ] as const
+    static styles = [ "writer", "engineer", "journalist", "telegrapher", "caveman" ] as const
 
     /*  get the effective persona style for an optional session;
         returns the default "engineer" if nothing is configured  */
@@ -63,6 +63,7 @@ export default class PersonaMCP {
                 "otherwise it operates on the strongest/closest scope (user/project cascade). " +
                 "Allowed styles: \"writer\" (decorative, eloquent, explaining), " +
                 "\"engineer\" (concise, factual, accurate), " +
+                "\"journalist\" (layered, pyramid-structured title/core/detail), " +
                 "\"telegrapher\" (very brief, factual, abbreviating), " +
                 "\"caveman\" (ultra brief, rough, stuttering).",
             inputSchema: {
