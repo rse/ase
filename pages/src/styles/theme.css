@@ -9,6 +9,8 @@
 @import "@fontsource-variable/source-sans-3";
 @import "@fontsource-variable/source-code-pro";
 
+@import "../../node_modules/typopro-web/web/TypoPRO-Kalam/TypoPRO-Kalam.css";
+
 /*  brand scale   */
 :root {
     --brand-50:  oklch(97.5% 0.012 250);

@@ -8,7 +8,12 @@
 import LogoASE     from "./Logo-ASE.astro"
 import TypingDemo  from "./Typing-Demo.astro"
 import Flag        from "./Flag.astro"
-import { Swiper, SwiperWrapper, SwiperSlide, SwiperPagination } from "astro-swiper"
+import Annotation  from "./Annotation.astro"
+import {
+    Swiper,
+    SwiperWrapper,
+    SwiperSlide
+}                  from "astro-swiper"
 
 /*  rotating hero quotes, swipeable via the <Swiper> carousel below.  */
 const quotes = [
@@ -80,18 +85,28 @@ const quotes = [
                 <a href="https://github.com/rse" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/followers/rse?logo=github&label=author%20followers&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (author followers)" />
                 </a>
-                <a href="https://github.com/rse/ase" class="inline-flex overflow-hidden rounded-md">
-                    <img src="https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (project stars)" />
-                </a>
                 <a href="https://github.com/rse/ase/releases" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/v/release/rse/ase?logo=github&label=latest%20release&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (release)" />
                 </a>
+                <span class="relative inline-flex">
+                    {/* hand-drawn annotation pointing at the project-stars button;
+                        kept as a sibling of the badge so the badge's own
+                        `overflow-hidden` (for its rounded corners) does not clip it */}
+                    <Annotation class="pointer-events-none absolute bottom-full left-1/2 z-30 w-[200px] -translate-x-1/4">
+                        If you like ASE,<br/>
+                        please support it<br/>
+                        by giving a star!
+                    </Annotation>
+                    <a href="https://github.com/rse/ase" class="inline-flex overflow-hidden rounded-md">
+                        <img src="https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (project stars)" />
+                    </a>
+                </span>
             </div>
 
             {/* sub-title */}
             <p class="mt-6 max-w-2xl text-lg text-foreground-secondary sm:text-xl text-left">
-                The opinionated <b>Open Source</b> companion tooling of
-                <a href="#author">Dr. Ralf S. Engelschall</a>
+                The opinionated <b>Open Source</b> companion tooling of{" "}
+                <a href="#author">Dr. Ralf S. Engelschall</a>{" "}
                 for fusing the concept of <b>Agentic AI Coding</b> and traditional <b>Software Engineering</b>
                 in the software development tool <b>Anthropic Claude
                 Code</b> &mdash; and with reduced support also in the alternative
