@@ -2,6 +2,18 @@
 ChangeLog
 =========
 
+0.9.28 (2026-06-26)
+-------------------
+
+- IMPROVEMENT: refine persona rules and default invalid persona to engineer (`ase-persona.md`)
+- IMPROVEMENT: add fade-in/out stargazer scripting-hint annotation and swipe through multiple quotes on Hero (`Annotation.astro`, `Hero.astro`, `package.json`)
+- IMPROVEMENT: darken modal background (`Modal.astro`)
+- IMPROVEMENT: document `pages/` area in repository layout (`AGENTS.md`)
+- BUGFIX: fix rendering under latest Astro compiler trimming newlines (website components)
+- UPDATE: switch website to TypoPRO fonts only (`package.json`, `theme.css`)
+- UPDATE: upgrade tool dependencies (`tool/package.json`)
+- CLEANUP: ignore Playwright temporary directory (`pages/.gitignore`)
+
 0.9.27 (2026-06-26)
 -------------------
 
