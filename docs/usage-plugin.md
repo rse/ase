@@ -40,11 +40,12 @@ The following ASE commands/skills exist on the meta-level:
   for it, then derive a fortification.
 
 - **/ase-meta-persona** \[*persona*\]:<br/>
-  Adjust communication style in four intensity levels of token usage.
+  Adjust communication style in five intensity levels of token usage.
   The *persona* can be either a decorative, eloquent, and explaining
   `writer`, a brief, factual, and accurate `engineer` (default), a
-  very brief, factual, and abbreviating `telegrapher`, or an ultra
-  brief, rough and stuttering `caveman`.
+  layered, pyramid-structured `journalist`, a very brief, factual, and
+  abbreviating `telegrapher`, or an ultra brief, rough and stuttering
+  `caveman`.
 
 - **/ase-meta-changelog**:<br/>
   Update changes entries in `CHANGELOG.md` files from Git commit information.
