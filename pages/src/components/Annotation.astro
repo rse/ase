@@ -31,7 +31,7 @@ const arc = [
     "C 20 14, 6 44, 30 90"         /*  single smooth sweep down to target */
 ].join(" ")
 ---
-<div class={`annotation pointer-events-none select-none ${className ?? ""}`}>
+<div class={`annotation annotation-cycle pointer-events-none select-none ${className ?? ""}`}>
     <svg
         class="block h-auto w-full overflow-visible"
         width={W}
@@ -80,3 +80,26 @@ const arc = [
         <slot />
     </div>
 </div>
+
+<style>
+    /*  wait hidden (10s), fade in (2s), hold (10s), fade out (2s),
+        then restart from the beginning; total cycle = 24s  */
+    .annotation-cycle {
+        animation: annotation-cycle 24s ease-in-out infinite;
+    }
+
+    @keyframes annotation-cycle {
+        0%      { opacity: 0; }   /*  start hidden for 10s    */
+        41.67%  { opacity: 0; }   /*  end of hidden wait      */
+        50%     { opacity: 1; }   /*  fade in over 2s         */
+        91.67%  { opacity: 1; }   /*  hold visible for 10s    */
+        100%    { opacity: 0; }   /*  fade out over 2s        */
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .annotation-cycle {
+            animation: none;
+            opacity: 1;
+        }
+    }
+</style>
