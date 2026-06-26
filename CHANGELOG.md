@@ -2,6 +2,15 @@
 ChangeLog
 =========
 
+0.9.29 (2026-06-27)
+-------------------
+
+- FEATURE: add fifth `journalist` persona and reimplement all persona styles (`ase-persona.md`, `ase-meta-persona`, `ase-persona.ts`, `ase-config.ts`)
+- IMPROVEMENT: integrate `pages/` workspace into top-level build orchestration (`etc/stx.conf`)
+- UPDATE: re-render workflow and agentic-levels diagrams (`docs/`, `pages/public/assets/`)
+- CLEANUP: cleanup skill manpages (`help.md` files)
+- CLEANUP: cleanup website author component (`Section-Author.astro`)
+
 0.9.28 (2026-06-26)
 -------------------
 
