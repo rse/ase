@@ -6,8 +6,8 @@
 
 @import "tailwindcss";
 
-@import "@fontsource-variable/source-sans-3";
-@import "@fontsource-variable/source-code-pro";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro.css";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceCodePro/TypoPRO-SourceCodePro.css";
 
 @import "../../node_modules/typopro-web/web/TypoPRO-Kalam/TypoPRO-Kalam.css";
 
@@ -95,9 +95,9 @@
     --color-accent:       var(--accent);
     --color-accent-hover: var(--accent-hover);
 
-    --font-display: "Source Sans 3 Variable",   ui-sans-serif, system-ui, sans-serif;
-    --font-sans:    "Source Sans 3 Variable",   ui-sans-serif, system-ui, sans-serif;
-    --font-mono:    "Source Code Pro Variable", ui-monospace, monospace;
+    --font-display: "TypoPRO Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+    --font-sans:    "TypoPRO Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+    --font-mono:    "TypoPRO Source Code Pro", ui-monospace, monospace;
 }
 
 /*  ==== base element styling ====  */
