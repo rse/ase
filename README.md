@@ -414,55 +414,6 @@ LLM vendor and the *OpenRouter* proxy API as an alternative, i.e. you
 can leverage all paid "Chat" AI services by just providing the
 `ASE_MCP_KEY_OPENROUTER` of an *OpenRouter* account.
 
-### Agent Harness &amp; Operation Modes
-
-When working with **ASE**, the user decides (usually based on the estimated extent
-and complexity of the particular task to perform) which operation mode to choose:
-
-[![operation-modes](docs/operation-modes.svg)](docs/operation-modes.pdf)
-
-<table>
-<tr>
-<td width="50%" valign="top">
-
-1. **Ad-Hoc Mode** (**Claude Code**):
-   The default mode of the agent harness where the user just ad-hoc
-   enters a prompt with an instruction. The instructions are persisted only
-   in the current session.
-
-2. **Plan Mode** (**Claude Code**):
-   The advanced mode of the agent harness where the user enters a
-   dedicated "plan mode" to initially craft and then continuously refine
-   a plan. The plan has an ad-hoc format and is persisted internally
-   by the agent, but is available in the current session only.
-
-</td>
-<td width="50%" valign="top">
-
-3. **Task Mode** (**ASE**):
-   The more advanced mode of **ASE** where the user initially crafts and
-   then continuously refines a task plan. The task plan has a fixed
-   format and is persisted by **ASE** and hence is available across
-   agent sessions.
-
-4. **Funnel Mode** (**ASE**):
-   The even more advanced mode of **ASE** where the user first sketches the
-   plan, then the agent figures out possible approaches, then the user
-   selects one approach, then a task plan is created for this approach,
-   and then finally this switches over to the regular **Task Mode**.
-   The task plan has a fixed format and is persisted by **ASE** and
-   hence is available across agent sessions.
-
-5. **Sync Mode** (**ASE**):
-   The separated reconciliation mode of **ASE** where the user aligns
-   the code and documentation to the specification and architecture
-   ("forward engineering") or even aligns the specification and
-   architecture to the code and documentation ("reverse engineering").
-
-</td>
-</tr>
-</table>
-
 See Also
 --------
 
