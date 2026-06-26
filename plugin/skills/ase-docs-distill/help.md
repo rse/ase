@@ -14,7 +14,7 @@
 
 The `ase-docs-distill` skill reads a *provided document* and distills it
 into a *flat*, *importance-ranked* list of its *key points*. The
-*docs-reference* is resolved *probe-as-file-first*: if the argument names
+*document-reference* is resolved *probe-as-file-first*: if the argument names
 a *readable file* it is read from disk, otherwise the argument is taken
 *verbatim* as *pasted text*. The document is read *silently* - only the
 final ranked list is shown - so even a large document does not flood the
@@ -45,7 +45,7 @@ non-numeric value falls back to the default *5*.
     document does not contain *N* salient ones, and an invalid or
     non-positive *N* reverts to the default.
 
-*docs-reference*:
+*document-reference*:
     The document to distill - either a *path* to a readable file or the
     *text* itself pasted inline. If it resolves to a readable file the
     file is read; otherwise it is treated verbatim as pasted text.

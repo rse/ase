@@ -8,6 +8,7 @@
 `ase-sync-export`
     [`--help`|`-h`]
     [`--source`|`-s` *source*[,...]]
+    [*filter*]
 
 ##  DESCRIPTION
 
@@ -28,7 +29,8 @@ An *export* is declared by a `-   Export:` bullet point in an artifact's
 format definition (see `ase-format-meta.md`, `ase-format-spec.md`, and
 `ase-format-arch.md`); an artifact *without* such a bullet is *not*
 exported. Each exported file is named
-`YYYY-MM-DD-<set>-<slug>-<id>.<ext>` and stored in the artifact's own
+`<set>-<no>-<id>-<slug>-<export-name>.<ext>` (e.g.
+`SPEC-07-DM-Data-Model-export.svg`) and stored in the artifact's own
 base directory. Initially, the *Data Model* (`SPEC-DM`) exports as a
 Mermaid UML diagram converted to SVG, and the *Technology Stack*
 (`ARCH-TS`) exports as a compact Markdown table.
@@ -38,6 +40,14 @@ Mermaid UML diagram converted to SVG, and the *Technology Stack*
 `--source`|`-s` *source*[,...]:
     The comma-separated list of artifact kinds to export. Defaults to
     `SPEC,ARCH` (the skill errors out on an empty source).
+
+##  ARGUMENTS
+
+*filter*:
+    An optional free-form filtering hint that narrows the source
+    artifacts, or the aspects of those artifacts, to take into account
+    when materializing the exports. If omitted, every export declared by
+    a source artifact is materialized.
 
 ##  EXAMPLES
 
@@ -52,6 +62,12 @@ Export only the specification artifacts:
 
 ```text
 ❯ /ase-sync-export -s SPEC
+```
+
+Export only the data-model artifact:
+
+```text
+❯ /ase-sync-export -s SPEC data model
 ```
 
 ##  SEE ALSO
