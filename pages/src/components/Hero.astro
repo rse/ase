@@ -8,6 +8,15 @@
 import LogoASE     from "./Logo-ASE.astro"
 import TypingDemo  from "./Typing-Demo.astro"
 import Flag        from "./Flag.astro"
+import { Swiper, SwiperWrapper, SwiperSlide, SwiperPagination } from "astro-swiper"
+
+/*  rotating hero quotes, swipeable via the <Swiper> carousel below.  */
+const quotes = [
+    "Boost your daily productivity while<br/>keeping yourself in the driver's seat!",
+    "Fuse Agentic AI Coding with<br/>traditional Software Engineering!",
+    "Let the agent handle the chores while<br/>you stay in control of the craft!",
+    "Various operation modes provided &mdash;<br/>you choose the best for the job!"
+]
 ---
 <section class="relative isolate overflow-hidden">
     {/* hanging flag, carrying the sponsor logos as its overlay content */}
@@ -42,13 +51,26 @@ import Flag        from "./Flag.astro"
                 </span>
             </h1>
 
-            {/* quote */}
-            <div class="mt-8 max-w-2xl flex flex-wrap items-center justify-center gap-4">
-                <blockquote class="border-l-8 border-brand-700 px-4 text-left text-lg italic leading-tight text-white">
-                    Boost your daily productivity while<br/>
-                    keeping yourself in the driver's seat!
-                </blockquote>
-            </div>
+            {/* quotes — swipeable carousel, auto-rotating, with pagination */}
+            <Swiper
+                class="hero-quotes mt-8 w-full max-w-xl"
+                options={{
+                    direction:  "vertical",
+                    loop:       true,
+                    autoplay:   { delay: 6000, disableOnInteraction: false },
+                    pagination: { el: ".swiper-pagination", clickable: true },
+                    a11y:       { enabled: true },
+                    keyboard:   { enabled: true }
+                }}
+            >
+                <SwiperWrapper>
+                    {quotes.map((quote) => (
+                        <SwiperSlide class="flex items-center justify-center px-10">
+                            <blockquote class="border-l-8 border-brand-700 px-4 text-left text-lg italic leading-tight text-white" set:html={quote}/>
+                        </SwiperSlide>
+                    ))}
+                </SwiperWrapper>
+            </Swiper>
 
             {/* GitHub badges */}
             <div class="mt-8 flex min-h-[28px] flex-wrap items-center justify-center gap-2">
@@ -150,5 +172,22 @@ import Flag        from "./Flag.astro"
     @media (prefers-reduced-motion: reduce) {
         .hero-stagger > *,
         .chevron-bounce { animation: none; }
+    }
+
+    /*  theme the swiper quote carousel to the brand palette. The carousel
+        swipes vertically, so it needs a fixed height (the wrapper would
+        otherwise collapse). Swiper's bundle CSS forces "margin: auto" on
+        ".swiper" (centring it and defeating Tailwind's ml-* utilities), so
+        the horizontal offset is set here instead: a right auto-margin keeps
+        the carousel off the right edge while a left margin nudges it right.  */
+    .hero-quotes.hero-quotes {
+        --swiper-theme-color:              var(--brand-500);
+        --swiper-pagination-bullet-inactive-color: var(--brand-400);
+        height: 3rem;
+        margin-left:  auto;
+        margin-right: 2rem;
+    }
+    .hero-quotes .swiper-slide {
+        height: auto;
     }
 </style>
