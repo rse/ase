@@ -82,8 +82,29 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     `ase-format-spec.md` (Specification / SPEC) and `ase-format-arch.md`
     (Architecture / ARCH).
 
-The root `README.md` is user-facing install docs;
-`pages/` is the GitHub Pages site (`.github/workflows/static.yml`).
+The root `README.md` is user-facing install docs.
+
+- `pages/` — the `ase-web` GitHub Pages site (https://ase.tools),
+  an Astro 6 static site built with Tailwind CSS 4 and deployed via
+  `.github/workflows/static.yml`. Build orchestration uses `@rse/stx`
+  (`npm start`, config `pages/etc/stx.conf`) wrapping the Astro CLI with
+  `pages/etc/astro.config.mjs`. Targets: `lint` (`astro check` + `eslint`
+  via `etc/eslint.mjs`), `build` (`astro build`, depends on `lint`,
+  output to `dst/`), `dev` (`astro dev`), `preview` (`astro preview`),
+  `clean`/`distclean`. Layout under `pages/src/`:
+  - `pages/src/pages/index.astro` — the single-page entry point.
+  - `pages/src/layouts/BaseLayout.astro` — shared page layout.
+  - `pages/src/components/*.astro` — the component set, including
+    `Hero`, `Page-Header`/`Page-Footer`, `Section-*` (Highlights, Usage,
+    Setup, Compat, Architecture, Workflows, Design, Author, Glow),
+    `Modal*` (Video, Image, Help), `Logo-*` (ASE, RSE, GitHub),
+    `Progress*`, `Theme-Switcher`/`Theme-Init`, `Scroll-Reveal`/
+    `Scroll-Spy`, `Typing-Demo`, `Terminal`, `Diagram`, etc.
+  - `pages/src/data/*.ts` — site content data (`site.ts`,
+    `highlights.ts`, `skills.ts`).
+  - `pages/src/styles/theme.css` — Tailwind theme.
+  - `pages/public/assets/` — static SVG/PNG assets (logos, diagrams,
+    portrait).
 
 ## Tool Build System
 
