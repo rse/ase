@@ -18,7 +18,8 @@ export default defineConfig([
         ],
         rules: {
             "md/no-double-space":     "off",
-            "md/code-lang-shorthand": "off"
+            "md/code-lang-shorthand": "off",
+            "md/no-irregular-dash":   "off"
         }
     }
 ])
