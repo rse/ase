@@ -1,5 +1,6 @@
 dst/
 .astro/
+.playwright-mcp
 node_modules/
 npm-debug.log*
 .env
