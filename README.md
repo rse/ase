@@ -280,53 +280,6 @@ see whether **ASE** is right for you:
 </tr>
 </table>
 
-Sneak Preview
--------------
-
-The following are sneak previews of **ASE** skills in action. Click
-onto the screenshots to watch the scripted and pre-recorded demo
-sessions to get an impression of **ASE**. Find more such demo sessions
-[here](https://rse.github.io/ase-media/).
-
-<table>
-<tr>
-<td width="33%" valign="top">
-
-*Mix of Skills #1*:
-
-[![ase-mix-1](https://rse.github.io/ase-media/ase-mix-1.jpg)](https://rse.github.io/ase-media/ase-mix-1.mp4)
-
-[ase-arch-**discover**](plugin/skills/ase-arch-discover/help.md)<br/>
-[ase-meta-**evaluate**](plugin/skills/ase-meta-evaluate/help.md)<br/>
-[ase-meta-**diaboli**](plugin/skills/ase-meta-diaboli/help.md)<br/>
-[ase-meta-**steelman**](plugin/skills/ase-meta-steelman/help.md)<br/>
-[ase-meta-**why**](plugin/skills/ase-meta-why/help.md)<br/>
-[ase-meta-**quorum**](plugin/skills/ase-meta-quorum/help.md)
-
-</td>
-<td width="33%" valign="top">
-
-*Mix of Skills #2*:
-
-[![ase-mix-2](https://rse.github.io/ase-media/ase-mix-2.jpg)](https://rse.github.io/ase-media/ase-mix-2.mp4)
-
-[ase-meta-**persona**](plugin/skills/ase-meta-persona/help.md)<br/>
-[ase-meta-**search**](plugin/skills/ase-meta-search/help.md)
-
-</td>
-<td width="33%" valign="top">
-
-*Mix of Skills #3*:
-
-[![ase-mix-3](https://rse.github.io/ase-media/ase-mix-3.jpg)](https://rse.github.io/ase-media/ase-mix-3.mp4)
-
-[ase-code-**craft**](plugin/skills/ase-code-craft/help.md)<br/>
-[ase-task-**implement**](plugin/skills/ase-task-implement/help.md)
-
-</td>
-</tr>
-</table>
-
 User Setup
 ----------
 
