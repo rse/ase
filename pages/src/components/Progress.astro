@@ -39,6 +39,12 @@
         window.addEventListener("resize", onScroll)
         if (btt) btt.addEventListener("click", function () {
             window.scrollTo({ top: 0, behavior: "smooth" })
+
+            /*  strip any "#xxx" fragment from the URL (via replaceState, so it
+                neither adds a history entry nor re-jumps the page) to ensure we
+                really stay at the very top.  */
+            if (window.location.hash)
+                history.replaceState(null, "", window.location.pathname + window.location.search)
         })
         update()
     })()
