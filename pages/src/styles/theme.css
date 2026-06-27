@@ -28,7 +28,7 @@
 :root {
     --background:           oklch(15.0% 0.030 250);
     --background-secondary: oklch(19.0% 0.032 250);
-    --background-elevated:  oklch(22.0% 0.034 250);
+    --background-elevated:  oklch(25.0% 0.034 250);
 
     --foreground:           oklch(92% 0.035 250);
     --foreground-secondary: oklch(80% 0.040 250);
