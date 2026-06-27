@@ -196,9 +196,19 @@ const quotes = [
     .hero-quotes.hero-quotes {
         --swiper-theme-color:              var(--brand-500);
         --swiper-pagination-bullet-inactive-color: var(--brand-400);
-        height: 3rem;
+        /*  tall enough for the longest quote when it wraps to four lines on the
+            narrowest phones; each vertical slide is sized to this height, so an
+            undersized value lets a wrapped quote spill into the next slide and
+            overlap it. Tightened from the `sm` breakpoint up, where the wider
+            `text-lg` quotes fit in two lines.  */
+        height: 6rem;
         margin-left:  auto;
         margin-right: 2rem;
+    }
+    @media (width >= 40rem) {
+        .hero-quotes.hero-quotes {
+            height: 3rem;
+        }
     }
     .hero-quotes .swiper-slide {
         height: auto;
