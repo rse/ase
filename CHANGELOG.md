@@ -2,6 +2,17 @@
 ChangeLog
 =========
 
+0.9.30 (2026-06-27)
+-------------------
+
+- IMPROVEMENT: extend, reorder, and add brainstorming to website highlights (`highlights.ts`)
+- IMPROVEMENT: import more README content into website Usage section (`Section-Usage.astro`)
+- IMPROVEMENT: mention role-experience assumption in website Design section (`Section-Design.astro`)
+- IMPROVEMENT: make Hero quote even more friendly (`Hero.astro`)
+- BUGFIX: fix grammar problems (`README.md`)
+- BUGFIX: remove trailing dot in persona pyramid-format examples (`ase-persona.md`)
+- CLEANUP: remove README content already present on the website (`README.md`)
+
 0.9.29 (2026-06-27)
 -------------------
 
