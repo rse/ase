@@ -2,10 +2,17 @@
 ChangeLog
 =========
 
-0.9.31 (2026-06-27)
+0.9.31 (2026-06-28)
 -------------------
 
-- IMPROVEMENT: further improvements to mobile rendering of website
+- IMPROVEMENT: add annotations across website sections with flat variant (`Annotation.astro`, `Section-*.astro`)
+- IMPROVEMENT: further improve mobile/responsive rendering of website (`Hero.astro`, `Page-Header.astro`, `Section-Compat.astro`, `Typing-Demo.astro`)
+- IMPROVEMENT: close hamburger menu and clear URL on outside click/top (`Page-Header.astro`, `Progress.astro`)
+- IMPROVEMENT: add project links to website Author section (`Section-Author.astro`)
+- IMPROVEMENT: improve coloring of agentic-levels diagram (`docs/`, `pages/public/assets/`)
+- IMPROVEMENT: align Typing-Demo prompt with other terminals (`Typing-Demo.astro`)
+- CLEANUP: fix wording and proofread findings across website sections (`Section-*.astro`)
+- CLEANUP: ignore more macOS and temporary files (`.gitignore`)
 
 0.9.30 (2026-06-27)
 -------------------
