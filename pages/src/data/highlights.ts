@@ -138,7 +138,7 @@ export const highlights: Highlights[] = [
     },
     {
         eyebrow: "Automatic ChangeLog",
-        title:   "Auto-Generate ChangeLog Entries from Git",
+        title:   "Auto-generate ChangeLog entries from Git",
         body:    "Keep your <code>CHANGELOG.md</code> file current without the chore: derive concise, " +
                  "human-readable changelog entries straight from your Git history and " +
                  "fold them into the existing file under the right version and category.",
