@@ -53,8 +53,43 @@ export const highlights: Highlights[] = [
         body:    "Compare alternatives the rigorous way: a weighted multi-criteria decision matrix " +
                  "turns a fuzzy \"which is best?\" question into a transparent, defensible verdict.",
         skill:   "/ase-meta-evaluate Commander vs. Yargs vs. Optique, " +
-                 "focus on popularity, features and TypeScript support",
+                 "focus on popularity, features, ease of use, and TypeScript support",
         video:   "ase-meta-evaluate"
+    },
+    {
+        eyebrow: "Play Advocatus Diaboli",
+        title:   "Challenge your decision with an Advocatus Diaboli",
+        body:    "Know the antitheses to your decision before others bring them up. " +
+                 "Let the decision be challenged by a relentless Advocatus Diaboli " +
+                 "and even get a resulting synthesis based on Dialectical Reasoning.",
+        skill:   "/ase-meta-diaboli --count=10 We should migrate the ASE project from TypeScript to Rust",
+        video:   "ase-meta-diaboli"
+    },
+    {
+        eyebrow: "Play Steelman",
+        title:   "Strengthen your decision with a Steelman",
+        body:    "Further improve the strength of your decision before others challenge it. " +
+                 "Let the decision be fortified by a helpful Steelman into a " +
+                 "a stronger position that consolidates everything that genuinely strengthens it " +
+                 "while honestly bounding where it holds.",
+        skill:   "/ase-meta-steelman --count=10 ASE is a useful Claude Code plugin",
+        video:   "ase-meta-steelman"
+    },
+    {
+        eyebrow: "Document Proofreading",
+        title:   "Analyze documents for spelling, punctuation, and grammar",
+        body:    "Scan your documents for problems in spelling, punctuation and grammar. " +
+                 "Optionally, let the documents be automatically corrected.",
+        skill:   "/ase-code-analyze --auto @README.md",
+        video:   "ase-docs-proofread"
+    },
+    {
+        eyebrow: "Logical Code Analysis",
+        title:   "Analyze code for logic and control-flow defects",
+        body:    "Scan your source code for problems in its logic, semantics, and control flow, with " +
+                 "evidence-grounded, line-cited findings instead of vague hand-wavings.",
+        skill:   "/ase-code-analyze --severity=MEDIUM @tool/src/",
+        video:   "ase-code-analyze"
     },
     {
         eyebrow: "Alternative Approach Funnel",
@@ -73,30 +108,6 @@ export const highlights: Highlights[] = [
                  "implemented as a complete, surgical change set you stay in control of.",
         skill:   "/ase-task-implement hello",
         video:   "ase-task-implement"
-    },
-    {
-        eyebrow: "Logical Code Analysis",
-        title:   "Analyze code for logic and control-flow defects",
-        body:    "Scan your source code for problems in its logic, semantics, and control flow, with " +
-                 "evidence-grounded, line-cited findings instead of vague hand-wavings.",
-        skill:   "/ase-code-analyze --severity=MEDIUM @tool/src/",
-        video:   "ase-code-analyze"
-    },
-    {
-        eyebrow: "Play Advocatus Diaboli",
-        title:   "Challenge your decision with an Advocatus Diaboli",
-        body:    "Know the anti-theses to your decision before others bring them up. " +
-                 "Let the decision be challenged by a relentless Advocatus Diaboli.",
-        skill:   "/ase-meta-diaboli --count=10 We should migrate the project from TypeScript to Rust",
-        video:   "ase-meta-diaboli"
-    },
-    {
-        eyebrow: "Play Steelman",
-        title:   "Strengthen your decision with a Steelman",
-        body:    "Further improve the strength of your decision before others challenge them. " +
-                 "Let the decision be improved by a helpful Steelman.",
-        skill:   "/ase-meta-steelman --count=10 ASE is a useful Claude Code plugin",
-        video:   "ase-meta-steelman"
     }
 ]
 
