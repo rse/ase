@@ -11,6 +11,7 @@ ChangeLog
 - IMPROVEMENT: make Hero quote even more friendly (`Hero.astro`)
 - BUGFIX: fix grammar problems (`README.md`)
 - BUGFIX: remove trailing dot in persona pyramid-format examples (`ase-persona.md`)
+- UPDATE: switch distribution license from GPL-3.0 to Apache-2.0 (`LICENSE.txt`, file headers)
 - CLEANUP: remove README content already present on the website (`README.md`)
 
 0.9.29 (2026-06-27)
