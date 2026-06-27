@@ -17,7 +17,7 @@
         <span class="text-accent" id="hero-topic"></span>
     </div>
     <div class="block h-20 w-full overflow-hidden px-4 py-3 tracking-[-0.03em]">
-        <span class="select-none text-white">❯ </span>
+        <span class="select-none text-brand-300">❯ </span>
         <span id="hero-typed" class="whitespace-pre-wrap [overflow-wrap:anywhere]"></span>
     </div>
 </div>
@@ -62,7 +62,7 @@
         ]
 
         const strings = commands.map(([ , cmd, rest ]) =>
-            `<b class="font-bold text-accent">${cmd}</b> ${rest}`)
+            `<span class="text-brand-400">${cmd}</span> ${rest}`)
         if (topic)
             topic.textContent = commands[0][0]
         const backDelay = 5000

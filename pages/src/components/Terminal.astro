@@ -49,9 +49,9 @@ const plain = (cmd: string) => cmd.replace(/\*\*([^*]*)\*\*/g, "$1")
         <div class="flex flex-col gap-0 px-4 py-2">
             {commands.map((cmd) => (
                 <div class="group flex items-start gap-3 font-mono tracking-[-0.03em]">
-                    <span class="select-none text-accent">❯</span>
+                    <span class="select-none text-brand-300">❯</span>
                     <code class="code-plain flex-1 text-foreground">{tokenize(cmd).map((t) => (
-                        t.meta ? <span class="text-accent">{t.text}</span> : t.text
+                        t.meta ? <span class="text-brand-400">{t.text}</span> : t.text
                     ))}</code>
                     {copy && (
                         <button
