@@ -71,7 +71,7 @@ const quotes = [
             >
                 <SwiperWrapper>
                     {quotes.map((quote) => (
-                        <SwiperSlide class="flex items-center justify-center px-6 sm:px-10">
+                        <SwiperSlide class="flex items-center justify-center px-4 sm:px-10">
                             <blockquote class="border-l-8 border-brand-700 px-4 text-left text-sm italic leading-tight text-white sm:text-lg" set:html={quote}/>
                         </SwiperSlide>
                     ))}
@@ -196,22 +196,12 @@ const quotes = [
         the horizontal offset is set here instead: a right auto-margin keeps
         the carousel off the right edge while a left margin nudges it right.  */
     .hero-quotes.hero-quotes {
-        --swiper-theme-color:              var(--brand-500);
+        --swiper-theme-color: var(--brand-500);
         --swiper-pagination-bullet-inactive-color: var(--brand-400);
-        /*  tall enough for the longest quote when it wraps to four lines on the
-            narrowest phones; each vertical slide is sized to this height, so an
-            undersized value lets a wrapped quote spill into the next slide and
-            overlap it. Tightened from the `sm` breakpoint up, where the wider
-            `text-lg` quotes fit in two lines.  */
-        height: 6rem;
+        height: 3rem;
         margin-left:  auto;
-        margin-right: 2rem;
+        margin-right: 0;
         touch-action: pan-y;
-    }
-    @media (width >= 40rem) {
-        .hero-quotes.hero-quotes {
-            height: 3rem;
-        }
     }
     .hero-quotes .swiper-slide {
         height: auto;
