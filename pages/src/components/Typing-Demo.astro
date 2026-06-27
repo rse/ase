@@ -9,14 +9,16 @@
 <div class="hero-prompt mt-8 block w-full max-w-[min(37rem,100%)] overflow-hidden
     rounded-lg border border-border-strong bg-background-elevated/60 text-left font-mono
     text-sm leading-relaxed text-foreground-secondary sm:text-base">
-    <div class="flex select-none items-center gap-1.5 bg-accent/10 px-4 py-1.5 font-sans">
-        <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
-        <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
-        <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
-        <span class="ml-2 text-foreground-secondary">Claude Code:</span>
-        <span class="text-accent" id="hero-topic"></span>
+    <div class="select-none bg-accent/10 px-4 py-1.5 font-sans sm:flex sm:items-center">
+        <div class="flex items-center gap-1.5">
+            <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-400)]"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-500)]"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-[var(--brand-600)]"></span>
+            <span class="ml-2 text-foreground-secondary">Claude Code:</span>
+        </div>
+        <div class="mt-1 h-[2.6em] overflow-hidden leading-tight text-accent sm:ml-1 sm:mt-0 sm:h-auto sm:overflow-visible" id="hero-topic"></div>
     </div>
-    <div class="block h-20 w-full overflow-hidden px-4 py-3 tracking-[-0.03em]">
+    <div class="block h-[110px] w-full overflow-y-auto px-4 py-3 text-xs tracking-[-0.03em] sm:h-20 sm:overflow-hidden sm:text-base">
         <span class="select-none text-brand-300">❯ </span>
         <span id="hero-typed" class="whitespace-pre-wrap [overflow-wrap:anywhere]"></span>
     </div>
@@ -91,6 +93,13 @@
                     window.setTimeout(() => { topic.textContent = next }, erase)
                 }
             })
+
+        /*  follow the caret: when a command outgrows the fixed body height
+            on mobile, pin the scroll to the bottom on every typed change.  */
+        const body = target.parentElement
+        if (body)
+            new MutationObserver(() => { body.scrollTop = body.scrollHeight })
+                .observe(target, { childList: true, subtree: true, characterData: true })
     }
 </script>
 

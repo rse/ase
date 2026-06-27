@@ -60,12 +60,13 @@ const quotes = [
             <Swiper
                 class="hero-quotes mt-8 w-full max-w-xl"
                 options={{
-                    direction:  "vertical",
-                    loop:       true,
-                    autoplay:   { delay: 6000, disableOnInteraction: false },
-                    pagination: { el: ".swiper-pagination", clickable: true },
-                    a11y:       { enabled: true },
-                    keyboard:   { enabled: true }
+                    direction:      "vertical",
+                    allowTouchMove: false,
+                    loop:           true,
+                    autoplay:       { delay: 6000, disableOnInteraction: false },
+                    pagination:     { el: ".swiper-pagination", clickable: true },
+                    a11y:           { enabled: true },
+                    keyboard:       { enabled: true }
                 }}
             >
                 <SwiperWrapper>
@@ -205,6 +206,7 @@ const quotes = [
         height: 6rem;
         margin-left:  auto;
         margin-right: 2rem;
+        touch-action: pan-y;
     }
     @media (width >= 40rem) {
         .hero-quotes.hero-quotes {
