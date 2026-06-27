@@ -14,24 +14,34 @@
 
 interface Props {
     class?: string
+    fade?: boolean
+    flat?: boolean
 }
-const { class: className } = Astro.props
+const { class: className, fade = false, flat = false } = Astro.props
 
 /*  arc geometry (SVG user units): a gentle curve from the top-right
     corner down to the bottom-left, where the arrow head points at the
-    annotated target.  */
-const W = 200  /*  overall width   */
-const H = 110  /*  overall height  */
+    annotated target. The `flat` variant uses a shorter overall height
+    and a flatter arc that drops less vertically, sweeping more along
+    the horizontal towards a higher target point.  */
+const W = 200              /*  overall width                  */
+const H = flat ? 70 : 110  /*  overall height (shorter if flat)  */
 
 /*  the arc path: start at top-right, sweep leftwards along the top to
     the top-left, then hook downwards to the target point near the
-    bottom-left. Two cubic Bézier segments give a smooth "L"-shaped hook.  */
-const arc = [
-    "M 58 12",                     /*  start: top-right                  */
-    "C 20 14, 6 44, 30 90"         /*  single smooth sweep down to target */
-].join(" ")
+    bottom-left. A smooth cubic Bézier gives the "L"-shaped hook; the
+    `flat` variant ends at a higher target with a gentler drop.  */
+const arc = flat ?
+    "M 64 14 C 28 12, 28 34, 30 52" :  /*  flatter sweep, near-vertical at the arrow end  */
+    "M 58 12 C 20 14, 6 44, 30 90"     /*  default sweep down to target  */
+
+/*  arrow head at the bottom-left (target) end of the arc; the `flat`
+    variant points nearly straight down, nudged slightly clockwise.  */
+const head = flat ?
+    "M 30 52 L 20 41 M 30 52 L 37 40" :  /*  near-downward head, tilted clockwise  */
+    "M 30 90 L 16 84 M 30 90 L 34 76"    /*  head at the default target  */
 ---
-<div class={`annotation annotation-cycle pointer-events-none select-none ${className ?? ""}`}>
+<div class={`annotation ${fade ? "annotation-cycle" : ""} pointer-events-none select-none ${className ?? ""}`}>
     <svg
         class="block h-auto w-full overflow-visible"
         width={W}
@@ -60,7 +70,7 @@ const arc = [
         {/* arrow head at the bottom-left (target) end of the arc, pointing
             down-and-leftwards where the hook terminates */}
         <path
-            d="M 30 90 L 16 84 M 30 90 L 34 76"
+            d={head}
             fill="none"
             stroke="var(--brand-800)"
             stroke-width="3"
@@ -75,8 +85,8 @@ const arc = [
         positions the outer wrapper (absolutely), so this anchors against
         that wrapper. */}
     <div
-        class="annotation-label absolute inset-x-0 -top-3 translate-x-7 -rotate-2 text-center leading-[1.1] text-brand-500"
-        style="font-family: 'TypoPRO Kalam', cursive; font-size: 18px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+        class={`annotation-label absolute inset-x-0 -top-3 ${flat ? "translate-x-10" : "translate-x-7"} -rotate-2 text-center font-normal leading-[1.1] text-brand-500`}
+        style="font-family: 'TypoPRO Kalam', cursive; font-size: 19px; font-weight: 400; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
         <slot />
     </div>
 </div>
