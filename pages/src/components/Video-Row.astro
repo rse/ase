@@ -41,8 +41,8 @@ const skillCmd = spaceIdx === -1 ?
             style="background: radial-gradient(ellipse 70% 60% at center, color-mix(in oklch, var(--brand-500) 30%, transparent), transparent 80%);"
             aria-hidden="true"
         ></div>
-        <p class="text-sm font-semibold uppercase tracking-wider text-accent">{usp.eyebrow}</p>
-        <h3 class="mt-3 text-2xl font-bold sm:text-3xl">{usp.title}</h3>
+        <p class="ase-eyebrow">{usp.eyebrow}</p>
+        <h3 class="ase-h3">{usp.title}</h3>
         <p class="mt-4 text-foreground-secondary" set:html={usp.body}></p>
         <Terminal class="mt-5" prefix="Claude Code" commands={[ skillCmd ]}/>
     </div>

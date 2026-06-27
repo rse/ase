@@ -8,7 +8,6 @@
 
 @import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro.css";
 @import "../../node_modules/typopro-web/web/TypoPRO-SourceCodePro/TypoPRO-SourceCodePro.css";
-
 @import "../../node_modules/typopro-web/web/TypoPRO-Kalam/TypoPRO-Kalam.css";
 
 /*  brand scale   */
@@ -105,6 +104,26 @@
     @apply mt-1;
     text-align: left;
     text-indent: 2em;
+}
+
+/*  accent-colored, uppercase eyebrow label above section/subsection headings  */
+@utility ase-eyebrow {
+    @apply text-sm font-semibold uppercase tracking-wider text-accent;
+}
+
+/*  primary section heading (h2)  */
+@utility ase-h2 {
+    @apply text-3xl font-bold sm:text-4xl;
+}
+
+/*  subsection heading (h3)  */
+@utility ase-h3 {
+    @apply mt-3 text-2xl font-bold sm:text-3xl;
+}
+
+/*  bordered, accent-on-hover navigation/call-to-action button  */
+@utility ase-btn {
+    @apply rounded-lg border border-border-strong px-3 py-2 font-semibold text-foreground transition-colors hover:border-accent hover:text-accent;
 }
 
 /*  ==== base element styling ====  */

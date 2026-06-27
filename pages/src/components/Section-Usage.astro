@@ -15,7 +15,7 @@ import { skillGroups } from "../data/skills.ts"
 ---
 <section id="usage" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <header class="mx-auto max-w-2xl text-center" data-reveal>
-        <h2 class="text-3xl font-bold sm:text-4xl">
+        <h2 class="ase-h2">
             Understand ASE <span class="text-accent">Philosophy</span>
         </h2>
         <p class="mt-4 text-left text-foreground-secondary">
@@ -34,8 +34,8 @@ import { skillGroups } from "../data/skills.ts"
         <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div class="relative isolate lg:order-1">
                 <SectionGlow variant="text" side="left" />
-                <p class="text-sm font-semibold uppercase tracking-wider text-accent">Agentic AI Levels</p>
-                <h3 class="mt-3 text-2xl font-bold sm:text-3xl">From Manual To<br/>Fully Autonomous</h3>
+                <p class="ase-eyebrow">Agentic AI Levels</p>
+                <h3 class="ase-h3">From Manual To<br/>Fully Autonomous</h3>
                 <p class="mt-4 text-foreground-secondary">
                     <b>ASE</b> tries to support
                     the gradual stepping from Agentic AI Level 0 (where the
@@ -55,12 +55,11 @@ import { skillGroups } from "../data/skills.ts"
             <Diagram class="lg:order-2" src="/assets/agentic-levels.svg" label="agentic levels diagram" />
         </div>
 
-        {/*  row 2 — workflow diagram left, text right (zig-zag)  */}
         <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div class="relative isolate lg:order-2">
                 <SectionGlow variant="text" side="right" />
-                <p class="text-sm font-semibold uppercase tracking-wider text-accent">Skills &amp; Workflows</p>
-                <h3 class="mt-3 text-2xl font-bold sm:text-3xl">Step-Wise Driving,<br/>You In The Loop</h3>
+                <p class="ase-eyebrow">Skills &amp; Workflows</p>
+                <h3 class="ase-h3">Step-Wise Driving,<br/>You In The Loop</h3>
                 <p class="mt-4 text-foreground-secondary">
                     Within the above Agentic AI Levels, <b>ASE</b> provides its
                     various skills to let the engineer trigger the
@@ -79,8 +78,6 @@ import { skillGroups } from "../data/skills.ts"
             <Diagram class="lg:order-1" src="/assets/workflow.svg" label="ASE usage workflow diagram" />
         </div>
 
-        {/*  full-width skill catalog: the four skill groups (Meta / Task Mode /
-            Funnel Mode / Other) as a 4-column grid, framed like the diagrams.  */}
         <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
             <div class="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-5">
                 {skillGroups.map((group) => {
@@ -95,9 +92,6 @@ import { skillGroups } from "../data/skills.ts"
                             <p class="text-sm font-bold uppercase tracking-wider text-accent">{word}<br/>Mode {fraction.trim() && <span class="font-light">{fraction.trim()}</span>}</p>
                             <ul class="mt-3 space-y-1 text-[0.90625rem] leading-none text-foreground-secondary">
                                 {group.skills.map((id) => {
-                                    /*  split "ase-<area>-<name>" into the dim
-                                        "ase-<area>-" prefix and the accented
-                                        clickable "<name>" trigger.  */
                                     const idx    = id.lastIndexOf("-")
                                     const prefix = id.slice(0, idx + 1)
                                     const name   = id.slice(idx + 1)
@@ -112,12 +106,11 @@ import { skillGroups } from "../data/skills.ts"
             </div>
         </div>
 
-        {/*  row 3 — text left, operation-modes diagram right  */}
         <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div class="relative isolate lg:order-1">
                 <SectionGlow variant="text" side="left" />
-                <p class="text-sm font-semibold uppercase tracking-wider text-accent">Operation Modes</p>
-                <h3 class="mt-3 text-2xl font-bold sm:text-3xl">Advanced Workflows, Maximum Flexibility</h3>
+                <p class="ase-eyebrow">Operation Modes</p>
+                <h3 class="ase-h3">Advanced Workflows, Maximum Flexibility</h3>
                 <div class="mt-4 text-foreground-secondary">
                     <p>
                     On top of the usual Agentic AI Coding tool modes{" "}
