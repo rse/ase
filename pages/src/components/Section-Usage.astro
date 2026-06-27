@@ -14,11 +14,11 @@ import Diagram         from "./Diagram.astro"
 import { skillGroups } from "../data/skills.ts"
 ---
 <section id="usage" class="relative isolate mx-auto max-w-4xl px-6 py-8">
-    <header class="mx-auto max-w-2xl text-center" data-reveal>
+    <header class="ase-section-head" data-reveal>
         <h2 class="ase-h2">
             Understand ASE <span class="text-accent">Philosophy</span>
         </h2>
-        <p class="mt-4 text-left text-foreground-secondary">
+        <p class="ase-lead">
             <b>ASE</b> is based on{" "}
             <b>Dr. Ralf S. Engelschall</b>'s Agentic AI Level model,
             where it tries to focus on the "sweet-spot" levels.
@@ -31,7 +31,7 @@ import { skillGroups } from "../data/skills.ts"
 
     <div class="mt-12 flex flex-col gap-12" data-reveal-children>
         {/*  row 1 — text left, agentic-levels diagram right  */}
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="relative isolate lg:order-1">
                 <SectionGlow variant="text" side="left" />
                 <p class="ase-eyebrow">Agentic AI Levels</p>
@@ -55,7 +55,7 @@ import { skillGroups } from "../data/skills.ts"
             <Diagram class="lg:order-2" src="/assets/agentic-levels.svg" label="agentic levels diagram" />
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="relative isolate lg:order-2">
                 <SectionGlow variant="text" side="right" />
                 <p class="ase-eyebrow">Skills &amp; Workflows</p>
@@ -106,7 +106,7 @@ import { skillGroups } from "../data/skills.ts"
             </div>
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="relative isolate lg:order-1">
                 <SectionGlow variant="text" side="left" />
                 <p class="ase-eyebrow">Operation Modes</p>

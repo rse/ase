@@ -9,26 +9,28 @@ import SectionGlow from "./Section-Glow.astro"
 import Terminal    from "./Terminal.astro"
 ---
 <section id="workflows" class="relative isolate mx-auto max-w-4xl px-6 py-8">
-    <header class="mx-auto max-w-2xl text-center" data-reveal>
+    <header class="ase-section-head" data-reveal>
         <h2 class="ase-h2">
             How to Use <span class="text-accent">Workflows</span>
         </h2>
-        <p class="mt-4 text-left text-foreground-secondary">
+        <p class="ase-lead">
             <b>ASE</b> is based on individual skills which can both be
             sequentially triggered and partially also automatically
             chained. This way typical practical workflows can be
             realized. The following shows typical workflows in the
-            Agentic AI Coding tool <b>Claude Code</b>. Which workflow to
-            choose depends on the requirements, the wished pros and the
-            acceptable cons. <b>ASE</b> does not mandate a particular
-            workflow as the particular tasks of Software Engineers are
-            to different. In practice, one needs nearly all workflows.
-            Each one at a certain time.
+            Agentic AI Coding tool <b>Claude Code</b>.
+        </p>
+        <p class="ase-indent-p text-foreground-secondary">
+            Which workflow to choose depends on the requirements, the
+            wished pros and the acceptable cons. <b>ASE</b> does not
+            mandate a particular workflow as the particular tasks of
+            Software Engineers are to different. In practice, one needs
+            nearly all workflows. Each one at a certain time.
         </p>
     </header>
 
     <div class="mt-12 flex flex-col gap-12" data-reveal-children>
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="lg:order-1 relative isolate">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Ad-Hoc Prompt</p>
@@ -50,7 +52,7 @@ import Terminal    from "./Terminal.astro"
             />
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="lg:order-1 relative isolate">
                 <p class="ase-eyebrow">Plan Mode</p>
                 <h3 class="ase-h3">Simple Planning</h3>
@@ -79,7 +81,7 @@ import Terminal    from "./Terminal.astro"
             </div>
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="lg:order-1 relative isolate">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Task Mode #1</p>
@@ -107,7 +109,7 @@ import Terminal    from "./Terminal.astro"
             />
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="lg:order-1 relative isolate">
                 <p class="ase-eyebrow">Task Mode #2</p>
                 <h3 class="ase-h3">Professional Planning</h3>
@@ -137,7 +139,7 @@ import Terminal    from "./Terminal.astro"
             </div>
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="lg:order-1 relative isolate">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Funnel Mode</p>
@@ -168,7 +170,7 @@ import Terminal    from "./Terminal.astro"
             />
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="lg:order-1 relative isolate">
                 <p class="ase-eyebrow">Quick Mode</p>
                 <h3 class="ase-h3">Quick &amp; Dirty</h3>
@@ -195,7 +197,7 @@ import Terminal    from "./Terminal.astro"
             </div>
         </div>
 
-        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div class="ase-grid-split">
             <div class="lg:order-1 relative isolate">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Reconciliation Mode</p>

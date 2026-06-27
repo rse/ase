@@ -126,6 +126,21 @@
     @apply rounded-lg border border-border-strong px-3 py-2 font-semibold text-foreground transition-colors hover:border-accent hover:text-accent;
 }
 
+/*  centered, width-constrained section header wrapper  */
+@utility ase-section-head {
+    @apply mx-auto max-w-2xl text-center;
+}
+
+/*  vertically-centered two-column split layout (text/diagram zig-zag rows)  */
+@utility ase-grid-split {
+    @apply grid items-center gap-10 lg:grid-cols-2 lg:gap-16;
+}
+
+/*  left-aligned section lead/intro copy  */
+@utility ase-lead {
+    @apply mt-4 text-left text-foreground-secondary;
+}
+
 /*  ==== base element styling ====  */
 
 html {
