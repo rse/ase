@@ -101,7 +101,7 @@
 }
 
 /*  left-aligned, first-line-indented section body copy  */
-@utility indent-paragraph {
+@utility ase-indent-p {
     @apply mt-1;
     text-align: left;
     text-indent: 2em;
