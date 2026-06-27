@@ -11,8 +11,8 @@ About
 
 **Agentic Software Engineering (ASE)** is the
 opinionated [Open Source](https://github.com/rse/ase/blob/master/LICENSE.txt) companion
-toolkit of [Dr. Ralf S. Engelschall](#author)
-for fusing the concept of **Agentic AI Coding** and traditional **Software Engineering**
+toolkit of [*Dr. Ralf S. Engelschall*](https://ase.tools/#author)
+for fusing the concept of *Agentic AI Coding* and traditional *Software Engineering*
 in the software development tool [Anthropic Claude
 Code](https://claude.com/product/claude-code) — and with reduced support also in the alternative
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
@@ -21,10 +21,10 @@ tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
 **ASE** ships with agent hooks, agent skills, an underlying Model-Context-Protocol (MCP)
 service and a Command-Line Interface (CLI), incorporating reasonable methodology
 and automation aspects, to support the recurring tasks of a
-**Software Developer** and **Software Architect**.
+*Software Developer* and *Software Architect*.
 
 **ASE** is primarily motivated by the following statement of its primary
-author, *Dr. Ralf S. Engelschall*:
+author, [*Dr. Ralf S. Engelschall*](https://ase.tools/#author):
 
 > "Software developers in the industrial Software Engineering context,
 > in their recurring tasks, should leverage pre-manufactured agentic AI
