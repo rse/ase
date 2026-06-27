@@ -72,7 +72,7 @@ const quotes = [
                 <SwiperWrapper>
                     {quotes.map((quote) => (
                         <SwiperSlide class="flex items-center justify-center px-4 sm:px-10">
-                            <blockquote class="border-l-8 border-brand-700 px-4 text-left text-sm italic leading-tight text-white sm:text-lg" set:html={quote}/>
+                            <blockquote class="border-l-8 border-brand-700 px-4 text-left text-xs italic leading-tight text-white sm:text-lg" set:html={quote}/>
                         </SwiperSlide>
                     ))}
                 </SwiperWrapper>
@@ -202,6 +202,14 @@ const quotes = [
         margin-left:  auto;
         margin-right: 2rem;
         touch-action: pan-y;
+    }
+
+    /*  on small viewports the smaller quote font (text-xs) needs less
+        vertical room, so shrink the fixed carousel height accordingly.  */
+    @media (max-width: 639px) {
+        .hero-quotes.hero-quotes {
+            height: 2rem;
+        }
     }
     .hero-quotes .swiper-slide {
         height: auto;
