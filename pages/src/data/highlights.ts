@@ -38,6 +38,15 @@ export const highlights: Highlights[] = [
         video:   "ase-meta-persona"
     },
     {
+        eyebrow: "Parametrized Brainstorming",
+        title:   "Diverge, cluster, and shortlist new ideas",
+        body:    "Turn a fuzzy topic into a focused shortlist: first diverge into a " +
+                 "broad set of ideas, then converge by clustering and scoring them, and finally " +
+                 "distill a ranked shortlist with a recommended direction to pursue.",
+        skill:   "/ase-meta-brainstorm --max-clarify=0 --min-ideas=20 clever and useful AI skills for software engineering",
+        video:   "ase-meta-brainstorm"
+    },
+    {
         eyebrow: "Component Discovery",
         title:   "Discover the right components for your technology stack",
         body:    "Get methodical support in finding suitable libraries and frameworks to " +
@@ -91,6 +100,7 @@ export const highlights: Highlights[] = [
         skill:   "/ase-code-analyze --severity=MEDIUM @tool/src/",
         video:   "ase-code-analyze"
     },
+
     {
         eyebrow: "Alternative Approach Funnel",
         title:   "Craft through a funnel of approaches",
