@@ -19,7 +19,7 @@ a companion Command-Line Interface (CLI) tool, including a built-in
 *MCP* service (of about 7K LoC TypeScript code). **ASE**, on the
 surface, provides 39 agent skills and commands to support the most
 important, recurring work-steps in the primary disciplines of *Software
-Engineering*, especially in the discipline *Software Development* and
+Engineering*, especially in the disciplines *Software Development* and
 *Software Architecture*.
 
 **ASE** is primarily motivated by the following statement of its primary
@@ -29,7 +29,7 @@ author, *Dr. Ralf S. Engelschall*:
 > in their recurring tasks, should leverage pre-manufactured agentic AI
 > skills to boost their daily productivity. Those skills incorporate
 > reasonable methodology and automation aspects while keeping the
-> developers in the driver seat to ensure stable result quality."
+> developers in the driver's seat to ensure stable result quality."
 
 Notices
 -------
