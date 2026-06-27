@@ -11,6 +11,7 @@
 
 import SectionGlow from "./Section-Glow.astro"
 import Terminal    from "./Terminal.astro"
+import Annotation  from "./Annotation.astro"
 ---
 <section id="setup" class="relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="left" />
@@ -41,8 +42,13 @@ import Terminal    from "./Terminal.astro"
     </header>
 
     <div data-reveal>
+        <Annotation flat class="hidden sm:block left-[75%] -translate-x-1/2">
+            Execute just two<br/>
+            commands and you<br/>
+            are up and running!
+        </Annotation>
         <Terminal
-            class="mx-auto mt-8 max-w-2xl"
+            class="mx-auto mt-8 sm:mt-18 max-w-2xl"
             copy={true}
             title="Installation"
             commands={[

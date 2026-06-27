@@ -12,6 +12,7 @@
 import SectionGlow from "./Section-Glow.astro"
 import LogoGitHub  from "./Logo-GitHub.astro"
 import LogoRSE     from "./Logo-RSE.astro"
+import Annotation  from "./Annotation.astro"
 
 const contributors = [
     "Matthias Brusdeylins",
@@ -95,10 +96,15 @@ const contributors = [
     </div>
 </section>
 
-<section id="contributors" class="relative isolate mx-auto max-w-4xl px-6 py-8">
+<section id="contributors" class="mt-4 sm:mt-12 relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="left" />
     <header class="ase-section-head" data-reveal>
         <h2 class="ase-h2">
+            <Annotation flat class="hidden sm:block right-0 -translate-x-2/3">
+                Wanna join our<br/>
+                Open Source<br/>
+                software journey?
+            </Annotation>
             Thanks to the <span class="text-accent">Contributors</span>
         </h2>
         <p class="ase-lead">

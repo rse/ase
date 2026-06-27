@@ -11,6 +11,7 @@
 
 import SectionGlow     from "./Section-Glow.astro"
 import Diagram         from "./Diagram.astro"
+import Annotation      from "./Annotation.astro"
 import { skillGroups } from "../data/skills.ts"
 ---
 <section id="usage" class="relative isolate mx-auto max-w-4xl px-6 py-8">
@@ -74,7 +75,12 @@ import { skillGroups } from "../data/skills.ts"
                     replaying the delegated work.
                 </p>
             </div>
-            <div class="lg:order-2">
+            <div class="lg:order-2 relative">
+                <Annotation flat class="hidden sm:block right-0 -translate-x-1/2">
+                    ASE focuses on the<br/>
+                    sweet-spot of the<br/>
+                    Agentic AI Levels 1-3!
+                </Annotation>
                 <Diagram class="" src="/assets/agentic-levels.svg" label="agentic levels diagram" />
                 <p class="mt-8 text-foreground-secondary ase-indent-p">
                     <b>Level 4 (autonomous)</b>: you are assigning
@@ -181,7 +187,14 @@ import { skillGroups } from "../data/skills.ts"
                     </p>
                 </div>
             </div>
-            <Diagram class="lg:order-2" src="/assets/operation-modes.svg" label="ASE operation modes diagram" />
+            <div class="lg:order-2 relative">
+                <Annotation flat class="hidden sm:block right-0 -translate-x-1/2">
+                    Get 3 new powerful<br/>
+                    operation modes in<br/>
+                    your Claude Code!
+                </Annotation>
+                <Diagram class="lg:order-2" src="/assets/operation-modes.svg" label="ASE operation modes diagram" />
+            </div>
         </div>
     </div>
 </section>

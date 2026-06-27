@@ -9,12 +9,17 @@
     layout describing the four distinct design decisions behind ASE.  */
 
 import SectionGlow from "./Section-Glow.astro"
+import Annotation  from "./Annotation.astro"
 ---
-<section id="design" class="relative isolate mx-auto max-w-4xl px-6 py-8">
+<section id="design" class="mt-4 sm:mt-12 relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="left"/>
 
     <header class="ase-section-head" data-reveal>
         <h2 class="ase-h2">
+            <Annotation flat class="hidden sm:block right-0 -translate-x-1/2">
+                We put experts in<br/>
+                in the driver's seat!
+            </Annotation>
             Understand Design <span class="text-accent">Assumptions</span>
         </h2>
         <p class="ase-lead">

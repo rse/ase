@@ -10,11 +10,16 @@
 
 import SectionGlow from "./Section-Glow.astro"
 import Diagram     from "./Diagram.astro"
+import Annotation  from "./Annotation.astro"
 ---
-<section id="architecture" class="relative isolate mx-auto max-w-4xl px-6 py-8">
+<section id="architecture" class="mt-4 sm:mt-12 relative isolate mx-auto max-w-4xl px-6 py-8">
     <SectionGlow variant="section" side="left" />
     <header class="ase-section-head" data-reveal>
         <h2 class="ase-h2">
+            <Annotation flat class="hidden sm:block right-0 -translate-x-1/2">
+                ASE pimps up<br/>
+                your Claude Code!
+            </Annotation>
             Overview of the <span class="text-accent">Architecture</span>
         </h2>
         <p class="ase-lead">
