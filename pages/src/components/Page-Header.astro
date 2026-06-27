@@ -117,6 +117,16 @@ import ProgressBar   from "./Progress-Bar.astro"
         menu.querySelectorAll("a").forEach(function (link) {
             link.addEventListener("click", function () { setOpen(false) })
         })
+
+        /*  close the open panel when clicking anywhere outside of it or the
+            toggle button (the toggle handles its own clicks above).  */
+        document.addEventListener("click", function (ev) {
+            if (!menu.hasAttribute("data-open"))
+                return
+            if (menu.contains(ev.target) || btn.contains(ev.target))
+                return
+            setOpen(false)
+        })
     })()
 </script>
 
