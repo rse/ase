@@ -47,6 +47,15 @@ export const highlights: Highlights[] = [
         video:   "ase-meta-brainstorm"
     },
     {
+        eyebrow: "Root-Cause Analysis",
+        title:   "Trace root-cause with Five-Whys method",
+        body:    "Drill past symptoms to the real cause: the Five-Whys method iteratively asks " +
+                 "\"why?\" to trace a problem or claim back to its root, optionally branching into " +
+                 "multiple causal paths to widen the investigation.",
+        skill:   "/ase-meta-why --width=2 is the Decibel (dB) unit a logarithmic one?",
+        video:   "ase-meta-why"
+    },
+    {
         eyebrow: "Component Discovery",
         title:   "Discover the right components for your technology stack",
         body:    "Get methodical support in finding suitable libraries and frameworks to " +
@@ -85,11 +94,20 @@ export const highlights: Highlights[] = [
         video:   "ase-meta-steelman"
     },
     {
+        eyebrow: "Document Distillation",
+        title:   "Distill a document down to its ranked key points",
+        body:    "Cut a long document down to its essence: distill it into a flat, " +
+                 "importance-ranked list of key points, each with a salience rank, a rationale, " +
+                 "and a verbatim, line-cited evidence snippet.",
+        skill:   "/ase-docs-distill --top=3 @plugin/meta/ase-format-spec.md",
+        video:   "ase-docs-distill"
+    },
+    {
         eyebrow: "Document Proofreading",
         title:   "Analyze documents for spelling, punctuation, and grammar",
         body:    "Scan your documents for problems in spelling, punctuation and grammar. " +
                  "Optionally, let the documents be automatically corrected.",
-        skill:   "/ase-code-analyze --auto @README.md",
+        skill:   "/ase-docs-proofread --auto @README.md",
         video:   "ase-docs-proofread"
     },
     {
