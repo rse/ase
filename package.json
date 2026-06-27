@@ -7,7 +7,7 @@
     "repository":                           { "url": "git+https://github.com/rse/ase.git", "type": "git" },
     "bugs":                                 { "url": "http://github.com/rse/ase/issues" },
     "version":                              "0.9.29",
-    "license":                              "GPL-3.0-only",
+    "license":                              "Apache-2.0",
     "author": {
         "name":                             "Dr. Ralf S. Engelschall",
         "email":                            "rse@engelschall.com",

@@ -1,7 +1,7 @@
 /*
 **  Agentic Software Engineering (ASE)
 **  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
-**  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
+**  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
 import { defineConfig } from "eslint/config"
