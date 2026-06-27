@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.31 (2026-06-27)
+-------------------
+
+- IMPROVEMENT: further improvements to mobile rendering of website
+
 0.9.30 (2026-06-27)
 -------------------
 
