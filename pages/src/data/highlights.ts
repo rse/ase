@@ -118,7 +118,6 @@ export const highlights: Highlights[] = [
         skill:   "/ase-code-analyze --severity=MEDIUM @tool/src/",
         video:   "ase-code-analyze"
     },
-
     {
         eyebrow: "Alternative Approach Funnel",
         title:   "Craft through a funnel of approaches",
@@ -136,6 +135,15 @@ export const highlights: Highlights[] = [
                  "implemented as a complete, surgical change set you stay in control of.",
         skill:   "/ase-task-implement hello",
         video:   "ase-task-implement"
+    },
+    {
+        eyebrow: "Automatic ChangeLog",
+        title:   "Auto-Generate ChangeLog Entries from Git",
+        body:    "Keep your <code>CHANGELOG.md</code> file current without the chore: derive concise, " +
+                 "human-readable changelog entries straight from your Git history and " +
+                 "fold them into the existing file under the right version and category.",
+        skill:   "/ase-meta-changelog",
+        video:   "ase-meta-changelog"
     }
 ]
 
