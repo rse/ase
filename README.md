@@ -9,17 +9,19 @@
 About
 -----
 
-**Agentic Software Engineering (ASE)** is the opinionated companion
-tooling of *Dr. Ralf S. Engelschall* for combining the approach of
-*Agentic AI* and *Software Engineering* with the help of *Agentic AI
-Coding Tools* like *Claude Code*. **ASE** primarily consists of a
-*Claude Code* plugin (of about 20K LoC agent skill definitions) and
-a companion Command-Line Interface (CLI) tool, including a built-in
-*MCP* service (of about 7K LoC TypeScript code). **ASE**, on the
-surface, provides 39 agent skills and commands to support the most
-important, recurring work-steps in the primary disciplines of *Software
-Engineering*, especially in the disciplines *Software Development* and
-*Software Architecture*.
+**Agentic Software Engineering (ASE)** is the
+opinionated [Open Source](https://github.com/rse/ase/blob/master/LICENSE.txt) companion
+toolkit of [Dr. Ralf S. Engelschall](#author)
+for fusing the concept of **Agentic AI Coding** and traditional **Software Engineering**
+in the software development tool [Anthropic Claude
+Code](https://claude.com/product/claude-code) — and with reduced support also in the alternative
+tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
+[OpenAI Codex](https://github.com/openai/codex).
+
+**ASE** ships with agent hooks, agent skills, an underlying Model-Context-Protocol (MCP)
+service and a Command-Line Interface (CLI), incorporating reasonable methodology
+and automation aspects, to support the recurring tasks of a
+**Software Developer** and **Software Architect**.
 
 **ASE** is primarily motivated by the following statement of its primary
 author, *Dr. Ralf S. Engelschall*:
@@ -54,15 +56,8 @@ Notices
 > (especially hooks, interactive user dialog tool, etc.) realistically
 > allow it.
 
-> [!NOTE]
-> **STATUS QUO**: **ASE** is still under active initial development
-> and somewhat incomplete. All existing functionality is already
-> stable and used on a daily basis in production. Feel free to
-> already join us on our journey towards [*Agentic Software
-> Engineering*](docs/agentic-software-engineering.md).
-
-Unique Selling Points
----------------------
+Highlights
+----------
 
 Check out the following scenarios and corresponding **ASE** examples to
 see whether **ASE** is right for you:
