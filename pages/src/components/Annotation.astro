@@ -7,10 +7,15 @@
 
 /*  hand-drawn annotation: a curved white arc/arrow sweeping from the
     top-right down to the bottom-left, with a short white text caption
-    placed above the arc. Intended to be absolutely positioned by the
-    caller as an overlay that points at a nearby UI element. The arrow
-    head sits at the arc's bottom-left (target) end. The caption is
-    supplied via the default slot.  */
+    placed above the arc. Rendered as an overlay that points at a nearby
+    UI element. The arrow head sits at the arc's bottom-left (target)
+    end. The caption is supplied via the default slot.
+
+    The root carries the shared overlay defaults (`absolute bottom-full
+    z-30 w-[200px]`, hidden below the `sm` breakpoint via `hidden
+    sm:block`); the caller only supplies the horizontal anchoring (e.g.
+    `left-1/2 -translate-x-1/4` or `right-0 translate-x-1/4`) and any
+    overrides through the `class` prop, which is appended last.  */
 
 interface Props {
     class?: string
@@ -41,7 +46,7 @@ const head = flat ?
     "M 30 52 L 20 41 M 30 52 L 37 40" :  /*  near-downward head, tilted clockwise  */
     "M 30 90 L 16 84 M 30 90 L 34 76"    /*  head at the default target  */
 ---
-<div class={`annotation ${fade ? "annotation-cycle" : ""} pointer-events-none select-none ${className ?? ""}`}>
+<div class={`annotation ${fade ? "annotation-cycle" : ""} pointer-events-none select-none absolute bottom-full z-30 hidden w-[200px] sm:block ${className ?? ""}`}>
     <svg
         class="block h-auto w-full overflow-visible"
         width={W}
