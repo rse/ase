@@ -2,3 +2,4 @@ node_modules/
 .ase
 .env
 .DS_Store
+.playwright-mcp
