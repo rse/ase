@@ -124,8 +124,10 @@ html {
     color-scheme: dark;
     background: var(--background);
     /*  clip decorative bleed (e.g. the USP background glows) so it never
-        produces a horizontal scrollbar.  */
-    overflow-x: hidden;
+        produces a horizontal scrollbar. `clip` (rather than `hidden`) avoids
+        establishing a scroll container, so it does not interfere with the
+        `position: sticky`/`fixed` header or `scroll-padding-top`.  */
+    overflow-x: clip;
     position: relative;
 }
 :root.light {
@@ -140,6 +142,10 @@ body {
     line-height: 1.3;
     -webkit-font-smoothing: antialiased;
     position: relative;
+    /*  also clip on the body: `overflow-x: hidden` on the root alone does not
+        reliably suppress horizontal touch panning on mobile when the body is
+        still `visible`, which let the decorative glows pan the page sideways.  */
+    overflow-x: clip;
 }
 
 h1, h2, h3 {
