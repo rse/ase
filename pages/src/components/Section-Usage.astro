@@ -30,31 +30,64 @@ import { skillGroups } from "../data/skills.ts"
     </header>
 
     <div class="mt-12 flex flex-col gap-12" data-reveal-children>
-        {/*  row 1 — text left, agentic-levels diagram right  */}
         <div class="ase-grid-split">
             <div class="relative isolate lg:order-1">
                 <SectionGlow variant="text" side="left" />
                 <p class="ase-eyebrow">Agentic AI Levels</p>
                 <h3 class="ase-h3">From Manual To<br/>Fully Autonomous</h3>
                 <p class="mt-4 text-foreground-secondary">
-                    <b>ASE</b> tries to support
-                    the gradual stepping from Agentic AI Level 0 (where the
-                    engineer does everything) to Agentic AI Level 4 (where the AI
-                    agent does everything), while strongly focusing on the
-                    intermediate Agentic AI Levels 1-3 &mdash; the "sweet-spot".
+                    <b>ASE</b> supports the gradual Agentic AI levels 0-4,
+                    but focuses on the "sweet-spot" of acting on Levels 1-3:
                 </p>
                 <p class="text-foreground-secondary ase-indent-p">
-                    This means that in <b>ASE</b> the engineer
-                    is in the driver's seat and always decides and
-                    interactively triggers the next operational
-                    step, although for some operations multiple
-                    steps can be chained or executed in a
-                    non-interactive mode.
+                    <b>Level 0 (manually)</b>: you do everything
+                    manually and without support by the AI agent at all
+                    &mdash; think "do-it-yourself", where you obviously
+                    know the results and inherently train your own
+                    skills.
+                </p>
+                <p class="text-foreground-secondary ase-indent-p">
+                    <b>Level 1 (assisted)</b>: you are supported by the
+                    AI agent for individual steps only &mdash; think
+                    "assistant", where you still know all results in
+                    detail, but inherently your practical execution
+                    skills partly can start to wane in the long-term.
+                </p>
+                <p class="text-foreground-secondary ase-indent-p">
+                    <b>Level 2 (supervised)</b>: you are working on
+                    an entire task with the AI agent as an equal pair
+                    &mdash; think "co-worker", where your colleague
+                    shares the task workload with you, you mutually
+                    review each other's results, hence you still know
+                    all results in detail, but inherently your practical
+                    execution skills can be lost in the long-term.
+                </p>
+                <p class="text-foreground-secondary ase-indent-p">
+                    <b>Level 3 (delegated)</b>: you are delegating
+                    entire workflows to the AI agent &mdash; think
+                    "offshoring", where your colleague stems the entire
+                    workload for you, you just review the results, but
+                    your own practical execution skill and your ability
+                    to quality assure the results will be forever lost
+                    if you are not regularly, at least virtually,
+                    replaying the delegated work.
                 </p>
             </div>
-            <Diagram class="lg:order-2" src="/assets/agentic-levels.svg" label="agentic levels diagram" />
+            <div class="lg:order-2">
+                <Diagram class="" src="/assets/agentic-levels.svg" label="agentic levels diagram" />
+                <p class="mt-8 text-foreground-secondary ase-indent-p">
+                    <b>Level 4 (autonomous)</b>: you are assigning
+                    entire process lifecycles to the AI agent &mdash;
+                    think "third-party", where your vendor does
+                    everything for you, you just take the results as
+                    is, and your own practical execution skill doesn't
+                    matter and is already out of scope.
+                </p>
+            </div>
         </div>
+    </div>
 
+    <div class="mt-12 flex flex-col gap-12" data-reveal-children>
         <div class="ase-grid-split">
             <div class="relative isolate lg:order-2">
                 <SectionGlow variant="text" side="right" />

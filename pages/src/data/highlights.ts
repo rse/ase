@@ -88,7 +88,7 @@ export const highlights: Highlights[] = [
         title:   "Strengthen your decision with a Steelman",
         body:    "Further improve the strength of your decision before others challenge it. " +
                  "Let the decision be fortified by a helpful Steelman into a " +
-                 "a stronger position that consolidates everything that genuinely strengthens it " +
+                 "stronger position that consolidates everything that genuinely strengthens it " +
                  "while honestly bounding where it holds.",
         skill:   "/ase-meta-steelman --count=10 ASE is a useful Claude Code plugin",
         video:   "ase-meta-steelman"
