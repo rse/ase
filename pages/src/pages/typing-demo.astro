@@ -1,0 +1,58 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
+*/
+
+/*  Isolated render route used solely for capturing a video/GIF of the
+    <TypingDemo/> component (see etc/record-typing-demo.mjs).  */
+
+import                   "../styles/theme.css"
+import ThemeInit    from "../components/Theme-Init.astro"
+import LogoASE      from "../components/Logo-ASE.astro"
+import TypingDemo   from "../components/Typing-Demo.astro"
+---
+<!DOCTYPE html>
+<html lang="en" class="dark">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>ASE — Typing Demo</title>
+        <ThemeInit/>
+        <style is:global>
+            .typing-demo-capture { padding-bottom: 30px; }
+            .typing-demo-capture .hero-prompt {
+                background-color: color-mix(in oklch,
+                    color-mix(in oklch, var(--accent) 10%, var(--accent)) 30%, black) !important;
+            }
+            .typing-demo-capture .hero-prompt > div:first-child {
+                background-color: color-mix(in oklch,
+                    color-mix(in oklch, var(--accent) 10%, var(--accent)) 41%, black) !important;
+            }
+        </style>
+    </head>
+    <body class="bg-background">
+        <main class="typing-demo-capture relative isolate flex h-screen w-full items-center
+            justify-center gap-10 overflow-hidden px-8">
+            {/* radial wash, mirrored from the Hero but enlarged to cover
+                more of this short, wide capture viewport */}
+            <div
+                class="pointer-events-none absolute inset-0 -z-10"
+                style="background:
+                    radial-gradient(ellipse 240% 300% at 55% 30%, color-mix(in oklch, var(--brand-600) 50%, transparent), transparent 35%),
+                    linear-gradient(to bottom, var(--background-elevated), var(--background-secondary));"
+                aria-hidden="true"
+            ></div>
+
+            {/* ASE logo with project URL beneath it, translated down so the
+                logo+URL block centers optically level with the terminal */}
+            <div class="flex shrink-0 translate-y-[18px] flex-col items-center justify-center gap-3">
+                <LogoASE class="h-auto w-32" idPrefix="ase-capture-logo"/>
+                <span class="mt-[-10px] font-sans text-3xl text-accent">ase.tools</span>
+            </div>
+
+            <TypingDemo count={7}/>
+        </main>
+    </body>
+</html>
