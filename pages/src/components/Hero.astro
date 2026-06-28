@@ -79,7 +79,7 @@ const quotes = [
             </Swiper>
 
             {/* GitHub badges */}
-            <div class="mt-6 flex min-h-[28px] flex-wrap items-center justify-center gap-2">
+            <div class="relative z-40 mt-6 flex min-h-[28px] flex-wrap items-center justify-center gap-2">
                 <a href="https://github.com/rse" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/stars/rse?logo=github&label=author%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (author stars)" />
                 </a>
@@ -89,7 +89,7 @@ const quotes = [
                 <a href="https://github.com/rse/ase/releases" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/v/release/rse/ase?logo=github&label=project%20release&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (release)" />
                 </a>
-                <span class="relative inline-flex">
+                <span class="group relative inline-flex">
                     <Annotation fade class="left-1/2 -translate-x-1/4">
                         If you like ASE,<br/>
                         please support it<br/>
@@ -99,6 +99,16 @@ const quotes = [
                     <a href="https://github.com/rse/ase" class="inline-flex overflow-hidden rounded-md">
                         <img src="https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (project stars)" />
                     </a>
+                    {/* on hover, reveal an animated guide showing how to give the
+                        project a star, in a popup anchored below the badge. */}
+                    <span class="pointer-events-none absolute right-0 top-full z-50 mt-3 origin-top-right scale-95 opacity-0 transition duration-200 group-hover:scale-100 group-hover:opacity-100">
+                        <img
+                            src="/assets/gh-star.gif"
+                            alt="How to star the ASE project on GitHub"
+                            loading="lazy"
+                            class="block w-72 max-w-[80vw] rounded-lg border border-border-strong [filter:drop-shadow(0_5px_3px_rgba(0,0,0,0.35))] sm:w-96"
+                        />
+                    </span>
                 </span>
             </div>
 
