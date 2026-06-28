@@ -51,7 +51,7 @@ const src    = `${mediaBase}/${name}.mp4`
 
         {/* centered play-button overlay (no dimming tint over the poster). */}
         <span class="pointer-events-none absolute inset-0 grid place-items-center">
-            <span class="grid h-16 w-16 place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_60%,black)] text-2xl font-bold text-white shadow-lg backdrop-blur transition-colors group-hover:bg-[color-mix(in_oklch,var(--accent)_80%,black)]">
+            <span class="grid h-16 w-16 place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_60%,black)]/60 text-2xl font-bold text-white shadow-lg backdrop-blur-xs transition-colors group-hover:bg-[color-mix(in_oklch,var(--accent)_80%,black)]/60">
                 ▶
             </span>
         </span>
