@@ -2,18 +2,27 @@
 ChangeLog
 =========
 
-0.9.33 (2026-06-28)
+0.9.33 (2026-06-29)
 -------------------
 
+- FEATURE: add internal typing-demo page for rendering a banner (`typing-demo.astro`, `typing-demo.mjs`)
 - IMPROVEMENT: use consistent "Anthropic Claude Code CLI" naming across docs, website, and tool (`README.md`, `AGENTS.md`, website, tool)
 - IMPROVEMENT: refine Hero rendering, text, height, and spacing (`Hero.astro`, `Typing-Demo.astro`, `Section-Design.astro`, `Section-Setup.astro`)
+- IMPROVEMENT: add count option to render just the top-N commands in typing demo (`Typing-Demo.astro`)
 - IMPROVEMENT: add star-this-project animation and script to Hero (`Hero.astro`, `gh-star.gif`, `gh-star.sh`)
 - IMPROVEMENT: be more precise about compatibility in website Compat section (`Section-Compat.astro`)
 - IMPROVEMENT: add zoom button to website diagrams (`Diagram.astro`, `Video-Embed.astro`)
 - IMPROVEMENT: provide local Playr SVG icon and re-add video speed control (`Modal-Video.astro`, `astro.config.mjs`)
 - IMPROVEMENT: add project links and feedback credits to Author/Footer sections (`Section-Author.astro`, `Page-Footer.astro`)
+- IMPROVEMENT: use signet in front of author name (`Section-Author.astro`)
+- IMPROVEMENT: step down to single-column grids on small viewports (`Section-Author.astro`)
+- IMPROVEMENT: emit a `robots.txt` file (`astro.config.mjs`)
+- IMPROVEMENT: reduce font scope to shrink generated site size (`theme.css`)
 - IMPROVEMENT: update banner image (`docs/ase-banner.png`)
+- UPDATE: upgrade dependencies (`package.json`)
 - CLEANUP: make ASE constitution not Claude-Code-CLI-specific (`ase-constitution.md`)
+- CLEANUP: clean up Usage and Author website components (`Section-Usage.astro`, `Section-Author.astro`)
+- CLEANUP: remove obsolete import (`Page-Footer.astro`)
 
 0.9.32 (2026-06-28)
 -------------------
