@@ -8,7 +8,7 @@ User Setup
 ### Prerequisites
 
 - Operating System: macOS, Linux, Windows
-- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
+- Agent Tool: [Anthropic Claude Code CLI](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
 - Runtime Engine: [Node.js](https://nodejs.org)
 
 ### Installation
@@ -81,7 +81,7 @@ Contributor Setup
 ### Prerequisites
 
 - Operating System: macOS, Linux, Windows
-- Agent Tool: [Claude Code](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
+- Agent Tool: [Anthropic Claude Code CLI](https://code.claude.com) or [GitHub Copilot CLI](https://github.com/features/copilot/cli)
 - Runtime Engine: [Node.js](https://nodejs.org)
 - Version Control: [Git](https://git-scm.com)
 

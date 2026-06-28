@@ -10,7 +10,7 @@ import { z }              from "zod"
 /*  reusable functionality: in-memory key/value store living inside the
     "ase service" process; per-project (one service per project) and
     not persisted; intended for sharing information between skills
-    across multiple Claude Code instances connected to the same service  */
+    across multiple Anthropic Claude Code CLI instances connected to the same service  */
 export class KV {
     /*  the actual in-memory store  */
     private static store = new Map<string, unknown>()

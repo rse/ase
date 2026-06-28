@@ -23,7 +23,7 @@ import { writeStdout }                      from "./ase-stdout.js"
 type Tool = "claude" | "copilot" | "codex"
 
 /*  per-tool dispatch table for the parts that actually differ between
-    Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI hook integrations.  */
+    Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI hook integrations.  */
 type ToolSpec = {
     toolNameField:           "tool_name"  | "toolName"
     toolInputField:          "tool_input" | "toolArgs"
@@ -48,8 +48,8 @@ const addonMcpServers = [
 ]
 
 /*  build a per-tool regular expression matching the tool names exposed
-    by the addon MCP servers: Claude Code prefixes them as
-    "mcp__<server>__<tool>", whereas Copilot CLI prefixes them as
+    by the addon MCP servers: Anthropic Claude Code CLI prefixes them as
+    "mcp__<server>__<tool>", whereas GitHub Copilot CLI prefixes them as
     "<server>-<tool>"  */
 const addonMcpToolNamePattern = (prefix: string, suffix: string): RegExp => {
     const alternatives = addonMcpServers
@@ -238,8 +238,8 @@ export default class HookCommand {
             versionHints.push("**NOTICE:** *development* setup")
         const versionHint = versionHints.length > 0 ? "(" + versionHints.join(", ") + ")" : ""
 
-        /*  read session information (Claude Code uses snake_case fields,
-            Copilot CLI uses camelCase fields)  */
+        /*  read session information (Anthropic Claude Code CLI uses snake_case fields,
+            GitHub Copilot CLI uses camelCase fields)  */
         const stdin = await this.readStdin()
         const input = this.parseJSON(stdin, v.object({
             session_id: v.optional(v.string()),
@@ -297,8 +297,8 @@ export default class HookCommand {
         /*  determine headless mode  */
         const headless = (process.env.ASE_HEADLESS ?? "false") === "true" ? "true" : "false"
 
-        /*  provide ASE information to Claude Code shell commands
-            (Claude Code only -- Copilot CLI has no equivalent mechanism)  */
+        /*  provide ASE information to Anthropic Claude Code CLI shell commands
+            (Anthropic Claude Code CLI only -- GitHub Copilot CLI has no equivalent mechanism)  */
         const envFile = tool === "claude" ? (process.env.CLAUDE_ENV_FILE ?? "") : ""
         if (envFile !== "") {
             const script =
@@ -333,8 +333,8 @@ export default class HookCommand {
         /*  build the deterministic ASE banner (rendered directly by the
             agent harness, independent of any model decision, so it is
             guaranteed to appear once in every non-headless session;
-            Claude Code and OpenAI Codex CLI surface a top-level
-            "systemMessage" field for this -- Copilot CLI has no equivalent)  */
+            Anthropic Claude Code CLI and OpenAI Codex CLI surface a top-level
+            "systemMessage" field for this -- GitHub Copilot CLI has no equivalent)  */
         const banner =
             `\n⧉ ASE: ⎈ version: ${versionCurrentPlugin}${versionHint !== "" ? " " + versionHint.replaceAll(/\*/g, "") : ""}` +
             `\n⧉ ASE: ※ user: ${userId}, ⚑ project: ${projectId}` +
@@ -342,8 +342,8 @@ export default class HookCommand {
             `\n⧉ ASE: ☯ persona: ${persona}`
 
         /*  inject markdown into session context.
-            Claude Code and OpenAI Codex CLI expect the context nested in
-            "hookSpecificOutput"; Copilot CLI expects a flat top-level
+            Anthropic Claude Code CLI and OpenAI Codex CLI expect the context nested in
+            "hookSpecificOutput"; GitHub Copilot CLI expects a flat top-level
             "additionalContext" field.  */
         const payload = tool !== "copilot" ? {
             "hookSpecificOutput": {
@@ -367,8 +367,8 @@ export default class HookCommand {
     /*  publish the agent activity marker to tmux as a per-pane user
         option, so tmux can render the live state via
         #{@ase_agent_status} (refreshed on tmux's own interval,
-        independent of Claude Code's statusline repaint cadence).
-        Notice: the Claude Code statusline is not usable for this case
+        independent of Anthropic Claude Code CLI's statusline repaint cadence).
+        Notice: the Anthropic Claude Code CLI statusline is not usable for this case
         at all, as it is not repainted during agent processing!  */
     private writeAgentStatus (status: "busy" | "ready"): void {
         const icon = status === "busy" ? "▶" : "⏸"
@@ -413,8 +413,8 @@ export default class HookCommand {
         return 0
     }
 
-    /*  pick the session id from a parsed payload (Claude Code uses
-        snake_case fields, Copilot CLI uses camelCase fields)  */
+    /*  pick the session id from a parsed payload (Anthropic Claude Code CLI uses
+        snake_case fields, GitHub Copilot CLI uses camelCase fields)  */
     private pickSessionId (input: { session_id?: string, sessionId?: string }): string {
         return input.session_id ?? input.sessionId ?? ""
     }
@@ -509,7 +509,7 @@ export default class HookCommand {
     }
 
     /*  handler for "ase hook pre-tool-use" (all tools).
-        For Claude Code and Copilot CLI this is where ASE tool
+        For Anthropic Claude Code CLI and GitHub Copilot CLI this is where ASE tool
         invocations are auto-approved (via "permissionDecision: allow").
         OpenAI Codex CLI rejects that mechanism in "PreToolUse", so for
         Codex this handler stays silent and approval is granted in the
@@ -534,8 +534,8 @@ export default class HookCommand {
         const { approve, reason } = this.decideApproval(tool, spec, input)
 
         /*  emit permission decision (or stay silent to defer to default flow).
-            Claude Code expects the decision nested in "hookSpecificOutput";
-            Copilot CLI expects flat top-level fields.  */
+            Anthropic Claude Code CLI expects the decision nested in "hookSpecificOutput";
+            GitHub Copilot CLI expects flat top-level fields.  */
         if (approve) {
             const payload = spec.preToolUseWrapped ? {
                 "hookSpecificOutput": {
@@ -600,7 +600,7 @@ export default class HookCommand {
         /*  register CLI top-level command "ase hook"  */
         const hookCmd = program
             .command("hook")
-            .description("Claude Code and Copilot CLI hook entry points")
+            .description("Anthropic Claude Code CLI and GitHub Copilot CLI hook entry points")
             .action(() => {
                 hookCmd.outputHelp()
                 process.exit(1)

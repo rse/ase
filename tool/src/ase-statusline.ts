@@ -18,7 +18,7 @@ import type Log                             from "./ase-log.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
 import pkg                                  from "../package.json" with { type: "json" }
 
-/*  forced-color chalk instance: stdout is a pipe under Claude Code,
+/*  forced-color chalk instance: stdout is a pipe under Anthropic Claude Code CLI,
     so chalk auto-detection would yield level 0; force level 1 to keep
     emitting ANSI sequences as the original implementation did  */
 const c = new Chalk({ level: 1 })
@@ -31,8 +31,8 @@ const COLORS: ReadonlySet<string> = new Set<ForegroundColorName | "default">([
 /*  type of supported tool (host) systems  */
 type Tool = "claude" | "copilot" | "codex"
 
-/*  shape of the JSON payload Claude Code / Copilot CLI passes on stdin
-    (Copilot CLI's payload is mostly a subset of Claude Code's, with the
+/*  shape of the JSON payload Anthropic Claude Code CLI / Copilot CLI passes on stdin
+    (Copilot CLI's payload is mostly a subset of Anthropic Claude Code CLI's, with the
     extra top-level "cwd" field and without "effort", "thinking",
     "output_style", and "rate_limits"; the "context_window.current_usage"
     sub-object is shared, and "model.display_name" plus the cost,
@@ -112,7 +112,7 @@ const readStdin = async (): Promise<string> => {
     return Buffer.concat(chunks).toString("utf8")
 }
 
-/*  detect terminal column width via /dev/tty (stdout is a pipe under Claude Code)  */
+/*  detect terminal column width via /dev/tty (stdout is a pipe under Anthropic Claude Code CLI)  */
 const detectTermWidth = (): number => {
     let width = 0
     let tty: number | null = null
@@ -283,7 +283,7 @@ export default class StatuslineCommand {
 
         program
             .command("statusline")
-            .description("Render Claude Code or GitHub Copilot CLI statusline from stdin JSON")
+            .description("Render Anthropic Claude Code CLI or GitHub Copilot CLI statusline from stdin JSON")
             .option("-t, --tool <tool>",
                 "target tool (\"claude\" or \"copilot\"; \"codex\" is unsupported)", toolDflt)
             .option("-w, --width <n>",
@@ -325,7 +325,7 @@ export default class StatuslineCommand {
                 }
 
                 /*  normalize Copilot CLI's top-level "cwd" into the
-                    "workspace.current_dir" structure shared with Claude Code  */
+                    "workspace.current_dir" structure shared with Anthropic Claude Code CLI  */
                 if (tool === "copilot"
                     && (data.workspace?.current_dir === undefined || data.workspace.current_dir === "")
                     && typeof data.cwd === "string" && data.cwd !== "") {

@@ -15,18 +15,18 @@ import SectionGlow from "./Section-Glow.astro"
     optional dagger marker), version, compatibility percentage, and the ASE
     development goal. `primary` highlights the mainstream-target row.  */
 const harnesses = [
-    { name: "Anthropic Claude Code", version: "2.1.x", compat: "100%", goal: "primary",   primary: true,  mark: ""  },
-    { name: "GitHub Copilot CLI",    version: "1.0.x", compat: "95%",  goal: "secondary", primary: false, mark: ""  },
-    { name: "OpenAI Codex CLI",      version: "0.x.x", compat: "90%",  goal: "secondary", primary: false, mark: "†" }
+    { name: "Anthropic Claude Code CLI", version: "2.1.x", compat: "100%", goal: "primary",   primary: true,  mark: ""  },
+    { name: "GitHub Copilot CLI",        version: "1.0.x", compat: "95%",  goal: "secondary", primary: false, mark: ""  },
+    { name: "OpenAI Codex CLI",          version: "0.x.x", compat: "90%",  goal: "secondary", primary: false, mark: "†" }
 ]
 
 const llms = [
-    { name: "Anthropic Claude Opus",   version: "4.8", compat: "100%", goal: "primary",   primary: true,  mark: ""  },
-    { name: "Anthropic Claude Sonnet", version: "4.6", compat: "95%",  goal: "secondary", primary: false, mark: ""  },
-    { name: "Anthropic Claude Fable",  version: "5",   compat: "90%",  goal: "secondary", primary: false, mark: "‡" },
-    { name: "Anthropic Claude Haiku",  version: "4.5", compat: "70%",  goal: "none",      primary: false, mark: ""  },
-    { name: "OpenAI GPT",              version: "5.5", compat: "95%",  goal: "none",      primary: false, mark: ""  },
-    { name: "Gemini Flash",            version: "3.5", compat: "70%",  goal: "none",      primary: false, mark: ""  }
+    { name: "Anthropic Claude Opus",     version: "4.8",   compat: "100%", goal: "primary",   primary: true,  mark: ""  },
+    { name: "Anthropic Claude Sonnet",   version: "4.6",   compat: "95%",  goal: "secondary", primary: false, mark: ""  },
+    { name: "Anthropic Claude Fable",    version: "5",     compat: "90%",  goal: "secondary", primary: false, mark: "‡" },
+    { name: "Anthropic Claude Haiku",    version: "4.5",   compat: "70%",  goal: "none",      primary: false, mark: ""  },
+    { name: "OpenAI GPT",                version: "5.5",   compat: "95%",  goal: "none",      primary: false, mark: ""  },
+    { name: "Gemini Flash",              version: "3.5",   compat: "70%",  goal: "none",      primary: false, mark: ""  }
 ]
 ---
 <section id="compat" class="relative isolate mx-auto max-w-4xl px-6 py-8">
@@ -108,11 +108,11 @@ const llms = [
 
             <p class="mt-1 text-left text-foreground-secondary">
             This compatibility statement here does <u>not</u> mean <b>ASE</b> cannot be
-            used with other combinations than <b>Claude Code + Claude
-            Opus</b>, like the cheap and powerful <b>Claude Code +
+            used with other combinations than <b>Anthropic Claude Code CLI + Claude
+            Opus</b>, like the cheap and powerful <b>Anthropic Claude Code CLI +
             Minimax-M3</b> or the popular alternative <b>OpenAI Codex
             CLI + GPT</b> combination. It only means that <b>ASE</b> is
-            primarily developed against <b>Claude Code + Claude Opus</b>{" "}
+            primarily developed against <b>Anthropic Claude Code CLI + Claude Opus</b>{" "}
             and hence this combination showed no incompatibilities or
             unexpected results.
             </p>
@@ -122,7 +122,7 @@ const llms = [
             incompatibilities are that some instructions of the{" "}
             <b>ASE</b> skills are not 100% strictly followed. This
             can be fully harmless in practice, but is at least not as
-            good as the mainstream combination <b>Claude Code + Claude
+            good as the mainstream combination <b>Anthropic Claude Code CLI + Claude
             Opus</b> where we didn't observe this.
             </p>
         </blockquote>

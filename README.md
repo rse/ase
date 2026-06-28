@@ -233,7 +233,7 @@ see whether **ASE** is right for you:
   strongest possible case, and finally consolidated into a fortification
   argument?
   &rarr; [`/ase-meta-steelman`](plugin/skills/ase-meta-steelman/help.md)
-  `ASE is one of the best Claude Code add-ons.`
+  `ASE is one of the best Anthropic Claude Code CLI add-ons.`
 
 - **Key Point Distillation**:
   You want a document distilled into a flat, importance-ranked list of
@@ -280,7 +280,7 @@ User Setup
 ### Prerequisites
 
 - Operating System: macOS, Linux, Windows
-- Agent Tool: [Claude Code](https://code.claude.com), [GitHub Copilot CLI](https://github.com/features/copilot/cli), or [OpenAI Codex CLI](https://github.com/openai/codex)
+- Agent Tool: [Anthropic Claude Code CLI](https://code.claude.com), [GitHub Copilot CLI](https://github.com/features/copilot/cli), or [OpenAI Codex CLI](https://github.com/openai/codex)
 - Runtime Engine: [Node.js](https://nodejs.org)
 
 ### Installation
@@ -364,7 +364,7 @@ can leverage all paid "Chat" AI services by just providing the
 See Also
 --------
 
-- [claudeX](https://github.com/rse/claudex) (convenience wrapper for Claude Code)
+- [claudeX](https://github.com/rse/claudex) (convenience wrapper for Anthropic Claude Code CLI)
 - [mcp-to-openai](https://github.com/rse/mcp-to-openai) (gateway between MCP and OpenAI-compatible APIs)
 - [bash-authorize](https://github.com/rse/bash-authorize) (pre-tool-use hook for Bash commands)
 

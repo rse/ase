@@ -18,7 +18,7 @@ DESCRIPTION
 -----------
 
 `ase`, *Agentic Software Engineering (ASE)*,
-is the command-line companion tool to the *ASE* Claude Code plugin.
+is the command-line companion tool to the *ASE* Anthropic Claude Code CLI plugin.
 It provides plugin/tool setup, layered project configuration
 management, a per-project background HTTP service (bridged into the
 agent tool as an MCP server), agent hook handlers, status line
@@ -159,7 +159,7 @@ The following top-level commands exist for service management:
   exits with status 0.
 
 The following top-level command exists for bridging the per-project
-background service as a *Claude Code* MCP server:
+background service as a *Anthropic Claude Code CLI* MCP server:
 
 - `ase mcp`:
   Bridge stdio MCP to the per-project background service over
@@ -169,13 +169,13 @@ background service as a *Claude Code* MCP server:
   is intended to be configured as a stdio MCP server in *Claude
   Code* and not invoked directly by end users.
 
-The following top-level command exists for rendering the *Claude Code*
+The following top-level command exists for rendering the *Anthropic Claude Code CLI*
 or *GitHub Copilot CLI* statusline:
 
 - `ase statusline` \[`-t`|`--tool` `claude`|`copilot`\] \[`-w`|`--width` *n*\] \[`-m`|`--margin` *n*\] \[`--no-icons`\] \[`--no-labels`\] \[*line* \[...\]\]:
-  Render the *Claude Code* or *GitHub Copilot CLI* statusline from a
+  Render the *Anthropic Claude Code CLI* or *GitHub Copilot CLI* statusline from a
   JSON payload read on standard input. Intended to be configured as
-  the `statusLine` command in *Claude Code* settings (or the
+  the `statusLine` command in *Anthropic Claude Code CLI* settings (or the
   `statusLine.command` entry in `~/.copilot/settings.json` for *GitHub
   Copilot CLI*) and not invoked directly by end users. The `--tool`
   option selects the host (default: `claude`, or the value of the
@@ -183,10 +183,10 @@ or *GitHub Copilot CLI* statusline:
   payload's top-level `cwd` field is mapped onto `workspace.current_dir`
   for the renderers below, and placeholders backed by Claude-Code-only
   fields (such as `%e`, `%t`, `%O`, `%S`, `%D`, `%W`, `%Q`) are simply
-  suppressed. The input JSON is the standard *Claude Code* statusline
+  suppressed. The input JSON is the standard *Anthropic Claude Code CLI* statusline
   payload (with `workspace.current_dir`, `model.display_name`,
   `context_window.used_percentage`, `effort.level`, `thinking.enabled`,
-  `session_id`, and -- on *Claude Code* `2.1.90+` -- additionally
+  `session_id`, and -- on *Anthropic Claude Code CLI* `2.1.90+` -- additionally
   `transcript_path`, `version`, `output_style.name`, raw token counts
   in `context_window.current_usage.*` and `context_window.total_*_tokens`,
   `cost.total_cost_usd` / `cost.total_duration_ms`, and the
@@ -210,10 +210,10 @@ or *GitHub Copilot CLI* statusline:
   `$54.44`), `%b` (git branch, or `no git`), `%g` (git status:
   `clean` or `dirty`), `%G` (git untracked file count), `%d` (full
   current working directory path), `%M` (memory used/total, e.g.
-  `33.2G/64.0G`), `%V` (*Claude Code* version), and `%O`
+  `33.2G/64.0G`), `%V` (*Anthropic Claude Code CLI* version), and `%O`
   (output-style name). All `%`-tokens whose source field is missing
   in the input JSON (or, for `%b`/`%g`/`%G`, when the *cwd* is not a
-  git working tree) are *suppressed silently*, so older *Claude Code*
+  git working tree) are *suppressed silently*, so older *Anthropic Claude Code CLI*
   versions and synthetic test inputs do not produce empty
   placeholders. The context bar color shifts from default to blue,
   yellow, and red as context usage crosses 40%, 60%, and 80%. In
@@ -270,26 +270,26 @@ The following top-level command exists for diagram rendering:
       explicit terminal width/height for clipping.
 
 The following top-level commands exist for installing, updating, and
-uninstalling the *ASE* tool and its companion *Claude Code* plugin:
+uninstalling the *ASE* tool and its companion *Anthropic Claude Code CLI* plugin:
 
 - `ase setup`:
   Entry point group for setup operations. Without a subcommand, the
   help text is shown and the command exits with status 1.
 
 - `ase setup install` \[`-d`|`--dev`\]:
-  Install the *ASE Claude Code* plugin (and, in `--dev` mode, the
+  Install the *ASE Anthropic Claude Code CLI* plugin (and, in `--dev` mode, the
   local working copy of the `@rse/ase` tool instead of the published
   npm package). The default for `--dev` is taken from the
   `ASE_SETUP_DEV` environment variable.
 
 - `ase setup update` \[`-f`|`--force`\] \[`-d`|`--dev`\]:
-  Update the *ASE* tool and the *ASE Claude Code* plugin to their
+  Update the *ASE* tool and the *ASE Anthropic Claude Code CLI* plugin to their
   latest versions. With `--force`, the update is always performed
   even if already at the latest version. With `--dev`, the local
   working copy is used instead of the remote repository.
 
 - `ase setup uninstall` \[`-d`|`--dev`\]:
-  Uninstall the *ASE Claude Code* plugin and the *ASE* tool.
+  Uninstall the *ASE Anthropic Claude Code CLI* plugin and the *ASE* tool.
 
 - `ase setup enable`:
   Enable the (already-installed) *ASE* plugin in the agent tool.
@@ -340,7 +340,7 @@ uninstalling the *ASE* tool and its companion *Claude Code* plugin:
 All `ase setup` subcommands -- except `ase setup mcp list` -- accept
 the host selector \[`-t`|`--tool` `claude`|`copilot`\] (default:
 `claude`, or the value of the `ASE_TOOL` environment variable if set)
-to choose between *Claude Code* and *GitHub Copilot CLI* as the target
+to choose between *Anthropic Claude Code CLI* and *GitHub Copilot CLI* as the target
 agent tool.
 
 The following top-level commands exist for managing persisted task
@@ -414,29 +414,29 @@ self-test skill:
   intended to be invoked by the skill (after it has recorded all actual
   probe results) and not directly by end users.
 
-The following top-level commands exist for *Claude Code* hook
+The following top-level commands exist for *Anthropic Claude Code CLI* hook
 integration:
 
 - `ase hook`:
-  Entry point group for *Claude Code* hook events. Without a
+  Entry point group for *Anthropic Claude Code CLI* hook events. Without a
   subcommand, the help text is shown and the command exits with
   status 1.
 
 - `ase hook session-start`:
-  Handle the *Claude Code* `SessionStart` hook event. This
-  subcommand is intended to be invoked by *Claude Code*
+  Handle the *Anthropic Claude Code CLI* `SessionStart` hook event. This
+  subcommand is intended to be invoked by *Anthropic Claude Code CLI*
   internally as a configured hook handler only, not directly
   by end users.
 
 - `ase hook session-end`:
-  Handle the *Claude Code* `SessionEnd` hook event. This
-  subcommand is intended to be invoked by *Claude Code*
+  Handle the *Anthropic Claude Code CLI* `SessionEnd` hook event. This
+  subcommand is intended to be invoked by *Anthropic Claude Code CLI*
   internally as a configured hook handler only, not directly
   by end users.
 
 - `ase hook pre-tool-use`:
-  Handle the *Claude Code* `PreToolUse` hook event. This
-  subcommand is intended to be invoked by *Claude Code*
+  Handle the *Anthropic Claude Code CLI* `PreToolUse` hook event. This
+  subcommand is intended to be invoked by *Anthropic Claude Code CLI*
   internally as a configured hook handler only, not directly
   by end users.
 
@@ -446,14 +446,14 @@ integration:
   as a configured hook handler only, not directly by end users.
 
 - `ase hook user-prompt-submit`:
-  Handle the *Claude Code* `UserPromptSubmit` hook event. This
-  subcommand is intended to be invoked by *Claude Code*
+  Handle the *Anthropic Claude Code CLI* `UserPromptSubmit` hook event. This
+  subcommand is intended to be invoked by *Anthropic Claude Code CLI*
   internally as a configured hook handler only, not directly
   by end users.
 
 - `ase hook stop`:
-  Handle the *Claude Code* `Stop` hook event. This subcommand is
-  intended to be invoked by *Claude Code* internally as a configured
+  Handle the *Anthropic Claude Code CLI* `Stop` hook event. This subcommand is
+  intended to be invoked by *Anthropic Claude Code CLI* internally as a configured
   hook handler only, not directly by end users.
 
 CONFIGURATION FILES

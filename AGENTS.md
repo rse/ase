@@ -3,8 +3,8 @@
 
 **Agentic Software Engineering (ASE)** is the opinionated companion
 tooling of *Dr. Ralf S. Engelschall* for combining Agentic AI Coding
-with Software Engineering in tools like *Claude Code*. **ASE** consists
-of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
+with Software Engineering in tools like *Anthropic Claude Code CLI*. **ASE** consists
+of a *Anthropic Claude Code CLI* plugin and a Command-Line Interface (CLI) tool.
 
 ## Repository Layout
 
@@ -19,7 +19,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   `project`/`task`/`session` scopes (subcommands: `init`, `list`,
   `edit`, `get`, `set`, `delete`); `ase service` runs a per-project
   background HTTP service (subcommands: `start`, `status`, `send`,
-  `stop`) bridged to *Claude Code* via `ase mcp`; `ase hook` handles
+  `stop`) bridged to *Anthropic Claude Code CLI* via `ase mcp`; `ase hook` handles
   agent hook events (subcommands: `session-start`, `session-end`,
   `pre-tool-use`, `permission-request`, `user-prompt-submit`, `stop`);
   `ase setup`
@@ -30,7 +30,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   activate`/`mcp deactivate [<servers>]` which read per-server API keys
   from `ASE_MCP_KEY_<ID>` environment variables, also sourced from
   `.env` files);
-  `ase statusline` renders the *Claude Code* (or *GitHub Copilot CLI*)
+  `ase statusline` renders the *Anthropic Claude Code CLI* (or *GitHub Copilot CLI*)
   status line (*OpenAI Codex CLI* has no scriptable status line, so
   `ase statusline --tool codex` errors out); `ase task` manages persisted task plans under
   `<project>/.ase/task/<id>/plan.md` (subcommands: `list`, `load`,
@@ -49,7 +49,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
   (current/latest version determination).
   The `tool/plugin` is a build-time copy of `plugin` and can be ignored.
 
-- `plugin/` — the Claude Code plugin published via the marketplace
+- `plugin/` — the Anthropic Claude Code CLI plugin published via the marketplace
   defined at `.claude-plugin/marketplace.json`. Plugin metadata in
   `plugin/.claude-plugin/plugin.json` (with a *GitHub Copilot CLI*
   variant at `plugin/.github/plugin/plugin.json` and an *OpenAI Codex
@@ -68,7 +68,7 @@ of a *Claude Code* plugin and a Command-Line Interface (CLI) tool.
     `ase-code-lint`, `ase-docs-proofread`); 6 in total.
   - `plugin/commands/` — slash commands directory (currently empty).
   - `plugin/hooks/hooks.json`, `plugin/hooks/hooks-copilot.json`, and
-    `plugin/hooks/hooks-codex.json` — hook wirings into *Claude Code* /
+    `plugin/hooks/hooks-codex.json` — hook wirings into *Anthropic Claude Code CLI* /
     *GitHub Copilot CLI* / *OpenAI Codex CLI*.
   - `plugin/meta/*.md` — meta documents injected into sessions or
     used by skills: `ase-constitution.md` (session constitution),

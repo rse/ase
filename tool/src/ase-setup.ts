@@ -22,7 +22,7 @@ import Version           from "./ase-version.js"
 type Tool = "claude" | "copilot" | "codex"
 
 /*  per-tool dispatch table for the parts that actually differ between
-    Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI plugin
+    Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI plugin
     marketplace integrations  */
 type ToolSpec = {
     cli:       string
@@ -32,9 +32,9 @@ type ToolSpec = {
     pUpdate:   string  /*  plugin marketplace subcommand to refresh a snapshot  */
 }
 const toolSpecs: Record<Tool, ToolSpec> = {
-    "claude":  { cli: "claude",  label: "Claude Code",      pInstall: "install", pRemove: "uninstall", pUpdate: "update"  },
-    "copilot": { cli: "copilot", label: "Copilot CLI",      pInstall: "install", pRemove: "uninstall", pUpdate: "update"  },
-    "codex":   { cli: "codex",   label: "OpenAI Codex CLI", pInstall: "add",     pRemove: "remove",    pUpdate: "upgrade" }
+    "claude":  { cli: "claude",  label: "Anthropic Claude Code CLI", pInstall: "install", pRemove: "uninstall", pUpdate: "update"  },
+    "copilot": { cli: "copilot", label: "GitHub Copilot CLI",        pInstall: "install", pRemove: "uninstall", pUpdate: "update"  },
+    "codex":   { cli: "codex",   label: "OpenAI Codex CLI",          pInstall: "add",     pRemove: "remove",    pUpdate: "upgrade" }
 }
 
 /*  per-MCP dispatch table  */
@@ -430,7 +430,7 @@ export default class SetupCommand {
     /*  register an MCP server with the tool, supporting both the "stdio"
         (a local subprocess command) and "http" (a remote URL, optionally
         with HTTP headers) transports; the per-tool command line differs
-        between Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI  */
+        between Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI  */
     private async mcpAdd (tool: Tool, name: string, env: Record<string, string>, transport:
         { type: "stdio", command: string[] } |
         { type: "http",  url: string, headers?: Record<string, string> }): Promise<void> {
@@ -488,7 +488,7 @@ export default class SetupCommand {
     }
 
     /*  unregister an MCP server from the tool; the per-tool command line
-        differs between Claude Code, GitHub Copilot CLI, and OpenAI Codex CLI  */
+        differs between Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI  */
     private async mcpRemove (tool: Tool, name: string): Promise<void> {
         const args = tool === "claude" ?
             [ "mcp", "remove", "--scope", "user", name ] :

@@ -97,7 +97,7 @@ The following ASE commands/skills exist on the task-level:
 
 - **/ase-task-edit** \[*id*\]:<br/>
   Iteratively craft and refine a named task plan through a
-  conversational loop, without using *Claude Code Plan Mode*.
+  conversational loop, without using *Anthropic Claude Code CLI Plan Mode*.
 
 - **/ase-task-grill** \[*id*\]:<br/>
   Relentlessly interview the user about every essential aspect of the

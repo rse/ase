@@ -12,7 +12,7 @@ export const site = {
     title:       "Agentic Software Engineering (ASE)",
     tagline:     "Agentic Software Engineering",
     description: "The opinionated companion tooling of Dr. Ralf S. Engelschall for combining " +
-                 "Agentic AI Coding with Software Engineering in tools like Claude Code.",
+                 "Agentic AI Coding with Software Engineering in tools like Anthropic Claude Code CLI.",
     url:         "https://ase.tools",
     author:      "Dr. Ralf S. Engelschall",
     email:       "rse@engelschall.com",

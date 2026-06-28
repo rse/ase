@@ -28,7 +28,7 @@ Skill Output
 -   *IMPORTANT*: For *Final-Message-Only Display* ("focus mode"):
     some agent harnesses show the user only the *final* text message of
     a turn and *hide* all text emitted *between* tool calls. If your
-    harness instructions indicate such a mode (e.g. *Claude Code* with
+    harness instructions indicate such a mode (e.g. *Anthropic Claude Code CLI* with
     "focus mode" enabled), you *MUST* repeat *all* <template/> outputs
     emitted since the last shown final text message -- *verbatim*, in
     their *original order*, and each only *once* -- at the *top* of the
