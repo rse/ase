@@ -6,3 +6,4 @@ npm-debug.log*
 .env
 .env.production
 .DS_Store
+public/assets/plyr.svg

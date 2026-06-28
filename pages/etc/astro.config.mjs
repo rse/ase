@@ -9,6 +9,8 @@ import sitemap          from "@astrojs/sitemap"
 import tailwindcss      from "@tailwindcss/vite"
 import fs               from "node:fs"
 import path             from "node:path"
+import { fileURLToPath } from "node:url"
+import { createRequire }  from "node:module"
 
 /*  reduce a built `_astro/` filename to a short, stable, lower-case base with
     no Astro virtual-module markers or Vite content hash  */
@@ -70,6 +72,21 @@ function deHashAssets () {
         }
     }
 }
+
+/*  vendor the Plyr control-icon sprite into `public/assets/` at build time so
+    the player loads it locally instead of from `cdn.plyr.io`. Resolving via the
+    package keeps the sprite version-locked to the installed `plyr`; the copied
+    file is git-ignored. Runs for both `astro dev` and `astro build`, since this
+    config module is evaluated by both.  */
+function vendorPlyrSprite () {
+    const require = createRequire(import.meta.url)
+    const distDir = path.dirname(require.resolve("plyr"))
+    const src     = path.join(distDir, "plyr.svg")
+    const dst     = fileURLToPath(new URL("../public/assets/plyr.svg", import.meta.url))
+    fs.mkdirSync(path.dirname(dst), { recursive: true })
+    fs.copyFileSync(src, dst)
+}
+vendorPlyrSprite()
 
 export default defineConfig({
     output: "static",
