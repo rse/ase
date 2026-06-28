@@ -6,6 +6,7 @@
 
 import { defineConfig } from "astro/config"
 import sitemap          from "@astrojs/sitemap"
+import robotsTxt        from "astro-robots-txt"
 import tailwindcss      from "@tailwindcss/vite"
 import fs               from "node:fs"
 import path             from "node:path"
@@ -97,6 +98,7 @@ export default defineConfig({
     },
     integrations: [
         sitemap(),
+        robotsTxt(),
         deHashAssets()
     ],
     vite: {
