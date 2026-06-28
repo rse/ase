@@ -30,7 +30,9 @@ import Modal from "./Modal.astro"
     const elem       = document.getElementById("video-modal-player")
     if (videoModal && elem) {
         const player = new Plyr(elem, {
-            controls: [ "play-large", "play", "progress", "current-time", "fullscreen" ]
+            controls: [ "play-large", "play", "progress", "current-time", "settings", "fullscreen" ],
+            settings: [ "speed" ],
+            speed:    { selected: 1, options: [ 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2 ] }
         })
         const openVideo = (src: string, label: string) => {
             player.source = {
