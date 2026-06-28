@@ -1,4 +1,6 @@
 
+[![ASE](pages/public/assets/typing-demo.gif)](https://ase.tools)
+
 [![ASE](docs/ase-banner.png)](https://ase.tools)
 
 [![github (author stars)](https://img.shields.io/github/stars/rse?logo=github&label=author%20stars&color=%233377aa)](https://github.com/rse)
