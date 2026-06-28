@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.32 (2026-06-28)
+-------------------
+
+- IMPROVEMENT: auto-approve Read operations targeting files under the plugin root (`ase-hook.ts`)
+
 0.9.31 (2026-06-28)
 -------------------
 
