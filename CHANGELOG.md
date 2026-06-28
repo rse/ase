@@ -5,6 +5,9 @@ ChangeLog
 0.9.32 (2026-06-28)
 -------------------
 
+- FEATURE: add `ase meta <file>` command to load ASE meta files from user skills (`ase-meta.ts`, `ase.ts`)
+- FEATURE: place demo `hello` skill under version control (`.claude/skills/hello/`)
+- IMPROVEMENT: add stdout writing helper to avoid output truncations (`ase-stdout.ts`, `ase-artifact.ts`, `ase-hook.ts`, `ase-task.ts`)
 - IMPROVEMENT: auto-approve Read operations targeting files under the plugin root (`ase-hook.ts`)
 
 0.9.31 (2026-06-28)
