@@ -2,6 +2,19 @@
 ChangeLog
 =========
 
+0.9.33 (2026-06-28)
+-------------------
+
+- IMPROVEMENT: use consistent "Anthropic Claude Code CLI" naming across docs, website, and tool (`README.md`, `AGENTS.md`, website, tool)
+- IMPROVEMENT: refine Hero rendering, text, height, and spacing (`Hero.astro`, `Typing-Demo.astro`, `Section-Design.astro`, `Section-Setup.astro`)
+- IMPROVEMENT: add star-this-project animation and script to Hero (`Hero.astro`, `gh-star.gif`, `gh-star.sh`)
+- IMPROVEMENT: be more precise about compatibility in website Compat section (`Section-Compat.astro`)
+- IMPROVEMENT: add zoom button to website diagrams (`Diagram.astro`, `Video-Embed.astro`)
+- IMPROVEMENT: provide local Playr SVG icon and re-add video speed control (`Modal-Video.astro`, `astro.config.mjs`)
+- IMPROVEMENT: add project links and feedback credits to Author/Footer sections (`Section-Author.astro`, `Page-Footer.astro`)
+- IMPROVEMENT: update banner image (`docs/ase-banner.png`)
+- CLEANUP: make ASE constitution not Claude-Code-CLI-specific (`ase-constitution.md`)
+
 0.9.32 (2026-06-28)
 -------------------
 
