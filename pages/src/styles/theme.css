@@ -6,9 +6,16 @@
 
 @import "tailwindcss";
 
-@import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro.css";
-@import "../../node_modules/typopro-web/web/TypoPRO-SourceCodePro/TypoPRO-SourceCodePro.css";
-@import "../../node_modules/typopro-web/web/TypoPRO-Kalam/TypoPRO-Kalam.css";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro-Regular.css";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro-RegularIt.css";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro-Light.css";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro-Semibold.css";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceSansPro/TypoPRO-SourceSansPro-Bold.css";
+
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceCodePro/TypoPRO-SourceCodePro-Regular.css";
+@import "../../node_modules/typopro-web/web/TypoPRO-SourceCodePro/TypoPRO-SourceCodePro-Bold.css";
+
+@import "../../node_modules/typopro-web/web/TypoPRO-Kalam/TypoPRO-Kalam-Regular.css";
 
 /*  brand scale   */
 :root {
