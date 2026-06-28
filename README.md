@@ -16,7 +16,7 @@ for fusing the concept of *Agentic AI Coding* and traditional *Software Engineer
 in the software development tool [Anthropic Claude
 Code](https://claude.com/product/claude-code) — and with reduced support also in the alternative
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
-[OpenAI Codex](https://github.com/openai/codex).
+[OpenAI Codex CLI](https://github.com/openai/codex).
 
 **ASE** ships with agent hooks, agent skills, an underlying Model-Context-Protocol (MCP)
 service and a Command-Line Interface (CLI), incorporating reasonable methodology
