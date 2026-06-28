@@ -17,6 +17,7 @@ import * as v                               from "valibot"
 import type Log                             from "./ase-log.js"
 import Version                              from "./ase-version.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
+import { writeStdout }                      from "./ase-stdout.js"
 
 /*  type of supported tool (host) systems  */
 type Tool = "claude" | "copilot" | "codex"
@@ -111,19 +112,6 @@ export default class HookCommand {
     /*  drain and discard the stdin event payload  */
     private async drainStdin (): Promise<void> {
         await this.readStdin()
-    }
-
-    /*  write to stdout and resolve only once it has been fully
-        flushed to the underlying file descriptor  */
-    private writeStdout (text: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            process.stdout.write(text, (err) => {
-                if (err)
-                    reject(err)
-                else
-                    resolve()
-            })
-        })
     }
 
     /*  best-effort JSON parse with valibot schema validation: returns
@@ -372,7 +360,7 @@ export default class HookCommand {
         if ((tool === "claude" || tool === "codex") && headless !== "true")
             (payload as Record<string, unknown>).systemMessage = banner
 
-        await this.writeStdout(JSON.stringify(payload))
+        await writeStdout(JSON.stringify(payload))
         return 0
     }
 
@@ -559,7 +547,7 @@ export default class HookCommand {
                 "permissionDecision":       "allow",
                 "permissionDecisionReason": reason
             }
-            await this.writeStdout(JSON.stringify(payload))
+            await writeStdout(JSON.stringify(payload))
         }
         return 0
     }
@@ -591,7 +579,7 @@ export default class HookCommand {
                     "decision":      { "behavior": "allow" }
                 }
             }
-            await this.writeStdout(JSON.stringify(payload))
+            await writeStdout(JSON.stringify(payload))
         }
         return 0
     }

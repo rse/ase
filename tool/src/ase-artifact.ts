@@ -16,6 +16,7 @@ import type { McpServer }       from "@modelcontextprotocol/sdk/server/mcp.js"
 import type Log                 from "./ase-log.js"
 import { Config, configSchema } from "./ase-config.js"
 import { Task }                 from "./ase-task.js"
+import { writeStdout }          from "./ase-stdout.js"
 
 /*  the recognized artifact kinds, in descending precedence order;
     "othr" is the implicit catch-all and is always resolved last  */
@@ -252,17 +253,16 @@ export default class ArtifactCommand {
                 "comma-separated list of artifact kinds " +
                 `(${artifactKinds.join("|")})`,
                 artifactKinds.join(","))
-            .action((opts: { kind: string }) => {
+            .action(async (opts: { kind: string }) => {
                 const kinds  = opts.kind.split(",").map((k) => Artifact.validateKind(k.trim()))
                 const result = Artifact.list(this.log, kinds)
                 const single = result.length === 1
                 for (const { kind, files } of result) {
                     if (!single)
-                        process.stdout.write(`# ${kind}:\n`)
+                        await writeStdout(`# ${kind}:\n`)
                     for (const file of files)
-                        process.stdout.write(`- ${file}\n`)
+                        await writeStdout(`- ${file}\n`)
                 }
-                process.exit(0)
             })
 
         /*  register CLI sub-command "ase artifact name"  */
@@ -274,10 +274,9 @@ export default class ArtifactCommand {
                 "artifact kind " +
                 `(${configuredKinds.join("|")})`,
                 "code")
-            .action((filename: string, opts: { kind: string }) => {
+            .action(async (filename: string, opts: { kind: string }) => {
                 const kind = Artifact.validateKind(opts.kind.trim())
-                process.stdout.write(`${Artifact.name(this.log, kind, filename)}\n`)
-                process.exit(0)
+                await writeStdout(`${Artifact.name(this.log, kind, filename)}\n`)
             })
     }
 }

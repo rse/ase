@@ -19,6 +19,7 @@ import type { McpServer }                     from "@modelcontextprotocol/sdk/se
 import type Log                               from "./ase-log.js"
 import { Config, configSchema, parseScope }   from "./ase-config.js"
 import { Markdown }                           from "./ase-markdown.js"
+import { writeStdout }                        from "./ase-stdout.js"
 
 /*  reusable functionality: persisted task plans under
     <project>/<basedir>/TASK-<id>.md (driven by the
@@ -293,15 +294,14 @@ export default class TaskCommand {
             .command("list")
             .description("List all persisted task ids, one per line")
             .option("-v, --verbose", "also show the task file modification time as (YYYY-MM-DD HH:MM)")
-            .action((opts: { verbose?: boolean }) => {
+            .action(async (opts: { verbose?: boolean }) => {
                 const items = Task.list(this.log, opts.verbose ?? false)
                 for (const item of items) {
                     if (opts.verbose)
-                        process.stdout.write(`${item.id}\t(${item.mtime})\n`)
+                        await writeStdout(`${item.id}\t(${item.mtime})\n`)
                     else
-                        process.stdout.write(`${item.id}\n`)
+                        await writeStdout(`${item.id}\n`)
                 }
-                process.exit(0)
             })
 
         /*  register CLI sub-command "ase task load"  */
@@ -309,10 +309,9 @@ export default class TaskCommand {
             .command("load")
             .description("Load a task by id and write it to stdout")
             .argument("<id>", "Task identifier")
-            .action((id: string) => {
+            .action(async (id: string) => {
                 const text = Task.load(this.log, id)
-                process.stdout.write(text)
-                process.exit(0)
+                await writeStdout(text)
             })
 
         /*  register CLI sub-command "ase task edit"  */
