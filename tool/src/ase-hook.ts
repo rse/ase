@@ -175,9 +175,9 @@ export default class HookCommand {
         })
     }
 
-    /*  handler for "ase hook session-start" (all tools)  */
-    private async doSessionStart (tool: Tool): Promise<number> {
-        /*  determine plugin root (env var name differs per tool)  */
+    /*  determine the plugin root directory (the environment variable
+        carrying it differs per tool), throwing if it cannot be found  */
+    private pluginRoot (tool: Tool): string {
         let pluginRootVars: string[]
         if (tool === "copilot")
             pluginRootVars = [ "COPILOT_PLUGIN_ROOT" ]
@@ -193,6 +193,25 @@ export default class HookCommand {
             }
         if (pluginRoot === "")
             throw new Error(`${pluginRootVars.join("/")} environment variable is not set`)
+        return pluginRoot
+    }
+
+    /*  determine the plugin root directory like "pluginRoot", but return
+        an empty string instead of throwing, so callers on the hot path of
+        a tool-approval decision can silently decline to auto-approve  */
+    private pluginRootSafe (tool: Tool): string {
+        try {
+            return this.pluginRoot(tool)
+        }
+        catch (_e) {
+            return ""
+        }
+    }
+
+    /*  handler for "ase hook session-start" (all tools)  */
+    private async doSessionStart (tool: Tool): Promise<number> {
+        /*  determine plugin root (env var name differs per tool)  */
+        const pluginRoot = this.pluginRoot(tool)
 
         /*  determine path to external files  */
         const filePkg = path.join(pluginRoot, ".claude-plugin", "plugin.json")
@@ -296,6 +315,7 @@ export default class HookCommand {
         if (envFile !== "") {
             const script =
                 `export ASE_VERSION=${quote([ versionCurrentPlugin ])}\n` +
+                `export ASE_PLUGIN_ROOT=${quote([ pluginRoot ])}\n` +
                 `export ASE_USER_ID=${quote([ userId ])}\n` +
                 `export ASE_PROJECT_ID=${quote([ projectId ])}\n` +
                 `export ASE_TASK_ID=${quote([ taskId ])}\n` +
@@ -309,6 +329,7 @@ export default class HookCommand {
         md =
             `<ase-version>${versionCurrentPlugin}</ase-version>\n` +
             `<ase-version-hint>${versionHint}</ase-version-hint>\n` +
+            `<ase-plugin-root>${pluginRoot}</ase-plugin-root>\n` +
             `<ase-persona-style>${persona}</ase-persona-style>\n` +
             `<ase-user-id>${userId}</ase-user-id>\n` +
             `<ase-project-id>${projectId}</ase-project-id>\n` +
@@ -440,6 +461,24 @@ export default class HookCommand {
         }
     }
 
+    /*  determine whether a "Read" target "filePath" resolves to a
+        location inside the plugin root, so the recurring loads of ASE
+        skill include files (e.g. "@${CLAUDE_SKILL_DIR}/../../meta/...")
+        can be auto-approved instead of prompting the user on every skill
+        invocation. The path is normalized and compared with a trailing
+        separator to prevent a sibling directory sharing the root's name
+        prefix (or a "../" escape) from being mistaken for a descendant.  */
+    private isUnderPluginRoot (tool: Tool, filePath: string): boolean {
+        if (filePath === "")
+            return false
+        const pluginRoot = this.pluginRootSafe(tool)
+        if (pluginRoot === "")
+            return false
+        const root = path.resolve(pluginRoot) + path.sep
+        const abs  = path.resolve(filePath)
+        return (abs + path.sep).startsWith(root)
+    }
+
     /*  the edit-capable skills whose active state lets the pre-tool-use
         hook auto-approve subsequent "Edit" invocations  */
     private editCapableSkills = [ "ase-code-lint", "ase-docs-proofread" ]
@@ -449,18 +488,19 @@ export default class HookCommand {
         reason. The input field names and value shapes differ between
         tools, but the decision logic is shared by the "pre-tool-use" and
         "permission-request" handlers.  */
-    private decideApproval (spec: ToolSpec, input: Record<string, unknown>): { approve: boolean, reason: string } {
+    private decideApproval (tool: Tool, spec: ToolSpec, input: Record<string, unknown>): { approve: boolean, reason: string } {
         const toolName  = typeof input[spec.toolNameField] === "string" ?
             input[spec.toolNameField] as string : ""
-        let toolInput: { command?: string, skill?: string } = {}
+        let toolInput: { command?: string, skill?: string, file_path?: string } = {}
         const rawInput  = input[spec.toolInputField]
         if (spec.toolInputIsString && typeof rawInput === "string")
             toolInput = this.parseJSON(rawInput, v.object({
-                command: v.optional(v.string()),
-                skill:   v.optional(v.string())
+                command:   v.optional(v.string()),
+                skill:     v.optional(v.string()),
+                file_path: v.optional(v.string())
             }))
         else if (!spec.toolInputIsString && typeof rawInput === "object" && rawInput !== null)
-            toolInput = rawInput as { command?: string, skill?: string }
+            toolInput = rawInput as { command?: string, skill?: string, file_path?: string }
         if (toolName === spec.bashToolName && /^ase(\s|$)/.test(toolInput.command ?? ""))
             return { approve: true, reason: "ASE CLI invocation auto-approved" }
         else if (toolName === "Skill" && /^(?:ase:)?ase-.+/.test(toolInput.skill ?? ""))
@@ -469,6 +509,8 @@ export default class HookCommand {
             return { approve: true, reason: "ASE MCP tool invocation auto-approved" }
         else if (spec.addonMcpToolNamePattern.test(toolName))
             return { approve: true, reason: "ASE addon MCP tool invocation auto-approved" }
+        else if (toolName === "Read" && this.isUnderPluginRoot(tool, toolInput.file_path ?? ""))
+            return { approve: true, reason: "ASE plugin file read auto-approved" }
         else if (toolName === "Edit") {
             const sessionId   = this.pickSessionId(input)
             const activeSkill = this.readActiveSkill(sessionId)
@@ -501,7 +543,7 @@ export default class HookCommand {
             return 0
 
         /*  determine whether to auto-approve the tool invocation  */
-        const { approve, reason } = this.decideApproval(spec, input)
+        const { approve, reason } = this.decideApproval(tool, spec, input)
 
         /*  emit permission decision (or stay silent to defer to default flow).
             Claude Code expects the decision nested in "hookSpecificOutput";
@@ -539,7 +581,7 @@ export default class HookCommand {
         }))
 
         /*  determine whether to auto-approve the tool invocation  */
-        const { approve } = this.decideApproval(spec, input)
+        const { approve } = this.decideApproval(tool, spec, input)
 
         /*  emit the Codex "PermissionRequest" approval decision  */
         if (approve) {
