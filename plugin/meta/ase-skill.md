@@ -143,10 +143,10 @@ Skill Sequential Processing
 -   *IMPORTANT*: You *MUST* *strictly sequentially* execute every <step/> in
     a <flow/>. You *MUST* not implicitly skip any <step/> during
     processing, except you were explicitly requested to do this or the
-    step is a configured to be a conditional step!
+    step is configured to be a conditional step!
 
 -   *IMPORTANT*: You *MUST* *strictly sequentially* execute every numbered
-    items in a <step/>. You *MUST* not implicitly skip any numbered item during
+    item in a <step/>. You *MUST* not implicitly skip any numbered item during
     processing, except you were explicitly requested to do this!
 
 -   *IMPORTANT*: For any <step/> that specifies an *agent* in its

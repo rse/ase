@@ -130,7 +130,7 @@ Procedure
     For this process, determine the <n/> essential aspects <aspect-N/>
     (a one or two word long short identifier like `Foo` or `Bar-Baz`)
     and the corresponding decision/question <question-N/> where a shared
-    understanding is required upon.
+    understanding is required.
 
     Honor also the following checks for identifying the problematic
     aspects:

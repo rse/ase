@@ -1003,7 +1003,7 @@ its purpose, and the alternatives that were considered but not chosen.
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
 
--   The known *Client Aspects* which usually have to covered (at least for
+-   The known *Client Aspects* which usually have to be covered (at least for
     clients in a Rich-Client architecture):
 
     -   **Interface Theme**:
@@ -1079,7 +1079,7 @@ its purpose, and the alternatives that were considered but not chosen.
     -   **Environment Detection**:
         Runtime Detection, Feature Detection.
 
--   The known *Server Aspects* which usually have to covered (at least for
+-   The known *Server Aspects* which usually have to be covered (at least for
     servers, sometimes called Thin-Servers, in a Rich-Client architecture):
 
     -   **Environment Detection**:

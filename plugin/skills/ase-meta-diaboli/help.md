@@ -1,7 +1,7 @@
 
 ##  NAME
 
-`ase-meta-diaboli` - Play "Devil's Advocate" (latin: "Advocatus Diaboli")
+`ase-meta-diaboli` - Play "Devil's Advocate" (Latin: "Advocatus Diaboli")
 
 ##  SYNOPSIS
 
@@ -12,7 +12,7 @@
 
 ##  DESCRIPTION
 
-The `ase-meta-diaboli` skill plays *Devil's Advocate* (latin:
+The `ase-meta-diaboli` skill plays *Devil's Advocate* (Latin:
 *Advocatus Diaboli*) by relentlessly challenging or criticising a
 supplied *thesis*. It applies a disciplined set of critical-thinking
 tenets - steelmanning, stress-testing fundamentals, surfacing implicit
