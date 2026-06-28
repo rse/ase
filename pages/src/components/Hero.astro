@@ -58,7 +58,7 @@ const quotes = [
 
             {/* quotes — swipeable carousel, auto-rotating, with pagination */}
             <Swiper
-                class="hero-quotes mt-8 w-full max-w-xl"
+                class="hero-quotes mt-6 w-full max-w-xl"
                 options={{
                     direction:      "vertical",
                     allowTouchMove: false,
@@ -79,7 +79,7 @@ const quotes = [
             </Swiper>
 
             {/* GitHub badges */}
-            <div class="mt-8 flex min-h-[28px] flex-wrap items-center justify-center gap-2">
+            <div class="mt-6 flex min-h-[28px] flex-wrap items-center justify-center gap-2">
                 <a href="https://github.com/rse" class="inline-flex overflow-hidden rounded-md">
                     <img src="https://img.shields.io/github/stars/rse?logo=github&label=author%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (author stars)" />
                 </a>
@@ -103,28 +103,36 @@ const quotes = [
             </div>
 
             {/* sub-title */}
-            <p class="mt-6 max-w-2xl text-lg text-foreground-secondary sm:text-xl text-left">
+            <p class="mt-6 max-w-2xl text-base sm:text-lg text-foreground-secondary text-left">
                 The opinionated <a href="https://github.com/rse/ase/blob/master/LICENSE.txt">Open Source</a> companion
                 toolkit of <a href="#author">Dr. Ralf S. Engelschall</a>{" "}
                 for fusing the concept of <b>Agentic AI Coding</b> and traditional <b>Software Engineering</b>{" "}
                 in the software development tool <a href="https://claude.com/product/claude-code">Anthropic Claude
                 Code CLI</a> &mdash; and with reduced support also in the alternative
-                tool <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a> or{" "}
-                <a href="https://github.com/openai/codex">OpenAI Codex CLI</a>.
+                tools <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a> and{" "}
+                <a href="https://github.com/openai/codex">OpenAI Codex CLI</a>.{" "}
+                It ships as a plugin for the tool and provides agent hooks,
+                agent skills, an underlying Model-Context-Protocol (MCP)
+                service and a Command-Line Interface (CLI).
             </p>
 
-            <p class="mt-4 max-w-2xl text-lg text-foreground-secondary sm:text-xl text-left">
-                <b>ASE</b> ships with agent hooks, agent skills, an underlying Model-Context-Protocol (MCP)
-                service and a Command-Line Interface (CLI), incorporating reasonable methodology
-                and automation aspects, to support the recurring tasks of a{" "}
-                <b>Software Developer</b> and <b>Software Architect</b>.
+            <p class="ase-indent-p mt-2 max-w-2xl text-base sm:text-lg text-foreground-secondary text-left">
+                It incorporates reasonable methodology and automation aspects to support the
+                daily, recurring tasks of a <b>Software Developer</b> and <b>Software Architect</b>.
+                The comprehensive functionality spans from <i>brainstorming ideas</i>, <i>searching the
+                Web</i>, <i>asking foreign LLMs</i>, <i>finding quorum answers</i>,{" "}
+                <i>discovering components</i>, through <i>evaluating alternatives</i>,{" "}
+                <i>challenging and fortifying statements</i>, <i>analyzing root-causes</i>,{" "}
+                <i>managing tasks</i>, <i>grilling task plans</i>, all the way to <i>analyzing,
+                fixing, refactoring, and crafting code</i>, <i>reviewing changesets</i>,{" "}
+                <i>generating changelog entries</i>, and many more.
             </p>
 
             {/* terminal-style typed out examples of ASE skill invocations */}
             <TypingDemo/>
 
             {/* buttons */}
-            <div class="mt-8 flex flex-wrap items-center justify-center gap-2">
+            <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
                 <a href="#highlights" class="ase-btn">
                     Highlights ↓
                 </a>
