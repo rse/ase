@@ -5,15 +5,37 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
+import QRCode from "./QR-Code.astro"
 ---
 <footer class="border-t border-border/60 bg-background-secondary">
-    <div class="mx-auto max-w-4xl px-6 py-5 text-sm text-foreground-muted">
-        <p>
-            <strong>ASE — Agentic Software Engineering</strong>
-        </p>
-        <p class="mt-2">
-            Copyright &copy; 2025-2026 <a href="https://github.com/rse">Dr. Ralf S. Engelschall</a><br/>
-            Licensed under <a href="https://spdx.org/licenses/Apache-2.0">Apache-2.0</a> as Open Source
-        </p>
+    <div class="mx-auto flex max-w-4xl items-center gap-5 px-6 py-5 text-sm text-foreground-muted">
+        {/*  QR-code trigger: opens the `#qr-modal` popup showing the QR code for
+             the site URL. Opening is wired in Modal-QR.astro (which owns the
+             popup and its closing). The icon sits at the accent colour and turns
+             white (the foreground colour) while hovered.  */}
+        <button
+            id="qr-toggle"
+            type="button"
+            aria-label="Show QR code for this site"
+            aria-controls="qr-modal"
+            class="qr-toggle inline-flex shrink-0 cursor-pointer items-center text-accent transition-colors"
+        >
+            <QRCode class="h-20 w-20 transition-colors"/>
+        </button>
+        <div>
+            <p>
+                <strong>ASE — Agentic Software Engineering</strong>
+            </p>
+            <p class="mt-2">
+                Copyright &copy; 2025-2026 <a href="https://github.com/rse">Dr. Ralf S. Engelschall</a><br/>
+                Licensed under <a href="https://spdx.org/licenses/Apache-2.0">Apache-2.0</a> as Open Source
+            </p>
+        </div>
     </div>
 </footer>
+
+<style is:global>
+    /*  QR-code toggle: the icon turns white (the foreground colour) while the
+        button is hovered, lifting from its default accent colour.  */
+    .qr-toggle:hover { color: var(--foreground) !important; }
+</style>
