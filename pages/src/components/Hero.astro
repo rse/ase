@@ -114,44 +114,44 @@ const quotes = [
                 </span>
             </div>
 
-            {/* sub-title with a YouTube preview floated top-right; the text flows
-                around it on the left and, once the float ends, below full-width.
-                Capped at the same max-w-2xl as the paragraph below so neither
-                row is wider than the other. The float is dropped on narrow
-                viewports, where the video instead stacks above the text. */}
-            <div class="mt-6 w-full max-w-2xl">
-                <div class="mb-4 w-full lg:float-right lg:mb-2 lg:ml-8 lg:w-[20%]">
+            {/* sub-title */}
+            <p class="mt-6 max-w-2xl text-base sm:text-lg leading-snug text-foreground-secondary text-justify break-words">
+                The opinionated <a href="https://github.com/rse/ase/blob/master/LICENSE.txt">Open Source</a> companion
+                toolkit of <a href="#author">Dr. Ralf S. Engelschall</a>{" "}
+                for fusing the concept of <b>Agentic AI Coding</b> and traditional <b>Software Engineering</b>{" "}
+                in the software development tool <a href="https://claude.com/product/claude-code">Anthropic Claude
+                Code CLI</a> &mdash; and with reduced support also in the alternative
+                tools <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a> and{" "}
+                <a href="https://github.com/openai/codex">OpenAI Codex CLI</a>.{" "}
+                It ships as a plugin for the tool and provides agent hooks,
+                agent skills, an underlying Model-Context-Protocol (MCP)
+                service and a Command-Line Interface (CLI).
+            </p>
+
+            {/* second paragraph, with a YouTube preview floated top-right; the text
+                flows around it on the left and, once the float ends, below
+                full-width. The float is dropped on narrow viewports, where the
+                video instead stacks above the text. */}
+            <div class="mt-1 w-full max-w-2xl">
+                <div class="mb-4 w-full lg:float-right lg:mb-2 lg:ml-8 lg:w-[21%]">
                     <HeroVideo id="yNFSVDRa_kM" label="Agentic Software Engineering (ASE)"/>
-                    <p class="mt-1.5 text-center text-xs italic text-accent">
+                    <p class="mt-1.5 text-center text-xs text-accent">
                         Dr. Ralf S. Engelschall in a<br/>
                         studio interview on ASE
                     </p>
                 </div>
-                <p class="text-base sm:text-lg leading-snug text-foreground-secondary text-left">
-                    The opinionated <a href="https://github.com/rse/ase/blob/master/LICENSE.txt">Open Source</a> companion
-                    toolkit of <a href="#author">Dr. Ralf S. Engelschall</a>{" "}
-                    for fusing the concept of <b>Agentic AI Coding</b> and traditional <b>Software Engineering</b>{" "}
-                    in the software development tool <a href="https://claude.com/product/claude-code">Anthropic Claude
-                    Code CLI</a> &mdash; and with reduced support also in the alternative
-                    tools <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a> and{" "}
-                    <a href="https://github.com/openai/codex">OpenAI Codex CLI</a>.{" "}
-                    It ships as a plugin for the tool and provides agent hooks,
-                    agent skills, an underlying Model-Context-Protocol (MCP)
-                    service and a Command-Line Interface (CLI).
+                <p class="ase-indent-p text-base sm:text-lg leading-snug text-foreground-secondary text-justify break-words">
+                    It incorporates reasonable methodology and automation aspects to support the
+                    daily, recurring tasks of a <b>Software Developer</b> and <b>Software Architect</b>.
+                    The comprehensive functionality spans from <i>brainstorming ideas</i>, <i>searching the
+                    Web</i>, <i>asking foreign LLMs</i>,{" "}
+                    <i>discovering components</i>, through <i>evaluating alternatives</i>,{" "}
+                    <i>challenging statements</i>, <i>analyzing root-causes</i>,{" "}
+                    <i>managing tasks</i>, <i>grilling task plans</i>, all the way to <i>analyzing,
+                    fixing, refactoring, and crafting code</i>, <i>reviewing changesets</i>,
+                    and many more.
                 </p>
             </div>
-
-            <p class="ase-indent-p mt-1 max-w-2xl text-base sm:text-lg leading-snug text-foreground-secondary text-left">
-                It incorporates reasonable methodology and automation aspects to support the
-                daily, recurring tasks of a <b>Software Developer</b> and <b>Software Architect</b>.
-                The comprehensive functionality spans from <i>brainstorming ideas</i>, <i>searching the
-                Web</i>, <i>asking foreign LLMs</i>,{" "}
-                <i>discovering components</i>, through <i>evaluating alternatives</i>,{" "}
-                <i>challenging statements</i>, <i>analyzing root-causes</i>,{" "}
-                <i>managing tasks</i>, <i>grilling task plans</i>, all the way to <i>analyzing,
-                fixing, refactoring, and crafting code</i>, <i>reviewing changesets</i>,
-                and many more.
-            </p>
 
             {/* terminal-style typed out examples of ASE skill invocations */}
             <TypingDemo/>
