@@ -1,0 +1,46 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
+*/
+
+/*  Hero-side YouTube preview: a clickable poster + play-button that opens
+    a Modal-YouTube popup (wired via `data-youtube-open`, scoped to this
+    video's id so several previews can coexist on one page). The paired
+    Modal-YouTube itself is *not* rendered here but by the caller, at the
+    page root — nesting a `fixed` modal inside the Hero's `isolate` +
+    `overflow-hidden` section would trap it in that stacking context and
+    clip it to the section's bounds instead of the full viewport. The
+    poster is YouTube's own `hqdefault` thumbnail for the given video id.  */
+
+interface Props {
+    id:    string
+    label: string
+}
+
+const { id, label } = Astro.props
+
+const poster = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+---
+<button
+    type="button"
+    class="hero-video group relative block aspect-video w-full cursor-pointer overflow-hidden rounded-xl border border-border shadow-lg"
+    data-youtube-open={id}
+    aria-label={`Play video: ${label}`}
+>
+    <img
+        src={poster}
+        alt={label}
+        loading="lazy"
+        class="block h-full w-full object-cover"
+    />
+
+    {/* play-button overlay at 50%/65%, dimmed poster underneath. */}
+    <span class="pointer-events-none absolute inset-0 bg-black/25 transition-colors group-hover:bg-black/35"></span>
+    <span class="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2">
+        <span class="grid h-4 w-4 place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_60%,black)]/60 text-xs font-bold text-white shadow-lg backdrop-blur-xs transition-colors group-hover:bg-[color-mix(in_oklch,var(--accent)_80%,black)]/60 sm:h-5 sm:w-5">
+            ▶
+        </span>
+    </span>
+</button>

@@ -1,0 +1,63 @@
+---
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
+*/
+
+/*  full-viewport YouTube modal: the reusable Modal shell wrapped around
+    astro-embed's lite-youtube-embed powered <YouTube> component. One
+    instance per video id, so a page can embed several distinct videos;
+    the DOM id is derived from the video id and the trigger is scoped to
+    `[data-youtube-open="<id>"]`, so multiple instances don't collide.  */
+
+import Modal    from "./Modal.astro"
+import { YouTube } from "@astro-community/astro-embed-youtube"
+
+interface Props {
+    id:    string
+    label: string
+}
+
+const { id, label } = Astro.props
+const modalId = `youtube-modal-${id}`
+---
+<Modal id={modalId} label={label}>
+    <div class="aspect-video max-h-[90vh] w-[94vw] max-w-[calc(90vh*16/9)] overflow-hidden rounded-xl shadow-[0_25px_50px_-12px_rgb(0_0_0_/_0.6)]">
+        <YouTube id={id} title={label} params="rel=0"/>
+    </div>
+</Modal>
+
+{/* open on a trigger click; the Modal shell handles closing. lite-youtube-embed
+    has no stop/deactivate API, so on "modal:close" the injected playback
+    <iframe> is removed by hand (which halts its audio/video immediately) and
+    the "lyt-activated" class is dropped to restore the clickable poster.  */}
+<script is:inline define:vars={{ modalId, id }}>
+    (function () {
+        const youtubeModal = document.getElementById(modalId)
+        if (!youtubeModal) return
+        const liteYoutube = youtubeModal.querySelector("lite-youtube")
+        document.querySelectorAll(`[data-youtube-open="${id}"]`).forEach(function (trigger) {
+            trigger.addEventListener("click", function () {
+                youtubeModal.style.display = "grid"
+            })
+        })
+        youtubeModal.addEventListener("modal:close", function () {
+            if (!liteYoutube) return
+            const iframe = liteYoutube.querySelector("iframe")
+            if (iframe) iframe.remove()
+            liteYoutube.classList.remove("lyt-activated")
+        })
+    })()
+</script>
+
+<style is:global>
+    [id^="youtube-modal-"] lite-youtube {
+        width:     100%;
+        max-width: 100%;
+        height:    100%;
+    }
+    [id^="youtube-modal-"] lite-youtube::after {
+        padding-bottom: 0;
+    }
+</style>
