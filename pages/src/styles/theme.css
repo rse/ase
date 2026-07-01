@@ -109,7 +109,7 @@
 /*  left-aligned, first-line-indented section body copy  */
 @utility ase-indent-p {
     @apply mt-1;
-    text-align: left;
+    text-align: justify;
     text-indent: 2em;
 }
 
@@ -146,6 +146,14 @@
 /*  left-aligned section lead/intro copy  */
 @utility ase-lead {
     @apply mt-4 text-left text-foreground-secondary;
+}
+
+/*  justified body copy — hyphenates long words so the justified line-fill
+    does not stretch inter-word spacing into ragged-looking gaps  */
+@utility ase-justify {
+    @apply text-justify;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 /*  ==== base element styling ====  */

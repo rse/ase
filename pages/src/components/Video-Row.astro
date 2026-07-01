@@ -43,7 +43,7 @@ const skillCmd = spaceIdx === -1 ?
         ></div>
         <p class="ase-eyebrow">{usp.eyebrow}</p>
         <h3 class="ase-h3">{usp.title}</h3>
-        <p class="mt-4 text-foreground-secondary" set:html={usp.body}></p>
+        <p class="mt-4 text-foreground-secondary ase-justify" set:html={usp.body}></p>
         <Terminal class="mt-5" prefix="Claude Code" commands={[ skillCmd ]}/>
     </div>
     <div class={reversed ? "lg:order-1" : "lg:order-2"}>
