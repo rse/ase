@@ -21,6 +21,9 @@ import Version           from "./ase-version.js"
 /*  type of supported tool (host) systems  */
 type Tool = "claude" | "copilot" | "codex"
 
+/*  type of supported plugin/MCP installation scopes (Anthropic Claude Code CLI only)  */
+type Scope = "user" | "project" | "local"
+
 /*  per-tool dispatch table for the parts that actually differ between
     Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI plugin
     marketplace integrations  */
@@ -45,7 +48,7 @@ type mcpServerSpec = {
     env:      string[],
     server:   string,
     skills:   string[],
-    handler:  (spec: mcpServerSpec, tool: Tool, action: "activate" | "deactivate", envKey: string, envVal: string) => Promise<void>
+    handler:  (spec: mcpServerSpec, tool: Tool, scope: Scope, action: "activate" | "deactivate", envKey: string, envVal: string) => Promise<void>
 }
 
 /*  CLI command "ase setup"  */
@@ -192,7 +195,8 @@ export default class SetupCommand {
     }
 
     /*  handler for "ase setup install" (both tools)  */
-    private async doInstall (tool: Tool, dev: boolean): Promise<number> {
+    private async doInstall (tool: Tool, dev: boolean, scope: Scope): Promise<number> {
+        this.requireClaudeScope(tool, scope)
         const spec = toolSpecs[tool]
         await this.ensureTool("npm")
         await this.ensureTool(spec.cli)
@@ -202,16 +206,19 @@ export default class SetupCommand {
             `installing ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote/bundled"})`)
         const pkgdir  = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
         const source  = dev ? path.resolve(pkgdir, "..") : pkgdir
-        await this.run(spec.cli, [ "plugin", "marketplace", "add", source ])
-        await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase" ], { retries: 3 })
+        const scopeArgs = tool === "claude" ? [ "--scope", scope ] : []
+        await this.run(spec.cli, [ "plugin", "marketplace", "add", source, ...scopeArgs ])
+        await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase", ...scopeArgs ], { retries: 3 })
         return 0
     }
 
     /*  handler for "ase setup update" (both tools)  */
-    private async doUpdate (tool: Tool, force: boolean, dev: boolean): Promise<number> {
+    private async doUpdate (tool: Tool, force: boolean, dev: boolean, scope: Scope): Promise<number> {
+        this.requireClaudeScope(tool, scope)
         const spec = toolSpecs[tool]
         await this.ensureTool("npm")
         await this.ensureTool(spec.cli)
+        const scopeArgs = tool === "claude" ? [ "--scope", scope ] : []
 
         /*  best-effort stop of background service  */
         this.log.write("info", `setup: update${dev ? "[dev]" : ""}: ` +
@@ -230,9 +237,9 @@ export default class SetupCommand {
                 but there is no version change in the plugin manifest,
                 so just re-install the plugin to let the tool update its copy  */
             this.log.write("info", `setup: update[dev]: re-install ASE ${spec.label} plugin (origin: local)`)
-            await this.run(spec.cli, [ "plugin", spec.pRemove,  "ase@ase" ],
+            await this.run(spec.cli, [ "plugin", spec.pRemove,  "ase@ase", ...scopeArgs ],
                 { ignoreError: `ASE ${spec.label} plugin not installed` })
-            await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase" ], { retries: 3 })
+            await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase", ...scopeArgs ], { retries: 3 })
         }
         else {
             /*  perform NPM version check  */
@@ -251,53 +258,59 @@ export default class SetupCommand {
 
             /*  update ASE plugin (refresh the marketplace snapshot, then
                 update the plugin itself; the OpenAI Codex CLI has no
-                "plugin update" subcommand, so re-install it instead)  */
+                "plugin update" subcommand, so re-install it instead;
+                "plugin marketplace update" has no "--scope" option at all,
+                so it never receives one)  */
             this.log.write("info", `setup: update: updating ASE ${spec.label} plugin`)
             await this.run(spec.cli, [ "plugin", "marketplace", spec.pUpdate, "ase" ])
             if (tool !== "codex")
-                await this.run(spec.cli, [ "plugin", "update", "ase@ase" ])
+                await this.run(spec.cli, [ "plugin", "update", "ase@ase", ...scopeArgs ])
             else {
-                await this.run(spec.cli, [ "plugin", spec.pRemove,  "ase@ase" ],
+                await this.run(spec.cli, [ "plugin", spec.pRemove,  "ase@ase", ...scopeArgs ],
                     { ignoreError: `ASE ${spec.label} plugin not installed` })
-                await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase" ], { retries: 3 })
+                await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase", ...scopeArgs ], { retries: 3 })
             }
         }
         return 0
     }
 
     /*  handler for "ase setup enable" (both tools)  */
-    private async doEnable (tool: Tool): Promise<number> {
+    private async doEnable (tool: Tool, scope: Scope): Promise<number> {
+        this.requireClaudeScope(tool, scope)
         const spec = toolSpecs[tool]
         await this.ensureTool(spec.cli)
         this.log.write("info", `setup: enable: enabling ASE ${spec.label} plugin`)
         /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
             enable" subcommand, so (re-)install the plugin instead  */
         const args = tool === "claude" ?
-            [ "plugin", "enable",   "ase@ase" ] :
+            [ "plugin", "enable",   "ase@ase", "--scope", scope ] :
             [ "plugin", spec.pInstall, "ase@ase" ]
         await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
         return 0
     }
 
     /*  handler for "ase setup disable" (both tools)  */
-    private async doDisable (tool: Tool): Promise<number> {
+    private async doDisable (tool: Tool, scope: Scope): Promise<number> {
+        this.requireClaudeScope(tool, scope)
         const spec = toolSpecs[tool]
         await this.ensureTool(spec.cli)
         this.log.write("info", `setup: disable: disabling ASE ${spec.label} plugin`)
         /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
             disable" subcommand, so uninstall the plugin instead  */
         const args = tool === "claude" ?
-            [ "plugin", "disable",  "ase@ase" ] :
+            [ "plugin", "disable",  "ase@ase", "--scope", scope ] :
             [ "plugin", spec.pRemove, "ase@ase" ]
         await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
         return 0
     }
 
     /*  handler for "ase setup uninstall" (both tools)  */
-    private async doUninstall (tool: Tool, dev: boolean): Promise<number> {
+    private async doUninstall (tool: Tool, dev: boolean, scope: Scope): Promise<number> {
+        this.requireClaudeScope(tool, scope)
         const spec = toolSpecs[tool]
         await this.ensureTool("npm")
         await this.ensureTool(spec.cli)
+        const scopeArgs = tool === "claude" ? [ "--scope", scope ] : []
 
         /*  best-effort stop of background service  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
@@ -307,9 +320,9 @@ export default class SetupCommand {
         /*  uninstall ASE plugin  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
             `uninstalling ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote/bundled"})`)
-        await this.run(spec.cli, [ "plugin", spec.pRemove, "ase@ase" ],
+        await this.run(spec.cli, [ "plugin", spec.pRemove, "ase@ase", ...scopeArgs ],
             { ignoreError: `ASE ${spec.label} plugin not installed` })
-        await this.run(spec.cli, [ "plugin", "marketplace", "remove", "ase" ],
+        await this.run(spec.cli, [ "plugin", "marketplace", "remove", "ase", ...scopeArgs ],
             { ignoreError: `ASE ${spec.label} plugin marketplace not registered` })
 
         /*  uninstall ASE CLI tool (non-development only)  */
@@ -344,7 +357,8 @@ export default class SetupCommand {
     }
 
     /*  handler for "ase setup mcp activate|deactivate [<servers>]"  */
-    private async doMcp (action: "activate" | "deactivate", tool: Tool, servers: string): Promise<number> {
+    private async doMcp (action: "activate" | "deactivate", tool: Tool, servers: string, scope: Scope): Promise<number> {
+        this.requireClaudeScope(tool, scope)
         await this.ensureTool(toolSpecs[tool].cli)
 
         /*  source .env files into the environment so the per-server
@@ -401,7 +415,7 @@ export default class SetupCommand {
                 if (installed) {
                     this.log.write("info", `setup: mcp: activate: [${id}]: MCP server "${handle.server}" ` +
                         "already registered: removing stale registration first")
-                    await this.mcpRemove(tool, handle.server)
+                    await this.mcpRemove(tool, handle.server, scope)
                 }
             }
             else if (!installed) {
@@ -414,7 +428,7 @@ export default class SetupCommand {
             /*  call the handler  */
             this.log.write("info", `setup: mcp: ${action}: [${id}]: MCP server "${handle.server}" ` +
                 `(name: ${handle.name}${handle.version ? (", version: " + handle.version) : ""})`)
-            await handle.handler(handle, tool, action, envKey, envVal)
+            await handle.handler(handle, tool, scope, action, envKey, envVal)
         }
         return 0
     }
@@ -433,10 +447,10 @@ export default class SetupCommand {
         between Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI  */
     private async mcpAdd (tool: Tool, name: string, env: Record<string, string>, transport:
         { type: "stdio", command: string[] } |
-        { type: "http",  url: string, headers?: Record<string, string> }): Promise<void> {
+        { type: "http",  url: string, headers?: Record<string, string> }, scope: Scope): Promise<void> {
         const args: string[] = [ "mcp", "add" ]
         if (tool === "claude") {
-            args.push("--scope", "user")
+            args.push("--scope", scope)
             args.push("--transport", transport.type)
             if (transport.type === "stdio") {
                 for (const [ key, val ] of Object.entries(env))
@@ -489,9 +503,9 @@ export default class SetupCommand {
 
     /*  unregister an MCP server from the tool; the per-tool command line
         differs between Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI  */
-    private async mcpRemove (tool: Tool, name: string): Promise<void> {
+    private async mcpRemove (tool: Tool, name: string, scope: Scope): Promise<void> {
         const args = tool === "claude" ?
-            [ "mcp", "remove", "--scope", "user", name ] :
+            [ "mcp", "remove", "--scope", scope, name ] :
             [ "mcp", "remove", name ]
         await this.run(toolSpecs[tool].cli, args,
             { ignoreError: `MCP server "${name}" not registered` })
@@ -504,7 +518,7 @@ export default class SetupCommand {
         direct: { url: string, api: string, model: string },
         router: { model: string }
     ): mcpServerSpec["handler"] {
-        return async (spec, tool, action, envKey, envVal) => {
+        return async (spec, tool, scope, action, envKey, envVal) => {
             if (action === "activate")
                 await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
                     type: "stdio", command: [
@@ -521,9 +535,9 @@ export default class SetupCommand {
                             "--openai-model", direct.model
                         ])
                     ]
-                })
+                }, scope)
             else
-                await this.mcpRemove(tool, spec.server)
+                await this.mcpRemove(tool, spec.server, scope)
         }
     }
 
@@ -603,14 +617,14 @@ export default class SetupCommand {
             env:     [ "BRAVE" ],
             server:  "search-brave",
             skills:  [ "ase-meta-search", "ase-meta-evaluate", "ase-arch-discover" ],
-            handler: async (spec, tool, action, _envKey, envVal) => {
+            handler: async (spec, tool, scope, action, _envKey, envVal) => {
                 if (action === "activate")
                     await this.mcpAdd(tool, spec.server, {
                         "BRAVE_API_KEY": envVal,
                         "BRAVE_MCP_ENABLED_TOOLS": "brave_web_search"
-                    }, { type: "stdio", command: [ "npx", "-y", "@brave/brave-search-mcp-server" ] })
+                    }, { type: "stdio", command: [ "npx", "-y", "@brave/brave-search-mcp-server" ] }, scope)
                 else
-                    await this.mcpRemove(tool, spec.server)
+                    await this.mcpRemove(tool, spec.server, scope)
             }
         },
         {
@@ -620,13 +634,13 @@ export default class SetupCommand {
             env:     [ "PERPLEXITY" ],
             server:  "search-perplexity",
             skills:  [ "ase-meta-search", "ase-meta-evaluate", "ase-arch-discover" ],
-            handler: async (spec, tool, action, _envKey, envVal) => {
+            handler: async (spec, tool, scope, action, _envKey, envVal) => {
                 if (action === "activate")
                     await this.mcpAdd(tool, spec.server, {
                         "PERPLEXITY_API_KEY": envVal
-                    }, { type: "stdio", command: [ "npx", "-y", "@perplexity-ai/mcp-server" ] })
+                    }, { type: "stdio", command: [ "npx", "-y", "@perplexity-ai/mcp-server" ] }, scope)
                 else
-                    await this.mcpRemove(tool, spec.server)
+                    await this.mcpRemove(tool, spec.server, scope)
             }
         },
         {
@@ -636,12 +650,12 @@ export default class SetupCommand {
             env:     [ "EXA" ],
             server:  "search-exa",
             skills:  [ "ase-meta-search", "ase-meta-evaluate", "ase-arch-discover" ],
-            handler: async (spec, tool, action, _envKey, envVal) => {
+            handler: async (spec, tool, scope, action, _envKey, envVal) => {
                 if (action === "activate")
                     await this.mcpAdd(tool, spec.server, {},
-                        { type: "http", url: `https://mcp.exa.ai/mcp?exaApiKey=${envVal}` })
+                        { type: "http", url: `https://mcp.exa.ai/mcp?exaApiKey=${envVal}` }, scope)
                 else
-                    await this.mcpRemove(tool, spec.server)
+                    await this.mcpRemove(tool, spec.server, scope)
             }
         }
     ]
@@ -651,6 +665,20 @@ export default class SetupCommand {
         if (value !== "claude" && value !== "copilot" && value !== "codex")
             throw new Error(`invalid --tool value: "${value}" (expected "claude", "copilot", or "codex")`)
         return value
+    }
+
+    /*  parse and validate the --scope option  */
+    private parseScope (value: string): Scope {
+        if (value !== "user" && value !== "project" && value !== "local")
+            throw new Error(`invalid --scope value: "${value}" (expected "user", "project", or "local")`)
+        return value
+    }
+
+    /*  reject a non-default --scope for tools which have no scope concept
+        at all (only Anthropic Claude Code CLI supports plugin/MCP scopes)  */
+    private requireClaudeScope (tool: Tool, scope: Scope): void {
+        if (tool !== "claude" && scope !== "user")
+            throw new Error("--scope is only supported for --tool claude")
     }
 
     /*  register commands  */
@@ -676,49 +704,54 @@ export default class SetupCommand {
         setupCmd
             .command("install")
             .description("install the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
-            .action(async (opts: { tool: string, dev: boolean }) => {
-                process.exit(await this.doInstall(this.parseTool(opts.tool), opts.dev))
+            .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .option("-d, --dev",           "use local working copy instead of remote/bundled repository", devDflt)
+            .action(async (opts: { tool: string, scope: string, dev: boolean }) => {
+                process.exit(await this.doInstall(this.parseTool(opts.tool), opts.dev, this.parseScope(opts.scope)))
             })
 
         /*  register CLI sub-command "ase setup update"  */
         setupCmd
             .command("update")
             .description("update the ASE tool and the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .option("-f, --force",       "always perform the update, even if already at latest version", false)
-            .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
-            .action(async (opts: { tool: string, force: boolean, dev: boolean }) => {
-                process.exit(await this.doUpdate(this.parseTool(opts.tool), opts.force, opts.dev))
+            .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .option("-f, --force",         "always perform the update, even if already at latest version", false)
+            .option("-d, --dev",           "use local working copy instead of remote/bundled repository", devDflt)
+            .action(async (opts: { tool: string, scope: string, force: boolean, dev: boolean }) => {
+                process.exit(await this.doUpdate(this.parseTool(opts.tool), opts.force, opts.dev, this.parseScope(opts.scope)))
             })
 
         /*  register CLI sub-command "ase setup uninstall"  */
         setupCmd
             .command("uninstall")
             .description("uninstall the ASE plugin for a tool and the ASE tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .option("-d, --dev",         "use local working copy instead of remote/bundled repository", devDflt)
-            .action(async (opts: { tool: string, dev: boolean }) => {
-                process.exit(await this.doUninstall(this.parseTool(opts.tool), opts.dev))
+            .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .option("-d, --dev",           "use local working copy instead of remote/bundled repository", devDflt)
+            .action(async (opts: { tool: string, scope: string, dev: boolean }) => {
+                process.exit(await this.doUninstall(this.parseTool(opts.tool), opts.dev, this.parseScope(opts.scope)))
             })
 
         /*  register CLI sub-command "ase setup enable"  */
         setupCmd
             .command("enable")
             .description("enable the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .action(async (opts: { tool: string }) => {
-                process.exit(await this.doEnable(this.parseTool(opts.tool)))
+            .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .action(async (opts: { tool: string, scope: string }) => {
+                process.exit(await this.doEnable(this.parseTool(opts.tool), this.parseScope(opts.scope)))
             })
 
         /*  register CLI sub-command "ase setup disable"  */
         setupCmd
             .command("disable")
             .description("disable the ASE plugin for a tool")
-            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .action(async (opts: { tool: string }) => {
-                process.exit(await this.doDisable(this.parseTool(opts.tool)))
+            .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .action(async (opts: { tool: string, scope: string }) => {
+                process.exit(await this.doDisable(this.parseTool(opts.tool), this.parseScope(opts.scope)))
             })
 
         /*  register CLI sub-command "ase setup mcp"  */
@@ -742,18 +775,20 @@ export default class SetupCommand {
         mcpCmd
             .command("activate [servers]")
             .description("activate pre-defined MCP servers (comma-separated list, or \"all\")")
-            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .action(async (servers: string | undefined, opts: { tool: string }) => {
-                process.exit(await this.doMcp("activate", this.parseTool(opts.tool), servers ?? "all"))
+            .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .action(async (servers: string | undefined, opts: { tool: string, scope: string }) => {
+                process.exit(await this.doMcp("activate", this.parseTool(opts.tool), servers ?? "all", this.parseScope(opts.scope)))
             })
 
         /*  register CLI sub-command "ase setup mcp deactivate"  */
         mcpCmd
             .command("deactivate [servers]")
             .description("deactivate pre-defined MCP servers (comma-separated list, or \"all\")")
-            .option("-t, --tool <tool>", "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .action(async (servers: string | undefined, opts: { tool: string }) => {
-                process.exit(await this.doMcp("deactivate", this.parseTool(opts.tool), servers ?? "all"))
+            .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .action(async (servers: string | undefined, opts: { tool: string, scope: string }) => {
+                process.exit(await this.doMcp("deactivate", this.parseTool(opts.tool), servers ?? "all", this.parseScope(opts.scope)))
             })
     }
 }

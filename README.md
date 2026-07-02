@@ -292,22 +292,28 @@ User Setup
 npm install -g @rse/ase
 
 #   install ASE plugin into agent tool
-ase setup install [--tool claude|copilot|codex]
+ase setup install [--tool claude|copilot|codex] [--scope user|project|local]
 ```
 
 ### Updating
 
 ```
 #   update ASE tool in PATH and ASE plugin in agent tool
-ase setup update [--tool claude|copilot|codex]
+ase setup update [--tool claude|copilot|codex] [--scope user|project|local]
 ```
 
 ### Uninstallation
 
 ```
 #   uninstall ASE tool from PATH and ASE plugin from agent tool
-ase setup uninstall [--tool claude|copilot|codex]
+ase setup uninstall [--tool claude|copilot|codex] [--scope user|project|local]
 ```
+
+The `--scope` option defaults to `user` (today's global, machine-wide behavior). Use
+`--scope project` to share the plugin registration via the repository, or `--scope
+local` to keep it out of version control and confined to a single repository. `--scope`
+is only supported for `--tool claude`; a non-`user` scope is rejected for `copilot` and
+`codex`, whose CLIs have no scope concept.
 
 Foreign MCP Servers
 -------------------
@@ -321,10 +327,10 @@ setup mcp`.
 ase setup mcp list
 
 #   activate MCP servers in the agent tool
-ase setup mcp activate   [--tool claude|copilot|codex] [<server>[,...]]
+ase setup mcp activate   [--tool claude|copilot|codex] [--scope user|project|local] [<server>[,...]]
 
 #   deactivate MCP servers in the agent tool
-ase setup mcp deactivate [--tool claude|copilot|codex] [<server>[,...]]
+ase setup mcp deactivate [--tool claude|copilot|codex] [--scope user|project|local] [<server>[,...]]
 ```
 
 Each MCP server reads its API key from an environment

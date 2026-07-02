@@ -5,6 +5,7 @@ ChangeLog
 0.9.34 (2026-07-02)
 -------------------
 
+- FEATURE: add `-s, --scope <user|project|local>` option to `ase setup install/update/uninstall/enable/disable` and `ase setup mcp activate/deactivate`
 - FEATURE: add YouTube video embed and QR-code modal to the website (`Hero-Video.astro`, `Modal-YouTube.astro`, `Modal-QR.astro`, `QR-Code.astro`, `Page-Footer.astro`)
 - FEATURE: add Anthropic Claude Sonnet 5 to the website compatibility matrix (`Section-Compat.astro`)
 - IMPROVEMENT: justify body text blocks across website sections with hyphenation support (`theme.css`, `Hero.astro`, `Section-*.astro`)

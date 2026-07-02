@@ -298,6 +298,16 @@ uninstalling the *ASE* tool and its companion *Anthropic Claude Code CLI* plugin
   Disable the (already-installed) *ASE* plugin in the agent tool
   without uninstalling it.
 
+  All of `install`, `update`, `uninstall`, `enable`, and `disable` also
+  accept \[`-s`|`--scope` `user`|`project`|`local`\] (default: `user`)
+  to select the plugin installation scope: `user` registers the plugin
+  globally for the current user, `project` registers it in the project
+  and is meant to be shared via version control, and `local` registers
+  it in the project but keeps it out of version control. `--scope` is
+  only supported for `--tool claude`; requesting a non-`user` scope for
+  `copilot` or `codex` fails with an error, since those agent tools have
+  no scope concept.
+
 - `ase setup mcp`:
   Entry point group for managing the pre-defined *foreign MCP servers*
   that *ASE* skills can *optionally* leverage. Without a subcommand,
@@ -336,6 +346,11 @@ uninstalling the *ASE* tool and its companion *Anthropic Claude Code CLI* plugin
   The optional *servers* argument behaves as for `activate` (empty or
   `all` selects every registered server). A server that is not
   currently registered is skipped.
+
+  Both `activate` and `deactivate` also accept \[`-s`|`--scope`
+  `user`|`project`|`local`\] (default: `user`) to select the MCP server
+  registration scope, with the same `--tool claude`-only restriction as
+  for the plugin subcommands above.
 
 All `ase setup` subcommands -- except `ase setup mcp list` -- accept
 the host selector \[`-t`|`--tool` `claude`|`copilot`\] (default:
