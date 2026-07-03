@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+0.9.35 (2026-07-03)
+-------------------
+
+- UPDATE: upgrade NPM dependencies across all workspaces (`package.json`, `pages/package.json`, `plugin/package.json`, `tool/package.json`)
+- CLEANUP: reduce `AGENTS.md` repository-layout section verbosity (`AGENTS.md`)
+
 0.9.34 (2026-07-02)
 -------------------
 
