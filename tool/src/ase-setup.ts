@@ -206,7 +206,7 @@ export default class SetupCommand {
             `installing ASE ${spec.label} plugin (origin: ${dev ? "local" : "remote/bundled"})`)
         const pkgdir  = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
         const source  = dev ? path.resolve(pkgdir, "..") : pkgdir
-        const scopeArgs = tool === "claude" ? [ "--scope", scope ] : []
+        const scopeArgs = tool === "claude" && scope !== "user" ? [ "--scope", scope ] : []
         await this.run(spec.cli, [ "plugin", "marketplace", "add", source, ...scopeArgs ])
         await this.run(spec.cli, [ "plugin", spec.pInstall, "ase@ase", ...scopeArgs ], { retries: 3 })
         return 0
@@ -218,7 +218,7 @@ export default class SetupCommand {
         const spec = toolSpecs[tool]
         await this.ensureTool("npm")
         await this.ensureTool(spec.cli)
-        const scopeArgs = tool === "claude" ? [ "--scope", scope ] : []
+        const scopeArgs = tool === "claude" && scope !== "user" ? [ "--scope", scope ] : []
 
         /*  best-effort stop of background service  */
         this.log.write("info", `setup: update${dev ? "[dev]" : ""}: ` +
@@ -282,8 +282,9 @@ export default class SetupCommand {
         this.log.write("info", `setup: enable: enabling ASE ${spec.label} plugin`)
         /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
             enable" subcommand, so (re-)install the plugin instead  */
+        const scopeArgs = scope !== "user" ? [ "--scope", scope ] : []
         const args = tool === "claude" ?
-            [ "plugin", "enable",   "ase@ase", "--scope", scope ] :
+            [ "plugin", "enable",   "ase@ase", ...scopeArgs ] :
             [ "plugin", spec.pInstall, "ase@ase" ]
         await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
         return 0
@@ -297,8 +298,9 @@ export default class SetupCommand {
         this.log.write("info", `setup: disable: disabling ASE ${spec.label} plugin`)
         /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
             disable" subcommand, so uninstall the plugin instead  */
+        const scopeArgs = scope !== "user" ? [ "--scope", scope ] : []
         const args = tool === "claude" ?
-            [ "plugin", "disable",  "ase@ase", "--scope", scope ] :
+            [ "plugin", "disable",  "ase@ase", ...scopeArgs ] :
             [ "plugin", spec.pRemove, "ase@ase" ]
         await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
         return 0
@@ -310,7 +312,7 @@ export default class SetupCommand {
         const spec = toolSpecs[tool]
         await this.ensureTool("npm")
         await this.ensureTool(spec.cli)
-        const scopeArgs = tool === "claude" ? [ "--scope", scope ] : []
+        const scopeArgs = tool === "claude" && scope !== "user" ? [ "--scope", scope ] : []
 
         /*  best-effort stop of background service  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
@@ -450,7 +452,8 @@ export default class SetupCommand {
         { type: "http",  url: string, headers?: Record<string, string> }, scope: Scope): Promise<void> {
         const args: string[] = [ "mcp", "add" ]
         if (tool === "claude") {
-            args.push("--scope", scope)
+            if (scope !== "user")
+                args.push("--scope", scope)
             args.push("--transport", transport.type)
             if (transport.type === "stdio") {
                 for (const [ key, val ] of Object.entries(env))
@@ -504,9 +507,8 @@ export default class SetupCommand {
     /*  unregister an MCP server from the tool; the per-tool command line
         differs between Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI  */
     private async mcpRemove (tool: Tool, name: string, scope: Scope): Promise<void> {
-        const args = tool === "claude" ?
-            [ "mcp", "remove", "--scope", scope, name ] :
-            [ "mcp", "remove", name ]
+        const scopeArgs = tool === "claude" && scope !== "user" ? [ "--scope", scope ] : []
+        const args = [ "mcp", "remove", ...scopeArgs, name ]
         await this.run(toolSpecs[tool].cli, args,
             { ignoreError: `MCP server "${name}" not registered` })
     }
