@@ -22,18 +22,35 @@ plan content always overrules the draft.
 The implementation can be performed in one of two *modes*. In mode
 `all`, the plan is implemented as one complete change set in a single
 pass. In mode `steps`, the plan is first *restructured* into small,
-self-contained, individually verifiable increments - each one a
-reviewable diff of related code plus its corresponding test. The
-increment list is persisted as an `IMPLEMENTATION STEPS` section
-(a numbered checkbox list) inside the task plan itself, so progress
-survives discussion pauses and even session restarts. After each
-implemented increment, its checkbox is ticked and a short step summary
-is recorded beneath it inside the plan, the plan is saved, the summary
-is emitted as text, and the user is asked - via a custom dialog whose
-question already carries a one-line condensation of the summary - how
-to proceed: `CONTINUE` (implement the next increment), `DISCUSS` (pause
-the skill for a free discussion in the chat), or `DONE` (stop and
-preserve the plan including the step progress).
+self-contained, individually verifiable increments - each one the
+*smallest landable unit*: a reviewable diff of related code plus its
+corresponding test, ending "compiles + tests green + report". Besides
+regular code increments, `[measure]` increments are probes whose
+measured result decides whether a dependent increment is built or
+cancelled, and `[live]` increments are live verifications where the
+user runs the application and reports logs/screenshots back.
+
+The increment list is persisted as an `IMPLEMENTATION STEPS` section
+(a numbered checkbox list plus a `BASELINE` bullet naming the known
+pre-existing failures) inside the task plan itself, so progress
+survives discussion pauses and even session restarts. The section is a *living ledger*:
+increments may be resequenced, split, or merged when contact with the
+code demands it (rationale recorded beneath the affected item), and
+deferred work must name its target increment. After each increment,
+its checkbox is ticked, a step summary with findings is recorded
+beneath it, the plan is saved, and a *standardized step report* is
+emitted: a table of the changed production files (Status / File /
+What), tests named separately, the verification result citing the
+known pre-existing failures, and the explicit staging status. The
+skill *never* commits and stages only on an explicit `STAGE` gate
+choice - Git sovereignty remains with the user. Via a custom dialog
+carrying a one-line condensation of the report, the user then
+decides: `CONTINUE` (next increment), `STAGE` (stage the increment's
+not-yet-staged files, then continue), `DISCUSS` (pause for a free
+discussion in the chat), or `DONE` (stop and preserve plan and
+progress). The gate reviews *results*: implementing the next
+increment is the default; the skill asks again only on genuine scope
+changes.
 
 If the loaded plan already contains an `IMPLEMENTATION STEPS` section
 with at least one open checkbox, the skill *resumes* mode `steps` at
@@ -52,7 +69,10 @@ If the task plan deliberately *omits* the `##  VERIFICATION` section
 the entire verification phase is strictly skipped: no build, tests,
 linter, type-checker, or program execution is performed once the
 source files have been modified. In mode `steps`, this rule applies
-per increment.
+per increment. Otherwise the verification matches the increment type
+(unit, architecture/structure, measurement, or live verification) and
+checks *harness realism*: whether the test harness reflects the live
+conditions (advancing clock, concurrency, reconnects).
 
 After implementation, the user is asked whether to preserve or
 delete the task plan, unless `--next` pre-selects this choice.
