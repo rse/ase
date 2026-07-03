@@ -39,6 +39,13 @@ import Annotation  from "./Annotation.astro"
             The <code>--tool claude</code> is the default and not necessary
             for the mainstream tool <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>.
         </p>
+        <p class="ase-indent-p text-foreground-secondary ase-justify">
+            The <code>--scope</code> option defaults to <code>user</code> (global,
+            machine-wide). Use <code>--scope project</code> to share the plugin
+            registration via the project repository, or <code>--scope local</code> to
+            share the plugin via the project repository while keeping it out of version control.
+            Option <code>--scope</code> is only supported for <code>--tool claude</code>.
+        </p>
     </header>
 
     <div data-reveal>
@@ -53,7 +60,7 @@ import Annotation  from "./Annotation.astro"
             title="Installation"
             commands={[
                 "**npm** install -g @rse/ase",
-                "**ase** setup install **[**--tool claude**|**copilot**|**codex**]**"
+                "**ase** setup install\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
             ]}
         />
     </div>
@@ -64,7 +71,7 @@ import Annotation  from "./Annotation.astro"
             copy={true}
             title="Updating"
             commands={[
-                "**ase** setup update **[**--tool claude**|**copilot**|**codex**]**"
+                "**ase** setup update\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
             ]}
         />
     </div>
@@ -75,7 +82,7 @@ import Annotation  from "./Annotation.astro"
             copy={true}
             title="Uninstallation"
             commands={[
-                "**ase** setup uninstall **[**--tool claude**|**copilot**|**codex**]**"
+                "**ase** setup uninstall\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
             ]}
         />
     </div>
@@ -117,7 +124,7 @@ import Annotation  from "./Annotation.astro"
             commands={[
                 "**ase** setup mcp list",
                 "export ASE_MCP_KEY_**<service>**=\"**<token>**\"",
-                "**ase** setup mcp activate **[**--tool claude**|**copilot**|**codex**]**"
+                "**ase** setup mcp activate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
             ]}
         />
     </div>
@@ -128,7 +135,7 @@ import Annotation  from "./Annotation.astro"
             copy={true}
             title="MCP Uninstallation"
             commands={[
-                "**ase** setup mcp deactivate **[**--tool claude**|**copilot**|**codex**]**"
+                "**ase** setup mcp deactivate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
             ]}
         />
     </div>

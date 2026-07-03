@@ -33,9 +33,10 @@ const tokenize = (cmd: string) =>
         meta: /^\*\*[^*]*\*\*$/.test(part)
     }))
 
-/*  the raw command without the **...** highlight markers, so the copied text
-    stays unchanged.  */
-const plain = (cmd: string) => cmd.replace(/\*\*([^*]*)\*\*/g, "$1")
+/*  the raw command without the **...** highlight markers and with embedded
+    "\n" wrap points folded back to spaces, so the copied text is the actual
+    single-line shell command.  */
+const plain = (cmd: string) => cmd.replace(/\*\*([^*]*)\*\*/g, "$1").replace(/\n/g, " ")
 ---
 <div class={className}>
     <div class="overflow-hidden rounded-xl border border-border-strong bg-background-elevated/60 text-[0.7875rem] leading-snug shadow-xl sm:text-[0.9rem]">
@@ -51,7 +52,12 @@ const plain = (cmd: string) => cmd.replace(/\*\*([^*]*)\*\*/g, "$1")
                 <div class="group flex items-start gap-3 font-mono tracking-[-0.03em]">
                     <span class="select-none text-brand-300">❯</span>
                     <code class="code-plain flex-1 text-foreground">{tokenize(cmd).map((t) => (
-                        t.meta ? <span class="text-brand-400">{t.text}</span> : t.text
+                        t.text.split("\n").map((line, i) => (
+                            <>
+                                {i > 0 && <br/>}
+                                {t.meta ? <span class="text-brand-400">{line}</span> : line}
+                            </>
+                        ))
                     ))}</code>
                     {copy && (
                         <button
