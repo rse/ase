@@ -13,8 +13,8 @@
         "typescript":                             "6.0.3",
         "eslint":                                 "10.6.0",
         "@eslint/js":                             "10.0.1",
-        "@typescript-eslint/parser":              "8.62.0",
-        "typescript-eslint":                      "8.62.0",
+        "@typescript-eslint/parser":              "8.62.1",
+        "typescript-eslint":                      "8.62.1",
         "@stylistic/eslint-plugin":               "5.10.0",
         "eslint-plugin-astro":                    "2.1.1",
         "astro-eslint-parser":                    "2.1.0",
@@ -22,13 +22,13 @@
         "playwright":                             "1.61.1"
     },
     "dependencies": {
-        "astro":                                  "7.0.3",
+        "astro":                                  "7.0.6",
         "@astrojs/sitemap":                       "3.7.3",
         "@astro-community/astro-embed-youtube":   "0.5.10",
         "astro-robots-txt":                       "1.0.0",
         "astro-swiper":                           "2.7.1",
-        "tailwindcss":                            "4.3.1",
-        "@tailwindcss/vite":                      "4.3.1",
+        "tailwindcss":                            "4.3.2",
+        "@tailwindcss/vite":                      "4.3.2",
         "typopro-web":                            "4.2.8",
         "marked":                                 "18.0.5",
         "plyr":                                   "3.8.4",
@@ -39,5 +39,10 @@
     },
     "scripts": {
         "start":                                  "stx -v4 -l warning -c etc/stx.conf"
+    },
+    "allowScripts": {
+        "core-js@3.49.0":                         true,
+        "esbuild@0.28.1":                         true,
+        "typopro-web@4.2.8":                      true
     }
 }
