@@ -164,19 +164,21 @@ Procedure
         ">
 
         1.  *Restructure* the task plan in <content/> into <m/> small,
-            self-contained, individually verifiable *increments*: each
-            increment bundles the code belonging together plus its
-            corresponding test, is compilable/green on its own, and
-            respects the dependency order between increments. A sensible
-            restructuring of the plan is allowed and encouraged -- the
-            plan order is no dogma. Sizing rule: one increment equals
-            one reviewable diff (about one class or one feature cut),
-            *never* "all files at once".
-
-            Like in `all` mode, primarily follow and honor the task
-            plan in <content/>, and secondarily derive hints from the
-            optionally existing `IMPLEMENTATION DRAFT` section -- the
-            specification text in <content/> always overrules the draft.
+            self-contained, individually verifiable *increments*, each
+            the *smallest landable unit*: one reviewable diff (about
+            one class or one feature cut) bundling the code belonging
+            together plus its corresponding test, ending "compiles +
+            tests green + report" -- *never* "all files at once".
+            Respect the dependency order, but the plan order is no
+            dogma: sensible restructuring is encouraged. Where the
+            plan calls for them, use the two special increment
+            *types*: `[measure]` probes whose *measured* result
+            decides whether a dependent increment is built or
+            cancelled, and `[live]` verifications where the *user*
+            runs the application and reports logs/screenshots back
+            (their diagnosis loops belong to the increment). Like in
+            `all` mode, the plan text in <content/> always overrules
+            the optional `IMPLEMENTATION DRAFT` hints.
 
             Do not output anything in this step.
 
@@ -189,9 +191,16 @@ Procedure
             <format>
             ##  IMPLEMENTATION STEPS
 
+            -   **BASELINE**: pre-existing failures: <list, or `none`>
+
             - [ ] 1. <step-title-1/> -- <one-sentence scope>
-            - [ ] 2. <step-title-2/> -- <one-sentence scope>
+            - [ ] 2. [measure] <step-title-2/> -- <one-sentence scope>
             </format>
+
+            The **BASELINE** bullet names the build/test failures
+            existing *before* the first increment (extend it when
+            verification reveals further pre-existing ones); the
+            optional `[measure]`/`[live]` tag marks the increment type.
 
             Do not output anything in this step.
 
@@ -207,6 +216,30 @@ Procedure
 
     2.  **Implementation Loop:**
 
+        The loop is a *contract*, not a schedule -- four rules bind
+        *every* iteration:
+
+        -   *One increment at a time*: *never* implement past the
+            next review gate, however trivial the next increment
+            seems.
+
+        -   *Implementing is the default*: the gate reviews *results*
+            and never re-asks permission to implement; ask separately
+            only on genuine *scope changes*.
+
+        -   *Git remains with the user*: *never* commit, and stage
+            only when the user explicitly chooses `STAGE` at a review
+            gate -- otherwise leave *all* changes unstaged for the
+            user to review, stage, and commit.
+
+        -   *Resequencing is allowed, silence is not*: when contact
+            with the code shows an increment is mis-cut or mis-ordered,
+            reorder/split/merge the step list and record the
+            rationale as an indented note below the affected item
+            (e.g. "moved after step 7, because ...") via
+            `ase_task_save`. Deferred work *MUST* name its target
+            increment.
+
         Set <m/> to the total number of checkbox items of the
         `##  IMPLEMENTATION STEPS` section in <content/>.
         For each still *open* increment <n/> (checkbox `- [ ]`, in
@@ -217,55 +250,75 @@ Procedure
 
             <if condition="<content/> contains a `##  VERIFICATION` section heading">
             Verify the increment according to the `##  VERIFICATION`
-            section, as far as applicable to this increment.
+            section, as far as applicable, matching the increment
+            *type*: unit tests for behavior, architecture/structure
+            tests for structural increments, the recorded measurement
+            for `[measure]`, the user-reported evidence for `[live]`.
+            Also check *harness realism*: does the harness reflect
+            the live conditions (advancing clock, concurrency,
+            reconnects)?
             </if>
             <else>
             The task plan deliberately *omits* the `##  VERIFICATION`
-            section. You *MUST* therefore *strictly skip* the entire
-            verification phase after modifying the source files: do *NOT*
-            run any build, do *NOT* run any tests, do *NOT* run any linter,
-            do *NOT* run any type-checker, do *NOT* execute the modified
-            program, and do *NOT* otherwise verify the change set in any
-            way.
+            section: *strictly skip* the entire verification phase,
+            exactly as specified for `all` mode above (no build, no
+            tests, no linter, no type-checker, no program execution,
+            no other verification).
             </else>
 
             Then *compose* the <step-summary/> of increment <n/>:
             2-5 bullet lines telling what was changed (functionally,
-            not as a file list), which artifacts are affected, and the
+            not as a file list), the affected artifacts, the
             verification result (e.g. "tests 12/12 green" or
-            "verification skipped per plan").
+            "verification skipped per plan"), and any *findings* worth
+            remembering (including deferred work with its named target
+            increment).
+
+            <if condition="increment <n/> is a `[measure]` increment">
+            The measured result *gates* the dependent increments: mark
+            a cancelled increment's checkbox as `- [x]`, strike its
+            title through (`~~...~~`), and record the measured
+            rationale as an indented note below it.
+            </if>
 
             Then set the checkbox of increment <n/> to `- [x]` in
             <content/>, insert the <step-summary/> as indented bullet
-            lines directly below the checkbox item of increment <n/>,
-            and call the `ase_task_save(id: "<ase-task-id/>",
-            text: "<content/>")` tool of the `ase` MCP server again to
-            persist both the progress and the summary.
+            lines directly below it, and call the `ase_task_save(id:
+            "<ase-task-id/>", text: "<content/>")` tool of the `ase`
+            MCP server again to persist progress and summary.
 
             Do not output anything in this step.
 
-        2.  Only output the following <template/>, where <step-summary/>
-            is *verbatim* the just persisted step summary of increment
-            <n/>:
+        2.  Only output the following *step report* <template/>, where
+            the table lists the changed *production* files (one row
+            per file), <status/> is `A` (added), `M` (modified), or
+            `D` (deleted), <what/> is a one-clause change description,
+            and <verdict/> is the verification result:
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ➤ step: **<n/>/<m/>** -- **<step-title-n/>**, ▶ status: **step implemented**
-            <step-summary/>
+
+            | Status    | File      | What    |
+            | --------- | --------- | ------- |
+            | <status/> | `<file/>` | <what/> |
+
+            ● **Tests**: <tests added/changed and their result, or `none`>
+            ● **Verification**: <verdict/> (pre-existing failures: <list, or `none`>)
+            ● **Staging**: all changes left unstaged -- staging/committing remains with you
             </template>
 
-        3.  <if condition="increment <n/> is NOT the last increment <m/>">
+        3.  <if condition="at least one increment is still open">
             *Review gate*: let the *user interactively choose* how to
             proceed.
 
-            You *MUST* have output the step summary <template/> of the
+            You *MUST* have output the step report <template/> of the
             previous sub-item as regular text *BEFORE* the dialog is
-            shown -- *never* enter the review gate without it, as the
-            step summary is the basis for the user's review decision.
+            shown -- it is the basis for the user's review decision.
             If it was not output yet, output it now.
 
             Set <step-gist/> to a one-line condensation (at most about
-            25 words, no line breaks) of the <step-summary/> of
-            increment <n/>, ending with the verification result.
+            25 words, no line breaks) of the just emitted step report,
+            ending with the verification result.
 
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
@@ -275,6 +328,7 @@ Procedure
             <expand name="custom-dialog" arg1="--no-other">
                 Step <n/>/<m/>: <step-gist/> -- How to proceed?
                 CONTINUE: Implement the next step.
+                STAGE: Stage this step's not-yet-staged files, then implement the next step.
                 DISCUSS: Pause here; re-invoke ase-task-implement to resume.
                 DONE: Stop and PRESERVE the plan including step progress.
             </expand>
@@ -283,6 +337,13 @@ Procedure
 
             -   If <result/> is `CONTINUE`:
                 Continue the loop with the next open increment.
+
+            -   If <result/> is `STAGE`:
+                *Stage* exactly the files of increment <n/> (the step
+                report's production files plus its test files) that
+                are not already staged, via `git add <file/> [...]`
+                (*never* `git add -A`), then continue the loop with
+                the next open increment.
 
             -   If <result/> is `DISCUSS` or `CANCEL`:
                 Only output the following <template/> and then
@@ -305,7 +366,7 @@ Procedure
                 </template>
             </if>
 
-    3.  After the last increment <m/> was implemented: *remove* the
+    3.  Once no increment is open anymore: *remove* the
         entire `##  IMPLEMENTATION STEPS` section from the plan in
         <content/> again (the plan returns to its canonical format) and
         call the `ase_task_save(id: "<ase-task-id/>", text: "<content/>")`
