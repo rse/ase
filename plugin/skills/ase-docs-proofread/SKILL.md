@@ -55,7 +55,7 @@ Analyze documents for spelling, punctuation, or grammar errors
 
     ```text
         Agent(
-            description:       "Proofread Investigation",
+            description:       "Proofread Investigation (<batch-index/>/<batch-count/>)",
             subagent_type:     "ase:ase-docs-proofread",
             prompt:            <batch/>,
             run_in_background: false
@@ -63,7 +63,10 @@ Analyze documents for spelling, punctuation, or grammar errors
     ```
 
     Here <batch/> is the space-separated list of the document file
-    paths of the corresponding batch.
+    paths of the corresponding batch, <batch-index/> is the 1-based
+    index of that batch, and <batch-count/> is the total number of
+    batches, so that each parallel invocation is distinguishable in
+    the progress display.
 
     Parse the result message of each `Agent` tool invocation as a JSON
     array, concatenate all those arrays, sort the combined list by

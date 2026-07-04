@@ -81,7 +81,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     ```text
         Agent(
-            description:       "Analysis Investigation",
+            description:       "Analysis Investigation (<batch-index/>/<batch-count/>)",
             subagent_type:     "ase:ase-code-analyze",
             prompt:            "<lens/> <batch/>",
             run_in_background: false
@@ -89,7 +89,10 @@ problems in *performance* and *efficiency*, or problems in *security*.
     ```
 
     Here <batch/> is the space-separated list of the source code file
-    paths of the corresponding batch.
+    paths of the corresponding batch, <batch-index/> is the 1-based
+    index of that batch, and <batch-count/> is the total number of
+    batches, so that each parallel invocation is distinguishable in
+    the progress display.
 
     Parse the result message of each `Agent` tool invocation as a JSON
     array and concatenate all those arrays. Then *deduplicate* the

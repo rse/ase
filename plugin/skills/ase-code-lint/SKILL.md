@@ -55,7 +55,7 @@ related to a set of code quality aspects.
 
     ```text
         Agent(
-            description:       "Lint Investigation",
+            description:       "Lint Investigation (<batch-index/>/<batch-count/>)",
             subagent_type:     "ase:ase-code-lint",
             prompt:            <batch/>,
             run_in_background: false
@@ -63,7 +63,10 @@ related to a set of code quality aspects.
     ```
 
     Here <batch/> is the space-separated list of the source code file
-    paths of the corresponding batch.
+    paths of the corresponding batch, <batch-index/> is the 1-based
+    index of that batch, and <batch-count/> is the total number of
+    batches, so that each parallel invocation is distinguishable in
+    the progress display.
 
     Parse the result message of each `Agent` tool invocation as a JSON
     array and concatenate all those arrays. Then *deduplicate* the
