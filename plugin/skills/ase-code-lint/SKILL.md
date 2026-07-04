@@ -259,7 +259,7 @@ related to a set of code quality aspects.
 
             <expand name="custom-dialog" arg1="--other">
                 CORRECTION: How would you like to proceed with this proposed correction?
-                ACCEPT: Apply the proposed correction.
+                ACCEPT: Apply this proposed correction.
                 REJECT: Skip this proposed correction.
             </expand>
 
