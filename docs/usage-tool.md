@@ -56,10 +56,12 @@ The following top-level commands exist for configuration handling:
   The file is validated against a schema: on read, unknown or
   invalid entries are warned about and silently dropped from the
   in-memory view; on set/write, they cause a fatal error.
-  Recognized keys are grouped under three top-level sections:
+  Recognized keys are grouped under two top-level sections:
   `project.*` (project identity, classification, and artifact
-  globs), `agent.*` (agent persona and process), and `task.*`
-  (currently `task.id`, the active task identifier).
+  globs: `project.id`, `project.name`, `project.boxing`, and the
+  `project.artifact.`*kind*`.{basedir,files}` globs) and `agent.*`
+  (`agent.persona`, `agent.task` -- the active task identifier --
+  and `agent.skill`).
   All `ase config` subcommands accept a `--scope` *scope* option
   that selects the scope chain. The *scope* value is a
   comma-separated list of scope terms, in any order; each term
@@ -85,16 +87,15 @@ The following top-level commands exist for configuration handling:
   `session:S1` as the write target.
 
 - `ase config init` *type*:
-  Initialize `.ase/config.yaml` with preset values for all recognized
-  keys. The *type* argument selects the preset:
-  `default` (empty baseline with all recognized keys present and
-  unset),
-  `vibe` (solo rookie: small black-box prototype, bare code, fully
-  agent-driven, spec-driven, engineer ambition),
-  `pro` (solo expert: medium white-box product, framework-based,
-  human-controlled, code-driven, artist ambition),
-  or `industry` (team crew: large grey-box MVP, framework-based,
-  human-in-the-loop, code-driven, craftsman ambition).
+  Initialize `.ase/config.yaml` with preset values. The *type* argument
+  selects the preset:
+  `default` (baseline: persona `engineer`, boxing `white`, plus the
+  active task `default` and the full set of `project.artifact.*` globs),
+  `vibe` (persona `writer`, boxing `black`),
+  `pro` (persona `engineer`, boxing `white`),
+  or `industry` (persona `engineer`, boxing `grey`).
+  The `vibe`, `pro`, and `industry` presets each set only
+  `agent.persona`, `project.id`, `project.name`, and `project.boxing`.
 
 - `ase config edit`:
   Open `.ase/config.yaml` in the editor defined by the `$EDITOR`
@@ -105,8 +106,8 @@ The following top-level commands exist for configuration handling:
 
 - `ase config list`:
   List all effective configured values across the scope
-  inheritance chain, rendered as a three-column table of `key`,
-  `value`, and `origin`. The `origin` column identifies the
+  inheritance chain, rendered as a three-column table of `KEY`,
+  `VALUE`, and `SCOPE`. The `SCOPE` column identifies the
   scope (`user`, `project`, `task:`*id*, or `session:`*id*) that
   supplied each value. For overlapping keys only the value from
   the strongest scope is shown.
@@ -195,22 +196,22 @@ or *GitHub Copilot CLI* statusline:
   rendering composed from one or more template *line* arguments.
   Each *line* may contain literal characters and the following
   `%`-prefixed placeholders: `%u` (user), `%p` (project), `%T` (task,
-  suppressed if empty), `%s` (session name, falling back to session
-  id), `%m` (model), `%e` (effort), `%t` (thinking), `%P` (persona,
+  suppressed if empty), `%s` (session id, or `unknown` if absent),
+  `%m` (model), `%e` (effort), `%t` (thinking), `%P` (persona,
   suppressed if empty), `%c` (context-usage progress bar with a
   20-cell bar and percentage),
-  `%C` (current context tokens, e.g. `334k`), `%L` (context-window
-  token limit, e.g. `1.0M`), `%N` (cumulative session tokens, e.g.
-  `104.9M`), `%a` (lines of code added in this session), `%r`
+  `%C` (current/limit context tokens, e.g. `334k/1.0M`),
+  `%a` (lines of code added in this session), `%r`
   (lines of code removed in this session), `%S` (5-hour rate-limit
   window used percentage), `%D` (5-hour window time-until-reset,
   e.g. `4hr 27m`), `%W` (7-day rate-limit window used percentage),
   `%Q` (7-day window time-until-reset), `%H` (session wall-clock
   duration, e.g. `92hr 40m`), `%X` (session cost in USD, e.g.
-  `$54.44`), `%b` (git branch, or `no git`), `%g` (git status:
-  `clean` or `dirty`), `%G` (git untracked file count), `%d` (full
+  `$54.44`), `%b` (git branch, or `no git`), `%g` (git changed lines,
+  e.g. `+42/-7`), `%G` (git untracked file count), `%d` (full
   current working directory path), `%M` (memory used/total, e.g.
-  `33.2G/64.0G`), `%V` (*Anthropic Claude Code CLI* version), and `%O`
+  `33.2G/64.0G`), `%V` (combined *Anthropic Claude Code CLI* and *ASE*
+  version, e.g. `claude/2.1.90 ase/0.9.35`), and `%O`
   (output-style name). All `%`-tokens whose source field is missing
   in the input JSON (or, for `%b`/`%g`/`%G`, when the *cwd* is not a
   git working tree) are *suppressed silently*, so older *Anthropic Claude Code CLI*
@@ -252,10 +253,12 @@ The following top-level command exists for diagram rendering:
 
 - `ase diagram`:
   Render a *Mermaid* diagram specification (read from standard
-  input or from `--input` *file*) as Unicode/ASCII art. Supports
+  input or from `--input` *file*) as Unicode/ASCII art or SVG. Supports
   the following options:
     - \[`-i`|`--input` *file*\]:
       read *Mermaid* source from *file* instead of standard input.
+    - \[`-f`|`--format` `ascii`|`svg`\]:
+      select the output format (default: `ascii`).
     - \[`-a`|`--ascii`\]:
       emit plain ASCII (`+-|`) instead of Unicode box-drawing.
     - \[`-c`|`--color-mode` *mode*\]:
@@ -353,20 +356,27 @@ uninstalling the *ASE* tool and its companion *Anthropic Claude Code CLI* plugin
   for the plugin subcommands above.
 
 All `ase setup` subcommands -- except `ase setup mcp list` -- accept
-the host selector \[`-t`|`--tool` `claude`|`copilot`\] (default:
+the host selector \[`-t`|`--tool` `claude`|`copilot`|`codex`\] (default:
 `claude`, or the value of the `ASE_TOOL` environment variable if set)
-to choose between *Anthropic Claude Code CLI* and *GitHub Copilot CLI* as the target
-agent tool.
+to choose between *Anthropic Claude Code CLI*, *GitHub Copilot CLI*, and
+*OpenAI Codex CLI* as the target agent tool.
 
 The following top-level commands exist for managing persisted task
-plans under `<project>/.ase/task/`*id*`/plan.md`:
+plans, each stored as a single file `<project>/`*basedir*`/TASK-`*id*`.md`,
+where *basedir* is the `project.artifact.task.basedir` configuration
+value (default `.ase/task`) and the filename must match the
+`project.artifact.task.files` glob (default `*.md`). A legacy
+`<basedir>/`*id*`/plan.md` layout is auto-migrated to the current
+single-file layout on first access:
 
 - `ase task`:
   Entry point group for task plan management. Without a subcommand,
   the help text is shown and the command exits with status 1.
 
-- `ase task list`:
+- `ase task list` \[`-v`|`--verbose`\]:
   List all persisted task ids in lexicographic order, one per line.
+  With `--verbose`, each id is annotated with the task file's
+  modification timestamp (`YYYY-MM-DD HH:MM`).
 
 - `ase task load` *id*:
   Load the task plan with the given *id* and write it to standard
@@ -382,17 +392,18 @@ plans under `<project>/.ase/task/`*id*`/plan.md`:
   standard input.
 
 - `ase task delete` *id*:
-  Delete the task plan with the given *id* (removing the entire
-  `<project>/.ase/task/`*id*`/` directory). Exits with status 1 if no such
-  task existed.
+  Delete the task plan with the given *id* (removing its
+  `<project>/`*basedir*`/TASK-`*id*`.md` file). Exits with status 1 if no
+  such task existed.
 
 - `ase task rename` *old-id* *new-id*:
   Rename the task plan with the given *old-id* to *new-id* (moving the
-  entire `<project>/.ase/task/`*old-id*`/` directory). Exits with status 1
-  if no such task existed or the target id is already in use.
+  `TASK-`*old-id*`.md` file to `TASK-`*new-id*`.md` and rewriting the
+  `# TASK <id>:` heading inside). Exits with status 1 if no such task
+  existed or the target id is already in use.
 
 - `ase task purge` \[*age*\]:
-  Remove all persisted tasks whose modification time is older than
+  Remove all persisted task files whose modification time is older than
   *age* (default: `31d`). The *age* argument is a `<number><unit>`
   value, where *unit* is one of `h` (hour), `d` (day), `m` (month), or
   `y` (year).
@@ -419,6 +430,15 @@ kinds to project-relative file lists, driven by the
   project-relative path. The `--kind` option selects one of the five
   configured kinds `spec`, `arch`, `code`, `docs`, or `infr` (default:
   `code`).
+
+The following top-level command exists for exposing plugin meta files:
+
+- `ase meta` *name* \[...\]:
+  Output the contents of one or more plugin *meta files* to standard
+  output. Each *name* selects a file under the plugin's `meta/`
+  directory; the `ase-` prefix and `.md` extension are optional. This is
+  intended to be leveraged by *ASE* skills and not typically invoked
+  directly by end users.
 
 The following top-level command exists for the `ase-meta-compat`
 self-test skill:
@@ -502,11 +522,14 @@ STATE FILES
 - `.ase/service.log`:
   Stdout/stderr log of the detached background service.
 
-- `<project>/.ase/task/`*id*`/plan.md`:
+- `<project>/`*basedir*`/TASK-`*id*`.md`:
   Persisted task plan, managed by the `ase task` subcommands, located
   relative to the Git top-level directory (or the current working
-  directory outside a Git repository). The per-task directory is owned
-  by *ASE* in full and removed by `ase task delete` and `ase task purge`.
+  directory outside a Git repository). *basedir* defaults to `.ase/task`
+  (configurable via `project.artifact.task.basedir`). Each task file is
+  owned by *ASE* and removed by `ase task delete` and `ase task purge`.
+  A legacy `<basedir>/`*id*`/plan.md` layout is auto-migrated to this
+  single-file layout on first access.
 
 HISTORY
 -------
