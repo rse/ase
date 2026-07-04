@@ -1,4 +1,4 @@
-- --
+---
 name: ase-meta-changelog
 argument-hint: "[--help|-h]"
 description: >
