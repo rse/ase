@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.36 (2026-07-04)
+-------------------
+
+- IMPROVEMENT: add tiered staleness (`--staleness`) and small-scope (`--small-scope`) dependency-weight penalties to `ase-arch-discover`
+
 0.9.35 (2026-07-04)
 -------------------
 

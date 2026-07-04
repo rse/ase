@@ -1,6 +1,6 @@
 ---
 name: ase-arch-discover
-argument-hint: "[--help|-h] [--limit|-l=12] <functionality>"
+argument-hint: "[--help|-h] [--limit|-l=12] [--staleness|-s=18] [--small-scope|-S] <functionality>"
 description: >
     Discover additional, third-party components (libraries/frameworks) for
     the technology stack to provide needed functionality.
@@ -25,7 +25,7 @@ Discover Components
 
 <expand name="getopt"
     arg1="ase-arch-discover"
-    arg2="--limit|-l=12">
+    arg2="--limit|-l=12 --staleness|-s=18 --small-scope|-S">
     $ARGUMENTS
 </expand>
 
@@ -166,18 +166,25 @@ for the technology stack to *provide* the *needed functionality*
             entries by Maven coordinate.
 
     6.  Call the `ase_component_info(stack: "<stack/>", components:
-        [ "<package-1/>", ..., "<package-C/>" ])` tool of the `ase` MCP
-        server *once* for the entire candidate set of discovered packages.
-        The tool dispatches internally on <stack/> and fetches all
-        metadata in maximum parallel and returns an array of objects `{
-        name, version, created, updated, repository, stars, downloads,
-        rank }`. For each
-        component <component-K/> (K=1-C) read from its corresponding
-        entry: <version-K/> from `version`, <updated-K/> from `updated`,
-        <created-K/> from `created`, <repository-K/> from `repository`,
-        <stars-K/> from `stars` (numeric or `N.A.`), <downloads-K/>
-        from `downloads` (numeric or `N.A.`) and <rank-K/> from `rank`
-        (numeric).
+        [ "<package-1/>", ..., "<package-C/>" ], staleMonths:
+        <getopt-option-staleness/>, smallScope: <getopt-option-small-scope/>)`
+        tool of the `ase` MCP server *once* for the entire candidate set of
+        discovered packages. When the <getopt-option-small-scope/> option is
+        enabled, the ranking treats the <functionality/> as *small-scope*,
+        i.e. narrow, self-contained, and low-effort enough that a
+        *dependency-free/hand-rolled* implementation is a realistic
+        alternative to pulling in a third-party component. The tool
+        dispatches internally on <stack/>
+        and fetches all metadata in maximum parallel and returns an array
+        of objects `{ name, version, created, updated, repository, stars,
+        downloads, deps, rank }`. For each component <component-K/>
+        (K=1-C) read from its corresponding entry: <version-K/> from
+        `version`, <updated-K/> from `updated`, <created-K/> from
+        `created`, <repository-K/> from `repository`, <stars-K/> from
+        `stars` (numeric or `N.A.`), <downloads-K/> from `downloads`
+        (numeric or `N.A.`), <deps-K/> from `deps` (numeric or `N.A.`)
+        and <rank-K/> from `rank` (numeric). The returned `rank` already
+        reflects the staleness and small-scope dependency penalties.
 
     7.  Sort, in descending order, the discovered candidate components
         <component-K/> (K=1-C) by their `rank` field and trim the result
@@ -192,7 +199,15 @@ for the technology stack to *provide* the *needed functionality*
         you should not stumble over) is its single most distinguishing
         perspective, and remember this as an <info-K/> (K=1-N) formatted
         like `<type/>: <hint/>` where <type/> is one of `USP`, `Crux`,
-        or `Gotcha` and <hint/> is a 1-6 word hint. Do not output
+        or `Gotcha` and <hint/> is a 1-6 word hint.
+
+        *Staleness override*: determine the coarse age <age-K/> (like
+        `2y`) of the last release from <updated-K/>. If <updated-K/> is
+        known and its age exceeds *twice* <getopt-option-staleness/>
+        months, *append* to <info-K/> the hint `Gotcha: stale/abandoned
+        -- last release <age-K/> ago`; else if its age exceeds
+        <getopt-option-staleness/> months, *append* to <info-K/> the
+        hint `Gotcha: aging -- last release <age-K/> ago`. Do not output
         anything.
     </step>
 
@@ -217,11 +232,11 @@ for the technology stack to *provide* the *needed functionality*
         <template>
         <ase-tpl-bullet-normal/> **COMPONENT RANKING**:
 
-        | ⚑ *Component* | ▣ *Package*    | ❖ *Version*  | ↓ *Downloads*      | ⎈ *Stars*      | ⏲ *Updated*      | ☆ *Created*  |
-        | :------------ | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- |
-        | **<name-1/>** | `<package-1/>` | <version-1/> | **<downloads-1/>** | **<stars-1/>** | **<updated-1/>** | <created-1/> |
+        | ⚑ *Component* | ▣ *Package*    | ❖ *Version*  | ↓ *Downloads*      | ⎈ *Stars*      | ⏲ *Updated*      | ☆ *Created*  | ⚭ *Dep.*   |
+        | :------------ | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- | ---------: |
+        | **<name-1/>** | `<package-1/>` | <version-1/> | **<downloads-1/>** | **<stars-1/>** | **<updated-1/>** | <created-1/> | <deps-1/>  |
         [...]
-        | **<name-N/>** | `<package-N/>` | <version-N/> | **<downloads-N/>** | **<stars-N/>** | **<updated-N/>** | <created-N/> |
+        | **<name-N/>** | `<package-N/>` | <version-N/> | **<downloads-N/>** | **<stars-N/>** | **<updated-N/>** | <created-N/> | <deps-N/>  |
         </template>
     </step>
 </flow>

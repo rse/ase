@@ -18,6 +18,7 @@ export interface ComponentInfo {
     repository: string
     stars:      number | "N.A."
     downloads:  number | "N.A."
+    deps:       number | "N.A."
     rank:       number
 }
 
@@ -48,29 +49,34 @@ export class Skills {
 
     /*  fetch the full registry packument for a single package  */
     private static async fetchPackument (name: string): Promise<{
-        version: string, time: Record<string, string>, repository: string
+        version: string, time: Record<string, string>, repository: string, deps: number | "N.A."
     }> {
         try {
             const pkg = await pacote.packument(name, { fullMetadata: true }) as unknown as {
                 "dist-tags"?: { latest?: string }
                 time?:        Record<string, string>
-                versions?:    Record<string, { repository?: { url?: string } | string }>
+                versions?:    Record<string, {
+                    repository?:   { url?: string } | string
+                    dependencies?: Record<string, string>
+                }>
             }
             const version  = pkg["dist-tags"]?.latest ?? ""
             const time     = pkg.time ?? {}
             const verEntry = version !== "" ? pkg.versions?.[version] : undefined
             let repository = ""
+            let deps: number | "N.A." = "N.A."
             if (verEntry !== undefined) {
                 const r = verEntry.repository
                 if (typeof r === "string")
                     repository = r
                 else if (r !== undefined && typeof r.url === "string")
                     repository = r.url
+                deps = Object.keys(verEntry.dependencies ?? {}).length
             }
-            return { version, time, repository }
+            return { version, time, repository, deps }
         }
         catch {
-            return { version: "", time: {}, repository: "" }
+            return { version: "", time: {}, repository: "", deps: "N.A." }
         }
     }
 
@@ -113,11 +119,11 @@ export class Skills {
         known release, which we treat as the "created" date. The latest POM is
         then downloaded directly from the repo to extract the SCM/project URL.  */
     private static async fetchMavenInfo (coord: string): Promise<{
-        version: string, created: string, updated: string, repository: string
+        version: string, created: string, updated: string, repository: string, deps: number | "N.A."
     }> {
         const [ groupId, artifactId ] = coord.split(":", 2)
         if (groupId === undefined || artifactId === undefined || groupId === "" || artifactId === "")
-            return { version: "", created: "", updated: "", repository: "" }
+            return { version: "", created: "", updated: "", repository: "", deps: "N.A." }
         try {
             const latest = await Skills.httpLimit(() => ofetch<{
                 response?: { docs?: Array<{ v?: string, latestVersion?: string, timestamp?: number }> }
@@ -158,6 +164,7 @@ export class Skills {
             }
             const created = typeof firstTs === "number" ? new Date(firstTs).toISOString() : updated
             let repository = ""
+            let deps: number | "N.A." = "N.A."
             if (version !== "") {
                 try {
                     const pom = await Skills.httpLimit(() => ofetch<string, "text">(
@@ -174,16 +181,32 @@ export class Skills {
                             if (url !== null)
                                 repository = url[1]
                         }
+
+                        /*  count the `<dependency>` entries of the direct
+                            `<dependencies>` block, skipping `test`/`provided`
+                            scopes; a `<dependencyManagement>` block is ignored
+                            as it only declares versions, not real dependencies  */
+                        const managed  = /<dependencyManagement>[\s\S]*?<\/dependencyManagement>/gi
+                        const stripped = pom.replace(managed, "")
+                        const depRe    = /<dependency>([\s\S]*?)<\/dependency>/gi
+                        let count = 0
+                        let dep: RegExpExecArray | null
+                        while ((dep = depRe.exec(stripped)) !== null) {
+                            const scope = /<scope>\s*([^<\s]+)\s*<\/scope>/i.exec(dep[1])
+                            if (scope === null || (scope[1] !== "test" && scope[1] !== "provided"))
+                                count++
+                        }
+                        deps = count
                     }
                 }
                 catch {
                     repository = ""
                 }
             }
-            return { version, created, updated, repository }
+            return { version, created, updated, repository, deps }
         }
         catch {
-            return { version: "", created: "", updated: "", repository: "" }
+            return { version: "", created: "", updated: "", repository: "", deps: "N.A." }
         }
     }
 
@@ -234,7 +257,12 @@ export class Skills {
         -   "JavaScript"/"TypeScript": NPM registry (pacote) + GitHub stars + npm-downloads
         -   "Java"/"Kotlin":           Maven Central + GitHub stars + mvnrepository.com "Used By"
         -   "Unknown":                 not supported -- return empty result  */
-    static async info (stack: string, components: string[]): Promise<ComponentInfo[]> {
+    static async info (
+        stack:      string,
+        components: string[],
+        staleMonths = 18,
+        smallScope  = false
+    ): Promise<ComponentInfo[]> {
         if (stack === "JavaScript" || stack === "TypeScript") {
             /*  per package: kick off packument and downloads in parallel,
                 then stars as soon as the packument resolves; across packages
@@ -248,7 +276,7 @@ export class Skills {
                 ])
                 const created = p.time.created ?? ""
                 const updated = p.version !== "" ? (p.time[p.version] ?? "") : ""
-                const rank    = Skills.computeRank(downloads, stars, created, updated)
+                const rank    = Skills.computeRank(downloads, stars, created, updated, p.deps, staleMonths, smallScope)
                 return {
                     name,
                     version:    p.version,
@@ -257,6 +285,7 @@ export class Skills {
                     repository: p.repository,
                     stars,
                     downloads,
+                    deps:       p.deps,
                     rank
                 }
             }))
@@ -277,7 +306,7 @@ export class Skills {
                 const [ i, downloads, stars ] = await Promise.all([
                     infoPromise, downloadsPromise, starsPromise
                 ])
-                const rank = Skills.computeRank(downloads, stars, i.created, i.updated)
+                const rank = Skills.computeRank(downloads, stars, i.created, i.updated, i.deps, staleMonths, smallScope)
                 return {
                     name,
                     version:    i.version,
@@ -286,6 +315,7 @@ export class Skills {
                     repository: i.repository,
                     stars,
                     downloads,
+                    deps:       i.deps,
                     rank
                 }
             }))
@@ -311,10 +341,13 @@ export class Skills {
         per-artifact download counts) is likewise treated as neutral `1`, so
         such stacks can still be ranked by the remaining metrics.  */
     private static computeRank (
-        downloads: number | "N.A.",
-        stars:     number | "N.A.",
-        created:   string,
-        updated:   string
+        downloads:   number | "N.A.",
+        stars:       number | "N.A.",
+        created:     string,
+        updated:     string,
+        deps:        number | "N.A.",
+        staleMonths: number,
+        smallScope:  boolean
     ): number {
         const d = typeof downloads === "number" ? downloads + 1 : 1
         const s = typeof stars     === "number" ? stars     + 1 : 1
@@ -339,7 +372,31 @@ export class Skills {
             entry rankable without rewarding the missing date.  */
         const lifespan   = (!Number.isNaN(cMs) && !Number.isNaN(uMs)) ? Math.max(0, uMs - cMs) : 1
         const recentness = !Number.isNaN(uMs) ? Math.exp(-Math.max(0, (now - uMs) / msPerDay) / halfLife) : 0.5
-        return d * s * lifespan * recentness
+        let rank = d * s * lifespan * recentness
+        /*  hard, caller-tunable staleness penalty on top of the soft
+            `recentness` decay: unlike the smooth exp-decay above, this is a
+            two-tier *cliff* keyed off the `staleMonths` threshold. Past the
+            first tier (`staleMonths`) the rank is cut to `0.3x`, past the
+            second tier (`2 x staleMonths`, i.e. long abandoned) to `0.1x`.
+            A component below the first tier -- or one whose `updated` date
+            is unknown -- is left unpenalized.  */
+        if (!Number.isNaN(uMs)) {
+            const ageMonths = (now - uMs) / msPerDay / 30
+            if (ageMonths > 2 * staleMonths)
+                rank *= 0.1
+            else if (ageMonths > staleMonths)
+                rank *= 0.3
+        }
+        /*  small-scope dependency-weight penalty: for a narrow, self-
+            contained need, dragging in a heavy dependency tree is usually
+            the wrong call, so each real component is demoted in proportion
+            to its own number of *direct* dependencies (`1 / (1 + deps)`).
+            A zero-dep component is left unpenalized; an unknown `deps` count
+            (`"N.A."`) is treated neutrally. This only applies when the
+            caller flags the need as small-scope.  */
+        if (smallScope && typeof deps === "number")
+            rank *= 1 / (1 + deps)
+        return rank
     }
 
     /*  compute the per-alternative product-sum (rating) row from a
@@ -383,20 +440,28 @@ export class SkillsMCP {
                 "version + earliest/latest release timestamps from the Maven Central Solr " +
                 "search endpoint, the SCM/project URL from the latest POM at `repo1.maven.org`, " +
                 "GitHub stars (if applicable), and the \"Used By\" count from `mvnrepository.com` " +
-                "as the `downloads` proxy. Returns a JSON `text` array of " +
-                "`{ name, version, created, updated, repository, stars, downloads, rank }` " +
-                "objects, sorted in descending order by `rank`. Failures of individual side " +
-                "calls are isolated and reported as `\"N.A.\"` or empty string so every entry " +
-                "has the full shape.",
+                "as the `downloads` proxy. The number of *direct* dependencies is read as `deps` " +
+                "(from the packument version entry for NPM, or the latest POM's `<dependencies>` " +
+                "block for Maven). Returns a JSON `text` array of " +
+                "`{ name, version, created, updated, repository, stars, downloads, deps, rank }` " +
+                "objects, sorted in descending order by `rank`. The `rank` applies a two-tier hard " +
+                "staleness penalty keyed off `staleMonths` (0.3x past the threshold, 0.1x past twice " +
+                "it) and, when `smallScope` is set, a dependency-weight penalty of `1/(1+deps)` so " +
+                "dependency-heavy components sink. Failures of individual side calls are isolated " +
+                "and reported as `\"N.A.\"` or empty string so every entry has the full shape.",
             inputSchema: {
                 stack: z.string()
                     .describe("Technology stack: \"JavaScript\", \"TypeScript\", \"Java\", \"Kotlin\", or \"Unknown\""),
                 components: z.array(z.string())
-                    .describe("List of package names (NPM) or Maven coordinates `groupId:artifactId` (Java/Kotlin)")
+                    .describe("List of package names (NPM) or Maven coordinates `groupId:artifactId` (Java/Kotlin)"),
+                staleMonths: z.number().optional()
+                    .describe("Staleness threshold in months (default 18); a release older than this is rank-penalized"),
+                smallScope: z.boolean().optional()
+                    .describe("If true, penalize each component by its direct-dependency count (small-scope need)")
             }
         }, async (args) => {
             try {
-                const result = await Skills.info(args.stack, args.components)
+                const result = await Skills.info(args.stack, args.components, args.staleMonths, args.smallScope)
                 return {
                     content: [ { type: "text", text: JSON.stringify(result) } ]
                 }
