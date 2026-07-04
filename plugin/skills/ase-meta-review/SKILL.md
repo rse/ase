@@ -149,7 +149,7 @@ Procedure
         Then render a *three-column table* with one row per finding by
         using the following output <template/>. For each finding, repeat
         the third line, set <severity/> to its `severity` field, set
-        <dimension/> to its `dimension` field set <location/> to its
+        <dimension/> to its `dimension` field, set <location/> to its
         `location` field, and set <finding/> to its `finding` field.
 
         In the <location/> column, markup the `file:line` reference
