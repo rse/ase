@@ -5,32 +5,32 @@ ChangeLog
 0.9.37 (2026-07-04)
 -------------------
 
-- FEATURE: wire the `project.boxing` transparency classification (`white`/`grey`/`black`) into artifact-touching skills
-- IMPROVEMENT: surface `project.boxing` in configuration docs and export it into the session environment and status line (`docs/configuration.md`, `ase-hook.ts`, `ase-constitution.md`)
-- IMPROVEMENT: credit the author as renowned in the website Hero section (`Hero.astro`)
-- CLEANUP: reduce Hero top spacing by dropping the `mt-1` margin (`Hero.astro`)
+- FEATURE [code]: wire the `project.boxing` transparency classification (`white`/`grey`/`black`) into artifact-touching skills
+- IMPROVEMENT [code, docs]: surface `project.boxing` in configuration docs and export it into the session environment and status line (`docs/configuration.md`, `ase-hook.ts`, `ase-constitution.md`)
+- IMPROVEMENT [docs]: credit the author as renowned in the website Hero section (`Hero.astro`)
+- CLEANUP [docs]: reduce Hero top spacing by dropping the `mt-1` margin (`Hero.astro`)
 
 0.9.36 (2026-07-04)
 -------------------
 
-- IMPROVEMENT: add tiered staleness (`--staleness`) and small-scope (`--small-scope`) dependency-weight penalties to `ase-arch-discover`
-- UPDATE: upgrade GitHub Action `actions/setup-node` from v4 to v5 (`static.yml`)
-- UPDATE: sync tool and plugin reference documentation with current implementation (`docs/usage-plugin.md`, `docs/usage-tool.md`)
+- IMPROVEMENT [code]: add tiered staleness (`--staleness`) and small-scope (`--small-scope`) dependency-weight penalties to `ase-arch-discover`
+- UPDATE [infr]: upgrade GitHub Action `actions/setup-node` from v4 to v5 (`static.yml`)
+- UPDATE [docs]: sync tool and plugin reference documentation with current implementation (`docs/usage-plugin.md`, `docs/usage-tool.md`)
 
 0.9.35 (2026-07-04)
 -------------------
 
-- FEATURE: document `--scope` option in website Setup section (`Section-Setup.astro`, `Terminal.astro`)
-- IMPROVEMENT: fan out Agent spawning with parallelism across skills to gain performance (`ase-code-analyze.md`, `ase-code-lint`, `ase-docs-proofread`, `ase-meta-quorum`, `ase-meta-search`)
-- IMPROVEMENT: drop explicit `--scope user` since it is the default (`ase-setup.ts`)
-- IMPROVEMENT: refine compatibility statements for Sonnet and Fable (`Section-Compat.astro`)
-- IMPROVEMENT: credit feedback contributors in website Author section (`Section-Author.astro`)
-- BUGFIX: fix Agent response handling and give tasks unique names across skills (`ase-*/SKILL.md`)
-- BUGFIX: fix "in flight" calculations on service socket close (`ase-service.ts`)
-- BUGFIX: fix proofread results across website copy, docs, and skills (website, `README.md`, skills)
-- UPDATE: upgrade NPM dependencies across all workspaces (`package.json`, `pages/package.json`, `plugin/package.json`, `tool/package.json`)
-- CLEANUP: reduce `AGENTS.md` repository-layout section verbosity (`AGENTS.md`)
-- CLEANUP: remove unused user-dialog meta to stop the LLM from triggering it (`ase-dialog.md`)
+- FEATURE [docs]: document `--scope` option in website Setup section (`Section-Setup.astro`, `Terminal.astro`)
+- IMPROVEMENT [code]: fan out Agent spawning with parallelism across skills to gain performance (`ase-code-analyze.md`, `ase-code-lint`, `ase-docs-proofread`, `ase-meta-quorum`, `ase-meta-search`)
+- IMPROVEMENT [code]: drop explicit `--scope user` since it is the default (`ase-setup.ts`)
+- IMPROVEMENT [docs]: refine compatibility statements for Sonnet and Fable (`Section-Compat.astro`)
+- IMPROVEMENT [docs]: credit feedback contributors in website Author section (`Section-Author.astro`)
+- BUGFIX [code]: fix Agent response handling and give tasks unique names across skills (`ase-*/SKILL.md`)
+- BUGFIX [code]: fix "in flight" calculations on service socket close (`ase-service.ts`)
+- BUGFIX [code, docs]: fix proofread results across website copy, docs, and skills (website, `README.md`, skills)
+- UPDATE [infr]: upgrade NPM dependencies across all workspaces (`package.json`, `pages/package.json`, `plugin/package.json`, `tool/package.json`)
+- CLEANUP [infr]: reduce `AGENTS.md` repository-layout section verbosity (`AGENTS.md`)
+- CLEANUP [code]: remove unused user-dialog meta to stop the LLM from triggering it (`ase-dialog.md`)
 
 0.9.34 (2026-07-02)
 -------------------
