@@ -294,6 +294,12 @@ export default class HookCommand {
         if (typeof val === "string")
             persona = val
 
+        /*  determine project boxing transparency  */
+        let boxing = process.env.ASE_PROJECT_BOXING ?? "white"
+        const valBoxing = cfg.get("project.boxing")
+        if (typeof valBoxing === "string")
+            boxing = valBoxing
+
         /*  determine headless mode  */
         const headless = (process.env.ASE_HEADLESS ?? "false") === "true" ? "true" : "false"
 
@@ -306,6 +312,7 @@ export default class HookCommand {
                 `export ASE_PLUGIN_ROOT=${quote([ pluginRoot ])}\n` +
                 `export ASE_USER_ID=${quote([ userId ])}\n` +
                 `export ASE_PROJECT_ID=${quote([ projectId ])}\n` +
+                `export ASE_PROJECT_BOXING=${quote([ boxing ])}\n` +
                 `export ASE_TASK_ID=${quote([ taskId ])}\n` +
                 `export ASE_SESSION_ID=${quote([ sessionId ])}\n` +
                 `export ASE_HEADLESS=${quote([ headless ])}\n` +
@@ -321,6 +328,7 @@ export default class HookCommand {
             `<ase-persona-style>${persona}</ase-persona-style>\n` +
             `<ase-user-id>${userId}</ase-user-id>\n` +
             `<ase-project-id>${projectId}</ase-project-id>\n` +
+            `<ase-project-boxing>${boxing}</ase-project-boxing>\n` +
             `<ase-task-id>${taskId}</ase-task-id>\n` +
             `<ase-session-id>${sessionId}</ase-session-id>\n` +
             `<ase-headless>${headless}</ase-headless>\n` +
@@ -339,7 +347,7 @@ export default class HookCommand {
             `\n⧉ ASE: ⎈ version: ${versionCurrentPlugin}${versionHint !== "" ? " " + versionHint.replaceAll(/\*/g, "") : ""}` +
             `\n⧉ ASE: ※ user: ${userId}, ⚑ project: ${projectId}` +
             `\n⧉ ASE: ◉ task: ${taskId}, ⏻ session: ${sessionId}` +
-            `\n⧉ ASE: ☯ persona: ${persona}`
+            `\n⧉ ASE: ☯ persona: ${persona}, ⊞ boxing: ${boxing}`
 
         /*  inject markdown into session context.
             Anthropic Claude Code CLI and OpenAI Codex CLI expect the context nested in

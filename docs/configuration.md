@@ -18,11 +18,21 @@ The following configuration parameters control the project:
 
 -   **project.name**: the full name of the project
 
--   **project.boxing**: the project *source code* is treated as a...
+-   **project.boxing**: the project *source artifacts* (of any kind:
+    specification, architecture, source code, documentation,
+    infrastructure, task plan, and other artifacts) are treated as a...
 
-    -   `white`:     ...white box, i.e., the code is intentionally fully transparent and understood.
-    -   `grey`:      ...grey  box, i.e., the code is intentionally partially intransparent or not understood.
-    -   `black`:     ...black box, i.e., the code is intentionally fully intransparent and not understood.
+    -   `white`:     ...white box, i.e., the artifacts are intentionally fully transparent and understood.
+    -   `grey`:      ...grey  box, i.e., the artifacts are intentionally partially intransparent or not understood.
+    -   `black`:     ...black box, i.e., the artifacts are intentionally fully intransparent and not understood.
+
+    The boxing level modulates both the *work depth* (how deeply
+    artifact-touching skills inspect and produce artifacts) and the
+    *output visibility* (how much artifact content and how many findings
+    they surface): `white` yields full inspection and full exposure,
+    `grey` yields inspection of significant parts and exposure of
+    material findings only, and `black` yields minimal inspection with
+    suppressed findings and hidden artifact internals.
 
 The project *artifacts* are configured per kind, each kind defined by a
 `.basedir` anchor and a `.files` miniglob spec. The `.basedir` is a
