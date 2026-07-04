@@ -1,7 +1,7 @@
 {
     "private":                                    true,
     "name":                                       "ase-web",
-    "version":                                    "0.9.34",
+    "version":                                    "0.9.35",
     "description":                                "Agentic Software Engineering (ASE)",
     "author":                                     "Dr. Ralf S. Engelschall <rse@engelschall.com>",
     "license":                                    "Apache-2.0",
