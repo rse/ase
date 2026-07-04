@@ -325,6 +325,10 @@ export default class ServiceCommand {
             const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined })
             const mcp       = buildMcpServer()
             request.raw.res.on("close", () => {
+                /*  "h.abandon" (see below) bypasses "onPreResponse",
+                    so undo the "onRequest" accounting here instead  */
+                inFlight     = Math.max(0, inFlight - 1)
+                lastActivity = Date.now()
                 transport.close().catch(() => {})
                 mcp.close().catch(() => {})
             })
