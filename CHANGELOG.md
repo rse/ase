@@ -2,11 +2,20 @@
 ChangeLog
 =========
 
-0.9.35 (2026-07-03)
+0.9.35 (2026-07-04)
 -------------------
 
+- FEATURE: document `--scope` option in website Setup section (`Section-Setup.astro`, `Terminal.astro`)
+- IMPROVEMENT: fan out Agent spawning with parallelism across skills to gain performance (`ase-code-analyze.md`, `ase-code-lint`, `ase-docs-proofread`, `ase-meta-quorum`, `ase-meta-search`)
+- IMPROVEMENT: drop explicit `--scope user` since it is the default (`ase-setup.ts`)
+- IMPROVEMENT: refine compatibility statements for Sonnet and Fable (`Section-Compat.astro`)
+- IMPROVEMENT: credit feedback contributors in website Author section (`Section-Author.astro`)
+- BUGFIX: fix Agent response handling and give tasks unique names across skills (`ase-*/SKILL.md`)
+- BUGFIX: fix "in flight" calculations on service socket close (`ase-service.ts`)
+- BUGFIX: fix proofread results across website copy, docs, and skills (website, `README.md`, skills)
 - UPDATE: upgrade NPM dependencies across all workspaces (`package.json`, `pages/package.json`, `plugin/package.json`, `tool/package.json`)
 - CLEANUP: reduce `AGENTS.md` repository-layout section verbosity (`AGENTS.md`)
+- CLEANUP: remove unused user-dialog meta to stop the LLM from triggering it (`ase-dialog.md`)
 
 0.9.34 (2026-07-02)
 -------------------
