@@ -10,6 +10,7 @@ disable-model-invocation: false
 effort: high
 allowed-tools:
     - "Agent"
+    - "Glob"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
@@ -53,180 +54,53 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
 2.  <step id="STEP 2: Investigate Code Base">
 
-    In this STEP 2, investigate on the code. If the code base is large,
-    you *MUST* use the `Agent` tool (not inline work) to create multiple
-    sub-agents to split the investigation task into appropriate chunks.
+    First, use the following <template/> to give a hint on this step:
 
-    Tenets:
+    <template>
+    <ase-tpl-bullet-secondary/> **ANALYSIS INVESTIGATION**
+    </template>
 
-    -   **Quiet Operation**:
+    Dispatch the investigation to *sub-agents* via the `Agent`
+    tool so that *no* investigation details leak into the user-visible
+    transcript. The sub-agents perform the silent reading and checking;
+    only their final structured return values are consumed here.
 
-        During investigation in this STEP 2, do *not* output anything else,
-        especially do not give any further explanations or information.
+    For this, first determine the *analysis lens* <lens/>: set
+    <lens>performance</lens> if <getopt-option-performance/> is equal
+    `true`, set <lens>security</lens> if <getopt-option-security/> is
+    equal `true`, and set <lens>logic</lens> otherwise.
 
-    -   **Practical Relevance Only**:
+    Then *silently* resolve `<getopt-arguments/>` to the list
+    <sources/> of individual source code files, expanding any
+    directory or wildcard references with the `Glob` tool. Then
+    partition <sources/>, preserving order, into at most *eight*
+    batches of roughly equal size (a single file yields a single
+    batch), and invoke the following tool once per batch, emitting
+    *all* invocations *in one single message* so they run in
+    *parallel*:
 
-        Focus on *practically relevant* cases and especially do *not*
-        investigate theoretical or fictive cases.
+    ```text
+        Agent(
+            description:       "Analysis Investigation",
+            subagent_type:     "ase:ase-code-analyze",
+            prompt:            "<lens/> <batch/>",
+            run_in_background: false
+        )
+    ```
 
-    -   **Problem Focus Only**:
+    Here <batch/> is the space-separated list of the source code file
+    paths of the corresponding batch.
 
-        Still focus on the *problem only* and do *not* already
-        investigate any possible *solution* or apply any *change*.
+    Parse the result message of each `Agent` tool invocation as a JSON
+    array and concatenate all those arrays. Then *deduplicate* the
+    combined list: when two problems share the same `file` and `line`,
+    *silently drop* all but the first one (sub-agents may have read
+    overlapping *related* files for comprehension). Finally sort the
+    list by `file` and then numerically by `line`, and set <problems/>
+    to that list.
 
-    -   **Lens Focus**:
-
-        <if condition="<getopt-option-performance/> is equal `true`">
-
-        Focus on *performance* and *efficiency* only - and do *not*
-        investigate logic, semantics, control flow, or security
-        problems.
-
-        Analysis Hints (not exhaustive, just indicators):
-        -   high algorithmic complexity
-        -   needless resource allocations/copies
-        -   redundant recomputation
-        -   many I/O and query round-trips
-        -   concurrency bottlenecks
-        -   mismatched data structures
-        -   N+1 query patterns (1 parent query, N child queries)
-        -   missing caching/memoization of stable results
-        -   blocking/synchronous calls on hot paths
-        -   unbounded growth (memory leaks, ever-growing collections)
-        -   inefficient string building/concatenation in loops
-        -   premature or repeated serialization/parsing
-        -   lack of batching/pagination for bulk operations
-        -   excessive logging or instrumentation overhead
-        -   chatty network protocols (no connection pooling/keep-alive)
-        -   lock contention and overly coarse-grained locking
-        -   eager/over-fetching of data that is never used
-        -   missing database indexes
-        -   repeated regex (re)compilation in hot paths
-        -   busy-waiting/polling instead of event-driven waits
-        -   transferring uncompressed or overly verbose payloads
-        -   missing short-circuit evaluation in expensive conditions
-        -   recomputing invariants inside loops (loop-invariant code)
-        -   suboptimal batch sizes (too small = overhead, too large = latency)
-        -   inefficient algorithms for sorting/searching already-ordered data
-        -   redundant validation/sanitization of trusted internal data
-        -   missing connection/resource reuse (open-close per operation)
-        -   [...]
-
-        </if>
-
-        <if condition="<getopt-option-security/> is equal `true`">
-
-        Focus on *security* only - and do *not* investigate logic,
-        semantics, performance, or efficiency problems.
-
-        Analysis Hints (not exhaustive, just indicators):
-        -   unsafe data deserialization
-        -   missing input data validation/sanitization
-        -   broken authentication/authorization
-        -   sensitive-data exposure
-        -   path traversal
-        -   unsafe cryptography
-        -   hard-coded secrets
-        -   vulnerable dependencies
-        -   injection flaws
-        -   cross-site scripting (XSS) and output-encoding gaps
-        -   cross-site request forgery (CSRF) and missing anti-forgery tokens
-        -   insecure direct object references (IDOR)
-        -   server-side request forgery (SSRF)
-        -   insecure or missing transport encryption (TLS)
-        -   weak session management (fixation, predictable tokens)
-        -   missing rate limiting/anti-automation controls
-        -   overly permissive CORS or file permissions
-        -   verbose error messages leaking internals
-        -   unsafe randomness for security-sensitive values
-        -   mass assignment / over-binding of request parameters
-        -   security misconfiguration (default credentials, debug modes, exposed admin endpoints)
-        -   missing or misconfigured security headers (CSP, HSTS, X-Frame-Options)
-        -   improper certificate/hostname validation (TLS verification disabled)
-        -   insufficient logging and monitoring of security events
-        -   race conditions / TOCTOU (time-of-check to time-of-use) flaws
-        -   integer overflow/underflow and buffer overflows
-        -   use-after-free and memory-safety violations
-        -   privilege escalation through improper privilege dropping
-        -   insecure file upload handling (unrestricted type/size, executable storage)
-        -   unsafe handling of untrusted regular expressions (ReDoS)
-        -   caching of sensitive data in shared or client-side caches
-        -   secrets or sensitive data leaking into logs, traces, or telemetry
-        -   insecure default-deny failures (fail-open instead of fail-closed)
-        -   missing integrity verification (unsigned updates, no subresource integrity)
-        -   excessive data exposure in API responses (returning more fields than needed)
-        -   improper resource cleanup leading to exhaustion (connection/file-descriptor leaks)
-        -   business-logic flaws (bypassable workflows, negative quantities, replay)
-        -   [...]
-
-        </if>
-
-        <if condition="<getopt-option-performance/> is NOT equal `true` and <getopt-option-security/> is NOT equal `true`">
-
-        Focus on problems in the *logic* and *semantics* and the related
-        *control flow* only - and do *not* investigate performance,
-        efficiency, or security problems.
-
-        Analysis Hints (not exhaustive, just indicators):
-        -   incorrect conditionals and boolean logic
-        -   off-by-one and boundary errors
-        -   operator misuse
-        -   mishandled edge cases
-        -   broken or missing error handling
-        -   incorrect async/await/promise handling
-        -   control-flow defects (unreachable code, missing breaks, wrong early returns)
-        -   state-mutation bugs
-        -   incorrect default values
-        -   null/undefined mishandling
-        -   type-coercion bugs
-        -   faulty parsing or merge/override semantics
-        -   race conditions and unsynchronized shared state
-        -   resource leaks (unclosed files, handles, connections)
-        -   inverted or swapped function arguments
-        -   incorrect loop termination or accumulator initialization
-        -   shadowed or reassigned variables changing intent
-        -   incomplete switch/case or enum coverage
-        -   silent exception swallowing
-        -   floating-point comparison and rounding errors
-        -   integer overflow/underflow or truncating division
-        -   sign and modulo errors with negative operands
-        -   reference vs. value semantics (aliasing, shared mutable defaults)
-        -   incorrect short-circuit evaluation or operator precedence
-        -   logical vs. bitwise operator confusion
-        -   negation mistakes in compound predicates
-        -   wrong comparison operator (`==` instead of `===`, `<` vs. `<=`, etc)
-        -   inverted condition or swapped if/else branches
-        -   dead or duplicated conditional branches
-        -   fall-through where a break or return was intended
-        -   missing or misplaced base case in recursion (non-termination)
-        -   mutation of a collection while iterating over it
-        -   incorrect index, key, or bounds when accessing collections
-        -   empty-collection or single-element edge cases unhandled
-        -   wrong order of operations in initialization or teardown
-        -   missing cleanup on early return, break, or exception path
-        -   double-free, use-after-free, or double-close of resources
-        -   incorrect time-zone, date arithmetic, or unit conversions
-        -   stale cache or memoization not invalidated on change
-        -   incorrect deep vs. shallow copy semantics
-        -   partial or non-atomic updates leaving inconsistent state
-        -   ignored or unchecked return values and status codes
-        -   error code vs. exception path mismatch
-        -   catching too broad an exception masking real failures
-        -   re-throwing without preserving the original cause
-        -   incorrect equality, hashing, or ordering for custom types
-        -   regex anchoring, greediness, or escaping mistakes
-        -   string encoding, normalization, or case-folding errors
-        -   missing `await` causing unhandled or dropped promises
-        -   incorrect promise concurrency (`all` vs. `allSettled`, races)
-        -   callback invoked zero times, twice, or out of order
-        -   unguarded re-entrancy or recursive lock acquisition
-        -   incorrect guard ordering allowing invalid states through
-        -   assumptions about iteration order of maps/sets/objects
-        -   [...]
-
-        </if>
-
-    You *MUST* not output anything in this STEP 2.
+    You *MUST* *NOT* output anything at all in this STEP 2 beyond the
+    `Glob` and `Agent` tool invocations.
 
     </step>
 
@@ -235,7 +109,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
     Before reporting, *apply the severity floor* selected via
     <getopt-option-severity/> (default `LOW`): define the ordinal rank
     `LOW`=1, `MEDIUM`=2, `HIGH`=3. *Keep* a detected problem if and only
-    if its <severity/> is `ACCEPTED` *or* `rank(severity)` is greater
+    if its `severity` field is `ACCEPTED` *or* `rank(severity)` is greater
     than or equal to `rank(<getopt-option-severity/>)`; *silently drop*
     all other problems (they are neither reported nor persisted). With
     the default floor `LOW`, all problems are kept. `ACCEPTED` problems
@@ -250,9 +124,12 @@ problems in *performance* and *efficiency*, or problems in *security*.
     "ase-issue-" }` entry,
     and still emit the final hint <template/> below.
 
-    In this STEP 3, for *EVERY* surviving problem, immediately report
-    it with the following output <template/>, based on concise bullet
-    points.
+    In this STEP 3, for *EVERY* surviving problem in <problems/>, set
+    <severity/> to its `severity` field, <title/> to its `title` field,
+    <description/> to its `description` field, <evidence/> to its
+    `evidence` field, and <trade-off/> to its `trade-off` field, and
+    immediately report it with the following output <template/>, based
+    on concise bullet points.
 
     <if condition="<getopt-option-performance/> is equal `true`">
 
@@ -287,45 +164,6 @@ problems in *performance* and *efficiency*, or problems in *security*.
         *not* give any further explanations or information.
 
     -   Uniquely identify the problems with `P<n/>` where <n/> is 1, 2, ...
-
-    -   In <description/>, use *ultra brief* but still as *precise* as
-        possible problem descriptions.
-
-    -   In <description/>, highlight *code* as <template>`<code/>`</template>
-        and *key aspects* as <template>*<aspect/>*</template>.
-
-    -   In <description/>, add inline *references* to the related
-        code positions in the form of either
-        <template>(`<filename/>:<line-number/>`)</template>,
-        <template>(`<filename/>:<line-number/>-<line-number/>`)</template> or
-        <template>(`<filename/>#<function-or-method/>`)</template>.
-
-    -   In <description/>, classify the problem with a <severity/>
-        of <template>LOW</template>, <template>MEDIUM</template>,
-        <template>HIGH</template>, or <template>ACCEPTED</template>,
-        ranked by the estimated *impact* of the problem. Use
-        <template>ACCEPTED</template> when the problem is a deliberate,
-        justified trade-off that should remain on record but is never
-        dropped by the severity floor (see STEP 3).
-
-    -   For <title/> ultra-compress the <description/> to a concise,
-        short, single sentence. Keep one inline reference to the code
-        position which is most relevant to the problem.
-
-    -   <if condition="<getopt-option-performance/> is equal `true`">
-        In <evidence/>, ground the finding by citing either the inferred
-        *Big-O* time/space complexity (e.g. `O(n²)` reducible to `O(n)`)
-        with the exact driving loop or recursion, or the matched
-        performance *anti-pattern* (e.g. N+1 query, sync-in-loop, repeated
-        recompute, string concat in loop), with an inline code reference.
-        </if>
-
-    -   <if condition="<getopt-option-performance/> is equal `true`">
-        In <trade-off/>, state the *cost* of the optimization (e.g.
-        readability, additional memory for speed, added complexity), so
-        the user can make an informed decision; use *none* if there is no
-        meaningful trade-off.
-        </if>
 
     -   *Additionally*, persist all reported problems in a *single*
         `ase_kv_batch` call to the `ase` MCP server with `transactional`
