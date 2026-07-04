@@ -95,11 +95,11 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
     <mermaid-spec/> for a `flowchart TB` diagram with all modules as
     boxes and the imports between modules as the directed edges. Then
     dispatch the rendering to the `ase-meta-diagram` sub-agent by
-    calling the tool `Agent(name: "ase-meta-diagram", description:
-    "Diagram Rendering", subagent_type: "ase:ase-meta-diagram", prompt:
-    <mermaid-spec/>)` and reproduce its returned fenced code block
-    verbatim in the response text. Do not display any further
-    explanation except for this diagram.
+    calling the tool `Agent(description: "Diagram Rendering",
+    subagent_type: "ase:ase-meta-diagram", prompt: <mermaid-spec/>,
+    run_in_background: false)` and reproduce its
+    returned fenced code block verbatim in the response text. Do not
+    display any further explanation except for this diagram.
     </step>
 </flow>
 

@@ -33,10 +33,10 @@ Query foreign LLM for: <query><getopt-arguments/></query>
 
     ```text
         Agent(
-            name:          "ase-meta-chat",
-            description:   "Query Foreign LLM for Chat",
-            subagent_type: "ase:ase-meta-chat",
-            prompt:        <query/>
+            description:       "Query Foreign LLM for Chat",
+            subagent_type:     "ase:ase-meta-chat",
+            prompt:            <query/>,
+            run_in_background: false
         )
     ```
 

@@ -48,11 +48,10 @@ related to a set of code quality aspects.
 
     ```text
         Agent(
-            name:          "ase-code-lint",
-            description:   "Lint Investigation",
-            subagent_type: "ase:ase-code-lint",
-            mode:          "plan",
-            prompt:        <getopt-arguments/>
+            description:       "Lint Investigation",
+            subagent_type:     "ase:ase-code-lint",
+            prompt:            <getopt-arguments/>,
+            run_in_background: false
         )
     ```
 

@@ -48,11 +48,10 @@ Analyze documents for spelling, punctuation, or grammar errors
 
     ```text
         Agent(
-            name:          "ase-docs-proofread",
-            description:   "Proofread Investigation",
-            subagent_type: "ase:ase-docs-proofread",
-            mode:          "plan",
-            prompt:        <getopt-arguments/>
+            description:       "Proofread Investigation",
+            subagent_type:     "ase:ase-docs-proofread",
+            prompt:            <getopt-arguments/>,
+            run_in_background: false
         )
     ```
 

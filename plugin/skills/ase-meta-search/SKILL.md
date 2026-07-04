@@ -41,10 +41,10 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     <define name="agent">
     ```text
         Agent(
-            name:          "ase-meta-search-<arg1/>",
-            description:   "Query Web Search Service: <arg1/>",
-            subagent_type: "ase:ase-meta-search",
-            prompt:        <content/>
+            description:       "Query Web Search Service: <arg1/>",
+            subagent_type:     "ase:ase-meta-search",
+            prompt:            <content/>,
+            run_in_background: false
         )
     ```
     </define>

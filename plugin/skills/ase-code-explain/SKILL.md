@@ -74,11 +74,11 @@ code and *explain* it in a *brief*, *standardized*, and *concise* way.
     diagram type per intent: `classDiagram` for class/method structure,
     `sequenceDiagram` for actor/message flow, or `flowchart TB` for
     boxes-and-lines component layouts. Then dispatch the rendering to
-    the `ase-meta-diagram` sub-agent by calling the tool `Agent(name:
-    "ase-meta-diagram", description: "Diagram Rendering", subagent_type:
-    "ase:ase-meta-diagram", prompt: <mermaid-spec/>)` and reproduce its
-    returned fenced code block verbatim in the response text. Do *not*
-    hand-draw.
+    the `ase-meta-diagram` sub-agent by calling the tool
+    `Agent(description: "Diagram Rendering", subagent_type:
+    "ase:ase-meta-diagram", prompt: <mermaid-spec/>,
+    run_in_background: false)` and reproduce its returned fenced code
+    block verbatim in the response text. Do *not* hand-draw.
 
     Keep your explanation *brief* and *concise*.
     Output the result with the following <template/>:

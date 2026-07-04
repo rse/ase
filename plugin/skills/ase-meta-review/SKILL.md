@@ -83,11 +83,10 @@ Procedure
 
     ```text
         Agent(
-            name:          "ase-meta-review",
-            description:   "Review Investigation",
-            subagent_type: "ase:ase-meta-review",
-            mode:          "plan",
-            prompt:        "Review the staged changes."
+            description:       "Review Investigation",
+            subagent_type:     "ase:ase-meta-review",
+            prompt:            "Review the staged changes.",
+            run_in_background: false
         )
     ```
 

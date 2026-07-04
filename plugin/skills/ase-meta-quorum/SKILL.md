@@ -83,10 +83,10 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     ```text
         Agent(
-            name:          "ase-meta-chat-<arg2/>",
-            description:   "Query Foreign LLM: <arg1/>",
-            subagent_type: "ase:ase-meta-chat",
-            prompt:        "<arg2/> <query/>"
+            description:       "Query Foreign LLM: <arg1/>",
+            subagent_type:     "ase:ase-meta-chat",
+            prompt:            "<arg2/> <query/>",
+            run_in_background: false
         )
     ```
 

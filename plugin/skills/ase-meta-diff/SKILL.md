@@ -301,9 +301,9 @@ Procedure
             labels ultra short (basenames or module names only).
 
         2.  Dispatch the rendering to the `ase-meta-diagram` sub-agent by
-            calling the tool `Agent(name: "ase-meta-diagram",
-            description: "Diagram Rendering", subagent_type:
-            "ase:ase-meta-diagram", prompt: "<mermaid-spec/>")` and capture
+            calling the tool `Agent(description: "Diagram Rendering",
+            subagent_type: "ase:ase-meta-diagram", prompt:
+            "<mermaid-spec/>", run_in_background: false)` and capture
             its returned `text` field as <diagram/>.
 
     4.  Then emit the following <template/>, showing <diagram/> and
