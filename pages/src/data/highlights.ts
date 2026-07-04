@@ -32,7 +32,7 @@ export const highlights: Highlights[] = [
                  "from the decorative, eloquent, and explaining <b>writer</b>, " +
                  "the concise, factual, and accurate <b>engineer</b> (default), " +
                  "the layered, pyramid-structured <b>journalist</b>, " +
-                 "over the brief, factual, and abbreviating <b>telegrapher</b>, " +
+                 "through the brief, factual, and abbreviating <b>telegrapher</b>, " +
                  "down to the terse, rough, and stuttering <b>caveman</b>.",
         skill:   "/ase-meta-persona engineer",
         video:   "ase-meta-persona"
@@ -114,7 +114,7 @@ export const highlights: Highlights[] = [
         eyebrow: "Logical Code Analysis",
         title:   "Analyze code for logic and control-flow defects",
         body:    "Scan your source code for problems in its logic, semantics, and control flow, with " +
-                 "evidence-grounded, line-cited findings instead of vague hand-wavings.",
+                 "evidence-grounded, line-cited findings instead of vague hand-waving.",
         skill:   "/ase-code-analyze --severity=MEDIUM @tool/src/",
         video:   "ase-code-analyze"
     },
