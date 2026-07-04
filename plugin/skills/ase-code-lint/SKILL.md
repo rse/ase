@@ -39,24 +39,39 @@ related to a set of code quality aspects.
     <ase-tpl-bullet-secondary/> **LINT INVESTIGATION**
     </template>
 
-    Dispatch the investigation to a *sub-agent* via the `Agent`
+    Dispatch the investigation to *sub-agents* via the `Agent`
     tool so that *no* investigation details leak into the user-visible
-    transcript. The sub-agent performs the silent reading and checking;
-    only its final structured return value is consumed here.
+    transcript. The sub-agents perform the silent reading and checking;
+    only their final structured return values are consumed here.
 
-    For this, invoke *exactly once* the tool:
+    For this, first *silently* resolve `<getopt-arguments/>` to the
+    list <sources/> of individual source code files, expanding any
+    directory or wildcard references with the `Glob` tool. Then
+    partition <sources/>, preserving order, into at most *eight*
+    batches of roughly equal size (a single file yields a single
+    batch), and invoke the following tool once per batch, emitting
+    *all* invocations *in one single message* so they run in
+    *parallel*:
 
     ```text
         Agent(
             description:       "Lint Investigation",
             subagent_type:     "ase:ase-code-lint",
-            prompt:            <getopt-arguments/>,
+            prompt:            <batch/>,
             run_in_background: false
         )
     ```
 
-    Parse the single result message of the `Agent` tool as a JSON array
-    and set <problems/> to that list.
+    Here <batch/> is the space-separated list of the source code file
+    paths of the corresponding batch.
+
+    Parse the result message of each `Agent` tool invocation as a JSON
+    array and concatenate all those arrays. Then *deduplicate* the
+    combined list: when two problems share the same `file`, `line`, and
+    `aspect`, *silently drop* all but the first one (sub-agents may
+    have read overlapping *related* files for comprehension). Finally
+    sort the list by `file` and then numerically by `line`, and set
+    <problems/> to that list.
 
     Then *apply the severity floor* selected via <getopt-option-severity/>
     (default `LOW`): define the ordinal rank `LOW`=1, `MEDIUM`=2,

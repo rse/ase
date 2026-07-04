@@ -64,6 +64,9 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     A backend is *selected* if `all` is in <getopt-option-services/> *OR*
     that backend's own name is in <getopt-option-services/>.
 
+    Then invoke the following tool once per *selected* backend, emitting
+    *all* invocations *in one single message* so they run in *parallel*:
+
     If the `perplexity` backend is *selected* and the MCP tool
     `perplexity_search` from the MCP server `search-perplexity` is available:
 
