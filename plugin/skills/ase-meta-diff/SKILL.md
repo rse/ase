@@ -123,10 +123,28 @@ Procedure
             *not* output any further explanation.
         </if>
 
+    4.  <if condition="
+            <ase-project-boxing/> is equal `black` and
+            (<getopt-option-coherence/> is equal `true` or
+             <getopt-option-risk/> is equal `true` or
+             <getopt-option-blast/> is equal `true`)
+        ">
+        The project source artifacts are classified as a *black box*, so
+        the user does *not* want the staged changes scrutinized or their
+        coherence, risk, and blast-radius findings surfaced. The
+        requested scrutiny of STEP 3 through STEP 5 is therefore
+        suppressed: only output the following <template/> and then *SKIP*
+        the remaining steps STEP 3 through STEP 5:
+
+        <template>
+        <ase-tpl-bullet-normal/> **DIFF SCRUTINY**: *suppressed* (`project.boxing` is `black`)
+        </template>
+        </if>
+
     </step>
 
 3.  <step id="STEP 3: Assess Intent Coherence"
-        condition="<getopt-option-coherence/> is equal `true` and <diff/> is NOT empty">
+        condition="<getopt-option-coherence/> is equal `true` and <diff/> is NOT empty and <ase-project-boxing/> is not equal `black`">
 
     1.  From the *same* captured <diff/> and <stat/>, *reconstruct the
         single intended change* as a thesis - the one logical, coherent purpose
@@ -203,7 +221,7 @@ Procedure
     </step>
 
 4.  <step id="STEP 4: Score Against Risk Rubric"
-        condition="<getopt-option-risk/> is equal `true` and <diff/> is NOT empty">
+        condition="<getopt-option-risk/> is equal `true` and <diff/> is NOT empty and <ase-project-boxing/> is not equal `black`">
 
     1.  Score the *same* captured <diff/> and <stat/> information
         against the four-axis rubric below. Each axis is scored on an
@@ -275,7 +293,7 @@ Procedure
     </step>
 
 5.  <step id="STEP 5: Render Blast-Radius Map"
-        condition="<getopt-option-blast/> is equal `true` and <diff/> is NOT empty">
+        condition="<getopt-option-blast/> is equal `true` and <diff/> is NOT empty and <ase-project-boxing/> is not equal `black`">
 
     1.  From the *same* captured <diff/> and <stat/>, *extract the
         touched modules* - the distinct changed source files (or their

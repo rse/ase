@@ -194,8 +194,11 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     You *MUST* perform the following sub-steps *internally* and *without
     any output* until and including the recommendation decision. Only
     sub-steps 4-6 below are allowed to produce output, and only if
-    <getopt-option-auto/> is equal `false`. If <getopt-option-auto/> is
-    equal `true`, *skip* the reporting sub-steps 4-6 entirely (perform
+    <getopt-option-auto/> is equal `false` *and* <ase-project-boxing/>
+    is *not* equal `black`.
+
+    If <getopt-option-auto/> is equal `true` or <ase-project-boxing/> is
+    equal `black`, *skip* the reporting sub-steps 4-6 entirely (perform
     no output at all) to speed up processing.
 
     1.  *Propose* corresponding *resolution approach*, including optionally,
@@ -241,7 +244,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <ase-tpl-foot title="APPROACHES"/>
         </template>
 
-    7.  <if condition="<getopt-option-auto/> is not `true`">
+    7.  <if condition="<getopt-option-auto/> is not equal `true` and <ase-project-boxing/> is not equal `black`">
 
         In the following, you *MUST* *NOT* use your built-in
         <user-dialog-tool/> tool! Instead, you *MUST* just show a

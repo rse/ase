@@ -34,6 +34,21 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
 
 <flow>
 1.  <step id="STEP 1: PROJECT ABSTRACT">
+
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so the
+    user does *not* want them inspected or their internals surfaced.
+    *Skip* the entire insight gathering: do *not* read any source, only
+    output the following <template/> and then *SKIP* the remaining steps
+    STEP 2 through STEP 4:
+
+    <template>
+    <ase-tpl-bullet-normal/> **PROJECT INSIGHT**: *suppressed* (`project.boxing` is `black`)
+    </template>
+
+    </if>
+
     Determine an <abstract/> summary of this project.
     For this, check a potentially existing `README.*` file
     or scan the source files and figure it out indirectly.

@@ -67,6 +67,19 @@ Procedure
 
 2.  <step id="STEP 2: Review Investigation">
 
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so
+    the user does *not* want the staged changes scrutinized or their
+    findings surfaced. *Skip* the entire review investigation: do
+    *not* invoke the `Agent` tool and do *not* read any change, set
+    <findings/> to the *empty* list, set <verdict/> to `SKIPPED (boxing:
+    black)`, set <summary/> to a *one-line* neutral restatement of the
+    change intent derived solely from STEP 1, and proceed *directly* to
+    STEP 3.
+
+    </if>
+
     First, use the following <template/> to give a hint on this step:
 
     <template>
@@ -102,13 +115,20 @@ Procedure
     severity floor below, so the floor only affects which findings are
     *rendered*, never the verdict.
 
-    Then *apply the severity floor* selected via <getopt-option-severity/>
-    (default `LOW`): define the ordinal rank `LOW`=1, `MEDIUM`=2,
-    `HIGH`=3. *Keep* a finding in <findings/> if and only if its
-    `severity` field is `ACCEPTED` *or* `rank(severity)` is greater than
-    or equal to `rank(<getopt-option-severity/>)`; *silently drop* all
-    other findings. With the default floor `LOW`, all findings are kept.
-    `ACCEPTED` findings are *never* dropped.
+    Then determine the *effective severity floor* <floor/>: define the
+    ordinal rank `LOW`=1, `MEDIUM`=2, `HIGH`=3, start from
+    <floor><getopt-option-severity/></floor> (default `LOW`), and - if
+    <ase-project-boxing/> is equal `grey` - raise <floor/> to `MEDIUM`
+    whenever its current rank is below `rank(MEDIUM)` (grey boxing
+    surfaces only *material* findings of severity `MEDIUM` and above).
+    The floor affects only which findings are *rendered*, never the
+    <verdict/> derived above.
+
+    Then *apply the effective severity floor* <floor/>: *Keep* a finding
+    in <findings/> if and only if its `severity` field is `ACCEPTED` *or*
+    `rank(severity)` is greater than or equal to `rank(<floor/>)`;
+    *silently drop* all other findings. With the default floor `LOW`, all
+    findings are kept. `ACCEPTED` findings are *never* dropped.
 
     You *MUST* *NOT* output anything else in this STEP 2.
 

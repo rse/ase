@@ -121,6 +121,22 @@ interface quality, quality attributes, and architecture governance.
 
 <flow>
 1.  <step id="STEP 1: Investigate Code Base">
+
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so
+    the user does *not* want the architecture inspected or its findings
+    surfaced. *Skip* the entire investigation and reporting: do *not*
+    invoke any `Agent` tool and do *not* read any source, only output
+    the following <template/> and then *SKIP* the remaining steps STEP 2
+    through STEP 4:
+
+    <template>
+    <ase-tpl-bullet-normal/> **ARCHITECTURE ANALYSIS**: *suppressed* (`project.boxing` is `black`)
+    </template>
+
+    </if>
+
     Investigate the code from an *architectural* perspective. If the
     code base is large, you *MUST* use the `Agent` tool (not inline
     work) to create multiple sub-agents to split the investigation

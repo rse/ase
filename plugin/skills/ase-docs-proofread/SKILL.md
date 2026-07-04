@@ -33,6 +33,21 @@ Analyze documents for spelling, punctuation, or grammar errors
 
 1.  <step id="STEP 1: Investigation">
 
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so
+    the user does *not* want them inspected or their problems surfaced.
+    *Skip* the entire investigation and reporting: do *not* invoke any
+    `Glob` or `Agent` tool and do *not* read any document, only output
+    the following <template/> and then *SKIP* the remaining steps STEP 2
+    and STEP 3:
+
+    <template>
+    <ase-tpl-bullet-normal/> **PROOFREAD**: *suppressed* (`project.boxing` is `black`)
+    </template>
+
+    </if>
+
     First, use the following <template/> to give a hint on this step:
 
     <template>
@@ -141,7 +156,26 @@ Analyze documents for spelling, punctuation, or grammar errors
             <description/>
             </template>
 
-        3.  <if condition="<getopt-option-auto/> is not 'true'">
+        3.  <if condition="<getopt-option-auto/> is not 'true' and <ase-project-boxing/> is equal `grey`">
+
+            The project source artifacts are classified as a *grey box*, so
+            the user does *not* want the full artifact internals surfaced:
+            *suppress* the full unified diff and instead show only a
+            *condensed* one-line representation. Determine <old-snippet/>
+            as the *single-line* collapse of <old-text/> (join its lines
+            with ` ⏎ `, or `∅` when <old-text/> is empty for a pure
+            insertion) and <new-snippet/> as the same collapse of
+            <new-text/> (or `∅` when empty for a pure deletion). Then
+            report the correction with the following <template/>:
+
+            <template>
+
+            <ase-tpl-bullet-normal/> **<type/> CORRECTION**: `<old-snippet/>` → `<new-snippet/>`
+
+            </template>
+
+            </if>
+            <elseif condition="<getopt-option-auto/> is not 'true'">
 
             Determine the hunk *body* as an ordered list of lines, each
             carrying a one-character prefix (` ` for context, `-` for
@@ -195,7 +229,7 @@ Analyze documents for spelling, punctuation, or grammar errors
 
             </template>
 
-            </if>
+            </elseif>
 
         4.  <if condition="<getopt-option-auto/> is not 'true'">
 

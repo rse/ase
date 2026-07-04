@@ -54,6 +54,20 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
 2.  <step id="STEP 2: Investigate Code Base">
 
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so
+    the user does *not* want them inspected or their problems surfaced.
+    *Skip* the entire investigation and analysis: do *not* invoke any
+    `Glob` or `Agent` tool and do *not* read any source, only output
+    the following <template/> and then *SKIP* the remaining step STEP 3:
+
+    <template>
+    <ase-tpl-bullet-normal/> **CODE ANALYSIS**: *suppressed* (`project.boxing` is `black`)
+    </template>
+
+    </if>
+
     First, use the following <template/> to give a hint on this step:
 
     <template>
@@ -109,14 +123,19 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
 3.  <step id="STEP 3: Show Results">
 
-    Before reporting, *apply the severity floor* selected via
-    <getopt-option-severity/> (default `LOW`): define the ordinal rank
-    `LOW`=1, `MEDIUM`=2, `HIGH`=3. *Keep* a detected problem if and only
-    if its `severity` field is `ACCEPTED` *or* `rank(severity)` is greater
-    than or equal to `rank(<getopt-option-severity/>)`; *silently drop*
-    all other problems (they are neither reported nor persisted). With
-    the default floor `LOW`, all problems are kept. `ACCEPTED` problems
-    are *never* dropped.
+    Before reporting, determine the *effective severity floor* <floor/>:
+    define the ordinal rank `LOW`=1, `MEDIUM`=2, `HIGH`=3, start from
+    <floor><getopt-option-severity/></floor> (default `LOW`), and - if
+    <ase-project-boxing/> is equal `grey` - raise <floor/> to `MEDIUM`
+    whenever its current rank is below `rank(MEDIUM)` (grey boxing
+    surfaces only *material* findings of severity `MEDIUM` and above).
+
+    Then *apply the effective severity floor* <floor/>: *Keep* a detected
+    problem if and only if its `severity` field is `ACCEPTED` *or*
+    `rank(severity)` is greater than or equal to `rank(<floor/>)`;
+    *silently drop* all other problems (they are neither reported nor
+    persisted). With the default floor `LOW`, all problems are kept.
+    `ACCEPTED` problems are *never* dropped.
 
     Then renumber the surviving problems contiguously as `P<n/>` with
     <n/> = 1, 2, ... in the original ordering. If *all* problems are

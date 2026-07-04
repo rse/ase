@@ -33,6 +33,21 @@ related to a set of code quality aspects.
 
 1.  <step id="STEP 1: Investigation">
 
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so
+    the user does *not* want them inspected or their problems surfaced.
+    *Skip* the entire investigation and reporting: do *not* invoke any
+    `Glob` or `Agent` tool and do *not* read any source, only output
+    the following <template/> and then *SKIP* the remaining steps STEP 2
+    and STEP 3:
+
+    <template>
+    <ase-tpl-bullet-normal/> **LINT**: *suppressed* (`project.boxing` is `black`)
+    </template>
+
+    </if>
+
     First, use the following <template/> to give a hint on this step:
 
     <template>
@@ -76,13 +91,18 @@ related to a set of code quality aspects.
     sort the list by `file` and then numerically by `line`, and set
     <problems/> to that list.
 
-    Then *apply the severity floor* selected via <getopt-option-severity/>
-    (default `LOW`): define the ordinal rank `LOW`=1, `MEDIUM`=2,
-    `HIGH`=3. *Keep* a problem in <problems/> if and only if its
-    `severity` field is `ACCEPTED` *or* `rank(severity)` is greater than
-    or equal to `rank(<getopt-option-severity/>)`; *silently drop* all
-    other problems. With the default floor `LOW`, all problems are kept.
-    `ACCEPTED` problems are *never* dropped.
+    Then determine the *effective severity floor* <floor/>: define the
+    ordinal rank `LOW`=1, `MEDIUM`=2, `HIGH`=3, start from
+    <floor><getopt-option-severity/></floor> (default `LOW`), and - if
+    <ase-project-boxing/> is equal `grey` - raise <floor/> to `MEDIUM`
+    whenever its current rank is below `rank(MEDIUM)` (grey boxing
+    surfaces only *material* findings of severity `MEDIUM` and above).
+
+    Then *apply the effective severity floor* <floor/>: *Keep* a problem
+    in <problems/> if and only if its `severity` field is `ACCEPTED` *or*
+    `rank(severity)` is greater than or equal to `rank(<floor/>)`;
+    *silently drop* all other problems. With the default floor `LOW`, all
+    problems are kept. `ACCEPTED` problems are *never* dropped.
 
     You *MUST* *NOT* output anything else in this step 1.
 
@@ -145,6 +165,7 @@ related to a set of code quality aspects.
 
         2.  Set <context></context> (set to empty).
             Set <diff></diff> (set to empty).
+            Set <diff-condensed></diff-condensed> (set to empty).
 
         3.  Iterate over the change set:
 
@@ -153,7 +174,9 @@ related to a set of code quality aspects.
             1.  Set <file/>         to the `file`         field of <item/>.
                 Set <change-hunks/> to the `change-hunks` field of <item/>.
 
-                Set <diff-file/> to the following <template/>:
+                Unless <ase-project-boxing/> is equal `grey` (where the
+                full unified diff is suppressed and this per-file header is
+                unused), set <diff-file/> to the following <template/>:
 
                 <template>
                 --- <file/> (original)
@@ -170,11 +193,18 @@ related to a set of code quality aspects.
                     Set <new-text/>       to the `new_text`       field of <item/>.
                     Set <context-after/>  to the `context_after`  field of <item/>.
 
-                2.  Determine the hunk *body* as an ordered list of lines,
-                    each carrying a one-character prefix (` ` for context,
-                    `-` for old-side, `+` for new-side). Build it by
-                    concatenating, in order and *skipping any part that is
-                    empty*:
+                2.  *Skip* this substep entirely when <ase-project-boxing/>
+                    is equal `grey` - the full unified diff is suppressed
+                    there, so none of the <hunk-body/>, <old-count/>,
+                    <new-count/>, <old-start/>, or <new-start/> values
+                    below are consumed (substep 4 builds only the condensed
+                    one-liner instead).
+
+                    Otherwise, determine the hunk *body* as an ordered list
+                    of lines, each carrying a one-character prefix (` ` for
+                    context, `-` for old-side, `+` for new-side). Build it
+                    by concatenating, in order and *skipping any part that
+                    is empty*:
 
                     - one ` `-prefixed line for *each* line of
                       <context-before/> (if non-empty),
@@ -217,7 +247,27 @@ related to a set of code quality aspects.
 
                     <template>`<file/>`:<line/></template>
 
-                4.  Append the following <template/> to <diff-file/>,
+                4.  <if condition="<ase-project-boxing/> is equal `grey`">
+
+                    The full unified diff is *suppressed* under grey boxing
+                    (see substep 5 below), so *skip* the full-diff append
+                    and instead build only a *condensed* one-line
+                    representation of this hunk: determine <old-snippet/>
+                    as the *single-line* collapse of <old-text/> (join its
+                    lines with ` ⏎ `, or `∅` when <old-text/> is empty for
+                    a pure insertion) and <new-snippet/> as the same
+                    collapse of <new-text/> (or `∅` when empty for a pure
+                    deletion). Then append the following <template/> to
+                    <diff-condensed/> as a new line:
+
+                    <template>
+                    <ase-tpl-bullet-signal/> `<file/>`:<line/>: `<old-snippet/>` → `<new-snippet/>`
+                    </template>
+
+                    </if>
+                    <else>
+
+                    Append the following <template/> to <diff-file/>,
                     emitting <hunk-body/> verbatim (one already-prefixed
                     line per line, with no extra blank or space-only lines):
 
@@ -226,9 +276,12 @@ related to a set of code quality aspects.
                     <hunk-body/>
                     </template>
 
+                    </else>
+
                 </for>
 
-            3.  Append <diff-file/> to <diff/>.
+            3.  Unless <ase-project-boxing/> is equal `grey` (where
+                <diff-file/> is unused), append <diff-file/> to <diff/>.
 
             </for>
 
@@ -241,7 +294,25 @@ related to a set of code quality aspects.
 
             </template>
 
-        5.  <if condition="<getopt-option-auto/> is not 'true'">
+        5.  <if condition="<getopt-option-auto/> is not 'true' and <ase-project-boxing/> is not equal `black`">
+
+            <if condition="<ase-project-boxing/> is equal `grey`">
+
+            The project source artifacts are classified as a *grey box*, so
+            the user does *not* want the full artifact internals surfaced:
+            *suppress* the full unified diff and instead show only the
+            *condensed* one-line-per-hunk representation. Report the
+            solution with the following <template/>:
+
+            <template>
+            <ase-tpl-bullet-normal/> **<aspect/> SOLUTION**:
+
+            <diff-condensed/>
+
+            </template>
+
+            </if>
+            <else>
 
             Report the solution with the following <template/>:
 
@@ -253,6 +324,8 @@ related to a set of code quality aspects.
             ```
 
             </template>
+
+            </else>
 
             </if>
             <else>

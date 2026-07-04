@@ -243,6 +243,46 @@ Skill Identification
     steps at the end of a skill beside the explicit outputs via any
     <template/>.
 
+Artifact Boxing Transparency
+----------------------------
+
+-   *IMPORTANT*: The *boxing* of a project (indicated by
+    <ase-project-boxing/> configuration) classifies how *transparent*
+    its *source artifacts* (specification, architecture, source code,
+    documentation, infrastructure, task plan, and other artifacts) are,
+    and thus how *deeply* you *MUST* inspect or produce them and how
+    *much* of their internals you *MUST* surface.
+
+-   *IMPORTANT*: Boxing modulates only the *work depth* (inspection and
+    production thoroughness) and the *output visibility* (surfaced
+    content and findings) of *artifact-touching* skills, per the three
+    lists below. It *MUST* *NOT* alter the *communication style*
+    (governed exclusively by the persona), and it *MUST* *NOT* apply to
+    skills that neither read, critique, nor write any project source
+    artifact.
+
+    -   If <ase-project-boxing/> is `white`:
+        -   Transparency:      *fully*
+        -   Work depth:        inspect *fully*, produce *thoroughly*
+        -   Findings surfaced: *all*
+        -   Internals exposed: *full* (complete diffs, exhaustive rationale)
+
+    -   If <ase-project-boxing/> is `grey`:
+        -   Transparency:      *partially*
+        -   Work depth:        inspect *significant* parts, produce *reasonably*
+        -   Findings surfaced: *essentials*, summarize rest
+        -   Internals exposed: *key* only (essential hunks, condensed rationale), summarize rest
+
+    -   If <ase-project-boxing/> is `black`:
+        -   Transparency:      *none*
+        -   Work depth:        *minimum* work to satisfy the request
+        -   Findings surfaced: *none* (report only the *outcome*)
+        -   Internals exposed: *none* (no diffs, no code, no per-artifact explanation)
+
+-   *IMPORTANT*: Precedence rule: skill's *explicit* `black` branches
+    deterministically skip or suppress and *win* over the implicit decisions
+    above. Where no such branches exist, the decisions above apply.
+
 Template Patterns
 -----------------
 
@@ -360,3 +400,4 @@ Template Patterns
     clamped to zero so an over-long text never yields a negative count):
 
     <template><text/><ws/></template>
+

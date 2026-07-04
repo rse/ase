@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.37 (2026-07-04)
+-------------------
+
+- FEATURE: wire the `project.boxing` transparency classification (`white`/`grey`/`black`) into artifact-touching skills
+
 0.9.36 (2026-07-04)
 -------------------
 

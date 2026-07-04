@@ -43,6 +43,23 @@ code and *explain* it in a *brief*, *standardized*, and *concise* way.
     Second, explain *WHY* the code does it (*rationale*).
 
     Keep your explanations *brief* and *concise*.
+
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so the
+    user wants only the *minimal* surface explanation. Output *only* the
+    *WHAT* block (omit the *WHY* block) with the following <template/>:
+
+    <template>
+    <ase-tpl-bullet-normal/> **WHAT** (You should know what):
+    - [...]
+    - [...]
+    - [...]
+    </template>
+
+    </if>
+    <else>
+
     Output the result with the following <template/>:
 
     <template>
@@ -56,9 +73,21 @@ code and *explain* it in a *brief*, *standardized*, and *concise* way.
     - [...]
     - [...]
     </template>
+
+    </else>
     </step>
 
 3.  <step id="STEP 3: ANALOGY and DIAGRAM">
+
+    <if condition="<ase-project-boxing/> is equal `black`">
+
+    The project source artifacts are classified as a *black box*, so
+    deeper elaboration is *not* wanted. *Skip* this STEP 3 and the
+    following STEP 4 entirely: do *not* output any ANALOGY, DIAGRAM,
+    CRUXES, or GOTCHAS, and do *not* dispatch any diagram rendering.
+
+    </if>
+
     **Give insights with ANALOGY and DIAGRAM**.
 
     First, give an analogy by comparing the code to something from
