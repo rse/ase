@@ -347,7 +347,7 @@ export default class HookCommand {
             `\n⧉ ASE: ⎈ version: ${versionCurrentPlugin}${versionHint !== "" ? " " + versionHint.replaceAll(/\*/g, "") : ""}` +
             `\n⧉ ASE: ※ user: ${userId}, ⚑ project: ${projectId}` +
             `\n⧉ ASE: ◉ task: ${taskId}, ⏻ session: ${sessionId}` +
-            `\n⧉ ASE: ☯ persona: ${persona}, ⊞ boxing: ${boxing}`
+            `\n⧉ ASE: ☯ persona: ${persona}, ▢ boxing: ${boxing}`
 
         /*  inject markdown into session context.
             Anthropic Claude Code CLI and OpenAI Codex CLI expect the context nested in

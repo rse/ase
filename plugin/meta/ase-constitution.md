@@ -16,7 +16,7 @@ any skill flow:
 ⧉ **ASE**: ⎈ version: **<ase-version/>** <ase-version-hint/>
 ⧉ **ASE**: ※ user: **<ase-user-id/>**, ⚑ project: **<ase-project-id/>**
 ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⏻ session: **<ase-session-id/>**
-⧉ **ASE**: ☯ persona: **<ase-persona-style/>**
+⧉ **ASE**: ☯ persona: **<ase-persona-style/>**, ▢ boxing: **<ase-project-boxing/>**
 </template>
 
 Prohibitions
