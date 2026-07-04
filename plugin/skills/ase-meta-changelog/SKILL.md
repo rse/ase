@@ -1,4 +1,4 @@
----
+- --
 name: ase-meta-changelog
 argument-hint: "[--help|-h]"
 description: >
@@ -38,9 +38,12 @@ Format
 The *ChangeLog* file is a Markdown formatted file named `CHANGELOG.md`,
 and contains sections with headers in the style `N.M.K (YYYY-MM-DD)`.
 
-Each *ChangeLog* entry is always formatted as `<prefix/>: <summary/>`
-where the <prefix/> is one of the following tags and their usual related
-changes:
+Each *ChangeLog* entry is always formatted as...
+
+    `<change-type/> [<artifact-kind/>]: <summary/>`
+
+...where the <change-type/> is one of the following tags and their usual
+related changes:
 
     -   `FEATURE`:     new        functionality or configuration
     -   `IMPROVEMENT`: improved   functionality or configuration
@@ -49,9 +52,21 @@ changes:
     -   `CLEANUP`:     cleaned up functionality or configuration
     -   `REFACTOR`:    refactored functionality or configuration
 
+The <artifact-kind/> is one or more of the following *artifact* tags,
+classifying which kind of artifact the change primarily touches. If
+multiple artifact kinds apply, comma-separate them
+(e.g. `[arch, code]`):
+
+    -   `spec`:  requirement/specification artifacts
+    -   `arch`:  architecture/design artifacts
+    -   `code`:  source code artifacts
+    -   `docs`:  documentation artifacts
+    -   `infr`:  infrastructure/build/tooling artifacts
+    -   `othr`:  any other artifacts
+
 The <summary/> is not longer than about 60-80 characters. The
 *ChangeLog* entries for a single product release version are also always
-grouped and sorted according to the above <prefix/> list.
+grouped and sorted according to the above <change-type/> list.
 
 Processing
 ----------
@@ -123,6 +138,16 @@ Processing
     For each Git commit, reduce the Git commit messages to a single
     short <summary/> sentence, not longer than 60-80 characters.
 
+    For each entry, also determine the <artifact-kind/> *artifact kind*
+    tag(s) from the paths of the changed files. To classify a changed
+    file to its artifact class, call the `ase_artifact_list(kind: [
+    ... ])` tool of the `ase` MCP server *once*, passing the `kind`
+    tokens (`spec`, `arch`, `code`, `docs`, `infr`, `othr`), and read
+    the returned `artifacts` array of `{ kind, files }` objects to match
+    each changed file to its kind. Map the matched lower-cased kind back
+    to its upper-cased <artifact-kind/> tag, and comma-separate multiple
+    tags when more than one artifact class applies.
+
     If a <summary/> is too short or especially is not comprehensible
     enough because of too little context information, add some essential
     context, especially references to the class/module/package, etc.
@@ -144,11 +169,11 @@ Processing
     Without immediately modifying the `CHANGELOG.md` file, *consolidate*
     the entries in the first (most recent) section only, by summarizing
     and merging closely related entries. Perform the entry consolidation
-    per <prefix/> group only.
+    per <change-type/> group only.
 
     Without immediately modifying the `CHANGELOG.md` file, *sort* the
     entries in the first (most recent) section only. Instead of the
-    chronological commit order, group the entries by the <prefix/>es.
+    chronological commit order, group the entries by the <change-type/>s.
 
     </step>
 
