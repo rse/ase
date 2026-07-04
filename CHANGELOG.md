@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - IMPROVEMENT: add tiered staleness (`--staleness`) and small-scope (`--small-scope`) dependency-weight penalties to `ase-arch-discover`
+- UPDATE: upgrade GitHub Action `actions/setup-node` from v4 to v5 (`static.yml`)
 
 0.9.35 (2026-07-04)
 -------------------
