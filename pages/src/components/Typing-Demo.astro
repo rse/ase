@@ -46,7 +46,7 @@ const { count = 0 } = Astro.props
             [   "Hunt for logic, performance, and security flaws",
                 "/ase-code-analyze", "--performance --severity=HIGH @tool/src/**/*.ts" ],
             [   "Find third-party components for technology stack",
-                "/ase-arch-discover", "--limit=20 command line option and argument parsing library" ],
+                "/ase-arch-discover", "--limit=20 command-line option and argument parsing library" ],
             [   "Align target artifacts with their source",
                 "/ase-sync-reconcile", "--source=SPEC,ARCH --target=CODE,DOCS" ],
             [   "Narrate staged changes",
@@ -60,7 +60,7 @@ const { count = 0 } = Astro.props
             [   "Extract ranked key points",
                 "/ase-docs-distill", "--top=5 @docs/architecture.md" ],
             [   "Compare alternatives via weighted decision matrix",
-                "/ase-arch-evaluate", "Commander.js vs Yargs vs. Optique, focus on TypeScript support, features and popularity" ],
+                "/ase-arch-evaluate", "Commander.js vs. Yargs vs. Optique, focus on TypeScript support, features, and popularity" ],
             [   "Build strongest case for thesis",
                 "/ase-meta-steelman", "--count=10 ASE is a useful Claude Code plugin" ],
             [   "Trace root cause with Five-Whys method",
@@ -74,7 +74,7 @@ const { count = 0 } = Astro.props
         ]
 
         /*  honor the optional "count" prop (via data-count): a positive
-            value restricts the loop to the first N commands, the default
+            value restricts the loop to the first N commands; the default
             0 cycles through all of them.  */
         const count    = Number(target.closest(".hero-prompt")?.getAttribute("data-count")) || 0
         const commands = count > 0 ? allCommands.slice(0, count) : allCommands

@@ -48,7 +48,7 @@ export const highlights: Highlights[] = [
     },
     {
         eyebrow: "Root-Cause Analysis",
-        title:   "Trace root-cause with Five-Whys method",
+        title:   "Trace root cause with Five-Whys method",
         body:    "Drill past symptoms to the real cause: the Five-Whys method iteratively asks " +
                  "\"why?\" to trace a problem or claim back to its root, optionally branching into " +
                  "multiple causal paths to widen the investigation.",
@@ -105,7 +105,7 @@ export const highlights: Highlights[] = [
     {
         eyebrow: "Document Proofreading",
         title:   "Analyze documents for spelling, punctuation, and grammar",
-        body:    "Scan your documents for problems in spelling, punctuation and grammar. " +
+        body:    "Scan your documents for problems in spelling, punctuation, and grammar. " +
                  "Optionally, let the documents be automatically corrected.",
         skill:   "/ase-docs-proofread --auto @README.md",
         video:   "ase-docs-proofread"
@@ -131,8 +131,8 @@ export const highlights: Highlights[] = [
     {
         eyebrow: "Named and Persisted Plans",
         title:   "Implement against named, persisted, structured task plans",
-        body:    "Use named, persisted, structured and cross-session task plans in a strict, fixed format — then " +
-                 "implemented as a complete, surgical change set you stay in control of.",
+        body:    "Use named, persisted, structured, and cross-session task plans in a strict, fixed format — then " +
+                 "implement them as a complete, surgical change set you stay in control of.",
         skill:   "/ase-task-implement hello",
         video:   "ase-task-implement"
     },
