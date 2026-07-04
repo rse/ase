@@ -6,6 +6,7 @@ ChangeLog
 -------------------
 
 - FEATURE [code]: wire the `project.boxing` transparency classification (`white`/`grey`/`black`) into artifact-touching skills
+- FEATURE [code]: add `[<artifact-kind>]` tag support to the `ase-meta-changelog` skill (`SKILL.md`, `help.md`)
 - IMPROVEMENT [code, docs]: surface `project.boxing` in configuration docs and export it into the session environment and status line (`docs/configuration.md`, `ase-hook.ts`, `ase-constitution.md`)
 - IMPROVEMENT [docs]: credit the author as renowned in the website Hero section (`Hero.astro`)
 - CLEANUP [docs]: reduce Hero top spacing by dropping the `mt-1` margin (`Hero.astro`)
