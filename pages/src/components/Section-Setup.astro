@@ -188,10 +188,10 @@ import Annotation  from "./Annotation.astro"
                     [ [ "%V", "Tool versions" ],       [ "", "" ] ]
                 ].map(([ left, right ]) => (
                     <tr class="border-b border-border/40 last:border-0">
-                        <td class="py-1.5 pr-1 align-top font-bold text-accent sm:py-0 sm:pr-3">{left[0] !== "" && <code>{left[0]}</code>}</td>
-                        <td class="py-1.5 px-1 align-top text-foreground-secondary sm:py-0 sm:px-3">{left[1]}</td>
-                        <td class="py-1.5 px-1 align-top font-bold text-accent sm:py-0 sm:px-3">{right[0] !== "" && <code>{right[0]}</code>}</td>
-                        <td class="py-1.5 pl-1 align-top text-foreground-secondary sm:py-0 sm:pl-3">{right[1]}</td>
+                        <td class="py-0 pr-1 align-top font-bold text-accent leading-tight sm:pr-3">{left[0] !== "" && <code>{left[0]}</code>}</td>
+                        <td class="py-0 px-1 align-top text-foreground-secondary leading-tight sm:px-3">{left[1]}</td>
+                        <td class="py-0 px-1 align-top font-bold text-accent leading-tight sm:px-3">{right[0] !== "" && <code>{right[0]}</code>}</td>
+                        <td class="py-0 pl-1 align-top text-foreground-secondary leading-tight sm:pl-3">{right[1]}</td>
                     </tr>
                 ))}
             </tbody>
