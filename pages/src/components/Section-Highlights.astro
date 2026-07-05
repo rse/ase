@@ -24,7 +24,29 @@ const inline = (text: string) => text
     .replace(/`(.+?)`/g,       "<code>$1</code>")
 ---
 <section id="highlights" class="mx-auto max-w-4xl px-6 py-8">
-    <header class="mt-12 ase-section-head" data-reveal>
+    <header class="mt-12 ase-section-head relative" data-reveal>
+        <h2 class="ase-h2 relative inline-block">
+            <Annotation flat class="right-0 translate-x-1/4">
+                Wanna see some<br/>
+                skills in action to get<br/>
+                an early feel for ASE?
+            </Annotation>
+            Boost Your Daily <span class="text-accent">Software Engineering</span>
+        </h2>
+        <p class="ase-lead ase-justify">
+            Pre-manufactured skills for the Agentic AI Tool that
+            fold reasonable methodology and automation into the
+            recurring work-steps of industrial Software Engineering
+            — with you in the loop and in the driver's seat to still
+            ensure stable results quality.
+        </p>
+    </header>
+
+    <div class="mt-12 flex flex-col gap-12" data-reveal-children>
+        {highlights.map((usp, index) => <VideoRow usp={usp} index={index} />)}
+    </div>
+
+    <header class="mt-24 ase-section-head" data-reveal>
         <h2 class="ase-h2 relative inline-block">
             <Annotation flat class="right-0 translate-x-2/4">
                 Rethink you habbits<br/>
@@ -62,27 +84,5 @@ const inline = (text: string) => text
                 ))}
             </tbody>
         </table>
-    </div>
-
-    <header class="mt-24 ase-section-head relative" data-reveal>
-        <h2 class="ase-h2 relative inline-block">
-            <Annotation flat class="right-0 translate-x-1/4">
-                Wanna see some<br/>
-                skills in action to get<br/>
-                an early feel for ASE?
-            </Annotation>
-            Boost Your Daily <span class="text-accent">Software Engineering</span>
-        </h2>
-        <p class="ase-lead ase-justify">
-            Pre-manufactured skills for the Agentic AI Tool that
-            fold reasonable methodology and automation into the
-            recurring work-steps of industrial Software Engineering
-            — with you in the loop and in the driver's seat to still
-            ensure stable results quality.
-        </p>
-    </header>
-
-    <div class="mt-12 flex flex-col gap-12" data-reveal-children>
-        {highlights.map((usp, index) => <VideoRow usp={usp} index={index} />)}
     </div>
 </section>
