@@ -10,6 +10,7 @@
     columns reveal directionally (left/right) so the two halves converge on
     scroll, mirrored per row via the row's `reversed` flag in Video-Row.  */
 
+import SectionGlow      from "./Section-Glow.astro"
 import VideoRow         from "./Video-Row.astro"
 import Annotation       from "./Annotation.astro"
 import { highlights }   from "../data/highlights.ts"
@@ -47,6 +48,8 @@ const inline = (text: string) => text
         {highlights.map((usp, index) => <VideoRow usp={usp} index={index} />)}
     </div>
 
+    <div class="relative isolate">
+    <SectionGlow variant="section" side="right" />
     <header class="mt-24 ase-section-head" data-reveal>
         <h2 class="ase-h2 relative inline-block">
             <Annotation flat class="right-0 translate-x-2/4">
@@ -85,5 +88,6 @@ const inline = (text: string) => text
                 ))}
             </tbody>
         </table>
+    </div>
     </div>
 </section>
