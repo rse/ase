@@ -19,52 +19,52 @@ export const comparison: Comparison[] = [
         native:   "Fire the agent's `WebSearch` tool or lean on the LLM's " +
                   "**world knowledge** for a single take.",
         ase:      "Run `/ase-meta-search` or `/ase-meta-quorum` to poll **multiple** " +
-                  "engines and AI services at once, auto-distilled into one consensus answer."
+                  "engines and AI services at once, **auto-distilled** into one **consensus** answer."
     },
     {
         topic:    "Finding<br/>Components",
         manually: "Search the Web, tally NPM downloads and GitHub stars by hand, " +
-                  "then go with your gut.",
+                  "then **go with your gut**.",
         native:   "Let the agent search, gather, and guess through " +
-                  "an ad-hoc consolidation prompt.",
+                  "an **ad-hoc consolidation prompt**.",
         ase:      "Run `/ase-arch-discover` to discover, rank, and report candidates " +
-                  "via a strict, multi-criteria process."
+                  "via a **strict, multi-criteria** process."
     },
     {
         topic:    "Evaluating<br/>Alternatives",
         manually: "Open a dozen tabs, skim READMEs, and settle " +
-                  "\"which is best?\" on gut and recency bias.",
+                  "\"which is best?\" on **gut and recency bias**.",
         native:   "Ask the agent and get a confident single-shot pick " +
-                  "with no defensible reasoning.",
+                  "with **no defensible reasoning**.",
         ase:      "Run `/ase-meta-evaluate` for a weighted decision matrix, plus " +
-                  "`/ase-meta-steelman`, turning a fuzzy question into a defensible verdict."
+                  "`/ase-meta-steelman`, turning a fuzzy question into a **defensible verdict**."
     },
     {
         topic:    "Analyzing<br/>Problems",
-        manually: "Browse the code and bisect with `console.log` " +
+        manually: "**Browse** the code and bisect with `console.log` " +
                   "until the bug surfaces.",
         native:   "Hand the agent your error messages and let it " +
-                  "ad-hoc hunt down and patch the bug.",
+                  "ad-hoc **hunt down and patch** the bug.",
         ase:      "Run `/ase-code-resolve` to investigate, decide an approach, " +
-                  "plan a task, and resolve it end-to-end."
+                  "plan a task, and resolve it **end-to-end**."
     },
     {
         topic:    "Crafting<br/>Code",
-        manually: "Hand-edit every aspect of the new feature " +
-                  "and hope it's right first time.",
-        native:   "Tell the agent to \"craft this\" and get a plausible but " +
-                  "unbounded change set to review after the fact.",
-        ase:      "Run `/ase-code-craft` for a funnel- and plan-driven build, " +
-                  "where the agent grills you to kill underspecified corners."
+        manually: "**Hand-edit** every aspect of the new feature " +
+                  "and **hope** it's right first time.",
+        native:   "Tell the agent to \"craft this\" and get a **plausible but " +
+                  "unbounded** change set to review after the fact.",
+        ase:      "Run `/ase-code-craft` for a **funnel- and plan-driven** build, " +
+                  "where the agent **grills you and your plan** to kill underspecified aspects."
     },
     {
         topic:    "Refactoring<br/>Code",
-        manually: "Hand-edit each call site, hope the tests catch the rest, " +
-                  "and hold the whole blast radius in your head.",
-        native:   "Tell the agent to \"refactor this\" and get a plausible but " +
-                  "unbounded change set to review after the fact.",
+        manually: "Hand-edit each call site, **hope** the tests catch the rest, " +
+                  "and hold the whole **blast radius in your head**.",
+        native:   "Tell the agent to \"refactor this\" and get a **plausible but " +
+                  "unbounded** change set to review after the fact.",
         ase:      "Run `/ase-code-refactor` for a surgical, scoped change set, " +
-                  "guided by refactoring tenets and an optional preflight you approve first."
+                  "**guided by refactoring tenets** and an optional **preflight** you approve first."
     },
     {
         topic:    "Spec-Driven<br/>Development",
