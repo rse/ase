@@ -56,12 +56,14 @@ following procedure:
             If this line exists, parse it according to the format `<label/>: <description/>`.
             Set <n/> to <n/> + 1 (increment entry count).
             Set <label-key/> to `<ase-tpl-key digit="<n/>"/>`.
-            Set <label-text/> to `<ase-tpl-pad width="<width/>" text="<label/>:"/>`.
+            Set <label-text/> to `**<label/>:**`.
+            Set <label-pad/> to `<ase-tpl-pad width="<width/>" text="<label/>:"/>` with
+            the leading `<label/>:` text removed, i.e. only the trailing padding spaces.
             Append an entry to <text/>:
 
             <text>
             <text/>
-            <ase-tpl-boxline><label-key/>  ▶  **<label-text/>** <description/></ase-tpl-boxline>
+            <ase-tpl-boxline><label-key/>  ▶  <label-text/><label-pad/> <description/></ase-tpl-boxline>
             </text>
 
             <if condition="<keys/> is empty">

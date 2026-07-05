@@ -286,6 +286,15 @@ Artifact Boxing Transparency
 Template Patterns
 -----------------
 
+-   *IMPORTANT*: In every `<template/>` below you *MUST* reproduce all
+    box-drawing and decorative glyphs *verbatim*, character-for-character,
+    exactly as written. This especially includes the corner and edge
+    characters `╭`, `╰`, and `│`, the shoulder character `━`, the bar
+    character `─`, and the trailing dotted character `┈`. You *MUST* *NOT*
+    substitute visually similar ASCII fallbacks (e.g. `+`, `|`, `-`) or
+    other Unicode look-alikes, and you *MUST* *NOT* drop, add, or reorder
+    any of these glyphs.
+
 -   When `<ase-tpl-head/>` (no title attribute) should be expanded, use:
 
     <template>
