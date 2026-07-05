@@ -12,9 +12,58 @@
 import VideoRow         from "./Video-Row.astro"
 import Annotation       from "./Annotation.astro"
 import { highlights }   from "../data/highlights.ts"
+import { comparison }   from "../data/comparison.ts"
+
+/*  render lightweight inline markup in the comparison cells: turn "**...**"
+    into <b>...</b>, "*...*" into <i>...</i>, and "`...`" into <code>...</code>.
+    The "**" pass runs first so the single-asterisk pass never consumes a bold
+    marker.  */
+const inline = (text: string) => text
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/\*(.+?)\*/g,     "<i>$1</i>")
+    .replace(/`(.+?)`/g,       "<code>$1</code>")
 ---
 <section id="highlights" class="mx-auto max-w-4xl px-6 py-8">
-    <header class="ase-section-head relative" data-reveal>
+    <header class="mt-12 ase-section-head" data-reveal>
+        <h2 class="ase-h2 relative inline-block">
+            <Annotation flat class="right-0 translate-x-2/4">
+                Rethink you habbits<br/>
+                and boost yourself!
+            </Annotation>
+            See the <span class="text-accent">Productivity Difference</span>
+        </h2>
+        <p class="mt-4 text-foreground-secondary ase-justify">
+            Some sample, recurring work-steps from Software Engineering,
+            done three ways: old-school by hand, with a bare Agentic
+            AI Coding tool, and with the same tool boosted by the{" "}
+            <b>ASE</b> plugin.
+        </p>
+    </header>
+
+    <div class="mt-6 overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal>
+        <table class="w-full text-left text-xs sm:text-sm">
+            <thead>
+                <tr class="border-b border-border-strong text-accent">
+                    <th class="pb-2 pr-1 font-semibold sm:pr-2"></th>
+                    <th class="pb-2 px-1 font-semibold sm:px-2">Manually:<br/><i>Old-School</i></th>
+                    <th class="pb-2 px-1 font-semibold sm:px-2">Claude Code CLI:<br/><i>AI Native</i></th>
+                    <th class="pb-2 pl-1 font-semibold sm:pl-2">Claude Code CLI + ASE:<br/><i>AI Advanced</i></th>
+                </tr>
+            </thead>
+            <tbody>
+                {comparison.map((row) => (
+                    <tr class="border-b border-border-strong last:border-0">
+                        <td class="py-1 pr-1 align-top font-bold text-accent     sm:pr-2">{row.topic}</td>
+                        <td class="py-1 px-1 align-top text-foreground-muted     sm:px-2" set:html={inline(row.manually)} />
+                        <td class="py-1 px-1 align-top text-foreground-secondary sm:px-2" set:html={inline(row.native)} />
+                        <td class="py-1 pl-1 align-top text-foreground           sm:pl-2" set:html={inline(row.ase)} />
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+
+    <header class="mt-24 ase-section-head relative" data-reveal>
         <h2 class="ase-h2 relative inline-block">
             <Annotation flat class="right-0 translate-x-1/4">
                 Wanna see some<br/>
@@ -31,6 +80,7 @@ import { highlights }   from "../data/highlights.ts"
             ensure stable results quality.
         </p>
     </header>
+
     <div class="mt-12 flex flex-col gap-12" data-reveal-children>
         {highlights.map((usp, index) => <VideoRow usp={usp} index={index} />)}
     </div>
