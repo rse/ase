@@ -124,7 +124,12 @@ import Annotation  from "./Annotation.astro"
             copy={true}
             title="Statusline Installation"
             commands={[
-                "**ase** setup statusline activate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**\n**[**--width **<n>****] [**--margin **<n>****] [**--no-icons**] [**--no-labels**]**\n**[****<format> ...****]**"
+                "**ase** setup statusline activate\n" +
+                "**[**--tool claude**|**copilot**|**codex**]\n" +
+                "[**--scope user**|**project**|**local**]**\n" +
+                "**[**--width **<n>****] [**--margin **<n>****]\n" +
+                "[**--no-icons**] [**--no-labels**]**\n" +
+                "**[****<format> ...****]**"
             ]}
         />
     </div>
@@ -135,7 +140,9 @@ import Annotation  from "./Annotation.astro"
             copy={true}
             title="Statusline Uninstallation"
             commands={[
-                "**ase** setup statusline deactivate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
+                "**ase** setup statusline deactivate\n" +
+                "**[**--tool claude**|**copilot**|**codex**]\n" +
+                "[**--scope user**|**project**|**local**]**"
             ]}
         />
     </div>
