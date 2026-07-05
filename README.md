@@ -5,6 +5,9 @@
 
 [![github (author stars)](https://img.shields.io/github/stars/rse?logo=github&label=author%20stars&color=%233377aa)](https://github.com/rse)
 [![github (author followers)](https://img.shields.io/github/followers/rse?label=author%20followers&logo=github&color=%234477aa)](https://github.com/rse)
+
+<br/>
+
 [![github (project license)](https://img.shields.io/github/license/rse/ase?logo=github&label=project%20license&color=%233377aa)](https://github.com/rse/ase/blob/master/LICENSE.txt)
 [![github (project release)](https://img.shields.io/github/v/release/rse/ase?logo=github&label=project%20release&color=%233377aa)](https://github.com/rse/ase)
 [![github (project stars)](https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&color=%233377aa)](https://github.com/rse/ase)
