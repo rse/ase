@@ -17,238 +17,270 @@ import Annotation  from "./Annotation.astro"
     <SectionGlow variant="section" side="left" />
 
     <header class="ase-section-head" data-reveal>
-        <h2 class="ase-h2">
+        <h2 class="ase-h2 mt-12">
+            <Annotation flat class="hidden sm:block left-[75%] -translate-x-2/2">
+                Execute just two<br/>
+                commands and you<br/>
+                are up and running!
+            </Annotation>
             Easy <span class="text-accent">Setup</span>
         </h2>
         <p class="mt-4 text-foreground-secondary ase-justify">
-            As a prerequisite, please install the Agentic AI Coding tool{" "}
-            <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>{" "}
-            (or with reduced support the alternatives <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>{" "}
-            or <a href="https://github.com/openai/codex">OpenAI Codex CLI</a>) and
-            the essential run-time environment{" "}
-            <a href="https://nodejs.org/">Node.js</a> for your particular platform.
-        </p>
-        <p class="ase-indent-p text-foreground-secondary ase-justify">
-            Then execute the two commands below under <b>Installation</b>. The first command installs
-            the <b>ASE</b> Command-Line Interface (CLI),
-            the second uses it to install
-            the <b>ASE</b> Plugin into your Agentic AI Coding tool.
-            The <code>ase setup update</code> keeps <b>ASE</b> up to date and
-            the <code>ase setup uninstall</code> will reverse the
-            installation residue-free again at any time.
-            The <code>--tool claude</code> is the default and not necessary
-            for the mainstream tool <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>.
-        </p>
-        <p class="ase-indent-p text-foreground-secondary ase-justify">
-            The <code>--scope</code> option defaults to <code>user</code> (global,
-            machine-wide). Use <code>--scope project</code> to share the plugin
-            registration via the project repository, or <code>--scope local</code> to
-            share the plugin via the project repository while keeping it out of version control.
-            Option <code>--scope</code> is only supported for <code>--tool claude</code>.
+            Getting started with <b>ASE</b> takes just a couple of commands.
+            Follow the prerequisites and the installation steps on the left,
+            run the ready-to-copy commands shown on the right, and you are
+            up and running within minutes.
         </p>
     </header>
 
-    <div data-reveal>
-        <Annotation flat class="hidden sm:block left-[75%] -translate-x-1/2">
-            Execute just two<br/>
-            commands and you<br/>
-            are up and running!
-        </Annotation>
-        <Terminal
-            class="mx-auto mt-8 sm:mt-18 max-w-2xl"
-            copy={true}
-            title="Installation"
-            commands={[
-                "**npm** install -g @rse/ase",
-                "**ase** setup install\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
-            ]}
-        />
-    </div>
+    <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start">
+        <div class="mt-6 ase-section-head" data-reveal>
+            <p class="text-foreground-secondary ase-justify">
+                As a prerequisite, please install the Agentic AI Coding tool{" "}
+                <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>{" "}
+                (or with reduced support the alternatives <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>{" "}
+                or <a href="https://github.com/openai/codex">OpenAI Codex CLI</a>) and
+                the essential run-time environment{" "}
+                <a href="https://nodejs.org/">Node.js</a> for your particular platform.
+            </p>
+            <p class="ase-indent-p text-foreground-secondary ase-justify">
+                Then execute the two commands below under <b>Installation</b>. The first command installs
+                the <b>ASE</b> Command-Line Interface (CLI),
+                the second uses it to install
+                the <b>ASE</b> Plugin into your Agentic AI Coding tool.
+                The <code>ase setup update</code> keeps <b>ASE</b> up to date and
+                the <code>ase setup uninstall</code> will reverse the
+                installation residue-free again at any time.
+                The <code>--tool claude</code> is the default and not necessary
+                for the mainstream tool <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>.
+            </p>
+            <p class="ase-indent-p text-foreground-secondary ase-justify">
+                The <code>--scope</code> option defaults to <code>user</code> (global,
+                machine-wide). Use <code>--scope project</code> to share the plugin
+                registration via the project repository, or <code>--scope local</code> to
+                share the plugin via the project repository while keeping it out of version control.
+                Option <code>--scope</code> is only supported for <code>--tool claude</code>.
+            </p>
+        </div>
 
-    <div data-reveal>
-        <Terminal
-            class="mx-auto mt-8 max-w-2xl"
-            copy={true}
-            title="Updating"
-            commands={[
-                "**ase** setup update\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
-            ]}
-        />
-    </div>
+        <div class="relative mt-6">
+            <div data-reveal>
+                <Terminal
+                    class="mx-auto mt-8 sm:mt-18 lg:mt-0 max-w-2xl"
+                    copy={true}
+                    title="Installation"
+                    commands={[
+                        "**npm** install -g @rse/ase",
+                        "**ase** setup install\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
+                    ]}
+                />
+            </div>
 
-    <div data-reveal>
-        <Terminal
-            class="mx-auto mt-8 max-w-2xl"
-            copy={true}
-            title="Uninstallation"
-            commands={[
-                "**ase** setup uninstall\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
-            ]}
-        />
+            <div data-reveal>
+                <Terminal
+                    class="mx-auto mt-8 max-w-2xl"
+                    copy={true}
+                    title="Updating"
+                    commands={[
+                        "**ase** setup update\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
+                    ]}
+                />
+            </div>
+
+            <div data-reveal>
+                <Terminal
+                    class="mx-auto mt-8 max-w-2xl"
+                    copy={true}
+                    title="Uninstallation"
+                    commands={[
+                        "**ase** setup uninstall\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
+                    ]}
+                />
+            </div>
+        </div>
     </div>
 
     <header class="mt-12 ase-section-head" data-reveal>
         <h2 class="text-1xl font-bold sm:text-2xl">
             Power-Up with <span class="text-accent">Custom Statusline</span>
         </h2>
-        <p class="mt-4 text-foreground-secondary ase-justify">
-            <b>ASE</b> can <i>optionally</i> configure a rich, information-dense
-            statusline for the <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>{" "}
-            (or with reduced support the alternative <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>),
-            rendered by the built-in <code>ase statusline</code> command. It surfaces
-            your current user, project, task, and session, the active model, effort,
-            and thinking state, the persona, and a live context-window gauge, all
-            colorized and width-aware. <b>ASE</b> will just add the corresponding{" "}
-            <code>statusLine</code> entry to the tool's <code>settings.json</code>,
-            leaving any of your other settings untouched.
-        </p>
-        <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
-            <b class="text-accent">NOTICE:</b>
-            <span class="mt-1 block text-foreground-secondary">
-            The custom statusline is <b>NOT</b> required
-            for <b>ASE</b> to work. It is fully
-            optional when using <b>ASE</b>, but will
-            power up your Agentic AI Coding session with
-            an at-a-glance overview of the current context.
-            An existing, hand-crafted <code>statusLine</code> is always
-            preserved. The statusline is supported
-            for <code>--tool claude</code> and <code>--tool copilot</code>,
-            but not for <code>--tool codex</code>.
-            </span>
-        </blockquote>
     </header>
 
-    <div data-reveal>
-        <Terminal
-            class="mx-auto mt-8 max-w-2xl"
-            copy={true}
-            title="Statusline Installation"
-            commands={[
-                "**ase** setup statusline activate\n" +
-                "**[**--tool claude**|**copilot**|**codex**]\n" +
-                "[**--scope user**|**project**|**local**]**\n" +
-                "**[**--width **<n>****] [**--margin **<n>****]\n" +
-                "[**--no-icons**] [**--no-labels**]**\n" +
-                "**[****<format> ...****]**"
-            ]}
-        />
+    <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start">
+        <div class="mt-6 ase-section-head" data-reveal>
+            <p class="text-foreground-secondary ase-justify">
+                <b>ASE</b> can <i>optionally</i> configure a rich, information-dense
+                statusline for the <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>{" "}
+                (or with reduced support the alternative <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>),
+                rendered by the built-in <code>ase statusline</code> command.
+            </p>
+            <p class="text-foreground-secondary ase-indent-p ase-justify">
+                It surfaces
+                your current user, project, task, and session, the active model, effort,
+                and thinking state, the persona, and a live context-window gauge, all
+                colorized and width-aware. <b>ASE</b> will just add the corresponding{" "}
+                <code>statusLine</code> entry to the tool's <code>settings.json</code>,
+                leaving any of your other settings untouched.
+            </p>
+            <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
+                <b class="text-accent">NOTICE:</b>
+                <span class="mt-1 block text-foreground-secondary">
+                The custom statusline is <b>NOT</b> required
+                for <b>ASE</b> to work. It is fully
+                optional when using <b>ASE</b>, but will
+                power up your Agentic AI Coding session with
+                an at-a-glance overview of the current context.
+                An existing, hand-crafted <code>statusLine</code> is always
+                preserved. The statusline is supported
+                for <code>--tool claude</code> and <code>--tool copilot</code>,
+                but not for <code>--tool codex</code>.
+                </span>
+            </blockquote>
+            <p class="mt-4 text-foreground-secondary ase-justify">
+                The <code class="text-brand-400!">&lt;format&gt;</code> template lines support the
+                following <code>%x</code> expansion constructs, plus
+                arbitrary <code>&lt;<span class="text-brand-400!">color</span>
+                &gt;...&lt;/<span class="text-brand-400!">color</span>&gt;</code> markup
+                (<code class="text-brand-400!">color</code> being one of <code>black</code>, <code>red</code>,{" "}
+                <code>green</code>, <code>yellow</code>, <code>blue</code>,{" "}
+                <code>magenta</code>, <code>cyan</code>, <code>white</code>, or{" "}
+                <code>default</code>).
+                When no <code class="text-brand-400!">&lt;format&gt;</code> arguments are given, <b>ASE</b> uses
+                the following implicit positional arguments: <code>"&lt;blue&gt;%u&lt;/blue&gt; &lt;red&gt;%p&lt;/red&gt; &lt;black&gt;%T&lt;/black&gt; %s"
+                "%m %e %t" "%P %c"</code>
+            </p>
+        </div>
+
+        <div class="relative mt-6">
+            <div data-reveal>
+                <Terminal
+                    class="mx-auto mt-8 lg:mt-0 max-w-2xl"
+                    copy={true}
+                    title="Statusline Installation"
+                    commands={[
+                        "**ase** setup statusline activate\n" +
+                        "**[**--tool claude**|**copilot**|**codex**]\n" +
+                        "[**--scope user**|**project**|**local**]**\n" +
+                        "**[**--width **<n>****] [**--margin **<n>****]\n" +
+                        "[**--no-icons**] [**--no-labels**]**\n" +
+                        "**[****<format> ...****]**"
+                    ]}
+                />
+            </div>
+
+            <div data-reveal>
+                <Terminal
+                    class="mx-auto mt-8 max-w-2xl"
+                    copy={true}
+                    title="Statusline Uninstallation"
+                    commands={[
+                        "**ase** setup statusline deactivate\n" +
+                        "**[**--tool claude**|**copilot**|**codex**]\n" +
+                        "[**--scope user**|**project**|**local**]**"
+                    ]}
+                />
+            </div>
+
+            <div class="mt-8 overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal>
+                <table class="w-full text-left text-xs sm:text-sm">
+                    <thead>
+                        <tr class="border-b border-border text-accent">
+                            <th class="pb-2 pr-1 font-semibold sm:pr-3"></th>
+                            <th class="pb-2 px-1 font-semibold sm:px-3">Meaning</th>
+                            <th class="pb-2 px-1 font-semibold sm:px-3"></th>
+                            <th class="pb-2 pl-1 font-semibold sm:pl-3">Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {[
+                            [ [ "%u", "User name" ],           [ "%S", "Session usage" ] ],
+                            [ [ "%p", "Project name" ],        [ "%D", "Session resets" ] ],
+                            [ [ "%T", "Task id" ],             [ "%W", "Weekly usage" ] ],
+                            [ [ "%s", "Session id" ],          [ "%Q", "Weekly resets" ] ],
+                            [ [ "%m", "Model name" ],          [ "%H", "Elapsed time" ] ],
+                            [ [ "%e", "Effort level" ],        [ "%X", "Session cost" ] ],
+                            [ [ "%t", "Thinking state" ],      [ "%a", "Lines added" ] ],
+                            [ [ "%O", "Output style" ],        [ "%r", "Lines removed" ] ],
+                            [ [ "%P", "Persona style" ],       [ "%b", "Git branch" ] ],
+                            [ [ "%c", "Context gauge" ],       [ "%g", "Git changes" ] ],
+                            [ [ "%C", "Token count" ],         [ "%G", "Untracked files" ] ],
+                            [ [ "%M", "Memory usage" ],        [ "%d", "Working directory" ] ],
+                            [ [ "%V", "Tool versions" ],       [ "", "" ] ]
+                        ].map(([ left, right ]) => (
+                            <tr class="border-b border-border/40 last:border-0">
+                                <td class="py-0 pr-1 align-top font-bold text-accent leading-tight sm:pr-3">{left[0] !== "" && <code>{left[0]}</code>}</td>
+                                <td class="py-0 px-1 align-top text-foreground-secondary leading-tight sm:px-3">{left[1]}</td>
+                                <td class="py-0 px-1 align-top font-bold text-accent leading-tight sm:px-3">{right[0] !== "" && <code>{right[0]}</code>}</td>
+                                <td class="py-0 pl-1 align-top text-foreground-secondary leading-tight sm:pl-3">{right[1]}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div data-reveal>
-        <Terminal
-            class="mx-auto mt-8 max-w-2xl"
-            copy={true}
-            title="Statusline Uninstallation"
-            commands={[
-                "**ase** setup statusline deactivate\n" +
-                "**[**--tool claude**|**copilot**|**codex**]\n" +
-                "[**--scope user**|**project**|**local**]**"
-            ]}
-        />
-    </div>
-
-    <p class="mx-auto mt-8 max-w-2xl text-foreground-secondary ase-justify" data-reveal>
-        The <code class="text-brand-400!">&lt;format&gt;</code> template lines support the
-        following <code>%x</code> expansion constructs, plus
-        arbitrary <code>&lt;<span class="text-brand-400!">color</span>
-        &gt;...&lt;/<span class="text-brand-400!">color</span>&gt;</code> markup
-        (<code class="text-brand-400!">color</code> being one of <code>black</code>, <code>red</code>,{" "}
-        <code>green</code>, <code>yellow</code>, <code>blue</code>,{" "}
-        <code>magenta</code>, <code>cyan</code>, <code>white</code>, or{" "}
-        <code>default</code>).
-        When no <code class="text-brand-400!">&lt;format&gt;</code> arguments are given, <b>ASE</b> uses
-        the following implicit positional arguments: <code>"&lt;blue&gt;%u&lt;/blue&gt; &lt;red&gt;%p&lt;/red&gt; &lt;black&gt;%T&lt;/black&gt; %s"
-        "%m %e %t" "%P %c"</code>
-    </p>
-
-    <div class="mx-auto mt-6 max-w-2xl overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal>
-        <table class="w-full text-left text-xs sm:text-sm">
-            <thead>
-                <tr class="border-b border-border text-accent">
-                    <th class="pb-2 pr-1 font-semibold sm:pr-3">Construct</th>
-                    <th class="pb-2 px-1 font-semibold sm:px-3">Meaning</th>
-                    <th class="pb-2 px-1 font-semibold sm:px-3">Construct</th>
-                    <th class="pb-2 pl-1 font-semibold sm:pl-3">Meaning</th>
-                </tr>
-            </thead>
-            <tbody>
-                {[
-                    [ [ "%u", "User name" ],           [ "%S", "Session usage" ] ],
-                    [ [ "%p", "Project name" ],        [ "%D", "Session resets" ] ],
-                    [ [ "%T", "Task id" ],             [ "%W", "Weekly usage" ] ],
-                    [ [ "%s", "Session id" ],          [ "%Q", "Weekly resets" ] ],
-                    [ [ "%m", "Model name" ],          [ "%H", "Elapsed time" ] ],
-                    [ [ "%e", "Effort level" ],        [ "%X", "Session cost" ] ],
-                    [ [ "%t", "Thinking state" ],      [ "%a", "Lines added" ] ],
-                    [ [ "%O", "Output style" ],        [ "%r", "Lines removed" ] ],
-                    [ [ "%P", "Persona style" ],       [ "%b", "Git branch" ] ],
-                    [ [ "%c", "Context gauge" ],       [ "%g", "Git changes" ] ],
-                    [ [ "%C", "Token count" ],         [ "%G", "Untracked files" ] ],
-                    [ [ "%M", "Memory usage" ],        [ "%d", "Working directory" ] ],
-                    [ [ "%V", "Tool versions" ],       [ "", "" ] ]
-                ].map(([ left, right ]) => (
-                    <tr class="border-b border-border/40 last:border-0">
-                        <td class="py-0 pr-1 align-top font-bold text-accent leading-tight sm:pr-3">{left[0] !== "" && <code>{left[0]}</code>}</td>
-                        <td class="py-0 px-1 align-top text-foreground-secondary leading-tight sm:px-3">{left[1]}</td>
-                        <td class="py-0 px-1 align-top font-bold text-accent leading-tight sm:px-3">{right[0] !== "" && <code>{right[0]}</code>}</td>
-                        <td class="py-0 pl-1 align-top text-foreground-secondary leading-tight sm:pl-3">{right[1]}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
-
-    <header class="mt-12 ase-section-head" data-reveal>
+    <header class="mt-8 ase-section-head" data-reveal>
         <h2 class="text-1xl font-bold sm:text-2xl">
             Power-Up with <span class="text-accent">Foreign Services</span>
         </h2>
-        <p class="mt-4 text-foreground-secondary ase-justify">
-            <b>ASE</b> can <i>optionally</i> leverage additional
-            Model-Context-Protocol (MCP) servers for contacting foreign
-            LLM services (<b>OpenAI ChatGPT</b>, <b>Google Gemini</b>, <b>DeepSeek</b>, <b>xAI
-            Grok</b>, <b>Alibaba Qwen</b>, or <b>Z.AI GLM</b>) via MCP-to-OpenAI servers
-            and Web Search services (<b>Brave</b>, <b>Perplexity</b>, or <b>Exa</b>) via their
-            dedicated MCP servers. You only need the access tokens
-            of those services at hand. <b>ASE</b> will just add the
-            corresponding local MCP servers to the Agentic AI Coding
-            tool.
-        </p>
-        <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
-            <b class="text-accent">NOTICE:</b>
-            <span class="mt-1 block text-foreground-secondary">
-            These add-on MCP servers are <b>NOT</b> required
-            for <b>ASE</b> to work. They are fully
-            optional when using <b>ASE</b>, but will
-            power up some of the <b>ASE</b> skills (like{" "}
-            <code>ase-meta-chat</code>, <code>ase-meta-search</code>,
-            and <code>ase-meta-quorum</code>) with additional
-            functionality.
-            </span>
-        </blockquote>
     </header>
 
-    <div data-reveal>
-        <Terminal
-            class="mx-auto mt-8 max-w-2xl"
-            copy={true}
-            title="MCP Installation"
-            commands={[
-                "**ase** setup mcp list",
-                "export ASE_MCP_KEY_**<service>**=\"**<token>**\"",
-                "**ase** setup mcp activate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
-            ]}
-        />
-    </div>
+    <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start">
+        <div class="mt-6 ase-section-head" data-reveal>
+            <p class="text-foreground-secondary ase-justify">
+                <b>ASE</b> can <i>optionally</i> leverage additional
+                Model-Context-Protocol (MCP) servers for contacting foreign
+                LLM services (<b>OpenAI ChatGPT</b>, <b>Google Gemini</b>, <b>DeepSeek</b>, <b>xAI
+                Grok</b>, <b>Alibaba Qwen</b>, or <b>Z.AI GLM</b>) via MCP-to-OpenAI servers
+                and Web Search services (<b>Brave</b>, <b>Perplexity</b>, or <b>Exa</b>) via their
+                dedicated MCP servers.
+            </p>
+            <p class="text-foreground-secondary ase-indent-p ase-justify">
+                You only need the access tokens
+                of those services at hand. <b>ASE</b> will just add the
+                corresponding local MCP servers to the Agentic AI Coding
+                tool.
+            </p>
+            <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
+                <b class="text-accent">NOTICE:</b>
+                <span class="mt-1 block text-foreground-secondary">
+                These add-on MCP servers are <b>NOT</b> required
+                for <b>ASE</b> to work. They are fully
+                optional when using <b>ASE</b>, but will
+                power up some of the <b>ASE</b> skills (like{" "}
+                <code>ase-meta-chat</code>, <code>ase-meta-search</code>,
+                and <code>ase-meta-quorum</code>) with additional
+                functionality.
+                </span>
+            </blockquote>
+        </div>
 
-    <div data-reveal>
-        <Terminal
-            class="mx-auto mt-8 max-w-2xl"
-            copy={true}
-            title="MCP Uninstallation"
-            commands={[
-                "**ase** setup mcp deactivate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
-            ]}
-        />
+        <div class="relative mt-6">
+            <div data-reveal>
+                <Terminal
+                    class="mx-auto mt-8 lg:mt-0 max-w-2xl"
+                    copy={true}
+                    title="MCP Installation"
+                    commands={[
+                        "**ase** setup mcp list",
+                        "export ASE_MCP_KEY_**<service>**=\"**<token>**\"",
+                        "**ase** setup mcp activate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
+                    ]}
+                />
+            </div>
+
+            <div data-reveal>
+                <Terminal
+                    class="mx-auto mt-8 max-w-2xl"
+                    copy={true}
+                    title="MCP Uninstallation"
+                    commands={[
+                        "**ase** setup mcp deactivate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
+                    ]}
+                />
+            </div>
+        </div>
     </div>
 
 </section>
