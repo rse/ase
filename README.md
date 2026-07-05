@@ -8,6 +8,7 @@
 <br/>
 [![github (project license)](https://img.shields.io/github/license/rse/ase?logo=github&label=project%20license&color=%233377aa)](https://github.com/rse/ase/blob/master/LICENSE.txt)
 [![github (project release)](https://img.shields.io/github/v/release/rse/ase?logo=github&label=project%20release&color=%233377aa)](https://github.com/rse/ase)
+<br/>
 [![github (project stars)](https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&color=%233377aa)](https://github.com/rse/ase)
 
 About
