@@ -40,8 +40,10 @@ const contributors = [
         </p>
     </header>
 
-    <div class="mt-12 flex w-full flex-col items-center gap-16 sm:flex-row sm:items-start" data-reveal>
-        <div class="w-full min-w-0 sm:basis-3/8 sm:shrink-0 sm:grow-0">
+    <div class="mt-12 flex w-full flex-col items-center gap-16 sm:flex-row sm:items-start">
+        {/*  portrait reveals from the left edge, text from the right, converging
+            toward center ("right"/"left" are inverted per Scroll-Reveal naming)  */}
+        <div class="w-full min-w-0 sm:basis-3/8 sm:shrink-0 sm:grow-0" data-reveal="right">
             <a href="https://github.com/rse" class="block overflow-hidden rounded-xl ring-1 ring-border-strong transition hover:ring-accent">
                 <img src="/assets/rse-portrait.png" alt="Dr. Ralf S. Engelschall" class="aspect-[10/9] w-full object-cover" />
             </a>
@@ -50,7 +52,7 @@ const contributors = [
                 <b class="text-xl">Dr. Ralf S. Engelschall</b>
             </a>
         </div>
-        <div class="w-full min-w-0 sm:basis-5/8">
+        <div class="w-full min-w-0 sm:basis-5/8" data-reveal="left">
             <p class="mt-1 text-foreground-secondary ase-justify">
                 <b>RSE</b> is <b>CTO msg group</b> and <b>Director msg Research</b> at <a href="https://www.msg.group">msg</a>{" "}
                 &mdash; a Software Engineering company group with more than 11,000 people &mdash;
@@ -136,15 +138,17 @@ const contributors = [
         </p>
     </header>
 
-    <div class="mt-12 w-full" data-reveal>
+    <div class="mt-12 w-full">
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <div class="flex flex-col items-center gap-2 py-2 overflow-hidden rounded-xl border border-border-strong p-1 text-center text-foreground">
+            {/*  left sponsor reveals from the left edge, right from the right
+                ("right"/"left" are inverted per Scroll-Reveal naming)  */}
+            <div class="flex flex-col items-center gap-2 py-2 overflow-hidden rounded-xl border border-border-strong p-1 text-center text-foreground" data-reveal="right">
                 <div class="flex flex-1 items-center justify-center">
                     <img src="/assets/msg-logo-white.svg" alt="msg systems ag" class="h-14 w-auto opacity-75" />
                 </div>
                 <div class="mb-2">msg systems ag</div>
             </div>
-            <div class="flex flex-col items-center gap-2 py-2 overflow-hidden rounded-xl border border-border-strong p-1 text-center text-foreground">
+            <div class="flex flex-col items-center gap-2 py-2 overflow-hidden rounded-xl border border-border-strong p-1 text-center text-foreground" data-reveal="left">
                 <div class="flex flex-1 items-center justify-center">
                     <img src="/assets/sea-logo-white.svg" alt="SEA Software Engineering Academy gGmbH" class="h-20 w-auto opacity-75" />
                 </div>

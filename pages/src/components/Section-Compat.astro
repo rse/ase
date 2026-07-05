@@ -47,9 +47,10 @@ const llms = [
         </p>
     </header>
 
-    <div class="mt-12 grid gap-8 lg:grid-cols-2" data-reveal-children>
-        {/*  Agent-Harness compatibility matrix  */}
-        <div class="overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4">
+    <div class="mt-12 grid gap-8 lg:grid-cols-2">
+        {/*  Agent-Harness compatibility matrix — reveals from the left edge
+            ("right" starts off-screen left, per Scroll-Reveal's inverted naming)  */}
+        <div class="overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal="right">
             <table class="w-full text-left text-xs sm:text-sm">
                 <thead>
                     <tr class="border-b border-border text-foreground">
@@ -72,8 +73,9 @@ const llms = [
             </table>
         </div>
 
-        {/*  LLM compatibility matrix  */}
-        <div class="overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4">
+        {/*  LLM compatibility matrix — reveals from the right edge
+            ("left" starts off-screen right, per Scroll-Reveal's inverted naming)  */}
+        <div class="overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal="left">
             <table class="w-full text-left text-xs sm:text-sm">
                 <thead>
                     <tr class="border-b border-border text-foreground">
@@ -101,45 +103,48 @@ const llms = [
         <span class="text-accent">†</span> <i>OpenAI Codex CLI</i> has no scriptable custom status line support at all.<br/>
     </p>
 
-    <div class="mx-auto mt-10 max-w-2xl" data-reveal>
-        <blockquote class="border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary">
-            <b class="text-accent">NOTICE: Agent Harness Compatibility</b>
+    <div class="mt-10 grid gap-8 lg:grid-cols-2 lg:items-start">
+        {/*  Agent-Harness NOTICE — reveals from the left edge
+            ("right" starts off-screen left, per Scroll-Reveal's inverted naming)  */}
+        <div data-reveal="right">
+            <blockquote class="border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary">
+                <b class="text-accent">NOTICE: Agent Harness Compatibility</b>
 
-            <p class="mt-1 text-foreground-secondary ase-justify">
-            This compatibility statement here does <u>not</u> mean{" "}
-            <b>ASE</b> cannot be used with the <b>Anthropic Claude
-            Code</b> IDE plugin or Desktop app. It only means that{" "}
-            <b>ASE</b> is primarily developed against <b>Anthropic
-            Claude Code CLI</b>. For the IDE plugin or Desktop app
-            at least expect certain incompatibilities or missing
-            functionalities (e.g. the statusbar, etc.).
-            </p>
-        </blockquote>
-    </div>
+                <p class="mt-1 text-foreground-secondary ase-justify">
+                This compatibility statement here does <u>not</u> mean{" "}
+                <b>ASE</b> cannot be used with the <b>Anthropic Claude
+                Code</b> IDE plugin or Desktop app. It only means that{" "}
+                <b>ASE</b> is primarily developed against <b>Anthropic
+                Claude Code CLI</b>. For the IDE plugin or Desktop app
+                at least expect certain incompatibilities or missing
+                functionalities (e.g. the statusbar, etc.).
+                </p>
+            </blockquote>
+        </div>
 
-    <div class="mx-auto mt-10 max-w-2xl" data-reveal>
-        <blockquote class="border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary">
-            <b class="text-accent">NOTICE: LLM Compatibility</b>
+        {/*  LLM NOTICE — reveals from the right edge
+            ("left" starts off-screen right, per Scroll-Reveal's inverted naming)  */}
+        <div data-reveal="left">
+            <blockquote class="border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary">
+                <b class="text-accent">NOTICE: LLM Compatibility</b>
 
-            <p class="mt-1 text-foreground-secondary ase-justify">
-            This compatibility statement here does <u>not</u> mean <b>ASE</b> cannot be
-            used with other combinations than <b>Anthropic Claude Code CLI + Claude
-            Opus</b>, like the cheap and powerful <b>Anthropic Claude Code CLI +
-            Minimax-M3</b> or the popular alternative <b>OpenAI Codex
-            CLI + GPT</b> combination. It only means that <b>ASE</b> is
-            primarily developed against <b>Anthropic Claude Code CLI + Claude Opus</b>{" "}
-            and hence this combination showed no incompatibilities or
-            unexpected results.
-            </p>
+                <p class="mt-1 text-foreground-secondary ase-justify">
+                This compatibility statement here does <u>not</u> mean <b>ASE</b> cannot be
+                used with other combinations than <b>Anthropic Claude Code CLI + Claude
+                Opus</b>, like the cheap and powerful <b>Anthropic Claude Code CLI +
+                Minimax-M3</b> or the popular alternative <b>OpenAI Codex
+                CLI + GPT</b> combination. It only means that <b>ASE</b> is
+                primarily developed against <b>Anthropic Claude Code CLI + Claude Opus</b>{" "}
+                and hence this combination showed no incompatibilities or
+                unexpected results.
+                </p>
 
-            <p class="text-foreground-secondary ase-indent-p ase-justify">
-            For other combinations, the usual and hence expected
-            incompatibilities are that some instructions of the{" "}
-            <b>ASE</b> skills are not 100% strictly followed. This
-            can be fully harmless in practice, but is at least not as
-            good as the mainstream combination <b>Anthropic Claude Code CLI + Claude
-            Opus</b> where we didn't observe this.
-            </p>
-        </blockquote>
+                <p class="text-foreground-secondary ase-indent-p ase-justify">
+                For other combinations, the usual and hence expected
+                incompatibilities are that some instructions of the{" "}
+                <b>ASE</b> skills are not 100% strictly followed.
+                </p>
+            </blockquote>
+        </div>
     </div>
 </section>

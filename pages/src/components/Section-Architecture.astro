@@ -30,9 +30,9 @@ import Annotation  from "./Annotation.astro"
             Command-Line Interface (CLI).
         </p>
     </header>
-    <div class="mt-12 flex flex-col gap-24" data-reveal-children>
+    <div class="mt-12 flex flex-col gap-24">
         <div class="ase-grid-split">
-            <div class="relative isolate lg:order-1">
+            <div class="relative isolate lg:order-1" data-reveal="right">
                 <SectionGlow variant="text" side="left" />
                 <p class="ase-eyebrow">Software Architecture</p>
                 <h3 class="ase-h3">Hooks, Skills, MCP, CLI</h3>
@@ -55,7 +55,9 @@ import Annotation  from "./Annotation.astro"
                     xxx</code></b>).
                 </p>
             </div>
-            <Diagram class="lg:order-2" src="/assets/building-blocks.svg" label="ASE building blocks diagram" />
+            <div class="lg:order-2" data-reveal="left">
+                <Diagram src="/assets/building-blocks.svg" label="ASE building blocks diagram" />
+            </div>
         </div>
     </div>
 </section>

@@ -35,9 +35,9 @@ import Annotation  from "./Annotation.astro"
         </p>
     </header>
 
-    <div class="mt-12 flex flex-col gap-12" data-reveal-children>
+    <div class="mt-12 flex flex-col gap-12">
         <div class="ase-grid-split">
-            <div class="lg:order-1 relative isolate">
+            <div class="lg:order-1 relative isolate" data-reveal="right">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Ad-Hoc Prompt</p>
                 <h3 class="ase-h3">Simple Prompting</h3>
@@ -49,17 +49,18 @@ import Annotation  from "./Annotation.astro"
                     detail decisions. Use for simple tasks only.
                 </p>
             </div>
-            <Terminal
-                class="lg:order-2 relative isolate"
-                prefix="Claude Code"
-                commands={[
-                    "Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal"
-                ]}
-            />
+            <div class="lg:order-2 relative isolate" data-reveal="left">
+                <Terminal
+                    prefix="Claude Code"
+                    commands={[
+                        "Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal"
+                    ]}
+                />
+            </div>
         </div>
 
         <div class="ase-grid-split">
-            <div class="lg:order-1 relative isolate">
+            <div class="lg:order-1 relative isolate" data-reveal="right">
                 <p class="ase-eyebrow">Plan Mode</p>
                 <h3 class="ase-h3">Simple Planning</h3>
                 <p class="mt-4 text-foreground-secondary ase-justify">
@@ -72,7 +73,7 @@ import Annotation  from "./Annotation.astro"
                     medium-complex tasks under ad-hoc planning.
                 </p>
             </div>
-            <div class="lg:order-2 relative isolate">
+            <div class="lg:order-2 relative isolate" data-reveal="left">
                 <SectionGlow variant="text" side="right"/>
                 <Terminal
                     prefix="Claude Code"
@@ -88,7 +89,7 @@ import Annotation  from "./Annotation.astro"
         </div>
 
         <div class="ase-grid-split">
-            <div class="lg:order-1 relative isolate">
+            <div class="lg:order-1 relative isolate" data-reveal="right">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Task Mode #1</p>
                 <h3 class="ase-h3">Advanced Planning</h3>
@@ -102,21 +103,22 @@ import Annotation  from "./Annotation.astro"
                     planning.
                 </p>
             </div>
-            <Terminal
-                class="lg:order-2 relative isolate"
-                prefix="Claude Code"
-                commands={[
-                    "**/ase-task-edit** Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
-                    "Change output color to blue",
-                    "Use NPM package \"chalk\" for coloring",
-                    "**IMPLEMENT**",
-                    "**DELETE**"
-                ]}
-            />
+            <div class="lg:order-2 relative isolate" data-reveal="left">
+                <Terminal
+                    prefix="Claude Code"
+                    commands={[
+                        "**/ase-task-edit** Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
+                        "Change output color to blue",
+                        "Use NPM package \"chalk\" for coloring",
+                        "**IMPLEMENT**",
+                        "**DELETE**"
+                    ]}
+                />
+            </div>
         </div>
 
         <div class="ase-grid-split">
-            <div class="lg:order-1 relative isolate">
+            <div class="lg:order-1 relative isolate" data-reveal="right">
                 <p class="ase-eyebrow">Task Mode #2</p>
                 <h3 class="ase-h3">Professional Planning</h3>
                 <p class="mt-4 text-foreground-secondary ase-justify">
@@ -128,7 +130,7 @@ import Annotation  from "./Annotation.astro"
                     extra "thinking before acting" is desired.
                 </p>
             </div>
-            <div class="lg:order-2 relative isolate">
+            <div class="lg:order-2 relative isolate" data-reveal="left">
                 <SectionGlow variant="text" side="right"/>
                 <Terminal
                     prefix="Claude Code"
@@ -146,7 +148,7 @@ import Annotation  from "./Annotation.astro"
         </div>
 
         <div class="ase-grid-split">
-            <div class="lg:order-1 relative isolate">
+            <div class="lg:order-1 relative isolate" data-reveal="right">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Funnel Mode</p>
                 <h3 class="ase-h3">Expert Planning</h3>
@@ -160,24 +162,25 @@ import Annotation  from "./Annotation.astro"
                     planning where the solution approach is not obvious.
                 </p>
             </div>
-            <Terminal
-                class="lg:order-2 relative isolate"
-                prefix="Claude Code"
-                commands={[
-                    "**/ase-code-craft** Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
-                    "**A1**",
-                    "Change output color to blue",
-                    "Use NPM package \"chalk\" for coloring",
-                    "**GRILL**",
-                    "**PREFLIGHT**",
-                    "**IMPLEMENT**",
-                    "**DELETE**"
-                ]}
-            />
+            <div class="lg:order-2 relative isolate" data-reveal="left">
+                <Terminal
+                    prefix="Claude Code"
+                    commands={[
+                        "**/ase-code-craft** Create \"hello\" CLI command which prints \"Hello World\" in red to the terminal",
+                        "**A1**",
+                        "Change output color to blue",
+                        "Use NPM package \"chalk\" for coloring",
+                        "**GRILL**",
+                        "**PREFLIGHT**",
+                        "**IMPLEMENT**",
+                        "**DELETE**"
+                    ]}
+                />
+            </div>
         </div>
 
         <div class="ase-grid-split">
-            <div class="lg:order-1 relative isolate">
+            <div class="lg:order-1 relative isolate" data-reveal="right">
                 <p class="ase-eyebrow">Quick Mode</p>
                 <h3 class="ase-h3">Quick &amp; Dirty</h3>
                 <p class="mt-4 text-foreground-secondary ase-justify">
@@ -192,7 +195,7 @@ import Annotation  from "./Annotation.astro"
                     the previous state is acceptable.
                 </p>
             </div>
-            <div class="lg:order-2 relative isolate">
+            <div class="lg:order-2 relative isolate" data-reveal="left">
                 <SectionGlow variant="text" side="right"/>
                 <Terminal
                     prefix="Claude Code"
@@ -204,7 +207,7 @@ import Annotation  from "./Annotation.astro"
         </div>
 
         <div class="ase-grid-split">
-            <div class="lg:order-1 relative isolate">
+            <div class="lg:order-1 relative isolate" data-reveal="right">
                 <SectionGlow variant="text" side="left"/>
                 <p class="ase-eyebrow">Reconciliation Mode</p>
                 <h3 class="ase-h3">Artifact Reconciliation</h3>
@@ -219,13 +222,14 @@ import Annotation  from "./Annotation.astro"
                     drive the development.
                 </p>
             </div>
-            <Terminal
-                class="lg:order-2 relative isolate"
-                prefix="Claude Code"
-                commands={[
-                    "**/ase-sync-reconcile** --source SPEC,ARCH --target CODE,DOCS"
-                ]}
-            />
+            <div class="lg:order-2 relative isolate" data-reveal="left">
+                <Terminal
+                    prefix="Claude Code"
+                    commands={[
+                        "**/ase-sync-reconcile** --source SPEC,ARCH --target CODE,DOCS"
+                    ]}
+                />
+            </div>
         </div>
     </div>
 </section>

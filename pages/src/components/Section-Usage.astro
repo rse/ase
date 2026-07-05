@@ -30,9 +30,9 @@ import { skillGroups } from "../data/skills.ts"
         </p>
     </header>
 
-    <div class="mt-12 flex flex-col gap-12" data-reveal-children>
+    <div class="mt-12 flex flex-col gap-12">
         <div class="ase-grid-split">
-            <div class="relative isolate lg:order-1">
+            <div class="relative isolate lg:order-1" data-reveal="right">
                 <SectionGlow variant="text" side="left" />
                 <p class="ase-eyebrow">Agentic AI Levels</p>
                 <h3 class="ase-h3">From Manual To<br/>Fully Autonomous</h3>
@@ -83,7 +83,7 @@ import { skillGroups } from "../data/skills.ts"
                     skill doesn't matter as it is already out of scope.
                 </p>
             </div>
-            <div class="lg:order-2 relative">
+            <div class="lg:order-2 relative" data-reveal="left">
                 <Annotation flat class="hidden sm:block right-0 -translate-x-1/2">
                     ASE focuses on the<br/>
                     sweet spot of the<br/>
@@ -94,9 +94,9 @@ import { skillGroups } from "../data/skills.ts"
         </div>
     </div>
 
-    <div class="mt-12 flex flex-col gap-12" data-reveal-children>
+    <div class="mt-12 flex flex-col gap-12">
         <div class="ase-grid-split">
-            <div class="relative isolate lg:order-2">
+            <div class="relative isolate lg:order-2" data-reveal="left">
                 <SectionGlow variant="text" side="right" />
                 <p class="ase-eyebrow">Skills &amp; Workflows</p>
                 <h3 class="ase-h3">Step-Wise Driving,<br/>You In The Loop</h3>
@@ -115,10 +115,12 @@ import { skillGroups } from "../data/skills.ts"
                     in an in-page popup or run <b><code>/ase-xxx-xxx --help</code></b> at run-time.
                 </p>
             </div>
-            <Diagram class="lg:order-1" src="/assets/workflow.svg" label="ASE usage workflow diagram" />
+            <div class="lg:order-1" data-reveal="right">
+                <Diagram src="/assets/workflow.svg" label="ASE usage workflow diagram" />
+            </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8">
+        <div class="overflow-hidden rounded-xl border border-border-strong p-6 shadow-xl sm:p-8" data-reveal>
             <div class="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-5">
                 {skillGroups.map((group) => {
                     /*  split a group label like "Standalone Mode 1/2" around
@@ -147,7 +149,7 @@ import { skillGroups } from "../data/skills.ts"
         </div>
 
         <div class="ase-grid-split">
-            <div class="relative isolate lg:order-1">
+            <div class="relative isolate lg:order-1" data-reveal="right">
                 <SectionGlow variant="text" side="left" />
                 <p class="ase-eyebrow">Operation Modes</p>
                 <h3 class="ase-h3">Advanced Workflows, Maximum Flexibility</h3>
@@ -187,7 +189,7 @@ import { skillGroups } from "../data/skills.ts"
                     </p>
                 </div>
             </div>
-            <div class="lg:order-2 relative">
+            <div class="lg:order-2 relative" data-reveal="left">
                 <Annotation flat class="hidden sm:block right-0 -translate-x-1/2">
                     Get 3 new powerful<br/>
                     operation modes in<br/>

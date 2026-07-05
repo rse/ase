@@ -22,6 +22,15 @@ interface Props {
 const { usp, index } = Astro.props
 const reversed       = index % 2 === 1
 
+/*  reveal each column from its own outer screen edge so the two halves
+    converge toward the row center. The `data-reveal` value naming is
+    inverted vs. intuition ("left" starts off-screen to the right), so the
+    visually-left column uses "right" and the visually-right column uses
+    "left". On reversed (zig-zag) rows the video sits left and the text
+    right, so the directions swap with `reversed`.  */
+const textReveal  = reversed ? "left"  : "right"
+const videoReveal = reversed ? "right" : "left"
+
 /*  wrap the showcased skill's leading `/ase-xxx-xxx` command keyword in the
     Terminal component's `**...**` highlight markers, so it is tinted in the
     brand accent while the arguments stay in the foreground.  */
@@ -31,7 +40,7 @@ const skillCmd = spaceIdx === -1 ?
     `**${usp.skill.slice(0, spaceIdx)}**${usp.skill.slice(spaceIdx)}`
 ---
 <div class="ase-grid-split">
-    <div class={`relative isolate ${reversed ? "lg:order-2" : "lg:order-1"}`}>
+    <div class={`relative isolate ${reversed ? "lg:order-2" : "lg:order-1"}`} data-reveal={textReveal}>
         {/* blue radial glow behind the text block, bleeding off the viewport
             on the text's side of the row (left on normal rows, right on the
             reversed/zig-zag rows). */}
@@ -46,7 +55,7 @@ const skillCmd = spaceIdx === -1 ?
         <p class="mt-4 text-foreground-secondary ase-justify" set:html={usp.body}></p>
         <Terminal class="mt-5" prefix="Claude Code" commands={[ skillCmd ]}/>
     </div>
-    <div class={reversed ? "lg:order-1" : "lg:order-2"}>
+    <div class={reversed ? "lg:order-1" : "lg:order-2"} data-reveal={videoReveal}>
         <VideoEmbed name={usp.video} label={usp.title}/>
     </div>
 </div>
