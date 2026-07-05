@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+0.9.38 (2026-07-05)
+-------------------
+
+- FEATURE [code, docs, infr]: add `ase setup statusline activate|deactivate` commands (`ase-setup.ts`, `Section-Setup.astro`, `package.json`)
+- BUGFIX [code]: harden custom-dialog rendering against wrong glyph/padding output (`ase-dialog.md`, `ase-skill.md`)
+
 0.9.37 (2026-07-04)
 -------------------
 
