@@ -76,7 +76,7 @@ const inline = (text: string) => text
             <tbody>
                 {comparison.map((row) => (
                     <tr class="border-b border-border-strong last:border-0">
-                        <td class="py-1 pr-1 align-top font-bold text-accent     sm:pr-2">{row.topic}</td>
+                        <td class="py-1 pr-1 align-top font-bold text-accent     sm:pr-2" set:html={inline(row.topic)} />
                         <td class="py-1 px-1 align-top text-foreground-muted     sm:px-2" set:html={inline(row.manually)} />
                         <td class="py-1 px-1 align-top text-foreground-secondary sm:px-2" set:html={inline(row.native)} />
                         <td class="py-1 pl-1 align-top text-foreground           sm:pl-2" set:html={inline(row.ase)} />

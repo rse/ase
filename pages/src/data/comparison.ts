@@ -13,7 +13,7 @@ export type Comparison = {
 
 export const comparison: Comparison[] = [
     {
-        topic:    "Researching Topic",
+        topic:    "Researching<br/>Topic",
         manually: "Hop between **Google**, **Wikipedia**, and **ChatGPT**, " +
                   "stitching the answers together yourself.",
         native:   "Fire the agent's `WebSearch` tool or lean on the LLM's " +
@@ -22,7 +22,7 @@ export const comparison: Comparison[] = [
                   "engines and AI services at once, auto-distilled into one consensus answer."
     },
     {
-        topic:    "Finding Technology Stack Components",
+        topic:    "Finding<br/>Components",
         manually: "Search the Web, tally NPM downloads and GitHub stars by hand, " +
                   "then go with your gut.",
         native:   "Let the agent search, gather, and guess through " +
@@ -31,7 +31,7 @@ export const comparison: Comparison[] = [
                   "via a strict, multi-criteria process."
     },
     {
-        topic:    "Evaluating Alternatives",
+        topic:    "Evaluating<br/>Alternatives",
         manually: "Open a dozen tabs, skim READMEs, and settle " +
                   "\"which is best?\" on gut and recency bias.",
         native:   "Ask the agent and get a confident single-shot pick " +
@@ -40,7 +40,7 @@ export const comparison: Comparison[] = [
                   "`/ase-meta-steelman`, turning a fuzzy question into a defensible verdict."
     },
     {
-        topic:    "Analyzing Problems",
+        topic:    "Analyzing<br/>Problems",
         manually: "Browse the code and bisect with `console.log` " +
                   "until the bug surfaces.",
         native:   "Hand the agent your error messages and let it " +
@@ -49,7 +49,7 @@ export const comparison: Comparison[] = [
                   "plan a task, and resolve it end-to-end."
     },
     {
-        topic:    "Crafting Code",
+        topic:    "Crafting<br/>Code",
         manually: "Hand-edit every aspect of the new feature " +
                   "and hope it's right first time.",
         native:   "Tell the agent to \"craft this\" and get a plausible but " +
@@ -58,7 +58,7 @@ export const comparison: Comparison[] = [
                   "where the agent grills you to kill underspecified corners."
     },
     {
-        topic:    "Refactoring Code",
+        topic:    "Refactoring<br/>Code",
         manually: "Hand-edit each call site, hope the tests catch the rest, " +
                   "and hold the whole blast radius in your head.",
         native:   "Tell the agent to \"refactor this\" and get a plausible but " +
@@ -67,7 +67,7 @@ export const comparison: Comparison[] = [
                   "guided by refactoring tenets and an optional preflight you approve first."
     },
     {
-        topic:    "Spec-Driven Development",
+        topic:    "Spec-Driven<br/>Development",
         manually: "**Up-front** write a **monolithic** spec in Word, then **manually** " +
                   "derive and implement User-Stories from the Backlog.",
         native:   "**Iteratively** write a **modular** spec in **ad-hoc** Markdown, " +
