@@ -101,126 +101,126 @@ import Annotation  from "./Annotation.astro"
     </div>
 
     <div class="relative isolate">
-    <SectionGlow variant="section" side="right" />
-    <header class="mt-12 ase-section-head" data-reveal>
-        <h2 class="text-1xl font-bold sm:text-2xl">
-            Power-Up with <span class="text-accent">Custom Statusline</span>
-        </h2>
-    </header>
+        <SectionGlow variant="section" side="right" />
+        <header class="mt-12 ase-section-head" data-reveal>
+            <h2 class="text-1xl font-bold sm:text-2xl">
+                Power-Up with <span class="text-accent">Custom Statusline</span>
+            </h2>
+        </header>
 
-    <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start">
-        <div class="mt-6 ase-section-head" data-reveal="right">
-            <p class="text-foreground-secondary ase-justify">
-                <b>ASE</b> can <i>optionally</i> configure a rich, information-dense
-                statusline for the <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>{" "}
-                (or with reduced support the alternative <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>),
-                rendered by the built-in <code>ase statusline</code> command.
-            </p>
-            <p class="text-foreground-secondary ase-indent-p ase-justify">
-                It surfaces
-                your current user, project, task, and session, the active model, effort,
-                and thinking state, the persona, and a live context-window gauge, all
-                colorized and width-aware. <b>ASE</b> will just add the corresponding{" "}
-                <code>statusLine</code> entry to the tool's <code>settings.json</code>,
-                leaving any of your other settings untouched.
-            </p>
-            <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
-                <b class="text-accent">NOTICE:</b>
-                <span class="mt-1 block text-foreground-secondary">
-                The custom statusline is <b>NOT</b> required
-                for <b>ASE</b> to work. It is fully
-                optional when using <b>ASE</b>, but will
-                power up your Agentic AI Coding session with
-                an at-a-glance overview of the current context.
-                An existing, hand-crafted <code>statusLine</code> is always
-                preserved. The statusline is supported
-                for <code>--tool claude</code> and <code>--tool copilot</code>,
-                but not for <code>--tool codex</code>.
-                </span>
-            </blockquote>
-            <p class="mt-4 text-foreground-secondary ase-justify">
-                The <code class="text-brand-400!">&lt;format&gt;</code> template lines support the
-                following <code>%x</code> expansion constructs, plus
-                arbitrary <code>&lt;<span class="text-brand-400!">color</span>
-                &gt;...&lt;/<span class="text-brand-400!">color</span>&gt;</code> markup
-                (<code class="text-brand-400!">color</code> being one of <code>black</code>, <code>red</code>,{" "}
-                <code>green</code>, <code>yellow</code>, <code>blue</code>,{" "}
-                <code>magenta</code>, <code>cyan</code>, <code>white</code>, or{" "}
-                <code>default</code>).
-                When no <code class="text-brand-400!">&lt;format&gt;</code> arguments are given, <b>ASE</b> uses
-                the following implicit positional arguments: <code>"&lt;blue&gt;%u&lt;/blue&gt; &lt;red&gt;%p&lt;/red&gt; &lt;black&gt;%T&lt;/black&gt; %s"
-                "%m %e %t" "%P %c"</code>
-            </p>
-        </div>
-
-        <div class="relative mt-6">
-            <div data-reveal="left">
-                <Terminal
-                    class="mx-auto mt-8 lg:mt-0 max-w-2xl"
-                    copy={true}
-                    title="Statusline Installation"
-                    commands={[
-                        "**ase** setup statusline activate\n" +
-                        "**[**--tool claude**|**copilot**|**codex**]\n" +
-                        "[**--scope user**|**project**|**local**]**\n" +
-                        "**[**--width **<n>****] [**--margin **<n>****]\n" +
-                        "[**--no-icons**] [**--no-labels**]**\n" +
-                        "**[****<format> ...****]**"
-                    ]}
-                />
+        <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-start">
+            <div class="mt-6 ase-section-head" data-reveal="right">
+                <p class="text-foreground-secondary ase-justify">
+                    <b>ASE</b> can <i>optionally</i> configure a rich, information-dense
+                    statusline for the <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>{" "}
+                    (or with reduced support the alternative <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>),
+                    rendered by the built-in <code>ase statusline</code> command.
+                </p>
+                <p class="text-foreground-secondary ase-indent-p ase-justify">
+                    It surfaces
+                    your current user, project, task, and session, the active model, effort,
+                    and thinking state, the persona, and a live context-window gauge, all
+                    colorized and width-aware. <b>ASE</b> will just add the corresponding{" "}
+                    <code>statusLine</code> entry to the tool's <code>settings.json</code>,
+                    leaving any of your other settings untouched.
+                </p>
+                <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
+                    <b class="text-accent">NOTICE:</b>
+                    <span class="mt-1 block text-foreground-secondary">
+                        The custom statusline is <b>NOT</b> required
+                        for <b>ASE</b> to work. It is fully
+                        optional when using <b>ASE</b>, but will
+                        power up your Agentic AI Coding session with
+                        an at-a-glance overview of the current context.
+                        An existing, hand-crafted <code>statusLine</code> is always
+                        preserved. The statusline is supported
+                        for <code>--tool claude</code> and <code>--tool copilot</code>,
+                        but not for <code>--tool codex</code>.
+                    </span>
+                </blockquote>
+                <p class="mt-4 text-foreground-secondary ase-justify">
+                    The <code class="text-brand-400!">&lt;format&gt;</code> template lines support the
+                    following <code>%x</code> expansion constructs, plus
+                    arbitrary <code>&lt;<span class="text-brand-400!">color</span>
+                    &gt;...&lt;/<span class="text-brand-400!">color</span>&gt;</code> markup
+                    (<code class="text-brand-400!">color</code> being one of <code>black</code>, <code>red</code>,{" "}
+                    <code>green</code>, <code>yellow</code>, <code>blue</code>,{" "}
+                    <code>magenta</code>, <code>cyan</code>, <code>white</code>, or{" "}
+                    <code>default</code>).
+                    When no <code class="text-brand-400!">&lt;format&gt;</code> arguments are given, <b>ASE</b> uses
+                    the following implicit positional arguments: <code>"&lt;blue&gt;%u&lt;/blue&gt; &lt;red&gt;%p&lt;/red&gt; &lt;black&gt;%T&lt;/black&gt; %s"
+                    "%m %e %t" "%P %c"</code>
+                </p>
             </div>
 
-            <div data-reveal="left">
-                <Terminal
-                    class="mx-auto mt-8 max-w-2xl"
-                    copy={true}
-                    title="Statusline Uninstallation"
-                    commands={[
-                        "**ase** setup statusline deactivate\n" +
-                        "**[**--tool claude**|**copilot**|**codex**]\n" +
-                        "[**--scope user**|**project**|**local**]**"
-                    ]}
-                />
-            </div>
+            <div class="relative mt-6">
+                <div data-reveal="left">
+                    <Terminal
+                        class="mx-auto mt-8 lg:mt-0 max-w-2xl"
+                        copy={true}
+                        title="Statusline Installation"
+                        commands={[
+                            "**ase** setup statusline activate\n" +
+                            "**[**--tool claude**|**copilot**|**codex**]\n" +
+                            "[**--scope user**|**project**|**local**]**\n" +
+                            "**[**--width **<n>****] [**--margin **<n>****]\n" +
+                            "[**--no-icons**] [**--no-labels**]**\n" +
+                            "**[****<format> ...****]**"
+                        ]}
+                    />
+                </div>
 
-            <div class="mt-8 overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal="left">
-                <table class="w-full text-left text-xs sm:text-sm">
-                    <thead>
-                        <tr class="border-b border-border text-accent">
-                            <th class="pb-2 pr-1 font-semibold sm:pr-3"></th>
-                            <th class="pb-2 px-1 font-semibold sm:px-3">Meaning</th>
-                            <th class="pb-2 px-1 font-semibold sm:px-3"></th>
-                            <th class="pb-2 pl-1 font-semibold sm:pl-3">Meaning</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {[
-                            [ [ "%u", "User name" ],           [ "%S", "Session usage" ] ],
-                            [ [ "%p", "Project name" ],        [ "%D", "Session resets" ] ],
-                            [ [ "%T", "Task id" ],             [ "%W", "Weekly usage" ] ],
-                            [ [ "%s", "Session id" ],          [ "%Q", "Weekly resets" ] ],
-                            [ [ "%m", "Model name" ],          [ "%H", "Elapsed time" ] ],
-                            [ [ "%e", "Effort level" ],        [ "%X", "Session cost" ] ],
-                            [ [ "%t", "Thinking state" ],      [ "%a", "Lines added" ] ],
-                            [ [ "%O", "Output style" ],        [ "%r", "Lines removed" ] ],
-                            [ [ "%P", "Persona style" ],       [ "%b", "Git branch" ] ],
-                            [ [ "%c", "Context gauge" ],       [ "%g", "Git changes" ] ],
-                            [ [ "%C", "Token count" ],         [ "%G", "Untracked files" ] ],
-                            [ [ "%M", "Memory usage" ],        [ "%d", "Working directory" ] ],
-                            [ [ "%V", "Tool versions" ],       [ "", "" ] ]
-                        ].map(([ left, right ]) => (
-                            <tr class="border-b border-border/40 last:border-0">
-                                <td class="py-0 pr-1 align-top font-bold text-accent leading-tight sm:pr-3">{left[0] !== "" && <code>{left[0]}</code>}</td>
-                                <td class="py-0 px-1 align-top text-foreground-secondary leading-tight sm:px-3">{left[1]}</td>
-                                <td class="py-0 px-1 align-top font-bold text-accent leading-tight sm:px-3">{right[0] !== "" && <code>{right[0]}</code>}</td>
-                                <td class="py-0 pl-1 align-top text-foreground-secondary leading-tight sm:pl-3">{right[1]}</td>
+                <div data-reveal="left">
+                    <Terminal
+                        class="mx-auto mt-8 max-w-2xl"
+                        copy={true}
+                        title="Statusline Uninstallation"
+                        commands={[
+                            "**ase** setup statusline deactivate\n" +
+                            "**[**--tool claude**|**copilot**|**codex**]\n" +
+                            "[**--scope user**|**project**|**local**]**"
+                        ]}
+                    />
+                </div>
+
+                <div class="mt-8 overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal="left">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead>
+                            <tr class="border-b border-border text-accent">
+                                <th class="pb-2 pr-1 font-semibold sm:pr-3"></th>
+                                <th class="pb-2 px-1 font-semibold sm:px-3">Meaning</th>
+                                <th class="pb-2 px-1 font-semibold sm:px-3"></th>
+                                <th class="pb-2 pl-1 font-semibold sm:pl-3">Meaning</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {[
+                                [ [ "%u", "User name" ],           [ "%S", "Session usage" ] ],
+                                [ [ "%p", "Project name" ],        [ "%D", "Session resets" ] ],
+                                [ [ "%T", "Task id" ],             [ "%W", "Weekly usage" ] ],
+                                [ [ "%s", "Session id" ],          [ "%Q", "Weekly resets" ] ],
+                                [ [ "%m", "Model name" ],          [ "%H", "Elapsed time" ] ],
+                                [ [ "%e", "Effort level" ],        [ "%X", "Session cost" ] ],
+                                [ [ "%t", "Thinking state" ],      [ "%a", "Lines added" ] ],
+                                [ [ "%O", "Output style" ],        [ "%r", "Lines removed" ] ],
+                                [ [ "%P", "Persona style" ],       [ "%b", "Git branch" ] ],
+                                [ [ "%c", "Context gauge" ],       [ "%g", "Git changes" ] ],
+                                [ [ "%C", "Token count" ],         [ "%G", "Untracked files" ] ],
+                                [ [ "%M", "Memory usage" ],        [ "%d", "Working directory" ] ],
+                                [ [ "%V", "Tool versions" ],       [ "", "" ] ]
+                            ].map(([ left, right ]) => (
+                                <tr class="border-b border-border/40 last:border-0">
+                                    <td class="py-0 pr-1 align-top font-bold text-accent leading-tight sm:pr-3">{left[0] !== "" && <code>{left[0]}</code>}</td>
+                                    <td class="py-0 px-1 align-top text-foreground-secondary leading-tight sm:px-3">{left[1]}</td>
+                                    <td class="py-0 px-1 align-top font-bold text-accent leading-tight sm:px-3">{right[0] !== "" && <code>{right[0]}</code>}</td>
+                                    <td class="py-0 pl-1 align-top text-foreground-secondary leading-tight sm:pl-3">{right[1]}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
     <header class="mt-8 ase-section-head" data-reveal>
@@ -248,13 +248,13 @@ import Annotation  from "./Annotation.astro"
             <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
                 <b class="text-accent">NOTICE:</b>
                 <span class="mt-1 block text-foreground-secondary">
-                These add-on MCP servers are <b>NOT</b> required
-                for <b>ASE</b> to work. They are fully
-                optional when using <b>ASE</b>, but will
-                power up some of the <b>ASE</b> skills (like{" "}
-                <code>ase-meta-chat</code>, <code>ase-meta-search</code>,
-                and <code>ase-meta-quorum</code>) with additional
-                functionality.
+                    These add-on MCP servers are <b>NOT</b> required
+                    for <b>ASE</b> to work. They are fully
+                    optional when using <b>ASE</b>, but will
+                    power up some of the <b>ASE</b> skills (like{" "}
+                    <code>ase-meta-chat</code>, <code>ase-meta-search</code>,
+                    and <code>ase-meta-quorum</code>) with additional
+                    functionality.
                 </span>
             </blockquote>
         </div>
