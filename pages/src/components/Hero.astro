@@ -45,8 +45,16 @@ const quotes = [
 
     <div class="mx-auto flex min-h-[88vh] max-w-4xl flex-col items-center justify-center px-6 pt-[6rem] pb-20 text-center">
         <div class="hero-stagger flex flex-col items-center">
-            {/* ASE logo (inlined component, so its two fills can be themed) */}
-            <LogoASE class="mb-4 h-auto w-32 sm:w-40" idPrefix="ase-hero-logo" />
+            {/*  ASE logo and annotation  */}
+            <div class="relative">
+                <span
+                    class="pointer-events-none absolute text-left right-full top-0 mr-8 hidden w-56 -rotate-2 leading-[1.10] text-brand-400 lg:block"
+                    style="font-family: 'TypoPRO Kalam', cursive; font-size: 22px; letter-spacing: -0.03em;">
+                    From a founder of the<br/>
+                    Apache Software Foundation...
+                </span>
+                <LogoASE class="mb-4 h-auto w-32 sm:w-40" idPrefix="ase-hero-logo" />
+            </div>
 
             {/* title */}
             <h1 class="max-w-full text-4xl font-bold break-words sm:text-6xl md:text-7xl">
