@@ -54,6 +54,7 @@
         "pretty-ms":                        "9.3.0",
         "luxon":                            "3.7.2",
         "@modelcontextprotocol/sdk":        "1.29.0",
+        "json-asty":                        "1.3.2",
         "zod":                              "4.4.3",
         "which":                            "7.0.0",
         "update-notifier":                  "7.3.1",
@@ -64,6 +65,9 @@
         "pacote":                           "22.0.0",
         "ofetch":                           "1.5.1",
         "picomatch":                        "4.0.5"
+    },
+    "allowScripts": {
+         "es5-ext":                         true
     },
     "engines": {
         "npm":                              ">=10.0.0",

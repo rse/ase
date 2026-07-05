@@ -5,6 +5,7 @@
 */
 
 import fs                from "node:fs/promises"
+import os                from "node:os"
 import path              from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -14,6 +15,10 @@ import which             from "which"
 import * as dotenvx      from "@dotenvx/dotenvx"
 import Table             from "cli-table3"
 import chalk             from "chalk"
+import writeFileAtomic   from "write-file-atomic"
+import { mkdirp }        from "mkdirp"
+import JsonAsty          from "json-asty"
+import type { AstNode }  from "json-asty"
 
 import type Log          from "./ase-log.js"
 import Version           from "./ase-version.js"
@@ -662,6 +667,249 @@ export default class SetupCommand {
         }
     ]
 
+    /*  the default "ase statusline" format lines used when the user does
+        not override them with positional arguments to "activate"  */
+    private readonly statuslineFormatDflt = [
+        "<blue>%u</blue> <red>%p</red> <black>%T</black> %s",
+        "%m %e %t",
+        "%P %c"
+    ]
+
+    /*  resolve the tool settings file for a given installation scope  */
+    private statuslineSettingsFile (tool: Tool, scope: Scope): string {
+        if (tool === "copilot") {
+            const home = process.env.COPILOT_HOME ?? ""
+            const base = home !== "" ? home : path.join(os.homedir(), ".copilot")
+            return path.join(base, "settings.json")
+        }
+        else if (scope === "project")
+            return path.join(process.cwd(), ".claude", "settings.json")
+        else if (scope === "local")
+            return path.join(process.cwd(), ".claude", "settings.local.json")
+        else
+            return path.join(os.homedir(), ".claude", "settings.json")
+    }
+
+    /*  reject the statusline operation for tools without a scriptable
+        statusline mechanism (only the OpenAI Codex CLI lacks one)  */
+    private requireStatuslineTool (tool: Tool): void {
+        if (tool === "codex")
+            throw new Error("statusline configuration is not supported for --tool codex " +
+                `(the ${toolSpecs[tool].label} has no scriptable statusline mechanism)`)
+    }
+
+    /*  reject a non-default --scope for the GitHub Copilot CLI, which has a
+        single per-user settings file and thus no scope concept  */
+    private requireStatuslineScope (tool: Tool, scope: Scope): void {
+        if (tool === "copilot" && scope !== "user")
+            throw new Error("--scope is only supported for --tool claude " +
+                `(the ${toolSpecs[tool].label} has a single per-user settings file)`)
+    }
+
+    /*  build the "ase statusline ..." command string from the activate
+        options and the effective format lines  */
+    private statuslineCommand (opts: { width: number, margin: number, icons: boolean, labels: boolean }, format: string[]): string {
+        const parts = [ "ase", "statusline", "-w", String(opts.width), "-m", String(opts.margin) ]
+        if (!opts.icons)
+            parts.push("--no-icons")
+        if (!opts.labels)
+            parts.push("--no-labels")
+        const lines = format.length > 0 ? format : this.statuslineFormatDflt
+        for (const line of lines)
+            parts.push(`'${line.replace(/'/g, "'\\''")}'`)
+        return parts.join(" ")
+    }
+
+    /*  determine whether an existing "statusLine" value object is owned by us  */
+    private statuslineIsOwned (member: AstNode): boolean {
+        const obj = member.query("/ * [ pos() == 2 ]")[0]
+        if (obj === undefined)
+            return false
+        for (const m of obj.query("/ member")) {
+            const key = m.query("/ string [ pos() == 1 ]")[0]
+            if (key !== undefined && key.get("value") === "command") {
+                const val = m.query("/ string [ pos() == 2 ]")[0]
+                const cmd = val !== undefined ? String(val.get("value") ?? "") : ""
+                return cmd.startsWith("ase statusline")
+            }
+        }
+        return false
+    }
+
+    /*  locate the top-level "statusLine" member node within the root object  */
+    private statuslineFindMember (root: AstNode): AstNode | undefined {
+        for (const m of root.query("/ member")) {
+            const key = m.query("/ string [ pos() == 1 ]")[0]
+            if (key !== undefined && key.get("value") === "statusLine")
+                return m
+        }
+        return undefined
+    }
+
+    /*  build the "statusLine" member subtree natively inside the target
+        AST, reproducing the exact whitespace tokens json-asty emits for a
+        canonically 4-space-indented settings.json  */
+    private statuslineBuildMember (root: AstNode, command: string): AstNode {
+        const strMember = (key: string, val: string, epilog?: string): AstNode => {
+            const k = root.create("string").set({ body: JSON.stringify(key), value: key, epilog: ": " })
+            const v = root.create("string").set({ body: JSON.stringify(val), value: val })
+            const m = root.create("member")
+            if (epilog !== undefined)
+                m.set({ epilog })
+            return m.add(k, v)
+        }
+        const numMember = (key: string, val: number, epilog?: string): AstNode => {
+            const k = root.create("string").set({ body: JSON.stringify(key), value: key, epilog: ": " })
+            const v = root.create("number").set({ body: String(val), value: val })
+            const m = root.create("member")
+            if (epilog !== undefined)
+                m.set({ epilog })
+            return m.add(k, v)
+        }
+        const obj = root.create("object").set({ prolog: "{\n        ", epilog: "\n    }\n" })
+        obj.add(
+            strMember("type",    "command", ",\n        "),
+            strMember("command", command,   ",\n        "),
+            numMember("padding", 0)
+        )
+        const key = root.create("string").set({
+            body:  JSON.stringify("statusLine"),
+            value: "statusLine",
+            epilog: ": "
+        })
+        return root.create("member").add(key, obj)
+    }
+
+    /*  normalize the previous-last member so a following ",\n    " comma reads cleanly  */
+    private statuslineMakeNonLast (member: AstNode): void {
+        const val = member.query("/ * [ pos() == 2 ]")[0]
+        if (val !== undefined) {
+            const ep = val.get("epilog")
+            if (typeof ep === "string" && ep.endsWith("\n"))
+                val.set({ epilog: ep.replace(/\n$/, "") })
+        }
+        member.set({ epilog: ",\n    " })
+    }
+
+    /*  read a settings.json file into a JSON-ASTy AST  */
+    private async statuslineReadAst (file: string): Promise<AstNode> {
+        let text = ""
+        try {
+            text = await fs.readFile(file, "utf8")
+        }
+        catch {
+            /*  missing file: start from an empty object  */
+        }
+        if (text.trim() === "")
+            text = "{}"
+        return JsonAsty.parse(text)
+    }
+
+    /*  write a JSON-ASTy AST back to a settings.json file  */
+    private async statuslineWriteAst (file: string, root: AstNode): Promise<void> {
+        await mkdirp(path.dirname(file))
+        const text = JsonAsty.unparse(root)
+        writeFileAtomic.sync(file, text, { encoding: "utf8" })
+    }
+
+    /*  handler for "ase setup statusline activate"  */
+    private async doStatuslineActivate (tool: Tool, scope: Scope,
+        opts: { width: number, margin: number, icons: boolean, labels: boolean }, format: string[]): Promise<number> {
+        this.requireStatuslineTool(tool)
+        this.requireStatuslineScope(tool, scope)
+        const file    = this.statuslineSettingsFile(tool, scope)
+        const command = this.statuslineCommand(opts, format)
+        const root    = await this.statuslineReadAst(file)
+
+        const existing = this.statuslineFindMember(root)
+        if (existing !== undefined) {
+            /*  preserve a foreign, hand-crafted statusLine: skip and warn  */
+            if (!this.statuslineIsOwned(existing)) {
+                this.log.write("warning", "setup: statusline: activate: a non-ASE \"statusLine\" " +
+                    `is already present in ${file}: preserving it (skipped)`)
+                return 0
+            }
+            /*  replace the value object in place, preserving its epilog  */
+            const valNew = this.statuslineBuildMember(root, command).query("/ object")[0]!
+            const valOld = existing.query("/ * [ pos() == 2 ]")[0]!
+            valNew.set({ epilog: valOld.get("epilog") })
+            existing.del(valOld).add(valNew)
+            this.log.write("info", `setup: statusline: activate: updating ASE "statusLine" in ${file}`)
+        }
+        else {
+            /*  insert a fresh statusLine member  */
+            const members = root.query("/ member")
+            const member  = this.statuslineBuildMember(root, command)
+            if (members.length === 0) {
+                root.set({ prolog: "{\n    ", epilog: "}\n" })
+                root.add(member)
+            }
+            else {
+                root.set({ epilog: "}\n" })
+                this.statuslineMakeNonLast(members[members.length - 1]!)
+                root.add(member)
+            }
+            this.log.write("info", `setup: statusline: activate: adding ASE "statusLine" to ${file}`)
+        }
+        await this.statuslineWriteAst(file, root)
+        return 0
+    }
+
+    /*  handler for "ase setup statusline deactivate"  */
+    private async doStatuslineDeactivate (tool: Tool, scope: Scope): Promise<number> {
+        this.requireStatuslineTool(tool)
+        this.requireStatuslineScope(tool, scope)
+        const file = this.statuslineSettingsFile(tool, scope)
+
+        /*  a missing settings file means nothing to remove  */
+        try {
+            await fs.access(file)
+        }
+        catch {
+            this.log.write("info", `setup: statusline: deactivate: no settings file ${file} (skipped)`)
+            return 0
+        }
+
+        /*  read file  */
+        const root   = await this.statuslineReadAst(file)
+        const target = this.statuslineFindMember(root)
+        if (target === undefined) {
+            this.log.write("info", `setup: statusline: deactivate: no "statusLine" in ${file} (skipped)`)
+            return 0
+        }
+
+        /*  preserve a foreign, hand-crafted statusLine: skip and warn  */
+        if (!this.statuslineIsOwned(target)) {
+            this.log.write("warning", "setup: statusline: deactivate: a non-ASE \"statusLine\" " +
+                `is present in ${file}: preserving it (skipped)`)
+            return 0
+        }
+
+        /*  remove the member and repair the whitespace at the seam  */
+        const members = root.query("/ member")
+        const wasLast = members[members.length - 1] === target
+        root.del(target)
+        if (wasLast) {
+            if (members.length > 1) {
+                /*  promote the new last member: strip its comma epilog and
+                    restore the pre-"}" newline into the root epilog when the
+                    new-last value is a scalar (a container value carries the
+                    newline in its own epilog already)  */
+                const newLast = members[members.length - 2]!
+                newLast.set({ epilog: undefined })
+                const val = newLast.query("/ * [ pos() == 2 ]")[0]
+                const ep  = val !== undefined ? val.get("epilog") : undefined
+                if (!(typeof ep === "string" && ep.endsWith("\n")))
+                    root.set({ epilog: "\n}\n" })
+            }
+            else
+                root.set({ epilog: "}\n" })
+        }
+        await this.statuslineWriteAst(file, root)
+        this.log.write("info", `setup: statusline: deactivate: removing ASE "statusLine" from ${file}`)
+        return 0
+    }
+
     /*  parse and validate the --tool option  */
     private parseTool (value: string): Tool {
         if (value !== "claude" && value !== "copilot" && value !== "codex")
@@ -791,6 +1039,53 @@ export default class SetupCommand {
             .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
             .action(async (servers: string | undefined, opts: { tool: string, scope: string }) => {
                 process.exit(await this.doMcp("deactivate", this.parseTool(opts.tool), servers ?? "all", this.parseScope(opts.scope)))
+            })
+
+        /*  parser for the non-negative integer "ase setup statusline" options  */
+        const parseNonNeg = (name: string) => (value: string): number => {
+            const n = Number.parseInt(value, 10)
+            if (!Number.isFinite(n) || n < 0)
+                throw new Error(`invalid --${name} value: "${value}" (expected a non-negative integer)`)
+            return n
+        }
+
+        /*  register CLI sub-command "ase setup statusline"  */
+        const statuslineCmd = setupCmd
+            .command("statusline")
+            .description("activate or deactivate the ASE statusline for a tool")
+            .action(() => {
+                statuslineCmd.outputHelp()
+                process.exit(1)
+            })
+
+        /*  register CLI sub-command "ase setup statusline activate"  */
+        statuslineCmd
+            .command("activate [format...]")
+            .description("activate the ASE statusline (optionally with custom format lines)")
+            .option("-t, --tool <tool>",   "target tool (\"claude\" or \"copilot\"; \"codex\" is unsupported)", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .option("-w, --width <n>",     "force terminal width to <n> characters (0 = auto-detect via /dev/tty)",
+                parseNonNeg("width"), 0)
+            .option("-m, --margin <n>",    "reduce maximum used terminal width by <n> characters on each side",
+                parseNonNeg("margin"), 2)
+            .option("--no-icons",          "disable icons in placeholder rendering")
+            .option("--no-labels",         "disable labels in front of bold values")
+            .action(async (format: string[] | undefined,
+                opts: { tool: string, scope: string, width: number, margin: number, icons: boolean, labels: boolean }) => {
+                process.exit(await this.doStatuslineActivate(
+                    this.parseTool(opts.tool), this.parseScope(opts.scope),
+                    { width: opts.width, margin: opts.margin, icons: opts.icons, labels: opts.labels },
+                    format ?? []))
+            })
+
+        /*  register CLI sub-command "ase setup statusline deactivate"  */
+        statuslineCmd
+            .command("deactivate")
+            .description("deactivate the ASE statusline")
+            .option("-t, --tool <tool>",   "target tool (\"claude\" or \"copilot\"; \"codex\" is unsupported)", toolDflt)
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .action(async (opts: { tool: string, scope: string }) => {
+                process.exit(await this.doStatuslineDeactivate(this.parseTool(opts.tool), this.parseScope(opts.scope)))
             })
     }
 }

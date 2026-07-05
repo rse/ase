@@ -89,6 +89,110 @@ import Annotation  from "./Annotation.astro"
 
     <header class="mt-12 ase-section-head" data-reveal>
         <h2 class="text-1xl font-bold sm:text-2xl">
+            Power-Up with <span class="text-accent">Custom Statusline</span>
+        </h2>
+        <p class="mt-4 text-foreground-secondary ase-justify">
+            <b>ASE</b> can <i>optionally</i> configure a rich, information-dense
+            statusline for the <a href="https://claude.com/products/claude-code">Anthropic Claude Code CLI</a>{" "}
+            (or with reduced support the alternative <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>),
+            rendered by the built-in <code>ase statusline</code> command. It surfaces
+            your current user, project, task, and session, the active model, effort,
+            and thinking state, the persona, and a live context-window gauge, all
+            colorized and width-aware. <b>ASE</b> will just add the corresponding{" "}
+            <code>statusLine</code> entry to the tool's <code>settings.json</code>,
+            leaving any of your other settings untouched.
+        </p>
+        <blockquote class="mt-4 border-l-4 border-accent bg-background-elevated/40 px-6 py-0 text-foreground-secondary ase-justify">
+            <b class="text-accent">NOTICE:</b>
+            <span class="mt-1 block text-foreground-secondary">
+            The custom statusline is <b>NOT</b> required
+            for <b>ASE</b> to work. It is fully
+            optional when using <b>ASE</b>, but will
+            power up your Agentic AI Coding session with
+            an at-a-glance overview of the current context.
+            An existing, hand-crafted <code>statusLine</code> is always
+            preserved. The statusline is supported
+            for <code>--tool claude</code> and <code>--tool copilot</code>,
+            but not for <code>--tool codex</code>.
+            </span>
+        </blockquote>
+    </header>
+
+    <div data-reveal>
+        <Terminal
+            class="mx-auto mt-8 max-w-2xl"
+            copy={true}
+            title="Statusline Installation"
+            commands={[
+                "**ase** setup statusline activate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**\n**[**--width **<n>****] [**--margin **<n>****] [**--no-icons**] [**--no-labels**]**\n**[****<format> ...****]**"
+            ]}
+        />
+    </div>
+
+    <div data-reveal>
+        <Terminal
+            class="mx-auto mt-8 max-w-2xl"
+            copy={true}
+            title="Statusline Uninstallation"
+            commands={[
+                "**ase** setup statusline deactivate\n**[**--tool claude**|**copilot**|**codex**]\n[**--scope user**|**project**|**local**]**"
+            ]}
+        />
+    </div>
+
+    <p class="mx-auto mt-8 max-w-2xl text-foreground-secondary ase-justify" data-reveal>
+        The <code class="text-brand-400!">&lt;format&gt;</code> template lines support the
+        following <code>%x</code> expansion constructs, plus
+        arbitrary <code>&lt;<span class="text-brand-400!">color</span>
+        &gt;...&lt;/<span class="text-brand-400!">color</span>&gt;</code> markup
+        (<code class="text-brand-400!">color</code> being one of <code>black</code>, <code>red</code>,{" "}
+        <code>green</code>, <code>yellow</code>, <code>blue</code>,{" "}
+        <code>magenta</code>, <code>cyan</code>, <code>white</code>, or{" "}
+        <code>default</code>).
+        When no <code class="text-brand-400!">&lt;format&gt;</code> arguments are given, <b>ASE</b> uses
+        the following implicit positional arguments: <code>"&lt;blue&gt;%u&lt;/blue&gt; &lt;red&gt;%p&lt;/red&gt; &lt;black&gt;%T&lt;/black&gt; %s"
+        "%m %e %t" "%P %c"</code>
+    </p>
+
+    <div class="mx-auto mt-6 max-w-2xl overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal>
+        <table class="w-full text-left text-xs sm:text-sm">
+            <thead>
+                <tr class="border-b border-border text-foreground">
+                    <th class="pb-2 pr-1 font-semibold sm:pr-3">Construct</th>
+                    <th class="pb-2 px-1 font-semibold sm:px-3">Meaning</th>
+                    <th class="pb-2 px-1 font-semibold sm:px-3">Construct</th>
+                    <th class="pb-2 pl-1 font-semibold sm:pl-3">Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                {[
+                    [ [ "%u", "User name" ],           [ "%S", "Session usage" ] ],
+                    [ [ "%p", "Project name" ],        [ "%D", "Session resets" ] ],
+                    [ [ "%T", "Task id" ],             [ "%W", "Weekly usage" ] ],
+                    [ [ "%s", "Session id" ],          [ "%Q", "Weekly resets" ] ],
+                    [ [ "%m", "Model name" ],          [ "%H", "Elapsed time" ] ],
+                    [ [ "%e", "Effort level" ],        [ "%X", "Session cost" ] ],
+                    [ [ "%t", "Thinking state" ],      [ "%a", "Lines added" ] ],
+                    [ [ "%O", "Output style" ],        [ "%r", "Lines removed" ] ],
+                    [ [ "%P", "Persona style" ],       [ "%b", "Git branch" ] ],
+                    [ [ "%c", "Context gauge" ],       [ "%g", "Git changes" ] ],
+                    [ [ "%C", "Token count" ],         [ "%G", "Untracked files" ] ],
+                    [ [ "%M", "Memory usage" ],        [ "%d", "Working directory" ] ],
+                    [ [ "%V", "Tool versions" ],       [ "", "" ] ]
+                ].map(([ left, right ]) => (
+                    <tr class="border-b border-border/40 last:border-0">
+                        <td class="py-1.5 pr-1 align-top font-bold text-accent sm:py-0 sm:pr-3">{left[0] !== "" && <code>{left[0]}</code>}</td>
+                        <td class="py-1.5 px-1 align-top text-foreground-secondary sm:py-0 sm:px-3">{left[1]}</td>
+                        <td class="py-1.5 px-1 align-top font-bold text-accent sm:py-0 sm:px-3">{right[0] !== "" && <code>{right[0]}</code>}</td>
+                        <td class="py-1.5 pl-1 align-top text-foreground-secondary sm:py-0 sm:pl-3">{right[1]}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+
+    <header class="mt-12 ase-section-head" data-reveal>
+        <h2 class="text-1xl font-bold sm:text-2xl">
             Power-Up with <span class="text-accent">Foreign Services</span>
         </h2>
         <p class="mt-4 text-foreground-secondary ase-justify">
