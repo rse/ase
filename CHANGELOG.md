@@ -2,6 +2,16 @@
 ChangeLog
 =========
 
+0.9.39 (2026-07-05)
+-------------------
+
+- FEATURE [docs]: add old-school/AI-native/AI-advanced comparison table to website Highlights section (`Section-Highlights.astro`, `comparison.ts`)
+- FEATURE [docs]: add license reference to README (`README.md`)
+- IMPROVEMENT [docs]: refine Hero attention drawing and dim coloring (`Hero.astro`)
+- IMPROVEMENT [docs]: improve website Setup section rendering (`Section-Setup.astro`)
+- IMPROVEMENT [docs]: refine README line breaks and image ordering (`README.md`)
+- UPDATE [docs]: update banner image (`docs/ase-banner.png`)
+
 0.9.38 (2026-07-05)
 -------------------
 
