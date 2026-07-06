@@ -2,6 +2,17 @@
 ChangeLog
 =========
 
+0.9.40 (2026-07-06)
+-------------------
+
+- IMPROVEMENT [docs]: improve website Setup section rendering and right-side placement (`Section-Setup.astro`)
+- IMPROVEMENT [docs]: add more scroll-reveal content animations across website sections (`Section-*.astro`, `Video-Row.astro`)
+- IMPROVEMENT [docs]: refine Highlights comparison table for mobile readability, positioning, and richer markup (`Section-Highlights.astro`, `comparison.ts`)
+- IMPROVEMENT [docs]: credit further feedback contributors in website Author section (`Section-Author.astro`)
+- BUGFIX [docs]: fix HTML element indentation, section glows, and a typo across website sections (`Section-*.astro`)
+- CLEANUP [docs]: clean up Highlights comparison table markup (`Section-Highlights.astro`, `comparison.ts`)
+- CLEANUP [infr]: drop unneeded top-level `json-asty` dependency (`package.json`)
+
 0.9.39 (2026-07-05)
 -------------------
 
