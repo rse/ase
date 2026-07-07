@@ -18,8 +18,8 @@
     "devDependencies": {
         "eslint":                           "9.39.4",
         "@eslint/js":                       "9.39.4",
-        "@typescript-eslint/parser":        "8.62.1",
-        "@typescript-eslint/eslint-plugin": "8.62.1",
+        "@typescript-eslint/parser":        "8.63.0",
+        "@typescript-eslint/eslint-plugin": "8.63.0",
         "eslint-plugin-promise":            "7.3.0",
         "eslint-plugin-import":             "2.32.0",
         "neostandard":                      "0.13.0",
@@ -42,7 +42,7 @@
     },
     "dependencies": {
         "commander":                        "15.0.0",
-        "@dotenvx/dotenvx":                 "2.1.4",
+        "@dotenvx/dotenvx":                 "2.1.5",
         "yaml":                             "2.9.0",
         "valibot":                          "1.4.2",
         "execa":                            "9.6.1",
