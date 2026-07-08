@@ -25,8 +25,5 @@
     "scripts": {
         "postinstall":                      "npm start post-install",
         "start":                            "stx -v4 -l warning -c etc/stx.conf"
-    },
-    "allowScripts": {
-        "es5-ext@0.10.64":                  true
     }
 }
