@@ -19,6 +19,9 @@
         "shx":                              "0.4.0",
         "stdver":                           "0.9.16"
     },
+    "allowScripts": {
+        "es5-ext":                          false
+    },
     "engines": {
         "npm":                              ">=10.0.0",
         "node":                             ">=22.0.0"
