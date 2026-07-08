@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.43 (2026-07-09)
+-------------------
+
+- CLEANUP [infr]: upgrade dependencies to eliminate `es5-ext` transitively
+
 0.9.42 (2026-07-09)
 -------------------
 
