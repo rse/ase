@@ -302,14 +302,18 @@ uninstalling the *ASE* tool and its companion *Anthropic Claude Code CLI* plugin
   without uninstalling it.
 
   All of `install`, `update`, `uninstall`, `enable`, and `disable` also
-  accept \[`-s`|`--scope` `user`|`project`|`local`\] (default: `user`)
-  to select the plugin installation scope: `user` registers the plugin
-  globally for the current user, `project` registers it in the project
-  and is meant to be shared via version control, and `local` registers
-  it in the project but keeps it out of version control. `--scope` is
-  only supported for `--tool claude`; requesting a non-`user` scope for
-  `copilot` or `codex` fails with an error, since those agent tools have
-  no scope concept.
+  accept \[`-s`|`--scope` `user`|`project`|`local`\] to select the plugin
+  installation scope: `user` registers the plugin globally for the
+  current user, `project` registers it in the project and is meant to be
+  shared via version control, and `local` registers it in the project
+  but keeps it out of version control. For `install` the default is
+  `user`; for `update`, `uninstall`, `enable`, and `disable` the scope
+  is auto-detected from the existing installation (the strongest of
+  `local`, `project`, or `user` whose settings file registers the
+  plugin), falling back to `user` when no installation is found.
+  `--scope` is only supported for `--tool claude`; requesting a
+  non-`user` scope for `copilot` or `codex` fails with an error, since
+  those agent tools have no scope concept.
 
 - `ase setup mcp`:
   Entry point group for managing the pre-defined *foreign MCP servers*
