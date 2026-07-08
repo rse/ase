@@ -5,7 +5,7 @@ ChangeLog
 0.9.41 (2026-07-09)
 -------------------
 
-- UPDATE [infr, docs]: upgrade NPM dependencies for tool, plugin, and website (`package.json`)
+- UPDATE [infr]: upgrade NPM dependencies and add missing `json-asty` dependency (`package.json`)
 - CLEANUP [infr]: disable `es5-ext` install scripts (`package.json`)
 
 0.9.40 (2026-07-06)
