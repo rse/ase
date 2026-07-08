@@ -22,7 +22,7 @@
         "playwright":                             "1.61.1"
     },
     "dependencies": {
-        "astro":                                  "7.0.6",
+        "astro":                                  "7.0.7",
         "@astrojs/sitemap":                       "3.7.3",
         "@astro-community/astro-embed-youtube":   "0.5.10",
         "astro-robots-txt":                       "1.0.0",
