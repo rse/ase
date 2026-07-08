@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.42 (2026-07-09)
+-------------------
+
+- CLEANUP [infr]: disable `es5-ext` install scripts also at top-level
+
 0.9.41 (2026-07-09)
 -------------------
 
