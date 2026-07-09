@@ -41,8 +41,8 @@
         "start":                                  "stx -v4 -l warning -c etc/stx.conf"
     },
     "allowScripts": {
-        "core-js@3.49.0":                         true,
-        "esbuild@0.28.1":                         true,
-        "typopro-web@4.2.8":                      true
+        "core-js":                                true,
+        "esbuild":                                true,
+        "typopro-web":                            true
     }
 }
