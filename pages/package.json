@@ -11,7 +11,7 @@
         "@rse/stx":                               "1.1.6",
         "@astrojs/check":                         "0.9.9",
         "typescript":                             "6.0.3",
-        "eslint":                                 "10.6.0",
+        "eslint":                                 "10.7.0",
         "@eslint/js":                             "10.0.1",
         "@typescript-eslint/parser":              "8.63.0",
         "typescript-eslint":                      "8.63.0",
@@ -30,7 +30,7 @@
         "tailwindcss":                            "4.3.2",
         "@tailwindcss/vite":                      "4.3.2",
         "typopro-web":                            "4.2.8",
-        "marked":                                 "18.0.5",
+        "marked":                                 "18.0.6",
         "plyr":                                   "3.8.4",
         "typed.js":                               "3.0.0"
     },
