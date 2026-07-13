@@ -18,8 +18,8 @@
     "devDependencies": {
         "eslint":                           "9.39.4",
         "@eslint/js":                       "9.39.4",
-        "@typescript-eslint/parser":        "8.63.0",
-        "@typescript-eslint/eslint-plugin": "8.63.0",
+        "@typescript-eslint/parser":        "8.64.0",
+        "@typescript-eslint/eslint-plugin": "8.64.0",
         "eslint-plugin-promise":            "7.3.0",
         "eslint-plugin-import":             "2.32.0",
         "neostandard":                      "0.13.0",
@@ -42,7 +42,7 @@
     },
     "dependencies": {
         "commander":                        "15.0.0",
-        "@dotenvx/dotenvx":                 "2.3.1",
+        "@dotenvx/dotenvx":                 "2.7.2",
         "yaml":                             "2.9.0",
         "valibot":                          "1.4.2",
         "execa":                            "9.6.1",
@@ -58,7 +58,7 @@
         "zod":                              "4.4.3",
         "which":                            "7.0.0",
         "update-notifier":                  "7.3.1",
-        "shell-quote":                      "1.9.0",
+        "shell-quote":                      "1.10.0",
         "get-stdin":                        "10.0.0",
         "proper-lockfile":                  "4.1.2",
         "write-file-atomic":                "8.0.0",
