@@ -37,6 +37,11 @@
     "engines": {
         "node":                                   ">=22.0.0"
     },
+    "overrides": {
+        "typopro-web": {
+            "npm-install-fetch":                  "1.4.0"
+        }
+    },
     "scripts": {
         "start":                                  "stx -v4 -l warning -c etc/stx.conf"
     },
