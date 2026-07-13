@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+0.9.44 (2026-07-14)
+-------------------
+
+- BUGFIX [infr]: fix `pages` dependency pinning via a `typopro-web` override (`pages/package.json`)
+- UPDATE [infr]: upgrade NPM dependencies across all workspaces (`package.json`)
+
 0.9.43 (2026-07-09)
 -------------------
 
