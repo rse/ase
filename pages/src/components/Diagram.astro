@@ -36,7 +36,7 @@ const { src, label, class: className = "" } = Astro.props
         {/* centered zoom-button overlay (mirrors the Video-Embed play button)
             to indicate the diagram opens in the image modal on click. */}
         <span class="pointer-events-none absolute inset-0 grid place-items-center">
-            <span class="grid h-16 w-16 place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_60%,black)]/60 text-2xl font-bold text-white shadow-lg backdrop-blur-xs transition-colors group-hover:bg-[color-mix(in_oklch,var(--accent)_80%,black)]/60">
+            <span class="pointer-events-auto grid h-16 w-16 cursor-pointer place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_60%,black)]/60 text-2xl font-bold text-white shadow-lg backdrop-blur-xs transition-colors group-hover:bg-[color-mix(in_oklch,var(--accent)_80%,black)]/60">
                 <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="11" cy="11" r="7" />
                     <line x1="16" y1="16" x2="21" y2="21" />

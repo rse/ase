@@ -19,7 +19,7 @@ import Modal from "./Modal.astro"
         id="image-modal-image"
         src=""
         alt=""
-        class="max-h-[92vh] max-w-[94vw] rounded-lg object-contain"
+        class="max-h-[92vh] max-w-[94vw] cursor-zoom-out rounded-lg object-contain"
     />
 </Modal>
 
@@ -38,6 +38,14 @@ import Modal from "./Modal.astro"
             trigger.addEventListener("click", function () {
                 openImage(trigger.getAttribute("data-image-src") || "", trigger.getAttribute("data-image-label") || "")
             })
+        })
+
+        /*  a click on the enlarged image closes the modal too, reusing the
+            shell's close button so its scroll-unlock and "modal:close" event
+            fire uniformly.  */
+        imageEl.addEventListener("click", function () {
+            const closeBtn = imageModal.querySelector("[data-modal-close]")
+            if (closeBtn) closeBtn.click()
         })
     })()
 </script>
