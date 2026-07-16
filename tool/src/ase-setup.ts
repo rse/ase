@@ -931,6 +931,47 @@ export default class SetupCommand {
             throw new Error("--scope is only supported for --tool claude")
     }
 
+    /*  auto-detect the scope in which the ASE plugin is currently
+        installed, so an omitted --scope targets the existing installation
+        instead of blindly assuming the per-user scope; only the Anthropic
+        Claude Code CLI has a scope concept, so every other tool resolves to
+        "user"; the scopes are probed from the strongest ("local") down to
+        the weakest ("user"), and a scope counts as a match when its
+        settings file registers the plugin under "enabledPlugins" (the value
+        may be true or false, since even a disabled plugin is registered in
+        that scope)  */
+    private async detectScope (tool: Tool): Promise<Scope> {
+        if (tool !== "claude")
+            return "user"
+        const scopes: Scope[] = [ "local", "project", "user" ]
+        for (const scope of scopes) {
+            const file = this.statuslineSettingsFile(tool, scope)
+
+            /*  read and parse the settings file, skipping the scope on any
+                read or parse error (a missing or malformed file simply
+                cannot register the plugin)  */
+            let settings: unknown
+            try {
+                const text = await fs.readFile(file, "utf8")
+                settings = JSON.parse(text)
+            }
+            catch {
+                continue
+            }
+
+            /*  a match is the presence of the "ase@ase" key under
+                "enabledPlugins", regardless of its true/false value  */
+            const plugins = (settings as { enabledPlugins?: Record<string, unknown> })?.enabledPlugins
+            if (plugins !== undefined && plugins !== null
+                && Object.prototype.hasOwnProperty.call(plugins, "ase@ase")) {
+                if (scope !== "user")
+                    this.log.write("info", `setup: detected ASE plugin installation in scope "${scope}"`)
+                return scope
+            }
+        }
+        return "user"
+    }
+
     /*  register commands  */
     register (program: Command): void {
         /*  default for --dev derived from ASE_SETUP_DEV environment variable  */
@@ -966,11 +1007,13 @@ export default class SetupCommand {
             .command("update")
             .description("update the ASE tool and the ASE plugin for a tool")
             .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\", default: auto-detected)")
             .option("-f, --force",         "always perform the update, even if already at latest version", false)
             .option("-d, --dev",           "use local working copy instead of remote/bundled repository", devDflt)
-            .action(async (opts: { tool: string, scope: string, force: boolean, dev: boolean }) => {
-                process.exit(await this.doUpdate(this.parseTool(opts.tool), opts.force, opts.dev, this.parseScope(opts.scope)))
+            .action(async (opts: { tool: string, scope: string | undefined, force: boolean, dev: boolean }) => {
+                const tool  = this.parseTool(opts.tool)
+                const scope = opts.scope === undefined ? await this.detectScope(tool) : this.parseScope(opts.scope)
+                process.exit(await this.doUpdate(tool, opts.force, opts.dev, scope))
             })
 
         /*  register CLI sub-command "ase setup uninstall"  */
@@ -978,10 +1021,12 @@ export default class SetupCommand {
             .command("uninstall")
             .description("uninstall the ASE plugin for a tool and the ASE tool")
             .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\", default: auto-detected)")
             .option("-d, --dev",           "use local working copy instead of remote/bundled repository", devDflt)
-            .action(async (opts: { tool: string, scope: string, dev: boolean }) => {
-                process.exit(await this.doUninstall(this.parseTool(opts.tool), opts.dev, this.parseScope(opts.scope)))
+            .action(async (opts: { tool: string, scope: string | undefined, dev: boolean }) => {
+                const tool  = this.parseTool(opts.tool)
+                const scope = opts.scope === undefined ? await this.detectScope(tool) : this.parseScope(opts.scope)
+                process.exit(await this.doUninstall(tool, opts.dev, scope))
             })
 
         /*  register CLI sub-command "ase setup enable"  */
@@ -989,9 +1034,11 @@ export default class SetupCommand {
             .command("enable")
             .description("enable the ASE plugin for a tool")
             .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
-            .action(async (opts: { tool: string, scope: string }) => {
-                process.exit(await this.doEnable(this.parseTool(opts.tool), this.parseScope(opts.scope)))
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\", default: auto-detected)")
+            .action(async (opts: { tool: string, scope: string | undefined }) => {
+                const tool  = this.parseTool(opts.tool)
+                const scope = opts.scope === undefined ? await this.detectScope(tool) : this.parseScope(opts.scope)
+                process.exit(await this.doEnable(tool, scope))
             })
 
         /*  register CLI sub-command "ase setup disable"  */
@@ -999,9 +1046,11 @@ export default class SetupCommand {
             .command("disable")
             .description("disable the ASE plugin for a tool")
             .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
-            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
-            .action(async (opts: { tool: string, scope: string }) => {
-                process.exit(await this.doDisable(this.parseTool(opts.tool), this.parseScope(opts.scope)))
+            .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\", default: auto-detected)")
+            .action(async (opts: { tool: string, scope: string | undefined }) => {
+                const tool  = this.parseTool(opts.tool)
+                const scope = opts.scope === undefined ? await this.detectScope(tool) : this.parseScope(opts.scope)
+                process.exit(await this.doDisable(tool, scope))
             })
 
         /*  register CLI sub-command "ase setup mcp"  */
