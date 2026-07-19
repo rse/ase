@@ -43,8 +43,9 @@ export class Artifact {
 
     /*  translate a single ".gitignore" line into a picomatch-backed rule,
         honoring the anchored-vs-floating, directory-only, and negation
-        semantics of ".gitignore" patterns  */
-    private static compileIgnoreRule (line: string): IgnoreRule | null {
+        semantics of ".gitignore" patterns; anchored patterns resolve
+        relative to the "base" directory holding the ".gitignore"  */
+    private static compileIgnoreRule (line: string, base: string): IgnoreRule | null {
         let pattern = line.trim()
         if (pattern === "" || pattern.startsWith("#"))
             return null
@@ -61,19 +62,20 @@ export class Artifact {
         const anchored = pattern.includes("/")
         if (pattern.startsWith("/"))
             pattern = pattern.slice(1)
-        const glob    = anchored ? pattern : `**/${pattern}`
+        const glob    = anchored ? (base === "" ? pattern : `${base}/${pattern}`) : `**/${pattern}`
         const isMatch = picomatch(glob, { dot: true })
         return { matcher: (p: string) => isMatch(p), negated, dirOnly }
     }
 
-    /*  load the ".gitignore" rules located directly in a directory  */
-    private static loadIgnoreRules (dir: string): IgnoreRule[] {
+    /*  load the ".gitignore" rules located directly in a directory,
+        given as absolute "dir" and project-relative "relDir"  */
+    private static loadIgnoreRules (dir: string, relDir: string): IgnoreRule[] {
         const file = path.join(dir, ".gitignore")
         if (!fs.existsSync(file))
             return []
         const rules: IgnoreRule[] = []
         for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
-            const rule = Artifact.compileIgnoreRule(line)
+            const rule = Artifact.compileIgnoreRule(line, relDir)
             if (rule !== null)
                 rules.push(rule)
         }
@@ -101,7 +103,7 @@ export class Artifact {
         const root  = Task.projectRoot()
         const files = new Set<string>()
         const walk = (dir: string, relDir: string, inherited: IgnoreRule[]): void => {
-            const rules = [ ...inherited, ...Artifact.loadIgnoreRules(dir) ]
+            const rules = [ ...inherited, ...Artifact.loadIgnoreRules(dir, relDir) ]
             for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
                 if (entry.name === ".git")
                     continue
