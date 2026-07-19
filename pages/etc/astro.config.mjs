@@ -17,6 +17,8 @@ import { createRequire } from "node:module"
     no Astro virtual-module markers or Vite content hash  */
 function deHash (file) {
     const ext  = path.extname(file)
+    if (ext === ".map")  /*  recurse for double extensions like ".js.map"  */
+        return deHash(file.slice(0, -ext.length)) + ext
     let   base = file.slice(0, -ext.length)
     base = base.replace(/\.astro_astro_type_script.*$/, "")  /*  Astro component-script suffix  */
     base = base.replace(/@_@astro$/, "")                     /*  Astro virtual-module marker     */
