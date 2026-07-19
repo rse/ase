@@ -131,23 +131,14 @@ const navItems = [
         unlayered global `a {}` rule.  */
     .nav-link:hover { color: var(--foreground) !important; }
 
-    /*  header background layer: the translucent brand gradient plus the frosted
-        backdrop blur, kept off the <header> element itself (see the markup
-        comment) so it does not trap the mobile nav panel's own blur.  */
-    .nav-bar-bg {
-        background: linear-gradient(to right,
-            color-mix(in oklch, var(--background) 80%, transparent),
-            color-mix(in oklch, color-mix(in oklch, var(--background) 70%, var(--brand-600)) 80%, transparent),
-            color-mix(in oklch, var(--background) 80%, transparent)
-        );
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-    }
-
-    /*  the collapsed mobile drop-down panel: mirror the header's own translucent
-        gradient background and backdrop blur so the open menu reads identically
-        to the header bar it hangs from. Cleared again from the `lg` breakpoint
-        upwards, where the nav is an inline, transparent part of the header.  */
+    /*  header background layer and collapsed mobile drop-down panel: the
+        translucent brand gradient plus the frosted backdrop blur, kept off the
+        <header> element itself (see the markup comment) so it does not trap
+        the mobile nav panel's own blur. The panel shares the exact style so
+        the open menu reads identically to the header bar it hangs from; it is
+        cleared again from the `lg` breakpoint upwards, where the nav is an
+        inline, transparent part of the header.  */
+    .nav-bar-bg,
     .nav-menu-panel {
         background: linear-gradient(to right,
             color-mix(in oklch, var(--background) 80%, transparent),
