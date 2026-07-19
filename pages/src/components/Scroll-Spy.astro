@@ -17,7 +17,7 @@
 ---
 <script is:inline>
     (function () {
-        const links = Array.prototype.slice.call(document.querySelectorAll("[data-navlink]"))
+        const links = Array.from(document.querySelectorAll("[data-navlink]"))
         if (!links.length) return
         const entries = []
         links.forEach(function (link) {
@@ -43,7 +43,7 @@
             if (atBottom) {
                 pick = entries[entries.length - 1].link
             }
- else {
+            else {
                 entries.forEach(function (e) {
                     if (e.sec.getBoundingClientRect().top <= line) pick = e.link
                 })
