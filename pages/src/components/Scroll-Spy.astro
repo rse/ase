@@ -17,7 +17,7 @@
 ---
 <script is:inline>
     (function () {
-        const links = Array.from(document.querySelectorAll("[data-navlink]"))
+        const links = document.querySelectorAll("[data-navlink]")
         if (!links.length) return
         const entries = []
         links.forEach(function (link) {
