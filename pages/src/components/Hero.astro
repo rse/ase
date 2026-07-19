@@ -17,12 +17,27 @@ import {
     SwiperSlide
 }                   from "astro-swiper"
 
+/*  the single hero video: previewed inline (Hero-Video) and played in the
+    page-root modal (Modal-YouTube), so id and label must match between both.  */
+const video = { id: "yNFSVDRa_kM", label: "Agentic Software Engineering (ASE)" }
+
 /*  rotating hero quotes, swipeable via the <Swiper> carousel below.  */
 const quotes = [
     "Boost your daily productivity while<br/>keeping yourself in the driver's seat!",
     "Fuse Agentic AI Coding with<br/>traditional Software Engineering!",
     "Let the agent handle the chores while<br/>you stay in control of the craft!",
     "Various operation modes provided &mdash;<br/>you choose the best for the job!"
+]
+
+/*  GitHub badges via Shields.io: one shared URL helper and the plain badge
+    list (the "project stars" badge is rendered separately below, as it
+    carries the annotation and the hover guide).  */
+const badgeURL = (path: string) =>
+    `https://img.shields.io/${path}&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477`
+const badges = [
+    { href: "https://github.com/rse",              path: "github/stars/rse?logo=github&label=author%20stars",            alt: "github (author stars)"     },
+    { href: "https://github.com/rse",              path: "github/followers/rse?logo=github&label=author%20followers",    alt: "github (author followers)" },
+    { href: "https://github.com/rse/ase/releases", path: "github/v/release/rse/ase?logo=github&label=project%20release", alt: "github (release)"          }
 ]
 ---
 <section class="relative isolate overflow-hidden">
@@ -90,15 +105,11 @@ const quotes = [
 
             {/* GitHub badges */}
             <div class="relative z-40 mt-6 flex min-h-[28px] flex-wrap items-center justify-center gap-2">
-                <a href="https://github.com/rse" class="inline-flex overflow-hidden rounded-md">
-                    <img src="https://img.shields.io/github/stars/rse?logo=github&label=author%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (author stars)" />
-                </a>
-                <a href="https://github.com/rse" class="inline-flex overflow-hidden rounded-md">
-                    <img src="https://img.shields.io/github/followers/rse?logo=github&label=author%20followers&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (author followers)" />
-                </a>
-                <a href="https://github.com/rse/ase/releases" class="inline-flex overflow-hidden rounded-md">
-                    <img src="https://img.shields.io/github/v/release/rse/ase?logo=github&label=project%20release&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (release)" />
-                </a>
+                {badges.map((badge) => (
+                    <a href={badge.href} class="inline-flex overflow-hidden rounded-md">
+                        <img src={badgeURL(badge.path)} alt={badge.alt} />
+                    </a>
+                ))}
                 <span class="group relative inline-flex">
                     <Annotation fade class="left-1/2 -translate-x-1/4">
                         If you like ASE,<br/>
@@ -107,7 +118,7 @@ const quotes = [
                         Many thanks.
                     </Annotation>
                     <a href="https://github.com/rse/ase" class="inline-flex overflow-hidden rounded-md">
-                        <img src="https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477" alt="github (project stars)" />
+                        <img src={badgeURL("github/stars/rse/ase?logo=github&label=project%20stars")} alt="github (project stars)" />
                     </a>
                     {/* on hover, reveal an animated guide showing how to give the
                         project a star, in a popup anchored below the badge. */}
@@ -143,7 +154,7 @@ const quotes = [
                 video instead stacks above the text. */}
             <div class="w-full max-w-2xl">
                 <div class="mb-4 w-full lg:float-right lg:mb-2 lg:ml-8 lg:w-[21%]">
-                    <HeroVideo id="yNFSVDRa_kM" label="Agentic Software Engineering (ASE)"/>
+                    <HeroVideo id={video.id} label={video.label}/>
                     <p class="mt-1.5 text-center text-xs text-accent">
                         Dr. Ralf S. Engelschall in a<br/>
                         studio interview on ASE
@@ -164,35 +175,6 @@ const quotes = [
 
             {/* terminal-style typed out examples of ASE skill invocations */}
             <TypingDemo/>
-
-            {/* buttons */}
-            <!--
-            <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
-                <a href="#highlights" class="ase-btn">
-                    Highlights ↓
-                </a>
-                <a href="#setup" class="ase-btn">
-                    Setup ↓
-                </a>
-                <a href="#usage" class="ase-btn">
-                    Usage ↓
-                </a>
-                <a href="#workflows" class="ase-btn">
-                    Workflows ↓
-                </a>
-            </div>
-            <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
-                <a href="#design" class="ase-btn">
-                    Design ↓
-                </a>
-                <a href="#architecture" class="ase-btn">
-                    Architecture ↓
-                </a>
-                <a href="#compat" class="ase-btn">
-                    Compatibility ↓
-                </a>
-            </div>
-            -->
         </div>
     </div>
 
@@ -208,7 +190,7 @@ const quotes = [
 {/* rendered outside the Hero's <section> (which has isolate + overflow-hidden)
     so this fixed, full-viewport modal isn't clipped to / trapped inside its
     stacking context. */}
-<ModalYouTube id="yNFSVDRa_kM" label="Agentic Software Engineering (ASE)"/>
+<ModalYouTube id={video.id} label={video.label}/>
 
 <style is:global>
     /*  hero entrance animations:
@@ -242,8 +224,8 @@ const quotes = [
         swipes vertically, so it needs a fixed height (the wrapper would
         otherwise collapse). Swiper's bundle CSS forces "margin: auto" on
         ".swiper" (centring it and defeating Tailwind's ml-* utilities), so
-        the horizontal offset is set here instead: a right auto-margin keeps
-        the carousel off the right edge while a left margin nudges it right.  */
+        the horizontal offset is set here instead: a left auto-margin nudges
+        the carousel right while a right margin keeps it off the right edge.  */
     .hero-quotes.hero-quotes {
         --swiper-theme-color: var(--brand-500);
         --swiper-pagination-bullet-inactive-color: var(--brand-400);
