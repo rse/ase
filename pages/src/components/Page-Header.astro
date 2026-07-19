@@ -14,6 +14,17 @@ import LogoASE       from "./Logo-ASE.astro"
 import LogoGitHub    from "./Logo-GitHub.astro"
 import ThemeSwitcher from "./Theme-Switcher.astro"
 import ProgressBar   from "./Progress-Bar.astro"
+
+/*  the in-page section navigation entries  */
+const navItems = [
+    [ "#highlights",   "Highlights"    ],
+    [ "#setup",        "Setup"         ],
+    [ "#usage",        "Usage"         ],
+    [ "#workflows",    "Workflows"     ],
+    [ "#design",       "Design"        ],
+    [ "#architecture", "Architecture"  ],
+    [ "#compat",       "Compatibility" ]
+]
 ---
 <header class="fixed inset-x-0 top-0 z-50 border-b border-border/60">
     {/*  header background as a separate, absolutely-positioned layer rather than
@@ -53,27 +64,11 @@ import ProgressBar   from "./Progress-Bar.astro"
             class="nav-menu-panel absolute right-6 top-full hidden w-auto flex-col items-end gap-y-1.5 rounded-md rounded-t-none border border-border/60 p-4 shadow-lg data-[open]:flex lg:static lg:top-auto lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:justify-between lg:gap-x-5 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
         >
             <nav class="flex min-w-0 flex-col flex-wrap items-end gap-x-3 gap-y-1 text-base text-foreground-secondary lg:ml-4 lg:flex-row lg:items-center">
-                <a href="#highlights" data-navlink class="nav-spy transition-colors">
-                    Highlights
-                </a>
-                <a href="#setup" data-navlink class="nav-spy transition-colors">
-                    Setup
-                </a>
-                <a href="#usage" data-navlink class="nav-spy transition-colors">
-                    Usage
-                </a>
-                <a href="#workflows" data-navlink class="nav-spy transition-colors">
-                    Workflows
-                </a>
-                <a href="#design" data-navlink class="nav-spy transition-colors">
-                    Design
-                </a>
-                <a href="#architecture" data-navlink class="nav-spy transition-colors">
-                    Architecture
-                </a>
-                <a href="#compat" data-navlink class="nav-spy transition-colors">
-                    Compatibility
-                </a>
+                {navItems.map(([ href, label ]) =>
+                    <a href={href} data-navlink class="nav-spy transition-colors">
+                        {label}
+                    </a>
+                )}
             </nav>
             <nav class="flex flex-col flex-wrap items-end gap-x-3 gap-y-1 text-base text-foreground-secondary lg:flex-row lg:items-center">
                 <span class="flex items-center gap-2">
