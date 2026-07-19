@@ -98,11 +98,11 @@ const { count = 0 } = Astro.props
                 loop:           true,
                 showCursor:     true,
                 cursorChar:     "█",
-                onStringTyped: (pos: number, self: any) => {
+                onStringTyped: (pos: number) => {
                     if (!topic)
                         return
                     const next  = commands[(pos + 1) % commands.length][0]
-                    const shown = self.el.textContent.length
+                    const shown = target.textContent?.length ?? 0
                     /*  typed.js waits `backDelay`, then erases each char with a
                         humanized delay averaging 1.25x `backSpeed`.  */
                     const erase = backDelay + shown * backSpeed * 1.25
