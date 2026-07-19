@@ -18,7 +18,7 @@ import QRCode from "./QR-Code.astro"
             type="button"
             aria-label="Show QR code for this site"
             aria-controls="qr-modal"
-            class="qr-toggle inline-flex shrink-0 cursor-pointer items-center text-accent transition-colors"
+            class="inline-flex shrink-0 cursor-pointer items-center text-accent transition-colors hover:text-foreground"
         >
             <QRCode class="h-20 w-20 transition-colors"/>
         </button>
@@ -33,9 +33,3 @@ import QRCode from "./QR-Code.astro"
         </div>
     </div>
 </footer>
-
-<style is:global>
-    /*  QR-code toggle: the icon turns white (the foreground colour) while the
-        button is hovered, lifting from its default accent colour.  */
-    .qr-toggle:hover { color: var(--foreground) !important; }
-</style>
