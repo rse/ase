@@ -4,14 +4,14 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import { defineConfig } from "astro/config"
-import sitemap          from "@astrojs/sitemap"
-import robotsTxt        from "astro-robots-txt"
-import tailwindcss      from "@tailwindcss/vite"
-import fs               from "node:fs"
-import path             from "node:path"
+import { defineConfig }  from "astro/config"
+import sitemap           from "@astrojs/sitemap"
+import robotsTxt         from "astro-robots-txt"
+import tailwindcss       from "@tailwindcss/vite"
+import fs                from "node:fs"
+import path              from "node:path"
 import { fileURLToPath } from "node:url"
-import { createRequire }  from "node:module"
+import { createRequire } from "node:module"
 
 /*  reduce a built `_astro/` filename to a short, stable, lower-case base with
     no Astro virtual-module markers or Vite content hash  */
