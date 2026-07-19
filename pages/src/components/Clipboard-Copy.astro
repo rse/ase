@@ -18,12 +18,13 @@
             btn.addEventListener("click", function () {
                 const text = btn.getAttribute("data-copy") || ""
                 const done = function () {
-                    const prev = btn.textContent
+                    if (btn.dataset.label === undefined)
+                        btn.dataset.label = btn.textContent
                     btn.textContent = "Copied"
-                    setTimeout(function () { btn.textContent = prev }, 1500)
+                    setTimeout(function () { btn.textContent = btn.dataset.label }, 1500)
                 }
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(text).then(done, function () {})
+                    navigator.clipboard.writeText(text).then(done, function () { /*  clipboard write denied: intentionally keep button label unchanged  */ })
                 }
             })
         })
