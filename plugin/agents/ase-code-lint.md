@@ -50,7 +50,7 @@ Workflow
     -   **A03 - CLEANLINESS**:
         Check for unclean code and inconsistent code.
 
-        For unclean code, especially detect out-dated code construct
+        For unclean code, especially detect outdated code construct
         patterns. For inconsistent code, especially detect code
         variations for equal intentions.
 
@@ -246,7 +246,7 @@ Workflow
         *masks* another bug (e.g., unreachable code after a misplaced
         `return` that skips cleanup logic).
 
-    Be conservative — only report clear, well-grounded issues
+    Be conservative - only report clear, well-grounded issues
     that require an actual *code change*. Think twice to avoid
     *false positives*.
 

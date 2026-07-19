@@ -40,7 +40,7 @@ Workflow
 
     3.  Set <old-text/> to the lines of the old text which
         should be changed. Set <new-text/> to the lines of the
-        new text which will be changed.
+        new text which will replace it.
 
     4.  Set <description/> to an ultra-brief and concise
         Markdown-formatted description of the problem with
