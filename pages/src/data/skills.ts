@@ -80,4 +80,4 @@ export const skillGroups: SkillGroup[] = [
             "ase-sync-export"
         ]
     }
-] as const
+]
