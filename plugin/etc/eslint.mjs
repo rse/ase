@@ -5,11 +5,9 @@
 */
 
 import { defineConfig } from "eslint/config"
-import markdown         from "@eslint/markdown"
 import md               from "eslint-markdown"
 
 export default defineConfig([
-    // markdown.configs.recommended,
     md.configs.recommended,
     {
         files: [
