@@ -16,8 +16,8 @@ interface Props {
 }
 const { class: className } = Astro.props
 
-/*  flag geometry (SVG user units): a wide (landscape) banner with a shallow,
-    double-V ("W") cut into its wide bottom edge, so the overlay reads straight.  */
+/*  flag geometry (SVG user units): a tall (portrait) banner with a shallow,
+    double-V ("W") cut into its bottom edge, so the overlay reads straight.  */
 const W       = 132  /*  overall width                     */
 const H       = 220  /*  overall height                    */
 const notch   = 8    /*  depth of the two bottom V-notches */
@@ -31,8 +31,8 @@ const path = [
     `L ${W} 0`,                    /*  top-right                         */
     `L ${W} ${H}`,                 /*  down right side                   */
     `L ${W * 0.75} ${H - notch}`,  /*  up into right V-notch             */
-    `L ${W * 0.50} ${H - peak}`,   /*  down to centre peak               */
-    `L ${W * 0.25} ${H - notch}`,  /*  up into left V-notch              */
+    `L ${W * 0.50} ${H - peak}`,   /*  up to centre peak                 */
+    `L ${W * 0.25} ${H - notch}`,  /*  down into left V-notch            */
     `L 0 ${H}`,                    /*  down left side                    */
     "Z"
 ].join(" ")
