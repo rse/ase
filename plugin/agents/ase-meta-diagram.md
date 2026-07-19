@@ -1,9 +1,9 @@
 ---
 name: ase-meta-diagram
 description: "Diagram Rendering"
+effort: high
 tools:
     - "mcp__plugin_ase_ase__ase_diagram"
-effort: high
 ---
 
 Your role is to render a *single* diagram, with *deterministic* and
