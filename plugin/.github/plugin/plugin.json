@@ -11,7 +11,7 @@
         "email":   "rse@engelschall.com",
         "url":     "https://engelschall.com"
     },
-    "hooks":       "hooks/hooks-copilot.json",
+    "hooks":       "./hooks/hooks-copilot.json",
     "mcpServers": {
         "ase": {
             "command": "ase",
