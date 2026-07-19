@@ -1,6 +1,6 @@
 ---
 name: ase-meta-search
-description: Query the Web
+description: "Query the Web"
 model: sonnet
 effort: low
 tools:

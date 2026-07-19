@@ -3,12 +3,12 @@ name: ase-meta-chat
 description: "Query Foreign LLM for Chat via MCP Tool"
 effort: high
 tools:
-    - mcp__chat-openai-chatgpt__query
-    - mcp__chat-google-gemini__query
-    - mcp__chat-deepseek__query
-    - mcp__chat-xai-grok__query
-    - mcp__chat-zai-glm__query
-    - mcp__chat-alibaba-qwen__query
+    - "mcp__chat-openai-chatgpt__query"
+    - "mcp__chat-google-gemini__query"
+    - "mcp__chat-deepseek__query"
+    - "mcp__chat-xai-grok__query"
+    - "mcp__chat-zai-glm__query"
+    - "mcp__chat-alibaba-qwen__query"
 ---
 
 @../meta/ase-control.md
