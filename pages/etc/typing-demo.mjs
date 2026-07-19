@@ -31,7 +31,7 @@ const here     = path.dirname(fileURLToPath(import.meta.url))
 const root     = path.resolve(here, "..")
 const tmpDir   = path.join(root, "dst", "video")
 const outFile  = path.resolve(root, opt("out", "public/assets/typing-demo.gif"))
-const outFile2 = path.resolve(root, opt("out", "public/assets/typing-demo.mp4"))
+const outFile2 = path.resolve(root, opt("out2", "public/assets/typing-demo.mp4"))
 
 /*  the capture viewport  */
 const width  = 1000
@@ -176,4 +176,4 @@ await run("ffmpeg", [
     outFile2
 ])
 
-fs.unlink(webm)
+await fs.unlink(webm)
