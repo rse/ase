@@ -15,7 +15,7 @@
     The `index.astro` page alternates the USP/video column order per row, so
     the order below is also the visual top-to-bottom order on the page.  */
 
-export type Highlights = {
+export type Highlight = {
     eyebrow: string  /*  short, signal-coloured eyebrow above the heading   */
     title:   string  /*  the headline of the USP                            */
     body:    string  /*  one- to two-sentence elaboration                   */
@@ -23,7 +23,7 @@ export type Highlights = {
     video:   string  /*  the `ase-media` recording base name (without ext)  */
 }
 
-export const highlights: Highlights[] = [
+export const highlights: Highlight[] = [
     {
         eyebrow: "Token and Time Optimization",
         title:   "Switch persona to cut down tokens and reading time",
