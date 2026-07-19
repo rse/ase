@@ -36,7 +36,7 @@ function deHashAssets () {
         name: "de-hash-assets",
         hooks: {
             "astro:build:done": ({ dir }) => {
-                const root      = new URL(dir).pathname
+                const root      = fileURLToPath(dir)
                 const assetsDir = path.join(root, "_astro")
                 if (!fs.existsSync(assetsDir)) return
 
