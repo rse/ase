@@ -60,10 +60,10 @@ const { id, label = "Dialog" } = Astro.props
             document.body.style.overflow            = lock ? "hidden" : ""
         }
         const close = function () {
-        if (modal.style.display === "none" || getComputedStyle(modal).display === "none") return
-        modal.style.display = "none"
-        modal.dispatchEvent(new CustomEvent("modal:close", { bubbles: true }))
-    }
+            if (modal.style.display === "none" || getComputedStyle(modal).display === "none") return
+            modal.style.display = "none"
+            modal.dispatchEvent(new CustomEvent("modal:close", { bubbles: true }))
+        }
         modal.querySelectorAll("[data-modal-close]").forEach(function (btn) {
             btn.addEventListener("click", close)
         })
