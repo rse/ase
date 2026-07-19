@@ -27,9 +27,9 @@ import Modal from "./Modal.astro"
     import "plyr/dist/plyr.css"
 
     const videoModal = document.getElementById("video-modal")
-    const elem       = document.getElementById("video-modal-player")
-    if (videoModal && elem) {
-        const player = new Plyr(elem, {
+    const videoEl    = document.getElementById("video-modal-player")
+    if (videoModal && videoEl) {
+        const player = new Plyr(videoEl, {
             iconUrl:  "/assets/plyr.svg",
             controls: [ "play-large", "play", "progress", "current-time", "settings", "fullscreen" ],
             settings: [ "speed" ],
