@@ -60,7 +60,8 @@ const { id, label = "Dialog" } = Astro.props
             document.body.style.overflow            = lock ? "hidden" : ""
         }
         const close = function () {
-            if (modal.style.display === "none" || getComputedStyle(modal).display === "none") return
+            if (!isOpen())
+                return
             modal.style.display = "none"
             modal.dispatchEvent(new CustomEvent("modal:close", { bubbles: true }))
         }
