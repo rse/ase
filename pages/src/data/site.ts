@@ -22,4 +22,3 @@ export const site = {
         Kept in sync with the `--brand-*` scale in `styles/theme.css`.  */
     themeColor:  "#336699"
 } as const
-
