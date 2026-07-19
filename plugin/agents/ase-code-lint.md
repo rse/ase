@@ -314,9 +314,9 @@ Workflow
             4.  Set <context-after/> to exactly *up to two* lines of
                 *unchanged* code content which occurs in <file/>
                 directly *after* <old-text/>, i.e., the lines (<line/>
-                + <n/> + 1) and (<line/> + <n/> + 2), where <n/> is the
+                + <n/>) and (<line/> + <n/> + 1), where <n/> is the
                 number of lines in <old-text/>. Reduce to just one line
-                (<line/> + <n/> + 1) if <old-text/> is the second-last
+                (<line/> + <n/>) if <old-text/> is the second-last
                 line of the file. Set <context-after/> to empty if
                 <old-text/> is the last line in the file.
 
