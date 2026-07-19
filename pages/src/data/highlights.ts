@@ -16,7 +16,7 @@
     the order below is also the visual top-to-bottom order on the page.  */
 
 export type Highlight = {
-    eyebrow: string  /*  short, signal-coloured eyebrow above the heading   */
+    eyebrow: string  /*  short, signal-colored eyebrow above the heading    */
     title:   string  /*  the headline of the USP                            */
     body:    string  /*  one- to two-sentence elaboration                   */
     skill:   string  /*  the ASE skill the USP showcases                    */
