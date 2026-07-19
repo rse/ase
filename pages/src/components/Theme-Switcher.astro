@@ -38,7 +38,7 @@ const { class: className = "" } = Astro.props
             try {
                 localStorage.setItem("ase-color-mode", light ? "light" : "dark")
             }
-            catch (e) {}
+            catch { /*  intentionally ignore inaccessible localStorage  */ }
         })
     })()
 </script>
