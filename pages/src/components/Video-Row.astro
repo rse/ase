@@ -40,13 +40,13 @@ const skillCmd = spaceIdx === -1 ?
     `**${usp.skill.slice(0, spaceIdx)}**${usp.skill.slice(spaceIdx)}`
 ---
 <div class="ase-grid-split">
-    <div class={`relative isolate ${reversed ? "lg:order-2" : "lg:order-1"}`} data-reveal={textReveal}>
+    <div class:list={[ "relative isolate", reversed ? "lg:order-2" : "lg:order-1" ]} data-reveal={textReveal}>
         {/* blue radial glow behind the text block, bleeding off the viewport
             on the text's side of the row (left on normal rows, right on the
             reversed/zig-zag rows). */}
         <div
-            class="pointer-events-none absolute top-1/2 -z-10 h-[260%] w-[240%] -translate-y-1/2"
-            class:list={[ reversed ? "left-0 translate-x-[10%]" : "right-0 -translate-x-[10%]" ]}
+            class:list={[ "pointer-events-none absolute top-1/2 -z-10 h-[260%] w-[240%] -translate-y-1/2",
+                reversed ? "left-0 translate-x-[10%]" : "right-0 -translate-x-[10%]" ]}
             style="background: radial-gradient(ellipse 70% 60% at center, color-mix(in oklch, var(--brand-500) 30%, transparent), transparent 80%);"
             aria-hidden="true"
         ></div>
@@ -55,7 +55,7 @@ const skillCmd = spaceIdx === -1 ?
         <p class="mt-4 text-foreground-secondary ase-justify" set:html={usp.body}></p>
         <Terminal class="mt-5" prefix="Claude Code" commands={[ skillCmd ]}/>
     </div>
-    <div class={reversed ? "lg:order-1" : "lg:order-2"} data-reveal={videoReveal}>
+    <div class:list={[ reversed ? "lg:order-1" : "lg:order-2" ]} data-reveal={videoReveal}>
         <VideoEmbed name={usp.video} label={usp.title}/>
     </div>
 </div>
