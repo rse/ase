@@ -8,7 +8,7 @@
 /*  reusable full-viewport modal shell: a dimmed, blurred overlay plus a close
     button. The actual content (video, image, …) is provided via the default
     <slot> and managed by the caller. The overlay starts hidden; callers open
-    it by setting its display to "grid" (or calling `el.dataset` helpers below).
+    it by setting its display to "grid".
 
     Close behavior (close button + Escape) is wired here: it hides the overlay
     and dispatches a bubbling "modal:close" CustomEvent on the overlay, so the
