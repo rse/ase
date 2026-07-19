@@ -42,8 +42,8 @@ import Modal from "./Modal.astro"
                 sources: [ { src: src, type: "video/mp4" } ]
             }
             videoModal.style.display = "grid"
-            const p = player.play()
-            if (p && p.catch) p.catch(() => {})
+            /*  intentionally ignore autoplay-policy rejections of play()  */
+            player.play()?.catch(() => {})
         }
         document.querySelectorAll("[data-video-src]").forEach((trigger) => {
             trigger.addEventListener("click", () => {
