@@ -2,11 +2,37 @@
 ChangeLog
 =========
 
-0.9.44 (2026-07-14)
+0.9.44 (2026-07-20)
 -------------------
 
+- IMPROVEMENT [code]: harden Bash command approval with stricter validation in hook processing (`ase-hook.ts`)
+- IMPROVEMENT [code]: support `/xxx`-anchored `.gitignore` patterns and reject `..` filenames (`ase-artifact.ts`)
+- IMPROVEMENT [code]: validate sessions in task MCP tools and cache `projectRoot` results (`ase-task.ts`)
+- IMPROVEMENT [code]: normalize error outputs by dropping tool prefixes (`ase-config.ts`, `ase-kv.ts`, `ase-persona.ts`)
+- IMPROVEMENT [code]: harden error handling in setup, service, log, diagram, and meta commands (`ase-*.ts`)
+- IMPROVEMENT [code]: mask more key information and encode the Exa API key in the URL (`ase-setup.ts`)
+- IMPROVEMENT [code]: honor grey boxing in `ase-code-lint` and add `-h`/`--help` to `ase-meta-compat` (`SKILL.md`)
+- IMPROVEMENT [code]: refine wording and precision across plugin skills, agents, and meta files
+- IMPROVEMENT [docs]: improve website diagram zoom handling and external links (`Modal-Image.astro`, `Section-Author.astro`)
+- IMPROVEMENT [docs]: support `.js.map` files in the website build (`astro.config.mjs`)
+- IMPROVEMENT [infr]: allow more install scripts and run `allowScripts` locally via `execa` (`etc/stx.conf`, `package.json`)
+- BUGFIX [code]: fix Markdown span rendering: unclosed backticks, paragraph crossing, span close (`ase-markdown.ts`)
+- BUGFIX [code]: handle multi-byte UTF-8 sequences spanning chunk boundaries (`ase-service.ts`)
+- BUGFIX [code]: fix service restarts under a changed project id (`ase-mcp.ts`)
+- BUGFIX [code]: clamp statusline metric and fix skill scoring edge cases (`ase-statusline.ts`, `ase-skills.ts`)
+- BUGFIX [code]: fix log stream error handling and stderr TTY detection (`ase-log.ts`)
+- BUGFIX [code]: align `ase config get` locking behavior with its MCP tool counterpart (`ase-config.ts`)
+- BUGFIX [code]: fix references, placeholders, grammar, and wording across skills and meta files
+- BUGFIX [docs]: fix clipboard copying, DOM id uniqueness, invalid classes, and typos on the website
 - BUGFIX [infr]: fix `pages` dependency pinning via a `typopro-web` override (`pages/package.json`)
 - UPDATE [infr]: upgrade NPM dependencies across all workspaces (`package.json`)
+- CLEANUP [code]: remove redundancies and simplify code across the `ase` CLI sources (`tool/src/*.ts`)
+- CLEANUP [code]: cleanup formatting, alignment, comments, and stray blank lines across sources
+- CLEANUP [docs]: cleanup and simplify website components (`pages/src/**`)
+- CLEANUP [infr]: align repository URLs in all `package.json` files and drop unused ESLint code
+- REFACTOR [code]: split Markdown preparation into one function per pass (`ase-markdown.ts`)
+- REFACTOR [code]: merge nearly identical functions and use lookup tables (`ase-task.ts`, `ase-setup.ts`)
+- REFACTOR [docs]: replace conditional website header logic with a lookup data structure (`Page-Header.astro`)
 
 0.9.43 (2026-07-09)
 -------------------
