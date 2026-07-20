@@ -18,8 +18,8 @@
     "devDependencies": {
         "eslint":                           "9.39.4",
         "@eslint/js":                       "9.39.4",
-        "@typescript-eslint/parser":        "8.64.0",
-        "@typescript-eslint/eslint-plugin": "8.64.0",
+        "@typescript-eslint/parser":        "8.65.0",
+        "@typescript-eslint/eslint-plugin": "8.65.0",
         "eslint-plugin-promise":            "7.3.0",
         "eslint-plugin-import":             "2.32.0",
         "neostandard":                      "0.13.0",
@@ -42,10 +42,10 @@
     },
     "dependencies": {
         "commander":                        "15.0.0",
-        "@dotenvx/dotenvx":                 "2.13.0",
+        "@dotenvx/dotenvx":                 "2.15.1",
         "yaml":                             "2.9.0",
         "valibot":                          "1.4.2",
-        "execa":                            "9.6.1",
+        "execa":                            "10.0.0",
         "mkdirp":                           "3.0.1",
         "@hapi/hapi":                       "21.4.9",
         "beautiful-mermaid":                "1.1.3",
