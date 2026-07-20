@@ -588,8 +588,8 @@ export default class ConfigCommand {
                 "\"user\" is always implicitly included and \"project\" is implicitly " +
                 "included whenever a project context (Git repo or upward \".ase\" directory) exists")
             .description("manage ASE configuration")
-            .action((_opts, cmd: Command) => {
-                cmd.outputHelp()
+            .action(() => {
+                configCmd.outputHelp()
                 process.exit(1)
             })
 
