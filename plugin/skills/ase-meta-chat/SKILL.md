@@ -4,7 +4,7 @@ argument-hint: "[--help|-h] <llm> <query>"
 description: >
     Query foreign LLM for chat.
     Use this skill if a foreign LLM like OpenAI ChatGPT, Google Gemini,
-    DeepSeek or xAI Grok should be queried with a single chat message.
+    DeepSeek, xAI Grok or OpenAI Codex should be queried with a single chat message.
 user-invocable: true
 disable-model-invocation: false
 effort: medium

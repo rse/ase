@@ -12,16 +12,16 @@
 ##  DESCRIPTION
 
 The `ase-meta-chat` skill queries a *foreign LLM* (such as OpenAI
-ChatGPT, Google Gemini, DeepSeek, xAI Grok, Z.AI GLM, or Alibaba
-Qwen) with a single chat message. The underlying `ase:ase-meta-chat`
-sub-agent is invoked and its plain response is shown back verbatim
-without any further interpretation.
+ChatGPT, Google Gemini, DeepSeek, xAI Grok, Z.AI GLM, Alibaba Qwen,
+or OpenAI Codex) with a single chat message. The underlying
+`ase:ase-meta-chat` sub-agent is invoked and its plain response is
+shown back verbatim without any further interpretation.
 
 ##  ARGUMENTS
 
 *llm*:
     Identifier of the foreign LLM to query, e.g. `chatgpt`,
-    `gemini`, `deepseek`, `grok`, `glm`, or `qwen`.
+    `gemini`, `deepseek`, `grok`, `glm`, `qwen`, or `codex`.
 
 *query*:
     The chat message to send to the foreign LLM.

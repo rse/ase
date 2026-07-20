@@ -40,6 +40,7 @@ const addonMcpServers = [
     "chat-deepseek",
     "chat-google-gemini",
     "chat-openai-chatgpt",
+    "chat-openai-codex",
     "chat-xai-grok",
     "chat-zai-glm",
     "search-brave",

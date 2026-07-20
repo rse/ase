@@ -47,13 +47,15 @@ const toolSpecs: Record<Tool, ToolSpec> = {
 
 /*  per-MCP dispatch table  */
 type mcpServerSpec = {
-    id:       string,
-    name:     string,
-    version?: string,
-    env:      string[],
-    server:   string,
-    skills:   string[],
-    handler:  (spec: mcpServerSpec, tool: Tool, scope: Scope, action: "activate" | "deactivate", envKey: string, envVal: string) => Promise<void>
+    id:        string,
+    name:      string,
+    version?:  string,
+    env:       string[],
+    cli?:      string,   /*  gate activation on this CLI binary instead of an ASE_MCP_KEY  */
+    explicit?: boolean,  /*  register only on explicit (never implicit/"all") activation  */
+    server:    string,
+    skills:    string[],
+    handler:   (spec: mcpServerSpec, tool: Tool, scope: Scope, action: "activate" | "deactivate", envKey: string, envVal: string) => Promise<void>
 }
 
 /*  CLI command "ase setup"  */
@@ -393,7 +395,42 @@ export default class SetupCommand {
             /*  determine information and action  */
             let envKey = ""
             let envVal = ""
-            if (action === "activate") {
+
+            /*  enforce explicit opt-in for servers flagged "explicit": they
+                are NEVER registered on an implicit selection (empty list or
+                the literal "all"), only when their id is named on the
+                command line, so that enabling them is always a deliberate
+                user action. This is the consent gate for "openai-codex":
+                activating it routes the user's prompts to a foreign model
+                (OpenAI) through the local codex login -- a deliberate data
+                egress whose calls are auto-approved by the ASE hook once
+                registered; the explicit activation is that consent.  */
+            if (action === "activate" && handle.explicit === true && !explicit) {
+                this.log.write("info", `setup: mcp: activate: [${id}]: MCP server "${handle.server}" ` +
+                    `(${handle.name}) requires explicit activation: ` +
+                    `skipping (activate it deliberately via "ase setup mcp activate ${id}")`)
+                continue
+            }
+
+            if (action === "activate" && handle.cli !== undefined) {
+                /*  on activation of a CLI-backed server, gate on the
+                    presence of its command-line interface binary in $PATH
+                    instead of an API key environment variable (the CLI
+                    reads no ASE_MCP_KEY and carries its own configured
+                    authentication); skip the server when its id was only
+                    implicitly selected (empty list or "all"), but fail
+                    hard when it was given explicitly on the CLI  */
+                const found = await which(handle.cli).then(() => true).catch(() => false)
+                if (!found) {
+                    if (explicit)
+                        throw new Error(`CLI "${handle.cli}" not found in $PATH: ` +
+                            `cannot activate MCP server "${handle.server}"`)
+                    this.log.write("info", `setup: mcp: activate: [${id}]: CLI "${handle.cli}" not found in $PATH: ` +
+                        `skipping MCP server "${handle.server}" (${handle.name})`)
+                    continue
+                }
+            }
+            else if (action === "activate") {
                 /*  on activation, require at least one of the per-server API
                     key environment variables (ASE_MCP_KEY_<XXX>) to
                     be set; skip the server when its id was only
@@ -548,6 +585,27 @@ export default class SetupCommand {
         }
     }
 
+    /*  build a chat-model MCP handler backed by the OpenAI Codex CLI,
+        registering the in-process "ase chat" stdio bridge instead of the
+        "mcp-to-openai" gateway, so the same "query(prompt)" tool is served
+        through the Codex CLI's own configured authentication (it reads no
+        ASE_MCP_KEY; typically a ChatGPT subscription)  */
+    private chatCodexMcpHandler (): mcpServerSpec["handler"] {
+        return async (spec, tool, scope, action, _envKey, _envVal) => {
+            if (action === "activate")
+                await this.mcpAdd(tool, spec.server, {}, {
+                    type: "stdio", command: [
+                        "ase", "chat",
+                        "--service",  spec.name,
+                        "--mcp-tool", "query",
+                        "--timeout",  "300000"
+                    ]
+                }, scope)
+            else
+                await this.mcpRemove(tool, spec.server, scope)
+        }
+    }
+
     /*  registry of pre-defined MCP servers: maps each server id onto its
         dedicated handler which performs the activate/deactivate operation  */
     private mcpServers: mcpServerSpec[] = [
@@ -616,6 +674,21 @@ export default class SetupCommand {
             handler: this.chatMcpHandler(
                 { url: "https://api.z.ai/api/paas/v4/", api: "completion", model: "glm-5.1" },
                 { model: "z-ai/glm-5.1" })
+        },
+        {
+            id:       "openai-codex",
+            name:     "OpenAI Codex",
+            version:  "latest",
+            env:      [],
+            cli:      "codex",
+            /*  register only on explicit "openai-codex" activation, never
+                implicitly via "all": routing prompts to a foreign model
+                through the local codex login is a data egress that must be
+                a deliberate opt-in  */
+            explicit: true,
+            server:   "chat-openai-codex",
+            skills:   [ "ase-meta-chat", "ase-meta-quorum" ],
+            handler:  this.chatCodexMcpHandler()
         },
         {
             id:      "brave",

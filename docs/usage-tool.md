@@ -170,6 +170,28 @@ background service as a *Anthropic Claude Code CLI* MCP server:
   is intended to be configured as a stdio MCP server in *Claude
   Code* and not invoked directly by end users.
 
+- `ase chat` \[`-s`|`--service` *name*\] \[`-t`|`--mcp-tool` *name*\] \[`-m`|`--model` *model*\] \[`--timeout` *ms*\]:
+  Bridge a stdio MCP `query(prompt)` tool to the locally installed
+  *OpenAI Codex CLI* (`codex`), so that ASE skills can query OpenAI GPT
+  through the Codex CLI's own configured authentication (it reads no
+  `ASE_MCP_KEY`; typically a ChatGPT subscription). Each query runs
+  `codex` non-interactively in a throw-away temporary directory, with a
+  read-only sandbox, the switchable built-in tool surfaces disabled
+  (shell/command tool, web search, image generation, and the hosted
+  `apps` MCP) and multi-agent spawning requested off, a minimized
+  environment, the user config and execpolicy rules ignored, the prompt
+  piped on standard input, and a hard `--timeout` (default: 300000 ms).
+  It is intended to be registered as the stdio MCP server
+  `chat-openai-codex` by `ase setup mcp activate openai-codex` and not
+  invoked directly by end users. Trust note: this is defense in depth,
+  not a sealed box -- the built-in `view_image` reader has no feature
+  switch, the model catalog's `model_info.multi_agent_version` can
+  override the multi-agent flags (a model pinned to a multi-agent version
+  re-enables the spawn tools), and system- or cloud-level Codex
+  configuration stays outside the bridge's control. Treat this provider
+  exactly like a locally launched `codex`, which is why activation is an
+  explicit opt-in.
+
 The following top-level command exists for rendering the *Anthropic Claude Code CLI*
 or *GitHub Copilot CLI* statusline:
 
@@ -322,27 +344,50 @@ uninstalling the *ASE* tool and its companion *Anthropic Claude Code CLI* plugin
   MCP server name), `KEY` (the accepted `ASE_MCP_KEY_<KEY>` suffixes),
   and `SKILLS` (the *ASE* skills that leverage the server). The
   currently defined servers are the *chat* servers `openai-chatgpt`,
-  `google-gemini`, `deepseek`, `xai-grok`, `alibaba-qwen`, and
-  `zai-glm` (leveraged by `ase-meta-chat` and `ase-meta-quorum`), and
-  the *search* servers `brave`, `perplexity`, and `exa` (leveraged by
-  `ase-meta-search`, `ase-meta-evaluate`, and `ase-arch-discover`).
+  `google-gemini`, `deepseek`, `xai-grok`, `alibaba-qwen`, `zai-glm`,
+  and `openai-codex` (leveraged by `ase-meta-chat` and
+  `ase-meta-quorum`), and the *search* servers `brave`, `perplexity`,
+  and `exa` (leveraged by `ase-meta-search`, `ase-meta-evaluate`, and
+  `ase-arch-discover`). Unlike the other *chat* servers, `openai-codex`
+  reads no `ASE_MCP_KEY_<KEY>` variable at all (its `KEY` column is
+  empty): it is bridged through the local *OpenAI Codex CLI* via `ase
+  chat` and gated on the presence of the `codex` binary in `$PATH`.
 
 - `ase setup mcp activate` \[*servers*\]:
   Register one or more pre-defined MCP servers with the agent tool. The
   optional *servers* argument is a comma-separated list of server ids;
   when omitted or given as the literal `all`, every registered server
-  is selected. Each server reads its API key from an environment
+  is selected. Most servers read their API key from an environment
   variable `ASE_MCP_KEY_<KEY>`, where `<KEY>` is one of the suffixes
   shown in the `KEY` column of `ase setup mcp list` (e.g. the server
   `openai-chatgpt` uses `ASE_MCP_KEY_OPENAI_CHATGPT`). These variables
   are also automatically sourced from `.env` files in the current
-  directory. A server whose key variable is unset or empty is silently
-  skipped when implicitly selected, but causes a hard error when given
-  explicitly on the command line. A stale prior registration of the
-  same server is removed first so it is re-created cleanly. Each *chat*
-  server accepts either the LLM vendor's native API key or the
-  `ASE_MCP_KEY_OPENROUTER` key of an *OpenRouter* account as a common
-  alternative.
+  directory. The `openai-codex` server is the exception: it reads no
+  `ASE_MCP_KEY` (its authentication comes from the `codex` CLI's own
+  configured credentials, which may itself be a ChatGPT subscription or
+  an OpenAI API key that ASE never sees) and is instead gated on the
+  presence of its `codex` binary in `$PATH`. In either case the activation gate has the same
+  semantics: a server whose gate fails (its key variable unset/empty,
+  or its `codex` binary absent) is silently skipped when implicitly
+  selected via an empty list or `all`, but causes a hard error when
+  given explicitly on the command line. Beyond that gate, `openai-codex`
+  additionally requires **explicit** activation: it is *never* registered
+  by an implicit selection (empty list or `all`) even when its `codex`
+  binary is present -- it must be named on the command line (`ase setup
+  mcp activate openai-codex`), which emits an informational skip notice
+  otherwise. This is a deliberate consent gate, because activating it
+  routes your prompts to a foreign model (OpenAI) through the local
+  `codex` login and its calls are auto-approved by the ASE hook once
+  registered (as defense in depth the child `codex` runs with every
+  switchable tool surface disabled and a read-only sandbox, but the
+  switch-less `view_image` reader can still read a local file as an
+  image, the model catalog can override the multi-agent flags, and
+  system- or cloud-level Codex config stays outside ASE's control). A
+  stale prior
+  registration of the same server is removed first so it is re-created
+  cleanly. Each *chat* server except `openai-codex` accepts either the
+  LLM vendor's native API key or the `ASE_MCP_KEY_OPENROUTER` key of an
+  *OpenRouter* account as a common alternative.
 
 - `ase setup mcp deactivate` \[*servers*\]:
   Unregister one or more pre-defined MCP servers from the agent tool.

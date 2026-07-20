@@ -336,12 +336,15 @@ ase setup mcp activate   [--tool claude|copilot|codex] [--scope user|project|loc
 ase setup mcp deactivate [--tool claude|copilot|codex] [--scope user|project|local] [<server>[,...]]
 ```
 
-Each MCP server reads its API key from an environment
+Each API-based MCP server reads its API key from an environment
 variable `ASE_MCP_KEY_XXX`, where `XXX` is the server id in
 upper-case with dashes replaced by underscores (e.g. the server
 `openai-chatgpt` uses `ASE_MCP_KEY_OPENAI_CHATGPT`). These variables
-are also automatically sourced from `.env` files. A server whose
-key variable is unset or empty is silently skipped on activation.
+are also automatically sourced from `.env` files. Such a server whose
+key variable is unset or empty is silently skipped on activation. The
+`openai-codex` server is the exception: it reads no `ASE_MCP_KEY` and
+instead gates on explicit activation plus the presence of the local
+`codex` CLI.
 
 The following AI services are currently defined:
 
@@ -355,6 +358,7 @@ The following AI services are currently defined:
 - Chat: xAI Grok (`xai-grok`)
 - Chat: Alibaba Qwen (`alibaba-qwen`)
 - Chat: Z.AI GLM (`zai-glm`)
+- Chat: OpenAI Codex (`openai-codex`)
 
 </td>
 <td width="50%" valign="top">
@@ -367,10 +371,35 @@ The following AI services are currently defined:
 </tr>
 </table>
 
-Hint: All MCP servers of type "Chat" support both the native API of the
-LLM vendor and the *OpenRouter* proxy API as an alternative, i.e. you
-can leverage all paid "Chat" AI services by just providing the
-`ASE_MCP_KEY_OPENROUTER` of an *OpenRouter* account.
+Hint: All API-based MCP servers of type "Chat" (i.e. every one except
+`openai-codex`) support both the native API of the LLM vendor and the
+*OpenRouter* proxy API as an alternative, i.e. you can leverage those
+paid "Chat" AI services by just providing the `ASE_MCP_KEY_OPENROUTER`
+of an *OpenRouter* account.
+
+Hint: The `openai-codex` "Chat" server is special: it reads no
+`ASE_MCP_KEY_XXX` variable and instead bridges to GPT through the
+locally installed *OpenAI Codex CLI* (`codex`), used purely in a
+read-only, ephemeral query mode and authenticating via that CLI's own
+configured credentials (typically a ChatGPT subscription). Unlike every
+other server it is **never activated implicitly**: a bare `ase setup
+mcp activate` (or `all`) skips it, and it must be enabled explicitly via
+`ase setup mcp activate openai-codex`. This is a deliberate consent
+gate, because activating it routes your prompts to a foreign model
+(OpenAI) through your local `codex` login and its calls are
+auto-approved once registered. As defense in depth the bridge switches
+off the built-in tool surfaces it can (shell, web search, image
+generation, and the hosted `apps` MCP), requests multi-agent spawning
+off, ignores the user-level config, and runs under a `read-only`
+sandbox. This is not a sealed box, though. Several channels stay
+outside those switches: the built-in `view_image` reader has no feature
+switch, so a prompt-injected query could still make the model read a
+locally readable file as an image; the model catalog's
+`model_info.multi_agent_version` overrides the multi-agent flags, so a
+model pinned to a multi-agent version re-enables the spawn tools; and
+system- or cloud-level Codex configuration stays beyond the bridge's
+control. Treat this provider exactly like a locally launched `codex` --
+which is why activation is an explicit, deliberate opt-in.
 
 See Also
 --------

@@ -23,8 +23,10 @@ The following ASE commands/skills exist on the meta-level:
   restricts which search backends are consulted (default: all available).
 
 - **/ase-meta-chat** *llm* *query*:<br/>
-  Query a foreign LLM like OpenAI ChatGPT, Google Gemini, DeepSeek or
-  xAI Grok.
+  Query a foreign LLM like OpenAI ChatGPT, Google Gemini, DeepSeek,
+  xAI Grok, or OpenAI Codex (the latter bridged through the local
+  *OpenAI Codex CLI*, which reads no `ASE_MCP_KEY` and uses its own
+  configured authentication).
 
 - **/ase-meta-quorum** \[`--models`|`-m` *model*\[,...\]\] *question*:<br/>
   Query multiple AIs for a quorum answer. The `--models` option selects

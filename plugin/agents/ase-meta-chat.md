@@ -9,6 +9,7 @@ tools:
     - "mcp__chat-xai-grok__query"
     - "mcp__chat-zai-glm__query"
     - "mcp__chat-alibaba-qwen__query"
+    - "mcp__chat-openai-codex__query"
 ---
 
 @../meta/ase-control.md
@@ -26,13 +27,14 @@ tools:
     <if condition="<llm/> is equal 'grok'">    <server>chat-xai-grok</server>      </if>
     <if condition="<llm/> is equal 'glm'">     <server>chat-zai-glm</server>       </if>
     <if condition="<llm/> is equal 'qwen'">    <server>chat-alibaba-qwen</server>  </if>
+    <if condition="<llm/> is equal 'codex'">   <server>chat-openai-codex</server>  </if>
 
     <if condition="<server/> is empty">
         You *MUST* output the following <template/> and immediately *STOP* processing
         (do *NOT* continue with any further step and do *NOT* call any MCP tool):
 
         <template>
-        ERROR: unknown LLM `<llm/>` (has to be one of: chatgpt, gemini, deepseek, grok, glm, qwen)
+        ERROR: unknown LLM `<llm/>` (has to be one of: chatgpt, gemini, deepseek, grok, glm, qwen, codex)
         </template>
     </if>
 

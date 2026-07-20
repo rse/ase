@@ -11,6 +11,7 @@ import type { LogLevel }           from "./ase-log.js"
 import ConfigCommand               from "./ase-config.js"
 import ServiceCommand              from "./ase-service.js"
 import MCPCommand                  from "./ase-mcp.js"
+import ChatCommand                 from "./ase-chat.js"
 import HookCommand                 from "./ase-hook.js"
 import DiagramCommand              from "./ase-diagram.js"
 import SetupCommand                from "./ase-setup.js"
@@ -62,6 +63,7 @@ const main = async (): Promise<void> => {
     new SetupCommand(log).register(program)
     new ConfigCommand(log).register(program)
     new MCPCommand(log).register(program)
+    new ChatCommand(log).register(program)
     new ServiceCommand(log).register(program)
     new HookCommand(log).register(program)
     new StatuslineCommand(log).register(program)
