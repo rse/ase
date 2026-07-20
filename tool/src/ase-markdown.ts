@@ -238,9 +238,13 @@ export class Markdown {
                 }
 
                 /*  close span before the break, re-open after indentation,
-                    preserving the active fence width on both sides  */
+                    preserving the active fence width on both sides and padding
+                    with a space wherever an inserted delimiter run would merge
+                    with an adjacent literal backtick of the span content  */
                 const bars = "`".repeat(fence)
-                out += `${bars}${nl}${ws}${bars}`
+                const padC = out.endsWith("`") ? " " : ""
+                const padO = (i < text.length && text[i] === "`") ? " " : ""
+                out += `${padC}${bars}${nl}${ws}${bars}${padO}`
                 continue
             }
             out += ch
