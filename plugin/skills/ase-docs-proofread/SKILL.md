@@ -88,8 +88,8 @@ Analyze documents for spelling, punctuation, or grammar errors
     `file` and then numerically by `line`, and set <problems/> to that
     list.
 
-    You *MUST* *NOT* output anything at all in this step 1 beyond the
-    `Glob` and `Agent` tool invocations.
+    You *MUST* *NOT* output anything at all in this STEP 1 beyond the
+    above hint template and the `Glob` and `Agent` tool invocations.
     </step>
 
 2.  <step id="STEP 2: Summary">

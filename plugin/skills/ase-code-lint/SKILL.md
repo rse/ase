@@ -104,7 +104,7 @@ related to a set of code quality aspects.
     *silently drop* all other problems. With the default floor `LOW`, all
     problems are kept. `ACCEPTED` problems are *never* dropped.
 
-    You *MUST* *NOT* output anything else in this step 1.
+    You *MUST* *NOT* output anything else in this STEP 1.
 
     </step>
 
@@ -131,7 +131,7 @@ related to a set of code quality aspects.
     *(no problems detected)*
     </template>
 
-    You *MUST* *NOT* output anything else in this step 2.
+    You *MUST* *NOT* output anything else in this STEP 2.
 
     </step>
 
@@ -359,7 +359,7 @@ related to a set of code quality aspects.
             <else>
 
             Set <result>ACCEPT</result>.
-            You *MUST* *NOT* output anything else in this step 6.
+            You *MUST* *NOT* output anything else in this sub-step 6.
 
             </else>
 
