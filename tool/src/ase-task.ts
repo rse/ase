@@ -404,11 +404,8 @@ export default class TaskCommand {
                 const day   = 24 * hour
                 const month = 30 * day
                 const year  = 365 * day
-                const factor =
-                    unit === "h" ? hour  :
-                        unit === "d" ? day :
-                            unit === "m" ? month :
-                                year
+                const factors: Record<string, number> = { h: hour, d: day, m: month, y: year }
+                const factor  = factors[unit]
                 const removed = Task.purge(this.log, n * factor)
                 if (removed.length === 0)
                     this.log.write("info", "task: no tasks to purge")
