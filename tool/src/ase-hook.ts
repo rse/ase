@@ -496,7 +496,7 @@ export default class HookCommand {
             toolInput = rawInput as { command?: string, skill?: string, file_path?: string }
         const command = toolInput.command ?? ""
         if (toolName === spec.bashToolName && /^ase(\s|$)/.test(command)
-            && !/[;&|`\n]|\$\(/.test(command))
+            && !/[;&|<>`\n]|\$\(/.test(command))
             return { approve: true, reason: "ASE CLI invocation auto-approved" }
         else if (toolName === "Skill" && /^(?:ase:)?ase-.+/.test(toolInput.skill ?? ""))
             return { approve: true, reason: "ASE skill invocation auto-approved" }
