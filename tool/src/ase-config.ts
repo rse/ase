@@ -744,12 +744,9 @@ export class ConfigMCP {
             try {
                 const scope = parseScope(args.scope)
                 const cfg   = new Config("config", configSchema, this.log, scope)
-                let text = ""
-                cfg.lock(() => {
-                    cfg.read()
-                    const val = cfg.get(args.key)
-                    text = val === undefined ? "" : JSON.stringify(val)
-                })
+                cfg.read()
+                const val  = cfg.get(args.key)
+                const text = val === undefined ? "" : JSON.stringify(val)
                 return { content: [ { type: "text", text } ] }
             }
             catch (err: unknown) {
