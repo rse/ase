@@ -46,7 +46,7 @@ interface StatuslineInput {
     model?: {
         display_name?: string
     }
-    context_window?:  {
+    context_window?: {
         used_percentage?:     number
         total_input_tokens?:  number
         total_output_tokens?: number
@@ -78,12 +78,12 @@ interface StatuslineInput {
     }
     rate_limits?: {
         five_hour?: {
-            used_percentage?: number,
-            resets_at?: string | number
+            used_percentage?: number
+            resets_at?:       string | number
         }
         seven_day?: {
-            used_percentage?: number,
-            resets_at?: string | number
+            used_percentage?: number
+            resets_at?:       string | number
         }
     }
 }
@@ -367,7 +367,7 @@ export default class StatuslineCommand {
 
                 /*  helper to build the "<icon> <label>: " prefix subject to --no-icons / --no-labels  */
                 const prefix = (icon: string, label: string): string => {
-                    const i = opts.icons  ? `${icon} `    : ""
+                    const i = opts.icons  ? `${icon} `   : ""
                     const l = opts.labels ? `${label}: ` : ""
                     return `${i}${l}`
                 }
@@ -558,8 +558,8 @@ export default class StatuslineCommand {
 
                     /*  ==== VERSIONS ====  */
                     V: () => {
-                        const ccVersion = data.version ?? ""
-                        const aseVersion = pkg.version ?? ""
+                        const ccVersion  = data.version ?? ""
+                        const aseVersion = pkg.version  ?? ""
                         let version = ""
                         if (ccVersion !== "")
                             version += `claude/${ccVersion}`
