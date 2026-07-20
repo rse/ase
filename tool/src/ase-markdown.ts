@@ -179,9 +179,28 @@ export class Markdown {
                     n++
                     i++
                 }
-                if (fence === 0)
-                    /*  open a span of fence width n  */
-                    fence = n
+                if (fence === 0) {
+                    /*  open a span of fence width n, but only if a matching
+                        closing run of exactly n backticks exists ahead (an
+                        unmatched run is literal text per CommonMark and must
+                        not trigger the line-splitting below)  */
+                    let p      = i
+                    let closes = false
+                    while (p < text.length && !closes) {
+                        if (text[p] === "`") {
+                            let r = 0
+                            while (p + r < text.length && text[p + r] === "`")
+                                r++
+                            if (r === n)
+                                closes = true
+                            p += r
+                        }
+                        else
+                            p++
+                    }
+                    if (closes)
+                        fence = n
+                }
                 else if (n === fence)
                     /*  close the active span  */
                     fence = 0
