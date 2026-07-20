@@ -38,10 +38,10 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     <template>
     <getopt-arguments/>.
-    Please respond with facts and very concise and brief only,
+    Please respond very concisely and briefly, with facts only,
     usually with just 1 to 7 corresponding bullet points and with short sentences.
     Optionally, mention potential cruxes which should be noticed.
-    Beside bullet points, do not provide any additional explanations.
+    Besides bullet points, do not provide any additional explanations.
     Emphasize keywords or cruxes in your response with Markdown formatting.
     Format code parts with Markdown formatting.
     </template>
@@ -66,8 +66,9 @@ by querying *multiple* AIs for an *optimal consensus*.
     validates only the *first* token, so you *MUST* validate each
     remaining token yourself against the allowed set `all`, `chatgpt`,
     `gemini`, `deepseek`, `grok`, `glm`, `qwen`. If any token is *not*
-    in this set, only output the following <template/> and then
-    immediately *STOP* processing the entire current skill:
+    in this set, bind <token/> to that offending token, then only output
+    the following <template/> and then immediately *STOP* processing the
+    entire current skill:
 
     <template>
     ⧉ **ASE**: ✪ skill: **ase-meta-quorum**, ▶ ERROR: invalid `--models` token: **<token/>**
@@ -174,10 +175,6 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     **CONSENSUS RATE**: **<c/>/<n/>** <disagreement/>
 
-    When a quorum was *not* possible (see STEP 4), render this line
-    instead as just `**CONSENSUS RATE**: *n/a* <disagreement/>` (omitting
-    the `<c/>/<n/>` fraction), as a single AI cannot form a consensus.
-
     &#x25CB; **Anthropic Claude**:
     - [...]
     - [...]
@@ -206,6 +203,11 @@ by querying *multiple* AIs for an *optimal consensus*.
     - [...]
     - [...]
     </template>
+
+    In this output, when a quorum was *not* possible (see STEP 4),
+    render the consensus rate line instead as just `**CONSENSUS RATE**:
+    *n/a* <disagreement/>` (omitting the `<c/>/<n/>` fraction), as a
+    single AI cannot form a consensus.
 
     In this output, remove the sections of those AIs which were not
     queried (excluded via `--models`/`-m`) or were not available.
