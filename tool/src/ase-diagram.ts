@@ -259,7 +259,6 @@ export class Diagram {
     }
 }
 
-
 /*  command-line handling  */
 export default class DiagramCommand {
     constructor (private log: Log) {}
