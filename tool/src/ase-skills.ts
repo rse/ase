@@ -370,7 +370,7 @@ export class Skills {
             We therefore default a missing `recentness` to the decay value at
             one half-life (`0.5`), a conservative midpoint that keeps the
             entry rankable without rewarding the missing date.  */
-        const lifespan   = (!Number.isNaN(cMs) && !Number.isNaN(uMs)) ? Math.max(0, uMs - cMs) : 1
+        const lifespan   = (!Number.isNaN(cMs) && !Number.isNaN(uMs)) ? Math.max(1, uMs - cMs) : 1
         const recentness = !Number.isNaN(uMs) ? Math.exp(-Math.max(0, (now - uMs) / msPerDay) / halfLife) : 0.5
         let rank = d * s * lifespan * recentness
         /*  hard, caller-tunable staleness penalty on top of the soft
