@@ -18,40 +18,49 @@
 <script is:inline>
     (function () {
         const links = document.querySelectorAll("[data-navlink]")
-        if (!links.length) return
+        if (!links.length)
+            return
         const entries = []
-        links.forEach(function (link) {
+        links.forEach((link) => {
             const id = (link.getAttribute("href") || "").replace(/^#/, "")
             const sec = id && document.getElementById(id)
-            if (sec) entries.push({ link: link, sec: sec })
+            if (sec)
+                entries.push({ link: link, sec: sec })
         })
-        if (!entries.length) return
+        if (!entries.length)
+            return
         let active = null
-        function setActive(link) {
-            if (active === link) return
-            if (active) active.classList.remove("is-active")
+        const setActive = (link) => {
+            if (active === link)
+                return
+            if (active)
+                active.classList.remove("is-active")
             active = link
-            if (active) active.classList.add("is-active")
+            if (active)
+                active.classList.add("is-active")
         }
         let ticking = false
-        function update() {
+        const update = () => {
             ticking = false
             const line = window.innerHeight * 0.3
             const doc = document.documentElement
             const atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2
             let pick = null
-            if (atBottom) {
+            if (atBottom)
                 pick = entries[entries.length - 1].link
-            }
             else {
-                entries.forEach(function (e) {
-                    if (e.sec.getBoundingClientRect().top <= line) pick = e.link
+                entries.forEach((e) => {
+                    if (e.sec.getBoundingClientRect().top <= line)
+                        pick = e.link
                 })
             }
             setActive(pick)
         }
-        function onScroll() {
-            if (!ticking) { ticking = true; requestAnimationFrame(update) }
+        const onScroll = () => {
+            if (!ticking) {
+                ticking = true
+                requestAnimationFrame(update)
+            }
         }
         window.addEventListener("scroll", onScroll, { passive: true })
         window.addEventListener("resize", onScroll)
