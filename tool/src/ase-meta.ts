@@ -66,8 +66,9 @@ export default class MetaCommand {
             .argument("<name...>", "meta file name(s) (\"ase-\" prefix and \".md\" extension optional)")
             .action(async (names: string[]) => {
                 this.log.write("debug", `meta: reading ${names.length} file(s)`)
-                for (const name of names)
-                    await writeStdout(Meta.read(name))
+                const texts = names.map((name) => Meta.read(name))
+                for (const text of texts)
+                    await writeStdout(text)
             })
     }
 }
