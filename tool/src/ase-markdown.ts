@@ -67,6 +67,14 @@ export class Markdown {
         return result
     }
 
+    /*  measure the length of the backtick run starting at offset pos  */
+    private static runLength (text: string, pos: number): number {
+        let n = 0
+        while (pos + n < text.length && text[pos + n] === "`")
+            n++
+        return n
+    }
+
     /*  apply the inline-span and bullet-marker rewriting passes to a chunk of
         non-fenced Markdown text (see prepare() for fenced-block handling)  */
     private static rewrite (text: string): string {
@@ -90,9 +98,7 @@ export class Markdown {
                     run of N backticks is closed only by a run of exactly N
                     backticks, so the opening-run length determines what we
                     scan for as the closing delimiter  */
-                let open = 0
-                while (j + open < text.length && text[j + open] === "`")
-                    open++
+                const open = Markdown.runLength(text, j)
 
                 /*  scan the opening backtick-run span, capturing its raw
                     inner content up to the matching unescaped closing run of
@@ -114,9 +120,7 @@ export class Markdown {
                             closing delimiter only if it matches the opening
                             run length exactly; a shorter or longer run is
                             literal content of the span  */
-                        let runLen = 0
-                        while (k + runLen < text.length && text[k + runLen] === "`")
-                            runLen++
+                        const runLen = Markdown.runLength(text, k)
                         if (runLen === open) {
                             closed = true
                             break
@@ -174,11 +178,8 @@ export class Markdown {
                 /*  measure the full backtick run (a code-span delimiter is a
                     *run* of backticks; a span opened by N backticks is closed
                     only by a run of exactly N backticks)  */
-                let n = 0
-                while (i < text.length && text[i] === "`") {
-                    n++
-                    i++
-                }
+                const n = Markdown.runLength(text, i)
+                i += n
                 if (fence === 0) {
                     /*  open a span of fence width n, but only if a matching
                         closing run of exactly n backticks exists ahead (an
@@ -188,9 +189,7 @@ export class Markdown {
                     let closes = false
                     while (p < text.length && !closes) {
                         if (text[p] === "`") {
-                            let r = 0
-                            while (p + r < text.length && text[p + r] === "`")
-                                r++
+                            const r = Markdown.runLength(text, p)
                             if (r === n)
                                 closes = true
                             p += r
