@@ -25,12 +25,12 @@ export interface ComponentInfo {
 /*  reusable functionality: gather per-package metadata with maximum parallelism  */
 export class Skills {
     /*  HTTP timeout for the GitHub/npm-downloads side calls  */
-    private static HTTP_TIMEOUT_MS = 10_000
+    private static readonly HTTP_TIMEOUT_MS = 10_000
 
     /*  cap concurrent ofetch web requests to avoid hammering the remote
         endpoints (GitHub API, npm downloads API)  */
-    private static HTTP_CONCURRENCY = 4
-    private static httpActive       = 0
+    private static readonly HTTP_CONCURRENCY = 4
+    private static httpActive                = 0
     private static httpQueue: Array<() => void> = []
     private static async httpLimit<T> (fn: () => Promise<T>): Promise<T> {
         while (Skills.httpActive >= Skills.HTTP_CONCURRENCY)
