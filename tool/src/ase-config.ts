@@ -124,17 +124,22 @@ const parseScopeTerm = (value: string): ScopeTerm => {
         "(expected: \"user\", \"project\", \"task:<id>\", or \"session:<id>\")")
 }
 
+/*  determine the Git top-level directory, if inside a Git repository  */
+const gitToplevel = (): string | null => {
+    try {
+        const result = execaSync("git", [ "rev-parse", "--show-toplevel" ], { stderr: "ignore" })
+        return result.stdout.trim() || null
+    }
+    catch {
+        return null
+    }
+}
+
 /*  detect whether a project context exists, i.e. either we are inside
     a Git working tree or a ".ase" directory is present at or above cwd  */
 const hasProjectContext = (): boolean => {
-    try {
-        const result = execaSync("git", [ "rev-parse", "--show-toplevel" ], { stderr: "ignore" })
-        if (result.stdout.trim() !== "")
-            return true
-    }
-    catch {
-        /*  not inside a Git working tree  */
-    }
+    if (gitToplevel() !== null)
+        return true
     let dir = fs.realpathSync(process.cwd())
     for (;;) {
         if (fs.existsSync(path.join(dir, ".ase")))
@@ -269,14 +274,14 @@ export class Config {
         else if (term.kind === "project") {
             const rel   = path.join(".ase", `${name}.yaml`)
             const cwd   = process.cwd()
-            const top   = this.gitToplevel()
+            const top   = gitToplevel()
             const found = top !== null ?
                 this.findUpward(cwd, top, rel) :
                 (fs.existsSync(path.join(cwd, rel)) ? path.join(cwd, rel) : null)
             return found ?? path.join(top ?? cwd, rel)
         }
         else if (term.kind === "task") {
-            const top = this.gitToplevel() ?? process.cwd()
+            const top = gitToplevel() ?? process.cwd()
             return path.join(top, ".ase", "task", term.id, `${name}.yaml`)
         }
         else
@@ -303,18 +308,6 @@ export class Config {
         return null
     }
 
-    /*  determine the Git top-level directory, if inside a Git repository  */
-    private gitToplevel (): string | null {
-        try {
-            const result = execaSync("git", [ "rev-parse", "--show-toplevel" ], {
-                stderr: "ignore"
-            })
-            return result.stdout.trim() || null
-        }
-        catch {
-            return null
-        }
-    }
 
     /*  read the full scope chain into memory; the requested mode applies
         to the target scope only, inherited scopes are always lenient  */
