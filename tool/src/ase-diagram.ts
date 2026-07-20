@@ -301,7 +301,7 @@ export default class DiagramCommand {
                 "height of terminal of <n> lines (for diagram clipping)",
                 parseInteger("--terminal-height"), Diagram.detectTermHeight())
             .action(async (opts: DiagramOpts) => {
-                /*  fetch Mermaid diagram specification from stdin  */
+                /*  fetch Mermaid diagram specification from file or stdin  */
                 let src: string
                 if (opts.input !== undefined)
                     src = fs.readFileSync(opts.input, "utf8")
