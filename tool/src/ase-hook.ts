@@ -350,7 +350,7 @@ export default class HookCommand {
             Anthropic Claude Code CLI and OpenAI Codex CLI expect the context nested in
             "hookSpecificOutput"; GitHub Copilot CLI expects a flat top-level
             "additionalContext" field.  */
-        const payload = tool !== "copilot" ? {
+        const payload: Record<string, unknown> = tool !== "copilot" ? {
             "hookSpecificOutput": {
                 "hookEventName":     "SessionStart",
                 "additionalContext": md
@@ -363,7 +363,7 @@ export default class HookCommand {
             (only for the harnesses that support it and only when not
             running headless -- mirroring the constitution box condition)  */
         if ((tool === "claude" || tool === "codex") && headless !== "true")
-            (payload as Record<string, unknown>).systemMessage = banner
+            payload.systemMessage = banner
 
         await writeStdout(JSON.stringify(payload))
         return 0
