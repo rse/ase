@@ -199,7 +199,6 @@ problems in *performance* and *efficiency*, or problems in *security*.
     Finally, output the following <template/> to give a final hint:
 
     <template>
-    ⧉ **ASE**: ☻ skill: **<skill-name/>**, ▶ status: **skill finished**
     ⧉ **ASE**: ↪ hint: **For deeper analysis, suggestions on solution approaches and then final problem resolution, use `/ase-code-resolve P{n}` in the same or even a different session.**
     </template>
 
