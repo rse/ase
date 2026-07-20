@@ -465,7 +465,7 @@ export default class ServiceCommand {
                     await new Promise((resolve) => setTimeout(resolve, 100))
                     if (exited)
                         break
-                    const s = await probe(port, ctx.projectId)
+                    const s = await probe(port, ctx.projectId).catch(() => null)
                     if (s === true) {
                         this.log.write("info", `service: started on port ${port}`)
                         child.unref()
