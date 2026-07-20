@@ -228,6 +228,8 @@ export class Artifact {
         const file = filename.replace(/\\/g, "/").replace(/^\/+/, "")
         if (file === "")
             throw new Error("artifact: filename must not be empty")
+        if (file.split("/").includes(".."))
+            throw new Error("artifact: filename must not contain \"..\" segments")
         const cfg = new Config("config", configSchema, log)
         cfg.read()
         const { basedir } = Artifact.spec(cfg, kind)
