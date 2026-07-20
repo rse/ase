@@ -410,6 +410,15 @@ export default class TaskCommand {
     }
 }
 
+/*  render a caught error as an MCP tool error result  */
+const mcpError = (err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err)
+    return {
+        isError: true,
+        content: [ { type: "text" as const, text: `ERROR: ${message}` } ]
+    }
+}
+
 /*  MCP registration entry point for task tools  */
 export class TaskMCP {
     constructor (private log: Log) {}
@@ -450,11 +459,7 @@ export class TaskMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpError(err)
             }
         })
 
@@ -477,11 +482,7 @@ export class TaskMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpError(err)
             }
         })
 
@@ -505,11 +506,7 @@ export class TaskMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpError(err)
             }
         })
 
@@ -534,11 +531,7 @@ export class TaskMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpError(err)
             }
         })
 
@@ -566,11 +559,7 @@ export class TaskMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpError(err)
             }
         })
 
@@ -604,11 +593,7 @@ export class TaskMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpError(err)
             }
         })
     }
