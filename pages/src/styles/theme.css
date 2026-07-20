@@ -19,7 +19,6 @@
 
 /*  brand scale   */
 :root {
-    --brand-50:  oklch(97.5% 0.012 250);
     --brand-100: oklch(94.5% 0.028 250);
     --brand-200: oklch(90.0% 0.050 250);
     --brand-300: oklch(83.5% 0.075 250);
