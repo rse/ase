@@ -214,16 +214,15 @@ const formatCostUsd = (n: number): string => {
 }
 
 /*  probe local git status for the given working directory  */
-const probeGit = (cwd: string): { branch: string, dirty: boolean, untracked: number, added: number, removed: number } => {
+const probeGit = (cwd: string): { branch: string, untracked: number, added: number, removed: number } => {
     const gitCmd = (...args: string[]): string =>
         execFileSync("git", [ "-C", cwd, ...args ],
             { stdio: [ "ignore", "pipe", "ignore" ], timeout: 1000 }).toString("utf8")
     try {
-        const branch = gitCmd("rev-parse", "--abbrev-ref", "HEAD").trim()
-        const porc   = gitCmd("status", "--porcelain")
+        const branch    = gitCmd("rev-parse", "--abbrev-ref", "HEAD").trim()
+        const porc      = gitCmd("status", "--porcelain")
         const lines     = porc.split("\n").filter((l) => l.length > 0)
         const untracked = lines.filter((l) => l.startsWith("??")).length
-        const dirty     = lines.length > 0
         let added   = 0
         let removed = 0
         try {
@@ -236,10 +235,10 @@ const probeGit = (cwd: string): { branch: string, dirty: boolean, untracked: num
         catch (_e) {
             /*  no HEAD yet or git failure; leave counts at 0  */
         }
-        return { branch, dirty, untracked, added, removed }
+        return { branch, untracked, added, removed }
     }
     catch (_e) {
-        return { branch: "", dirty: false, untracked: 0, added: 0, removed: 0 }
+        return { branch: "", untracked: 0, added: 0, removed: 0 }
     }
 }
 
