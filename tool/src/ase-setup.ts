@@ -648,7 +648,7 @@ export default class SetupCommand {
             handler: async (spec, tool, scope, action, _envKey, envVal) => {
                 if (action === "activate")
                     await this.mcpAdd(tool, spec.server, {},
-                        { type: "http", url: `https://mcp.exa.ai/mcp?exaApiKey=${envVal}` }, scope)
+                        { type: "http", url: `https://mcp.exa.ai/mcp?exaApiKey=${encodeURIComponent(envVal)}` }, scope)
                 else
                     await this.mcpRemove(tool, spec.server, scope)
             }
