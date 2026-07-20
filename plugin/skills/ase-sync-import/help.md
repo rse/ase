@@ -78,4 +78,4 @@ Import a pasted feature description into a task plan:
 
 [`ase-sync-reconcile`](../ase-sync-reconcile/help.md),
 [`ase-sync-export`](../ase-sync-export/help.md),
-[`ase-task-implement`](../ase-task-implement/help.md)
+[`ase-task-implement`](../ase-task-implement/help.md).
