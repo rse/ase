@@ -515,6 +515,18 @@ export default class HookCommand {
         return { approve: false, reason: "" }
     }
 
+    /*  read the hook event payload from stdin and parse it into the
+        loosely-typed input object shared by the tool-approval handlers  */
+    private async readHookInput (tool: Tool): Promise<{ spec: ToolSpec, input: Record<string, unknown> }> {
+        const spec  = toolSpecs[tool]
+        const stdin = await this.readStdin()
+        const input = this.parseJSON(stdin, v.looseObject({
+            session_id: v.optional(v.string()),
+            sessionId:  v.optional(v.string())
+        }))
+        return { spec, input }
+    }
+
     /*  handler for "ase hook pre-tool-use" (all tools).
         For Anthropic Claude Code CLI and GitHub Copilot CLI this is where ASE tool
         invocations are auto-approved (via "permissionDecision: allow").
@@ -524,14 +536,8 @@ export default class HookCommand {
         still drain stdin, as Codex treats a non-draining hook as a hard
         error.  */
     private async doPreToolUse (tool: Tool): Promise<number> {
-        const spec = toolSpecs[tool]
-
         /*  read tool invocation information  */
-        const stdin = await this.readStdin()
-        const input = this.parseJSON(stdin, v.looseObject({
-            session_id: v.optional(v.string()),
-            sessionId:  v.optional(v.string())
-        }))
+        const { spec, input } = await this.readHookInput(tool)
 
         /*  Codex auto-approves through "PermissionRequest", not here  */
         if (spec.approvalEvent !== "PreToolUse")
@@ -566,14 +572,8 @@ export default class HookCommand {
         Staying silent (or returning a non-approval) defers to Codex's
         normal approval flow.  */
     private async doPermissionRequest (tool: Tool): Promise<number> {
-        const spec = toolSpecs[tool]
-
         /*  read tool invocation information  */
-        const stdin = await this.readStdin()
-        const input = this.parseJSON(stdin, v.looseObject({
-            session_id: v.optional(v.string()),
-            sessionId:  v.optional(v.string())
-        }))
+        const { spec, input } = await this.readHookInput(tool)
 
         /*  determine whether to auto-approve the tool invocation  */
         const { approve } = this.decideApproval(tool, spec, input)
