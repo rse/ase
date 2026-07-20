@@ -138,18 +138,24 @@ const detectTermWidth = (): number => {
     return width
 }
 
-/*  format a token count as a compact human-readable string (e.g. 334k, 104.9M)  */
-const formatTokens = (n: number): string => {
+/*  format a count as a compact human-readable string with the given scaling base  */
+const formatScaled = (n: number, base: number): string => {
     if (!Number.isFinite(n) || n < 0)
         return "0"
-    if (n >= 1_000_000_000)
-        return `${(n / 1_000_000_000).toFixed(1)}G`
-    if (n >= 1_000_000)
-        return `${(n / 1_000_000).toFixed(1)}M`
-    if (n >= 1_000)
-        return `${(n / 1_000).toFixed(1)}k`
+    if (n >= base ** 3)
+        return `${(n / base ** 3).toFixed(1)}G`
+    if (n >= base ** 2)
+        return `${(n / base ** 2).toFixed(1)}M`
+    if (n >= base)
+        return `${(n / base).toFixed(1)}k`
     return `${n}`
 }
+
+/*  format a token count as a compact human-readable string (e.g. 334k, 104.9M)  */
+const formatTokens = (n: number): string => formatScaled(n, 1000)
+
+/*  format a byte count as a compact human-readable string (e.g. 33.2G, 512M)  */
+const formatBytes = (n: number): string => formatScaled(n, 1024)
 
 /*  format a millisecond duration as a compact human-readable string (e.g. 6d 12hr 7m, 4hr 27m, 12m 30s)  */
 const formatDurationMs = (ms: number): string => {
@@ -205,19 +211,6 @@ const formatCostUsd = (n: number): string => {
     if (!Number.isFinite(n) || n < 0)
         return "$0.00"
     return `$${n.toFixed(2)}`
-}
-
-/*  format a byte count as a compact human-readable string (e.g. 33.2G, 512M)  */
-const formatBytes = (n: number): string => {
-    if (!Number.isFinite(n) || n < 0)
-        return "0"
-    if (n >= 1024 ** 3)
-        return `${(n / 1024 ** 3).toFixed(1)}G`
-    if (n >= 1024 ** 2)
-        return `${(n / 1024 ** 2).toFixed(1)}M`
-    if (n >= 1024)
-        return `${(n / 1024).toFixed(1)}k`
-    return `${n}`
 }
 
 /*  probe local git status for the given working directory  */
