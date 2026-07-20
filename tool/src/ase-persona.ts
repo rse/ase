@@ -4,18 +4,18 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import { isScalar }                           from "yaml"
-import { z }                                  from "zod"
+import { isScalar }                                              from "yaml"
+import { z }                                                     from "zod"
 
-import type { McpServer }                     from "@modelcontextprotocol/sdk/server/mcp.js"
+import type { McpServer }                                        from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import type Log                               from "./ase-log.js"
-import { Config, configSchema, parseScope }   from "./ase-config.js"
+import type Log                                                  from "./ase-log.js"
+import { Config, configSchema, parseScope, agentClassification } from "./ase-config.js"
 
 /*  reusable functionality: ASE agent persona style get/set  */
 export class Persona {
     /*  allowed persona style values  */
-    static styles = [ "writer", "engineer", "journalist", "telegrapher", "caveman" ] as const
+    static styles = agentClassification.persona
 
     /*  get the effective persona style for an optional session;
         returns the default "engineer" if nothing is configured  */
