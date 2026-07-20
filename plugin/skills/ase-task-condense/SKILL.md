@@ -37,7 +37,7 @@ Procedure
 
 1.  **Determine Task:**
 
-    1.  Set <instruction><getopt-arguments/></instruction> initially.
+    1.  Set <id><getopt-arguments/></id> initially.
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
@@ -45,11 +45,10 @@ Procedure
     2.  React on task id:
 
         1.  <if condition="
-                <instruction/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
+                <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
             ">
-            Set <ase-task-id><instruction/></ase-task-id> (set task
-            id to instruction) and <instruction></instruction> (set
-            instruction empty), call the `ase_task_id(id: "<ase-task-id/>",
+            Set <ase-task-id><id/></ase-task-id> (set task id) and
+            call the `ase_task_id(id: "<ase-task-id/>",
             session: "<ase-session-id/>")` tool from the `ase` MCP
             server to switch the task, and then only output the
             following <template/>:
@@ -59,7 +58,7 @@ Procedure
             </template>
             </if>
 
-        2.  <elseif condition="<instruction/> is NOT empty">
+        2.  <elseif condition="<id/> is NOT empty">
             The argument is neither empty nor a valid task id. As this
             skill only accepts an optional `[<id>]` argument and *never*
             a free-text instruction, only output the following <template/>
