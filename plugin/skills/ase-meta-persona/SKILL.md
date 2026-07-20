@@ -7,7 +7,7 @@ description: >
     the concise, factual, and accurate "engineer" (default),
     the layered, pyramid-structured "journalist",
     the brief, factual, and abbreviating "telegrapher",
-    the terse, rough, and stuttering "caveman".
+    or the terse, rough, and stuttering "caveman".
     Use when user says "persona <persona>" or "be <persona>".
 user-invocable: true
 disable-model-invocation: false
