@@ -69,7 +69,7 @@ export class Markdown {
 
     /*  apply the inline-span and bullet-marker rewriting passes to a chunk of
         non-fenced Markdown text (see prepare() for fenced-block handling)  */
-    static rewrite (text: string): string {
+    private static rewrite (text: string): string {
         /*  PASS 1: rewrite inline code spans that carry backslash-escaped
             backticks (`\``) into CommonMark-correct spans.  */
         {
