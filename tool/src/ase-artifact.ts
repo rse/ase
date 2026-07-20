@@ -288,6 +288,12 @@ export default class ArtifactCommand {
     }
 }
 
+/*  render a caught error as an MCP tool error result  */
+const mcpToolError = (err: unknown) => ({
+    isError: true,
+    content: [ { type: "text" as const, text: `ERROR: ${err instanceof Error ? err.message : String(err)}` } ]
+})
+
 /*  MCP registration entry point for artifact tools  */
 export class ArtifactMCP {
     constructor (private log: Log) {}
@@ -324,11 +330,7 @@ export class ArtifactMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpToolError(err)
             }
         })
 
@@ -360,11 +362,7 @@ export class ArtifactMCP {
                 }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
+                return mcpToolError(err)
             }
         })
     }

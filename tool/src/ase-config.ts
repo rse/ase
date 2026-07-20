@@ -720,6 +720,12 @@ export default class ConfigCommand {
     }
 }
 
+/*  render a caught error as a prefixed MCP tool error result  */
+const mcpToolError = (tool: string, err: unknown) => ({
+    isError: true,
+    content: [ { type: "text" as const, text: `${tool}: ERROR: ${err instanceof Error ? err.message : String(err)}` } ]
+})
+
 /*  MCP registration entry point for layered YAML configuration access  */
 export class ConfigMCP {
     constructor (private log: Log) {}
@@ -750,8 +756,7 @@ export class ConfigMCP {
                 return { content: [ { type: "text", text } ] }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `config_get: ERROR: ${message}` } ] }
+                return mcpToolError("config_get", err)
             }
         })
 
@@ -782,8 +787,7 @@ export class ConfigMCP {
                 return { content: [ { type: "text", text: `config_set: OK: stored "${args.key}" on scope "${args.scope}"` } ] }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `config_set: ERROR: ${message}` } ] }
+                return mcpToolError("config_set", err)
             }
         })
 
@@ -811,8 +815,7 @@ export class ConfigMCP {
                 return { content: [ { type: "text", text: `config_delete: OK: removed "${args.key}" on scope "${args.scope}"` } ] }
             }
             catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `config_delete: ERROR: ${message}` } ] }
+                return mcpToolError("config_delete", err)
             }
         })
     }
