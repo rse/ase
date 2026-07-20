@@ -236,8 +236,10 @@ Procedure
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
-            to *apply* the plan.
+            tool `Skill(skill: "ase:ase-task-implement", args: "<args/>")`
+            to invoke the `ase:ase-task-implement` skill in order to
+            *implement* the updated plan. Immediately stop processing
+            the current skill once the `Skill` tool was used.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to implementation**
@@ -249,8 +251,10 @@ Procedure
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
             Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-preflight", args: "<args/>")` tool
-            to *apply* the plan.
+            tool `Skill(skill: "ase:ase-task-preflight", args: "<args/>")`
+            to invoke the `ase:ase-task-preflight` skill in order to
+            *preflight* the updated plan. Immediately stop processing
+            the current skill once the `Skill` tool was used.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan updated -- hand-off to pre-flight**
