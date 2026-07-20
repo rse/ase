@@ -105,7 +105,7 @@
     --font-mono:    "TypoPRO Source Code Pro", ui-monospace, monospace;
 }
 
-/*  left-aligned, first-line-indented section body copy  */
+/*  justified, first-line-indented section body copy  */
 @utility ase-indent-p {
     @apply mt-1;
     text-align: justify;
