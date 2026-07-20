@@ -145,8 +145,8 @@ Processing
     ... ])` tool of the `ase` MCP server *once*, passing the `kind`
     tokens (`spec`, `arch`, `code`, `docs`, `infr`, `othr`), and read
     the returned `artifacts` array of `{ kind, files }` objects to match
-    each changed file to its kind. Map the matched lower-cased kind back
-    to its upper-cased <artifact-kind/> tag, and comma-separate multiple
+    each changed file to its kind. Use the matched lower-cased kind
+    directly as its <artifact-kind/> tag, and comma-separate multiple
     tags when more than one artifact class applies.
 
     If a <summary/> is too short or especially is not comprehensible
