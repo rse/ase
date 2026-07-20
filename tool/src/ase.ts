@@ -23,7 +23,6 @@ import pkg                         from "../package.json" with { type: "json" }
 
 /*  type of top-level (global) options  */
 export type GlobalOpts = {
-    debug:    boolean
     logLevel: LogLevel
     logFile:  string
 }
