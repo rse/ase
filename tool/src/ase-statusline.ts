@@ -267,9 +267,11 @@ export default class StatuslineCommand {
 
     /*  register commands  */
     register (program: Command): void {
-        /*  default for --tool derived from ASE_TOOL environment variable  */
+        /*  default for --tool derived from ASE_TOOL environment variable
+            (validated lazily by "parseTool" in the action, so an invalid
+            value cannot break unrelated "ase" commands at startup)  */
         const envTool  = process.env.ASE_TOOL ?? ""
-        const toolDflt = envTool !== "" ? this.parseTool(envTool) : "claude"
+        const toolDflt = envTool !== "" ? envTool : "claude"
 
         program
             .command("statusline")
