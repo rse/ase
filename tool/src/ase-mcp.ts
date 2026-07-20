@@ -4,7 +4,6 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import path                   from "node:path"
 import { fileURLToPath }      from "node:url"
 
 import { Command }            from "commander"
@@ -14,9 +13,8 @@ import { StdioServerTransport }          from "@modelcontextprotocol/sdk/server/
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js"
 import type { JSONRPCMessage }           from "@modelcontextprotocol/sdk/types.js"
 
-import { Config, configSchema } from "./ase-config.js"
 import type Log                 from "./ase-log.js"
-import { SERVICE_HOST as HOST, serviceSchema, probe } from "./ase-service.js"
+import { SERVICE_HOST as HOST, probe, loadServiceContext } from "./ase-service.js"
 
 /*  CLI command "ase mcp"  */
 export default class MCPCommand {
@@ -24,13 +22,7 @@ export default class MCPCommand {
 
     /*  load service identity context  */
     private loadContext (): { projectId: string, port: number | null } {
-        const cfg = new Config("config", configSchema, this.log)
-        cfg.read()
-        const svc = new Config("service", serviceSchema, this.log)
-        svc.read()
-        const projectId = (cfg.get("project.id") as string | null | undefined) ?? path.basename(process.cwd())
-        const port      = (svc.get("port")       as number | null | undefined) ?? null
-        return { projectId, port }
+        return loadServiceContext(this.log)
     }
 
     /*  run "ase service start" and wait for the service to come up  */

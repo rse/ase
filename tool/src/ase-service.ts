@@ -72,7 +72,7 @@ export const probe = async (port: number, projectId: string): Promise<boolean | 
     }
 }
 
-interface Context {
+export interface Context {
     projectId: string
     port:      number | null
     svc:       Config
@@ -86,6 +86,28 @@ const TICK_MS    = 60 * 1000
 const PORT_MIN   = 42000
 const PORT_MAX   = 44000
 const PORT_TRIES = 20
+
+/*  load the optional "config.yaml" and "service.yaml" files and derive
+    the service identity context (project id, port, service config)  */
+export const loadServiceContext = (log: Log): Context => {
+    /*  load files  */
+    const cfg = new Config("config", configSchema, log)
+    cfg.read()
+    const svc = new Config("service", serviceSchema, log)
+    svc.read()
+
+    /*  determine project id  */
+    const projectId = (cfg.get("project.id") as string | null | undefined) ?? path.basename(process.cwd())
+
+    /*  determine service port  */
+    const port      = (svc.get("port")       as number | null | undefined) ?? null
+
+    /*  determine path to ".ase" directory  */
+    const aseDir    = path.dirname(svc.filename)
+
+    /*  return context information  */
+    return { projectId, port, svc, aseDir }
+}
 
 /*  reusable functionality: port allocation, persistence, and process spawning  */
 export class Service {
@@ -215,30 +237,7 @@ export default class ServiceCommand {
 
     /*  load optional ".ase/config.yaml" and ".ase/service.yaml" files  */
     private loadContext (): Context {
-        /*  load files  */
-        const cfg = new Config("config", configSchema, this.log)
-        cfg.read()
-        const svc = new Config("service", serviceSchema, this.log)
-        svc.read()
-
-        /*  determine project id  */
-        const rawId     = cfg.get("project.id") as string | null | undefined
-        const projectId = rawId ?? path.basename(process.cwd())
-
-        /*  determine service port  */
-        const rawPort = svc.get("port") as number | null | undefined
-        const port: number | null = rawPort ?? null
-
-        /*  determine path to ".ase" directory  */
-        const aseDir = path.dirname(svc.filename)
-
-        /*  return context information  */
-        return {
-            projectId,
-            port,
-            svc,
-            aseDir
-        }
+        return loadServiceContext(this.log)
     }
 
     /*  service-side: bind HAPI server until "/stop" command is received or idle timeout happens  */
