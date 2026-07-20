@@ -158,9 +158,7 @@ export class Artifact {
     /*  read the configured "basedir" anchor and "files" miniglob spec
         for a single kind; "basedir" is project-root-relative (POSIX,
         "" ≡ project root) and "files" resolves relative to "basedir"  */
-    private static spec (log: Log, kind: Exclude<ArtifactKind, "othr">): { basedir: string, files: string } {
-        const cfg = new Config("config", configSchema, log)
-        cfg.read()
+    private static spec (cfg: Config, kind: Exclude<ArtifactKind, "othr">): { basedir: string, files: string } {
         const basedir = Artifact.configString(cfg, `project.artifact.${kind}.basedir`)
             .replace(/\\/g, "/").replace(/^\/+|\/+$/g, "")
             .replace(/^\.$/, "")
@@ -188,11 +186,13 @@ export class Artifact {
     /*  resolve the requested kinds to project-relative file lists  */
     static list (log: Log, kinds: ArtifactKind[]): { kind: ArtifactKind, files: string[] }[] {
         const all = Artifact.universe()
+        const cfg = new Config("config", configSchema, log)
+        cfg.read()
 
         /*  raw-resolve all five configured kinds  */
         const raw = new Map<Exclude<ArtifactKind, "othr">, Set<string>>()
         for (const kind of configuredKinds) {
-            const { basedir, files } = Artifact.spec(log, kind)
+            const { basedir, files } = Artifact.spec(cfg, kind)
             raw.set(kind, Artifact.resolveKind(basedir, files, all))
         }
 
@@ -227,7 +227,9 @@ export class Artifact {
         const file = filename.replace(/\\/g, "/").replace(/^\/+/, "")
         if (file === "")
             throw new Error("artifact: filename must not be empty")
-        const { basedir } = Artifact.spec(log, kind)
+        const cfg = new Config("config", configSchema, log)
+        cfg.read()
+        const { basedir } = Artifact.spec(cfg, kind)
         return basedir === "" ? file : `${basedir}/${file}`
     }
 }
