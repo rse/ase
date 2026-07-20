@@ -198,10 +198,9 @@ export class Task {
         return true
     }
 
-    /*  list all persisted tasks in lexicographic id order; if verbose is true,
-        each entry's `mtime` is set to the task file's modification time
-        formatted as "YYYY-MM-DD HH:MM", otherwise it is left undefined  */
-    static list (log: Log, verbose = false): { id: string, mtime: string | undefined }[] {
+    /*  scan the task base directory (after eager migration) for
+        "TASK-<id>.md" files matching the configured "files" miniglob  */
+    private static scan (log: Log): { id: string, file: string, st: fs.Stats }[] {
         if (Task.needsMigration(log))
             Task.migrateAll(log)
         const { basedir, files } = Task.spec(log)
@@ -209,18 +208,28 @@ export class Task {
         if (!fs.existsSync(dir))
             return []
         const isMatch = picomatch(files, { dot: true })
-        const out: { id: string, mtime: string | undefined }[] = []
+        const out: { id: string, file: string, st: fs.Stats }[] = []
         for (const entry of fs.readdirSync(dir)) {
             const m = /^TASK-([A-Za-z0-9_-]+)\.md$/.exec(entry)
             if (m === null || !isMatch(entry))
                 continue
             const file = path.join(dir, entry)
-            const st = fs.statSync(file)
+            const st   = fs.statSync(file)
             if (!st.isFile())
                 continue
-            const mtime = verbose ? DateTime.fromJSDate(st.mtime).toFormat("yyyy-LL-dd HH:mm") : undefined
-            out.push({ id: m[1], mtime })
+            out.push({ id: m[1], file, st })
         }
+        return out
+    }
+
+    /*  list all persisted tasks in lexicographic id order; if verbose is true,
+        each entry's `mtime` is set to the task file's modification time
+        formatted as "YYYY-MM-DD HH:MM", otherwise it is left undefined  */
+    static list (log: Log, verbose = false): { id: string, mtime: string | undefined }[] {
+        const out = Task.scan(log).map((entry) => ({
+            id:    entry.id,
+            mtime: verbose ? DateTime.fromJSDate(entry.st.mtime).toFormat("yyyy-LL-dd HH:mm") : undefined
+        }))
         out.sort((a, b) => a.id.localeCompare(b.id))
         return out
     }
@@ -228,26 +237,12 @@ export class Task {
     /*  purge tasks whose modification time is older than the given cutoff in
         milliseconds; returns the list of removed task ids  */
     static purge (log: Log, maxAgeMs: number): string[] {
-        if (Task.needsMigration(log))
-            Task.migrateAll(log)
-        const { basedir, files } = Task.spec(log)
-        const dir = path.join(Task.projectRoot(), basedir)
-        if (!fs.existsSync(dir))
-            return []
-        const isMatch = picomatch(files, { dot: true })
-        const cutoff  = Date.now() - maxAgeMs
+        const cutoff = Date.now() - maxAgeMs
         const removed: string[] = []
-        for (const entry of fs.readdirSync(dir)) {
-            const m = /^TASK-([A-Za-z0-9_-]+)\.md$/.exec(entry)
-            if (m === null || !isMatch(entry))
-                continue
-            const file = path.join(dir, entry)
-            const st = fs.statSync(file)
-            if (!st.isFile())
-                continue
-            if (st.mtimeMs < cutoff) {
-                fs.rmSync(file, { force: true })
-                removed.push(m[1])
+        for (const entry of Task.scan(log)) {
+            if (entry.st.mtimeMs < cutoff) {
+                fs.rmSync(entry.file, { force: true })
+                removed.push(entry.id)
             }
         }
         return removed
