@@ -201,8 +201,9 @@ export class Artifact {
         const part    = new Map<ArtifactKind, string[]>()
         for (const kind of configuredKinds) {
             const own: string[] = []
-            for (const file of raw.get(kind)!.size > 0 ? all : []) {
-                if (raw.get(kind)!.has(file) && !claimed.has(file)) {
+            const resolved = raw.get(kind)!
+            for (const file of all) {
+                if (resolved.has(file) && !claimed.has(file)) {
                     own.push(file)
                     claimed.add(file)
                 }
