@@ -18,21 +18,6 @@ import type { McpServer }                from "@modelcontextprotocol/sdk/server/
 
 import type Log                          from "./ase-log.js"
 
-/*  internal command options type  */
-interface DiagramOpts {
-    format:         "ascii" | "svg"
-    ascii:          boolean
-    colorMode:      "none" | "ansi16" | "ansi256",
-    input?:         string
-    nodeMarginX:    number
-    nodeMarginY:    number
-    nodePadding:    number
-    diagramClipX:   number
-    diagramClipY:   number
-    terminalWidth:  number
-    terminalHeight: number
-}
-
 /*  options accepted by the pure rendering helper  */
 export interface DiagramRenderOpts {
     format:         "ascii" | "svg"
@@ -45,6 +30,11 @@ export interface DiagramRenderOpts {
     diagramClipY:   number
     terminalWidth:  number
     terminalHeight: number
+}
+
+/*  internal command options type  */
+interface DiagramOpts extends DiagramRenderOpts {
+    input?: string
 }
 
 /*  custom argument parser for Commander: non-negative integer  */
