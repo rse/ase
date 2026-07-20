@@ -72,16 +72,16 @@ Procedure
         </template>
         </if>
 
-    2.   Analyze the <diff/> and <stat/> and synthesize a *concise* narrative of
-         WHAT changed and WHY, *grouped by intent* rather than by file.
-         Honor the following intents:
+    2.  Analyze the <diff/> and <stat/> and synthesize a *concise* narrative of
+        WHAT changed and WHY, *grouped by intent* rather than by file.
+        Honor the following intents:
 
-         -   `FEATURE`:     new        functionality or configuration
-         -   `IMPROVEMENT`: improved   functionality or configuration
-         -   `BUGFIX`:      corrected  functionality or configuration
-         -   `UPDATE`:      updated    functionality or configuration
-         -   `CLEANUP`:     cleaned up functionality or configuration
-         -   `REFACTOR`:    refactored functionality or configuration
+        -   `FEATURE`:     new        functionality or configuration
+        -   `IMPROVEMENT`: improved   functionality or configuration
+        -   `BUGFIX`:      corrected  functionality or configuration
+        -   `UPDATE`:      updated    functionality or configuration
+        -   `CLEANUP`:     cleaned up functionality or configuration
+        -   `REFACTOR`:    refactored functionality or configuration
 
     3.  <if condition="<diff/> is NOT empty">
         1.  First, output the following header <template/>:
