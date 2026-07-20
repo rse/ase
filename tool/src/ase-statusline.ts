@@ -16,6 +16,7 @@ import type { ForegroundColorName }         from "chalk"
 
 import type Log                             from "./ase-log.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
+import { writeStdout }                      from "./ase-stdout.js"
 import pkg                                  from "../package.json" with { type: "json" }
 
 /*  forced-color chalk instance: stdout is a pipe under Anthropic Claude Code CLI,
@@ -604,7 +605,7 @@ export default class StatuslineCommand {
                 }
 
                 /*  send output  */
-                process.stdout.write(out)
+                await writeStdout(out)
 
                 /*  optionally publish task id to the calling tmux pane as a per-pane user
                     option, so something (like claudeX) can pick it up via #{@ase_task_id}  */
