@@ -464,7 +464,7 @@ export default class StatuslineCommand {
 
                     /*  ==== CONTEXT ====  */
                     c: () => {
-                        const pct     = Math.floor(data.context_window?.used_percentage ?? 0)
+                        const pct     = Math.min(100, Math.max(0, Math.floor(data.context_window?.used_percentage ?? 0)))
                         const barSize = 20
                         const filled  = Math.round(pct / 100 * barSize)
                         const bar     = "█".repeat(filled) + "░".repeat(barSize - filled)
