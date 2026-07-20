@@ -98,7 +98,7 @@ Processing
     <ase-tpl-bullet-normal/> **DETERMINE ARTIFACT CHANGES:**
     </template>
 
-    To update to entries of the most recent *ChangeLog* section, consult
+    To update the entries of the most recent *ChangeLog* section, consult
     the Git *commits* plus the currently already staged changes in the Git
     *index*, but *ignore* the Git *stash* and still unstaged changes.
 
