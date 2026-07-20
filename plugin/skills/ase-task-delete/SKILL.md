@@ -51,7 +51,7 @@ Procedure
         </template>
         </if>
 
-2.  **Perform Operation**:
+2.  **Perform Operation:**
 
     1.  Call the `ase_task_delete(id: "<id/>")` tool of the `ase` MCP
         server to delete the task plan content and set <text/> to the
