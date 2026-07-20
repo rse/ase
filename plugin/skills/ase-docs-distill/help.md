@@ -37,13 +37,15 @@ document has fewer salient points than *N*, the skill emits only the
 points it found and *never pads* the list with filler; a `0`, negative, or
 non-numeric value falls back to the default *5*.
 
-##  ARGUMENTS
+##  OPTIONS
 
-`--top`, `-t` *N*:
+`--top`|`-t` *N*:
     Bound the ranked list to at most *N* key points (default *5*). The
     bound is a *cap*, never a *quota* - fewer points are emitted when the
     document does not contain *N* salient ones, and an invalid or
     non-positive *N* reverts to the default.
+
+##  ARGUMENTS
 
 *document-reference*:
     The document to distill - either a *path* to a readable file or the
