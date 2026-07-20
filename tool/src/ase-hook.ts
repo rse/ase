@@ -228,7 +228,7 @@ export default class HookCommand {
         const versionLatestTool    = await Version.latest()
 
         /*  sanity check situation  */
-        const versionHints = []
+        const versionHints: string[] = []
         if (versionCurrentPlugin !== versionCurrentTool)
             versionHints.push("**WARNING:** version *mismatch*: " +
                 `tool: **${versionCurrentTool}**, plugin: **${versionCurrentPlugin}**`)
