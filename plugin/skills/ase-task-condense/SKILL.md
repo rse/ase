@@ -212,8 +212,8 @@ Procedure
                 Next Step: How would you like to proceed with the plan?
                 DONE: Stop processing.
                 EDIT: Hand off plan to editing.
-                IMPLEMENT: Hand off plan to implementation.
                 PREFLIGHT: Hand off plan to pre-flighting.
+                IMPLEMENT: Hand off plan to implementation.
             </expand>
 
     2.  Check the tool <result/> and dispatch accordingly:
