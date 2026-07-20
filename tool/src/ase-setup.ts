@@ -228,7 +228,8 @@ export default class SetupCommand {
         /*  best-effort stop of background service  */
         this.log.write("info", `setup: update${dev ? "[dev]" : ""}: ` +
             "stopping potentially running ASE service")
-        await this.run("ase", [ "service", "stop" ], { quiet: true })
+        await this.run("ase", [ "service", "stop" ],
+            { quiet: true, ignoreError: "ASE service not running" })
 
         if (dev) {
             /*  update ASE CLI Tool  */
@@ -322,7 +323,8 @@ export default class SetupCommand {
         /*  best-effort stop of background service  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
             "stopping potentially running ASE service")
-        await this.run("ase", [ "service", "stop" ], { quiet: true })
+        await this.run("ase", [ "service", "stop" ],
+            { quiet: true, ignoreError: "ASE service not running" })
 
         /*  uninstall ASE plugin  */
         this.log.write("info", `setup: uninstall${dev ? "[dev]" : ""}: ` +
