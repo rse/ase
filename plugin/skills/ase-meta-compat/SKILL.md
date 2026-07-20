@@ -1,5 +1,6 @@
 ---
 name: ase-meta-compat
+argument-hint: "[--help|-h]"
 description: >
     Self-test the LLM's ability to execute ASE's core interpreter
     machinery (control flow, XML placeholders, regex matching,
@@ -12,6 +13,14 @@ disable-model-invocation: true
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
+
+If `$1` (the first token of the skill arguments) is equal to `-h` or
+`--help`, you *MUST* once output the following output <template/> and
+then *IMMEDIATELY* *STOP* the further skill processing:
+
+<template>
+@${CLAUDE_SKILL_DIR}/help.md
+</template>
 
 Self-Test ASE Compatibility
 ===========================
