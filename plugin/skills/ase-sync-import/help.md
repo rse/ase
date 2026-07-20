@@ -61,7 +61,7 @@ Import a foreign requirements document into the specification:
 ❯ /ase-sync-import -t SPEC docs/legacy/requirements.txt
 ```
 
-Import an external design write-up into the architecture, defaulting
+Import an external design write-up into the architecture, defaulting to
 both specification and architecture as targets:
 
 ```text
