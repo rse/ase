@@ -46,14 +46,14 @@ const toolSpecs: Record<Tool, ToolSpec> = {
 }
 
 /*  per-MCP dispatch table  */
-type mcpServerSpec = {
+type McpServerSpec = {
     id:       string,
     name:     string,
     version?: string,
     env:      string[],
     server:   string,
     skills:   string[],
-    handler:  (spec: mcpServerSpec, tool: Tool, scope: Scope, action: "activate" | "deactivate", envKey: string, envVal: string) => Promise<void>
+    handler:  (spec: McpServerSpec, tool: Tool, scope: Scope, action: "activate" | "deactivate", envKey: string, envVal: string) => Promise<void>
 }
 
 /*  CLI command "ase setup"  */
@@ -524,7 +524,7 @@ export default class SetupCommand {
     private chatMcpHandler (
         direct: { url: string, api: string, model: string },
         router: { model: string }
-    ): mcpServerSpec["handler"] {
+    ): McpServerSpec["handler"] {
         return async (spec, tool, scope, action, envKey, envVal) => {
             if (action === "activate")
                 await this.mcpAdd(tool, spec.server, { OPENAI_KEY: envVal }, {
@@ -550,7 +550,7 @@ export default class SetupCommand {
 
     /*  registry of pre-defined MCP servers: maps each server id onto its
         dedicated handler which performs the activate/deactivate operation  */
-    private mcpServers: mcpServerSpec[] = [
+    private mcpServers: McpServerSpec[] = [
         {
             id:      "openai-chatgpt",
             name:    "OpenAI ChatGPT",
