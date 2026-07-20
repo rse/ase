@@ -123,7 +123,7 @@ export class KVMCP {
             inputSchema: {
                 key: z.string()
                     .describe("key identifier (non-empty, no whitespace-only, no control characters, up to 1024 characters)"),
-                val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.any()), z.record(z.string(), z.any()) ])
+                val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.unknown()), z.record(z.string(), z.unknown()) ])
                     .describe("arbitrary JSON-compatible value to store under `key`")
             }
         }, async (args) => {
@@ -206,7 +206,7 @@ export class KVMCP {
                         .describe("the KV sub-command to execute"),
                     key: z.string().optional()
                         .describe("key identifier (required for `set`/`get`/`delete`)"),
-                    val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.any()), z.record(z.string(), z.any()) ]).optional()
+                    val: z.union([ z.string(), z.number(), z.boolean(), z.null(), z.array(z.unknown()), z.record(z.string(), z.unknown()) ]).optional()
                         .describe("value to store (required for `set`)"),
                     prefix: z.string().optional()
                         .describe("if given for `clear`, only remove keys starting with this prefix (otherwise remove all keys)")
