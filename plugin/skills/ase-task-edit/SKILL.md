@@ -185,13 +185,13 @@ Set <content-dirty>true</content-dirty>.
 
         Set <content-dirty>false</content-dirty>.
 
-        -   If <text/> starts with `ERROR:`:
+        -   If <text/> starts with `ERROR:` or `WARNING:`:
             Silently ignore the MCP error.
             Set <content/> to empty.
             Set <words/> to "0".
             Do not output anything.
 
-        -   If <text/> starts NOT with `ERROR:`:
+        -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
             Set <content><text/></content> (set content to text).
             Calculate the number of words <words/> of <content/>.
             Only output the following <template/>:
