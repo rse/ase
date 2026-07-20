@@ -13,6 +13,7 @@ import { DateTime }                           from "luxon"
 import picomatch                              from "picomatch"
 import { isScalar }                           from "yaml"
 import { z }                                  from "zod"
+import { LRUCache }                           from "lru-cache"
 
 import type { McpServer }                     from "@modelcontextprotocol/sdk/server/mcp.js"
 
@@ -33,19 +34,30 @@ export class Task {
             throw new Error("task: id must match [A-Za-z0-9_-]+")
     }
 
+    /*  cached project root determination (TTL-bounded, as the ASE
+        service is long-running and the Git context can change)  */
+    private static projectRootCache = new LRUCache<string, string>({ max: 4, ttl: 10 * 1000 })
+
     /*  determine the project root (Git top-level if inside a Git
-        working tree, otherwise the current working directory)  */
+        working tree, otherwise the current working directory);
+        cached, as each determination spawns a Git subprocess  */
     static projectRoot (): string {
+        const cwd    = process.cwd()
+        const cached = Task.projectRootCache.get(cwd)
+        if (cached !== undefined)
+            return cached
+        let root = cwd
         try {
             const result = execaSync("git", [ "rev-parse", "--show-toplevel" ], { stderr: "ignore" })
             const top = result.stdout.trim()
             if (top !== "")
-                return top
+                root = top
         }
         catch {
             /*  not inside a Git working tree  */
         }
-        return process.cwd()
+        Task.projectRootCache.set(cwd, root)
+        return root
     }
 
     /*  read the configured "basedir" anchor and "files" miniglob spec for
