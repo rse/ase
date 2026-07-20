@@ -156,7 +156,7 @@ Analyze documents for spelling, punctuation, or grammar errors
             <description/>
             </template>
 
-        3.  <if condition="<getopt-option-auto/> is not 'true' and <ase-project-boxing/> is equal `grey`">
+        3.  <if condition="<getopt-option-auto/> is not equal `true` and <ase-project-boxing/> is equal `grey`">
 
             The project source artifacts are classified as a *grey box*, so
             the user does *not* want the full artifact internals surfaced:
@@ -175,7 +175,7 @@ Analyze documents for spelling, punctuation, or grammar errors
             </template>
 
             </if>
-            <elseif condition="<getopt-option-auto/> is not 'true'">
+            <elseif condition="<getopt-option-auto/> is not equal `true`">
 
             Determine the hunk *body* as an ordered list of lines, each
             carrying a one-character prefix (` ` for context, `-` for
@@ -231,7 +231,7 @@ Analyze documents for spelling, punctuation, or grammar errors
 
             </elseif>
 
-        4.  <if condition="<getopt-option-auto/> is not 'true'">
+        4.  <if condition="<getopt-option-auto/> is not equal `true`">
 
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a

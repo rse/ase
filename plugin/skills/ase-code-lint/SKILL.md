@@ -294,7 +294,7 @@ related to a set of code quality aspects.
 
             </template>
 
-        5.  <if condition="<getopt-option-auto/> is not 'true' and <ase-project-boxing/> is not equal `black`">
+        5.  <if condition="<getopt-option-auto/> is not equal `true` and <ase-project-boxing/> is not equal `black`">
 
             <if condition="<ase-project-boxing/> is equal `grey`">
 
@@ -341,7 +341,7 @@ related to a set of code quality aspects.
 
             </else>
 
-        6.  <if condition="<getopt-option-auto/> is not 'true'">
+        6.  <if condition="<getopt-option-auto/> is not equal `true`">
 
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
