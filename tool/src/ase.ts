@@ -77,12 +77,8 @@ const main = async (): Promise<void> => {
     process.exit(0)
 }
 main().catch((err: unknown) => {
-    if (err instanceof CommanderError) {
-        if (err.exitCode !== 0)
-            process.exit(err.exitCode)
-        else
-            process.exit(0)
-    }
+    if (err instanceof CommanderError)
+        process.exit(err.exitCode)
     const message = err instanceof Error ? err.message : String(err)
     log.write("error", message)
     process.exit(1)
