@@ -797,7 +797,7 @@ export default class SetupCommand {
     private async statuslineWriteAst (file: string, root: AstNode): Promise<void> {
         await mkdirp(path.dirname(file))
         const text = JsonAsty.unparse(root)
-        writeFileAtomic.sync(file, text, { encoding: "utf8" })
+        await writeFileAtomic(file, text, { encoding: "utf8" })
     }
 
     /*  handler for "ase setup statusline activate"  */
