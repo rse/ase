@@ -68,6 +68,7 @@
         "lru-cache":                        "11.5.2"
     },
     "allowScripts": {
+        "fsevents":                         true
     },
     "engines": {
         "npm":                              ">=10.0.0",
