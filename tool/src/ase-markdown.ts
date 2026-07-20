@@ -41,22 +41,22 @@ export class Markdown {
         for (let li = 0; li < lines.length; li++) {
             const line = lines[li]
             const nl   = li < lines.length - 1 ? "\n" : ""
-            const m    = line.match(/^(\s*)(`{3,}|~{3,})/)
+            const m    = line.match(/^\s*(`{3,}|~{3,})/)
             if (!inFence && m) {
                 /*  a fence-opening line: flush the pending non-fenced buffer,
                     enter fenced mode, and emit the opener verbatim  */
                 flush()
                 inFence  = true
-                fenceCh  = m[2]![0]!
-                fenceLen = m[2]!.length
+                fenceCh  = m[1]![0]!
+                fenceLen = m[1]!.length
                 result += line + nl
             }
             else if (inFence) {
                 /*  inside a fenced block: emit verbatim and, on a matching
                     closing fence line, leave fenced mode  */
                 result += line + nl
-                const c = line.match(/^(\s*)(`{3,}|~{3,})\s*$/)
-                if (c && c[2]![0] === fenceCh && c[2]!.length >= fenceLen)
+                const c = line.match(/^\s*(`{3,}|~{3,})\s*$/)
+                if (c && c[1]![0] === fenceCh && c[1]!.length >= fenceLen)
                     inFence = false
             }
             else
