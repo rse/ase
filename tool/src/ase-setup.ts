@@ -47,12 +47,12 @@ const toolSpecs: Record<Tool, ToolSpec> = {
 
 /*  per-MCP dispatch table  */
 type McpServerSpec = {
-    id:       string,
-    name:     string,
-    version?: string,
-    env:      string[],
-    server:   string,
-    skills:   string[],
+    id:       string
+    name:     string
+    version?: string
+    env:      string[]
+    server:   string
+    skills:   string[]
     handler:  (spec: McpServerSpec, tool: Tool, scope: Scope, action: "activate" | "deactivate", envKey: string, envVal: string) => Promise<void>
 }
 
