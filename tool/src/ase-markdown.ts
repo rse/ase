@@ -129,6 +129,9 @@ export class Markdown {
                         k += runLen
                         continue
                     }
+                    if (c === "\n" && /^[ \t]*\r?(?:\n|$)/.test(text.slice(k + 1)))
+                        /*  a code span never crosses a paragraph break  */
+                        break
                     inner += c
                     k++
                 }
@@ -194,6 +197,9 @@ export class Markdown {
                                 closes = true
                             p += r
                         }
+                        else if (text[p] === "\n" && /^[ \t]*\r?(?:\n|$)/.test(text.slice(p + 1)))
+                            /*  a code span never crosses a paragraph break  */
+                            break
                         else
                             p++
                     }
