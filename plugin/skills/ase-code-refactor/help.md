@@ -56,7 +56,7 @@ plan via `ase_task_save` and then hands off to `ase-task-edit`,
     skill. For all other head tokens, the *entire* list is forwarded
     to `ase-task-edit`, which consumes its head itself. This lets an
     entire pipeline be pre-scripted in one shot. Recognized tokens at
-    this skill: `none` (default, hand-off to `ase-task-edit`
+    this skill: `none` (default, hand off to `ase-task-edit`
     interactively), `DONE` (stop), `EDIT` (hand off to
     `ase-task-edit`), `PREFLIGHT` (hand off to `ase-task-preflight`),
     or `IMPLEMENT` (hand off to `ase-task-implement`). Example:
