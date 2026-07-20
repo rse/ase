@@ -20,7 +20,7 @@ set placeholders into the context as a side-effect.
     3-6 are *structurally unreachable* and you *MUST NOT* call the
     `ase_getopt` MCP tool under any circumstances.
 
-    <if condition="<getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e. it does not start with an option)">
+    <if condition="<getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e. it does not contain an option)">
         Parse the options *locally*, without any MCP call:
 
         For each option token in <getopt-spec/> of the form
