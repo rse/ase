@@ -155,7 +155,7 @@ Procedure
         (the `\s` alternative)?
         Record `yes` or `no` as actual result for `regex/whitespace`.
 
-    7.  *complex*: Does  `--level=(low|high)...` match
+    7.  *complex*: Does `--level=(low|high)...` match
         `^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)(\.\.\.)?|.*))?$`?
         Record `yes` or `no` as actual result for `regex/complex`.
 
