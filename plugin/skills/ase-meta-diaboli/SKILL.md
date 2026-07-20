@@ -2,7 +2,7 @@
 name: ase-meta-diaboli
 argument-hint: "[--help|-h] [--count|-c <count>] <thesis>"
 description: >
-    Challenge a thesis by playing "Devil’s Advocate" (Latin: "Advocatus
+    Challenge a thesis by playing "Devil's Advocate" (Latin: "Advocatus
     Diaboli"). Use when the user wants a thesis or statement
     relentlessly challenged or criticised.
 user-invocable: true
@@ -15,7 +15,7 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-diaboli">
-    Play "Devil's Advocate"
+Play "Devil's Advocate"
 </skill>
 
 <expand name="getopt"
@@ -25,8 +25,8 @@ effort: xhigh
 </expand>
 
 <objective>
-    Play "Devil’s Advocate" (Latin: "Advocatus Diaboli") by relentlessly
-    challenging or criticising the thesis: <thesis><getopt-arguments/></thesis>
+Play "Devil's Advocate" (Latin: "Advocatus Diaboli") by relentlessly
+challenging or criticising the thesis: <thesis><getopt-arguments/></thesis>
 </objective>
 
 Determine the minimum number of *anti-theses* to surface: set <count/>
