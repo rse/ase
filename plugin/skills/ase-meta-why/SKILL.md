@@ -66,7 +66,7 @@ addressing surface-level symptoms.
 
         <while condition="<n/> is less than or equal to <depth/>">
 
-            Ask <question/> and document the answer in <answer/> with the following template:
+            Ask <question/> and document the answer in <answer/> with the following template.
             Don't stop at symptoms, keep digging for systemic issues.
             Consider technical, domain-specific, process-related, or organizational causes.
 

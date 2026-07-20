@@ -98,7 +98,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
         strongest available evidence is the one hardest to dismiss.
 
     -   **Seek the Confirming Case**:
-        Actively hunt for the supporting example, the favourable
+        Actively hunt for the supporting example, the favorable
         scenario, the precedent where the position succeeds, because
         one solid confirming case anchors the argument in reality.
 
@@ -130,7 +130,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 
     -   **Concede the Real Weaknesses**:
         Acknowledging where the thesis genuinely falls short is what
-        makes the defence credible, because a Steelman who can never
+        makes the defense credible, because a Steelman who can never
         admit a flaw is just an apologist.
 
     -   **Pre-Parade Thinking**:
