@@ -47,8 +47,9 @@ export class Meta {
         try {
             return fs.readFileSync(abs, "utf8")
         }
-        catch (_e) {
-            throw new Error(`meta: failed to read file: ${abs}`)
+        catch (err) {
+            const message = err instanceof Error ? err.message : String(err)
+            throw new Error(`meta: failed to read file: ${abs} (${message})`)
         }
     }
 }
