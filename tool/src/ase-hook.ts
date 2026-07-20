@@ -600,9 +600,11 @@ export default class HookCommand {
 
     /*  register commands  */
     register (program: Command): void {
-        /*  default for --tool derived from ASE_TOOL environment variable  */
+        /*  default for --tool derived from ASE_TOOL environment variable
+            (validated lazily by "parseTool" in each action, so an invalid
+            value cannot break unrelated "ase" commands at startup)  */
         const envTool  = process.env.ASE_TOOL ?? ""
-        const toolDflt = envTool !== "" ? this.parseTool(envTool) : "claude"
+        const toolDflt = envTool !== "" ? envTool : "claude"
 
         /*  register CLI top-level command "ase hook"  */
         const hookCmd = program
