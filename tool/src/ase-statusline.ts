@@ -222,22 +222,19 @@ const formatBytes = (n: number): string => {
 
 /*  probe local git status for the given working directory  */
 const probeGit = (cwd: string): { branch: string, dirty: boolean, untracked: number, added: number, removed: number } => {
+    const gitCmd = (...args: string[]): string =>
+        execFileSync("git", [ "-C", cwd, ...args ],
+            { stdio: [ "ignore", "pipe", "ignore" ], timeout: 1000 }).toString("utf8")
     try {
-        const branch = execFileSync("git", [ "-C", cwd, "rev-parse", "--abbrev-ref", "HEAD" ],
-            { stdio: [ "ignore", "pipe", "ignore" ], timeout: 1000 })
-            .toString("utf8").trim()
-        const porc = execFileSync("git", [ "-C", cwd, "status", "--porcelain" ],
-            { stdio: [ "ignore", "pipe", "ignore" ], timeout: 1000 })
-            .toString("utf8")
+        const branch = gitCmd("rev-parse", "--abbrev-ref", "HEAD").trim()
+        const porc   = gitCmd("status", "--porcelain")
         const lines     = porc.split("\n").filter((l) => l.length > 0)
         const untracked = lines.filter((l) => l.startsWith("??")).length
         const dirty     = lines.length > 0
         let added   = 0
         let removed = 0
         try {
-            const shortstat = execFileSync("git", [ "-C", cwd, "diff", "--shortstat", "HEAD" ],
-                { stdio: [ "ignore", "pipe", "ignore" ], timeout: 1000 })
-                .toString("utf8")
+            const shortstat = gitCmd("diff", "--shortstat", "HEAD")
             const mAdd = shortstat.match(/(\d+)\s+insertion/)
             const mDel = shortstat.match(/(\d+)\s+deletion/)
             if (mAdd !== null) added   = Number.parseInt(mAdd[1]!, 10)
