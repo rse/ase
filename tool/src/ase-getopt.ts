@@ -64,8 +64,10 @@ export class GetoptMCP {
                 /*  tokenize spec and add one option per token  */
                 const tokens    = args.spec.split(/\s+/).filter((e) => e.length > 0)
                 const re        = /^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)(\.\.\.)?|.*))?$/
+                const camelKey  = (long: string) => long.replace(/-(.)/g, (_, c: string) => c.toUpperCase())
                 const internals = new Set<string>()
                 const flagTakesValue = new Map<string, boolean>()
+                const listOpts: Array<{ long: string, choices: string[] }> = []
                 for (const tok of tokens) {
                     const m = re.exec(tok)
                     if (m === null)
@@ -92,11 +94,13 @@ export class GetoptMCP {
                     }
                     else
                         opt.default(false)
-                    if (long !== undefined && long.startsWith("int-")) {
+                    if (choices !== null && isList)
+                        listOpts.push({ long, choices })
+                    if (long.startsWith("int-")) {
                         /*  internal option: hide from usage help and remember
                             its camel-cased key for the info rendering below  */
                         opt.hideHelp()
-                        internals.add(long.replace(/-(.)/g, (_, c: string) => c.toUpperCase()))
+                        internals.add(camelKey(long))
                     }
                     cmd.addOption(opt)
                 }
@@ -104,22 +108,13 @@ export class GetoptMCP {
                 /*  parse args  */
                 cmd.parse(argsVec, { from: "user" })
 
-                /*  validate comma-separated list-of-choices options  */
-                const listOpts: Array<{ long: string, choices: string[] }> = []
-                for (const tok of tokens) {
-                    const m = re.exec(tok)
-                    if (m === null)
-                        continue
-                    const long       = m[1]
-                    const choicePart = m[4] ?? null
-                    const listMarker = m[5] ?? null
-                    if (choicePart !== null && listMarker !== null)
-                        listOpts.push({ long, choices: choicePart.split("|") })
-                }
+                /*  validate comma-separated list-of-choices options (only
+                    the first supplied token is checked here -- skills
+                    validate the remaining tokens as they consume them)  */
                 if (listOpts.length > 0) {
                     const opts = cmd.opts() as Record<string, unknown>
                     for (const { long, choices } of listOpts) {
-                        const key = long.replace(/-(.)/g, (_, c: string) => c.toUpperCase())
+                        const key = camelKey(long)
                         const v = opts[key]
                         if (typeof v !== "string")
                             continue
