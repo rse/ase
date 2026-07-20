@@ -60,10 +60,10 @@ Distill the key points of a document file:
 ❯ /ase-docs-distill doc/architecture.md
 ```
 
-Distill only the top 5 key points:
+Distill only the top 3 key points:
 
 ```text
-❯ /ase-docs-distill --top 5 doc/architecture.md
+❯ /ase-docs-distill --top 3 doc/architecture.md
 ```
 
 Distill a pasted block of text:
