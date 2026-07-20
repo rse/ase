@@ -157,7 +157,7 @@ Procedure
         words <words/> of <content/>.
 
     10. Call the `ase_task_save(id: "<ase-task-id/>",
-        text: "<content/>")` of the `ase` MCP server to save the updated
+        text: "<content/>")` tool of the `ase` MCP server to save the updated
         task plan content. Do not output anything related to this MCP
         call.
 

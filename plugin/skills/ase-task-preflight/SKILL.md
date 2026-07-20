@@ -162,7 +162,7 @@ Procedure
         </if>
 
     4.  Finally, call the `ase_task_save(id: "<ase-task-id/>",
-        text: "<content/>")` of the `ase` MCP server to save the updated
+        text: "<content/>")` tool of the `ase` MCP server to save the updated
         task plan content. Calculate the number of words <words/> of
         <content/>. Do not output anything related to this MCP tool call
         except the following <template/>:
