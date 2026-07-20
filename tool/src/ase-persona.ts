@@ -21,7 +21,7 @@ export class Persona {
         returns the default "engineer" if nothing is configured  */
     static get (log: Log, session?: string): string {
         const scope = parseScope(session !== undefined ? `session:${session}` : undefined)
-        const cfg = new Config("config", configSchema, log, scope)
+        const cfg   = new Config("config", configSchema, log, scope)
         cfg.read()
         const val = cfg.get("agent.persona")
         if (val === undefined)
@@ -35,7 +35,7 @@ export class Persona {
     /*  set the persona style on the strongest scope of an optional session  */
     static set (log: Log, style: string, session?: string): void {
         const scope = parseScope(session !== undefined ? `session:${session}` : undefined)
-        const cfg = new Config("config", configSchema, log, scope)
+        const cfg   = new Config("config", configSchema, log, scope)
         cfg.lock(() => {
             cfg.read()
             cfg.set("agent.persona", style)
