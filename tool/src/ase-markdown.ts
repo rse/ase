@@ -75,103 +75,101 @@ export class Markdown {
         return n
     }
 
-    /*  apply the inline-span and bullet-marker rewriting passes to a chunk of
-        non-fenced Markdown text (see prepare() for fenced-block handling)  */
-    private static rewrite (text: string): string {
-        /*  PASS 1: rewrite inline code spans that carry backslash-escaped
-            backticks (`\``) into CommonMark-correct spans.  */
-        {
-            let pre = ""
-            let j   = 0
-            while (j < text.length) {
-                const ch = text[j]
-                if (ch !== "`") {
-                    /*  literal backslash-escaped backtick *outside* any span
-                        is left verbatim for later scanning  */
-                    pre += ch
-                    j++
-                    continue
-                }
-
-                /*  measure the full opening backtick run: a code-span
-                    delimiter is a *run* of backticks and a span opened by a
-                    run of N backticks is closed only by a run of exactly N
-                    backticks, so the opening-run length determines what we
-                    scan for as the closing delimiter  */
-                const open = Markdown.runLength(text, j)
-
-                /*  scan the opening backtick-run span, capturing its raw
-                    inner content up to the matching unescaped closing run of
-                    exactly `open` backticks  */
-                let inner    = ""
-                let k        = j + open
-                let closed   = false
-                let escaped  = false
-                while (k < text.length) {
-                    const c = text[k]
-                    if (c === "\\" && k + 1 < text.length && text[k + 1] === "`") {
-                        inner += "\\`"
-                        escaped = true
-                        k += 2
-                        continue
-                    }
-                    if (c === "`") {
-                        /*  measure this backtick run and treat it as the
-                            closing delimiter only if it matches the opening
-                            run length exactly; a shorter or longer run is
-                            literal content of the span  */
-                        const runLen = Markdown.runLength(text, k)
-                        if (runLen === open) {
-                            closed = true
-                            break
-                        }
-                        inner += "`".repeat(runLen)
-                        k += runLen
-                        continue
-                    }
-                    if (c === "\n" && /^[ \t]*\r?(?:\n|$)/.test(text.slice(k + 1)))
-                        /*  a code span never crosses a paragraph break  */
-                        break
-                    inner += c
-                    k++
-                }
-                if (!closed || !escaped) {
-                    /*  not an escaped-backtick span: emit the opening run
-                        verbatim and continue scanning from just after it  */
-                    pre += "`".repeat(open)
-                    j += open
-                    continue
-                }
-
-                /*  un-escape inner `\`` into literal backticks, then choose a
-                    fence longer than the longest internal backtick run  */
-                const content = inner.replace(/\\`/g, "`")
-                let maxRun = 0
-                let run    = 0
-                for (const c of content) {
-                    if (c === "`") {
-                        run++
-                        if (run > maxRun)
-                            maxRun = run
-                    }
-                    else
-                        run = 0
-                }
-                const fence = "`".repeat(maxRun + 1)
-                const pad   = (content.startsWith("`") || content.endsWith("`")) ? " " : ""
-                pre += `${fence}${pad}${content}${pad}${fence}`
-                j = k + open
+    /*  PASS 1 of rewrite(): rewrite inline code spans that carry
+        backslash-escaped backticks (`\``) into CommonMark-correct spans  */
+    private static rewriteEscapedSpans (text: string): string {
+        let pre = ""
+        let j   = 0
+        while (j < text.length) {
+            const ch = text[j]
+            if (ch !== "`") {
+                /*  literal backslash-escaped backtick *outside* any span
+                    is left verbatim for later scanning  */
+                pre += ch
+                j++
+                continue
             }
-            text = pre
-        }
 
-        /*  PASS 2: split multi-line inline code spans by scanning the
-            entire text character-by-character while tracking whether we
-            are currently inside an active backtick (U+0060) span; on
-            every "<newline><whitespaces>" sequence encountered while
-            inside a span, close the span before the break and re-open
-            it after the indentation, so each physical line becomes its
-            own single-line span */
+            /*  measure the full opening backtick run: a code-span
+                delimiter is a *run* of backticks and a span opened by a
+                run of N backticks is closed only by a run of exactly N
+                backticks, so the opening-run length determines what we
+                scan for as the closing delimiter  */
+            const open = Markdown.runLength(text, j)
+
+            /*  scan the opening backtick-run span, capturing its raw
+                inner content up to the matching unescaped closing run of
+                exactly `open` backticks  */
+            let inner    = ""
+            let k        = j + open
+            let closed   = false
+            let escaped  = false
+            while (k < text.length) {
+                const c = text[k]
+                if (c === "\\" && k + 1 < text.length && text[k + 1] === "`") {
+                    inner += "\\`"
+                    escaped = true
+                    k += 2
+                    continue
+                }
+                if (c === "`") {
+                    /*  measure this backtick run and treat it as the
+                        closing delimiter only if it matches the opening
+                        run length exactly; a shorter or longer run is
+                        literal content of the span  */
+                    const runLen = Markdown.runLength(text, k)
+                    if (runLen === open) {
+                        closed = true
+                        break
+                    }
+                    inner += "`".repeat(runLen)
+                    k += runLen
+                    continue
+                }
+                if (c === "\n" && /^[ \t]*\r?(?:\n|$)/.test(text.slice(k + 1)))
+                    /*  a code span never crosses a paragraph break  */
+                    break
+                inner += c
+                k++
+            }
+            if (!closed || !escaped) {
+                /*  not an escaped-backtick span: emit the opening run
+                    verbatim and continue scanning from just after it  */
+                pre += "`".repeat(open)
+                j += open
+                continue
+            }
+
+            /*  un-escape inner `\`` into literal backticks, then choose a
+                fence longer than the longest internal backtick run  */
+            const content = inner.replace(/\\`/g, "`")
+            let maxRun = 0
+            let run    = 0
+            for (const c of content) {
+                if (c === "`") {
+                    run++
+                    if (run > maxRun)
+                        maxRun = run
+                }
+                else
+                    run = 0
+            }
+            const fence = "`".repeat(maxRun + 1)
+            const pad   = (content.startsWith("`") || content.endsWith("`")) ? " " : ""
+            pre += `${fence}${pad}${content}${pad}${fence}`
+            j = k + open
+        }
+        return pre
+    }
+
+    /*  PASS 2 of rewrite(): split multi-line inline code spans by scanning
+        the entire text character-by-character while tracking whether we
+        are currently inside an active backtick (U+0060) span; on
+        every "<newline><whitespaces>" sequence encountered while
+        inside a span, close the span before the break and re-open
+        it after the indentation, so each physical line becomes its
+        own single-line span  */
+    private static splitMultiLineSpans (text: string): string {
         let out   = ""
         let fence = 0
         let i     = 0
@@ -250,17 +248,26 @@ export class Markdown {
             out += ch
             i++
         }
+        return out
+    }
+
+    /*  apply the inline-span and bullet-marker rewriting passes to a chunk of
+        non-fenced Markdown text (see prepare() for fenced-block handling)  */
+    private static rewrite (text: string): string {
+        /*  PASS 1: rewrite escaped-backtick inline code spans  */
+        text = Markdown.rewriteEscapedSpans(text)
+
+        /*  PASS 2: split multi-line inline code spans into per-line spans  */
+        const out = Markdown.splitMultiLineSpans(text)
 
         /*  PASS 3: replace the leading "-"/"*" marker of every unordered
             bullet paragraph with "◯", preserving the leading indentation
             and the following whitespace; operate line-by-line so only the
             actual list markers (at a line start) are affected  */
-        out = out
+        return out
             .split("\n")
             .map((line) => line.replace(/^(\s*)[-*]([ \t]+)/, "$1◯$2"))
             .join("\n")
-
-        return out
     }
 }
 
