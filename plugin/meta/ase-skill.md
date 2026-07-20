@@ -218,7 +218,7 @@ Skill Identification
     following output <template/>:
 
     <template>
-    ⧉ **ASE**: ✪ skill: **<skill-name/>**, status: **skill finished**
+    ⧉ **ASE**: ✪ skill: **<skill-name/>**, ▶ status: **skill finished**
     </template>
 
 -   *IMPORTANT*: Set <objective></objective> (set to empty).
