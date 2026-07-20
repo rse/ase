@@ -33,8 +33,9 @@ demotes dependency-heavy components.
 ##  OPTIONS
 
 `--limit`|`-l=12`:
-    The *maximum* number of components searched per source and retained
-    in the final ranking (default: 12). Raise it for a broader, more
+    The *maximum* number of components retained in the final ranking
+    (default: 12); each discovery source may fetch up to twice this
+    number of candidates for ranking. Raise it for a broader, more
     exhaustive survey, lower it for a quicker, narrower lookup.
 
 `--staleness`|`-s=18`:
