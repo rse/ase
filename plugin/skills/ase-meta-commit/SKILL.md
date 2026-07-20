@@ -44,7 +44,9 @@ currently staged Git changes.
 
     `<type/>: <summary/>`
 
-    The known <type/>s and their usual corresponding kind of change are:
+    The known <type/>s (kept deliberately in sync with the intent groups
+    of the `ase-meta-diff` and `ase-meta-changelog` skills) and their
+    usual corresponding kind of change are:
 
     -   `FEATURE`:     new functionality or configuration
     -   `IMPROVEMENT`: improved functionality or configuration
