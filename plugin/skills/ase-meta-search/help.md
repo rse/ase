@@ -26,7 +26,7 @@ Brave, or `WebSearch` individually.
 
 `--services`|`-s`=(`all`|`perplexity`|`brave`|`exa`|`websearch`)...:
     The comma-separated list of search backends to query. The default
-    `all` queries every available backend (the original behavior);
+    `all` queries every available backend;
     otherwise only the listed backends are queried.
 
 ##  ARGUMENTS
