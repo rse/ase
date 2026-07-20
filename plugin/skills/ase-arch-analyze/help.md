@@ -12,8 +12,8 @@
 ##  DESCRIPTION
 
 The `ase-arch-analyze` skill reviews the *software architecture* of
-the referenced source code, including *package cohesion* and *inter-
-package coupling*, for *potential problems* across component boundaries,
+the referenced source code, including *package cohesion* and
+*inter-package coupling*, for *potential problems* across component boundaries,
 structural organization, architecture principles, interface quality,
 quality attributes, and architecture governance.
 

@@ -134,7 +134,7 @@ for the technology stack to *provide* the *needed functionality*
     4.  If <stack/> is "JavaScript" or "TypeScript":
 
         1.  Based on the essential keywords <keyword-L/> (L=1-M),
-            use the `ase-meta-search` skill in a subagent to *generally*
+            use the `ase-meta-search` skill in a sub-agent to *generally*
             discover an initial set of a maximum of <pool/> *NPM packages*
             <component-K/> and at least their real name <name-K/> and
             their unique package names <package-K/>.
@@ -150,7 +150,7 @@ for the technology stack to *provide* the *needed functionality*
     5.  If <stack/> is "Java" or "Kotlin":
 
         1.  Based on the essential keywords <keyword-L/> (L=1-M),
-            use the `ase-meta-search` skill in a subagent to *generally*
+            use the `ase-meta-search` skill in a sub-agent to *generally*
             discover an initial set of a maximum of <pool/> *Maven packages*
             <component-K/> and at least their real name <name-K/> and
             their unique Maven coordinates <package-K/> of the form
