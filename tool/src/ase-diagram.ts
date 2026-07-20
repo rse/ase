@@ -303,8 +303,16 @@ export default class DiagramCommand {
             .action(async (opts: DiagramOpts) => {
                 /*  fetch Mermaid diagram specification from file or stdin  */
                 let src: string
-                if (opts.input !== undefined)
-                    src = fs.readFileSync(opts.input, "utf8")
+                if (opts.input !== undefined) {
+                    try {
+                        src = fs.readFileSync(opts.input, "utf8")
+                    }
+                    catch (err: unknown) {
+                        const message = err instanceof Error ? err.message : String(err)
+                        this.log.write("error", `diagram: failed to read input file: ${message}`)
+                        process.exit(1)
+                    }
+                }
                 else
                     src = await getStdin()
                 if (src.trim() === "") {
