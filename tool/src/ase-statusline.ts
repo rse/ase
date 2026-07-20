@@ -446,7 +446,7 @@ export default class StatuslineCommand {
                         emit(`${prefix("⚒", "effort")}${c.bold(effort)}`)
                     },
                     t: () => {
-                        const thinking = (data.thinking?.enabled ?? false) === true ? "yes" : "no"
+                        const thinking = data.thinking?.enabled === true ? "yes" : "no"
                         emit(`${prefix("⚛", "thinking")}${c.bold(thinking)}`)
                     },
 
