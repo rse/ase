@@ -128,7 +128,8 @@ export default class MCPCommand {
             }
             try {
                 const ctx = await this.ensureService()
-                port = ctx.port
+                port      = ctx.port
+                projectId = ctx.projectId
                 const stale = client
                 client = null
                 if (stale !== null) {
