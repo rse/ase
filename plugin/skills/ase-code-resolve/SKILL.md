@@ -193,15 +193,15 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
     You *MUST* perform the following sub-steps *internally* and *without
     any output* until and including the recommendation decision. Only
-    sub-steps 4-6 below are allowed to produce output, and only if
+    sub-steps 4-7 below are allowed to produce output; sub-steps 4-6 only if
     <getopt-option-auto/> is equal `false` *and* <ase-project-boxing/>
     is *not* equal `black`.
 
     If <getopt-option-auto/> is equal `true` or <ase-project-boxing/> is
-    equal `black`, *skip* the reporting sub-steps 4-6 entirely (perform
-    no output at all) to speed up processing.
+    equal `black`, *skip* the reporting sub-steps 4-6 entirely (they
+    perform no output at all) to speed up processing.
 
-    1.  *Propose* corresponding *resolution approach*, including optionally,
+    1.  *Propose* a corresponding *resolution approach*, optionally including
         some *alternative* resolution approaches. Do *not* output anything
         in this sub-step.
 
