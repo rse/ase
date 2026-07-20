@@ -280,34 +280,20 @@ export default class SetupCommand {
         return 0
     }
 
-    /*  handler for "ase setup enable" (both tools)  */
-    private async doEnable (tool: Tool, scope: Scope): Promise<number> {
+    /*  handler for "ase setup enable|disable" (both tools)  */
+    private async doToggle (tool: Tool, scope: Scope, action: "enable" | "disable"): Promise<number> {
         this.requireClaudeScope(tool, scope)
         const spec = toolSpecs[tool]
         await this.ensureTool(spec.cli)
-        this.log.write("info", `setup: enable: enabling ASE ${spec.label} plugin`)
+        this.log.write("info", `setup: ${action}: ${action === "enable" ? "enabling" : "disabling"} ` +
+            `ASE ${spec.label} plugin`)
         /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
-            enable" subcommand, so (re-)install the plugin instead  */
+            enable"/"plugin disable" subcommand, so (re-)install or
+            uninstall the plugin instead  */
         const scopeArgs = scope !== "user" ? [ "--scope", scope ] : []
         const args = tool === "claude" ?
-            [ "plugin", "enable",   "ase@ase", ...scopeArgs ] :
-            [ "plugin", spec.pInstall, "ase@ase" ]
-        await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
-        return 0
-    }
-
-    /*  handler for "ase setup disable" (both tools)  */
-    private async doDisable (tool: Tool, scope: Scope): Promise<number> {
-        this.requireClaudeScope(tool, scope)
-        const spec = toolSpecs[tool]
-        await this.ensureTool(spec.cli)
-        this.log.write("info", `setup: disable: disabling ASE ${spec.label} plugin`)
-        /*  the GitHub Copilot CLI and OpenAI Codex CLI have no "plugin
-            disable" subcommand, so uninstall the plugin instead  */
-        const scopeArgs = scope !== "user" ? [ "--scope", scope ] : []
-        const args = tool === "claude" ?
-            [ "plugin", "disable",  "ase@ase", ...scopeArgs ] :
-            [ "plugin", spec.pRemove, "ase@ase" ]
+            [ "plugin", action, "ase@ase", ...scopeArgs ] :
+            [ "plugin", action === "enable" ? spec.pInstall : spec.pRemove, "ase@ase" ]
         await this.run(spec.cli, args, { retries: tool === "claude" ? 1 : 3 })
         return 0
     }
@@ -993,7 +979,7 @@ export default class SetupCommand {
             .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
             .action(async (opts: { tool: string, scope: string }) => {
-                process.exit(await this.doEnable(this.parseTool(opts.tool), this.parseScope(opts.scope)))
+                process.exit(await this.doToggle(this.parseTool(opts.tool), this.parseScope(opts.scope), "enable"))
             })
 
         /*  register CLI sub-command "ase setup disable"  */
@@ -1003,7 +989,7 @@ export default class SetupCommand {
             .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
             .action(async (opts: { tool: string, scope: string }) => {
-                process.exit(await this.doDisable(this.parseTool(opts.tool), this.parseScope(opts.scope)))
+                process.exit(await this.doToggle(this.parseTool(opts.tool), this.parseScope(opts.scope), "disable"))
             })
 
         /*  register CLI sub-command "ase setup mcp"  */
