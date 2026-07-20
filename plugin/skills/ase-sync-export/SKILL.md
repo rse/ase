@@ -141,11 +141,12 @@ Procedure
 
         -   *Determine* the side-by-side target file name
             <export-filename/>
-            as `<basedir/>/<artifact-set-id/>-<artifact-no/>-<artifact-id/>-<artifact-slug/>-<export-name/>.<export-ext/>`
+            as `<artifact-set-id/>-<artifact-no/>-<artifact-id/>-<artifact-slug/>-<export-name/>.<export-ext/>`
             and resolve it to a project-relative path inside the
-            artifact's own base directory by calling the
-            `ase_artifact_name(filename: "<file-name/>", kind:
-            "<export-filename/>")` tool of the `ase` MCP server.
+            artifact's own base directory (`<basedir/>`) by calling the
+            `ase_artifact_name(filename: "<export-filename/>", kind:
+            "<artifact-kind/>")` tool of the `ase` MCP server, with
+            <artifact-kind/> the artifact's own lower-cased kind.
 
         -   *Write* the derived rendering to that resolved path via the
             `Write` tool, overwriting any pre-existing export file of the
