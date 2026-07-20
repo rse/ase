@@ -386,21 +386,21 @@ export default class HookCommand {
         }
     }
 
-    /*  handler for "ase hook user-prompt-submit" (both tools)  */
+    /*  handler for "ase hook user-prompt-submit" (all tools)  */
     private async doUserPromptSubmit (_tool: Tool): Promise<number> {
         await this.drainStdin()
         this.writeAgentStatus("busy")
         return 0
     }
 
-    /*  handler for "ase hook stop" (both tools)  */
+    /*  handler for "ase hook stop" (all tools)  */
     private async doStop (_tool: Tool): Promise<number> {
         await this.drainStdin()
         this.writeAgentStatus("ready")
         return 0
     }
 
-    /*  handler for "ase hook session-end" (both tools)  */
+    /*  handler for "ase hook session-end" (all tools)  */
     private async doSessionEnd (_tool: Tool): Promise<number> {
         /*  determine session id  */
         const sessionId = await this.readSessionIdFromStdin()
@@ -605,7 +605,7 @@ export default class HookCommand {
         /*  register CLI top-level command "ase hook"  */
         const hookCmd = program
             .command("hook")
-            .description("Anthropic Claude Code CLI and GitHub Copilot CLI hook entry points")
+            .description("Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI hook entry points")
             .action(() => {
                 hookCmd.outputHelp()
                 process.exit(1)
