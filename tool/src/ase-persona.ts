@@ -75,7 +75,7 @@ export default class PersonaMCP {
                     Persona.set(this.log, args.style, args.session)
                     const where = args.session !== undefined ?
                         ` for session "${args.session}"` : ""
-                    const msg = `persona: OK: set agent.persona to "${args.style}"${where}`
+                    const msg = `OK: set agent.persona to "${args.style}"${where}`
                     return {
                         content: [ { type: "text", text: msg } ]
                     }
@@ -89,7 +89,7 @@ export default class PersonaMCP {
                 const message = err instanceof Error ? err.message : String(err)
                 return {
                     isError: true,
-                    content: [ { type: "text", text: `persona: ERROR: ${message}` } ]
+                    content: [ { type: "text", text: `ERROR: ${message}` } ]
                 }
             }
         })

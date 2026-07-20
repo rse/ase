@@ -109,7 +109,7 @@ export class KVMCP {
             }
             catch (err: unknown) {
                 const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `kv_get: ERROR: ${message}` } ] }
+                return { isError: true, content: [ { type: "text", text: `ERROR: ${message}` } ] }
             }
         })
 
@@ -129,11 +129,11 @@ export class KVMCP {
         }, async (args) => {
             try {
                 KV.set(args.key, args.val)
-                return { content: [ { type: "text", text: `kv_set: OK: stored key "${args.key}"` } ] }
+                return { content: [ { type: "text", text: `OK: stored key "${args.key}"` } ] }
             }
             catch (err: unknown) {
                 const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `kv_set: ERROR: ${message}` } ] }
+                return { isError: true, content: [ { type: "text", text: `ERROR: ${message}` } ] }
             }
         })
 
@@ -152,11 +152,11 @@ export class KVMCP {
         }, async (args) => {
             try {
                 const n = KV.clear(args.prefix)
-                return { content: [ { type: "text", text: `kv_clear: OK: removed ${n} key(s)` } ] }
+                return { content: [ { type: "text", text: `OK: removed ${n} key(s)` } ] }
             }
             catch (err: unknown) {
                 const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `kv_clear: ERROR: ${message}` } ] }
+                return { isError: true, content: [ { type: "text", text: `ERROR: ${message}` } ] }
             }
         })
 
@@ -174,13 +174,13 @@ export class KVMCP {
             try {
                 const removed = KV.delete(args.key)
                 const msg = removed ?
-                    `kv_delete: OK: removed key "${args.key}"` :
-                    `kv_delete: WARNING: no key "${args.key}" to remove`
+                    `OK: removed key "${args.key}"` :
+                    `WARNING: no key "${args.key}" to remove`
                 return { content: [ { type: "text", text: msg } ] }
             }
             catch (err: unknown) {
                 const message = err instanceof Error ? err.message : String(err)
-                return { isError: true, content: [ { type: "text", text: `kv_delete: ERROR: ${message}` } ] }
+                return { isError: true, content: [ { type: "text", text: `ERROR: ${message}` } ] }
             }
         })
 
@@ -196,10 +196,10 @@ export class KVMCP {
                 "first per-command error (remaining commands are skipped); otherwise per-command errors " +
                 "are recorded and execution continues. " +
                 "Returns a single `text` payload containing a JSON array of per-command result strings " +
-                "in the same format emitted by `kv_clear`/`kv_set`/`kv_get`/`kv_delete`. " +
+                "positionally matching the `commands` array. " +
                 "On transactional rollback, prior per-command result strings are rewritten to " +
-                "`kv_<cmd>: ROLLED-BACK` to truthfully reflect the post-rollback state, and the " +
-                "final entry remains `kv_batch: ERROR: <message>`.",
+                "`ROLLED-BACK` to truthfully reflect the post-rollback state, and the " +
+                "final entry remains `ERROR: <message>`.",
             inputSchema: {
                 commands: z.array(z.object({
                     command: z.enum([ "clear", "set", "get", "delete" ])
@@ -216,45 +216,40 @@ export class KVMCP {
                     .describe("if true, snapshot the store and roll back on first error")
             }
         }, async (args) => {
-            const results:  string[] = []
-            const cmdNames: string[] = []
+            const results: string[] = []
             const tx       = args.transactional === true
             const snapshot = tx ? KV.snapshot() : null
             for (const c of args.commands) {
                 try {
                     if (c.command === "clear") {
                         const n = KV.clear(c.prefix)
-                        results.push(`kv_clear: OK: removed ${n} key(s)`)
-                        cmdNames.push("clear")
+                        results.push(`OK: removed ${n} key(s)`)
                     }
                     else if (c.command === "set") {
                         if (c.key === undefined)
-                            throw new Error("kv_set: missing `key`")
+                            throw new Error("missing `key`")
                         if (c.val === undefined)
-                            throw new Error("kv_set: missing `val`")
+                            throw new Error("missing `val`")
                         KV.set(c.key, c.val)
-                        results.push(`kv_set: OK: stored key "${c.key}"`)
-                        cmdNames.push("set")
+                        results.push(`OK: stored key "${c.key}"`)
                     }
                     else if (c.command === "get") {
                         if (c.key === undefined)
-                            throw new Error("kv_get: missing `key`")
+                            throw new Error("missing `key`")
                         if (!KV.has(c.key))
                             results.push("")
                         else {
                             const val = KV.get(c.key)
                             results.push(val === undefined ? "" : JSON.stringify(val))
                         }
-                        cmdNames.push("get")
                     }
                     else if (c.command === "delete") {
                         if (c.key === undefined)
-                            throw new Error("kv_delete: missing `key`")
+                            throw new Error("missing `key`")
                         const removed = KV.delete(c.key)
                         results.push(removed ?
-                            `kv_delete: OK: removed key "${c.key}"` :
-                            `kv_delete: WARNING: no key "${c.key}" to remove`)
-                        cmdNames.push("delete")
+                            `OK: removed key "${c.key}"` :
+                            `WARNING: no key "${c.key}" to remove`)
                     }
                 }
                 catch (err: unknown) {
@@ -263,11 +258,11 @@ export class KVMCP {
                         if (snapshot !== null)
                             KV.restore(snapshot)
                         for (let i = 0; i < results.length; i++)
-                            results[i] = `kv_${cmdNames[i]}: ROLLED-BACK`
-                        results.push(`kv_batch: ERROR: ${message}`)
+                            results[i] = "ROLLED-BACK"
+                        results.push(`ERROR: ${message}`)
                         return { isError: true, content: [ { type: "text", text: JSON.stringify(results) } ] }
                     }
-                    results.push(`kv_${c.command}: ERROR: ${message}`)
+                    results.push(`ERROR: ${message}`)
                 }
             }
             return { content: [ { type: "text", text: JSON.stringify(results) } ] }

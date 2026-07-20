@@ -719,10 +719,10 @@ export default class ConfigCommand {
     }
 }
 
-/*  render a caught error as a prefixed MCP tool error result  */
-const mcpToolError = (tool: string, err: unknown) => ({
+/*  render a caught error as an MCP tool error result  */
+const mcpToolError = (err: unknown) => ({
     isError: true,
-    content: [ { type: "text" as const, text: `${tool}: ERROR: ${err instanceof Error ? err.message : String(err)}` } ]
+    content: [ { type: "text" as const, text: `ERROR: ${err instanceof Error ? err.message : String(err)}` } ]
 })
 
 /*  MCP registration entry point for layered YAML configuration access  */
@@ -755,7 +755,7 @@ export class ConfigMCP {
                 return { content: [ { type: "text", text } ] }
             }
             catch (err: unknown) {
-                return mcpToolError("config_get", err)
+                return mcpToolError(err)
             }
         })
 
@@ -783,10 +783,10 @@ export class ConfigMCP {
                     cfg.set(args.key, args.val)
                     cfg.write()
                 })
-                return { content: [ { type: "text", text: `config_set: OK: stored "${args.key}" on scope "${args.scope}"` } ] }
+                return { content: [ { type: "text", text: `OK: stored "${args.key}" on scope "${args.scope}"` } ] }
             }
             catch (err: unknown) {
-                return mcpToolError("config_set", err)
+                return mcpToolError(err)
             }
         })
 
@@ -811,10 +811,10 @@ export class ConfigMCP {
                     cfg.delete(args.key)
                     cfg.write()
                 })
-                return { content: [ { type: "text", text: `config_delete: OK: removed "${args.key}" on scope "${args.scope}"` } ] }
+                return { content: [ { type: "text", text: `OK: removed "${args.key}" on scope "${args.scope}"` } ] }
             }
             catch (err: unknown) {
-                return mcpToolError("config_delete", err)
+                return mcpToolError(err)
             }
         })
     }
