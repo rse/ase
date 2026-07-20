@@ -33,7 +33,14 @@ export default class Log {
             throw new RangeError(`invalid log level "${this._logLevel}" (expected one of: ${levels.map((l) => l.name).join(", ")})`)
         this.logLevelIdx = idx
         if (this._logFile !== "-")
-            this.stream = fs.createWriteStream(this._logFile, { flags: "a", encoding: "utf8" })
+            this.stream = this.openStream(this._logFile)
+    }
+    private openStream (file: string): fs.WriteStream {
+        const stream = fs.createWriteStream(file, { flags: "a", encoding: "utf8" })
+        stream.on("error", (err) => {
+            process.stderr.write(`${this._program}: ERROR: cannot write log file "${file}": ${err.message}\n`)
+        })
+        return stream
     }
     logLevel (level: LogLevel) {
         const idx = levels.findIndex((l) => l.name === level)
@@ -51,7 +58,7 @@ export default class Log {
             this.stream = null
         }
         if (file !== "-")
-            this.stream = fs.createWriteStream(file, { flags: "a", encoding: "utf8" })
+            this.stream = this.openStream(file)
     }
     write (level: LogLevel, msg: string) {
         const idx = levels.findIndex((l) => l.name === level)
