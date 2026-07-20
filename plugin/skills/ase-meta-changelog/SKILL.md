@@ -10,6 +10,7 @@ allowed-tools:
     - "Bash(git log *)"
     - "Bash(git diff *)"
     - "Bash(git show *)"
+    - "Bash(git tag --list *)"
     - "Write"
     - "Edit"
 ---
