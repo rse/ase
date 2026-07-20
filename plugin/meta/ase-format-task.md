@@ -49,14 +49,12 @@ You *MUST* honor the following hints on this *task* format:
 -   The <task-id/> has to be substituted with the current value of
     <ase-task-id/> in the current session context.
 
--   The <timestamp-created/> is the timestamp when this feature
-    crafting specification was created. The
-    <timestamp-modified/> is the timestamp when this feature
-    specification was last modified. Both use an ISO-style format
-    value. The value of both can be determined by
-    a call to the `ase_timestamp(format: "yyyy-LL-dd HH:mm")`
-    tool of the `ase` MCP server and use the `text` field of
-    its response.
+-   The <timestamp-created/> is the timestamp when this task plan was
+    created. The <timestamp-modified/> is the timestamp when this
+    task plan was last modified. Both use an ISO-style format
+    value. The value of both can be determined by a call to the
+    `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase` MCP
+    server and use the `text` field of its response.
 
 -   The <title/> is a short summary of the <summary-what/>, no longer than
     50 characters.
