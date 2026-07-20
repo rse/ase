@@ -367,11 +367,13 @@ related to a set of code quality aspects.
 
             -   <if condition="<result/> is 'ACCEPT'">
                 Invoke the `Edit` tool to apply the changes exactly
-                as shown in the <diff/>. The operation will be
-                auto-approved by the ASE `pre-tool-use` hook (which
-                tracks the active skill), so *no* interactive permission
-                prompt will appear. After applying the changes, just
-                continue with the next <item/>.
+                as given by the hunks of the current <change-set/>
+                (rendered as <diff/>, unless suppressed under grey
+                boxing). The operation will be auto-approved by the ASE
+                `pre-tool-use` hook (which tracks the active skill),
+                so *no* interactive permission prompt will appear.
+                After applying the changes, just continue with the next
+                <item/>.
                 </if>
 
             -   <if condition="<result/> starts with 'OTHER'">
