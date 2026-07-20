@@ -58,7 +58,7 @@ export default class Log {
         if (idx !== -1 && idx <= this.logLevelIdx) {
             const timestamp = DateTime.now().toFormat("yyyy-LL-dd HH:mm:ss.SSS")
             let line = `${this._program}: [${timestamp}]: `
-            if (this._logFile === "-" && process.stdout.isTTY)
+            if (this._logFile === "-" && process.stderr.isTTY)
                 line += `${levels[idx].style("[" + levels[idx].name.toUpperCase() + "]")}`
             else
                 line += `[${levels[idx].name.toUpperCase()}]`
