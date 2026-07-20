@@ -140,8 +140,8 @@ following procedure:
             </if>
             <else>
                 Output the following <template/> and then *START OVER*
-                by *GOING* to step 2.2.2 above, reusing the already-built
-                <text/> from step 2.2.1 unchanged (do *NOT* re-enter step 2.2.1
+                by *GOING* to step 2.2 above, reusing the already-built
+                <text/> from step 2.1 unchanged (do *NOT* re-enter step 2.1
                 and do *NOT* rebuild <text/>, <keys/>, <n/>, or <width/>).
 
                 <template>
