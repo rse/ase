@@ -15,7 +15,8 @@ export default class Version {
         return pkg.version
     }
 
-    /*  return latest ASE version available on the NPM registry  */
+    /*  return latest ASE version known from the NPM registry
+        (cached background check, falling back to the current version)  */
     static async latest (): Promise<string> {
         const notifier = updateNotifier({
             pkg,
