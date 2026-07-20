@@ -316,18 +316,7 @@ export default class DiagramCommand {
                 /*  create diagram rendering  */
                 let out: string
                 try {
-                    out = Diagram.render(src, {
-                        format:         opts.format,
-                        ascii:          opts.ascii ?? false,
-                        colorMode:      opts.colorMode,
-                        nodeMarginX:    opts.nodeMarginX,
-                        nodeMarginY:    opts.nodeMarginY,
-                        nodePadding:    opts.nodePadding,
-                        diagramClipX:   opts.diagramClipX,
-                        diagramClipY:   opts.diagramClipY,
-                        terminalWidth:  opts.terminalWidth,
-                        terminalHeight: opts.terminalHeight
-                    })
+                    out = Diagram.render(src, opts)
                 }
                 catch (err: unknown) {
                     const message = err instanceof Error ? err.message : String(err)
@@ -386,18 +375,7 @@ export class DiagramMCP {
             }
         }, async (args) => {
             try {
-                const out = Diagram.render(args.diagram, {
-                    format:         args.format,
-                    ascii:          args.ascii,
-                    colorMode:      args.colorMode,
-                    nodeMarginX:    args.nodeMarginX,
-                    nodeMarginY:    args.nodeMarginY,
-                    nodePadding:    args.nodePadding,
-                    diagramClipX:   args.diagramClipX,
-                    diagramClipY:   args.diagramClipY,
-                    terminalWidth:  args.terminalWidth,
-                    terminalHeight: args.terminalHeight
-                })
+                const out = Diagram.render(args.diagram, args)
                 return {
                     content: [ { type: "text", text: out } ]
                 }
