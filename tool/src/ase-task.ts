@@ -539,8 +539,9 @@ export class TaskMCP {
         mcp.registerTool("ase_task_rename", {
             title: "ASE task rename",
             description:
-                "Rename a previously persisted task from `old` to `new` by atomically moving the " +
-                "task `TASK-<id>.md` file. Returns a status `text` indicating whether the rename succeeded. " +
+                "Rename a previously persisted task from `old` to `new` by moving the " +
+                "task `TASK-<id>.md` file and rewriting its embedded task heading. " +
+                "Returns a status `text` indicating whether the rename succeeded. " +
                 "Fails with an error if the target id already exists.",
             inputSchema: {
                 old: z.string()
