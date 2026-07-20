@@ -12,6 +12,7 @@ import {
     renderMermaidSVG
 }                                        from "beautiful-mermaid"
 import { z }                             from "zod"
+import getStdin                          from "get-stdin"
 
 import type { McpServer }                from "@modelcontextprotocol/sdk/server/mcp.js"
 
@@ -268,13 +269,6 @@ export class Diagram {
     }
 }
 
-/*  read stdin into a single string  */
-const readStdin = async (): Promise<string> => {
-    const chunks: Buffer[] = []
-    for await (const chunk of process.stdin)
-        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk)
-    return Buffer.concat(chunks).toString("utf8")
-}
 
 /*  command-line handling  */
 export default class DiagramCommand {
@@ -323,7 +317,7 @@ export default class DiagramCommand {
                 if (opts.input !== undefined)
                     src = fs.readFileSync(opts.input, "utf8")
                 else
-                    src = await readStdin()
+                    src = await getStdin()
                 if (src.trim() === "") {
                     this.log.write("error", "diagram: empty Mermaid diagram specification")
                     process.exit(1)
