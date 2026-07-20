@@ -308,9 +308,9 @@ export default class ServiceCommand {
         const mcpHandler = async (request: Hapi.Request, h: Hapi.ResponseToolkit, body?: unknown) => {
             const b       = body as Record<string, unknown> | null | undefined
             const bParams = b?.params as Record<string, unknown> | null | undefined
-            const bMethod = typeof b?.method    === "string" ? b.method         : null
-            const bName   = typeof bParams?.name === "string" ? bParams.name    : null
-            const bArgs   = bParams?.arguments  !== undefined ? bParams.arguments : null
+            const bMethod = typeof b?.method     === "string"  ? b.method          : null
+            const bName   = typeof bParams?.name === "string"  ? bParams.name      : null
+            const bArgs   = bParams?.arguments   !== undefined ? bParams.arguments : null
             let bodyInfo  = ""
             if (bMethod !== null) {
                 bodyInfo = ` [${bMethod}]`
