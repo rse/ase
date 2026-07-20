@@ -34,6 +34,14 @@ export class Task {
             throw new Error("task: id must match [A-Za-z0-9_-]+")
     }
 
+    /*  validate the session id to keep it safe as a config scope term  */
+    static validateSession (session: string): void {
+        if (typeof session !== "string" || session.length === 0)
+            throw new Error("task: session must be a non-empty string")
+        if (!/^[A-Za-z0-9_-]+$/.test(session))
+            throw new Error("task: session must match [A-Za-z0-9_-]+")
+    }
+
     /*  cached project root determination (TTL-bounded, as the ASE
         service is long-running and the Git context can change)  */
     private static projectRootCache = new LRUCache<string, string>({ max: 4, ttl: 10 * 1000 })
@@ -250,6 +258,7 @@ export class Task {
 
     /*  get the active task id for a given session, or empty string if none  */
     static getId (log: Log, session: string): string {
+        Task.validateSession(session)
         const scope = parseScope(`session:${session}`)
         const cfg = new Config("config", configSchema, log, scope)
         cfg.read()
@@ -261,6 +270,7 @@ export class Task {
 
     /*  set the active task id for a given session  */
     static setId (log: Log, session: string, id: string): void {
+        Task.validateSession(session)
         const scope   = parseScope(`session:${session}`)
         const cfg = new Config("config", configSchema, log, scope)
         cfg.lock(() => {
