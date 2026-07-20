@@ -84,4 +84,4 @@ and a tighter shortlist:
 
 ##  SEE ALSO
 
-[`ase-meta-evaluate`](../ase-meta-evaluate/help.md), [`ase-meta-quorum`](../ase-meta-quorum/help.md), [`ase-meta-diaboli`](../ase-meta-diaboli/help.md)
+[`ase-meta-evaluate`](../ase-meta-evaluate/help.md), [`ase-meta-quorum`](../ase-meta-quorum/help.md), [`ase-meta-diaboli`](../ase-meta-diaboli/help.md).
