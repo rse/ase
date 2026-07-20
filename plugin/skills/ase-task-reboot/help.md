@@ -19,7 +19,8 @@ preserving the original creation timestamp, and writing a fresh plan
 content via `ase_task_save`.
 
 After the reboot, the user is asked whether to stop or hand off to
-`ase-task-edit`, unless `--next` pre-selects this choice.
+`ase-task-edit`, `ase-task-implement`, or `ase-task-preflight`,
+unless `--next` pre-selects this choice.
 
 ##  OPTIONS
 
