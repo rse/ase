@@ -40,8 +40,8 @@ You *MUST* honor the following hints on this *task* format:
     <template>`<code/>`</template> and *key aspects* as
     <template>*<aspect/>*</template>.
 
--   For <summary-what/> and <summary-why/> use *ultra brief* but
-    as *very precise* as possible description of the overall change. In
+-   For <summary-what/> and <summary-why/> use an *ultra brief* but
+    *as precise as possible* description of the overall change. In
     <summary-what/> tell what is changed. In <summary-why/> tell why it
     is changed, what benefit results or what the rationale is behind the
     change.
