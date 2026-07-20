@@ -78,7 +78,7 @@ Procedure
         *STOP* processing the entire current skill:
 
         <template>
-        ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: unknown artifact kind: **<kind/>**
+        ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: unknown or unsupported artifact kind: **<kind/>**
         </template>
 
     5.  <if condition="<getopt-bidirectional/> is not 'true'">
