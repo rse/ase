@@ -49,8 +49,8 @@ const main = async (): Promise<void> => {
         .enablePositionalOptions()
         .exitOverride()
 
-    /*  establish shared logger with defaults and then apply parsed
-        global options to the logger before any subcommand action  */
+    /*  apply parsed global options to the logger
+        before any subcommand action  */
     program.hook("preAction", async () => {
         const opts = program.opts<GlobalOpts>()
         log.logLevel(opts.logLevel)
