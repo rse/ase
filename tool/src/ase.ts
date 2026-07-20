@@ -8,17 +8,17 @@
 import { Command, CommanderError, Option } from "commander"
 import Log                         from "./ase-log.js"
 import type { LogLevel }           from "./ase-log.js"
-import ConfigCommand               from "./ase-config.js"
-import ServiceCommand              from "./ase-service.js"
-import MCPCommand                  from "./ase-mcp.js"
-import HookCommand                 from "./ase-hook.js"
-import DiagramCommand              from "./ase-diagram.js"
 import SetupCommand                from "./ase-setup.js"
+import ConfigCommand               from "./ase-config.js"
+import MCPCommand                  from "./ase-mcp.js"
+import ServiceCommand              from "./ase-service.js"
+import HookCommand                 from "./ase-hook.js"
 import StatuslineCommand           from "./ase-statusline.js"
 import TaskCommand                 from "./ase-task.js"
 import ArtifactCommand             from "./ase-artifact.js"
 import MetaCommand                 from "./ase-meta.js"
 import CompatCommand               from "./ase-compat.js"
+import DiagramCommand              from "./ase-diagram.js"
 import pkg                         from "../package.json" with { type: "json" }
 
 /*  type of top-level (global) options  */
