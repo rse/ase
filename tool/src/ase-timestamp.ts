@@ -4,9 +4,9 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z }              from "zod"
 import { DateTime }       from "luxon"
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
 /*  MCP registration entry point for timestamp tool  */
 export class TimestampMCP {
