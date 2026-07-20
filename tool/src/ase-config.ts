@@ -23,7 +23,7 @@ import type Log                                     from "./ase-log.js"
 
 /*  classification taxonomy  */
 export const projectClassification = {
-    boxing: [ "white", "grey", "black"     ]
+    boxing: [ "white", "grey", "black" ]
 } as const
 
 /*  agent classification taxonomy  */
