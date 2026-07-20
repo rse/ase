@@ -33,7 +33,7 @@ export class Skills {
     private static httpActive       = 0
     private static httpQueue: Array<() => void> = []
     private static async httpLimit<T> (fn: () => Promise<T>): Promise<T> {
-        if (Skills.httpActive >= Skills.HTTP_CONCURRENCY)
+        while (Skills.httpActive >= Skills.HTTP_CONCURRENCY)
             await new Promise<void>((resolve) => Skills.httpQueue.push(resolve))
         Skills.httpActive++
         try {
