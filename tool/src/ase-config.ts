@@ -308,7 +308,6 @@ export class Config {
         return null
     }
 
-
     /*  read the full scope chain into memory; the requested mode applies
         to the target scope only, inherited scopes are always lenient  */
     read (mode: "strict" | "lenient" = "lenient"): void {
@@ -820,4 +819,3 @@ export class ConfigMCP {
         })
     }
 }
-
