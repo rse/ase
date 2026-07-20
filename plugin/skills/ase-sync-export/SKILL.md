@@ -84,11 +84,13 @@ Procedure
 
     1.  Do not output anything in this STEP 2.
 
-    2.  For all kinds in <source/>, call the `ase_artifact_list(kind: [
-        ... ])` tool of the `ase` MCP server *once*, passing the
-        lower-cased `kind` tokens, and read the returned `artifacts`
-        array of `{ kind, files }` objects to obtain the project-relative
-        file list per kind.
+    2.  For all kinds in <source/> except `TASK`, call the
+        `ase_artifact_list(kind: [ ... ])` tool of the `ase` MCP server
+        *once*, passing the lower-cased `kind` tokens, and read the
+        returned `artifacts` array of `{ kind, files }` objects to obtain
+        the project-relative file list per kind. The `TASK` kind is *not*
+        resolvable via `ase_artifact_list` (task plans are managed by the
+        `ase_task_*` tools) and declares no export, so *silently skip* it.
 
     3.  <if condition="<hint/> is not empty">
 
