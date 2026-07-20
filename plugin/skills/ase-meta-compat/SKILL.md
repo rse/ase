@@ -119,7 +119,7 @@ Procedure
 
     5.  *step-skip*: A `<step condition="[...]">[...]</step>` either expands
         to its body (if condition evaluates to true) or to the empty string,
-        so what does `<step condition="42 is greater than 7">X</step>` expands into?
+        so what does `<step condition="42 is greater than 7">X</step>` expand into?
         Record the result of this construct for `control-flow/step-skip`.
 
     6.  *expand-subst*: With `<define name="foo">[<arg1/>:<content/>]</define>`,
