@@ -209,7 +209,7 @@ at runtime.
     -   Kind:           <arch-fv-component-kind/>
     -   Responsibility: <arch-fv-component-responsibility/>
     -   Interface:      <arch-fv-component-interface/>
-    -   Depends On:     <arch-fv-component-dependency/>, [...]
+    -   Depends On:     <arch-fv-component-dependency/>[, ...]
 
     <arch-fv-component-description/>,
     **BECAUSE** <arch-fv-component-rationale/>.
@@ -286,7 +286,7 @@ flow.
     ##  ASPECT: <arch-iv-aspect-name/> <a id="ARCH-IV-<arch-iv-aspect-id/>"></a>
 
     -   Concern:    <arch-iv-aspect-concern/>
-    -   Entities:   <arch-iv-aspect-entity/>, [...]
+    -   Entities:   <arch-iv-aspect-entity/>[, ...]
     -   Owner:      <arch-iv-aspect-owner/>
     -   Lifecycle:  <arch-iv-aspect-lifecycle/>
 
@@ -364,7 +364,7 @@ communicate.
     ##  UNIT: <arch-co-unit-name/> <a id="ARCH-CO-<arch-co-unit-id/>"></a>
 
     -   Kind:         <arch-co-unit-kind/>
-    -   Hosts:        <arch-co-unit-element/>, [...]
+    -   Hosts:        <arch-co-unit-element/>[, ...]
     -   Multiplicity: <arch-co-unit-multiplicity/>
     -   Coordination: <arch-co-unit-coordination/>
 
@@ -507,7 +507,7 @@ elements to the runtime platform, hardware, and network topology.
 
     -   Kind:     <arch-dp-node-kind/>
     -   Platform: <arch-dp-node-platform/>
-    -   Hosts:    <arch-dp-node-element/>, [...]
+    -   Hosts:    <arch-dp-node-element/>[, ...]
     -   Network:  <arch-dp-node-network/>
 
     <arch-dp-node-description/>,
@@ -584,7 +584,7 @@ production, defining installation, monitoring, and management concerns.
     ##  CONCERN: <arch-ov-concern-name/> <a id="ARCH-OV-<arch-ov-concern-id/>"></a>
 
     -   Category: <arch-ov-concern-category/>
-    -   Element:  <arch-ov-concern-element/>, [...]
+    -   Element:  <arch-ov-concern-element/>[, ...]
 
     <arch-ov-concern-description/>,
     **BECAUSE** <arch-ov-concern-rationale/>.
@@ -651,9 +651,9 @@ How the Non-Functional Requirements (NR) are addressed.
     ##  PERSPECTIVE: <arch-qp-perspective-name/> <a id="ARCH-QP-<arch-qp-perspective-id/>"></a>
 
     -   Quality:    <arch-qp-perspective-quality/>
-    -   Addresses:  <arch-qp-perspective-requirement/>, [...]
+    -   Addresses:  <arch-qp-perspective-requirement/>[, ...]
     -   Tactic:     <arch-qp-perspective-tactic/>
-    -   Affects:    <arch-qp-perspective-element/>, [...]
+    -   Affects:    <arch-qp-perspective-element/>[, ...]
 
     <arch-qp-perspective-description/>,
     **BECAUSE** <arch-qp-perspective-rationale/>.
@@ -740,7 +740,7 @@ forces at play, the chosen response, and the reasoning that justifies it.
     ##  DECISION: <arch-dr-decision-name/> <a id="ARCH-DR-<arch-dr-decision-id/>"></a>
 
     -   Status:        <arch-dr-decision-status/>
-    -   Affects:       <arch-dr-decision-element/>, [...]
+    -   Affects:       <arch-dr-decision-element/>[, ...]
     -   Superseded-By: <arch-dr-decision-superseded-by/>
     -   Created:       <arch-dr-decision-created/>
     -   Modified:      <arch-dr-decision-modified/>
