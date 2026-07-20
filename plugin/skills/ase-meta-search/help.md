@@ -22,12 +22,14 @@ information.
 This skill should be preferred over directly invoking Perplexity,
 Brave, or `WebSearch` individually.
 
-##  ARGUMENTS
+##  OPTIONS
 
 `--services`|`-s`=(`all`|`perplexity`|`brave`|`exa`|`websearch`)...:
     The comma-separated list of search backends to query. The default
     `all` queries every available backend (the original behavior);
     otherwise only the listed backends are queried.
+
+##  ARGUMENTS
 
 *query*:
     The search query to dispatch to the search services.

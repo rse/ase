@@ -29,7 +29,7 @@ wrong sub-cause. After identifying (and validating) the root cause it
 proposes a *SOLUTION* that addresses it, optionally including concrete
 source code changes.
 
-##  ARGUMENTS
+##  OPTIONS
 
 `--depth`|`-d` *N*:
     The *maximum* number of "why" iterations (the Five-Whys chain
@@ -48,6 +48,8 @@ source code changes.
     reached rather than merely listing alternatives. The result is still a
     single, but better-justified, root-cause. A non-numeric or non-positive
     value falls back to the default.
+
+##  ARGUMENTS
 
 *fact*:
     The observed *fact* (symptom, problem, or surprising outcome)

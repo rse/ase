@@ -48,18 +48,20 @@ The intent is constructive: building the best honest case for the
 thesis to arrive at a better final decision, not overselling or merely
 cheerleading.
 
-##  ARGUMENTS
+##  OPTIONS
 
-`--count`, `-c` *count*:
+`--count`|`-c` *count*:
     Surface at least *count* strong pro-theses (default *10*) per defense
     pass before sorting and reporting the top *count* and deriving the
     *FORTIFICATION*. An invalid or non-positive *count* reverts to the
     default *10*.
 
-`--rounds`, `-r` *rounds*:
+`--rounds`|`-r` *rounds*:
     Run *rounds* iterative defense rounds (default *1*), feeding each
     round's *FORTIFICATION* in as the next round's *thesis*. An invalid
     or non-positive *rounds* reverts to the default *1*.
+
+##  ARGUMENTS
 
 *thesis*:
     The statement, claim, or position to be charitably strengthened.
