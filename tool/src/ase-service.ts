@@ -182,20 +182,23 @@ export class Service {
             fd = fs.openSync(logFile, "r")
             const size  = fs.fstatSync(fd).size
             const CHUNK = 8192
-            const buf   = Buffer.alloc(CHUNK)
+            const chunks: Buffer[] = []
             let pos     = size
-            let tail    = ""
             let count   = 0
             while (pos > 0 && count <= lines) {
-                const n = Math.min(CHUNK, pos)
+                const n   = Math.min(CHUNK, pos)
+                const buf = Buffer.alloc(n)
                 pos -= n
                 fs.readSync(fd, buf, 0, n, pos)
-                const chunk = buf.toString("utf8", 0, n)
-                tail = chunk + tail
-                for (let i = 0; i < chunk.length; i++)
-                    if (chunk.charCodeAt(i) === 10) count++
+                chunks.unshift(buf)
+                for (let i = 0; i < n; i++)
+                    if (buf[i] === 10) count++
             }
-            const all = tail.split("\n").filter((l) => l.length > 0)
+
+            /*  decode once after re-assembly to avoid splitting
+                multi-byte UTF-8 sequences at chunk boundaries  */
+            const all = Buffer.concat(chunks).toString("utf8")
+                .split("\n").filter((l) => l.length > 0)
             return all.slice(-lines).join("\n")
         }
         catch {
