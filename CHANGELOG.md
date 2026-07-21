@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+0.9.45 (2026-07-21)
+-------------------
+
+- IMPROVEMENT [docs]: update website compat matrix to GPT 5.6 and tighten table spacing (`Section-Compat.astro`)
+- CLEANUP [code]: remove stray non-portable `model` frontmatter lines (`ase-meta-search.md`, `ase-arch-analyze/SKILL.md`)
+
 0.9.44 (2026-07-20)
 -------------------
 
