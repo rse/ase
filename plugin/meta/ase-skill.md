@@ -330,7 +330,7 @@ Template Patterns
     <raw-title-len/> is the number of characters in <raw-title/>,
     and <bar/> is the `─` character repeated exactly max(0, 67 -
     <raw-title-len/>) times -- clamped to zero so an over-long title
-    never yields a negative count.
+    never yields a negative count):
 
     <template>
 
