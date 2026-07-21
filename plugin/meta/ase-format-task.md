@@ -59,7 +59,7 @@ You *MUST* honor the following hints on this *task* format:
 -   The <title/> is a short summary of the <summary-what/>, no longer than
     50 characters.
 
--   The sections `##  CHANGES` and `##  VERIFICATION` all are just a short
+-   The sections `##  CHANGES` and `##  VERIFICATION` are each just a short
     list of 1-5 bullet points. Each bullet point is formatted as
     `- **<aspect/>**: <specification/>` where <aspect/> indicates
     the aspect of the section and <specification/> is 1-3 sentences
