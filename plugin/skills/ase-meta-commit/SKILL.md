@@ -48,10 +48,10 @@ currently staged Git changes.
     of the `ase-meta-diff` and `ase-meta-changelog` skills) and their
     usual corresponding kind of change are:
 
-    -   `FEATURE`:     new functionality or configuration
-    -   `IMPROVEMENT`: improved functionality or configuration
-    -   `BUGFIX`:      corrected functionality or configuration
-    -   `UPDATE`:      updated functionality or configuration
+    -   `FEATURE`:     new        functionality or configuration
+    -   `IMPROVEMENT`: improved   functionality or configuration
+    -   `BUGFIX`:      corrected  functionality or configuration
+    -   `UPDATE`:      updated    functionality or configuration
     -   `CLEANUP`:     cleaned up functionality or configuration
     -   `REFACTOR`:    refactored functionality or configuration
 
