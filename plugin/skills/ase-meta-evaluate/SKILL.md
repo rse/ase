@@ -81,19 +81,16 @@ multi-*criteria* decision matrix.
     -   For each alternative <alternative-K/> (K=1-N), decide whether
         it is a genuine member of <class-of-alternatives/>. If any
         <alternative-K/> is *not* a member (i.e. the alternatives are not
-        mutually comparable within a single class), collect the subset
-        of non-member alternatives into the space-separated list
-        <non-members/> (the <alternative-K/> for which the membership
-        decision was negative), output the following <template/> and
-        *stop the entire flow* immediately without executing any further
-        steps:
+        mutually comparable within a single class), output the following
+        <template/> (repeating the `⚑` line once per non-member
+        alternative, i.e. once for each <alternative-K/> for which the
+        membership decision was negative) and *stop the entire flow*
+        immediately without executing any further steps:
 
         <template>
         <ase-tpl-bullet-signal/> **ERROR: INCOMPARABLE ALTERNATIVES**: *<class-of-alternatives/>*
 
-        <for items="<non-members/>">
-        ⚑ **<item/>** (*member of a different class*)
-        </for>
+        ⚑ **<alternative-K/>** (*member of a different class*)
         </template>
 
     -   Output the determined, individual alternatives as a Markdown
