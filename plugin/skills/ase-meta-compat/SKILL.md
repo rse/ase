@@ -40,8 +40,8 @@ value until STEP 6. Do not fabricate passes: a probe whose actual result
 differs from its expected result *MUST* be recorded as a *fail*.
 
 Notice that this skill intentionally does not strictly follow the ASE
-skill format, especially it does not include any meta skill information,
-etc.
+skill format; in particular, it does not include the usual meta skill
+information.
 
 Procedure
 ---------
