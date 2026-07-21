@@ -124,7 +124,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     8.  Ask the user for clarification if the goal of this resolution is
         too unclear.
 
-    9.  Do not output anything in this step, unless you asked the user.
+    9.  Do not output anything else in this step, unless you asked the user.
 
     10. Investigate and *figure out details* related to this problem.
         Report those details with the following <template/>:

@@ -109,7 +109,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
     7.  Ask the user for clarification if the goal of this refactoring is
         too unclear.
 
-    8.  Do not output anything in this step, unless you asked the user.
+    8.  Do not output anything else in this step, unless you asked the user.
 
     </step>
 
