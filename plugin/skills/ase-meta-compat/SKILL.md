@@ -107,7 +107,7 @@ Procedure
         Record <s/> as actual result for `control-flow/while-sum`.
 
     3.  *for-order*: Set <s></s>, then evaluate
-        `<for items="x y z"><s><s/>-<item/></for>`.
+        `<for items="x y z"><s><s/>-<item/></s></for>`.
         Record <s/> as actual result for `control-flow/for-order`.
 
     4.  *while-break*: Set <i>1</i> and <hit></hit>, then evaluate
