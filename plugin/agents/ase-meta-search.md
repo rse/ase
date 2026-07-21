@@ -1,7 +1,6 @@
 ---
 name: ase-meta-search
 description: "Query the Web"
-model: sonnet
 effort: low
 tools:
     - "mcp__search-perplexity__perplexity_search"

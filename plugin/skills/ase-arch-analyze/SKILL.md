@@ -4,7 +4,6 @@ argument-hint: "[--help|-h] <source-reference>"
 description: Review software architecture, including package cohesion and inter-package coupling
 user-invocable: true
 disable-model-invocation: false
-model: opus
 effort: high
 allowed-tools:
     - "Bash(wc *)"
