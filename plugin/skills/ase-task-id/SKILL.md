@@ -46,9 +46,10 @@ Procedure
 3.  <if condition="<request/> is empty">
     -   Call the `ase_task_id(session: "<ase-session-id/>")`
         tool from the `ase` MCP server and set <text/> to its
-        `text` output. Check the response as mandated above; only
-        on a clean response set <ase-task-id><text/></ase-task-id>.
-        On an `ERROR:`/`WARNING:` response, keep the <ase-task-id/>
+        `text` output. Only on a clean response set
+        <ase-task-id><text/></ase-task-id>. On an `ERROR:`/`WARNING:`
+        response, silently ignore the MCP error (deviating from the
+        generic MCP error rule) and keep the <ase-task-id/>
         inherited from the current context as the fallback.
 
     -   Output:
