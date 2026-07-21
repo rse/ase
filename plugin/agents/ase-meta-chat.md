@@ -9,6 +9,9 @@ tools:
     - "mcp__chat-xai-grok__query"
     - "mcp__chat-zai-glm__query"
     - "mcp__chat-alibaba-qwen__query"
+    - "mcp__chat-anthropic-claude__query"
+    - "mcp__chat-openai-codex__query"
+    - "mcp__chat-github-copilot__query"
 ---
 
 @../meta/ase-control.md
@@ -20,19 +23,22 @@ tools:
 
 2.  Set <server></server> (set to empty).
 
-    <if condition="<llm/> is equal 'chatgpt'"> <server>chat-openai-chatgpt</server></if>
-    <if condition="<llm/> is equal 'gemini'">  <server>chat-google-gemini</server> </if>
-    <if condition="<llm/> is equal 'deepseek'"><server>chat-deepseek</server>      </if>
-    <if condition="<llm/> is equal 'grok'">    <server>chat-xai-grok</server>      </if>
-    <if condition="<llm/> is equal 'glm'">     <server>chat-zai-glm</server>       </if>
-    <if condition="<llm/> is equal 'qwen'">    <server>chat-alibaba-qwen</server>  </if>
+    <if condition="<llm/> is equal 'chatgpt'"> <server>chat-openai-chatgpt</server>  </if>
+    <if condition="<llm/> is equal 'gemini'">  <server>chat-google-gemini</server>   </if>
+    <if condition="<llm/> is equal 'deepseek'"><server>chat-deepseek</server>        </if>
+    <if condition="<llm/> is equal 'grok'">    <server>chat-xai-grok</server>        </if>
+    <if condition="<llm/> is equal 'glm'">     <server>chat-zai-glm</server>         </if>
+    <if condition="<llm/> is equal 'qwen'">    <server>chat-alibaba-qwen</server>    </if>
+    <if condition="<llm/> is equal 'claude'">  <server>chat-anthropic-claude</server></if>
+    <if condition="<llm/> is equal 'codex'">   <server>chat-openai-codex</server>    </if>
+    <if condition="<llm/> is equal 'copilot'"> <server>chat-github-copilot</server>  </if>
 
     <if condition="<server/> is empty">
         You *MUST* output the following <template/> and immediately *STOP* processing
         (do *NOT* continue with any further step and do *NOT* call any MCP tool):
 
         <template>
-        ERROR: unknown LLM `<llm/>` (has to be one of: chatgpt, gemini, deepseek, grok, glm, qwen)
+        ERROR: unknown LLM `<llm/>` (has to be one of: chatgpt, gemini, deepseek, grok, glm, qwen, claude, codex, copilot)
         </template>
     </if>
 

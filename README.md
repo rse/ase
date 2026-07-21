@@ -342,6 +342,10 @@ upper-case with dashes replaced by underscores (e.g. the server
 `openai-chatgpt` uses `ASE_MCP_KEY_OPENAI_CHATGPT`). These variables
 are also automatically sourced from `.env` files. A server whose
 key variable is unset or empty is silently skipped on activation.
+The harness-based servers (`anthropic-claude`, `openai-codex` and
+`github-copilot`) require no API key at all -- their variable instead
+carries the harness model identifier (or the special value `default` for
+the default model of the harness).
 
 The following AI services are currently defined:
 
@@ -355,6 +359,9 @@ The following AI services are currently defined:
 - Chat: xAI Grok (`xai-grok`)
 - Chat: Alibaba Qwen (`alibaba-qwen`)
 - Chat: Z.AI GLM (`zai-glm`)
+- Chat: Anthropic Claude (`anthropic-claude`)
+- Chat: OpenAI Codex (`openai-codex`)
+- Chat: GitHub Copilot (`github-copilot`)
 
 </td>
 <td width="50%" valign="top">
@@ -367,16 +374,22 @@ The following AI services are currently defined:
 </tr>
 </table>
 
-Hint: All MCP servers of type "Chat" support both the native API of the
-LLM vendor and the *OpenRouter* proxy API as an alternative, i.e. you
-can leverage all paid "Chat" AI services by just providing the
-`ASE_MCP_KEY_OPENROUTER` of an *OpenRouter* account.
+Hint: All API-based MCP servers of type "Chat" support both the native
+API of the LLM vendor and the *OpenRouter* proxy API as an alternative,
+i.e. you can leverage all paid "Chat" AI services by just providing the
+`ASE_MCP_KEY_OPENROUTER` of an *OpenRouter* account. Alternatively,
+the harness-based MCP servers of type "Chat" (`anthropic-claude`,
+`openai-codex` and `github-copilot`) require no API key at all, as they
+bridge to a locally installed AI agent harness CLI (Anthropic Claude
+Code CLI, OpenAI Codex CLI, or GitHub Copilot CLI) which authenticates
+via its own configured credentials.
 
 See Also
 --------
 
 - [claudeX](https://github.com/rse/claudex) (convenience wrapper for Anthropic Claude Code CLI)
 - [mcp-to-openai](https://github.com/rse/mcp-to-openai) (gateway between MCP and OpenAI-compatible APIs)
+- [mcp-to-harness](https://github.com/rse/mcp-to-harness) (bridge between MCP and AI agent harness CLIs)
 - [bash-authorize](https://github.com/rse/bash-authorize) (pre-tool-use hook for Bash commands)
 
 Support

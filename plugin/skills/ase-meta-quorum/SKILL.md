@@ -25,7 +25,7 @@ Query Multiple AIs for Quorum Answer
 
 <expand name="getopt"
     arg1="ase-meta-quorum"
-    arg2="--models|-m=(all|chatgpt|gemini|deepseek|grok|glm|qwen)...">
+    arg2="--models|-m=(all|chatgpt|gemini|deepseek|grok|glm|qwen|claude|codex|copilot)...">
     $ARGUMENTS
 </expand>
 
@@ -69,7 +69,8 @@ by querying *multiple* AIs for an *optimal consensus*.
     as a comma-separated list of model tokens. The getopt parser
     validates only the *first* token, so you *MUST* validate each
     remaining token yourself against the allowed set `all`, `chatgpt`,
-    `gemini`, `deepseek`, `grok`, `glm`, `qwen`. If any token is *not*
+    `gemini`, `deepseek`, `grok`, `glm`, `qwen`, `claude`, `codex`,
+    `copilot`. If any token is *not*
     in this set, bind <token/> to that offending token, then only output
     the following <template/> and then immediately *STOP* processing the
     entire current skill:
@@ -80,7 +81,10 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     The default is the single token `all`. If <getopt-option-models/>
     contains the token `all`, you *MUST* treat it as the full list
-    `chatgpt,gemini,deepseek,grok,glm,qwen` (all models). Anthropic
+    `chatgpt,gemini,deepseek,grok,glm,qwen` (all API-based models). The
+    harness-based models `claude`, `codex`, and `copilot` are *never*
+    part of `all` and are queried only when their token is given
+    *explicitly* (in addition to `all`, if wished). Anthropic
     Claude (yourself) is *always* included, independent of this option.
 
     <define name="agent">
@@ -119,6 +123,15 @@ by querying *multiple* AIs for an *optimal consensus*.
     </if>
     <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `qwen`">
     <expand name="agent" arg1="Alibaba Qwen"   arg2="qwen"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `claude`">
+    <expand name="agent" arg1="Anthropic Claude (harness)" arg2="claude"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `codex`">
+    <expand name="agent" arg1="OpenAI Codex"               arg2="codex"></expand>
+    </if>
+    <if condition="<getopt-option-models/> contains `copilot`">
+    <expand name="agent" arg1="GitHub Copilot"             arg2="copilot"></expand>
     </if>
 
     You *MUST* *NOT* output anything in this step.
@@ -204,6 +217,18 @@ by querying *multiple* AIs for an *optimal consensus*.
     - [...]
 
     &#x25CB; **Alibaba Qwen**:
+    - [...]
+    - [...]
+
+    &#x25CB; **Anthropic Claude (harness)**:
+    - [...]
+    - [...]
+
+    &#x25CB; **OpenAI Codex**:
+    - [...]
+    - [...]
+
+    &#x25CB; **GitHub Copilot**:
     - [...]
     - [...]
     </template>

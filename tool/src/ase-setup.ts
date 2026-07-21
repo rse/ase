@@ -536,6 +536,30 @@ export default class SetupCommand {
         }
     }
 
+    /*  build a chat-model MCP handler which bridges to a locally
+        installed AI agent harness CLI via the mcp-to-harness stdio
+        scaffold; the API key environment variable carries no key at all,
+        but instead the harness model identifier, with the special value
+        "default" selecting the default model of the harness  */
+    private harnessMcpHandler (harness: string): McpServerSpec["handler"] {
+        return async (spec, tool, scope, action, _envKey, envVal) => {
+            if (action === "activate")
+                await this.mcpAdd(tool, spec.server, {}, {
+                    type: "stdio", command: [
+                        "npx", "-y", "mcp-to-harness",
+                        "--service",  spec.name,
+                        "--mcp-tool", "query",
+                        "--harness",  harness,
+                        ...(envVal !== "default" ? [
+                            "--harness-model", envVal
+                        ] : [])
+                    ]
+                }, scope)
+            else
+                await this.mcpRemove(tool, spec.server, scope)
+        }
+    }
+
     /*  registry of pre-defined MCP servers: maps each server id onto its
         dedicated handler which performs the activate/deactivate operation  */
     private mcpServers: McpServerSpec[] = [
@@ -604,6 +628,33 @@ export default class SetupCommand {
             handler: this.chatMcpHandler(
                 { url: "https://api.z.ai/api/paas/v4/", api: "completion", model: "glm-5.1" },
                 { model: "z-ai/glm-5.1" })
+        },
+        {
+            id:      "anthropic-claude",
+            name:    "Anthropic Claude",
+            version: "latest",
+            env:     [ "ANTHROPIC_CLAUDE" ],
+            server:  "chat-anthropic-claude",
+            skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
+            handler: this.harnessMcpHandler("claude")
+        },
+        {
+            id:      "openai-codex",
+            name:    "OpenAI Codex",
+            version: "latest",
+            env:     [ "OPENAI_CODEX" ],
+            server:  "chat-openai-codex",
+            skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
+            handler: this.harnessMcpHandler("codex")
+        },
+        {
+            id:      "github-copilot",
+            name:    "GitHub Copilot",
+            version: "latest",
+            env:     [ "GITHUB_COPILOT" ],
+            server:  "chat-github-copilot",
+            skills:  [ "ase-meta-chat", "ase-meta-quorum" ],
+            handler: this.harnessMcpHandler("copilot")
         },
         {
             id:      "brave",
