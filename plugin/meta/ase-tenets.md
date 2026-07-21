@@ -80,7 +80,7 @@ CRAFTING TENETS
 ---------------
 
 When *crafting* from scratch a new artifact, a feature, or an aspect,
-you *MUST* honor the following so-called "CRAFTING TENETS":
+you *MUST* honor the following so-called **CRAFTING TENETS**:
 
 -   **Clear Minimal Scope**:
     Establish explicit boundaries for the new feature.
@@ -167,7 +167,7 @@ REFACTORING TENETS
 ------------------
 
 When *refactoring* existing artifacts or aspects,
-you *MUST* honor the following so-called **REFACTORING TENETS**
+you *MUST* honor the following so-called **REFACTORING TENETS**:
 
 -   **Behavior Preservation**:
     Refactoring changes only re-structure, never change any
@@ -200,7 +200,7 @@ RESOLVING TENETS
 ----------------
 
 When *resolving* a problem or challenge (bug-fixing),
-you *MUST* honor the following so-called **RESOLVING TENETS**
+you *MUST* honor the following so-called **RESOLVING TENETS**:
 
 -   **No Cleanups**:
     Strictly focus on resolving the problem and do not mix the task with
