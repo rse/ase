@@ -26,6 +26,9 @@ Configure Task Id
 *Get* or *set* the unique *task id* of the current session.
 </objective>
 
+Procedure
+---------
+
 1.  Determine request:
     <request><getopt-arguments/></request>
     Inherit the always existing <ase-session-id/> and the current
