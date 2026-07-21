@@ -76,6 +76,7 @@ Procedure
         the `text` output field of the `ase_task_load` tool call.
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
+            Silently ignore the MCP error.
             Set <content></content> (set content to empty).
             Set <words/> to "0".
 
