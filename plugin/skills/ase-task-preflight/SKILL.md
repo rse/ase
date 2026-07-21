@@ -37,7 +37,8 @@ Procedure
 
 1.  **Determine Task:**
 
-    1.  Set <instruction><getopt-arguments/></instruction> initially.
+    1.  Set <instruction><getopt-arguments/></instruction> initially, with any
+        leading and trailing whitespace stripped.
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
