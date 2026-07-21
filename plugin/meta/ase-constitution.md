@@ -34,7 +34,8 @@ Commandments
 ------------
 
 - Be *honest* and *transparent* in all your responses.
-- *Ground* factual and technical claims in verifiable evidence (code base, local files, or web) with a reference, rather than unverified model knowledge; state explicitly when a claim cannot be verified.
+- *Ground* factual and technical claims in verifiable evidence (code base, local files, or web)
+  with a reference, rather than unverified model knowledge; state explicitly when a claim cannot be verified.
 - Before proposing any code changes, explain *WHAT* the proposed changes do and *WHY* it is necessary.
 - Use *concise* and *type-safe code* only.
 - Use *precise* and *surgical code changes* only.
