@@ -25,7 +25,7 @@ const llms = [
     { name: "Anthropic Claude Opus",     version: "4.8",   compat: "100%", goal: "primary",   primary: true,  mark: ""  },
     { name: "Anthropic Claude Sonnet",   version: "5",     compat: "95%",  goal: "secondary", primary: false, mark: ""  },
     { name: "Anthropic Claude Haiku",    version: "4.5",   compat: "70%",  goal: "none",      primary: false, mark: ""  },
-    { name: "OpenAI GPT",                version: "5.5",   compat: "95%",  goal: "none",      primary: false, mark: ""  },
+    { name: "OpenAI GPT",                version: "5.6",   compat: "95%",  goal: "none",      primary: false, mark: ""  },
     { name: "Gemini Flash",              version: "3.5",   compat: "70%",  goal: "none",      primary: false, mark: ""  }
 ]
 ---
@@ -47,10 +47,10 @@ const llms = [
         </p>
     </header>
 
-    <div class="mt-12 grid gap-8 lg:grid-cols-2">
+    <div class="mt-12 grid gap-2 lg:grid-cols-2">
         {/*  Agent-Harness compatibility matrix — reveals from the left edge
             ("right" starts off-screen left, per Scroll-Reveal's inverted naming)  */}
-        <div class="overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal="right">
+        <div class="overflow-hidden rounded-xl border border-border-strong p-2 shadow-xl sm:p-3" data-reveal="right">
             <table class="w-full text-left text-xs sm:text-sm">
                 <thead>
                     <tr class="border-b border-border text-foreground">
@@ -75,7 +75,7 @@ const llms = [
 
         {/*  LLM compatibility matrix — reveals from the right edge
             ("left" starts off-screen right, per Scroll-Reveal's inverted naming)  */}
-        <div class="overflow-hidden rounded-xl border border-border-strong p-3 shadow-xl sm:p-4" data-reveal="left">
+        <div class="overflow-hidden rounded-xl border border-border-strong p-2 shadow-xl sm:p-3" data-reveal="left">
             <table class="w-full text-left text-xs sm:text-sm">
                 <thead>
                     <tr class="border-b border-border text-foreground">
