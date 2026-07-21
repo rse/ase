@@ -2,7 +2,7 @@
 name: ase-meta-changelog
 argument-hint: "[--help|-h]"
 description: >
-    Update changes entries in CHANGELOG.md files
+    Update ChangeLog entries in CHANGELOG.md files
 user-invocable: true
 disable-model-invocation: false
 effort: high
