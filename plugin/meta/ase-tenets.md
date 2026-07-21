@@ -5,7 +5,7 @@ ASE Tenets
 The following are the **ASE Tenets** -- the guiding principles you
 *MUST* internalize when requested. They are organized into *Generic
 Tenets*, which always apply, and *Operation-Specific Tenets*, which
-apply only to a particular kind of operation (Crafting, Aligning,
+apply only to a particular kind of operation (Crafting, Reconciling,
 Refactoring, Resolving).
 
 GENERIC TENETS
