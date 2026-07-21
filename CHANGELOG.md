@@ -5,7 +5,19 @@ ChangeLog
 0.9.45 (2026-07-21)
 -------------------
 
+- FEATURE [code]: support querying foreign AIs via an MCP-to-agent-harness bridge (`ase-setup.ts`, `ase-meta-chat.md`)
+- FEATURE [code]: add grounding commandment favoring evidence and references over model knowledge (`ase-constitution.md`)
+- IMPROVEMENT [code]: force smaller unified diffs in `ase-code-lint` and `ase-docs-proofread` (`SKILL.md`, agents)
+- IMPROVEMENT [code]: number the findings in `ase-code-lint` and `ase-docs-proofread` (`SKILL.md`)
+- IMPROVEMENT [code]: treat `TASK` differently and refine `ase-sync-import` handling (`SKILL.md`)
+- IMPROVEMENT [code]: improve `ase-meta-quorum` description and add missing `TaskUpdate` tool (`SKILL.md`)
+- IMPROVEMENT [code]: support more cases and be more precise in `ase-meta-changelog` (`SKILL.md`)
 - IMPROVEMENT [docs]: update website compat matrix to GPT 5.6 and tighten table spacing (`Section-Compat.astro`)
+- IMPROVEMENT [docs]: mark Fable as fully supported and in primary focus (`Section-Compat.astro`)
+- BUGFIX [code]: fix grammar, wording, references, and placeholders across skills and meta files
+- REFACTOR [code]: reduce redundancies in the task skills via a shared `ase-common-task.md` (`SKILL.md`)
+- REFACTOR [code]: reduce redundancy via a macro definition in task skills (`ase-task-*/SKILL.md`)
+- CLEANUP [code]: align skill structure, style, and references to repo-wide convention
 - CLEANUP [code]: remove stray non-portable `model` frontmatter lines (`ase-meta-search.md`, `ase-arch-analyze/SKILL.md`)
 
 0.9.44 (2026-07-20)
