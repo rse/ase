@@ -6,7 +6,7 @@
     "homepage":                             "https://ase.tools",
     "repository":                           { "url": "git+https://github.com/rse/ase.git", "type": "git" },
     "bugs":                                 { "url": "https://github.com/rse/ase/issues" },
-    "version":                              "0.9.44",
+    "version":                              "0.9.45",
     "license":                              "Apache-2.0",
     "author": {
         "name":                             "Dr. Ralf S. Engelschall",
