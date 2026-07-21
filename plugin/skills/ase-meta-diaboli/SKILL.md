@@ -103,8 +103,8 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 
     -   **Argue in Good Faith**:
         Make clear you're just stress-testing the thesis, not
-        obstructing, because the goal of the objective is a better final
-        decision, not winning.
+        obstructing, because the goal is a better final decision, not
+        winning.
 
     -   **Know When to Yield**:
         Conceding when the argument holds is what makes the challenge
