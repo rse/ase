@@ -17,7 +17,7 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-sync-import">
-    Import Foreign Sources into Artifact Set
+Import Foreign Sources into Artifact Set
 </skill>
 
 <expand name="getopt"
@@ -27,11 +27,11 @@ effort: xhigh
 </expand>
 
 <objective>
-    *Import* the information of the *foreign sources* (named by the
-    <hint/>) into the *target* artifact kinds, by reading the foreign
-    sources and generating or updating the target artifacts to faithfully
-    reflect the imported information:
-    <hint><getopt-arguments/></hint>.
+*Import* the information of the *foreign sources* (named by the
+<hint/>) into the *target* artifact kinds, by reading the foreign
+sources and generating or updating the target artifacts to faithfully
+reflect the imported information:
+<hint><getopt-arguments/></hint>.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md
