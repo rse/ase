@@ -285,9 +285,6 @@ over time.
     -   <spec-cj-step-name/> is a summary (5-10 words) of the *step* at its
         <spec-cj-step-touchpoint/>.
 
-    -   <spec-cj-step-actor/> is a `SPEC-PE-<spec-pe-persona-id/>` reference to the
-        corresponding **Aspect** of the Personas **Artifact**.
-
     -   <spec-cj-step-stage/> is one of:
 
         -   `Awareness`:     Customer is not aware of solution, but has a need.
@@ -296,6 +293,9 @@ over time.
         -   `Onboarding`:    Customer is using the solution.
         -   `Retention`:     Customer in the long-term stays a customer.
         -   `Advocacy`:      Customer is a fan of solution and tells the tribe.
+
+    -   <spec-cj-step-actor/> is a `SPEC-PE-<spec-pe-persona-id/>` reference to the
+        corresponding **Aspect** of the Personas **Artifact**.
 
     -   <spec-cj-step-goal/> is what the actor wants to achieve at this step.
 
