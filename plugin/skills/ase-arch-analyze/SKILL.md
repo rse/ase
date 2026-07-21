@@ -251,7 +251,7 @@ interface quality, quality attributes, and architecture governance.
       - *god-package*: *incoming ≥ 5* and *outgoing ≥ 3* -
         coordinator dumping ground that should be split along its
         internal topical clusters
-      - *fragment*: 1–2 files under a sibling parent that share a
+      - *fragment*: 1-2 files under a sibling parent that share a
         *name prefix* or *imported interface* with that sibling -
         consolidation candidate
 
@@ -277,7 +277,7 @@ interface quality, quality attributes, and architecture governance.
       which operations sit *between* the specific acquire and
       release in source order.
 
-    - *Package-graph construction (SA19–SA21)*: parse each file's
+    - *Package-graph construction (SA19-SA21)*: parse each file's
       import (or equivalent language construct) statement, keep
       only first-party packages within the analyzed scope, and
       persist two intermediate structures: the per-package
