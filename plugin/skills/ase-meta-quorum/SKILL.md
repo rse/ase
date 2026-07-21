@@ -12,6 +12,7 @@ effort: high
 allowed-tools:
     - "Agent"
     - "TaskCreate"
+    - "TaskUpdate"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
