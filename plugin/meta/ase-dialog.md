@@ -81,7 +81,7 @@ following procedure:
             Set <keys><keys/>/**CANCEL**</keys>.
         </else>
 
-        <if condition="<opts/> contains `--other`">
+        <if condition="<opts/> contains `--other` and does *not* contain `--no-other`">
             Set <hint>Please choose *one* option by typing <keys/>, or other free-text instruction.</hint>.
         </if>
         <else>
@@ -134,7 +134,7 @@ following procedure:
 
         4.  If <result/> is then *NEITHER* one of the "key"
             *NOR* "label" values from <spec/>:
-            <if condition="<opts/> contains `--other`">
+            <if condition="<opts/> contains `--other` and does *not* contain `--no-other`">
                 Set <result>OTHER: <result/></result>
                 (prefix result with `OTHER: `).
             </if>
