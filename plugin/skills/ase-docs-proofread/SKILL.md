@@ -135,11 +135,14 @@ Analyze documents for spelling, punctuation, or grammar errors
         still perform substep 3 first. Never leave this marker active
         for a later, unrelated `Edit`.
 
-    2.  Iterate over all problems:
+    2.  Set <total/> to the number of problems in <problems/> and
+        <index/> to `0`. Then iterate over all problems:
 
         <for items="<problems/>">
 
-        1.  Set <type/>           to the `type` field of <item/>.
+        1.  Increment <index/> by one (the 1-based position of the
+            current <item/> within <problems/>).
+            Set <type/>           to the `type` field of <item/>.
             Set <file/>           to the `file` field of <item/>.
             Set <line/>           to the `line` field of <item/>.
             Set <description/>    to the `description` field of <item/>.
@@ -163,7 +166,7 @@ Analyze documents for spelling, punctuation, or grammar errors
         2.  Report the problem with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-signal/> **<type/> PROBLEM**: `<file/>`:<line/>:
+            <ase-tpl-bullet-signal/> [<index/>/<total/>]: **<type/> PROBLEM**: `<file/>`:<line/>:
 
             <description/>
             </template>

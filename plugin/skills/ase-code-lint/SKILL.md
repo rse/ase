@@ -154,11 +154,14 @@ related to a set of code quality aspects.
         still perform substep 3 first. Never leave this marker active
         for a later, unrelated `Edit`.
 
-    2.  Iterate over all problems:
+    2.  Set <total/> to the number of problems in <problems/> and
+        <index/> to `0`. Then iterate over all problems:
 
         <for items="<problems/>">
 
-        1.  Set <aspect/>      to the `aspect`      field of <item/>.
+        1.  Increment <index/> by one (the 1-based position of the
+            current <item/> within <problems/>).
+            Set <aspect/>      to the `aspect`      field of <item/>.
             Set <severity/>    to the `severity`    field of <item/>.
             Set <description/> to the `description` field of <item/>.
             Set <change-set/>  to the `change-set`  field of <item/>.
@@ -301,7 +304,7 @@ related to a set of code quality aspects.
         4.  Report the problem with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-signal/> **<aspect/> PROBLEM** (`<severity/>`): <context/>
+            <ase-tpl-bullet-signal/> [<index/>/<total/>]: **<aspect/> PROBLEM** (`<severity/>`): <context/>
 
             <description/>
 
