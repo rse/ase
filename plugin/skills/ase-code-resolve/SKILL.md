@@ -289,7 +289,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
 
         If a `CHANGELOG.md` file exists in the project (or in any
         affected sub-package), the plan *MUST* include, as part of its
-        `## ※ CHANGES` section, an explicit bullet point describing
+        `##  CHANGES` section, an explicit bullet point describing
         the addition of a corresponding new entry to that `CHANGELOG.md`
         file, aligned with its existing style and conventions.
 
