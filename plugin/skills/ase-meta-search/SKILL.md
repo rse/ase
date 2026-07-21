@@ -109,7 +109,7 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
 
 2.  <step id="STEP 2: Consolidate Search Answers">
 
-    Consolidate all responses from the `ase:ase-meta-search` agents
+    Consolidate all responses from the `ase:ase-meta-search` agent
     calls above into a single response and output it without giving any
     further explanations.
 
