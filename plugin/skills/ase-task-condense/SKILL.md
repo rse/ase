@@ -31,6 +31,7 @@ semantics exactly.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 
 Procedure
 ---------
@@ -87,20 +88,20 @@ Set <args></args> (set args to empty).
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
             Silently ignore the MCP error.
-            Set <content></content> (set content to empty).
+            Set <task-content></task-content> (set task content to empty).
             Set <words/> to "0".
 
         -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
-            Set <content><text/></content> (set content to text).
-            Calculate the number of words <words/> of <content/>.
+            Set <task-content><text/></task-content> (set task content to text).
+            Calculate the number of words <words/> of <task-content/>.
 
         Set <words-before><words/></words-before> (remember the loaded
         word count for the strictly-smaller check in step 3).
 
-        <if condition="<content/> contains '⎈   Created:  <text/>'">
+        <if condition="<task-content/> contains '⎈   Created:  <text/>'">
         Set <timestamp-created><text/></timestamp-created> (extract the
         original creation timestamp so it can be re-inserted unchanged
-        into the condensed <content/> in step 3).
+        into the condensed <task-content/> in step 3).
         </if>
 
         Only output the following <template/>:
@@ -109,7 +110,7 @@ Set <args></args> (set args to empty).
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan loaded**
         </template>
 
-    2.  <if condition="<content/> is empty">
+    2.  <if condition="<task-content/> is empty">
         Complain and tell the user to use the `ase-code-resolve`,
         `ase-code-refactor`, `ase-code-craft`, or `ase-task-edit` skills
         first to create a task plan. Then immediately stop processing
@@ -118,8 +119,8 @@ Set <args></args> (set args to empty).
 
 3.  **Condense Task Plan:**
 
-    1.  *Apply the condense ruleset* to <content/>, producing a shorter
-        <content/>. The goal is to make the plan require as *little
+    1.  *Apply the condense ruleset* to <task-content/>, producing a shorter
+        <task-content/>. The goal is to make the plan require as *little
         reading* as possible while all semantics remain *fully preserved
         and unchanged*. Honor the following ruleset *strictly*:
 
@@ -159,25 +160,10 @@ Set <args></args> (set args to empty).
             longer wording*.
 
     2.  *Persist only if smaller*: calculate the number of words <words/>
-        of the condensed <content/>.
+        of the condensed <task-content/>.
 
         -   <if condition="<words/> is strictly smaller than <words-before/>">
-            Update <timestamp-modified/> with the current time in
-            ISO-style format, which has to be determined by calling
-            the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool
-            of the `ase` MCP server and use the `text` field of
-            its response. Keep the original <timestamp-created/>,
-            re-insert the current <ase-task-id/> and the refreshed
-            <timestamp-modified/> into <content/>.
-
-            Call the `ase_task_save(id: "<ase-task-id/>", text:
-            "<content/>")` tool of the `ase` MCP server to save the
-            condensed task plan content. Do not output anything related
-            to this MCP call except the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan condensed**
-            </template>
+            <expand name="task-save-content" arg1="plan condensed"></expand>
             </if>
 
         -   <if condition="<words/> is NOT strictly smaller than <words-before/>">
@@ -193,39 +179,15 @@ Set <args></args> (set args to empty).
 
     1.  *Determine next step*:
 
-        -   If <getopt-option-next/> is not equal to `none`:
-            Treat <getopt-option-next/> as a comma-separated chronological
-            list of pre-selected next-step tokens. *Split* it on `,`,
-            take the *first* token as <head/>, and store the remaining
-            tokens (joined back with `,`, or `none` if empty) into
-            <getopt-option-next/> so downstream skills can consume the tail.
-
-            -   If <head/> matches the regex `^(DONE|EDIT|IMPLEMENT|PREFLIGHT)$`:
-                Honor the pre-selected token.
-                Set <result><head/></result>.
-
-            -   else:
-                Only output the following <template/> and then immediately
-                *STOP* processing the entire current skill:
-
-                <template>
-                ⧉ **ASE**: ☻ skill: **ase-task-condense**, ▶ ERROR: invalid `--next` token: **<head/>**
-                </template>
-
-        -   If <getopt-option-next/> is equal to `none`:
-
-            In the following, you *MUST* *NOT* use your built-in
-            <user-dialog-tool/> tool! Instead, you *MUST* just show a
-            custom dialog according to the expanded `custom-dialog`
-            definition. You *MUST* closely follow this definition:
-
-            <expand name="custom-dialog" arg1="--no-other">
-                Next Step: How would you like to proceed with the plan?
-                DONE: Stop processing.
-                EDIT: Hand off plan to editing.
-                PREFLIGHT: Hand off plan to pre-flighting.
-                IMPLEMENT: Hand off plan to implementation.
-            </expand>
+        <expand name="task-next-select"
+            arg1="ase-task-condense"
+            arg2="DONE|EDIT|IMPLEMENT|PREFLIGHT">
+            Next Step: How would you like to proceed with the plan?
+            DONE: Stop processing.
+            EDIT: Hand off plan to editing.
+            PREFLIGHT: Hand off plan to pre-flighting.
+            IMPLEMENT: Hand off plan to implementation.
+        </expand>
 
     2.  Check the tool <result/> and dispatch accordingly:
 

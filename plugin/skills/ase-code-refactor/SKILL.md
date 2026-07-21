@@ -231,7 +231,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         closely aligning to the existing architecture and the existing
         code base. Use the <format/> defined for a task plan and inject
         the information from refactoring A<n/> and all derived realization
-        decisions into it. Store the resulting task plan in <content/>.
+        decisions into it. Store the resulting task plan in <task-content/>.
 
         If a `CHANGELOG.md` file exists in the project (or in any
         affected sub-package), the plan *MUST* include, as part of its
@@ -242,7 +242,7 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <if condition="<getopt-option-dry/> is equal `true`">
         You *MUST* completely omit the `##  VERIFICATION` section
         (including its heading and all of its bullet points) from
-        <content/>.
+        <task-content/>.
         </if>
 
         You *MUST* *NOT* call `Edit`, `Write`, `NotebookEdit`, or any
@@ -253,10 +253,10 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
         <timestamp-created/> and <timestamp-modified/> information. Then
         insert the current <ase-task-id/>, <timestamp-created/>, and
         <timestamp-modified/> information and calculate the number of
-        words <words/> of <content/>.
+        words <words/> of <task-content/>.
 
     3.  You then *MUST* *save* the resulting plan content with the
-        `ase_task_save(id: "<ase-task-id/>", text: "<content/>")`.
+        `ase_task_save(id: "<ase-task-id/>", text: "<task-content/>")`.
 
     4.  Output a hint with the following <template/>:
 

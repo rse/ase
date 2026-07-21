@@ -60,7 +60,7 @@ Procedure
         output anything related to this MCP tool call.
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
-            Set <content></content> (set content to empty).
+            Set <task-content></task-content> (set task content to empty).
             Only output the following <template/>:
 
             <template>
@@ -68,18 +68,18 @@ Procedure
             </template>
 
         -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
-            Set <content><text/></content> (set content to text).
-            Calculate the number of words <words/> of <content/>.
+            Set <task-content><text/></task-content> (set task content to text).
+            Calculate the number of words <words/> of <task-content/>.
             Only output the following <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<id/>**, ✪ plan: **<words/>** words, ▶ status: **plan loaded**
             </template>
 
-    2.  <if condition="<content/> is not empty">
-        Treat <content/> as *verbatim* Markdown.
+    2.  <if condition="<task-content/> is not empty">
+        Treat <task-content/> as *verbatim* Markdown.
         *Render plan*: Only output the following <template/>. If
-        <getopt-option-full/> is *not* `true`, <content/> is longer than
+        <getopt-option-full/> is *not* `true`, <task-content/> is longer than
         90 lines, and a `##  IMPLEMENTATION DRAFT` section (from the
         companion skill `ase-task-preflight`) exists, replace the entire
         content of the `##  IMPLEMENTATION DRAFT` section with `[...]`.
@@ -88,7 +88,7 @@ Procedure
 
         <template>
         <ase-tpl-head title="TASK"/>
-        <content/>
+        <task-content/>
         <ase-tpl-foot title="TASK"/>
         </template>
         </if>

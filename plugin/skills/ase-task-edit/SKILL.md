@@ -41,20 +41,20 @@ Procedure
 
 <define name="apply-refinement">
 Treat the <instruction/> as a *refinement instruction* for
-the plan, and update <content/> in-place by *applying* the
+the plan, and update <task-content/> in-place by *applying* the
 requested <instruction/> to the *plan*.
 
 When refining the plan this way, preserve the overall structure of the
 plan and only modify what the user actually requested. Do *not* rewrite
 unrelated sections of the plan.
 
-Calculate the number of words <words/> of <content/>.
-Set <content-dirty>true</content-dirty>.
+Calculate the number of words <words/> of <task-content/>.
+Set <task-content-dirty>true</task-content-dirty>.
 </define>
 
 <define name="generate-plan">
 Create a new plan from scratch and store the result as
-<content/> by closely following the defined plan format
+<task-content/> by closely following the defined plan format
 <format/> and injecting into it all the information from
 the <instruction/> and all decisions you derived from the
 <instruction/>.
@@ -69,7 +69,7 @@ and conventions.
 <if condition="<getopt-option-dry/> is equal `true`">
 You *MUST* completely omit the `##  VERIFICATION` section
 (including its heading and all of its bullet points) from
-<content/>.
+<task-content/>.
 </if>
 
 Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
@@ -77,8 +77,8 @@ Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
 for fresh <timestamp-created/> and <timestamp-modified/>
 information. Then insert the current <ase-task-id/>,
 <timestamp-created/>, and <timestamp-modified/> information
-and calculate the number of words <words/> of <content/>.
-Set <content-dirty>true</content-dirty>.
+and calculate the number of words <words/> of <task-content/>.
+Set <task-content-dirty>true</task-content-dirty>.
 </define>
 
 <define name="handoff-args">
@@ -193,24 +193,24 @@ Set <args></args> (set args to empty).
             call. Set <status>plan loaded</status>.
         </else>
 
-        Set <content-dirty>false</content-dirty>.
+        Set <task-content-dirty>false</task-content-dirty>.
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
             Silently ignore the MCP error.
-            Set <content/> to empty.
+            Set <task-content/> to empty.
             Set <words/> to "0".
             Do not output anything.
 
         -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
-            Set <content><text/></content> (set content to text).
-            Calculate the number of words <words/> of <content/>.
+            Set <task-content><text/></task-content> (set task content to text).
+            Calculate the number of words <words/> of <task-content/>.
             Only output the following <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **<status/>**
             </template>
 
-    2.  <if condition="<content/> is empty AND <instruction/> is empty">
+    2.  <if condition="<task-content/> is empty AND <instruction/> is empty">
         Ask the user interactively, without a special tool, for the
         initial plan content with a single question:
 
@@ -224,9 +224,9 @@ Set <args></args> (set args to empty).
         </template>
         </if>
 
-    3.  <if condition="<content/> is not empty AND
+    3.  <if condition="<task-content/> is not empty AND
             <instruction/> is not empty AND
-            <instruction/> is not equal <content/>">
+            <instruction/> is not equal <task-content/>">
         *Determine previous-plan handling*:
 
         -   If <getopt-option-plan/> matches the regex `^(OVERWRITE|REFINE|PRESERVE)$`:
@@ -295,14 +295,14 @@ Set <args></args> (set args to empty).
             </template>
         </if>
 
-    4.  <if condition="no line of <content/> matches the case-insensitive regex `^\s*#+\s*TASK\b` AND <instruction/> is empty">
-        Set <instruction><content/></instruction> (set instruction to content).
-        Set <content></content> (set content to empty).
-        Set <content-dirty>true</content-dirty>.
+    4.  <if condition="no line of <task-content/> matches the case-insensitive regex `^\s*#+\s*TASK\b` AND <instruction/> is empty">
+        Set <instruction><task-content/></instruction> (set instruction to task content).
+        Set <task-content></task-content> (set task content to empty).
+        Set <task-content-dirty>true</task-content-dirty>.
         Do not output anything.
         </if>
 
-    5.  <if condition="<content/> is empty AND <instruction/> is not empty">
+    5.  <if condition="<task-content/> is empty AND <instruction/> is not empty">
         <expand name="generate-plan"/>
 
         Only output the following <template/> and continue processing:
@@ -320,22 +320,22 @@ Set <args></args> (set args to empty).
     `PREFLIGHT`, or declines/cancels in the dialog of step 3.4:
 
     1.  *Update timestamp*:
-        <if condition="<content/> contains '⚙   Modified:' AND <content-dirty/> is 'true'">
+        <if condition="<task-content/> contains '⚙   Modified:' AND <task-content-dirty/> is 'true'">
         Update <timestamp-modified/> with the current time in
         ISO-style format, which has to be determined by calling the
         `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
         MCP server and use the `text` field of its response. Update
-        the `⚙   Modified: ...` line of <content/> with the new
+        the `⚙   Modified: ...` line of <task-content/> with the new
         `⚙   Modified: <timestamp-modified/>`.
         Do not output anything.
         </if>
 
     2.  *Persist plan*:
-        <if condition="<content-dirty/> is 'true'">
-        Call the `ase_task_save(id: "<ase-task-id/>", text: "<content/>")` tool
+        <if condition="<task-content-dirty/> is 'true'">
+        Call the `ase_task_save(id: "<ase-task-id/>", text: "<task-content/>")` tool
         of the `ase` MCP server to persist the current plan, and then
-        set <content-dirty>false</content-dirty> again. Calculate the
-        number of words <words/> of <content/>. Do not output anything
+        set <task-content-dirty>false</task-content-dirty> again. Calculate the
+        number of words <words/> of <task-content/>. Do not output anything
         related to this MCP tool call except the following <template/>:
 
         <template>
@@ -343,9 +343,9 @@ Set <args></args> (set args to empty).
         </template>
         </if>
 
-    3.  *Render plan*: Treat <content/> as *verbatim* Markdown.
+    3.  *Render plan*: Treat <task-content/> as *verbatim* Markdown.
         Only output the following <template/>, so the user
-        can read the plan and react to it. If <content/> is longer
+        can read the plan and react to it. If <task-content/> is longer
         than 90 lines and a `##  IMPLEMENTATION DRAFT` section (from the
         companion skill `ase-task-preflight`) exists, replace the entire
         content of the `##  IMPLEMENTATION DRAFT` section with `[...]`.
@@ -354,7 +354,7 @@ Set <args></args> (set args to empty).
 
         <template>
         <ase-tpl-head title="TASK"/>
-        <content/>
+        <task-content/>
         <ase-tpl-foot title="TASK"/>
         </template>
 

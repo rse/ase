@@ -31,6 +31,7 @@ for a corresponding, *complete source code change set*.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 
 Procedure
 ---------
@@ -45,99 +46,28 @@ Procedure
 
     2.  React on task id:
 
-        1.  <if condition="
-                <instruction/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`
-            ">
-            Set <ase-task-id><instruction/></ase-task-id> (set task
-            id to instruction) and <instruction></instruction> (set
-            instruction empty), call the `ase_task_id(id: "<ase-task-id/>",
-            session: "<ase-session-id/>")` tool from the `ase` MCP
-            server to switch the task, and then only output the
-            following <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-            </template>
-            </if>
-
-        2.  <elseif condition="
-                <instruction/> has the format `<id/>: <text/>` where
-                <id/> matches the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$` and
-                <text/> is *empty*
-            ">
-            Set <instruction></instruction> (set instruction to empty)
-            and <ase-task-id><id/></ase-task-id> (set task id to
-            id) and call the `ase_task_id(id: "<ase-task-id/>", session:
-            "<ase-session-id/>")` tool from the `ase` MCP server to
-            switch the task, and then only output the following
-            <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-            </template>
-            </elseif>
-
-        3.  <elseif condition="<instruction/> is NOT empty">
-            The argument is neither empty nor a valid task id. As this
-            skill only accepts an optional `[<id>]` argument and *never*
-            a free-text instruction, only output the following <template/>
-            and then immediately *STOP* processing the entire current skill:
-
-            <template>
-            ⧉ **ASE**: ☻ skill: **ase-task-preflight**, ▶ ERROR: expected single `[<id>]` argument
-            </template>
-            </elseif>
+        <expand name="task-react-id" arg1="ase-task-preflight"></expand>
 
 2.  **Determine Operation:**
 
     1.  Determine the current task plan content:
 
-        <if condition="
-            <getopt-option-int-reuse-task/> is equal `true`
-            *and* a `ase_task_save(id: '<ase-task-id/>', ...)` tool call
-            exists earlier in the current session
-        ">
-            Set <text/> to the `text` argument of the most recent
-            `ase_task_save(id: '<ase-task-id/>', ...)` tool call,
-            *without* calling `ase_task_load` again. Set <status>plan
-            reused</status>. Do not output anything.
-        </if>
-        <else>
-            Call the `ase_task_load(id: "<ase-task-id/>")` tool of the
-            `ase` MCP server to load the current task plan content and
-            set <text/> to the `text` output field of this `ase_task_load`
-            tool call. Do not output anything related to this MCP tool
-            call. Set <status>plan loaded</status>.
-        </else>
+        <expand name="task-load-content"></expand>
 
-        -   If <text/> starts with `ERROR:` or `WARNING:`:
-            Set <content></content> (set content to empty).
-            Set <words/> to "0".
-
-        -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
-            Set <content><text/></content> (set content to text).
-            Calculate the number of words <words/> of <content/>.
-
-        Only output the following <template/>:
-
-        <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **<status/>**
-        </template>
-
-    2.  If the <content/> is still empty, complain and tell the user to
+    2.  If the <task-content/> is still empty, complain and tell the user to
         use the `ase-code-resolve`, `ase-code-refactor`, `ase-code-craft`,
         or `ase-task-edit` skills first to create a task plan. Then
         immediately stop processing this skill.
 
 3.  **Create Implementation Draft:**
 
-    1.  Perform a *preflight* of the *implementation* of <content/> by creating a
+    1.  Perform a *preflight* of the *implementation* of <task-content/> by creating a
         draft for a corresponding, *complete artifact change set*
-        which *would* fully implement the task plan <content/>. Store
+        which *would* fully implement the task plan <task-content/>. Store
         this artifact change set in *unified diff* format in <unified-diff/>.
 
     2.  Append this artifact change set <unified-diff/> to the end
-        of the <content/> with the following <template/>. If a section
+        of the <task-content/> with the following <template/>. If a section
         named `##  IMPLEMENTATION DRAFT` already exists from a
         previous run of this skill, *replace* this entire existing
         section.
@@ -152,20 +82,20 @@ Procedure
 
         </template>
 
-    3.  <if condition="<content/> contains '⚙   Modified:'">
+    3.  <if condition="<task-content/> contains '⚙   Modified:'">
         Update <timestamp-modified/> with the current time in
         ISO-style format, which has to be determined by calling the
         `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
         MCP server and use the `text` field of its response. Update
-        the `⚙   Modified: ...` line of <content/> with the new
+        the `⚙   Modified: ...` line of <task-content/> with the new
         `⚙   Modified: <timestamp-modified/>`.
         Do not output anything.
         </if>
 
     4.  Finally, call the `ase_task_save(id: "<ase-task-id/>",
-        text: "<content/>")` tool of the `ase` MCP server to save the updated
+        text: "<task-content/>")` tool of the `ase` MCP server to save the updated
         task plan content. Calculate the number of words <words/> of
-        <content/>. Do not output anything related to this MCP tool call
+        <task-content/>. Do not output anything related to this MCP tool call
         except the following <template/>:
 
         <template>
@@ -176,38 +106,14 @@ Procedure
 
     1.  *Determine next step*:
 
-        -   If <getopt-option-next/> is not equal to `none`:
-            Treat <getopt-option-next/> as a comma-separated chronological
-            list of pre-selected next-step tokens. *Split* it on `,`,
-            take the *first* token as <head/>, and store the remaining
-            tokens (joined back with `,`, or `none` if empty) into
-            <getopt-option-next/> so downstream skills can consume the tail.
-
-            -   If <head/> matches the regex `^(DONE|EDIT|IMPLEMENT)$`:
-                Honor the pre-selected token.
-                Set <result><head/></result>.
-
-            -   else:
-                Only output the following <template/> and then immediately
-                *STOP* processing the entire current skill:
-
-                <template>
-                ⧉ **ASE**: ☻ skill: **ase-task-preflight**, ▶ ERROR: invalid `--next` token: **<head/>**
-                </template>
-
-        -   If <getopt-option-next/> is equal to `none`:
-
-            In the following, you *MUST* *NOT* use your built-in
-            <user-dialog-tool/> tool! Instead, you *MUST* just show a
-            custom dialog according to the expanded `custom-dialog`
-            definition. You *MUST* closely follow this definition:
-
-            <expand name="custom-dialog" arg1="--no-other">
-                Next Step: How would you like to proceed with the plan?
-                DONE: Stop processing.
-                EDIT: Hand processing off to editing.
-                IMPLEMENT: Hand processing off to implementation.
-            </expand>
+        <expand name="task-next-select"
+            arg1="ase-task-preflight"
+            arg2="DONE|EDIT|IMPLEMENT">
+            Next Step: How would you like to proceed with the plan?
+            DONE: Stop processing.
+            EDIT: Hand processing off to editing.
+            IMPLEMENT: Hand processing off to implementation.
+        </expand>
 
     2.  Check the tool <result/> and dispatch accordingly:
 

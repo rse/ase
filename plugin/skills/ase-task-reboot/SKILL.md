@@ -31,6 +31,7 @@ based on the existing *WHAT* and *WHY*.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 
 Procedure
 ---------
@@ -78,12 +79,12 @@ Procedure
         the `text` output field of the `ase_task_load` tool call.
 
         -   If <text/> starts with `ERROR:` or `WARNING:`:
-            Set <content></content> (set content to empty).
+            Set <task-content></task-content> (set task content to empty).
             Set <words/> to "0".
 
         -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
-            Set <content><text/></content> (set content to text).
-            Calculate the number of words <words/> of <content/>.
+            Set <task-content><text/></task-content> (set task content to text).
+            Calculate the number of words <words/> of <task-content/>.
 
         Only output the following <template/>:
 
@@ -91,7 +92,7 @@ Procedure
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan loaded**
         </template>
 
-    2.  <if condition="<content/> is empty">
+    2.  <if condition="<task-content/> is empty">
         Complain and tell the user to use the `ase-code-resolve`,
         `ase-code-refactor`, `ase-code-craft`, or `ase-task-edit` skills
         first to create a task plan. Then immediately stop processing
@@ -102,24 +103,24 @@ Procedure
 
     1.  Start with <instruction></instruction> (set instruction to empty).
 
-    2.  <if condition="<content/> contains neither '-   **WHAT**:' nor '-   **WHY**:'">
-        Set <instruction><content/></instruction> (set instruction to content).
+    2.  <if condition="<task-content/> contains neither '-   **WHAT**:' nor '-   **WHY**:'">
+        Set <instruction><task-content/></instruction> (set instruction to task content).
         </if>
 
-    3.  <if condition="<content/> contains '-   **WHAT**: <text/>'">
+    3.  <if condition="<task-content/> contains '-   **WHAT**: <text/>'">
         Set <instruction><text/></instruction> (set instruction to extracted text).
         </if>
 
-    4.  <if condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is empty">
+    4.  <if condition="<task-content/> contains '-   **WHY**: <text/>' and <instruction/> is empty">
         Set <instruction><text/></instruction> (set instruction to extracted text).
         </if>
 
-    5.  <if condition="<content/> contains '-   **WHY**: <text/>' and <instruction/> is NOT empty">
+    5.  <if condition="<task-content/> contains '-   **WHY**: <text/>' and <instruction/> is NOT empty">
         Set <instruction><instruction/>, BECAUSE <text/></instruction>
         (append extracted text to instruction).
         </if>
 
-    6.  <if condition="<content/> contains '⎈   Created:  <text/>'">
+    6.  <if condition="<task-content/> contains '⎈   Created:  <text/>'">
         Set <timestamp-created><text/></timestamp-created> (set
         timestamp-created to extracted text)
         </if>
@@ -128,8 +129,8 @@ Procedure
         The WHAT/WHY extraction yielded no usable text (e.g. a
         `-   **WHAT**:` line existed but captured empty text, so the
         whole-content fallback above did not fire). Fall back to the
-        full previous plan content: set <instruction><content/></instruction>
-        (set instruction to content).
+        full previous plan content: set <instruction><task-content/></instruction>
+        (set instruction to task content).
         <if condition="<instruction/> is still empty or contains only whitespace">
             There is nothing to reboot from. Only output the following
             <template/> and then immediately *STOP* processing the entire
@@ -142,30 +143,16 @@ Procedure
         </if>
 
     8.  Create a new plan from scratch and store the result as
-        <content/> by closely following the defined plan format
+        <task-content/> by closely following the defined plan format
         <format/> and injecting into it all the information from
         the <instruction/> and all decisions you derived from the
         <instruction/>.
 
-    9.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
-        `ase` MCP server and use the `text` field of its response for
-        <timestamp-modified/> information. If <timestamp-created/> is
-        still unset (because the previous <content/> had no `Created:`
-        line), set <timestamp-created><timestamp-modified/></timestamp-created>
-        (fall back to the modified timestamp). Then insert the current
-        <ase-task-id/>, previous <timestamp-created/>, and refreshed
-        <timestamp-modified/> information and calculate the number of
-        words <words/> of <content/>.
+    9.  <expand name="task-save-content" arg1="plan rebooted"></expand>
 
-    10. Call the `ase_task_save(id: "<ase-task-id/>",
-        text: "<content/>")` tool of the `ase` MCP server to save the updated
-        task plan content. Do not output anything related to this MCP
-        call.
-
-    11. Only output the following <template/> and continue processing:
+    10. Only output the following <template/> and continue processing:
 
         <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ plan: **<words/>** words, ▶ status: **plan rebooted**
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
         </template>
 
@@ -173,39 +160,15 @@ Procedure
 
     1.  *Determine next step*:
 
-        -   If <getopt-option-next/> is not equal to `none`:
-            Treat <getopt-option-next/> as a comma-separated chronological
-            list of pre-selected next-step tokens. *Split* it on `,`,
-            take the *first* token as <head/>, and store the remaining
-            tokens (joined back with `,`, or `none` if empty) into
-            <getopt-option-next/> so downstream skills can consume the tail.
-
-            -   If <head/> matches the regex `^(DONE|EDIT|IMPLEMENT|PREFLIGHT)$`:
-                Honor the pre-selected token.
-                Set <result><head/></result>.
-
-            -   else:
-                Only output the following <template/> and then immediately
-                *STOP* processing the entire current skill:
-
-                <template>
-                ⧉ **ASE**: ☻ skill: **ase-task-reboot**, ▶ ERROR: invalid `--next` token: **<head/>**
-                </template>
-
-        -   If <getopt-option-next/> is equal to `none`:
-
-            In the following, you *MUST* *NOT* use your built-in
-            <user-dialog-tool/> tool! Instead, you *MUST* just show a
-            custom dialog according to the expanded `custom-dialog`
-            definition. You *MUST* closely follow this definition:
-
-            <expand name="custom-dialog" arg1="--no-other">
-                Next Step: How would you like to proceed with the plan?
-                DONE: Stop processing.
-                EDIT: Hand off plan to editing.
-                IMPLEMENT: Hand off plan to implementation.
-                PREFLIGHT: Hand off plan to pre-flighting.
-            </expand>
+        <expand name="task-next-select"
+            arg1="ase-task-reboot"
+            arg2="DONE|EDIT|IMPLEMENT|PREFLIGHT">
+            Next Step: How would you like to proceed with the plan?
+            DONE: Stop processing.
+            EDIT: Hand off plan to editing.
+            IMPLEMENT: Hand off plan to implementation.
+            PREFLIGHT: Hand off plan to pre-flighting.
+        </expand>
 
     2.  Check the tool <result/> and dispatch accordingly:
 
