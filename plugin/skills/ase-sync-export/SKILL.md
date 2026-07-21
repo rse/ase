@@ -1,6 +1,6 @@
 ---
 name: ase-sync-export
-argument-hint: "[--help|-h] [--source|-s <source>[,...]] [<filter>]"
+argument-hint: "[--help|-h] [--source|-s <source>[,...]] [<hint>]"
 description: >
     Export artifact content into side-by-side, ready-to-consume files,
     one per artifact that declares an export. Use when the user wants to
