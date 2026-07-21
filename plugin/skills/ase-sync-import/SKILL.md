@@ -111,12 +111,15 @@ Procedure
 
 3.  <step id="STEP 3: Generate or Update Artifacts">
 
-    1.  For all kinds in <target/>, call the `ase_artifact_list(kind: [
-        ... ])` tool of the `ase` MCP server *once*, passing the
-        lower-cased `kind` tokens, and read the returned `artifacts`
-        array of `{ kind, files }` objects to obtain the project-relative
-        file list per kind. Read all *existing* target artifacts to
-        understand their current state.
+    1.  For all kinds in <target/> except `TASK`, call the
+        `ase_artifact_list(kind: [ ... ])` tool of the `ase` MCP server
+        *once*, passing the lower-cased `kind` tokens, and read the
+        returned `artifacts` array of `{ kind, files }` objects to
+        obtain the project-relative file list per kind. The `TASK` kind
+        is *not* resolvable via `ase_artifact_list` (task plans are
+        managed by the `ase_task_*` tools), so resolve and read it via
+        the `ase_task_id` and `ase_task_load` tools instead. Read all
+        *existing* target artifacts to understand their current state.
 
     2.  Internalize and honor the artifact-format conventions:
 
@@ -163,7 +166,8 @@ Procedure
         abstraction (a SPEC states intent, an ARCH states structure).
 
         Apply the generation/update directly to the target artifacts via
-        the `Write`/`Edit` tools.
+        the `Write`/`Edit` tools. For a `TASK` target, apply it via the
+        `ase_task_save` tool instead.
 
     6.  Report the performed changes with the following <template/>, listing
         one bullet line per generated or updated file (with <file/> its
