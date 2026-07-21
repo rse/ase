@@ -139,8 +139,8 @@ Procedure
         **ASE Tenets** when generating or updating in the following. Do
         not output anything.
 
-    4.  Once call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of
-        the `ase` MCP server to find out the current time and store it in
+    4.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+        `ase` MCP server *once* to find out the current time and store it in
         <timestamp-modified/>.
 
     5.  *Generate or update* the <target/> artifact files so that they
