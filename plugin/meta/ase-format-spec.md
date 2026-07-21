@@ -1271,13 +1271,13 @@ turn.
 
     -   <spec-ds-storyboard-usecase/> is a
         `SPEC-UC-<spec-uc-usecase-id/>` reference to the corresponding
-        **Aspect** of the Use Case **Artifact** the storyboard
+        **Aspect** of the Use Cases **Artifact** the storyboard
         visualizes (optional).
 
     -   <spec-ds-storyboard-scenario/> is a
         `SPEC-UC-<spec-uc-usecase-id/>-<spec-uc-usecase-scenario-id/>`
         reference to the corresponding scenario **Aspect** of the Use
-        Case **Artifact** the storyboard visualizes (optional).
+        Cases **Artifact** the storyboard visualizes (optional).
 
     -   <spec-ds-frame-name/>: a short (2-5 word) label for the screen,
         turn, or state depicted by the storyboard frame. Frames are
