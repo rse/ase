@@ -3,13 +3,13 @@ User Dialog
 ===========
 
 <user-dialog-tool>unknown</user-dialog-tool>
-<if condition="<ase-agent-tool/> is 'claude'">
+<if condition="<ase-agent-tool/> is `claude`">
     <user-dialog-tool>AskUserQuestion</user-dialog-tool>
 </if>
-<if condition="<ase-agent-tool/> is 'copilot'">
+<if condition="<ase-agent-tool/> is `copilot`">
     <user-dialog-tool>ask_user</user-dialog-tool>
 </if>
-<if condition="<ase-agent-tool/> is 'codex'">
+<if condition="<ase-agent-tool/> is `codex`">
     <user-dialog-tool>none</user-dialog-tool>
 </if>
 
