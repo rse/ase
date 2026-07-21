@@ -311,7 +311,7 @@ over time.
         actor encounters at this step (optional).
 
     -   In case a <spec-cj-step/> has no pain point at all, the
-        entire `- Pain Point:` bullet point is omitted.
+        entire `-   Pain Point:` bullet point is omitted.
 
 Functional Requirements (FR)
 ----------------------------
@@ -518,7 +518,7 @@ constraining the Functional and Non-Functional Requirements.
         business rule.
 
     -   In case the rule constrains no specific requirement, the
-        entire `- Constrains:` bullet point is omitted.
+        entire `-   Constrains:` bullet point is omitted.
 
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
@@ -853,7 +853,7 @@ ambiguities to avoid, shared consistently across all Artifacts.
         <spec-gl-term-name/> where helpful.
 
     -   In case a term has no synonyms, the
-        entire `- Synonyms:` bullet point is omitted.
+        entire `-   Synonyms:` bullet point is omitted.
 
 Use Cases (UC)
 --------------
@@ -932,7 +932,7 @@ for main, alternative, and exceptional paths.
         **SCENARIO** blocks of this use case).
 
     -   In case the use case realizes no specific functional requirement,
-        the entire `- Requirements:` bullet point is omitted.
+        the entire `-   Requirements:` bullet point is omitted.
 
     -   In case a precondition or postcondition is not present, the
         respective bullet point is omitted.

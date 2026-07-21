@@ -411,7 +411,7 @@ communicate.
         the chosen concurrency structure.
 
     -   In case the unit hosts no functional components, the
-        entire `- Hosts:` bullet point is omitted.
+        entire `-   Hosts:` bullet point is omitted.
 
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
@@ -551,7 +551,7 @@ elements to the runtime platform, hardware, and network topology.
         the node's placement and platform choice.
 
     -   In case the node hosts no functional components, the
-        entire `- Hosts:` bullet point is omitted.
+        entire `-   Hosts:` bullet point is omitted.
 
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
@@ -619,7 +619,7 @@ production, defining installation, monitoring, and management concerns.
         for the operational approach.
 
     -   In case the element reference is not present, the
-        entire `- Element:` bullet point is omitted.
+        entire `-   Element:` bullet point is omitted.
 
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
@@ -707,7 +707,7 @@ How the Non-Functional Requirements (NR) are addressed.
         ("why") for the chosen tactic over alternatives.
 
     -   In case the element reference is not present, the
-        entire `- Affects:` bullet point is omitted.
+        entire `-   Affects:` bullet point is omitted.
 
     -   In case the rationale is not present, the
         entire `, **BECAUSE** [...]` clause is omitted.
