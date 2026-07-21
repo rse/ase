@@ -47,7 +47,7 @@ addressing surface-level symptoms.
 
 2.  <step id="STEP 2: Root-Cause Analysis">
 
-    Find the root-cause of <problem/> by following the following iteration cycle.
+    Find the root-cause of <problem/> by following this iteration cycle.
     Start with a <question/> set equal to the <problem/>.
 
     Determine the *maximum chain length* from <getopt-option-depth/>:
