@@ -27,6 +27,9 @@ List Task Plans
 *List* all available *task plans* of the current project.
 </objective>
 
+Procedure
+---------
+
 1.  Call the `ase_task_list(verbose: <getopt-option-verbose/>)` tool from
     the `ase` MCP server. The result is a structured object with a
     `tasks` array where each entry has an `id` field, and -- if
