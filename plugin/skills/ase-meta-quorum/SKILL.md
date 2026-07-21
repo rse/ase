@@ -2,7 +2,10 @@
 name: ase-meta-quorum
 argument-hint: "[--help|-h] [--models|-m <model>[,...]] <question>"
 description: >
-    Query Multiple AIs for Quorum Answer.
+    Query multiple foreign AIs in parallel and synthesize a consensus
+    ("quorum") answer with a consensus rating. Use when the user wants
+    a quorum, a consensus answer, or the opinions of multiple AIs on a
+    question.
 user-invocable: true
 disable-model-invocation: false
 effort: high
