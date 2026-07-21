@@ -2,7 +2,7 @@
 name: ase-code-craft
 argument-hint: "[--help|-h] [--auto|-a] [--dry|-d] [--quick|-Q] [--next|-n <option>[,...]] [<task-id>:] <feature>"
 description: >
-    Craft Source:
+    Craft Source Code:
     Use when user wants to "create", "add", or "craft" a new feature from scratch.
 user-invocable: true
 disable-model-invocation: false

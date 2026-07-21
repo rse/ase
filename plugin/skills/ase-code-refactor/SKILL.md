@@ -18,7 +18,7 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-code-refactor">
-Refactor Artifacts
+Refactor Source Code
 </skill>
 
 <expand name="getopt"
