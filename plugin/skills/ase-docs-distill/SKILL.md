@@ -17,7 +17,7 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-docs-distill">
-    Distill Key Points
+Distill Key Points
 </skill>
 
 <expand name="getopt"
@@ -27,11 +27,11 @@ effort: high
 </expand>
 
 <objective>
-    *Distill* the content `<getopt-arguments/>` into a *flat*,
-    *importance-ranked* list of its *key points* - each point an
-    *atomic* claim carrying a *0-10 salience rank*, a *one-line
-    rationale*, and a *verbatim, line-cited evidence* snippet - keeping
-    at most `<getopt-option-top/>` points.
+*Distill* the content `<getopt-arguments/>` into a *flat*,
+*importance-ranked* list of its *key points* - each point an
+*atomic* claim carrying a *0-10 salience rank*, a *one-line
+rationale*, and a *verbatim, line-cited evidence* snippet - keeping
+at most `<getopt-option-top/>` points.
 </objective>
 
 Procedure

@@ -18,7 +18,7 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-sync-export">
-    Export Artifact Set to Side-by-Side Files
+Export Artifact Set to Side-by-Side Files
 </skill>
 
 <expand name="getopt"
@@ -28,11 +28,11 @@ allowed-tools:
 </expand>
 
 <objective>
-    *Export* the *source* artifact kinds (optionally filtered by
-    <hint/>) into side-by-side files, by reading the source artifacts
-    and materializing, for every artifact that declares an export,
-    the corresponding derived file next to the artifact itself.
-    <hint><getopt-arguments/></hint>.
+*Export* the *source* artifact kinds (optionally filtered by
+<hint/>) into side-by-side files, by reading the source artifacts
+and materializing, for every artifact that declares an export,
+the corresponding derived file next to the artifact itself.
+<hint><getopt-arguments/></hint>.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md

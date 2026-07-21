@@ -17,7 +17,7 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-sync-reconcile">
-    Reconcile Artifact Set to Artifact Set
+Reconcile Artifact Set to Artifact Set
 </skill>
 
 <expand name="getopt"
@@ -27,10 +27,10 @@ effort: xhigh
 </expand>
 
 <objective>
-    *Reconcile* the *target* artifact kinds to *reflect* the *current
-    state* of the *source* artifact kinds, by reading the source
-    artifacts and aligning the target artifacts accordingly:
-    <hint><getopt-arguments/></hint>.
+*Reconcile* the *target* artifact kinds to *reflect* the *current
+state* of the *source* artifact kinds, by reading the source
+artifacts and aligning the target artifacts accordingly:
+<hint><getopt-arguments/></hint>.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md

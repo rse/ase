@@ -15,7 +15,7 @@ effort: xhigh
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
 
 <skill name="ase-meta-steelman">
-    Build the "Steelman" Argument
+Build the "Steelman" Argument
 </skill>
 
 <expand name="getopt"
@@ -25,8 +25,8 @@ effort: xhigh
 </expand>
 
 <objective>
-    Build the "Steelman" argument by constructing the strongest
-    possible case for the thesis: <thesis><getopt-arguments/></thesis>
+Build the "Steelman" argument by constructing the strongest
+possible case for the thesis: <thesis><getopt-arguments/></thesis>
 </objective>
 
 Determine the number of *rounds* to perform: set <rounds/> to
