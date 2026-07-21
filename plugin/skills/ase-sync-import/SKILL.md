@@ -49,7 +49,7 @@ Procedure
 
     1.  The recognized artifact kinds are the seven tokens `TASK`,
         `SPEC`, `ARCH`, `CODE`, `DOCS`, `INFR`, and `OTHR`. Parse
-        <getopt-target/> as the comma-separated <target/> kind list.
+        <getopt-option-target/> as the comma-separated <target/> kind list.
         Upper-case and trim every parsed kind token. Do not output
         anything.
 

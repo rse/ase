@@ -48,8 +48,8 @@ Procedure
 
     1.  The recognized artifact kinds are the seven tokens `TASK`,
         `SPEC`, `ARCH`, `CODE`, `DOCS`, `INFR`, and `OTHR`. Parse
-        <getopt-target/> as the comma-separated <target/> kind list and
-        <getopt-source/> as the comma-separated <source/> kind list.
+        <getopt-option-target/> as the comma-separated <target/> kind list and
+        <getopt-option-source/> as the comma-separated <source/> kind list.
         Upper-case and trim every parsed kind token. Do not output
         anything.
 
@@ -81,7 +81,7 @@ Procedure
         ⧉ **ASE**: ☻ skill: **ase-sync-reconcile**, ▶ ERROR: unknown or unsupported artifact kind: **<kind/>**
         </template>
 
-    5.  <if condition="<getopt-bidirectional/> is not 'true'">
+    5.  <if condition="<getopt-option-bidirectional/> is not 'true'">
 
         Remove from <source/> any kind that is also present in <target/>
         (a kind is never its own source).
@@ -157,7 +157,7 @@ Procedure
         the `ase` MCP server to find out the current time and store it in
         <timestamp-modified/>.
 
-    4.  <if condition="<getopt-bidirectional/> is equal 'true'">
+    4.  <if condition="<getopt-option-bidirectional/> is equal 'true'">
 
         *Bidirectionally update* the <target/> and <source/> artifacts
         so that they faithfully *reflect the current state* of each
