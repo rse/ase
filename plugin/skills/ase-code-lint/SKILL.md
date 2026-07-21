@@ -193,6 +193,19 @@ related to a set of code quality aspects.
                     Set <new-text/>       to the `new_text`       field of <item/>.
                     Set <context-after/>  to the `context_after`  field of <item/>.
 
+                    Then *normalize* the hunk to its *minimal* form, so
+                    that the proposed diff shows exactly the lines the
+                    later `Edit` will actually change: while the *first*
+                    line of <old-text/> is identical to the *first* line
+                    of <new-text/>, *move* that line from both to the
+                    end of <context-before/> and increment <line/> by
+                    one; likewise, while the *last* line of <old-text/>
+                    is identical to the *last* line of <new-text/>,
+                    *move* that line from both to the front of
+                    <context-after/>. Finally, *trim* <context-before/>
+                    to its *last* two lines and <context-after/> to its
+                    *first* two lines.
+
                 2.  *Skip* this substep entirely when <ase-project-boxing/>
                     is equal `grey` - the full unified diff is suppressed
                     there, so none of the <hunk-body/>, <old-count/>,

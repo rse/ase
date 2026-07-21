@@ -303,6 +303,17 @@ Workflow
                 which should be changed. Set <new-text/> to the lines of the
                 new code in <file/> which will replace it.
 
+                Keep the hunk *minimal*: <old-text/> and <new-text/>
+                *MUST* *NOT* share any common leading or trailing
+                lines - *strip* such lines, as they are *unchanged*
+                context and not part of the change. When two changed
+                regions are separated by unchanged lines, emit *two
+                separate* change hunks instead of one large hunk which
+                re-states the unchanged lines. Render a *moved* block
+                as one pure-deletion hunk at its old location plus one
+                pure-insertion hunk at its new location - *never* by
+                deleting and re-adding the unchanged lines in between.
+
             3.  Set <context-before/> to exactly *up to two* lines of
                 *unchanged* code context which occurs in <file/>
                 directly *before* <old-text/>, i.e., the lines (<line/>

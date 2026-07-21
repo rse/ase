@@ -148,6 +148,18 @@ Analyze documents for spelling, punctuation, or grammar errors
             Set <new-text/>       to the `new_text` field of <item/>.
             Set <context-after/>  to the `context_after` field of <item/>.
 
+            Then *normalize* the change to its *minimal* form, so
+            that the proposed diff shows exactly the lines the later
+            `Edit` will actually change: while the *first* line of
+            <old-text/> is identical to the *first* line of
+            <new-text/>, *move* that line from both to the end of
+            <context-before/> and increment <line/> by one; likewise,
+            while the *last* line of <old-text/> is identical to the
+            *last* line of <new-text/>, *move* that line from both to
+            the front of <context-after/>. Finally, *trim*
+            <context-before/> to its *last* two lines and
+            <context-after/> to its *first* two lines.
+
         2.  Report the problem with the following <template/>:
 
             <template>

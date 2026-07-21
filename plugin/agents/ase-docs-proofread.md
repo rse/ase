@@ -42,6 +42,14 @@ Workflow
         should be changed. Set <new-text/> to the lines of the
         new text which will replace it.
 
+        Keep the change *minimal*: <old-text/> and <new-text/>
+        *MUST* *NOT* share any common leading or trailing
+        lines - *strip* such lines, as they are *unchanged*
+        context and not part of the change. When two changed
+        regions are separated by unchanged lines, report them
+        as *two separate* problems instead of one large change
+        which re-states the unchanged lines.
+
     4.  Set <description/> to an ultra-brief and concise
         Markdown-formatted description of the problem with
         a hint of what is wrong and why it is wrong. In
