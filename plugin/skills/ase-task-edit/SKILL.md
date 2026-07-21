@@ -81,6 +81,16 @@ and calculate the number of words <words/> of <content/>.
 Set <content-dirty>true</content-dirty>.
 </define>
 
+<define name="handoff-args">
+Set <args></args> (set args to empty).
+<if condition="the plan was saved via `ase_task_save` in step 3.2">
+    Set <args>--int-reuse-task</args>.
+</if>
+<if condition="<getopt-option-next/> is not equal `none`">
+    Set <args><args/> --next <getopt-option-next/></args>
+</if>
+</define>
+
 1.  **Determine Task and Instruction:**
 
     1.  Set <instruction><getopt-arguments/></instruction> initially.
@@ -405,13 +415,7 @@ Set <content-dirty>true</content-dirty>.
         -   If <result/> is `GRILL`:
 
             *Break* out of the *loop*.
-            Set <args></args> (set args to empty).
-            <if condition="the plan was saved via `ase_task_save` in step 3.2">
-                Set <args>--int-reuse-task</args>.
-            </if>
-            <if condition="<getopt-option-next/> is not equal `none`">
-                Set <args><args/> --next <getopt-option-next/></args>
-            </if>
+            <expand name="handoff-args"/>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-grill", args: "<args/>")` tool
             to *grill* the finalized plan.
@@ -423,13 +427,7 @@ Set <content-dirty>true</content-dirty>.
         -   If <result/> is `PREFLIGHT`:
 
             *Break* out of the *loop*.
-            Set <args></args> (set args to empty).
-            <if condition="the plan was saved via `ase_task_save` in step 3.2">
-                Set <args>--int-reuse-task</args>.
-            </if>
-            <if condition="<getopt-option-next/> is not equal `none`">
-                Set <args><args/> --next <getopt-option-next/></args>
-            </if>
+            <expand name="handoff-args"/>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-preflight", args: "<args/>")` tool
             to *apply* the finalized plan.
@@ -441,13 +439,7 @@ Set <content-dirty>true</content-dirty>.
         -   If <result/> is `IMPLEMENT`:
 
             *Break* out of the *loop*.
-            Set <args></args> (set args to empty).
-            <if condition="the plan was saved via `ase_task_save` in step 3.2">
-                Set <args>--int-reuse-task</args>.
-            </if>
-            <if condition="<getopt-option-next/> is not equal `none`">
-                Set <args><args/> --next <getopt-option-next/></args>
-            </if>
+            <expand name="handoff-args"/>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
             to *apply* the finalized plan.

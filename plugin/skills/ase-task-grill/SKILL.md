@@ -36,6 +36,13 @@ task plan until reaching a shared understanding.
 Procedure
 ---------
 
+<define name="handoff-args">
+Set <args>--int-reuse-task</args>.
+<if condition="<getopt-option-next/> is not equal `none`">
+    Set <args><args/> --next <getopt-option-next/></args>
+</if>
+</define>
+
 1.  **Determine Task:**
 
     1.  Set <id><getopt-arguments/></id> initially.
@@ -282,10 +289,7 @@ Procedure
             </template>
 
         -   If <result/> is `EDIT`:
-            Set <args>--int-reuse-task</args>.
-            <if condition="<getopt-option-next/> is not equal `none`">
-                Set <args><args/> --next <getopt-option-next/></args>
-            </if>
+            <expand name="handoff-args"/>
             Only output the following <template/> and then call the
             tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`
             to invoke the `ase:ase-task-edit` skill in order to *edit*
@@ -297,10 +301,7 @@ Procedure
             </template>
 
         -   If <result/> is `PREFLIGHT`:
-            Set <args>--int-reuse-task</args>.
-            <if condition="<getopt-option-next/> is not equal `none`">
-                Set <args><args/> --next <getopt-option-next/></args>
-            </if>
+            <expand name="handoff-args"/>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-preflight", args: "<args/>")` tool
             to *apply* the plan.
@@ -310,10 +311,7 @@ Procedure
             </template>
 
         -   If <result/> is `IMPLEMENT`:
-            Set <args>--int-reuse-task</args>.
-            <if condition="<getopt-option-next/> is not equal `none`">
-                Set <args><args/> --next <getopt-option-next/></args>
-            </if>
+            <expand name="handoff-args"/>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
             to *apply* the plan.
