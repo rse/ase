@@ -656,24 +656,24 @@ manages, defining how information is organized and connected.
 
     With:
 
-    -    <export-table-1/> is a Markdown table for the attributes with one
-         row per <spec-dm-attribute-id/>, sorted by <spec-dm-attribute-id/>
-         -- with the columns:
+    -   <export-table-1/> is a Markdown table for the attributes with one
+        row per <spec-dm-attribute-id/>, sorted by <spec-dm-attribute-id/>
+        -- with the columns:
 
-         -   `Attribute`     (`**<spec-dm-attribute-id/>**`)
-         -   `Type`          (`<spec-dm-attribute-qualifier/><spec-dm-attribute-type/>`)
-         -   `Description`   (`<spec-dm-attribute-description/>, **BECAUSE** <spec-dm-attribute-rationale/>.`)
+        -   `Attribute`     (`**<spec-dm-attribute-id/>**`)
+        -   `Type`          (`<spec-dm-attribute-qualifier/><spec-dm-attribute-type/>`)
+        -   `Description`   (`<spec-dm-attribute-description/>, **BECAUSE** <spec-dm-attribute-rationale/>.`)
 
-    -    <export-table-2/> is a Markdown table for the relation with one
-         row per <spec-dm-relation-id/>, sorted by <spec-dm-relation-id/> --
-         with the columns:
+    -   <export-table-2/> is a Markdown table for the relation with one
+        row per <spec-dm-relation-id/>, sorted by <spec-dm-relation-id/> --
+        with the columns:
 
-         -   `Relation`      (`**<spec-dm-relation-id/>**`)
-         -   `Target`        (`[<spec-dm-relation-target/>](#<spec-dm-relation-target-id/>) (<spec-dm-relation-cardinality/>)`)
-         -   `Description`   (`<spec-dm-relation-description/>, **BECAUSE** <spec-dm-relation-rationale/>.`)
+        -   `Relation`      (`**<spec-dm-relation-id/>**`)
+        -   `Target`        (`[<spec-dm-relation-target/>](#<spec-dm-relation-target-id/>) (<spec-dm-relation-cardinality/>)`)
+        -   `Description`   (`<spec-dm-relation-description/>, **BECAUSE** <spec-dm-relation-rationale/>.`)
 
-    -    In case a <spec-dm-entity/> has no relations at all, the
-         entire `### RELATIONS` block (including <export-table-2/>) is omitted.
+    -   In case a <spec-dm-entity/> has no relations at all, the
+        entire `### RELATIONS` block (including <export-table-2/>) is omitted.
 
 -   Export: `export.svg`
 
