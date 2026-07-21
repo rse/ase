@@ -47,7 +47,8 @@ Commandments
 - Always use *parentheses around arrow function parameters*, even for a single parameter.
 - Make a line break before the keywords "else", "catch", and "finally".
 - Try to *vertically align similar operators* on consecutive, similar lines.
-- Place spaces after opening and before closing angle brackets and braces.
+- Place spaces after opening and before closing angle brackets
+  (except for array access and array types) and braces (except for regular expression ranges).
 - Use *double-quotes* (`"[...]"`) instead of single-quotes (`'[...]'`) for all strings.
 - Use K&R coding style with *opening braces* at the end of lines and *closing braces* at the beginning of lines.
 - When a language has a *more strongly-typed variant*, prefer that variant.
