@@ -350,8 +350,14 @@ permitted way to persist artifacts is via `ase_task_save(...)`.
             <if condition="<getopt-option-next/> is not equal `none`">
                 Set <args><args/> --next <getopt-option-next/></args>
             </if>
+            <if condition="<getopt-option-quick/> is equal `true`">
+                Set <args><args/> --mode all</args>
+            </if>
             Call the tool `Skill(skill: "ase:ase-task-implement", args: "<args/>")`
             to *implement* the freshly composed plan, bypassing `ase-task-edit`.
+            The `--quick`/`-Q` one-shot forwards `--mode all` so
+            `ase-task-implement` runs the plan in a single pass, without
+            the interactive step-mode dialog.
             </elseif>
 
         3.  <elseif condition="<head/> is equal `PREFLIGHT`">
