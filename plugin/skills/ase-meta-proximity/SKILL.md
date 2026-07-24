@@ -52,6 +52,15 @@ named `<arg2/>`:
     prompt: "<prompt/>",
     run_in_background: false
 )`
+
+<if condition="the placeholder named `<arg2/>` contains no usable facts">
+Set the placeholder named `<arg2/>` to empty, so the determination below
+falls back to model knowledge, and output the following <template/>:
+
+<template>
+<ase-tpl-bullet-secondary/> **WARNING**: grounding found no usable facts -- falling back to model knowledge.
+</template>
+</if>
 </if>
 <else>
 Use the model's world knowledge and determine facts about <arg1/> and
