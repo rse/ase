@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.9.46 (2026-07-24)
+0.9.46 (2026-07-25)
 -------------------
 
 - FEATURE [code]: add `ase-meta-proximity` skill determining a topic's parent/sibling/child proximity, optionally grounded and navigable
