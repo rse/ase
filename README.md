@@ -253,6 +253,12 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-meta-search`](plugin/skills/ase-meta-search/help.md)
   `What is Agentic Software Engineering?`
 
+- **ELI5 Topic Explanation**:
+  You want a topic explained in a very simple, child-friendly
+  "Explain Like I'm 5" (ELI5) way, optionally grounded in Web facts?
+  &rarr; [`/ase-meta-eli5`](plugin/skills/ase-meta-eli5/help.md)
+  `Fourier transform`
+
 - **Foreign LLM Query**:
   You want to directly query a (potentially available) foreign LLM?
   &rarr; [`/ase-meta-chat`](plugin/skills/ase-meta-chat/help.md)
