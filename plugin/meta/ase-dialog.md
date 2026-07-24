@@ -50,7 +50,7 @@ following procedure:
         excluding the question label on line 1, and stopping at the first missing line --
         the same lines the entry loop below renders).
 
-        <for items="2 3 4 5 6 7 8 9">
+        <for items="2 3 4 5 6 7 8 9 10">
             Take from <spec/> the line number <item/>.
             If this line does not exist, <break/>.
             If this line exists, parse it according to the format `<label/>: <description/>`.
@@ -103,7 +103,7 @@ following procedure:
         </text>
 
         If <n/> is less than 2:
-        Set <result>ERROR: custom-dialog requires 2-8 answer lines, got <n/></result>
+        Set <result>ERROR: custom-dialog requires 2-9 answer lines, got <n/></result>
         and *SKIP* the following step 2.2 and continue with step 2.3 dispatch.
 
     2.  Output the following <template/>, end the current turn, wait for the
