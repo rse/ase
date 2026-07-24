@@ -5,6 +5,7 @@ ChangeLog
 0.9.46 (2026-07-24)
 -------------------
 
+- FEATURE [code]: add `ase-meta-proximity` skill determining a topic's parent/sibling/child proximity, optionally grounded and navigable
 - FEATURE [code]: add `ase-meta-eli5` skill explaining topics "like I'm 5", optionally Web-grounded
 
 0.9.45 (2026-07-21)
