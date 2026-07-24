@@ -49,8 +49,11 @@ plan via `ase_task_save` and then hands off to `ase-task-edit`,
     Shorthand alias for `-a -d -n IMPLEMENT,DELETE`: automatically pick
     the recommended resolution approach, compose the plan *without* the
     `##  VERIFICATION` section, immediately hand off to `ase-task-implement`,
-    and finally `ase-task-delete` the now-consumed plan. This gives a
-    single, fast *one-shot* resolution mode.
+    and finally `ase-task-delete` the now-consumed plan. The hand-off
+    additionally forwards `--mode all`, so `ase-task-implement` applies
+    the plan in a single pass *without* the interactive step-mode
+    dialog. This gives a single, fast, fully non-interactive *one-shot*
+    resolution mode.
 
 `--next`|`-n` *option*[,...]:
     Automatically choose the next step after composing the plan.
