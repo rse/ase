@@ -30,7 +30,7 @@
         "tailwindcss":                            "4.3.3",
         "@tailwindcss/vite":                      "4.3.3",
         "typopro-web":                            "4.2.8",
-        "marked":                                 "18.0.6",
+        "marked":                                 "18.0.7",
         "plyr":                                   "3.8.4",
         "typed.js":                               "3.0.0"
     },
