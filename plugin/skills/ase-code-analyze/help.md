@@ -10,6 +10,7 @@
     [`--performance`|`-p`]
     [`--security`|`-s`]
     [`--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`)]
+    [`--quick`|`-Q`]
     *source-reference*
 
 ##  DESCRIPTION
@@ -37,6 +38,26 @@ never suppressed. Surviving problems are reported in *descending
 severity* order `HIGH`, `MEDIUM`, `LOW`, `ACCEPTED` - keeping the
 `file`/`line` order within the same severity - and are renumbered
 contiguously as `P<n>`, so `P1` is the most severe problem.
+
+The `--quick`|`-Q` option turns the analysis into a fully autonomous
+one-shot `analyze → resolve → implement → verify` pipeline: after
+reporting, it groups the surviving problems into *per-file clusters*
+(same-file problems are never resolved in parallel), dispatches one
+worktree-isolated `ase-code-resolve -Q` sub-agent per cluster in
+parallel (in the background, with a progress line per returning
+cluster; each worktree is first *seeded* with the live tree's
+uncommitted state so its diff applies cleanly), then reconciles all
+resulting diffs into the working tree (plain `git apply`, `--3way` as
+fallback, and a conflicting cluster is re-resolved sequentially so that
+*all* problems are merged), removes the temporary worktrees again, and
+finally runs the project's formatter, build, and test suite centrally
+on the merged result, with up to two autonomous repair rounds for any
+failures. `ACCEPTED` problems document deliberately accepted trade-offs
+and are *excluded* from auto-resolution. Nothing is staged or
+committed -- staging remains with the user. It composes with
+`--severity` (only surviving findings are resolved) and requires a Git
+repository (otherwise the clusters are resolved sequentially without
+worktree isolation).
 
 The skill investigates the code base silently, reports each detected
 problem as a `PROBLEM` entry with severity (`LOW`, `MEDIUM`, `HIGH`) and
@@ -81,6 +102,13 @@ Analyze a directory, reporting only `MEDIUM` and `HIGH` problems:
 
 ```text
 ❯ /ase-code-analyze -S MEDIUM src/handlers/
+```
+
+Analyze a directory and, in one non-interactive shot, auto-resolve and
+implement every `HIGH` finding:
+
+```text
+❯ /ase-code-analyze -Q -S HIGH src/handlers/
 ```
 
 ##  SEE ALSO
