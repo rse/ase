@@ -214,18 +214,26 @@ Costs:
   with icon `$`, *suppressed*.
 
 - `%Y`:
-  The cumulative costs in USD of *all* *Anthropic Claude Code CLI*
-  sessions within the current calendar month (local time), e.g.,
-  `$1102.11`, *suppressed* if no session transcripts exist. Unlike
-  `%X`, which only reflects the current session, the figure is
-  computed locally from the session transcripts under
-  `~/.claude/projects/**/*.jsonl` (honoring `CLAUDE_CONFIG_DIR`) by
-  summing the token counts of each entry times the per-model price
-  (input, output, and 5-minute / 1-hour cache-write and cache-read
-  tokens, cross-checked against the *LiteLLM* price table). To keep
-  rendering fast, the result is cached and recomputed at most once per
-  `--month-cost-ttl` window by a detached background process, so a
-  rendering never blocks on the transcript scan.
+  The cumulative costs in USD of *all* sessions of *all* supported
+  agent tools within the current calendar month, e.g., `$1102.11`,
+  *suppressed* if no session logs exist. Unlike `%X`, which only
+  reflects the current session, the month boundary is a *UTC* one,
+  matching the day on which the model vendors bill and reset their
+  usage windows. The figure is computed locally, without any network
+  access, from the session logs of *Anthropic Claude Code CLI*
+  (`~/.claude/projects/**/*.jsonl`, honoring `CLAUDE_CONFIG_DIR`),
+  *OpenAI Codex CLI*
+  (`~/.codex/{sessions,archived_sessions}/**/rollout-*.jsonl`, honoring
+  `CODEX_HOME`), and *GitHub Copilot CLI*
+  (`~/.copilot/session-state/**/*.jsonl`, honoring
+  `COPILOT_CONFIG_DIR`). Per logged model call, the token counts
+  (uncached input, output including reasoning, cache-read, and
+  5-minute / 1-hour cache-write) are multiplied by the per-model prices
+  of the *LiteLLM* price snapshot bundled with *ASE*; a call logged more
+  than once is billed only once, and a model absent from the snapshot
+  contributes nothing. To keep rendering fast, the result is cached and
+  recomputed at most once per `--month-cost-ttl` window by a detached
+  background process, so a rendering never blocks on the log scan.
 
 Version control:
 
