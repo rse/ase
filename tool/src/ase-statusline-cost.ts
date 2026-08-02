@@ -4,83 +4,279 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-import fs        from "node:fs"
-import os        from "node:os"
-import path      from "node:path"
-import { spawn } from "node:child_process"
+import fs          from "node:fs"
+import os          from "node:os"
+import path        from "node:path"
+import { spawn }   from "node:child_process"
+
+import { prices }  from "./ase-statusline-prices.js"
+import type { Price } from "./ase-statusline-prices.js"
 
 /*  on-disk cache shape for the cumulative current-month cost  */
 export interface MonthCostCache {
-    month:      string   /*  "YYYY-MM" in local time  */
-    costUsd:    number   /*  cumulative cost across all sessions for that month  */
+    version:    number   /*  computation scheme, to invalidate results of an older ASE  */
+    month:      string   /*  "YYYY-MM" in UTC  */
+    costUsd:    number   /*  cumulative cost across all sessions of all agent tools  */
     computedAt: number   /*  epoch milliseconds of the last computation  */
 }
 
-/*  minimal shape of a single Claude Code session-log JSONL entry  */
-interface LogUsage {
-    input_tokens?:                number
-    output_tokens?:               number
-    cache_read_input_tokens?:     number
-    cache_creation_input_tokens?: number
-    cache_creation?: {
-        ephemeral_5m_input_tokens?: number
-        ephemeral_1h_input_tokens?: number
-    }
-}
-interface LogEntry {
-    timestamp?: string
-    requestId?: string
-    message?: {
-        id?:    string
-        model?: string
-        usage?: LogUsage
-    }
+/*  current computation scheme: bump whenever the scanning, pricing, or
+    month-bucketing semantics change, so that a cache written by an older
+    ASE is discarded instead of being rendered as if it were current  */
+const SCHEME = 2
+
+/*  normalized token usage of a single billed model call  */
+interface Usage {
+    input:        number   /*  uncached input tokens  */
+    output:       number   /*  generated tokens, including reasoning tokens  */
+    cacheRead:    number   /*  prompt-cache read tokens  */
+    cacheWrite5m: number   /*  prompt-cache write tokens with the 5-minute TTL  */
+    cacheWrite1h: number   /*  prompt-cache write tokens with the 1-hour TTL  */
 }
 
-/*  per-model pricing in USD per one million tokens (input/output prices),
-    cross-checked against LiteLLM's model_prices_and_context_window.json (the
-    same source ccusage uses). Cache-read and cache-write token prices are
-    derived from the input price via Anthropic's standard prompt-caching
-    economics: read 0.1x, 5-minute write 1.25x, 1-hour write 2x -- matching
-    LiteLLM's cache_read_input_token_cost, cache_creation_input_token_cost,
-    and cache_creation_input_token_cost_above_1hr respectively. None of the
-    current Claude models carry a >200k long-context premium, so per-request
-    token tiering is intentionally omitted. Models resolve by exact id or id
-    prefix, so dated snapshots (e.g. "claude-haiku-4-5-20251001") map to their
-    base entry. Unknown models contribute nothing (cannot be priced reliably).  */
-const PRICING: Record<string, { input: number, output: number }> = {
-    "claude-fable-5":    { input: 10.00, output: 50.00 },
-    "claude-opus-4-8":   { input:  5.00, output: 25.00 },
-    "claude-opus-4-7":   { input:  5.00, output: 25.00 },
-    "claude-opus-4-6":   { input:  5.00, output: 25.00 },
-    "claude-sonnet-5":   { input:  3.00, output: 15.00 },
-    "claude-sonnet-4-6": { input:  3.00, output: 15.00 },
-    "claude-haiku-4-5":  { input:  1.00, output:  5.00 }
+/*  a single billed model call, as reconstructed from an agent tool session log  */
+interface Call {
+    key:   string   /*  stable identity, so that a call logged more than once is billed once  */
+    model: string
+    usage: Usage
 }
 
-const resolvePricing = (model: string): { input: number, output: number } | null => {
-    if (PRICING[model] !== undefined)
-        return PRICING[model]!
-    for (const key of Object.keys(PRICING))
-        if (model.startsWith(key))
-            return PRICING[key]!
-    return null
+const noUsage = (): Usage => ({ input: 0, output: 0, cacheRead: 0, cacheWrite5m: 0, cacheWrite1h: 0 })
+
+/*  resolve the token prices of a model id. The agent tools log ids in
+    varying shapes, so the lookup widens step by step: the bare id, the id
+    with dots normalized to dashes (Copilot renders "claude-sonnet-4.5"),
+    the id without its vendor prefix ("anthropic/claude-opus-5"), and
+    finally the longest matching id prefix, which maps dated snapshots
+    like "claude-opus-5-20260401" onto their base entry. A model that
+    remains unknown contributes nothing, since it cannot be priced.  */
+const resolved = new Map<string, Price | null>()
+const resolvePrice = (model: string): Price | null => {
+    const memo = resolved.get(model)
+    if (memo !== undefined)
+        return memo
+    const price = resolvePriceUncached(model)
+    resolved.set(model, price)
+    return price
+}
+const resolvePriceUncached = (model: string): Price | null => {
+    const candidates = [ model, model.replace(/\./g, "-") ]
+    if (model.includes("/"))
+        candidates.push(model.slice(model.indexOf("/") + 1))
+    for (const candidate of candidates)
+        if (prices[candidate] !== undefined)
+            return prices[candidate]!
+    let best: string | null = null
+    for (const candidate of candidates)
+        for (const id of Object.keys(prices))
+            if (candidate.startsWith(id) && (best === null || id.length > best.length))
+                best = id
+    return best !== null ? prices[best]! : null
 }
 
-/*  derive the "YYYY-MM" key (local time) for a given date  */
+/*  price a single call, returning 0 for a model without known prices  */
+const costOf = (call: Call): number => {
+    const price = resolvePrice(call.model)
+    if (price === null)
+        return 0
+    const [ input, output, cacheRead, cacheWrite5m, cacheWrite1h ] = price
+    return call.usage.input        * input +
+           call.usage.output       * output +
+           call.usage.cacheRead    * cacheRead +
+           call.usage.cacheWrite5m * cacheWrite5m +
+           call.usage.cacheWrite1h * cacheWrite1h
+}
+
+/*  derive the "YYYY-MM" key of a date in UTC: the agent vendors bill and
+    reset their usage windows on UTC days, so a local-time month boundary
+    would attribute the calls of a late evening to the wrong month  */
 const monthKeyOf = (d: Date): string => {
-    const y = d.getFullYear()
-    const m = d.getMonth() + 1
+    const y = d.getUTCFullYear()
+    const m = d.getUTCMonth() + 1
     return `${y}-${m < 10 ? "0" : ""}${m}`
 }
 
-/*  root directory of the local Claude Code session logs, honoring the
-    CLAUDE_CONFIG_DIR override and otherwise defaulting to ~/.claude  */
-const logsRoot = (): string => {
-    const cfg  = process.env.CLAUDE_CONFIG_DIR
-    const base = cfg !== undefined && cfg.trim() !== "" ? cfg.trim() : path.join(os.homedir(), ".claude")
-    return path.join(base, "projects")
+/*  first millisecond of the UTC month a date falls into  */
+const startOfMonth = (d: Date): number =>
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)
+
+/*  parse a timestamp of any shape the session logs use (ISO 8601 string or
+    epoch seconds/milliseconds), returning null when it is unusable  */
+const parseTime = (raw: unknown): Date | null => {
+    if (typeof raw === "number") {
+        const d = new Date(raw < 1e12 ? raw * 1000 : raw)
+        return Number.isNaN(d.getTime()) ? null : d
+    }
+    if (typeof raw === "string" && raw !== "") {
+        const d = new Date(raw)
+        return Number.isNaN(d.getTime()) ? null : d
+    }
+    return null
 }
+
+/*  resolve a configuration root directory, honoring an environment override  */
+const rootDir = (envVar: string, fallback: string): string => {
+    const env = process.env[envVar]
+    if (env !== undefined && env.trim() !== "")
+        return env.trim()
+    return path.join(os.homedir(), fallback)
+}
+
+/*  recursively yield every file below a directory whose name passes a filter  */
+function * filesBelow (dir: string, accept: (name: string) => boolean): Generator<string> {
+    let entries: fs.Dirent[]
+    try {
+        entries = fs.readdirSync(dir, { withFileTypes: true })
+    }
+    catch (_e) {
+        return
+    }
+    for (const ent of entries) {
+        const p = path.join(dir, ent.name)
+        if (ent.isDirectory())
+            yield * filesBelow(p, accept)
+        else if (ent.isFile() && accept(ent.name))
+            yield p
+    }
+}
+
+/*  read a session log as parsed JSONL records, skipping whole files that were
+    not touched within the month (they cannot hold a current-month call, which
+    keeps the scan off the entire archive) and tolerating malformed lines  */
+function * records (file: string, since: number): Generator<{ obj: any, line: number }> {
+    try {
+        if (fs.statSync(file).mtimeMs < since)
+            return
+    }
+    catch (_e) {
+        return
+    }
+    let lines: string[]
+    try {
+        lines = fs.readFileSync(file, "utf8").split("\n")
+    }
+    catch (_e) {
+        return
+    }
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i] === "")
+            continue
+        try {
+            yield { obj: JSON.parse(lines[i]!), line: i }
+        }
+        catch (_e) {
+            /*  a truncated trailing line of a live session is expected  */
+        }
+    }
+}
+
+/*  scan the session logs of Anthropic Claude Code. Every assistant record
+    carries the usage of exactly one API call, but the same call is written
+    repeatedly while its response streams and again when a session is resumed
+    or forked, so the message id keys the de-duplication.  */
+function * scanClaude (month: string, since: number): Generator<Call> {
+    const root = path.join(rootDir("CLAUDE_CONFIG_DIR", ".claude"), "projects")
+    for (const file of filesBelow(root, (n) => n.endsWith(".jsonl"))) {
+        for (const { obj, line } of records(file, since)) {
+            const usage = obj?.message?.usage
+            if (usage === undefined || usage === null)
+                continue
+            const at = parseTime(obj?.timestamp)
+            if (at === null || monthKeyOf(at) !== month)
+                continue
+            const u = noUsage()
+            u.input     = usage.input_tokens            ?? 0
+            u.output    = usage.output_tokens           ?? 0
+            u.cacheRead = usage.cache_read_input_tokens ?? 0
+            const c5 = usage.cache_creation?.ephemeral_5m_input_tokens
+            const c1 = usage.cache_creation?.ephemeral_1h_input_tokens
+            if (c5 !== undefined || c1 !== undefined) {
+                u.cacheWrite5m = c5 ?? 0
+                u.cacheWrite1h = c1 ?? 0
+            }
+            else
+                u.cacheWrite5m = usage.cache_creation_input_tokens ?? 0
+            const id = typeof obj?.message?.id === "string" ? obj.message.id : ""
+            yield {
+                key:   id !== "" ? `claude:${id}` : `claude:${file}:${line}`,
+                model: typeof obj?.message?.model === "string" ? obj.message.model : "",
+                usage: u
+            }
+        }
+    }
+}
+
+/*  scan the rollout logs of the OpenAI Codex CLI. Codex reports the usage of
+    a call in a dedicated "token_count" event whose "last_token_usage" holds
+    the delta of that very call, so the events are summed as they come and
+    keyed positionally. The model is carried by the session and turn headers
+    rather than by the usage event itself.  */
+function * scanCodex (month: string, since: number): Generator<Call> {
+    const root = rootDir("CODEX_HOME", ".codex")
+    for (const dir of [ path.join(root, "sessions"), path.join(root, "archived_sessions") ]) {
+        for (const file of filesBelow(dir, (n) => n.startsWith("rollout-") && n.endsWith(".jsonl"))) {
+            let model = "gpt-5"
+            for (const { obj, line } of records(file, since)) {
+                const payload = obj?.payload
+                const named   = payload?.model ?? payload?.info?.model ?? payload?.info?.model_name
+                if (typeof named === "string" && named !== "")
+                    model = named
+                if (obj?.type !== "event_msg" || payload?.type !== "token_count")
+                    continue
+                const usage = payload?.info?.last_token_usage
+                if (usage === undefined || usage === null)
+                    continue
+                const at = parseTime(obj?.timestamp)
+                if (at === null || monthKeyOf(at) !== month)
+                    continue
+
+                /*  Codex counts the cached tokens within its input total,
+                    so the uncached remainder has to be recovered  */
+                const cached = usage.cached_input_tokens ?? 0
+                const u = noUsage()
+                u.input     = Math.max(0, (usage.input_tokens ?? 0) - cached)
+                u.output    = (usage.output_tokens ?? 0) + (usage.reasoning_output_tokens ?? 0)
+                u.cacheRead = cached
+                yield { key: `codex:${file}:${line}`, model, usage: u }
+            }
+        }
+    }
+}
+
+/*  scan the session state of the GitHub Copilot CLI. Copilot aggregates the
+    usage per model over the whole session, so a single record yields one
+    entry per involved model, and its input total covers the cached tokens as
+    well. Since that aggregate is cumulative, the entries of one session and
+    model are keyed identically, which bills only the final one.  */
+function * scanCopilot (month: string, since: number): Generator<Call> {
+    const root = path.join(rootDir("COPILOT_CONFIG_DIR", ".copilot"), "session-state")
+    for (const file of filesBelow(root, (n) => n.endsWith(".jsonl"))) {
+        for (const { obj } of records(file, since)) {
+            const metrics = obj?.modelMetrics
+            if (typeof metrics !== "object" || metrics === null)
+                continue
+            const at = parseTime(obj?.timestamp)
+            if (at === null || monthKeyOf(at) !== month)
+                continue
+            for (const [ model, entry ] of Object.entries<any>(metrics)) {
+                const usage = entry?.usage ?? entry
+                if (typeof usage !== "object" || usage === null)
+                    continue
+                const cacheRead  = usage.cacheReadTokens  ?? 0
+                const cacheWrite = usage.cacheWriteTokens ?? 0
+                const u = noUsage()
+                u.input        = Math.max(0, (usage.inputTokens ?? 0) - cacheRead - cacheWrite)
+                u.output       = (usage.outputTokens ?? 0) + (usage.reasoningTokens ?? 0)
+                u.cacheRead    = cacheRead
+                u.cacheWrite5m = cacheWrite
+                yield { key: `copilot:${file}:${model}`, model, usage: u }
+            }
+        }
+    }
+}
+
+/*  all supported agent tools, scanned in one pass  */
+const scanners = [ scanClaude, scanCodex, scanCopilot ]
 
 /*  per-user cache file in the temporary directory  */
 const cacheFile = (): string => {
@@ -94,11 +290,15 @@ const cacheFile = (): string => {
     return path.join(os.tmpdir(), `ase-statusline-month-cost-${user}.json`)
 }
 
-/*  read the persisted month-cost cache, or null when absent/unreadable  */
+/*  read the persisted month-cost cache, or null when absent, unreadable, or
+    written by an ASE with a different computation scheme  */
 export const readMonthCostCache = (): MonthCostCache | null => {
     try {
         const obj = JSON.parse(fs.readFileSync(cacheFile(), "utf8")) as MonthCostCache
-        if (typeof obj.month === "string" && typeof obj.costUsd === "number" && typeof obj.computedAt === "number")
+        if (obj.version === SCHEME
+            && typeof obj.month === "string"
+            && typeof obj.costUsd === "number"
+            && typeof obj.computedAt === "number")
             return obj
         return null
     }
@@ -116,102 +316,24 @@ const writeMonthCostCache = (cache: MonthCostCache): void => {
     }
 }
 
-/*  recursively yield every "*.jsonl" file below a directory  */
-function * jsonlFiles (dir: string): Generator<string> {
-    let entries: fs.Dirent[]
-    try {
-        entries = fs.readdirSync(dir, { withFileTypes: true })
-    }
-    catch (_e) {
-        return
-    }
-    for (const ent of entries) {
-        const p = path.join(dir, ent.name)
-        if (ent.isDirectory())
-            yield * jsonlFiles(p)
-        else if (ent.isFile() && ent.name.endsWith(".jsonl"))
-            yield p
-    }
-}
-
-/*  scan all local Claude Code session logs and sum the cost of every entry
-    belonging to the given month (local time). Returns the cumulative cost in
-    USD; missing or unreadable logs simply yield 0 without throwing.  */
+/*  scan the local session logs of every supported agent tool and sum the cost
+    of all calls billed within the given UTC month. Calls that were logged
+    more than once are billed once, keeping the most expensive of their
+    snapshots: the usage counts of a call grow while its response streams, so
+    the largest snapshot reflects the finally billed state. Missing or
+    unreadable logs simply contribute 0 without throwing.  */
 export const computeMonthCost = (now: Date): number => {
-    const month        = monthKeyOf(now)
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime()
-    const seen         = new Map<string, number>()
-    let total = 0
-    for (const file of jsonlFiles(logsRoot())) {
-        /*  skip whole files not touched this month: they cannot hold any
-            current-month entry, which avoids re-reading the entire archive  */
-        try {
-            if (fs.statSync(file).mtimeMs < startOfMonth)
-                continue
-        }
-        catch (_e) {
-            continue
-        }
-        let lines: string[]
-        try {
-            lines = fs.readFileSync(file, "utf8").split("\n")
-        }
-        catch (_e) {
-            continue
-        }
-        for (const line of lines) {
-            if (line === "")
-                continue
-            let o: LogEntry
-            try {
-                o = JSON.parse(line) as LogEntry
-            }
-            catch (_e) {
-                continue
-            }
-            const usage = o.message?.usage
-            if (usage === undefined)
-                continue
-            const ts = typeof o.timestamp === "string" ? o.timestamp : ""
-            if (ts === "")
-                continue
-            const d = new Date(ts)
-            if (Number.isNaN(d.getTime()) || monthKeyOf(d) !== month)
-                continue
-            const price = resolvePricing(o.message?.model ?? "")
-            if (price === null)
-                continue
-            const inM  = price.input  / 1_000_000
-            const outM = price.output / 1_000_000
-            let cost = 0
-            cost += (usage.input_tokens             ?? 0) * inM
-            cost += (usage.output_tokens            ?? 0) * outM
-            cost += (usage.cache_read_input_tokens  ?? 0) * inM * 0.1
-            const c5 = usage.cache_creation?.ephemeral_5m_input_tokens
-            const c1 = usage.cache_creation?.ephemeral_1h_input_tokens
-            if (c5 !== undefined || c1 !== undefined) {
-                cost += (c5 ?? 0) * inM * 1.25
-                cost += (c1 ?? 0) * inM * 2.00
-            }
-            else
-                cost += (usage.cache_creation_input_tokens ?? 0) * inM * 1.25
-            /*  de-duplicate identical messages that appear more than once,
-                within one session log (progressive usage snapshots written
-                while the response streams) or across logs (resume/fork),
-                keyed by message id plus request id. Keep the most expensive
-                snapshot per key: usage counts grow as output streams, so
-                the largest one reflects the final billed state.  */
-            const id  = o.message?.id ?? ""
-            const req = o.requestId   ?? ""
-            if (id !== "" && req !== "") {
-                const key = `${id} ${req}`
-                if (cost > (seen.get(key) ?? -1))
-                    seen.set(key, cost)
-            }
-            else
-                total += cost
+    const month = monthKeyOf(now)
+    const since = startOfMonth(now)
+    const seen  = new Map<string, number>()
+    for (const scan of scanners) {
+        for (const call of scan(month, since)) {
+            const cost = costOf(call)
+            if (cost > (seen.get(call.key) ?? -1))
+                seen.set(call.key, cost)
         }
     }
+    let total = 0
     for (const cost of seen.values())
         total += cost
     return total
@@ -219,7 +341,12 @@ export const computeMonthCost = (now: Date): number => {
 
 /*  recompute the current-month cost and persist it to the cache file  */
 export const refreshMonthCostCache = (now: Date): void => {
-    writeMonthCostCache({ month: monthKeyOf(now), costUsd: computeMonthCost(now), computedAt: now.getTime() })
+    writeMonthCostCache({
+        version:    SCHEME,
+        month:      monthKeyOf(now),
+        costUsd:    computeMonthCost(now),
+        computedAt: now.getTime()
+    })
 }
 
 /*  spawn a detached background process that recomputes the cache without
