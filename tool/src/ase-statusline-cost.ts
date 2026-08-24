@@ -280,7 +280,7 @@ const scanners = [ scanClaude, scanCodex, scanCopilot ]
 
 /*  per-user cache file in the temporary directory  */
 const cacheFile = (): string => {
-    let user = "default"
+    let user: string
     try {
         user = os.userInfo().username || "default"
     }
