@@ -84,6 +84,7 @@ npm start build-cmd     # tsc --project etc/tsc.json (emits into dst/)
 npm start build-plugin  # copy ../plugin and ../.claude-plugin into the package
 npm start build-watch   # nodemon rebuild on src/**/*.ts
 npm start lint-watch    # nodemon relint on src/**/*.ts
+npm start prices-update # refresh checked-in LiteLLM price snapshot (needs network)
 
 cd pages
 npm start lint          # astro check + eslint over src/**/*.{ts,astro}
