@@ -1,7 +1,11 @@
 {
     "name":                                 "ase",
+    "displayName":                          "ASE",
     "description":                          "Agentic Software Engineering (ASE)",
     "private":                              true,
+    "publisher":                            "rse",
+    "categories":                           [ "Chat" ],
+    "files":                               [ "vscode-skills/**" ],
     "keywords":                             [ "agentic", "ai", "coding", "tool", "cli", "software", "engineering" ],
     "homepage":                             "https://ase.tools",
     "repository":                           { "url": "git+https://github.com/rse/ase.git", "type": "git" },
@@ -24,12 +28,69 @@
     },
     "engines": {
         "npm":                              ">=10.0.0",
-        "node":                             ">=22.13.0"
+        "node":                             ">=22.13.0",
+        "vscode":                           "^1.105.0"
     },
     "allowScripts": {
         "fsevents":                         true
     },
     "scripts": {
-        "start":                            "stx -v4 -l warning -c etc/stx.conf"
+        "start":                            "stx -v4 -l warning -c etc/stx.conf",
+        "build-vscode":                     "npm start build && node etc/build-vscode-skills.mjs",
+        "package-vscode":                   "npm run build-vscode && npx @vscode/vsce package --allow-missing-repository"
+    },
+    "contributes": {
+        "chatSkills": [
+            { "path": "./vscode-skills/ase-arch-analyze/SKILL.md" },
+            { "path": "./vscode-skills/ase-arch-discover/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-analyze/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-craft/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-dissect/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-edit/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-explain/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-insight/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-lint/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-refactor/SKILL.md" },
+            { "path": "./vscode-skills/ase-code-resolve/SKILL.md" },
+            { "path": "./vscode-skills/ase-docs-distill/SKILL.md" },
+            { "path": "./vscode-skills/ase-docs-proofread/SKILL.md" },
+            { "path": "./vscode-skills/ase-help-intent/SKILL.md" },
+            { "path": "./vscode-skills/ase-help-skill/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-brainstorm/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-changelog/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-chat/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-commit/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-compat/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-config/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-diaboli/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-diff/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-eli5/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-evaluate/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-mint/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-proximity/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-quorum/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-quotes/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-review/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-search/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-steelman/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-why/SKILL.md" },
+            { "path": "./vscode-skills/ase-meta-workflow/SKILL.md" },
+            { "path": "./vscode-skills/ase-spec-edit/SKILL.md" },
+            { "path": "./vscode-skills/ase-sync-export/SKILL.md" },
+            { "path": "./vscode-skills/ase-sync-import/SKILL.md" },
+            { "path": "./vscode-skills/ase-sync-reconcile/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-condense/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-delete/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-dissect/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-edit/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-grill/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-id/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-implement/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-list/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-preflight/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-reboot/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-rename/SKILL.md" },
+            { "path": "./vscode-skills/ase-task-view/SKILL.md" }
+        ]
     }
 }
