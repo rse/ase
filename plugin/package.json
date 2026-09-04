@@ -36,7 +36,8 @@
     },
     "scripts": {
         "start":                            "stx -v4 -l warning -c etc/stx.conf",
-        "build-vscode":                     "npm start build && node etc/build-vscode-skills.mjs",
+        "build":                            "stx -v4 -l warning -c etc/stx.conf build",
+        "build-vscode":                     "npm run build && node etc/build-vscode-skills.mjs",
         "package-vscode":                   "npm run build-vscode && npx @vscode/vsce package --allow-missing-repository"
     },
     "contributes": {
