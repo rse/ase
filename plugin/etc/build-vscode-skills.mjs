@@ -6,6 +6,7 @@ const pluginDirectory = join(dirname(fileURLToPath(import.meta.url)), "..")
 const skillsDirectory = join(pluginDirectory, "skills")
 const metaDirectory = join(pluginDirectory, "meta")
 const outputDirectory = join(pluginDirectory, "vscode-skills")
+const packageFile = join(pluginDirectory, "package.json")
 const includePattern = /^(\s*)@\$\{CLAUDE_SKILL_DIR\}\/(.+)$/gm
 
 function expandFile(file, skillDirectory, ancestry = new Set()) {
@@ -34,6 +35,7 @@ function expandFile(file, skillDirectory, ancestry = new Set()) {
 rmSync(outputDirectory, { force: true, recursive: true })
 mkdirSync(outputDirectory, { recursive: true })
 
+const skills = []
 for (const skill of readdirSync(skillsDirectory).sort()) {
     const skillDirectory = join(skillsDirectory, skill)
     const sourceFile = join(skillDirectory, "SKILL.md")
@@ -44,4 +46,15 @@ for (const skill of readdirSync(skillsDirectory).sort()) {
     mkdirSync(targetDirectory, { recursive: true })
     cpSync(join(skillDirectory, "help.md"), join(targetDirectory, "help.md"))
     writeFileSync(join(targetDirectory, "SKILL.md"), expandFile(sourceFile, skillDirectory))
+    skills.push(skill)
 }
+
+/* keep package.json chatSkills in sync so a newly added or removed skill never has to be listed by hand */
+const chatSkillsPattern = /("chatSkills":\s*\[)[\s\S]*?(\n\s*\])/
+const chatSkillsEntries = skills
+    .map((skill) => `            { "path": "./vscode-skills/${skill}/SKILL.md" }`)
+    .join(",\n")
+const packageContent = readFileSync(packageFile, "utf8")
+if (!chatSkillsPattern.test(packageContent))
+    throw new Error("package.json: chatSkills array not found")
+writeFileSync(packageFile, packageContent.replace(chatSkillsPattern, `$1\n${chatSkillsEntries}$2`))
