@@ -162,6 +162,32 @@ Procedure
         by modifying the *artifacts* with a corresponding, complete
         *change set*.
 
+        Set <decisions></decisions> (empty) and
+        <open-points></open-points> (empty). They collect, one entry
+        each, the decisions you take on your own while implementing and
+        whatever ends up waiting for the *user*.
+
+        The implementation is *complete or it is not done*: you *MUST*
+        *NEVER* conclude this step while any point of the task plan is
+        still unimplemented -- not because the change set already grew
+        large, not because the remaining points look secondary or
+        cosmetic, and not because an open question stands in the way.
+        Work through *every* point of the plan within this single run.
+
+        Open questions therefore *MUST* *NOT* end the run: whenever the
+        plan leaves a detail undecided or admits several defensible
+        alternatives, *decide it yourself* -- picking what best fits the
+        surrounding artifacts and the internalized tenets -- and append
+        the decision plus a half-sentence rationale to <decisions/>,
+        instead of asking the user and stopping. Only a *genuine
+        blocker*, which no defensible assumption can bridge (a missing
+        credential, an inaccessible external system), may leave a point
+        unimplemented; append such a point to <open-points/> instead,
+        naming what remains open and why. Append to <open-points/> as
+        well whatever else now waits for the user once this run ends --
+        follow-ups you deliberately left out of scope, each with its
+        reason, and results which genuinely need their review.
+
         <if condition="<task-content/> contains an `##  IMPLEMENTATION DRAFT` section (from skill `ase-task-preflight`)">
         Take over the implementation draft of this section *1:1* as
         the change set: the draft is assumed to have been *reviewed*
@@ -251,6 +277,37 @@ Procedure
         <ase-tpl-hint level="minimal">
         The change set is uncommitted in `.ase/worktree/<worktree-name/>` on branch `<worktree-name/>` -- review and commit it there, then remove the worktree via `git worktree remove`.
         </ase-tpl-hint>
+        </if>
+
+    5.  Close the implementation with the boxed summary of what this run
+        left open and what it decided on its own. Both boxes are written
+        in the conversation language and the active persona style, list
+        *one entry per line*, and are *omitted entirely* when they carry
+        no content -- a run which implemented every point and took no
+        decision of its own outputs no box at all.
+
+        <if condition="<open-points/> is not empty">
+        Output everything which now waits for the *user* with the
+        following <template/>:
+
+        <template>
+        <ase-tpl-boxed title="OPEN POINTS">
+        ○   <open-point/>
+        </ase-tpl-boxed>
+        </template>
+        </if>
+
+        <if condition="<decisions/> is not empty">
+        The run decided open questions *on the user's behalf*, so they
+        *MUST* be able to revisit or overrule each of them. Output the
+        collected decisions -- each naming the chosen option and its
+        rationale -- directly below, with the following <template/>:
+
+        <template>
+        <ase-tpl-boxed title="DECISIONS">
+        ○   <decision/> -- <rationale/>
+        </ase-tpl-boxed>
+        </template>
         </if>
 
 5.  **Decide Next Step:**
