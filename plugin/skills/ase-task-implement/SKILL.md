@@ -269,6 +269,27 @@ Procedure
         by modifying the *artifacts* with a corresponding, complete
         *change set*.
 
+        Set <decisions></decisions> (empty). It collects the decisions
+        you take on your own while implementing, one entry per decision.
+
+        The implementation is *complete or it is not done*: you *MUST*
+        *NEVER* conclude this step while any point of the task plan is
+        still unimplemented -- not because the change set already grew
+        large, not because the remaining points look secondary or
+        cosmetic, and not because an open question stands in the way.
+        Work through *every* point of the plan within this single run.
+
+        Open questions therefore *MUST* *NOT* end the run: whenever the
+        plan leaves a detail undecided or admits several defensible
+        alternatives, *decide it yourself* -- picking what best fits the
+        surrounding artifacts and the internalized tenets -- and append
+        the decision plus a half-sentence rationale to <decisions/>,
+        instead of asking the user and stopping. Only a *genuine
+        blocker*, which no defensible assumption can bridge (a missing
+        credential, an inaccessible external system), may leave a point
+        unimplemented; such a point *MUST* then be appended to
+        <decisions/> as well, naming what remains open and why.
+
         <if condition="the backmatter of <task-content/> contains an attachment block with the `Type` key value `text/x-diff; charset=utf-8; kind="preflight"` (the implementation draft from skill `ase-task-preflight`)">
         Take over the implementation draft carried by the `Data` key of
         this attachment block *1:1* as the change set: the draft is
@@ -412,6 +433,24 @@ Procedure
         The change set is uncommitted on branch `<target-branch/>`, which is now checked out in the working copy -- review and commit it there.
         </ase-tpl-hint>
         </elseif>
+
+    5.  <if condition="<decisions/> is not empty">
+        The run decided open questions *on the user's behalf*, so they
+        *MUST* be able to revisit or overrule each of them. Output the
+        collected decisions -- one line per entry, each naming the
+        chosen option and its rationale, in the conversation language
+        and the active persona style -- with the following <template/>:
+
+        <template>
+        <ase-tpl-boxed title="DECISIONS">
+        ○   <decision/> -- <rationale/>
+        </ase-tpl-boxed>
+        </template>
+        </if>
+        <else>
+        The run took no decisions of its own, so the box is *omitted
+        entirely*. Do not output anything.
+        </else>
 
 5.  **Decide Next Step:**
 

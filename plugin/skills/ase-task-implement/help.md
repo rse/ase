@@ -74,6 +74,19 @@ skill stops and touches nothing. As a freshly created branch starts
 at `HEAD`, *uncommitted* changes of the current working copy are
 *not* carried over into it.
 
+The implementation runs to *completion*: the skill never concludes
+while any point of the plan is still unimplemented, neither because the
+change set grew large nor because an open question stands in the way.
+Undecided details and defensible alternatives are therefore *decided by
+the skill itself*, guided by the surrounding artifacts and the
+internalized tenets, instead of interrupting the run with a question.
+Every such decision is collected and, once the change set is applied,
+rendered as a boxed `DECISIONS` summary -- one line per decision with
+its rationale -- so each of them can be revisited or overruled. A point
+is left unimplemented only on a *genuine blocker* no assumption can
+bridge, and is then named in that same box. The box is omitted entirely
+when the run took no decisions of its own.
+
 After implementation, the user is asked whether to preserve or
 delete the task plan, unless `--next` pre-selects this choice.
 
