@@ -80,12 +80,15 @@ change set grew large nor because an open question stands in the way.
 Undecided details and defensible alternatives are therefore *decided by
 the skill itself*, guided by the surrounding artifacts and the
 internalized tenets, instead of interrupting the run with a question.
-Every such decision is collected and, once the change set is applied,
-rendered as a boxed `DECISIONS` summary -- one line per decision with
-its rationale -- so each of them can be revisited or overruled. A point
-is left unimplemented only on a *genuine blocker* no assumption can
-bridge, and is then named in that same box. The box is omitted entirely
-when the run took no decisions of its own.
+Once the change set is applied, the run closes with up to two boxed
+summaries: `OPEN POINTS` lists everything now waiting for the user --
+points left unimplemented on a *genuine blocker* no assumption can
+bridge, follow-ups deliberately left out of scope with their reason,
+and results needing review -- and `DECISIONS` lists each decision the
+skill took on its own together with its rationale, so it can be
+revisited or overruled. Either box is omitted entirely when it has no
+content; a run which implemented every point and decided nothing on its
+own emits no box at all.
 
 After implementation, the user is asked whether to preserve or
 delete the task plan, unless `--next` pre-selects this choice.
