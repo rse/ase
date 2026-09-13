@@ -17,6 +17,7 @@ import type Log                             from "./ase-log.js"
 import Version                              from "./ase-version.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
 import { readStdin, writeStdout }           from "./ase-stdio.js"
+import { refreshPricesOnStart }             from "./ase-statusline-cost.js"
 
 /*  type of supported tool (host) systems  */
 type Tool = "claude" | "copilot" | "codex"
@@ -296,6 +297,9 @@ export default class HookCommand {
 
         /*  garbage-collect orphaned session directories of previous agent runs  */
         this.pruneStaleSessions(sessionId)
+
+        /*  refresh the downloaded token prices of the %Y month cost in the background  */
+        refreshPricesOnStart(new Date())
 
         /*  establish config context (session-scoped only if a valid sessionId is present)  */
         const hasSession = this.isValidSessionId(sessionId)

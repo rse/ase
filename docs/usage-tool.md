@@ -273,8 +273,8 @@ or *GitHub Copilot CLI* statusline:
   agent sessions within the current calendar month, unlike `%X` which
   only reflects the current session. The month boundary is a *UTC* one,
   matching the day on which the model vendors bill and reset their
-  usage windows. The figure is computed locally, without any network
-  access, from the session logs of every supported agent tool:
+  usage windows. The figure is computed locally from the session logs
+  of every supported agent tool:
   *Anthropic Claude Code CLI* (`~/.claude/projects/**/*.jsonl`, honoring
   `CLAUDE_CONFIG_DIR`), *OpenAI Codex CLI*
   (`~/.codex/{sessions,archived_sessions}/**/rollout-*.jsonl`, honoring
@@ -283,10 +283,14 @@ or *GitHub Copilot CLI* statusline:
   `COPILOT_CONFIG_DIR`). Per logged model call, the token counts
   (uncached input, output including reasoning, cache-read, and
   5-minute / 1-hour cache-write) are multiplied by the per-model prices
-  of the *LiteLLM* price snapshot bundled with *ASE* (see `npm start
-  prices-update`); a call logged more than once - while its response
-  streams, or after a session was resumed or forked - is billed only
-  once, and a model absent from the snapshot contributes nothing.
+  of the *LiteLLM* price database. Once `%Y` is in use, `ase hook
+  session-start` downloads these prices in a detached background
+  process whenever the cached ones are older than a day; without a
+  download, the price snapshot bundled with *ASE* is used (see `npm
+  start prices-update`), and changed prices discard the cached figure.
+  A call logged more than once - while its response streams, or after
+  a session was resumed or forked - is billed only once, and a model
+  absent from the prices contributes nothing.
   To keep rendering fast, the result is cached in the temporary
   directory and recomputed at most once per *--month-cost-ttl* window
   by a detached background process, so a render never blocks on the
