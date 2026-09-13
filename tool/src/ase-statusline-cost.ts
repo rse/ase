@@ -23,7 +23,7 @@ export interface MonthCostCache {
 /*  current computation scheme: bump whenever the scanning, pricing, or
     month-bucketing semantics change, so that a cache written by an older
     ASE is discarded instead of being rendered as if it were current  */
-const SCHEME = 2
+const SCHEME = 3
 
 /*  normalized token usage of a single billed model call  */
 interface Usage {
