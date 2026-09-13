@@ -7,14 +7,17 @@
 import fs          from "node:fs"
 import os          from "node:os"
 import path        from "node:path"
+import crypto      from "node:crypto"
 import { spawn }   from "node:child_process"
 
-import { prices }  from "./ase-statusline-prices.js"
-import type { Price } from "./ase-statusline-prices.js"
+import { prices as snapshot }           from "./ase-statusline-prices.js"
+import type { Price }                   from "./ase-statusline-prices.js"
+import { LITELLM_SOURCE, reducePrices } from "./ase-statusline-litellm.js"
 
 /*  on-disk cache shape for the cumulative current-month cost  */
 export interface MonthCostCache {
     version:    number   /*  computation scheme, to invalidate results of an older ASE  */
+    prices:     string   /*  digest of the token prices, to invalidate results of other prices  */
     month:      string   /*  "YYYY-MM" in UTC  */
     costUsd:    number   /*  cumulative cost across all sessions of all agent tools  */
     computedAt: number   /*  epoch milliseconds of the last computation  */
@@ -60,6 +63,7 @@ const resolvePrice = (model: string): Price | null => {
     return price
 }
 const resolvePriceUncached = (model: string): Price | null => {
+    const { prices } = activePrices()
     const candidates = [ model, model.replace(/\./g, "-") ]
     if (model.includes("/"))
         candidates.push(model.slice(model.indexOf("/") + 1))
@@ -278,8 +282,8 @@ function * scanCopilot (month: string, since: number): Generator<Call> {
 /*  all supported agent tools, scanned in one pass  */
 const scanners = [ scanClaude, scanCodex, scanCopilot ]
 
-/*  per-user cache file in the temporary directory  */
-const cacheFile = (): string => {
+/*  per-user cache file of a given name in the temporary directory  */
+const cacheFile = (name: string): string => {
     let user: string
     try {
         user = os.userInfo().username || "default"
@@ -287,15 +291,76 @@ const cacheFile = (): string => {
     catch (_e) {
         user = process.env.USER ?? "default"
     }
-    return path.join(os.tmpdir(), `ase-statusline-month-cost-${user}.json`)
+    return path.join(os.tmpdir(), `ase-statusline-${name}-${user}.json`)
+}
+
+/*  on-disk cache shape for the token prices downloaded from LiteLLM  */
+interface PricesCache {
+    fetchedAt: number                  /*  epoch milliseconds of the download  */
+    prices:    Record<string, Price>   /*  reduced per-model token prices  */
+}
+
+/*  maximum age of the downloaded token prices before a refresh at session start  */
+const PRICES_TTL = 24 * 60 * 60 * 1000
+
+/*  read the downloaded token prices, or null when absent or malformed  */
+const readPricesCache = (): PricesCache | null => {
+    try {
+        const obj = JSON.parse(fs.readFileSync(cacheFile("prices"), "utf8")) as PricesCache
+        if (typeof obj.fetchedAt === "number"
+            && typeof obj.prices === "object" && obj.prices !== null
+            && Object.values(obj.prices).every((p) =>
+                Array.isArray(p) && p.length === 5 && p.every((n) => typeof n === "number")))
+            return obj
+        return null
+    }
+    catch (_e) {
+        return null
+    }
+}
+
+/*  the active token prices: the downloaded ones when available, else the
+    checked-in snapshot, together with a digest which ties a cached month
+    cost to the prices it was computed with  */
+let active: { prices: Readonly<Record<string, Price>>, digest: string } | null = null
+const activePrices = (): NonNullable<typeof active> => {
+    if (active === null) {
+        const prices = readPricesCache()?.prices ?? snapshot
+        const digest = crypto.createHash("sha1").update(JSON.stringify(prices)).digest("hex")
+        active = { prices, digest }
+    }
+    return active
+}
+
+/*  download the LiteLLM price database and persist its reduction; any
+    failure is swallowed, as the previous or snapshot prices remain usable  */
+export const refreshPricesCache = async (now: Date): Promise<void> => {
+    try {
+        const res = await fetch(LITELLM_SOURCE, { signal: AbortSignal.timeout(30 * 1000) })
+        if (!res.ok)
+            return
+        const prices = reducePrices(await res.json())
+        if (Object.keys(prices).length === 0)
+            return
+
+        /*  write atomically, as a concurrent statusline render may read the file  */
+        const file = cacheFile("prices")
+        const temp = `${file}.${process.pid}`
+        fs.writeFileSync(temp, JSON.stringify({ fetchedAt: now.getTime(), prices }), "utf8")
+        fs.renameSync(temp, file)
+    }
+    catch (_e) {
+        /*  offline or unreachable: keep the previous prices  */
+    }
 }
 
 /*  read the persisted month-cost cache, or null when absent, unreadable, or
-    written by an ASE with a different computation scheme  */
+    written by an ASE with a different computation scheme or other prices  */
 export const readMonthCostCache = (): MonthCostCache | null => {
     try {
-        const obj = JSON.parse(fs.readFileSync(cacheFile(), "utf8")) as MonthCostCache
+        const obj = JSON.parse(fs.readFileSync(cacheFile("month-cost"), "utf8")) as MonthCostCache
         if (obj.version === SCHEME
+            && obj.prices === activePrices().digest
             && typeof obj.month === "string"
             && typeof obj.costUsd === "number"
             && typeof obj.computedAt === "number")
@@ -309,7 +374,7 @@ export const readMonthCostCache = (): MonthCostCache | null => {
 
 const writeMonthCostCache = (cache: MonthCostCache): void => {
     try {
-        fs.writeFileSync(cacheFile(), JSON.stringify(cache), "utf8")
+        fs.writeFileSync(cacheFile("month-cost"), JSON.stringify(cache), "utf8")
     }
     catch (_e) {
         /*  best-effort: a non-writable temp directory just means no caching  */
@@ -343,27 +408,39 @@ export const computeMonthCost = (now: Date): number => {
 export const refreshMonthCostCache = (now: Date): void => {
     writeMonthCostCache({
         version:    SCHEME,
+        prices:     activePrices().digest,
         month:      monthKeyOf(now),
         costUsd:    computeMonthCost(now),
         computedAt: now.getTime()
     })
 }
 
-/*  spawn a detached background process that recomputes the cache without
-    blocking the current statusline render; any failure is swallowed since a
-    missed refresh only means the next render keeps using the stale value  */
-const spawnMonthCostRefresh = (): void => {
+/*  spawn a detached background process running an internal refresh option
+    of "ase statusline" without blocking the caller; any failure is swallowed
+    since a missed refresh only means the stale cached value stays in use  */
+const spawnRefresh = (option: string): void => {
     try {
         const entry = process.argv[1]
         if (entry === undefined)
             return
-        const child = spawn(process.execPath, [ entry, "statusline", "--refresh-month-cost" ],
+        const child = spawn(process.execPath, [ entry, "statusline", option ],
             { detached: true, stdio: "ignore" })
         child.unref()
     }
     catch (_e) {
         /*  unable to spawn: keep serving the last cached value  */
     }
+}
+
+/*  at agent session start, refresh the downloaded token prices in a detached
+    background process once they are older than a day, but only for users of
+    the %Y placeholder, as indicated by an existing month-cost cache  */
+export const refreshPricesOnStart = (now: Date): void => {
+    if (!fs.existsSync(cacheFile("month-cost")))
+        return
+    const cache = readPricesCache()
+    if (cache === null || now.getTime() - cache.fetchedAt >= PRICES_TTL)
+        spawnRefresh("--refresh-prices")
 }
 
 /*  resolve the value to render for the %Y current-month cost placeholder:
@@ -378,7 +455,7 @@ export const monthCostForRender = (now: Date, ttlSec: number): number | null => 
         && cache.month === month
         && now.getTime() - cache.computedAt < ttlSec * 1000
     if (!fresh)
-        spawnMonthCostRefresh()
+        spawnRefresh("--refresh-month-cost")
     if (cache !== null && cache.month === month && cache.costUsd > 0)
         return cache.costUsd
     return null
