@@ -50,6 +50,22 @@ to the very task plan implemented in them. As the worktree branches off
 `HEAD`, *uncommitted* changes of the current working copy are *not*
 carried over into it.
 
+The implementation runs to *completion*: the skill never concludes
+while any point of the plan is still unimplemented, neither because the
+change set grew large nor because an open question stands in the way.
+Undecided details and defensible alternatives are therefore *decided by
+the skill itself*, guided by the surrounding artifacts and the
+internalized tenets, instead of interrupting the run with a question.
+Once the change set is applied, the run closes with up to two boxed
+summaries: `OPEN POINTS` lists everything now waiting for the user --
+points left unimplemented on a *genuine blocker* no assumption can
+bridge, follow-ups deliberately left out of scope with their reason,
+and results needing review -- and `DECISIONS` lists each decision the
+skill took on its own together with its rationale, so it can be
+revisited or overruled. Either box is omitted entirely when it has no
+content; a run which implemented every point and decided nothing on its
+own emits no box at all.
+
 After implementation, the user is asked whether to preserve or
 delete the task plan, unless `--next` pre-selects this choice.
 
