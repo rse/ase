@@ -26,7 +26,6 @@ type Tool = "claude" | "copilot" | "codex"
 type ToolSpec = {
     toolNameField:           "tool_name"  | "toolName"
     toolInputField:          "tool_input" | "toolArgs"
-    toolInputIsString:       boolean
     bashToolName:            "Bash" | "bash"
     mcpToolNamePattern:      RegExp
     addonMcpToolNamePattern: RegExp
@@ -61,7 +60,6 @@ const toolSpecs: Record<Tool, ToolSpec> = {
     "claude": {
         toolNameField:           "tool_name",
         toolInputField:          "tool_input",
-        toolInputIsString:       false,
         bashToolName:            "Bash",
         mcpToolNamePattern:      /^mcp__plugin_ase_ase__.+/,
         addonMcpToolNamePattern: addonMcpToolNamePattern("mcp__", "__.+"),
@@ -72,7 +70,6 @@ const toolSpecs: Record<Tool, ToolSpec> = {
     "copilot": {
         toolNameField:           "toolName",
         toolInputField:          "toolArgs",
-        toolInputIsString:       true,
         bashToolName:            "bash",
         mcpToolNamePattern:      /^ase-.+/,
         addonMcpToolNamePattern: addonMcpToolNamePattern("", "-.+"),
@@ -83,7 +80,6 @@ const toolSpecs: Record<Tool, ToolSpec> = {
     "codex": {
         toolNameField:           "tool_name",
         toolInputField:          "tool_input",
-        toolInputIsString:       false,
         bashToolName:            "Bash",
         mcpToolNamePattern:      /^mcp__ase__.+/,
         addonMcpToolNamePattern: addonMcpToolNamePattern("mcp__", "__.+"),
@@ -571,9 +567,9 @@ export default class HookCommand {
         const rawInput  = input[spec.toolInputField]
         const toolName  = typeof rawName === "string" ? rawName : ""
         let   toolInput: ToolInput = {}
-        if (spec.toolInputIsString && typeof rawInput === "string")
+        if (typeof rawInput === "string")
             toolInput = this.parseJSON(rawInput, toolInputSchema)
-        else if (!spec.toolInputIsString && typeof rawInput === "object" && rawInput !== null) {
+        else if (typeof rawInput === "object" && rawInput !== null) {
             const result = v.safeParse(toolInputSchema, rawInput)
             if (result.success)
                 toolInput = result.output

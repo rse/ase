@@ -2,6 +2,14 @@
 ChangeLog
 =========
 
+1.0.7 (2026-09-XX)
+------------------
+
+-   BUGFIX [tool]: Object-shaped hook tool arguments
+    The pre-tool-use hook now derives the tool arguments from the *received* value shape
+    instead of a per-tool declaration, so the object-shaped `toolArgs` of the GitHub Copilot
+    CLI is parsed again and its `bash`, `Skill`, `Read`, and `Edit` auto-approvals work.
+
 1.0.6 (2026-09-14)
 ------------------
 
