@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-1.0.7 (2026-09-XX)
+1.0.7 (2026-09-17)
 ------------------
 
 -   BUGFIX [tool]: Object-shaped hook tool arguments
