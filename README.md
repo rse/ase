@@ -251,6 +251,12 @@ see whether **ASE** is right for you:
   prioritized, severity-tagged, line-cited findings?
   &rarr; [`/ase-meta-review`](plugin/skills/ase-meta-review/help.md)
 
+- **Change Curation**:
+  You have a pile of uncommitted changes and want them walked through
+  theme by theme, each group staged, explained with line-cited evidence,
+  and committed only on your explicit accept?
+  &rarr; [`/ase-code-review`](plugin/skills/ase-code-review/help.md)
+
 - **Change Set Dissection**:
   You have one large, mixed change set, but want it split into cohesive
   parts, each landing in its own Git WorkTree so it can be reviewed and

@@ -281,6 +281,14 @@ The following ASE commands/skills exist on the code-level:
   alone keeps just the listed ones, `--exclude` alone keeps all others,
   and both together keep the included ones minus the excluded ones.
 
+- **/ase-code-review**:<br/>
+  Review the uncommitted changes and curate them into clean commits:
+  group all hunks into themes, stage one theme at a time into the Git
+  index, explain it in a boxed group card with per-file, line-cited
+  evidence, and commit it only on the user's explicit accept. A demanded
+  correction is implemented via **/ase-code-edit**, after which the
+  group is re-staged and presented again.
+
 ### Documentation Commands
 
 The following ASE commands/skills exist on the documentation-level:
