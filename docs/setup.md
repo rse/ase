@@ -21,6 +21,24 @@ npm install -g @rse/ase
 ase setup install [--tool claude|copilot]
 ```
 
+### Visual Studio Code Chat
+
+The ASE plugin can be packaged as a Visual Studio Code extension and
+expose all ASE skills directly to GitHub Copilot Chat. The generated
+skills are self-contained, so this integration does not depend on the
+Claude Code include syntax used by the source skills.
+
+```
+cd plugin
+npm install
+npm run package-vscode
+code --install-extension ase-<version>.vsix
+```
+
+Reload Visual Studio Code after installation. In Copilot Chat, invoke a
+user-invocable ASE skill with its name, for example
+`/ase-meta-review` or `/ase-task-edit`.
+
 ### Updating
 
 ```
