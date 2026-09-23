@@ -48,12 +48,18 @@ file *logically achieves* now (behavior before → after, for a colleague
 who did not write the code -- never an enumeration of methods), a
 *Touched* line naming the changed symbols as the index into the editor,
 ordered foundations-first -- and per file five *evidence* lines, one
-each for `DOMAIN`, `ARCH` (including whether added signatures are
-uniform with their siblings in naming, parameter order, return type,
-and handling of absence), `CLEAN` (including whether every added
-method carries a brief, meaningful comment), `PERF`, and `TESTS`, each
-worded so that a beginner understands what was checked, what was
-found, and what it means. Every evidence line carries one of four honest
+each for `DOMAIN` (including whether the change can actually reach the
+promised outcome, edge cases included), `ARCH` (including whether added
+signatures are uniform with their siblings in naming, parameter order,
+return type, and handling of absence), `CLEAN` (including robustness on
+the failure paths, the documented project conventions, and whether every
+added method carries a brief, meaningful comment), `PERF`, and `TESTS`,
+each worded so that a beginner understands what was checked, what was
+found, and what it means. Two further dimensions, `SEC` (what the change
+exposes) and `DOC` (which document it leaves stale, `CHANGELOG.md`
+excluded), are gathered for every file as well but reach the card *only*
+when they carry a finding, so their mere presence already says that
+something has to be acted on. Every evidence line carries one of four honest
 statuses: `✓` *shown* (a source line the reviewer read carries the
 claim verbatim, cited as `file:line` -- no citation, no `✓`), `✗` *gap*
 (the concrete spot, the exposing input, and the cheapest repair), `?`
@@ -82,13 +88,34 @@ re-staged, re-verified, and presented again for a fresh decision;
 remaining groups. Nothing here ever discards working-tree content, and
 no correction ever commits by itself.
 
+Gathering that evidence is the expensive part of a review -- it reads
+whole files, callers, implementers, and tests behind a card of a few
+lines -- so it is fanned out, one sub-agent per staged file, and each
+dispatch carries an explicit *capability tier* chosen from the judgment
+that file actually needs: `standard` for a file-local judgement, `deep`
+once it has to leave the file (a signature with callers, a
+security-relevant path, a contract checked against the specification),
+and `max` only for a core contract the whole group builds on. Without an
+explicit tier a sub-agent would inherit the model of the review itself
+and judge a renamed constant as expensively as a changed interface. The
+tiers are named by capability, never by a vendor model name, so the
+skill stays valid under every agent tool; under *Anthropic Claude Code*
+the tier becomes the documented identifier of the `model` attribute,
+while under *GitHub Copilot* and *OpenAI Codex* -- neither of which
+documents valid identifiers for its sub-agent configuration -- the tier
+is stated in the prompt instead. Every sub-agent returns exactly its
+evidence records and nothing else; the reviewing skill translates them
+into the user's language when it writes the card.
+
 The skill *complements* its neighbours rather than duplicating them:
 `ase-repo-diff` narrates *what changed*, `ase-repo-review` renders a
 reviewer's *judgement*, `ase-code-lint` and `ase-code-analyze` flag
 *quality* and *logic/semantics* problems, and `ase-repo-commit` crafts
 the *commit message* -- whereas `ase-code-review` *curates and
-commits*. It does *not* judge code quality, and it never updates
-`CHANGELOG.md` (a release concern owned by `ase-repo-changelog`).
+commits*. Its evidence lines judge the *change in front of it*, never
+the code base at large: a general quality audit stays with the
+analyzers. It never updates `CHANGELOG.md` (a release concern owned by
+`ase-repo-changelog`).
 
 ##  ARGUMENTS
 
