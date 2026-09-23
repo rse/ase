@@ -56,8 +56,9 @@ the failure paths, the documented project conventions, and whether every
 added method carries a brief, meaningful comment), `PERF`, and `TESTS`,
 each worded so that a beginner understands what was checked, what was
 found, and what it means. Two further dimensions, `SEC` (what the change
-exposes) and `DOC` (which document it leaves stale, `CHANGELOG.md`
-excluded), are gathered for every file as well but reach the card *only*
+exposes) and `DOC` (which document it leaves stale, judged against what
+this project expects a change to carry along), are gathered for every
+file as well but reach the card *only*
 when they carry a finding, so their mere presence already says that
 something has to be acted on. Every evidence line carries one of four honest
 statuses: `✓` *shown* (a source line the reviewer read carries the
@@ -114,8 +115,8 @@ reviewer's *judgement*, `ase-code-lint` and `ase-code-analyze` flag
 the *commit message* -- whereas `ase-code-review` *curates and
 commits*. Its evidence lines judge the *change in front of it*, never
 the code base at large: a general quality audit stays with the
-analyzers. It never updates `CHANGELOG.md` (a release concern owned by
-`ase-repo-changelog`).
+analyzers. It writes no file of its own -- it stages and commits what
+the user accepted, and nothing beyond it.
 
 ##  ARGUMENTS
 
