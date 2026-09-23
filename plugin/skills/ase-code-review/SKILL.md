@@ -86,6 +86,56 @@ change and stated honestly (`✓`, `✗`, `?`, `–`); they are not a
 free-floating quality verdict, which stays with the analyzers.
 </objective>
 
+Evidence Budget
+---------------
+
+Gathering evidence is fanned out into sub-agents, and every one of them
+is paid for. Each dispatch therefore carries an explicit *capability
+tier*, chosen from the *judgment the file actually needs*, never from
+the model this review happens to run on -- without an explicit tier a
+sub-agent inherits that model, which judges a renamed constant as
+expensively as a changed interface. The tiers are named by capability,
+never by a vendor model name or a version, so the skill stays valid
+under every agent tool:
+
+-   `standard`: a *file-local* judgement -- the change is understandable
+    from the file itself plus the diff, touches no signature others
+    depend on, and its tests sit next to it.
+-   `deep`: a judgement which has to *leave* the file -- a changed
+    signature with callers or implementers, a security-relevant path, a
+    contract checked against the specification, a defect whose reach is
+    unclear.
+-   `max`: reserved for a file whose misjudgement would invalidate the
+    whole group -- a core contract every other file in the group builds
+    on.
+
+`light` is *never* used here: an evidence line which cites nothing is
+worse than no line at all.
+
+How the tier reaches the sub-agent is *tool-specific*, hence dispatch on
+<ase-agent-tool/>:
+
+<if condition="<ase-agent-tool/> is `claude`">
+Pass it as the `model` attribute with the documented identifier of the
+tier: `standard` is `sonnet`, `deep` is `opus`, and `max` is `fable`.
+</if>
+
+<else>
+Pass *no* model at all, because neither *GitHub Copilot* nor *OpenAI
+Codex* documents which model identifiers their sub-agent configuration
+accepts, and an invented identifier would break the dispatch at run
+time. State the tier as the *first* line of the sub-agent prompt, in the
+form `Tier: <tier/>.`, so the budget decision stays visible.
+</else>
+
+Effort is carried as the *last* line of the sub-agent prompt, and both
+tiers used here run *high*: `Think hard about this.` The same floor
+applies to a sub-agent which invokes a `<skill/>`. Beyond the tier, the
+sub-agents are budgeted by what flows *through* them: each returns
+exactly its evidence records and nothing else -- no prose summary, no
+restated file content, no narration -- and reads the *excerpts* a
+dimension needs rather than re-reading what it already cited.
+
 *IMPORTANT*: Author *every* free-text output of this skill -- the
 change intent, group one-liners, rationales, per-file explanations,
 evidence texts, verdicts, and discussion answers -- in the *user's
@@ -310,6 +360,20 @@ stay in their original form.
 
     5.3. *Gather evidence* for every staged file -- *before* any card
          text is authored, and *against* the change rather than for it.
+
+         This is the *expensive* step of the review: it reads whole
+         files, callers, implementers, and tests, while the card itself
+         is a few lines long. It is therefore *fanned out*, one
+         `<agent/>` per staged file -- files are independently decidable,
+         and their evidence records are simply collected -- and each of
+         them is dispatched at the *smallest capability tier* which can
+         still judge that file, as defined by `Evidence Budget` above.
+         The sub-agents return *only* their evidence records,
+         telegraphically; the reviewing skill translates them into the
+         user's language when it authors the card in 5.4. A group of a
+         single small file is judged directly, without a sub-agent, as
+         the dispatch would cost more than it saves.
+
          For each of the five dimensions `DOMAIN`, `ARCH`, `CLEAN`,
          `PERF`, and `TESTS`, first hunt for the *strongest reason the
          change could be wrong or incomplete* in that dimension, and
@@ -344,7 +408,11 @@ stay in their original form.
              project or vendor sources, or a documented contract --
              never against the changed code itself (`No
              Self-Reference`). A constraint the reviewer merely infers
-             is `?`, not `✓`.
+             is `?`, not `✓`. This line also carries *correctness*
+             against that contract: a latent defect, an unhandled edge
+             case, or a control or data flow which cannot reach the
+             promised outcome is a `✗` naming the input or state that
+             exposes it.
          -   `ARCH`: boundaries, layering, dependency direction,
              *interface quality*, and *completeness across the diff*.
              Interface quality means every added or changed signature is
@@ -360,8 +428,16 @@ stay in their original form.
              either in this group, already accepted, or the gap is
              named.
          -   `CLEAN`: naming, duplication, dead code, error handling,
-             type safety, and *method comments*, judged against the
-             *surrounding* code, not against a style ideal. Every added
+             type safety, *robustness*, *convention*, and *method
+             comments*, judged against the *surrounding* code, not
+             against a style ideal. Robustness covers what survives
+             failure: a resource opened but not released on every path,
+             a lock held across an await, an unchecked concurrent
+             access. Convention is measured against the *documented*
+             conventions of the project -- `AGENTS.md`, `CLAUDE.md`, and
+             the `ase-format-*` meta documents -- not against personal
+             taste; a documented rule broken by the change is a `✗`
+             citing the rule and the line. Every added
              or changed method, type, and non-trivial field carries a
              comment that says *what it is for* in one to two lines --
              at most four for a genuinely complex algorithm -- placed
@@ -387,6 +463,27 @@ stay in their original form.
              cites one of them adds "noch nicht abgenommen, liegt in
              G<n/>" -- a test that exists but awaits its own review is
              evidence with a caveat, not a gap.
+
+         Two further dimensions are *conditional*: they are gathered for
+         every file like the five above, but they reach the card *only*
+         when they carry a finding -- a `✗` or a `?`. A file where they
+         hold or do not apply emits no line for them at all, so the card
+         stays as short as it is today and every conditional line the
+         user *does* see is one that has to be acted on:
+
+         -   `SEC`: what the change exposes -- untrusted input reaching
+             a sink without validation, a secret or token entering a log
+             or an error message, a widened permission or authentication
+             path, a dependency pulled in for a security-relevant task.
+             Judged only for the change, never as a general audit of the
+             file.
+         -   `DOC`: what the change leaves stale -- a `README`, a help
+             text, a usage document, or an AI guidance document which
+             still describes the behavior as it was before this group.
+             `CHANGELOG.md` is *excluded*: it belongs to a release step.
+
+         Their statuses are the same four, and a `✗` in them counts
+         exactly like any other `✗`.
 
          Then derive the group <verdict/>: the counts of `✓`, `✗`, and
          `?` over all files, followed by `-- not ready without a
@@ -419,6 +516,8 @@ stay in their original form.
            <evidence-status/> CLEAN   <evidence-text/>
            <evidence-status/> PERF    <evidence-text/>
            <evidence-status/> TESTS   <evidence-text/>
+           <evidence-status/> SEC     <evidence-text/>
+           <evidence-status/> DOC     <evidence-text/>
 
          *Verdict*: <verdict/>
 
@@ -484,6 +583,11 @@ stay in their original form.
              fixed two-column gutter; a text that exceeds the line wraps
              onto continuation lines indented to the text column, so the
              gutter stays readable. Cited locations stay in backticks.
+         -   The `SEC` and `DOC` lines are *conditional*: they follow the
+             five in that order, but *only* for a file where 5.3 recorded
+             a `✗` or a `?` for them. They are *never* emitted as `✓` or
+             `–`, so their presence alone already says that something has
+             to be acted on.
          -   The *Verdict* line is the honest sum of the evidence: it
              is what flips the recommendation of the following dialog
              from `ACCEPT` to `CHANGE`, so it is never dressed up.
