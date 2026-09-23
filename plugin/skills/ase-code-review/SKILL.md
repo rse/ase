@@ -480,7 +480,10 @@ stay in their original form.
          -   `DOC`: what the change leaves stale -- a `README`, a help
              text, a usage document, or an AI guidance document which
              still describes the behavior as it was before this group.
-             `CHANGELOG.md` is *excluded*: it belongs to a release step.
+             Which documents a change is expected to carry along is a
+             *project* decision: judge against what this project's own
+             guidance and history show, never against a rule imported
+             from elsewhere.
 
          Their statuses are the same four, and a `✗` in them counts
          exactly like any other `✗`.
@@ -710,9 +713,9 @@ stay in their original form.
         `FILES`.
     -   `<left-uncommitted/>` is one bullet per skipped/cancelled
         group with its reason, or `none`.
-    -   Do *not* propose further actions and do *not* touch
-        `CHANGELOG.md` -- changelog updates belong to a release step,
-        never to a review step.
+    -   Do *not* propose further actions, and do *not* write any file
+        of your own: this skill commits what the user accepted and
+        nothing beyond it.
 
     </step>
 
