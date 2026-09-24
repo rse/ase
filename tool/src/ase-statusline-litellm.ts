@@ -4,7 +4,9 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
-import type { Price } from "./ase-statusline-prices.js"
+/*  per-model token prices in USD per single token, as the tuple
+    [ input, output, cache-read, cache-write (5m), cache-write (1h) ]  */
+export type Price = readonly [ number, number, number, number, number ]
 
 /*  canonical upstream price database (the same source ccusage and codeburn use)  */
 export const LITELLM_SOURCE = "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"
