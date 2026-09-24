@@ -10,14 +10,13 @@ import path        from "node:path"
 import crypto      from "node:crypto"
 import { spawn }   from "node:child_process"
 
-import { prices as snapshot }           from "./ase-statusline-prices.js"
-import type { Price }                   from "./ase-statusline-prices.js"
 import { LITELLM_SOURCE, reducePrices } from "./ase-statusline-litellm.js"
+import type { Price }                   from "./ase-statusline-litellm.js"
 
 /*  on-disk cache shape for the cumulative current-month cost  */
 export interface MonthCostCache {
     version:    number   /*  computation scheme, to invalidate results of an older ASE  */
-    prices:     string   /*  digest of the token prices, to invalidate results of other prices  */
+    prices:     string   /*  digest of the token prices ("" without any), to invalidate results of other prices  */
     month:      string   /*  "YYYY-MM" in UTC  */
     costUsd:    number   /*  cumulative cost across all sessions of all agent tools  */
     computedAt: number   /*  epoch milliseconds of the last computation  */
@@ -63,7 +62,7 @@ const resolvePrice = (model: string): Price | null => {
     return price
 }
 const resolvePriceUncached = (model: string): Price | null => {
-    const { prices } = activePrices()
+    const prices = activePrices()?.prices ?? {}
     const candidates = [ model, model.replace(/\./g, "-") ]
     if (model.includes("/"))
         candidates.push(model.slice(model.indexOf("/") + 1))
@@ -300,7 +299,7 @@ interface PricesCache {
     prices:    Record<string, Price>   /*  reduced per-model token prices  */
 }
 
-/*  maximum age of the downloaded token prices before a refresh at session start  */
+/*  maximum age of the downloaded token prices before a refresh  */
 const PRICES_TTL = 24 * 60 * 60 * 1000
 
 /*  read the downloaded token prices, or null when absent or malformed  */
@@ -319,22 +318,25 @@ const readPricesCache = (): PricesCache | null => {
     }
 }
 
-/*  the active token prices: the downloaded ones when available, else the
-    checked-in snapshot, together with a digest which ties a cached month
-    cost to the prices it was computed with  */
-let active: { prices: Readonly<Record<string, Price>>, digest: string } | null = null
-const activePrices = (): NonNullable<typeof active> => {
-    if (active === null) {
-        const prices = readPricesCache()?.prices ?? snapshot
-        const digest = crypto.createHash("sha1").update(JSON.stringify(prices)).digest("hex")
-        active = { prices, digest }
+/*  the active token prices, as downloaded from LiteLLM, together with a
+    digest which ties a cached month cost to the prices it was computed
+    with, or null as long as no prices were downloaded yet  */
+type Active = { prices: Readonly<Record<string, Price>>, digest: string } | null
+let active: Active | undefined
+const activePrices = (): Active => {
+    if (active === undefined) {
+        const prices = readPricesCache()?.prices
+        active = prices === undefined ? null : {
+            prices,
+            digest: crypto.createHash("sha1").update(JSON.stringify(prices)).digest("hex")
+        }
     }
     return active
 }
 
 /*  download the LiteLLM price database and persist its reduction; any
-    failure is swallowed, as the previous or snapshot prices remain usable  */
-export const refreshPricesCache = async (now: Date): Promise<void> => {
+    failure is swallowed, as the previously downloaded prices remain usable  */
+const refreshPricesCache = async (now: Date): Promise<void> => {
     try {
         const res = await fetch(LITELLM_SOURCE, { signal: AbortSignal.timeout(30 * 1000) })
         if (!res.ok)
@@ -348,6 +350,8 @@ export const refreshPricesCache = async (now: Date): Promise<void> => {
         const temp = `${file}.${process.pid}`
         fs.writeFileSync(temp, JSON.stringify({ fetchedAt: now.getTime(), prices }), "utf8")
         fs.renameSync(temp, file)
+        active = undefined
+        resolved.clear()
     }
     catch (_e) {
         /*  offline or unreachable: keep the previous prices  */
@@ -360,7 +364,7 @@ export const readMonthCostCache = (): MonthCostCache | null => {
     try {
         const obj = JSON.parse(fs.readFileSync(cacheFile("month-cost"), "utf8")) as MonthCostCache
         if (obj.version === SCHEME
-            && obj.prices === activePrices().digest
+            && obj.prices === (activePrices()?.digest ?? "")
             && typeof obj.month === "string"
             && typeof obj.costUsd === "number"
             && typeof obj.computedAt === "number")
@@ -404,43 +408,39 @@ export const computeMonthCost = (now: Date): number => {
     return total
 }
 
-/*  recompute the current-month cost and persist it to the cache file  */
-export const refreshMonthCostCache = (now: Date): void => {
+/*  recompute the current-month cost and persist it to the cache file, after
+    downloading the token prices when they are absent or older than a day.
+    Without any prices, a zero cost is cached, so that %Y stays hidden and
+    the download is retried only once the cache expires.  */
+export const refreshMonthCostCache = async (now: Date): Promise<void> => {
+    const cache = readPricesCache()
+    if (cache === null || now.getTime() - cache.fetchedAt >= PRICES_TTL)
+        await refreshPricesCache(now)
+    const current = activePrices()
     writeMonthCostCache({
         version:    SCHEME,
-        prices:     activePrices().digest,
+        prices:     current?.digest ?? "",
         month:      monthKeyOf(now),
-        costUsd:    computeMonthCost(now),
+        costUsd:    current !== null ? computeMonthCost(now) : 0,
         computedAt: now.getTime()
     })
 }
 
-/*  spawn a detached background process running an internal refresh option
-    of "ase statusline" without blocking the caller; any failure is swallowed
-    since a missed refresh only means the stale cached value stays in use  */
-const spawnRefresh = (option: string): void => {
+/*  spawn a detached background process that recomputes the cache without
+    blocking the current statusline render; any failure is swallowed since a
+    missed refresh only means the next render keeps using the stale value  */
+const spawnMonthCostRefresh = (): void => {
     try {
         const entry = process.argv[1]
         if (entry === undefined)
             return
-        const child = spawn(process.execPath, [ entry, "statusline", option ],
+        const child = spawn(process.execPath, [ entry, "statusline", "--refresh-month-cost" ],
             { detached: true, stdio: "ignore" })
         child.unref()
     }
     catch (_e) {
         /*  unable to spawn: keep serving the last cached value  */
     }
-}
-
-/*  at agent session start, refresh the downloaded token prices in a detached
-    background process once they are older than a day, but only for users of
-    the %Y placeholder, as indicated by an existing month-cost cache  */
-export const refreshPricesOnStart = (now: Date): void => {
-    if (!fs.existsSync(cacheFile("month-cost")))
-        return
-    const cache = readPricesCache()
-    if (cache === null || now.getTime() - cache.fetchedAt >= PRICES_TTL)
-        spawnRefresh("--refresh-prices")
 }
 
 /*  resolve the value to render for the %Y current-month cost placeholder:
@@ -455,7 +455,7 @@ export const monthCostForRender = (now: Date, ttlSec: number): number | null => 
         && cache.month === month
         && now.getTime() - cache.computedAt < ttlSec * 1000
     if (!fresh)
-        spawnRefresh("--refresh-month-cost")
+        spawnMonthCostRefresh()
     if (cache !== null && cache.month === month && cache.costUsd > 0)
         return cache.costUsd
     return null

@@ -270,7 +270,6 @@ npm start build-plugin  # copy ../plugin and ../.claude-plugin into the package
 npm start build-container # build and push the multi-arch container image (etc/ase.dockerfile)
 npm start build-watch   # nodemon rebuild on src/**/*.{ts,vue,styl,html}
 npm start lint-watch    # nodemon relint on src/**/*.{ts,vue}
-npm start prices-update # refresh checked-in LiteLLM price snapshot (needs network)
 
 cd pages
 npm start lint          # astro check + eslint over src/**/*.{ts,astro}

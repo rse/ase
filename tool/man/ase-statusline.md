@@ -216,11 +216,11 @@ Costs:
 - `%Y`:
   The cumulative costs in USD of *all* sessions of *all* supported
   agent tools within the current calendar month, e.g., `$1102.11`,
-  *suppressed* if no session logs exist. Unlike `%X`, which only
-  reflects the current session, the month boundary is a *UTC* one,
+  *suppressed* if no session logs exist (unlike `%X`, which only
+  reflects the current session). The month boundary is a *UTC* one,
   matching the day on which the model vendors bill and reset their
-  usage windows. The figure is computed locally, without any network
-  access, from the session logs of *Anthropic Claude Code CLI*
+  usage windows. The figure is computed locally from the session logs
+  of *Anthropic Claude Code CLI*
   (`~/.claude/projects/**/*.jsonl`, honoring `CLAUDE_CONFIG_DIR`),
   *OpenAI Codex CLI*
   (`~/.codex/{sessions,archived_sessions}/**/rollout-*.jsonl`, honoring
@@ -229,9 +229,12 @@ Costs:
   `COPILOT_CONFIG_DIR`). Per logged model call, the token counts
   (uncached input, output including reasoning, cache-read, and
   5-minute / 1-hour cache-write) are multiplied by the per-model prices
-  of the *LiteLLM* price snapshot bundled with *ASE*; a call logged more
-  than once is billed only once, and a model absent from the snapshot
-  contributes nothing. To keep rendering fast, the result is cached and
+  of the *LiteLLM* price database. The background recomputation
+  downloads these prices whenever the cached ones are absent or older
+  than a day, and keeps using the cached ones while offline; until a
+  first download succeeds, `%Y` stays hidden, and changed prices
+  discard the cached figure. A call logged more than once is billed
+  only once, and a model absent from the prices contributes nothing. To keep rendering fast, the result is cached and
   recomputed at most once per `--month-cost-ttl` window by a detached
   background process, so a rendering never blocks on the log scan.
 
@@ -327,6 +330,9 @@ Invalid JSON is an error.
 
 - *temporary directory*`/ase-statusline-month-cost-`*user*`.json`:
   The cache of the `%Y` current-month total cost.
+
+- *temporary directory*`/ase-statusline-prices-`*user*`.json`:
+  The cache of the *LiteLLM* token prices of `%Y`.
 
 - *per-user state directory*`/statusline-codex-usage.json`:
   The cache of the rate-limit windows fetched for the `gpt-*` models.

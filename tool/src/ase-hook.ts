@@ -22,7 +22,6 @@ import { readStdin, writeStdout }                         from "./ase-lib-stdio.
 import { Task }                                           from "./ase-task.js"
 import * as TaskFormat                                    from "./ase-task-format.js"
 import { parseTool, type Tool }                           from "./ase-setup-common.js"
-import { refreshPricesOnStart }                           from "./ase-statusline-cost.js"
 
 /*  per-tool dispatch table for the parts that actually differ between
     Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI hook integrations.  */
@@ -372,9 +371,6 @@ export default class HookCommand {
 
         /*  garbage-collect orphaned session directories of previous agent runs  */
         this.pruneStaleSessions(sessionId)
-
-        /*  refresh the downloaded token prices of the %Y month cost in the background  */
-        refreshPricesOnStart(new Date())
 
         /*  establish config context (session-scoped only if a valid sessionId is present)  */
         const hasSession = this.isValidSessionId(sessionId)
