@@ -13,6 +13,7 @@ import { Command }                                        from "commander"
 import { execaSync }                                      from "execa"
 import { ofetch }                                         from "ofetch"
 import { Agent }                                          from "undici"
+import { WebSocket }                                      from "ws"
 import { isScalar }                                       from "yaml"
 import { z }                                              from "zod"
 import { LRUCache }                                       from "lru-cache"
@@ -39,12 +40,13 @@ interface TaskStoreClient {
     setLifecycle (name: string): Promise<void>
     open   (): Promise<void>
     close  (): Promise<void>
-    list   (): Promise<Core.TaskListEntry[]>
+    list   (fields?: "header"): Promise<Core.TaskListEntry[]>
     load   (id: string): Promise<API.TaskPlan | null>
     save   (id: string, plan: API.TaskPlan): Promise<void>
     patch  (id: string, change: { status?: string, id?: string }): Promise<Core.TaskPatchResult | null>
     delete (id: string): Promise<boolean>
     purge  (age: string): Promise<string[]>
+    content (id: string, index: number): Promise<{ type: string, content: Buffer } | null>
 }
 
 /*  the opened storage delegate of a local store, shared by reference count  */
@@ -117,8 +119,8 @@ class LocalTaskStoreClient implements TaskStoreClient {
             await entry.opened.then((opened) => opened.store.close(), () => {})
         }
     }
-    list (): Promise<Core.TaskListEntry[]> {
-        return this.core.taskList(this.prjId)
+    list (fields?: "header"): Promise<Core.TaskListEntry[]> {
+        return this.core.taskList(this.prjId, "none", "none", fields ?? "none")
     }
     load (id: string): Promise<API.TaskPlan | null> {
         return this.missing(() => this.core.taskLoad(this.prjId, id), null)
@@ -138,6 +140,9 @@ class LocalTaskStoreClient implements TaskStoreClient {
     purge (age: string): Promise<string[]> {
         return this.core.taskPurge(this.prjId, age)
     }
+    content (id: string, index: number): Promise<{ type: string, content: Buffer } | null> {
+        return this.missing(() => this.core.attachmentContent(this.prjId, id, String(index)), null)
+    }
 }
 
 /*  the project as exposed by the project endpoints of a task store server  */
@@ -155,7 +160,7 @@ class RemoteTaskStoreClient implements TaskStoreClient {
     private dispatcher: Agent | undefined
     public  lifecycle:  TaskFormat.TaskLifecycle
     constructor (private prjId: string, private configured: TaskFormat.TaskLifecycle, private log: Log,
-        private base: string, private token: string, insecure: boolean) {
+        private base: string, private token: string, private insecure: boolean) {
         this.lifecycle  = configured
         this.dispatcher = insecure ? new Agent({ connect: { rejectUnauthorized: false } }) : undefined
     }
@@ -275,8 +280,9 @@ class RemoteTaskStoreClient implements TaskStoreClient {
     async close (): Promise<void> {
         await this.dispatcher?.close()
     }
-    async list (): Promise<Core.TaskListEntry[]> {
-        return (await this.request<{ tasks: Core.TaskListEntry[] }>("GET", this.tasks) ?? this.unregistered()).tasks
+    async list (fields?: "header"): Promise<Core.TaskListEntry[]> {
+        const url = this.tasks + (fields !== undefined ? `?fields=${fields}` : "")
+        return (await this.request<{ tasks: Core.TaskListEntry[] }>("GET", url) ?? this.unregistered()).tasks
     }
     async load (id: string): Promise<API.TaskPlan | null> {
         return this.task(await this.request<API.TaskPlan>("GET", `${this.tasks}/${id}`))
@@ -295,6 +301,76 @@ class RemoteTaskStoreClient implements TaskStoreClient {
     async purge (age: string): Promise<string[]> {
         const result = await this.request<{ purged: string[] }>("DELETE", `${this.tasks}?age=${encodeURIComponent(age)}`)
         return (result ?? this.unregistered()).purged
+    }
+    async content (id: string, index: number): Promise<{ type: string, content: Buffer } | null> {
+        const r = await ofetch.raw<ArrayBuffer, "arrayBuffer">(`${this.base}${this.tasks}/${id}/attachment/${index}/content`, {
+            headers:             { Authorization: `Bearer ${this.token}` },
+            responseType:        "arrayBuffer",
+            dispatcher:          this.dispatcher,
+            signal:              AbortSignal.timeout(10000),
+            ignoreResponseError: true
+        }).catch((err: unknown) => {
+            throw new Error(`task: store "${this.base}" unreachable: ${err instanceof Error ? err.message : String(err)}`, { cause: err })
+        })
+        if (r.status === 404)
+            return null
+        if (r.status < 200 || r.status >= 300)
+            throw new Core.Problem(r.status, `store "${this.base}": HTTP ${r.status}`)
+        return { type: r.headers.get("content-type") ?? "application/octet-stream", content: Buffer.from(r._data ?? new ArrayBuffer(0)) }
+    }
+
+    /*  subscribe to the change events of the project via the WebSocket event
+        endpoint, reconnecting after a connection loss or a failed handshake
+        (with a change notification on reconnect, as events may have been missed,
+        incl. lifecycle model changes); returns a function to unsubscribe  */
+    subscribe (onChange: () => void): () => void {
+        const url = `${this.base.replace(/^http/, "ws")}/projects/${this.prjId}/events`
+        let ws:      WebSocket | null = null
+        let timer:   ReturnType<typeof setTimeout> | null = null
+        let stopped  = false
+        let failed   = false
+        const connect = (): void => {
+            ws = new WebSocket(url, {
+                headers:            { Authorization: `Bearer ${this.token}` },
+                rejectUnauthorized: !this.insecure
+            })
+            ws.on("open", () => {
+                if (failed) {
+                    RemoteTaskStoreClient.registered.delete(this.key)
+                    onChange()
+                }
+                failed = false
+            })
+            ws.on("message", (data) => {
+                /*  drop the cached lifecycle model on a lifecycle model change  */
+                try {
+                    const frame = JSON.parse(String(data)) as Core.EventFrame
+                    if (frame.lifecycle !== undefined)
+                        RemoteTaskStoreClient.registered.delete(this.key)
+                }
+                catch {
+                    /*  ignore malformed frames (the change is notified anyway)  */
+                }
+                onChange()
+            })
+            ws.on("error", (err) => {
+                this.log.write("debug", `task: store "${this.base}": events: ${err.message}`)
+            })
+            ws.on("close", () => {
+                ws     = null
+                failed = true
+                if (!stopped)
+                    timer = setTimeout(connect, 2000)
+            })
+        }
+        connect()
+        return () => {
+            stopped = true
+            if (timer !== null)
+                clearTimeout(timer)
+            ws?.close()
+            this.close().catch(() => {})
+        }
     }
 }
 
@@ -359,6 +435,18 @@ export class Task {
     /*  cached task store specification (TTL-bounded, mirroring the project
         root cache, as each read parses the whole layered YAML config chain)  */
     private static specCache = new LRUCache<string, TaskStoreSpec>({ max: 4, ttl: 2 * 1000 })
+
+    /*  the configuration files the task store specification is read from
+        (for read-only consumers watching them), and the invalidation of the
+        cached specification after a change of them  */
+    static configFiles (log: Log): string[] {
+        const cfg = new Config("config", configSchema, log)
+        cfg.read()
+        return cfg.files()
+    }
+    static invalidate (): void {
+        Task.specCache.clear()
+    }
 
     /*  read the "project.id" of the project (defaulting to the sanitized
         basename of the project root), the "project.task.store" URL (defaulting to
@@ -432,6 +520,13 @@ export class Task {
         return /^(?:127(?:\.\d{1,3}){3}|\[::1\]|localhost)$/i.test(hostname)
     }
 
+    /*  resolve the base directory of a local "ase:<path>" task store,
+        for read-only consumers watching it; returns null for a remote one  */
+    static localDir (log: Log): string | null {
+        const m = /^ase:(?!\/\/)(.+)$/.exec(Task.spec(log).store.value)
+        return m === null ? null : path.resolve(Task.projectRoot(), m[1])
+    }
+
     /*  resolve the bearer token of a remote task store: the token embedded
         in the URL, else $ASE_TASK_STORE_TOKEN, else "project.task.token",
         else the token of the locally started task store server (only if the
@@ -486,13 +581,13 @@ export class Task {
             "(set $ASE_TASK_STORE_TOKEN, \"project.task.token\" on scope \"user\", or \"/<token>\" in the URL)")
     }
 
-    /*  run an operation on the client of the configured task store: the
+    /*  create the (unopened) client of the configured task store: the
         URL "ase://<addr>:<port>[/<token>]" selects a remote task store
         server via HTTP, "ases://<addr>:<port>[/<token>][?insecure]" via
         HTTPS (optionally without certificate verification), and
         "ase:<path>" the built-in storage plugin in-process on <path>
         (resolved relative to the project root)  */
-    private static async with<T> (log: Log, op: (client: TaskStoreClient) => Promise<T>): Promise<T> {
+    private static client (log: Log): TaskStoreClient {
         const spec = Task.spec(log)
         const { projectId, store, lifecycle } = spec
         const unsupported = () => new Error(`task: unsupported "project.task.store" URL "${store.value}" ` +
@@ -548,6 +643,12 @@ export class Task {
         }
         else
             throw unsupported()
+        return client
+    }
+
+    /*  run an operation on the opened client of the configured task store  */
+    private static async with<T> (log: Log, op: (client: TaskStoreClient) => Promise<T>): Promise<T> {
+        const client = Task.client(log)
         try {
             await client.open()
             return await op(client)
@@ -604,6 +705,64 @@ export class Task {
                 throw new Error(`task: target id "${newId}" already exists`, { cause: err })
             throw err
         }
+    }
+
+    /*  flatten a task plan header into string values (joining the
+        array-typed keys "After" and "Tags" with commas)  */
+    private static flatHeader (header: API.TaskHeader): Map<string, string> {
+        return new Map(Object.entries(header).map(([ key, val ]) =>
+            [ key, Array.isArray(val) ? val.join(", ") : val ] as [ string, string ]))
+    }
+
+    /*  split a task plan into its flattened header keys and its Markdown
+        body (without the attachments), for read-only consumers which must
+        not parse plans themselves; returns null if no task exists  */
+    static async parts (log: Log, id: string): Promise<{ keys: Map<string, string>, body: string } | null> {
+        Task.validateId(id)
+        const plan = await Task.with(log, (client) => client.load(id))
+        return plan === null ? null : { keys: Task.flatHeader(plan.header), body: plan.body }
+    }
+
+    /*  list the attachments of a task plan, each with its type, description,
+        and either the referenced file (relative to a local task store) or the
+        embedded data; returns an empty list if no task exists  */
+    static async attachments (log: Log, id: string): Promise<{ type: string, desc: string, file?: string, data?: string }[]> {
+        Task.validateId(id)
+        const plan = await Task.with(log, (client) => client.load(id))
+        return (plan?.attachment ?? []).filter((a) => a.Type !== undefined).map((a) => ({
+            type: a.Type,
+            desc: a.Desc ?? "",
+            ...(a.File !== undefined ? { file: a.File } : {}),
+            ...(a.Data !== undefined ? { data: a.Data } : {})
+        }))
+    }
+
+    /*  get the raw content of an attachment of a task plan (its embedded data or
+        its referenced file), through the task store; returns null if missing  */
+    static async attachmentContent (log: Log, id: string, index: number): Promise<{ type: string, content: Buffer } | null> {
+        Task.validateId(id)
+        return Task.with(log, (client) => client.content(id, index))
+    }
+
+    /*  subscribe to the change events of a remote task store (reconnecting
+        automatically); returns null for a local task store, whose changes
+        have to be watched via its directory (see localDir)  */
+    static subscribe (log: Log, onChange: () => void): (() => void) | null {
+        const client = Task.client(log)
+        return client instanceof RemoteTaskStoreClient ? client.subscribe(onChange) : null
+    }
+
+    /*  list all persisted tasks (see list) with their flattened header keys,
+        plus the effective task lifecycle model, within a single task store access  */
+    static async listHeaders (log: Log): Promise<{
+        lifecycle: TaskFormat.TaskLifecycle,
+        items:     { id: string, status: string, title: string, mtime: string, keys: Map<string, string> }[]
+    }> {
+        return Task.with(log, async (client) => {
+            const items = (await client.list("header")).map((item) =>
+                ({ ...item, keys: Task.flatHeader(item.header ?? {}) }))
+            return { lifecycle: client.lifecycle, items }
+        })
     }
 
     /*  get the lifecycle status of a task plan: the "Status:" frontmatter

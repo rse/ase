@@ -432,17 +432,22 @@ export const parseTaskText = (id: string, text: string, lifecycle: TaskLifecycle
     return { header, body, attachment }
 }
 
+/*  format the header of the JSON task plan structure into the key lines
+    of the task plan text (without the enclosing "---" lines): the keys in
+    canonical order (unknown keys trailing) with the array values comma-joined  */
+export const formatTaskHeader = (header: API.TaskHeader): string => {
+    const value = (v: string | string[]): string => Array.isArray(v) ? v.join(", ") : v
+    return orderKeys(frontKeys, Object.keys(header).filter((key) => header[key] !== undefined))
+        .map((key) => `${keyLine(key, value(header[key]))}\n`).join("")
+}
+
 /*  format the JSON task plan structure into the task plan text: the
-    header keys in canonical order (unknown keys trailing) with the
-    array values comma-joined, the body enclosed in its leading and
+    header (see formatTaskHeader), the body enclosed in its leading and
     trailing empty line, and every attachment as its own block with
     "Data" rendered as a "|4+" (or, without trailing newline, "|4-")
     literal block scalar, or as an empty value if empty  */
 export const formatTaskText = (plan: API.TaskPlan): string => {
-    const value = (v: string | string[]): string => Array.isArray(v) ? v.join(", ") : v
-    const front = orderKeys(frontKeys, Object.keys(plan.header).filter((key) => plan.header[key] !== undefined))
-        .map((key) => keyLine(key, value(plan.header[key])))
-    let text = `---\n${front.join("\n")}\n---\n\n`
+    let text = `---\n${formatTaskHeader(plan.header)}---\n\n`
     if (plan.body !== "")
         text += plan.body.endsWith("\n") ? `${plan.body}\n` : `${plan.body}\n\n`
     for (const att of plan.attachment) {

@@ -71,6 +71,8 @@ export const loadTaskStoragePlugin = async (name: string | null, ctx: API.TaskSt
             throw new Error(`task store: storage plugin "${name}" lacks the "${method}" method`)
     if (plugin.lock !== undefined && typeof plugin.lock !== "function")
         throw new Error(`task store: storage plugin "${name}" provides a non-function "lock" property`)
+    if (plugin.fileRead !== undefined && typeof plugin.fileRead !== "function")
+        throw new Error(`task store: storage plugin "${name}" provides a non-function "fileRead" property`)
     return plugin
 }
 
@@ -121,5 +123,11 @@ export class TaskStore {
     taskSave   (prjId: string, taskId: string, plan: API.TaskPlan): Promise<API.WriteResult>      { return this.plugin.taskSave(prjId, taskId, plan)      }
     taskDelete (prjId: string, taskId: string):                 Promise<boolean>          { return this.plugin.taskDelete(prjId, taskId)          }
     taskRename (prjId: string, oldId: string, newId: string):   Promise<boolean>          { return this.plugin.taskRename(prjId, oldId, newId)    }
+
+    /*  delegate the optional referenced file reading (null if unsupported)  */
+    get canReadFiles (): boolean { return this.plugin.fileRead !== undefined }
+    fileRead (prjId: string, file: string): Promise<Buffer | null> {
+        return this.plugin.fileRead !== undefined ? this.plugin.fileRead(prjId, file) : Promise.resolve(null)
+    }
 }
 

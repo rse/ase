@@ -326,6 +326,11 @@ export class Config {
         this.pruned   = []
     }
 
+    /*  the configuration files of the scope chain (after reading)  */
+    files (): string[] {
+        return this.docs.map((layer) => layer.filename).filter((filename) => filename !== "")
+    }
+
     /*  render a scope term as a short textual label  */
     static scopeLabel (term: ScopeTerm): string {
         if (term.kind === "default" || term.kind === "user" || term.kind === "project")

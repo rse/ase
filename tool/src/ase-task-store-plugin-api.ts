@@ -100,6 +100,11 @@ export interface TaskStoragePlugin {
         the source did not exist; the server guarantees that the
         target does not exist  */
     taskRename (prjId: string, oldId: string, newId: string): Promise<boolean>
+
+    /*  optionally read the content of a file referenced by the "File"
+        key of an attachment, relative to the storage location of the
+        project; returns null if it does not exist or escapes this location  */
+    fileRead? (prjId: string, file: string): Promise<Buffer | null>
 }
 
 /*  the plugin factory: the default export of the plugin module,

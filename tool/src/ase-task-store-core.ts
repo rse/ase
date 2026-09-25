@@ -45,9 +45,10 @@ export const problemBody = (status: number, detail: string, instance: string) =>
 /*  the change events of a single modifying request  */
 export type EventEntry = { status: string, title: string }
 export type EventFrame = {
-    added?:   Record<string, EventEntry>
-    updated?: Record<string, EventEntry & { parts: string[] }>
-    deleted?: string[]
+    added?:     Record<string, EventEntry>
+    updated?:   Record<string, EventEntry & { parts: string[] }>
+    deleted?:   string[]
+    lifecycle?: string
 }
 export type EventListener = (prjId: string, frame: EventFrame) => void
 
@@ -322,6 +323,8 @@ export class TaskStoreCore {
                 }
             }
             const result = await this.store.projectSet(prjId, name)
+            if (entry !== null && entry.lifecycle !== name)
+                this.listener(prjId, { lifecycle: name })
             return { created: result === "created", project: { id: prjId, lifecycle } }
         })
     }
@@ -463,6 +466,11 @@ export class TaskStoreCore {
     async headerGet (prjId: string, taskId: string): Promise<API.TaskHeader> {
         return (await this.read(prjId, taskId)).plan.header
     }
+
+    /*  get the entire header in its textual form of the task plan text  */
+    async headerContent (prjId: string, taskId: string): Promise<string> {
+        return TaskFormat.formatTaskHeader((await this.read(prjId, taskId)).plan.header)
+    }
     async headerSet (prjId: string, taskId: string, raw: unknown): Promise<TaskSaveResult> {
         return this.modify(prjId, taskId, "header", (plan, lifecycle) => {
             const header = this.validateHeader(taskId, raw)
@@ -551,6 +559,23 @@ export class TaskStoreCore {
     async attachmentGet (prjId: string, taskId: string, index: string): Promise<API.TaskAttachment> {
         const { plan } = await this.read(prjId, taskId)
         return plan.attachment[this.validateIndex(plan, index)]
+    }
+
+    /*  get the raw content of an attachment: its embedded "Data", or the
+        content of its "File" as read through the storage plugin  */
+    async attachmentContent (prjId: string, taskId: string, index: string): Promise<{ type: string, content: Buffer }> {
+        return this.serialize(prjId, async () => {
+            const { plan }   = await this.plan(prjId, taskId)
+            const attachment = plan.attachment[this.validateIndex(plan, index)]
+            if (attachment.Data !== undefined)
+                return { type: attachment.Type, content: Buffer.from(attachment.Data, "utf8") }
+            if (!this.store.canReadFiles)
+                throw problem(404, `storage plugin "${this.store.name}" provides no referenced file content`)
+            const content = await this.store.fileRead(prjId, attachment.File)
+            if (content === null)
+                throw problem(404, `no referenced file "${attachment.File}"`)
+            return { type: attachment.Type, content }
+        })
     }
     async attachmentSet (prjId: string, taskId: string, index: string, raw: unknown): Promise<void> {
         const attachment = this.validateAttachment(raw)

@@ -152,7 +152,8 @@ export class TaskStoreServer {
     /*  ==== events ====  */
 
     /*  deliver an event frame to the subscribers of a project, each
-        restricted to the task ids it subscribed to  */
+        restricted to the task ids it subscribed to (except for a
+        lifecycle model change, which concerns all task plans)  */
     private emit (prjId: string, frame: Core.EventFrame): void {
         const subs = this.subs.get(prjId)
         if (subs === undefined)
@@ -175,6 +176,8 @@ export class TaskStoreServer {
                 if (deleted.length > 0)
                     out.deleted = deleted
             }
+            if (frame.lifecycle !== undefined)
+                out.lifecycle = frame.lifecycle
             if (Object.keys(out).length > 0 && sub.ws.readyState === sub.ws.OPEN)
                 sub.ws.send(JSON.stringify(out))
         }
@@ -460,20 +463,26 @@ export class TaskStoreServer {
         })
         this.server.route({
             method:  "GET",
-            path:    `${T}/header/{key}`,
+            path:    `${T}/header/content`,
+            handler: async (request, h) =>
+                h.response(await core.headerContent(p(request).prjId, p(request).taskId)).type("text/plain; charset=utf-8")
+        })
+        this.server.route({
+            method:  "GET",
+            path:    `${T}/header/key/{key}`,
             handler: async (request) =>
                 ({ value: await core.headerKeyGet(p(request).prjId, p(request).taskId, p(request).key) })
         })
         this.server.route({
             method:  "PUT",
-            path:    `${T}/header/{key}`,
+            path:    `${T}/header/key/{key}`,
             options: json,
             handler: async (request, h) =>
                 this.created(h, await core.headerKeySet(p(request).prjId, p(request).taskId, p(request).key, request.payload))
         })
         this.server.route({
             method:  "DELETE",
-            path:    `${T}/header/{key}`,
+            path:    `${T}/header/key/{key}`,
             handler: async (request, h) => {
                 await core.headerKeyDelete(p(request).prjId, p(request).taskId, p(request).key)
                 return h.response().code(204)
@@ -548,13 +557,21 @@ export class TaskStoreServer {
         })
         this.server.route({
             method:  "GET",
-            path:    `${T}/attachment/{index}/{key}`,
+            path:    `${T}/attachment/{index}/content`,
+            handler: async (request, h) => {
+                const { type, content } = await core.attachmentContent(p(request).prjId, p(request).taskId, p(request).index)
+                return h.response(content).type(type)
+            }
+        })
+        this.server.route({
+            method:  "GET",
+            path:    `${T}/attachment/{index}/key/{key}`,
             handler: async (request) =>
                 ({ value: await core.attachmentKeyGet(p(request).prjId, p(request).taskId, p(request).index, p(request).key) })
         })
         this.server.route({
             method:  "PUT",
-            path:    `${T}/attachment/{index}/{key}`,
+            path:    `${T}/attachment/{index}/key/{key}`,
             options: json,
             handler: async (request, h) =>
                 this.created(h, await core.attachmentKeySet(p(request).prjId, p(request).taskId,
@@ -562,7 +579,7 @@ export class TaskStoreServer {
         })
         this.server.route({
             method:  "DELETE",
-            path:    `${T}/attachment/{index}/{key}`,
+            path:    `${T}/attachment/{index}/key/{key}`,
             handler: async (request, h) => {
                 await core.attachmentKeyDelete(p(request).prjId, p(request).taskId, p(request).index, p(request).key)
                 return h.response().code(204)

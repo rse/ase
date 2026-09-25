@@ -377,23 +377,25 @@ The *task plan* endpoints operate on entire plans:
 The *part* endpoints operate on the three parts of an *existing* plan
 (`{task}` abbreviates `/projects/{prjId}/tasks/{taskId}` below):
 
-| Method   | Path                              | Purpose                                             |
-| -------- | --------------------------------- | --------------------------------------------------- |
-| `GET`    | `{task}/header`                   | Get the entire header                               |
-| `PUT`    | `{task}/header`                   | Replace the entire header                           |
-| `GET`    | `{task}/header/{key}`             | Get a header value                                  |
-| `PUT`    | `{task}/header/{key}`             | Create or update a header value                     |
-| `DELETE` | `{task}/header/{key}`             | Delete a header key                                 |
-| `GET`    | `{task}/body`                     | Get the body                                        |
-| `PUT`    | `{task}/body`                     | Replace the body                                    |
-| `GET`    | `{task}/attachment`               | Get all attachments, or find them by `Type`         |
-| `POST`   | `{task}/attachment`               | Append an attachment                                |
-| `GET`    | `{task}/attachment/{index}`       | Get an attachment                                   |
-| `PUT`    | `{task}/attachment/{index}`       | Replace an attachment                               |
-| `DELETE` | `{task}/attachment/{index}`       | Delete an attachment                                |
-| `GET`    | `{task}/attachment/{index}/{key}` | Get an attachment value                             |
-| `PUT`    | `{task}/attachment/{index}/{key}` | Create or update an attachment value                |
-| `DELETE` | `{task}/attachment/{index}/{key}` | Delete an attachment key                            |
+| Method   | Path                                  | Purpose                                             |
+| -------- | ------------------------------------- | --------------------------------------------------- |
+| `GET`    | `{task}/header`                       | Get the entire header                               |
+| `PUT`    | `{task}/header`                       | Replace the entire header                           |
+| `GET`    | `{task}/header/content`               | Get the entire header as text                       |
+| `GET`    | `{task}/header/key/{key}`             | Get a header value                                  |
+| `PUT`    | `{task}/header/key/{key}`             | Create or update a header value                     |
+| `DELETE` | `{task}/header/key/{key}`             | Delete a header key                                 |
+| `GET`    | `{task}/body`                         | Get the body                                        |
+| `PUT`    | `{task}/body`                         | Replace the body                                    |
+| `GET`    | `{task}/attachment`                   | Get all attachments, or find them by `Type`         |
+| `POST`   | `{task}/attachment`                   | Append an attachment                                |
+| `GET`    | `{task}/attachment/{index}`           | Get an attachment                                   |
+| `PUT`    | `{task}/attachment/{index}`           | Replace an attachment                               |
+| `DELETE` | `{task}/attachment/{index}`           | Delete an attachment                                |
+| `GET`    | `{task}/attachment/{index}/content`   | Get the raw content of an attachment                |
+| `GET`    | `{task}/attachment/{index}/key/{key}` | Get an attachment value                             |
+| `PUT`    | `{task}/attachment/{index}/key/{key}` | Create or update an attachment value                |
+| `DELETE` | `{task}/attachment/{index}/key/{key}` | Delete an attachment key                            |
 
 All part endpoints respond with `404` if no project *prjId* or no task
 plan *taskId* exists, and with `422` for an invalid *taskId*. The API
@@ -816,7 +818,29 @@ curl -X PUT -H "Authorization: Bearer $TOKEN" \
     "http://127.0.0.1:42042/projects/ase/tasks/T1/header"
 ```
 
-### GET {task}/header/{key}
+### GET {task}/header/content
+
+Get the entire header of the task plan in its textual form, i.e., the
+key lines of the frontmatter of the task plan text (see *Task plans*),
+without the enclosing `---` lines: the keys in canonical order (unknown
+keys trailing), each `Key:` padded to a width of 10 characters, and the
+array values comma-joined.
+
+Response `200`: the key lines as `text/plain; charset=utf-8`:
+
+```text
+Type:     text/vnd.ase.task
+Id:       T1
+Status:   OPEN
+Tags:     api, rest
+```
+
+```sh
+curl -H "Authorization: Bearer $TOKEN" -o T1-header.txt \
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/content"
+```
+
+### GET {task}/header/key/{key}
 
 Get the value of the header key *key*.
 
@@ -835,10 +859,10 @@ Errors: `404` if the key is absent.
 
 ```sh
 curl -H "Authorization: Bearer $TOKEN" \
-    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/Tags"
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/key/Tags"
 ```
 
-### PUT {task}/header/{key}
+### PUT {task}/header/key/{key}
 
 Create or update the header key *key*.
 
@@ -879,10 +903,10 @@ value of the wrong type, an unknown or unreachable `Status` state, or a mismatch
 curl -X PUT -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d '{ "value": "closed" }' \
-    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/Status"
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/key/Status"
 ```
 
-### DELETE {task}/header/{key}
+### DELETE {task}/header/key/{key}
 
 Delete the header key *key*, so it reads as its default value
 again.
@@ -894,7 +918,7 @@ Errors: `404` if the key is absent, `422` for the non-deletable keys
 
 ```sh
 curl -X DELETE -H "Authorization: Bearer $TOKEN" \
-    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/Branch"
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/key/Branch"
 ```
 
 ### GET {task}/body
@@ -1061,7 +1085,28 @@ curl -X DELETE -H "Authorization: Bearer $TOKEN" \
     "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0"
 ```
 
-### GET {task}/attachment/{index}/{key}
+### GET {task}/attachment/{index}/content
+
+Get the raw content of the attachment at the zero-based position
+*index*: the embedded `Data` value (UTF-8 encoded), or the content of
+the file referenced by `File` (relative to the storage location of the
+project), as read through the optional `fileRead` method of the storage
+plugin.
+
+Response `200`: the raw content, with the attachment `Type` as its
+`Content-Type`.
+
+Errors: `404` if no attachment exists at *index*, the referenced file
+does not exist (or escapes the storage location of the project), or the
+storage plugin provides no `fileRead` method, `422` for a non-numeric
+*index*.
+
+```sh
+curl -H "Authorization: Bearer $TOKEN" -o sketch.png \
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0/content"
+```
+
+### GET {task}/attachment/{index}/key/{key}
 
 Get the value of the key *key* of the attachment at *index*.
 
@@ -1080,10 +1125,10 @@ Errors: `404` if no attachment exists at *index* or the key is absent,
 
 ```sh
 curl -H "Authorization: Bearer $TOKEN" \
-    "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0/Desc"
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0/key/Desc"
 ```
 
-### PUT {task}/attachment/{index}/{key}
+### PUT {task}/attachment/{index}/key/{key}
 
 Create or update the key *key* of the attachment at *index*.
 
@@ -1121,10 +1166,10 @@ an invalid `Type`.
 curl -X PUT -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d '{ "value": "implementation draft (revised)" }' \
-    "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0/Desc"
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0/key/Desc"
 ```
 
-### DELETE {task}/attachment/{index}/{key}
+### DELETE {task}/attachment/{index}/key/{key}
 
 Delete the key *key* of the attachment at *index*.
 
@@ -1136,13 +1181,13 @@ Errors: `404` if no attachment exists at *index* or the key is absent,
 
 ```sh
 curl -X DELETE -H "Authorization: Bearer $TOKEN" \
-    "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0/Desc"
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment/0/key/Desc"
 ```
 
 ### WebSocket /projects/{prjId}/events
 
 Subscribe to the addition, modification, and deletion events of the
-task plans of the project *prjId*. The endpoint is opened with a regular WebSocket handshake
+task plans of the project *prjId*, and to the changes of its lifecycle model. The endpoint is opened with a regular WebSocket handshake
 (`GET` with `Upgrade: websocket`, RFC 6455) and stays open until either
 side closes it; the server closes all subscriptions with close code
 `1001` when it shuts down.
@@ -1161,8 +1206,8 @@ handshake headers, like browsers -- in the `token` query parameter.
 Messages: the server sends one *text frame* per modifying request
 (`PUT`, `PATCH`, `POST`, or `DELETE` on a plan or one of its parts,
 or a purge), after the request has completed. Each frame carries a
-*single-line* JSON structure with at least one of the three keys
-`added`, `updated`, and `deleted` (each present only if non-empty):
+*single-line* JSON structure with at least one of the four keys
+`added`, `updated`, `deleted`, and `lifecycle` (each present only if non-empty):
 
 ```json
 { "added": { "T3": { "status": "OPEN", "title": "Add Kanban board" } }, "updated": { "T1": { "status": "CLOSED", "title": "Add REST API", "parts": [ "header", "body" ] } }, "deleted": [ "T2" ] }
@@ -1176,6 +1221,12 @@ or a purge), after the request has completed. Each frame carries a
   non-empty subset of `header`, `body`, and `attachment`, in this
   order.
 - `deleted`: an array of the ids of the removed task plans.
+- `lifecycle`: the name of the new lifecycle model of the project,
+  sent in a frame of its own when `PUT /projects/{prjId}` switches the
+  model of a registered project (after the frames of the plans whose
+  `Status` was mapped onto the new model). It is delivered to every
+  subscriber, independent of its `tasks` restriction, so a client can
+  re-read the model without polling.
 
 The keys and parts are determined by the request: a plan-level `PUT`
 reports a newly created plan under `added` and an overwritten plan
@@ -1375,6 +1426,11 @@ export interface TaskStoragePlugin {
         the source did not exist; the server guarantees that the
         target does not exist  */
     taskRename (prjId: string, oldId: string, newId: string): Promise<boolean>
+
+    /*  optionally read the content of a file referenced by the "File"
+        key of an attachment, relative to the storage location of the
+        project; returns null if it does not exist or escapes this location  */
+    fileRead? (prjId: string, file: string): Promise<Buffer | null>
 }
 
 /*  the plugin factory: the default export of the plugin module,
@@ -1394,6 +1450,7 @@ The division of labor between server and plugin is:
 | Part endpoints (read-modify-write cycles)         | ✓      |        |
 | Request serialization (per-project queue)         | ✓      |        |
 | Cross-process locking (optional `lock` method)    |        | ✓      |
+| Referenced file content (optional `fileRead`)     |        | ✓      |
 | Purge by age (list plus delete)                   | ✓      |        |
 | Rename conflict detection (`409`)                 | ✓      |        |
 | Event notifications (WebSocket), incl. titles     | ✓      |        |
