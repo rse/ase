@@ -87,8 +87,10 @@ You *MUST* honor the following hints on this *task* format:
     back. This trailing empty line is required for the Markdown "body" *only*.
 
 -   As `---` lines start the blocks, the *body* *MUST NOT* contain a line
-    consisting of just `---`, as it would be read as the start of the
-    "backmatter".
+    consisting of just `---` outside a fenced code block, as it could be read
+    as the start of the "backmatter" -- use `***` for a Markdown horizontal
+    rule instead. Inside a fenced code block, `---` lines are fine, but every
+    fenced code block of the *body* *MUST* be closed.
 
 -   The *frontmatter* can carry the keys `Type`, `Id`, `Created`, `Modified`,
     `Group`, `Phase`, `After`, `Status`, `Kind`, `Tags`, and `Branch` in exactly
@@ -179,7 +181,9 @@ You *MUST* honor the following hints on this *task* format:
     For embedded content, the `Data` key contains the content data as a YAML
     "literal block scalar" with the block header `|4+`, i.e., with an explicit
     indentation of exactly 4 spaces (which are stripped from the content) and
-    with all trailing blank lines kept as part of the content.
+    with all trailing blank lines kept as part of the content. Content without
+    a trailing newline instead uses the block header `|4-`, and empty content
+    is given as an empty `Data:` value.
 
     For referenced content, the `File` key contains the filename relative to the
     task storage location. Every attachment can optionally have a `Desc` key

@@ -39,13 +39,11 @@ export const agentClassification = {
 export const projectClassificationPresets: Record<string, Record<string, string>> = {
     vibe: {
         "agent.persona":   "writer",
-        "project.id":      "example",
         "project.name":    "Example Project",
         "project.boxing":  "black"
     },
     pro: {
         "agent.persona":   "engineer",
-        "project.id":      "example",
         "project.name":    "Example Project",
         "project.boxing":  "white"
     },
@@ -53,12 +51,10 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "agent.task":      "default",
         "agent.persona":   "engineer",
         "agent.guidance":  "normal",
-        "project.id":      "example",
         "project.name":    "Example Project",
         "project.boxing":  "white",
         "project.task.lifecycle":        "solo",
-        "project.artifact.task.basedir": ".ase/task",
-        "project.artifact.task.files":   "*.md",
+        "project.task.store":            "ase:./.ase/task",
         "project.artifact.spec.basedir": "docs/specbook",
         "project.artifact.spec.files":   "*.{md,txt,svg,png,jpg}",
         "project.artifact.spec.schema":  "",
@@ -71,7 +67,6 @@ export const projectClassificationPresets: Record<string, Record<string, string>
     },
     industry: {
         "agent.persona":   "engineer",
-        "project.id":      "example",
         "project.name":    "Example Project",
         "project.boxing":  "grey"
     }
@@ -91,8 +86,8 @@ type ScopeTerm =
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
     "agent.task":                    [ "session" ],
     "agent.skill":                   [ "session" ],
-    "project.artifact.task.basedir": [ "user", "project" ],
-    "project.artifact.task.files":   [ "user", "project" ],
+    "project.task.store":            [ "user", "project" ],
+    "project.task.token":            [ "user" ],
     "project.artifact.spec.basedir": [ "user", "project" ],
     "project.artifact.spec.files":   [ "user", "project" ],
     "project.artifact.spec.schema":  [ "user", "project" ],
@@ -107,6 +102,9 @@ export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"
 /*  default set of scope kinds writable for any unrestricted key  */
 const configWritableScopesDefault: ReadonlyArray<ScopeTerm["kind"]> =
     [ "user", "project", "task", "session" ]
+
+/*  keys carrying secrets, whose values are masked in listings  */
+export const configSecretKeys: ReadonlyArray<string> = [ "project.task.token" ]
 
 /*  a scope chain (one or more terms, canonical order default<user<project<task<session)  */
 type Scope = ScopeTerm[]
@@ -234,14 +232,15 @@ export const configSchema = v.nullish(v.strictObject({
         name:    v.optional(v.pipe(v.string(), v.minLength(1))),
         boxing:  v.optional(v.picklist(projectClassification.boxing)),
         task: v.optional(v.strictObject({
-            lifecycle: v.optional(v.picklist(projectClassification.lifecycle))
+            lifecycle: v.optional(v.picklist(projectClassification.lifecycle)),
+            store:     v.optional(v.pipe(v.string(), v.minLength(1))),
+            token:     v.optional(v.pipe(v.string(), v.minLength(1)))
         })),
         artifact: v.optional(v.strictObject({
             spec: artifactSpecSchema,
             code: artifactSchema,
             docs: artifactSchema,
-            infr: artifactSchema,
-            task: artifactSchema
+            infr: artifactSchema
         }))
     })),
     agent: v.optional(v.strictObject({
@@ -270,6 +269,7 @@ export class Config {
     private docs:    Layer[]
     private target:  number
     private pruned:  string[]
+    private locked:  string | null = null
 
     /*  creation  */
     constructor (
@@ -395,6 +395,36 @@ export class Config {
                     this.pruned.push(`unparsable YAML (${doc.errors[0].message.split("\n")[0]})`)
                 doc = new Document()
             }
+            else if (this.name === "config" && this.migrate(doc)) {
+                /*  persist the migration under the file lock (unless already held by us),
+                    re-reading the file there to not clobber a concurrent write  */
+                const persist = () => {
+                    const disk = parseDocument(fs.readFileSync(filename, "utf8"))
+                    if (disk.errors.length > 0 || !this.migrate(disk))
+                        return
+                    const empty = isMap(disk.contents) && disk.contents.items.length === 0
+                    writeFileAtomic.sync(filename, empty ? "" : disk.toString({ indent: 4 }),
+                        { encoding: "utf8", mode: this.fileMode(sc, disk) })
+                    this.log.write("info", `migrated obsolete "project.artifact.task" entries in ${filename}`)
+                }
+                try {
+                    if (this.locked === filename)
+                        persist()
+                    else {
+                        const release = lockfile.lockSync(filename)
+                        try {
+                            persist()
+                        }
+                        finally {
+                            release()
+                        }
+                    }
+                }
+                catch (err) {
+                    this.log.write("warning", `failed to migrate obsolete "project.artifact.task" entries in ${filename}: ` +
+                        (err instanceof Error ? err.message : String(err)))
+                }
+            }
             docs.push({ scope: sc, filename, doc })
         }
         this.docs   = docs
@@ -408,6 +438,28 @@ export class Config {
         }
     }
 
+    /*  migrate a configuration document in place from the obsolete (pre-1.1.0)
+        "project.artifact.task.{basedir,files}" variables: "basedir" becomes
+        "project.task.store" (as "ase:<basedir>") unless the latter is already
+        set, "files" is dropped; returns whether the document was changed  */
+    private migrate (doc: Document): boolean {
+        const task = [ "project", "artifact", "task" ]
+        if (!isMap(doc.getIn(task)))
+            return false
+        const basedir = doc.getIn([ ...task, "basedir" ])
+        const parent  = doc.getIn([ "project", "task" ])
+        if (typeof basedir === "string" && basedir !== ""
+            && (parent === undefined || isMap(parent)) && !doc.hasIn([ "project", "task", "store" ]))
+            doc.setIn([ "project", "task", "store" ], `ase:${basedir}`)
+        doc.deleteIn(task)
+        for (const p of [ [ "project", "artifact" ], [ "project" ] ]) {
+            const node = doc.getIn(p)
+            if (isMap(node) && node.items.length === 0)
+                doc.deleteIn(p)
+        }
+        return true
+    }
+
     /*  acquire a cross-process advisory lock on the target scope's file,
         execute the callback, then release the lock  */
     lock (cb: () => void): void {
@@ -416,12 +468,14 @@ export class Config {
             throw new Error("internal error: \"default\" scope is not lockable")
         fs.mkdirSync(path.dirname(td.filename), { recursive: true })
         if (!fs.existsSync(td.filename))
-            fs.writeFileSync(td.filename, "", "utf8")
+            fs.writeFileSync(td.filename, "", { encoding: "utf8", mode: this.fileMode(td.scope, null) })
         const release = lockfile.lockSync(td.filename)
+        this.locked = td.filename
         try {
             cb()
         }
         finally {
+            this.locked = null
             release()
         }
     }
@@ -442,7 +496,18 @@ export class Config {
 
         this.validateDoc(td.doc, td.filename, "strict")
         fs.mkdirSync(path.dirname(td.filename), { recursive: true })
-        writeFileAtomic.sync(td.filename, td.doc.toString({ indent: 4 }), { encoding: "utf8" })
+        writeFileAtomic.sync(td.filename, td.doc.toString({ indent: 4 }),
+            { encoding: "utf8", mode: this.fileMode(td.scope, td.doc) })
+    }
+
+    /*  determine the file mode of a scope's file: user-private (0600) for the
+        user scope, the "store" files, and any file carrying secrets, else
+        undefined (which lets an existing file's mode be preserved)  */
+    private fileMode (scope: ScopeTerm, doc: Document | null): number | undefined {
+        if (scope.kind === "user" || this.name === "store"
+            || (doc !== null && configSecretKeys.some((key) => doc.hasIn(key.split(".")))))
+            return 0o600
+        return undefined
     }
 
     /*  validate a single YAML document against the optional schema; in "strict"
@@ -535,6 +600,18 @@ export class Config {
             const node = this.docs[i].doc.getIn(segs)
             if (node !== undefined)
                 return node
+        }
+        return undefined
+    }
+
+    /*  retrieve the effective value at a dotted key (strongest scope wins)
+        together with the scope term which supplied it  */
+    getScoped (key: string): { value: unknown, scope: ScopeTerm } | undefined {
+        const segs = this.resolveKey(key).split(".")
+        for (let i = this.docs.length - 1; i >= 0; i--) {
+            const node = this.docs[i].doc.getIn(segs)
+            if (node !== undefined)
+                return { value: node, scope: this.docs[i].scope }
         }
         return undefined
     }
@@ -708,7 +785,7 @@ export default class ConfigCommand {
                 const rows: string[][] = []
                 for (const e of cfg.entries()) {
                     const val = isScalar(e.value) ? e.value.value : e.value
-                    rows.push([ e.key, String(val), Config.scopeLabel(e.scope) ])
+                    rows.push([ e.key, configSecretKeys.includes(e.key) ? "***" : String(val), Config.scopeLabel(e.scope) ])
                 }
                 await writeStdout(renderTable([ "KEY", "VALUE", "SCOPE" ], rows))
             })
@@ -924,7 +1001,7 @@ export class ConfigMCP {
                 cfg.read()
                 const entries = cfg.entries().map((e) => ({
                     key:   e.key,
-                    value: String(isScalar(e.value) ? e.value.value : e.value),
+                    value: configSecretKeys.includes(e.key) ? "***" : String(isScalar(e.value) ? e.value.value : e.value),
                     scope: Config.scopeLabel(e.scope)
                 }))
                 const result = { entries }

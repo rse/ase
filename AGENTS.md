@@ -36,7 +36,17 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `config`, `mcp`, `service`, `hook`, `statusline`, `task`, `artifact`,
         `spec`, `meta`, `compat`, `diagram`, `worktree`, `mint`, `metric`) plus support modules
         (`log`, `stdio`, `getopt`, `kv`, `markdown`, `skills`, `sleep`,
-        `timestamp`, `version`)
+        `timestamp`, `version`) and the task store (`task-store-server-cli` for
+        the `ase task store` CLI wrapper, `task-store-core` for the
+        transport-agnostic REST API functionality, `task-store-server-bind`
+        for its HTTP and WebSocket binding,
+        `task-store-plugin-api` for the storage plugin contract, `task-store-plugin-delegate`
+        for the plugin loader and the locking storage delegate,
+        `task-store-plugin-ase` for the built-in file-based storage plugin,
+        `task-format` for the textual task format codec and the lifecycle
+        models, see `docs/task-api.md`); `ase-task.ts` itself only forwards
+        the `ase task` CLI and `ase_task_*` MCP tools to the task store
+        selected by `project.task.store`
     -   `tool/bin/ase`: the published shim, loading compiled output from `dst/`
     -   `tool/plugin/` and `tool/.claude-plugin/`: build-time copies of
         `plugin/` and `.claude-plugin/` -- never edit them, they are regenerated

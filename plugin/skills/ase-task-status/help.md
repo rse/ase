@@ -23,8 +23,8 @@ The *status* is matched case-insensitively against the states of the
 task lifecycle model configured for the project via
 `project.task.lifecycle` (`solo`, `team`, or `enterprise`) and rejected
 if it is no such state. A status not reachable from the current one via
-one or more transitions of the state machine of the model is *warned*
-about, but set nevertheless.
+one or more transitions of the state machine of the model is *rejected*,
+too.
 
 If *id*`:` is omitted, the *current* task id (inherited from the session
 context) is used. A single bare token which is no state of the model is

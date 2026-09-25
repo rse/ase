@@ -21,6 +21,29 @@ ChangeLog
     optionally limited to its last lines (`-n`/`--lines`) and optionally followed in the style of
     `tail -f` (`-f`/`--follow`, based on the NPM package `tail`).
 
+-   FEATURE [tool]: Task store server with REST API and storage plugins
+    The new `ase task store` server serves the task plans of all registered projects through the
+    REST API of `docs/task-api.md` (bearer token, CORS, WebSocket change events, optional HTTPS via
+    `--tls-cert`/`--tls-key`) and persists them through a storage plugin: the built-in `ase` plugin
+    or an NPM package `ase-task-store-<name>`. Requests are serialized per project, and the `ase`
+    plugin locks cross-process (`proper-lockfile`), writes atomically (`write-file-atomic`), and
+    creates its directory on first save only, so service, CLI, and server can share one directory.
+
+-   FEATURE [tool]: Configurable task store
+    The new `project.task.store` URL selects the task plan location: `ase:<path>` (default
+    `ase:./.ase/task`, confined to the project root on `project`/`task` scope) runs the built-in
+    plugin in-process, `ase[s]://<addr>:<port>[/<token>][?insecure]` forwards to a remote server via
+    HTTP(S). The token alternatively comes from `$ASE_TASK_STORE_TOKEN`, the new user-scoped
+    `project.task.token`, or `store.yaml`. A remote store requires an explicit `project.id` and keeps
+    its registered lifecycle model, changed only via the new `ase task lifecycle [<name>]` (mapping
+    existing `Status` values). `project.artifact.task.{basedir,files}` were removed and are migrated
+    in place, and the legacy pre-1.0 task file migration was dropped.
+
+-   FEATURE [tool]: Task view command and task listing titles
+    The new `ase task view <id>` shows a task plan in `$PAGER` (default `more`) when on a terminal,
+    `$PAGER` and `$EDITOR` are run through the shell (supporting `less -R`), `ase task edit` works
+    on a temporary file, and `ase task list -v`/`ase_task_list` also report the task title.
+
 -   FEATURE [plugin]: Section-focused task plan grilling
     The new `--focus`/`-f` option of `ase-task-grill` grills only the given plan sections
     (`SPEC`, `DES`, `VER`) in the given order, the `Tags:` key records each as a `grilled:<section>` tag,
@@ -49,7 +72,7 @@ ChangeLog
 -   FEATURE [plugin,tool]: Task plan status get/set
     The new `ase-task-status` skill, `ase task status` CLI sub-command, and `ase_task_status` MCP
     tool report or set the `Status:` key of a task plan, validated against the lifecycle model.
-    `ase task save` and `ase_task_save` now also warn about unknown or unreachable states.
+    `ase task save` and `ase_task_save` now also reject unknown or unreachable states.
 
 -   FEATURE [tool]: Lifecycle-aware `ase task list` with `finished` sentinel
     The `--include`/`--exclude` states are validated against the lifecycle model, the new

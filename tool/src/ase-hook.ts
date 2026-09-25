@@ -17,6 +17,8 @@ import type Log                             from "./ase-log.js"
 import Version                              from "./ase-version.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
 import { readStdin, writeStdout }           from "./ase-stdio.js"
+import { Task }                             from "./ase-task.js"
+import * as TaskFormat                      from "./ase-task-format.js"
 
 /*  type of supported tool (host) systems  */
 type Tool = "claude" | "copilot" | "codex"
@@ -328,7 +330,13 @@ export default class HookCommand {
         catch {
             /*  not inside a Git working tree  */
         }
-        const projectId = path.basename(projectDir)
+        let configuredId = String(cfg.get("project.id") ?? "")
+        if (configuredId !== "" && !TaskFormat.ID_RE.test(configuredId)) {
+            this.log.write("warning", `hook: ignoring invalid configured "project.id" "${configuredId}" ` +
+                "(must match [A-Za-z0-9_-]+)")
+            configuredId = ""
+        }
+        const projectId = configuredId || Task.projectIdOf(projectDir)
 
         /*  determine user id  */
         const userId = process.env.USER ?? process.env.LOGNAME ?? "unknown"

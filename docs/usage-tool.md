@@ -59,7 +59,7 @@ The following top-level commands exist for configuration handling:
   in-memory view; on set/write, they cause a fatal error.
   Recognized keys are grouped under two top-level sections:
   `project.*` (project identity, classification, and artifact
-  globs: `project.id`, `project.name`, `project.boxing`, `project.task.lifecycle`, and the
+  globs: `project.id`, `project.name`, `project.boxing`, `project.task.lifecycle`, `project.task.store`, `project.task.token` (masked as `***` by `list`), and the
   `project.artifact.`*kind*`.{basedir,files}` globs plus the `project.artifact.spec.schema` file list) and `agent.*`
   (`agent.persona`, `agent.guidance`, `agent.task` -- the active
   task identifier -- and `agent.skill`).
@@ -453,12 +453,20 @@ to choose between *Anthropic Claude Code CLI*, *GitHub Copilot CLI*, and
 *OpenAI Codex CLI* as the target agent tool.
 
 The following top-level commands exist for managing persisted task
-plans, each stored as a single file `<project>/`*basedir*`/TASK-`*id*`.md`,
-where *basedir* is the `project.artifact.task.basedir` configuration
-value (default `.ase/task`) and the filename must match the
-`project.artifact.task.files` glob (default `*.md`). A legacy
-`<basedir>/`*id*`/plan.md` layout is auto-migrated to the current
-single-file layout on first access:
+plans, forwarded to the *task store* selected by the `project.task.store`
+configuration URL: `ase:`*path* (default `ase:./.ase/task`, a path
+resolved relative to the project root) stores the plans as
+`TASK-`*id*`.md` files in the textual task format directly in *path*
+through the built-in storage plugin running in-process, while
+`ase://`*addr*`:`*port* or `ase://`*addr*`:`*port*`/`*token* forwards
+them to a remote task store server (see `task-api.md`), registering the
+`project.id` with its `project.task.lifecycle` there on first use, and
+`ases://` instead of `ase://` connects via HTTPS (with the URL suffix
+`?insecure` skipping the certificate verification). The
+bearer token is the embedded *token* (warned about if configured on the
+`project` scope), else `$ASE_TASK_STORE_TOKEN`, else the
+`project.task.token` configuration (writable on the `user` scope only),
+else the `token` of the per-user `store.yaml`:
 
 - `ase task`:
   Entry point group for task plan management. Without a subcommand,
@@ -466,8 +474,8 @@ single-file layout on first access:
 
 - `ase task list` \[`-v`|`--verbose`\]:
   List all persisted task ids in lexicographic order, one per line.
-  With `--verbose`, each id is annotated with the task file's
-  modification timestamp (`YYYY-MM-DD HH:MM`).
+  With `--verbose`, each id is annotated with the task plan status, its
+  modification timestamp (`YYYY-MM-DD HH:MM`), and its title.
 
 - `ase task status` \[*id*\[`:`\]\] \[*status*\]:
   Get or set the lifecycle status (`Status:` frontmatter key) of the
@@ -476,45 +484,96 @@ single-file layout on first access:
   (defaulting to the initial state of the configured task lifecycle
   model). With *status* (a state of the model, case-insensitive), the
   status is set (the `Modified:` key is left alone, as it tracks body
-  changes only); a status not reachable from the current one via one
-  or more transitions of the model is warned about, but set nevertheless. A
-  single bare token which is a state of the model is taken as *status*,
-  else as *id*. Exits with status 1 if no such task exists or the
-  *status* is unknown.
+  changes only). A single bare token which is a state of the model is
+  taken as *status*, else as *id*. Exits with status 1 if no such task
+  exists, the *status* is unknown, or it is not reachable from the
+  current one via one or more transitions of the model.
 
 - `ase task load` *id*:
   Load the task plan with the given *id* and write it to standard
   output. Prints nothing if the task does not exist.
 
+- `ase task view` *id*:
+  Show the task plan with the given *id* in the pager defined by
+  `$PAGER` (falling back to `more`), run through the shell and fed via
+  its standard input. If standard output is not a terminal, the pager is
+  bypassed and the plan is written plainly to standard output. Exits
+  with status 1 if no such task exists.
+
 - `ase task edit` *id*:
   Open the task plan with the given *id* in the editor defined by
-  `$EDITOR` or `$VISUAL` (falling back to `vi`). The file and its
-  parent directory are created if missing.
+  `$EDITOR` or `$VISUAL` (falling back to `vi`, run through the shell,
+  so a value with arguments is supported), round-tripped through
+  a temporary file, as the task store is not necessarily local. A not
+  yet existing plan starts as its minimal frontmatter.
 
 - `ase task save` *id*:
   Save the task plan with the given *id*, reading its contents from
   standard input. The `Status:` frontmatter key is checked against the
-  configured task lifecycle model: a status which is not a state of the
-  model, or which is not reachable from the previously saved status via
-  one or more transitions of the model, is warned about, but the plan
-  is saved nevertheless.
+  configured task lifecycle model: a changed status which is not a state
+  of the model, or which is not reachable from the previously saved
+  status via one or more transitions of the model, lets the save fail
+  with exit status 1.
 
 - `ase task delete` *id*:
-  Delete the task plan with the given *id* (removing its
-  `<project>/`*basedir*`/TASK-`*id*`.md` file). Exits with status 1 if no
+  Delete the task plan with the given *id*. Exits with status 1 if no
   such task existed.
 
 - `ase task rename` *old-id* *new-id*:
-  Rename the task plan with the given *old-id* to *new-id* (moving the
-  `TASK-`*old-id*`.md` file to `TASK-`*new-id*`.md` and rewriting the
-  `# TASK <id>:` heading inside). Exits with status 1 if no such task
+  Rename the task plan with the given *old-id* to *new-id*, rewriting
+  the `Id:` frontmatter key inside. Exits with status 1 if no such task
   existed or the target id is already in use.
 
 - `ase task purge` \[*age*\]:
-  Remove all persisted task files whose modification time is older than
+  Remove all persisted task plans whose modification time is older than
   *age* (default: `31d`). The *age* argument is a `<number><unit>`
   value, where *unit* is one of `h` (hour), `d` (day), `m` (month), or
   `y` (year).
+
+- `ase task lifecycle` \[*name*\]:
+  Without *name*, print the effective task lifecycle model of the
+  project: `project.task.lifecycle` for a local task store, else the
+  model the project is registered under in the remote task store (which
+  is registered under `project.task.lifecycle` on first use only, as the
+  model is shared by all clients of the project). With *name* (`solo`,
+  `team`, or `enterprise`), explicitly switch the project in the remote
+  task store to this model. On every switch of the model, the `Status`
+  of the existing task plans is mapped onto the new model (e.g. `solo`
+  → `team`: `OPEN` → `PLANNING`, `CLOSED` → `IMPLEMENTED`). A local task store always follows
+  `project.task.lifecycle` and hence rejects *name*. A deviating
+  `project.task.lifecycle` is warned about once per deviation only
+  (tracked in `~/.ase/task-lifecycle.json`).
+
+- `ase task store start` \[`-a`|`--address` *host*\] \[`-p`|`--port` *port*\]
+  \[`-t`|`--token` *token*\] \[`-c`|`--cors` *origin*\] \[`-m`|`--module` *name*\]
+  \[`-d`|`--basedir` *dir*\] \[`-s`|`--solo`|`--no-solo`\] \[`--tls-cert` *file* `--tls-key` *file*\]:
+  Start the per-user task store REST API server (see `task-api.md`) in
+  the background, binding to *host* (default: `127.0.0.1`) and *port*
+  (default: the configured one, else allocated randomly), expecting the
+  bearer *token* (default: `ASE_TASK_STORE_TOKEN`, else the `token` key of
+  the per-user `store.yaml`, else generated; the effective token is
+  persisted there),
+  allowing cross-origin browser requests from *origin* (repeatable, `*`
+  for any origin), and loading the storage plugin *name*: `ase` for the
+  built-in one, else the NPM package `ase-task-store-`*name* (default:
+  the `storage.plugin` key of `store.yaml`, else `ase`). The built-in
+  plugin stores the plans below *dir* (default: `storage.options.basedir`,
+  else `tasks` below the per-user config directory), one sub-directory
+  per project, or -- with `--solo` -- a single project flat in *dir*,
+  accepting any project id (persisted as `storage.options.solo`, reset
+  by `--no-solo`). With `--tls-cert` and `--tls-key` (both PEM
+  files, default: the `tls.cert` and `tls.key` keys of `store.yaml`,
+  where the effective paths are persisted), the server serves HTTPS
+  instead of HTTP. Binding to a non-loopback *host* without TLS is warned
+  about. Idempotent if the server is already running, but restarts the
+  server if an explicitly given option deviates from its configuration.
+
+- `ase task store status`:
+  Report whether the task store server is running, and on which address
+  and port. Exits with status 1 if it is not running.
+
+- `ase task store stop`:
+  Stop the task store server.
 
 The following top-level commands exist for resolving project artifact
 kinds to project-relative file lists, driven by the
@@ -712,13 +771,12 @@ STATE FILES
   --log-level debug service start` to log the full *MCP* traffic.
 
 - `<project>/`*basedir*`/TASK-`*id*`.md`:
-  Persisted task plan, managed by the `ase task` subcommands, located
-  relative to the Git top-level directory (or the current working
-  directory outside a Git repository). *basedir* defaults to `.ase/task`
-  (configurable via `project.artifact.task.basedir`). Each task file is
-  owned by *ASE* and removed by `ase task delete` and `ase task purge`.
-  A legacy `<basedir>/`*id*`/plan.md` layout is auto-migrated to this
-  single-file layout on first access.
+  Persisted task plan, managed by the `ase task` subcommands through the
+  built-in storage plugin of a local `ase:`*basedir* task store
+  (`project.task.store`, default `ase:./.ase/task`), located relative
+  to the Git top-level directory (or the current working directory
+  outside a Git repository). Each task file is owned by *ASE* and
+  removed by `ase task delete` and `ase task purge`.
 
 HISTORY
 -------

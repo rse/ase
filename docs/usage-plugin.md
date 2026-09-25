@@ -181,8 +181,8 @@ The following ASE commands/skills exist on the task-level:
   current or given task plan. Without *status*, the current status is
   reported. With *status* (a state of the configured task lifecycle
   model, case-insensitive), the status is set, leaving the `Modified:`
-  key alone as it tracks body changes only. A transition the model does
-  not allow is warned about, but performed nevertheless.
+  key alone as it tracks body changes only. A status not reachable via
+  one or more transitions of the model is rejected.
 
 - **/ase-task-rename** \[*old-id*\] *new-id*:<br/>
   Rename the current or given task plan to *new-id*. When *old-id* is

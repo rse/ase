@@ -126,15 +126,7 @@ Procedure
             ⧉ **ASE**: ◉ task: **<id/>**, ▶ status: **<text/>**
             </template>
 
-        -   If <text/> starts with `WARNING:`:
-            The status was set nevertheless. Only output the following
-            <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<id/>**, ◐ status: **<status/>** (*updated*), ▶ **<text/>**
-            </template>
-
-        -   If <text/> starts NOT with `ERROR:` and NOT with `WARNING:`:
+        -   If <text/> starts NOT with `ERROR:`:
             Strip the leading `OK: ` prefix from <text/> and only output
             the following <template/>:
 

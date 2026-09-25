@@ -28,7 +28,7 @@ import { isLogLevel }                    from "./ase-log.js"
 import type { LogLevel }                 from "./ase-log.js"
 import { CompatMCP }                     from "./ase-compat.js"
 import { DiagramMCP }                    from "./ase-diagram.js"
-import { TaskMCP }                       from "./ase-task.js"
+import { Task, TaskMCP }                 from "./ase-task.js"
 import { MarkdownMCP }                   from "./ase-markdown.js"
 import { ArtifactMCP }                   from "./ase-artifact.js"
 import { SpecMCP }                       from "./ase-spec.js"
@@ -112,7 +112,7 @@ export const loadServiceContext = (log: Log): Context => {
     svc.read()
 
     /*  determine project id  */
-    const projectId = (cfg.get("project.id") as string | null | undefined) ?? path.basename(process.cwd())
+    const projectId = (cfg.get("project.id") as string | null | undefined) || Task.projectIdOf(Task.projectRoot())
 
     /*  determine service port  */
     const port      = (svc.get("port")       as number | null | undefined) ?? null
