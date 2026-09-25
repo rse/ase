@@ -150,16 +150,51 @@ const gitToplevel = (): string | null => {
     return top === "" ? null : top
 }
 
+/*  resolve the per-OS user-scope configuration directory  */
+export const userConfigDir = (): string => {
+    if (process.platform === "darwin")
+        /*  macOS  */
+        return path.join(os.homedir(), "Library", "Application Support", "ase")
+    else if (process.platform === "win32")
+        /*  Windows (roaming)  */
+        return path.join(process.env.APPDATA ?? os.homedir(), "ase")
+    else {
+        /*  Linux  */
+        const xdg  = process.env.XDG_CONFIG_HOME
+        const base = xdg !== undefined && xdg !== "" ? xdg : path.join(os.homedir(), ".config")
+        return path.join(base, "ase")
+    }
+}
+
+/*  resolve the per-OS user-scope state directory (per-session state and
+    other machine-local runtime information, never roamed or versioned)  */
+export const userStateDir = (): string => {
+    if (process.platform === "darwin")
+        /*  macOS  */
+        return path.join(os.homedir(), "Library", "Application Support", "ase")
+    else if (process.platform === "win32")
+        /*  Windows (local)  */
+        return path.join(process.env.LOCALAPPDATA ?? process.env.APPDATA ?? os.homedir(), "ase")
+    else {
+        /*  Linux  */
+        const xdg  = process.env.XDG_STATE_HOME
+        const base = xdg !== undefined && xdg !== "" ? xdg : path.join(os.homedir(), ".local", "state")
+        return path.join(base, "ase")
+    }
+}
+
 /*  determine the project root directory, i.e. either the top-level
     directory of the Git working tree or the nearest directory at or
-    above cwd which carries a ".ase" directory  */
+    above cwd which carries a ".ase" directory (excluding the home
+    directory, where a stale "~/.ase" of older ASE versions may exist)  */
 const projectRoot = (): string | null => {
     const top = gitToplevel()
     if (top !== null)
         return top
     let dir = fs.realpathSync(process.cwd())
+    const home = fs.realpathSync(os.homedir())
     for (;;) {
-        if (fs.existsSync(path.join(dir, ".ase")))
+        if (dir !== home && fs.existsSync(path.join(dir, ".ase")))
             return dir
         const parent = path.dirname(dir)
         if (parent === dir)
@@ -298,28 +333,12 @@ export class Config {
         return `${term.kind}:${term.id}`
     }
 
-    /*  resolve the per-OS user-scope base directory  */
-    private userConfigDir (): string {
-        if (process.platform === "darwin")
-            /*  macOS  */
-            return path.join(os.homedir(), "Library", "Application Support", "ase")
-        else if (process.platform === "win32")
-            /*  Windows  */
-            return path.join(process.env.APPDATA ?? os.homedir(), "ase")
-        else {
-            /*  Linux  */
-            const xdg  = process.env.XDG_CONFIG_HOME
-            const base = xdg !== undefined && xdg !== "" ? xdg : path.join(os.homedir(), ".config")
-            return path.join(base, "ase")
-        }
-    }
-
     /*  resolve the configuration filename based on the selected scope term  */
     private resolveFilename (name: string, term: ScopeTerm): string {
         if (term.kind === "default")
             throw new Error("internal error: \"default\" scope has no filename")
         if (term.kind === "user")
-            return path.join(this.userConfigDir(), `${name}.yaml`)
+            return path.join(userConfigDir(), `${name}.yaml`)
         else if (term.kind === "project") {
             const rel   = path.join(".ase", `${name}.yaml`)
             const root  = projectRoot() ?? process.cwd()
@@ -331,7 +350,7 @@ export class Config {
             return path.join(root, ".ase", "task", term.id, `${name}.yaml`)
         }
         else
-            return path.join(os.homedir(), ".ase", "session", term.id, `${name}.yaml`)
+            return path.join(userStateDir(), "session", term.id, `${name}.yaml`)
     }
 
     /*  upward-walk on filesystem for a file path relative to a start directory,

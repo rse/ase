@@ -10,7 +10,7 @@ earlier scopes):
 -   `user`:    (id: `$ASE_USER_ID`,    storage: *per-user config dir*`/config.yaml`)
 -   `project`: (id: `$ASE_PROJECT_ID`, storage: `.ase/config.yaml`)
 -   `task`:    (id: `$ASE_TASK_ID`,    storage: `.ase/task/<task-id>/config.yaml`)
--   `session`: (id: `$ASE_SESSION_ID`, storage: `~/.ase/session/<session-id>/config.yaml`)
+-   `session`: (id: `$ASE_SESSION_ID`, storage: *per-user state dir*`/session/<session-id>/config.yaml`)
 
 The following configuration parameters control the project:
 

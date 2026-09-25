@@ -4,30 +4,30 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import path                                 from "node:path"
-import fs                                   from "node:fs"
-import os                                   from "node:os"
-import readline                             from "node:readline/promises"
+import path                                               from "node:path"
+import fs                                                 from "node:fs"
+import os                                                 from "node:os"
+import readline                                           from "node:readline/promises"
 
-import { Command }                          from "commander"
-import { execaSync }                        from "execa"
-import { ofetch }                           from "ofetch"
-import { Agent }                            from "undici"
-import { isScalar }                         from "yaml"
-import { z }                                from "zod"
-import { LRUCache }                         from "lru-cache"
-import type { McpServer }                   from "@modelcontextprotocol/sdk/server/mcp.js"
+import { Command }                                        from "commander"
+import { execaSync }                                      from "execa"
+import { ofetch }                                         from "ofetch"
+import { Agent }                                          from "undici"
+import { isScalar }                                       from "yaml"
+import { z }                                              from "zod"
+import { LRUCache }                                       from "lru-cache"
+import type { McpServer }                                 from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import type Log                             from "./ase-log.js"
-import { Config, configSchema, parseScope } from "./ase-config.js"
-import { Markdown }                         from "./ase-markdown.js"
-import { readStdin, writeStdout }           from "./ase-stdio.js"
-import TaskStoreCommand, { storeSchema }    from "./ase-task-store-server-cli.js"
-import { urlHost }                          from "./ase-task-store-server-bind.js"
-import * as API                             from "./ase-task-store-plugin-api.js"
-import * as Delegate                        from "./ase-task-store-plugin-delegate.js"
-import * as Core                            from "./ase-task-store-core.js"
-import * as TaskFormat                      from "./ase-task-format.js"
+import type Log                                           from "./ase-log.js"
+import { Config, configSchema, parseScope, userStateDir } from "./ase-config.js"
+import { Markdown }                                       from "./ase-markdown.js"
+import { readStdin, writeStdout }                         from "./ase-stdio.js"
+import TaskStoreCommand, { storeSchema }                  from "./ase-task-store-server-cli.js"
+import { urlHost }                                        from "./ase-task-store-server-bind.js"
+import * as API                                           from "./ase-task-store-plugin-api.js"
+import * as Delegate                                      from "./ase-task-store-plugin-delegate.js"
+import * as Core                                          from "./ase-task-store-core.js"
+import * as TaskFormat                                    from "./ase-task-format.js"
 
 /*  the client-side view onto a task store, either the in-process
     REST API functionality on the built-in storage plugin (a local
@@ -241,7 +241,7 @@ class RemoteTaskStoreClient implements TaskStoreClient {
     /*  warn about a configured lifecycle model deviating from the one of the
         registered project, once per deviation only (persisted across processes)  */
     private mismatch (): void {
-        const file = path.join(os.homedir(), ".ase", "task-lifecycle.json")
+        const file = path.join(userStateDir(), "task-lifecycle.json")
         let seen: Record<string, string> = {}
         try {
             const data: unknown = JSON.parse(fs.readFileSync(file, "utf8"))

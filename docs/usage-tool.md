@@ -542,7 +542,7 @@ else the `token` of the per-user `store.yaml`:
   → `team`: `OPEN` → `PLANNING`, `CLOSED` → `IMPLEMENTED`). A local task store always follows
   `project.task.lifecycle` and hence rejects *name*. A deviating
   `project.task.lifecycle` is warned about once per deviation only
-  (tracked in `~/.ase/task-lifecycle.json`).
+  (tracked in *per-user state directory*`/task-lifecycle.json`).
 
 - `ase task store start` \[`-a`|`--address` *host*\] \[`-p`|`--port` *port*\]
   \[`-t`|`--token` *token*\] \[`-c`|`--cors` *origin*\] \[`-m`|`--module` *name*\]
@@ -750,12 +750,19 @@ CONFIGURATION FILES
   to the Git top-level directory. Outside a Git repository, the file
   is placed relative to the current working directory.
 
-- **session**: `~/.ase/session/`*id*`/config.yaml`:
+- **session**: *per-user state directory*`/session/`*id*`/config.yaml`:
   Per-session *ASE* configuration (scope `session:`*id*), located
-  under the user's home directory (independent of any project context).
+  independent of any project context and removed on session end.
 
 STATE FILES
 -----------
+
+- *per-user state directory*:
+  Machine-local per-user *ASE* state (session configurations and
+  `task-lifecycle.json`), never roamed or versioned. The per-user
+  state directory is `~/Library/Application Support/ase` on macOS,
+  `%LOCALAPPDATA%\ase` on Windows, and `$XDG_STATE_HOME/ase`
+  (falling back to `~/.local/state/ase`) on Linux and other Unix systems.
 
 - `.ase/service.yaml`:
   Per-project service state.

@@ -4,21 +4,21 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import path                                 from "node:path"
-import fs                                   from "node:fs"
-import os                                   from "node:os"
+import path                                               from "node:path"
+import fs                                                 from "node:fs"
+import os                                                 from "node:os"
 
-import { Command }                          from "commander"
-import { execaSync }                        from "execa"
-import { quote }                            from "shell-quote"
-import * as v                               from "valibot"
+import { Command }                                        from "commander"
+import { execaSync }                                      from "execa"
+import { quote }                                          from "shell-quote"
+import * as v                                             from "valibot"
 
-import type Log                             from "./ase-log.js"
-import Version                              from "./ase-version.js"
-import { Config, configSchema, parseScope } from "./ase-config.js"
-import { readStdin, writeStdout }           from "./ase-stdio.js"
-import { Task }                             from "./ase-task.js"
-import * as TaskFormat                      from "./ase-task-format.js"
+import type Log                                           from "./ase-log.js"
+import Version                                            from "./ase-version.js"
+import { Config, configSchema, parseScope, userStateDir } from "./ase-config.js"
+import { readStdin, writeStdout }                         from "./ase-stdio.js"
+import { Task }                                           from "./ase-task.js"
+import * as TaskFormat                                    from "./ase-task-format.js"
 
 /*  type of supported tool (host) systems  */
 type Tool = "claude" | "copilot" | "codex"
@@ -116,7 +116,7 @@ export default class HookCommand {
 
     /*  resolve the base directory holding all per-session state  */
     private sessionBaseDir (): string {
-        return path.join(os.homedir(), ".ase", "session")
+        return path.join(userStateDir(), "session")
     }
 
     /*  garbage-collect orphaned session directories left behind by agents
@@ -498,7 +498,7 @@ export default class HookCommand {
         /*  determine session id  */
         const sessionId = await this.readSessionIdFromStdin()
 
-        /*  remove the session directory ~/.ase/session/<id> (only for a valid sessionId)  */
+        /*  remove the session directory <state-dir>/session/<id> (only for a valid sessionId)  */
         if (this.isValidSessionId(sessionId)) {
             const dir = path.join(this.sessionBaseDir(), sessionId)
             try {

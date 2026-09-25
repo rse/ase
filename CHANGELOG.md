@@ -102,6 +102,13 @@ ChangeLog
     recognizes short responses matching `\d+[a-zA-Z]` (like `1A 2c`, instead of `Qn:An`) for
     cherry-picking answers, freely mixed with keyword text.
 
+-   IMPROVEMENT [tool]: Per-OS user state directory instead of `~/.ase`
+    The per-user state (session configurations and `task-lifecycle.json`) moved from `~/.ase` to
+    the per-OS state directory: `~/Library/Application Support/ase` on macOS (next to the user
+    configuration), `%LOCALAPPDATA%\ase` on Windows, and `$XDG_STATE_HOME/ase` (or
+    `~/.local/state/ase`) on Linux. Additionally, a `.ase` directory in the home directory no longer
+    makes the home directory a project root. A stale `~/.ase` can be removed.
+
 -   BUGFIX [plugin]: Task plan kind `SPECIFYING` honored
     `ase-task-preflight` and `ase-task-implement` now recognize the `Kind: SPECIFYING`
     frontmatter key of a task plan and internalize the SPECIFYING TENETS, and also infer
