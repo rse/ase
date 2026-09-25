@@ -88,6 +88,7 @@ export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"
     "agent.skill":                   [ "session" ],
     "project.task.store":            [ "user", "project" ],
     "project.task.token":            [ "user" ],
+    "project.task.lifecycle":        [ "user", "project" ],
     "project.artifact.spec.basedir": [ "user", "project" ],
     "project.artifact.spec.files":   [ "user", "project" ],
     "project.artifact.spec.schema":  [ "user", "project" ],

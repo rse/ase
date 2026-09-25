@@ -25,6 +25,7 @@ export const isLogLevel = (level: string): level is LogLevel =>
 export default class Log {
     private stream: fs.WriteStream | null = null
     private logLevelIdx = 0
+    private deferred: string[] | null = null
     constructor (
         private _program:  string,
         private _logLevel: LogLevel,
@@ -73,10 +74,24 @@ export default class Log {
             else
                 line += `[${levels[idx].name.toUpperCase()}]`
             line += `: ${msg}\n`
-            if (this._logFile === "-")
+            if (this._logFile === "-" && this.deferred !== null)
+                this.deferred.push(line)
+            else if (this._logFile === "-")
                 process.stderr.write(line)
             else if (this.stream !== null)
                 this.stream.write(line)
+        }
+    }
+
+    /*  defer stderr output (e.g. while a TUI owns the terminal) and flush it once re-enabled  */
+    defer (enable: boolean) {
+        if (enable && this.deferred === null)
+            this.deferred = []
+        else if (!enable && this.deferred !== null) {
+            const lines   = this.deferred
+            this.deferred = null
+            for (const line of lines)
+                process.stderr.write(line)
         }
     }
 
