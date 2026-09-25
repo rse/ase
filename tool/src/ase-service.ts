@@ -23,6 +23,7 @@ import { McpServer }                     from "@modelcontextprotocol/sdk/server/
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
 
 import { Config, configSchema, ConfigMCP } from "./ase-config.js"
+import { ensureAseGitignore }            from "./ase-config.js"
 import type Log                          from "./ase-lib-log.js"
 import { isLogLevel }                    from "./ase-lib-log.js"
 import type { LogLevel }                 from "./ase-lib-log.js"
@@ -152,6 +153,7 @@ export class Service {
 
     /*  persist an allocated port into ".ase/service.yaml"  */
     static persistPort (svc: Config, port: number): void {
+        ensureAseGitignore(path.dirname(svc.filename))
         svc.lock(() => {
             svc.read()
             svc.set("port", port)
@@ -192,6 +194,7 @@ export class Service {
     /*  spawn the current executable detached as a background service  */
     static spawnDetached (aseDir: string, port: number, logLevel: LogLevel): { child: ChildProcess, logFile: string } {
         fs.mkdirSync(aseDir, { recursive: true })
+        ensureAseGitignore(aseDir)
         const logFile = path.join(aseDir, "service.log")
 
         /*  trim the log before handing it to the service, as the detached

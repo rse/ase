@@ -183,6 +183,25 @@ export const userStateDir = (): string => {
     }
 }
 
+/*  ensure a self-ignoring ".ase/.gitignore" covering the machine-local runtime
+    files, so they never show up as untracked files in any project; an existing
+    file is left untouched, as the project may maintain its own rules  */
+export const ensureAseGitignore = (aseDir: string): void => {
+    const file = path.join(aseDir, ".gitignore")
+    if (fs.existsSync(file))
+        return
+    const rules = [ ".gitignore", "*.lock", "dashboard.yaml", "service.log", "service.yaml", "worktree/" ]
+    try {
+        fs.mkdirSync(aseDir, { recursive: true })
+        fs.writeFileSync(file, `#   ASE machine-local runtime files (generated)\n${rules.join("\n")}\n`,
+            { encoding: "utf8", flag: "wx" })
+    }
+    catch {
+        /*  intentionally ignore errors (e.g. concurrent creation or read-only
+            project), as a missing ignore file must never block the operation  */
+    }
+}
+
 /*  determine the project root directory, i.e. either the top-level
     directory of the Git working tree or the nearest directory at or
     above cwd which carries a ".ase" directory (excluding the home
