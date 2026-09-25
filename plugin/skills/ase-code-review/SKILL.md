@@ -315,7 +315,7 @@ stay in their original form.
 
 5.  <step id="STEP 5: Per-Group Stage, Explain, Accept">
 
-    Process the groups in table order. Four rules bind every
+    Process the groups in table order. Five rules bind every
     iteration:
 
     -   *Index only*: staging happens exclusively in the plain Git
@@ -332,6 +332,11 @@ stay in their original form.
         only operation that commits, and nothing here ever discards
         working-tree content.
     -   *One group at a time*: never stage past the current group.
+    -   *Whole card after every change*: whenever the group changes --
+        a correction via `CHANGE`, a re-staging, a build re-run -- re-emit
+        the *complete* group card with *all* file blocks, never a delta
+        or only the touched blocks, so the user never has to scroll back
+        in the chat to see the current state.
 
     For each group G<n/>:
 
@@ -500,8 +505,8 @@ stay in their original form.
          group reads as one visually self-contained unit the user can
          give a *single* ok for. Every file contributes a block -- name
          with layer and line counts, its directory, what changed, and
-         its evidence lines -- separated from the next block by a blank
-         line. Only output the following <template/>:
+         its evidence lines -- and the blocks are delimited by separator
+         lines. Only output the following <template/>:
 
          <template>
          <ase-tpl-boxed title="GROUP" subtitle="G<n/>/<group-count/>">
@@ -509,6 +514,7 @@ stay in their original form.
 
          *Why*: <rationale/>
 
+         <separator/>
          **<filename/>** · *<layer/>* · +<added/>/-<removed/>
          `<dirpath/>`
          <explanation/>
@@ -521,6 +527,7 @@ stay in their original form.
            <evidence-status/> TESTS   <evidence-text/>
            <evidence-status/> SEC     <evidence-text/>
            <evidence-status/> DOC     <evidence-text/>
+         <separator/>
 
          *Verdict*: <verdict/>
 
@@ -544,6 +551,11 @@ stay in their original form.
              blocks vanish), table cells are single-line, and `<br>`
              appears literally. Plain lines inside the box keep their
              soft line breaks.
+         -   `<separator/>` is a line of 96 `┈` characters, emitted
+             before *every* file block and once after the last one, so
+             each block is visually fenced off from its neighbours. It
+             replaces the blank line between two blocks; never use a
+             Markdown rule (`---`), which renders literally in the box.
          -   `<rationale/>` is 2-4 sentences reconstructing the goal
              this group addresses -- what problem, what outcome, what
              design choice. Anchor it in the mental model built so
@@ -561,18 +573,17 @@ stay in their original form.
              user has to locate the file in their editor from the card
              alone. A full path plus its metadata exceeds the box width
              on its own, which is why it occupies two lines.
-         -   `<explanation/>` is the *primary* text of the block: 2-3
-             plain sentences, in the user's language, telling a
-             colleague who did not write the code what this file
-             *logically achieves* now -- what it guarantees, decides, or
-             makes possible that it did not before, and why that matters
-             for the group's goal. Write it as *before → after* in terms
-             of behavior, not of code: "Bisher galt ein Fenster als
-             bedient, sobald das Skript nichts mehr las; jetzt fragt es
-             den Kalender, ob der Handelstag wirklich zu Ende ist" --
-             never "fügt drei Methoden hinzu" or a paraphrase of the
-             diff. Symbol names appear in it only where they are needed
-             to follow the thought, never as an enumeration.
+         -   `<explanation/>` is the *primary* text of the block: *1-2
+             short sentences* in simple words, in the user's language,
+             which tell a colleague who did not write the code *what*
+             this file now does differently and *why* -- the reason in
+             terms of the group's goal. Compact, but never cryptic:
+             "Fragt jetzt den Kalender, ob der Handelstag wirklich zu
+             Ende ist, statt ein Fenster schon als bedient zu werten,
+             sobald nichts mehr gelesen wird" -- never "fügt drei
+             Methoden hinzu" or a paraphrase of the diff. Symbol names
+             appear in it only where they are needed to follow the
+             thought, never as an enumeration.
          -   `<symbols/>` on the *Touched* line are the file's changed
              symbols -- the added or touched functions, methods,
              classes, types, or config keys, comma-separated in
@@ -654,8 +665,8 @@ stay in their original form.
                  either pulled into this group when they serve its
                  theme, or left to a later `REGROUP`.
              5.  Continue at 5.1, so the group is re-staged, re-verified
-                 (VERTICAL), and its card re-emitted before the next
-                 decision.
+                 (VERTICAL), and its *complete* card re-emitted before
+                 the next decision.
 
              Committing a *corrected* group is the user's call as
              before; the correction alone commits nothing.

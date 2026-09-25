@@ -42,10 +42,11 @@ mutation -- so the user's editor (e.g. VSCode Source Control) always
 shows the staged group and the remaining unstaged changes side by
 side. The skill emits the *group card* as a *boxed* card, so each group
 reads as one visually self-contained unit: a short rationale, then a
-block per staged file -- its bare name with layer and line counts, its
-full repo-relative directory, a plain-language explanation of what the
-file *logically achieves* now (behavior before → after, for a colleague
-who did not write the code -- never an enumeration of methods), a
+block per staged file, fenced off by separator lines -- its bare name
+with layer and line counts, its full repo-relative directory, a compact
+explanation in simple words of *what* the file now does differently and
+*why* (one to two sentences for a colleague who did not write the code
+-- never an enumeration of methods), a
 *Touched* line naming the changed symbols as the index into the editor,
 ordered foundations-first -- and per file five *evidence* lines, one
 each for `DOMAIN` (including whether the change can actually reach the
@@ -84,7 +85,9 @@ wish is implemented right away by delegating to `ase-code-edit` in the
 current working copy, with its `--mode` derived from the wish
 (`resolve` for a defect, `refactor` for structure at unchanged
 behavior, `craft` for something missing), after which the group is
-re-staged, re-verified, and presented again for a fresh decision;
+re-staged, re-verified, and presented again for a fresh decision --
+after every change the *complete* card is re-emitted, never a delta, so
+the current state never has to be scrolled for in the chat;
 *skip* unstages the group and defers it; *regroup* recuts the
 remaining groups. Nothing here ever discards working-tree content, and
 no correction ever commits by itself.
