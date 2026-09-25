@@ -291,9 +291,15 @@ export default class ServiceCommand {
         let lastActivity = Date.now()
         let inFlight     = 0
         let stopping     = false
-        server.ext("onRequest", (_request, h) => {
+
+        /*  accept only loopback "Host" headers, to defeat DNS rebinding attacks from browser pages  */
+        const allowedHosts = new Set([ `${HOST}:${ctx.port}`, `localhost:${ctx.port}` ])
+        server.ext("onRequest", (request, h) => {
             inFlight++
             lastActivity = Date.now()
+            const host = ((request.headers.host as string | undefined) ?? "").toLowerCase()
+            if (!allowedHosts.has(host))
+                return h.response({ error: "invalid Host header" }).code(421).takeover()
             return h.continue
         })
         server.ext("onPreResponse", (_request, h) => {
