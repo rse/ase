@@ -6,7 +6,7 @@
 
 import Table       from "cli-table3"
 
-import { Diagram } from "./ase-diagram.js"
+import { Diagram } from "./ase-util-diagram.js"
 
 /*  assumed terminal width in case the output is not a terminal at all  */
 const termWidthFallback = 80

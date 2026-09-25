@@ -14,9 +14,9 @@ import { execaSync }                        from "execa"
 import { Chalk }                            from "chalk"
 import type { ForegroundColorName }         from "chalk"
 
-import type Log                             from "./ase-util-log.js"
+import type Log                             from "./ase-lib-log.js"
 import { Config, configSchema, parseScope } from "./ase-config.js"
-import { readStdin, writeStdout }           from "./ase-util-stdio.js"
+import { readStdin, writeStdout }           from "./ase-lib-stdio.js"
 import pkg                                  from "../package.json" with { type: "json" }
 
 /*  forced-color chalk instance: stdout is a pipe under Anthropic Claude Code CLI,

@@ -15,13 +15,13 @@ import type { McpServer }       from "@modelcontextprotocol/sdk/server/mcp.js"
 import { SpecBook, renderDiagnostic, renderVerbose, formats, parseOutputSpec, previewAddr, previewPort } from "@rse/specbook"
 import type { Diagnostic, ExportFormat, VerboseLevel }                                                  from "@rse/specbook"
 
-import type Log                 from "./ase-util-log.js"
-import type { LogLevel }        from "./ase-util-log.js"
+import type Log                 from "./ase-lib-log.js"
+import type { LogLevel }        from "./ase-lib-log.js"
 import { Config, configSchema } from "./ase-config.js"
 import { Task }                 from "./ase-task.js"
 import { Artifact }             from "./ase-artifact.js"
-import { Meta }                 from "./ase-meta.js"
-import { writeStdout }          from "./ase-util-stdio.js"
+import { Meta }                 from "./ase-util-meta.js"
+import { writeStdout }          from "./ase-lib-stdio.js"
 
 /*  reusable functionality: lint, export, and preview the SpecBook-based
     project specification, located via the "project.artifact.spec.basedir"

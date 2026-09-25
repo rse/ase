@@ -13,7 +13,7 @@ import { StdioServerTransport }          from "@modelcontextprotocol/sdk/server/
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js"
 import type { JSONRPCMessage }           from "@modelcontextprotocol/sdk/types.js"
 
-import type Log                 from "./ase-util-log.js"
+import type Log                 from "./ase-lib-log.js"
 import { SERVICE_HOST as HOST, probe, loadServiceContext } from "./ase-service.js"
 
 /*  CLI command "ase mcp"  */

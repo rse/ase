@@ -34,9 +34,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
     -   `tool/src/ase.ts`: the entry point, wiring all top-level commands
     -   `tool/src/ase-*.ts`: one module per top-level command (`setup`,
         `config`, `mcp`, `service`, `hook`, `statusline`, `task`, `artifact`,
-        `spec`, `meta`, `compat`, `diagram`, `worktree`, `mint`, `metric`) plus
-        generic utility modules (`util-log`, `util-stdio`, `util-table`,
-        `util-ignore`, `util-version`), the MCP-only tool modules of the
+        `spec`, `util-meta`, `util-compat`, `util-diagram`, `util-worktree`,
+        `util-mint`, `util-metric`) plus generic library modules (`lib-log`,
+        `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`), the MCP-only tool modules of the
         service (`service-kv`, `service-getopt`, `service-markdown`,
         `service-skills`, `service-sleep`, `service-timestamp`), and the task store (`task-store-server-cli` for
         the `ase task store` CLI wrapper, `task-store-core` for the

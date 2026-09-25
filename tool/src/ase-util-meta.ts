@@ -10,8 +10,8 @@ import { fileURLToPath }    from "node:url"
 
 import { Command }          from "commander"
 
-import type Log             from "./ase-util-log.js"
-import { writeStdout }      from "./ase-util-stdio.js"
+import type Log             from "./ase-lib-log.js"
+import { writeStdout }      from "./ase-lib-stdio.js"
 
 /*  reusable functionality: resolve and read plugin "meta/" files  */
 export class Meta {

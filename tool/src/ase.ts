@@ -6,8 +6,8 @@
 */
 
 import { Command, CommanderError, Option } from "commander"
-import Log                         from "./ase-util-log.js"
-import type { LogLevel }           from "./ase-util-log.js"
+import Log                         from "./ase-lib-log.js"
+import type { LogLevel }           from "./ase-lib-log.js"
 import SetupCommand                from "./ase-setup.js"
 import ConfigCommand               from "./ase-config.js"
 import MCPCommand                  from "./ase-mcp.js"
@@ -17,12 +17,12 @@ import StatuslineCommand           from "./ase-statusline.js"
 import TaskCommand                 from "./ase-task.js"
 import ArtifactCommand             from "./ase-artifact.js"
 import SpecCommand                 from "./ase-spec.js"
-import MetaCommand                 from "./ase-meta.js"
-import CompatCommand               from "./ase-compat.js"
-import DiagramCommand              from "./ase-diagram.js"
-import WorktreeCommand             from "./ase-worktree.js"
-import MintCommand                 from "./ase-mint.js"
-import MetricCommand               from "./ase-metric.js"
+import MetaCommand                 from "./ase-util-meta.js"
+import CompatCommand               from "./ase-util-compat.js"
+import DiagramCommand              from "./ase-util-diagram.js"
+import WorktreeCommand             from "./ase-util-worktree.js"
+import MintCommand                 from "./ase-util-mint.js"
+import MetricCommand               from "./ase-util-metric.js"
 import pkg                         from "../package.json" with { type: "json" }
 
 /*  type of top-level (global) options  */

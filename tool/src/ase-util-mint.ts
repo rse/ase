@@ -12,7 +12,7 @@ import UUID                  from "pure-uuid"
 
 import type { McpServer }    from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import { writeStdout }       from "./ase-util-stdio.js"
+import { writeStdout }       from "./ase-lib-stdio.js"
 
 /*  the fixed ASE namespace UUID, itself a UUID V5 over the ASE home URL
     within the standard URL namespace, so that all hint-derived UUIDs

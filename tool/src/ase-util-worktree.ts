@@ -13,7 +13,7 @@ import { z }             from "zod"
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import { writeStdout }   from "./ase-util-stdio.js"
+import { writeStdout }   from "./ase-lib-stdio.js"
 
 /*  the repository-root-relative path components of the base directory
     which holds all ASE-managed Git worktrees  */
