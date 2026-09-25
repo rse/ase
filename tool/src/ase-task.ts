@@ -59,8 +59,10 @@ interface LocalTaskStoreShared {
     on the built-in storage plugin in "solo" mode, with the project
     registered under its configured lifecycle model on every open  */
 class LocalTaskStoreClient implements TaskStoreClient {
-    /*  the storage delegates, shared by all concurrently open clients of
-        the same store, so its per-project queue serializes in-process, too  */
+    /*  the storage delegates, shared by all concurrently open clients of the
+        same store (keyed by base directory only, as the lifecycle model is
+        re-registered on every open and hence survives a switch without a
+        second delegate), so its per-project queue serializes in-process, too  */
     private static shared = new Map<string, LocalTaskStoreShared>()
     private entry: LocalTaskStoreShared | undefined
     private core!: Core.TaskStoreCore
@@ -88,8 +90,7 @@ class LocalTaskStoreClient implements TaskStoreClient {
         }
     }
     async open (): Promise<void> {
-        const key = `${this.lifecycle.name}:${this.basedir}`
-        let entry = LocalTaskStoreClient.shared.get(key)
+        let entry = LocalTaskStoreClient.shared.get(this.basedir)
         if (entry === undefined) {
             const opened = (async () => {
                 const plugin = await Delegate.loadTaskStoragePlugin(Delegate.BUILTIN_PLUGIN, {
@@ -102,7 +103,7 @@ class LocalTaskStoreClient implements TaskStoreClient {
                 return { store, core }
             })()
             entry = { refs: 0, opened }
-            LocalTaskStoreClient.shared.set(key, entry)
+            LocalTaskStoreClient.shared.set(this.basedir, entry)
         }
         entry.refs++
         this.entry = entry
@@ -121,9 +122,8 @@ class LocalTaskStoreClient implements TaskStoreClient {
             return
         this.entry = undefined
         if (--entry.refs === 0) {
-            const key = `${this.lifecycle.name}:${this.basedir}`
-            if (LocalTaskStoreClient.shared.get(key) === entry)
-                LocalTaskStoreClient.shared.delete(key)
+            if (LocalTaskStoreClient.shared.get(this.basedir) === entry)
+                LocalTaskStoreClient.shared.delete(this.basedir)
             await entry.opened.then((opened) => opened.store.close(), () => {})
         }
     }
@@ -873,7 +873,7 @@ export default class TaskCommand {
     constructor (private log: Log) {}
 
     /*  register commands  */
-    register (program: Command): void {
+    register (program: Command): Command {
         /*  register CLI top-level command "ase task"  */
         const task = program
             .command("task")
@@ -1108,6 +1108,9 @@ export default class TaskCommand {
 
         /*  register CLI sub-command group "ase task store"  */
         new TaskStoreCommand(this.log).register(task)
+
+        /*  provide "ase task" command for further sub-commands  */
+        return task
     }
 }
 
