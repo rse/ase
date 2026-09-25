@@ -9,10 +9,10 @@ user-invocable: true
 disable-model-invocation: false
 allowed-tools:
     - "Bash(date *)"
-    - "Bash(ase meta *)"
+    - "Bash(ase util meta *)"
 ---
 
-!`ase meta control skill getopt`
+!`ase util meta control skill getopt`
 
 <purpose name="hello">
 Show a Nice Greeting Message

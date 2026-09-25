@@ -23,8 +23,8 @@ It provides plugin/tool setup, layered project configuration
 management, a per-project background HTTP service (bridged into the
 agent tool as an MCP server), agent hook handlers, status line
 rendering, persisted task plan management, artifact resolution,
-specification linting, exporting and previewing, diagram rendering, identifier
-minting, and a compatibility self-test helper.
+specification linting, exporting and previewing, and miscellaneous
+utilities like diagram rendering, identifier minting, and text measuring.
 
 OPTIONS
 -------
@@ -167,7 +167,7 @@ The following top-level commands exist for service management:
   Exits silently with status 0 if no log file exists.
 
 - `ase service stop`:
-  Stop the background service via HTTP `GET /stop`. Exits silently
+  Stop the background service via HTTP `POST /stop`. Exits silently
   with status 0 on successful stop. If no port is configured or
   the port is not responding, prints an informational message and
   exits with status 0.
@@ -559,11 +559,12 @@ else the `token` of the per-user `store.yaml`:
   model the project is registered under in the remote task store (which
   is registered under `project.task.lifecycle` on first use only, as the
   model is shared by all clients of the project). With *name* (`solo`,
-  `team`, or `enterprise`), explicitly switch the project in the remote
-  task store to this model. On every switch of the model, the `Status`
-  of the existing task plans is mapped onto the new model (e.g. `solo`
-  → `team`: `OPEN` → `PLANNING`, `CLOSED` → `IMPLEMENTED`). A local task store always follows
-  `project.task.lifecycle` and hence rejects *name*. A deviating
+  `team`, or `enterprise`), explicitly switch the project in the task
+  store to this model: for a local task store, which always follows
+  `project.task.lifecycle`, by setting it on the `project` scope. On
+  every switch of the model, the `Status` of the existing task plans is
+  mapped onto the new model (e.g. `solo` → `team`: `OPEN` → `PLANNING`,
+  `CLOSED` → `IMPLEMENTED`). For a remote task store, a deviating
   `project.task.lifecycle` is warned about once per deviation only
   (tracked in *per-user state directory*`/task-lifecycle.json`).
 

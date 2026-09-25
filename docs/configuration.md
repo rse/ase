@@ -45,7 +45,9 @@ The following configuration parameters control the project:
 
     The lifecycle is exported by the session-start hook as the
     `<ase-project-task-lifecycle/>` placeholder (and as the
-    `ASE_PROJECT_TASK_LIFECYCLE` environment variable).
+    `ASE_PROJECT_TASK_LIFECYCLE` environment variable). It is writable on
+    the `user` and `project` scopes only, as the task store follows these
+    two scopes only.
 
 -   **project.task.store**: the *task store* URL the `ase task` commands
     and `ase_task_*` MCP tools forward the project *task plans* to:
