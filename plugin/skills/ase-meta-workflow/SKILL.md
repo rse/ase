@@ -42,7 +42,7 @@ References
 
 -   The following <sample/> is a *reference skill* demonstrating the
     usual *layout* of a generated workflow skill -- its frontmatter, its
-    `ase meta` preamble, and the indentation of its `<flow>`:
+    `ase util meta` preamble, and the indentation of its `<flow>`:
 
     <sample>
     @${CLAUDE_SKILL_DIR}/sample.md
@@ -94,7 +94,7 @@ installation path. It therefore *MUST* strictly follow this contract:
 
     <if condition="<ase-agent-tool/> is `codex`">
     Emit *only* an `allowed-tools` field, carrying the space-separated
-    string `Bash(ase meta *)`, because *OpenAI Codex* accepts *no*
+    string `Bash(ase util meta *)`, because *OpenAI Codex* accepts *no*
     frontmatter fields besides `name`, `description`, `license`,
     `allowed-tools`, and `metadata`.
     </if>
@@ -115,14 +115,14 @@ installation path. It therefore *MUST* strictly follow this contract:
     Emit an `argument-hint` derived from the declared options and
     arguments, plus `user-invocable: true`, `disable-model-invocation:
     false`, and an `allowed-tools` list which *always* contains
-    `"Bash(ase meta *)"` plus `"Skill"` and/or `"Agent"` whenever the
+    `"Bash(ase util meta *)"` plus `"Skill"` and/or `"Agent"` whenever the
     workflow emits `<skill/>` and/or `<agent/>` invocations, plus any
     further tool the workflow actually uses.
     </else>
 
 -   **Preamble**: the generated skill has to pull in the ASE meta
-    definitions through the `ase meta` command, because it resolves them
-    from the bundled tool package, whereas the
+    definitions through the `ase util meta` command, because it resolves
+    them from the bundled tool package, whereas the
     `@${CLAUDE_SKILL_DIR}/../../meta/` includes used *inside* the ASE
     plugin have *no* resolvable path from outside of it. Append further
     meta names only when the workflow needs them (`dialog` for a
@@ -141,7 +141,7 @@ installation path. It therefore *MUST* strictly follow this contract:
     <preamble-block>
     *IMPORTANT*: *Before* anything else, run the shell command...
 
-    `ase meta control skill getopt`
+    `ase util meta control skill getopt`
 
     ...and treat its *entire* output as if it were written here. It
     defines the control flow constructs, the skill conventions, and the
@@ -150,7 +150,7 @@ installation path. It therefore *MUST* strictly follow this contract:
     </if>
 
     <else>
-    Emit the *single* line ``!`ase meta control skill getopt` `` as the
+    Emit the *single* line ``!`ase util meta control skill getopt` `` as the
     first body line.
     </else>
 

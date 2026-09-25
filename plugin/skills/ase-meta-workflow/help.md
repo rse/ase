@@ -44,8 +44,8 @@ derivation but never restricts it: arbitrary non-ASE actions and
 unlisted transitions stay allowed.
 
 The generated skill is *independent* of the ASE plugin installation path:
-it loads the ASE meta definitions through the `ase meta` command instead
-of plugin-relative includes.
+it loads the ASE meta definitions through the `ase util meta` command
+instead of plugin-relative includes.
 
 The skill is *portable* across the supported agent tools, because
 *Anthropic Claude Code*, *GitHub Copilot*, and *OpenAI Codex* differ in
@@ -62,7 +62,7 @@ agent tool:
     ``!`...`` construct before the skill content reaches the model. The
     other agent tools receive it verbatim and would silently leave it
     unexpanded, so they instead get an explicit instruction to run
-    `ase meta ...` themselves before anything else.
+    `ase util meta ...` themselves before anything else.
 
 ##  OPTIONS
 

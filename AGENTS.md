@@ -21,7 +21,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
     -   `plugin/agents/`: the sub-agent definitions leveraged by the skills
     -   `plugin/meta/`: the shared meta files (constitution, tenets, persona,
         dialog, getopt, and artifact format conventions), exposed to skills
-        via `ase meta <name>`; the specification format `ase-format-spec.md`
+        via `ase util meta <name>`; the specification format `ase-format-spec.md`
         includes the SpecBook models and formats description
         `ase-format-specbook.md` and the standard SpecBook schema
         configuration `ase-format-specbook.yaml`, both generated at
@@ -34,7 +34,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
     -   `tool/src/ase.ts`: the entry point, wiring all top-level commands
     -   `tool/src/ase-*.ts`: one module per top-level command (`setup`,
         `config`, `mcp`, `service`, `hook`, `statusline`, `task`, `artifact`,
-        `spec`, `util-meta`, `util-compat`, `util-diagram`, `util-worktree`,
+        `spec`, `util`, `util-meta`, `util-compat`, `util-diagram`, `util-worktree`,
         `util-mint`, `util-metric`) plus generic library modules (`lib-log`,
         `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`), the MCP-only tool modules of the
         service (`service-kv`, `service-getopt`, `service-markdown`,
@@ -138,12 +138,11 @@ background HTTP service), `ase mcp` (stdio-to-service MCP bridge), `ase
 hook` (agent tool hook handlers), `ase statusline` (statusline renderer),
 `ase task` (persisted task plans), `ase artifact` (artifact kind
 resolution), `ase spec` (SpecBook specification linting, exporting, and
-previewing),
-`ase meta` (plugin meta file output), `ase diagram` (Mermaid
-rendering), `ase worktree` (ASE worktree path resolution), `ase mint`
-(hash-derived identifier minting), `ase metric` (text length metrics),
-and `ase compat` (probe values for
-the `ase-meta-compat` self-test skill). See
+previewing), and `ase util` (utility commands: `ase util meta` (plugin
+meta file output), `ase util diagram` (Mermaid rendering), `ase util
+worktree` (ASE worktree path resolution), `ase util mint` (hash-derived
+identifier minting), `ase util metric` (text length metrics), and `ase
+util compat` (probe values for the `ase-meta-compat` self-test skill)). See
 `docs/usage-tool.md` for the full manual page.
 
 ## Code Style

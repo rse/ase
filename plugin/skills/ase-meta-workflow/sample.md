@@ -6,10 +6,10 @@ description: >
 user-invocable: true
 disable-model-invocation: false
 allowed-tools:
-    - "Bash(ase meta *)"
+    - "Bash(ase util meta *)"
 ---
 
-!`ase meta control skill getopt`
+!`ase util meta control skill getopt`
 
 <purpose name="optimizer">
 Analyze and Resolve Source Code Problems

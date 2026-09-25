@@ -277,9 +277,36 @@ or *GitHub Copilot CLI* statusline:
   tools (like the *claudeX* sister project) can pick it up via
   `#{@ase_task_id}`.
 
-The following top-level command exists for diagram rendering:
+The following top-level commands exist for miscellaneous utilities:
 
-- `ase diagram`:
+- `ase util`:
+  Entry point group for utility operations. Without a subcommand, the
+  help text is shown and the command exits with status 1.
+
+- `ase util meta` *name* \[...\]:
+  Output the contents of one or more plugin *meta files* to standard
+  output. Each *name* selects a file under the plugin's `meta/`
+  directory; the `ase-` prefix and `.md` extension are optional. This is
+  intended to be leveraged by *ASE* skills and not typically invoked
+  directly by end users.
+
+- `ase util compat`:
+  Output the canonical expected probe values for the `ase-meta-compat`
+  self-test skill as `<id>: <value>` lines, one per probe. This is
+  intended to be invoked by the skill (after it has recorded all actual
+  probe results) and not directly by end users.
+
+- `ase util worktree base` \[`-c`|`--create`\]:
+  Print the validated base directory `<repo-root>/.ase/worktree`
+  holding all *ASE* worktrees. With `--create`, the directory is
+  created if it does not exist yet.
+
+- `ase util worktree path` *id* \[`-c`|`--create`\]:
+  Print the validated worktree directory `<repo-root>/.ase/worktree/<id>`
+  of a single *id*, which has to match `[A-Za-z0-9_-]+`. With
+  `--create`, the base directory is created if it does not exist yet.
+
+- `ase util diagram`:
   Render a *Mermaid* diagram specification (read from standard
   input or from `--input` *file*) as Unicode/ASCII art or SVG. Supports
   the following options:
@@ -300,9 +327,7 @@ The following top-level command exists for diagram rendering:
     - \[`--terminal-width` *n*\] / \[`--terminal-height` *n*\]:
       explicit terminal width/height for clipping.
 
-The following top-level command exists for identifier minting:
-
-- `ase mint` \[`-t`|`--type` `uuid`|`sha1`\] \[`-c`|`--count` *count*\] \[*hint* \[...\]\]:
+- `ase util mint` \[`-t`|`--type` `uuid`|`sha1`\] \[`-c`|`--count` *count*\] \[*hint* \[...\]\]:
   Mint one or more hash-derived identifiers out of the *hint* formed by
   the remaining arguments, one identifier per output line. With `--type`
   `uuid` (default), a deterministic *UUID V5* over the *hint* within the
@@ -317,9 +342,7 @@ The following top-level command exists for identifier minting:
   of the `ase-meta-mint` skill; the language-level types of that skill
   require the AI and hence exist in the skill only.
 
-The following top-level command exists for text measuring:
-
-- `ase metric` \[`-f`|`--file` *file*\] \[*text* \[...\]\]:
+- `ase util metric` \[`-f`|`--file` *file*\] \[*text* \[...\]\]:
   Measure the length metrics of a text, given either as the content of
   *file* or as the *text* formed by the remaining arguments, which are
   mutually exclusive and of which exactly one has to be given. The
@@ -666,24 +689,6 @@ resolvers always see the very same specification:
   export is pushed into the connected browsers as an in-place document
   update. Before the first successful export, a placeholder page is
   served instead. The command does not terminate on its own.
-
-The following top-level command exists for exposing plugin meta files:
-
-- `ase meta` *name* \[...\]:
-  Output the contents of one or more plugin *meta files* to standard
-  output. Each *name* selects a file under the plugin's `meta/`
-  directory; the `ase-` prefix and `.md` extension are optional. This is
-  intended to be leveraged by *ASE* skills and not typically invoked
-  directly by end users.
-
-The following top-level command exists for the `ase-meta-compat`
-self-test skill:
-
-- `ase compat`:
-  Output the canonical expected probe values for the `ase-meta-compat`
-  self-test skill as `<id>: <value>` lines, one per probe. This is
-  intended to be invoked by the skill (after it has recorded all actual
-  probe results) and not directly by end users.
 
 The following top-level commands exist for *Anthropic Claude Code CLI* hook
 integration:

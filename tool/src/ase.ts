@@ -17,6 +17,7 @@ import StatuslineCommand           from "./ase-statusline.js"
 import TaskCommand                 from "./ase-task.js"
 import ArtifactCommand             from "./ase-artifact.js"
 import SpecCommand                 from "./ase-spec.js"
+import UtilCommand                 from "./ase-util.js"
 import MetaCommand                 from "./ase-util-meta.js"
 import CompatCommand               from "./ase-util-compat.js"
 import DiagramCommand              from "./ase-util-diagram.js"
@@ -71,12 +72,13 @@ const main = async (): Promise<void> => {
     new TaskCommand(log).register(program)
     new ArtifactCommand(log).register(program)
     new SpecCommand(log).register(program)
-    new MetaCommand(log).register(program)
-    new CompatCommand().register(program)
-    new DiagramCommand(log).register(program)
-    new WorktreeCommand().register(program)
-    new MintCommand().register(program)
-    new MetricCommand().register(program)
+    const util = new UtilCommand().register(program)
+    new MetaCommand(log).register(util)
+    new CompatCommand().register(util)
+    new DiagramCommand(log).register(util)
+    new WorktreeCommand().register(util)
+    new MintCommand().register(util)
+    new MetricCommand().register(util)
 
     /*  parse program arguments  */
     await program.parseAsync(process.argv)

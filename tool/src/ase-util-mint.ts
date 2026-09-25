@@ -58,7 +58,7 @@ export const mint = (type: MintType, hint: string, count: number): MintResult =>
     return { ids, warning }
 }
 
-/*  CLI command "ase mint"  */
+/*  CLI command "ase util mint"  */
 export default class MintCommand {
     /*  register commands  */
     register (program: Command): void {
@@ -73,7 +73,7 @@ export default class MintCommand {
                 const count  = Number(opts.count)
                 const result = mint(opts.type, hint.join(" "), count)
                 if (result.warning !== "")
-                    process.stderr.write(`ase mint: ${result.warning}\n`)
+                    process.stderr.write(`ase util mint: ${result.warning}\n`)
                 await writeStdout(`${result.ids.join("\n")}\n`)
             })
     }

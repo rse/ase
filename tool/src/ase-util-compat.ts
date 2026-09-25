@@ -50,7 +50,7 @@ const EXPECTED: Record<string, string> = {
 const formatExpected = (): string =>
     Object.entries(EXPECTED).map(([ id, value ]) => `${id}: ${value}`).join("\n") + "\n"
 
-/*  CLI command "ase compat"  */
+/*  CLI command "ase util compat"  */
 export default class CompatCommand {
     register (program: Command): void {
         program

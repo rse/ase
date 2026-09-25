@@ -54,7 +54,7 @@ export class Meta {
     }
 }
 
-/*  CLI command "ase meta"  */
+/*  CLI command "ase util meta"  */
 export default class MetaCommand {
     constructor (private log: Log) {}
 

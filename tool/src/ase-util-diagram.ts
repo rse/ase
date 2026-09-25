@@ -228,7 +228,7 @@ export class Diagram {
                 const widest = lines.reduce((m, l) => Math.max(m, visibleWidth(l)), 0)
                 if (widest > maxWidth)
                     widthWarn =
-                        `ase diagram: WARNING: rendered diagram width ${widest} exceeds budget ${maxWidth}; ` +
+                        `ase util diagram: WARNING: rendered diagram width ${widest} exceeds budget ${maxWidth}; ` +
                         "rightmost content was clipped. Please regenerate the Mermaid source to fit " +
                         `within ${maxWidth} chars by preferring a portrait orientation ` +
                         "(\"flowchart TB\", top-to-bottom) over landscape (\"LR\"/\"RL\"/\"BT\"), " +
@@ -239,7 +239,7 @@ export class Diagram {
             if (maxHeight > 0 && lines.length > maxHeight) {
                 const overflow = lines.length - maxHeight
                 heightWarn =
-                    `ase diagram: WARNING: rendered diagram height ${lines.length} exceeds budget ${maxHeight}; ` +
+                    `ase util diagram: WARNING: rendered diagram height ${lines.length} exceeds budget ${maxHeight}; ` +
                     `bottom ${overflow} line(s) were clipped. Please regenerate the Mermaid source to fit ` +
                     `within ${maxHeight} lines by reducing depth or splitting into multiple diagrams.`
                 lines = lines.slice(0, maxHeight)
