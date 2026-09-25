@@ -19,9 +19,9 @@ import { z }                                        from "zod"
 import { LRUCache }                                 from "lru-cache"
 import type { McpServer }                           from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import type Log                                     from "./ase-log.js"
-import { writeStdout }                              from "./ase-stdio.js"
-import { renderTable }                              from "./ase-table.js"
+import type Log                                     from "./ase-util-log.js"
+import { writeStdout }                              from "./ase-util-stdio.js"
+import { renderTable }                              from "./ase-util-table.js"
 
 /*  classification taxonomy  */
 export const projectClassification = {

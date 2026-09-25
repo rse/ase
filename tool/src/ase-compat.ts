@@ -7,7 +7,7 @@
 import { Command }          from "commander"
 import type { McpServer }   from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import { writeStdout }      from "./ase-stdio.js"
+import { writeStdout }      from "./ase-util-stdio.js"
 
 /*  the canonical expected values for every ase-meta-compat probe,
     keyed by "<category>/<probe-name>" as used in the skill  */

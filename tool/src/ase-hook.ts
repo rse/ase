@@ -13,10 +13,10 @@ import { execaSync }                                      from "execa"
 import { quote }                                          from "shell-quote"
 import * as v                                             from "valibot"
 
-import type Log                                           from "./ase-log.js"
-import Version                                            from "./ase-version.js"
+import type Log                                           from "./ase-util-log.js"
+import Version                                            from "./ase-util-version.js"
 import { Config, configSchema, parseScope, userStateDir } from "./ase-config.js"
-import { readStdin, writeStdout }                         from "./ase-stdio.js"
+import { readStdin, writeStdout }                         from "./ase-util-stdio.js"
 import { Task }                                           from "./ase-task.js"
 import * as TaskFormat                                    from "./ase-task-format.js"
 

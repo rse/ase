@@ -13,12 +13,12 @@ import { isScalar }             from "yaml"
 import { z }                    from "zod"
 import type { McpServer }       from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import type Log                 from "./ase-log.js"
+import type Log                 from "./ase-util-log.js"
 import { Config, configSchema } from "./ase-config.js"
 import { Task }                 from "./ase-task.js"
-import { Ignore }               from "./ase-ignore.js"
-import type { IgnoreRule }      from "./ase-ignore.js"
-import { writeStdout }          from "./ase-stdio.js"
+import { Ignore }               from "./ase-util-ignore.js"
+import type { IgnoreRule }      from "./ase-util-ignore.js"
+import { writeStdout }          from "./ase-util-stdio.js"
 
 /*  the recognized artifact kinds, in descending precedence order;
     "othr" is the implicit catch-all and is always resolved last  */

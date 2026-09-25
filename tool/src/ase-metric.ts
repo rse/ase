@@ -11,7 +11,7 @@ import { z }              from "zod"
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import { writeStdout }    from "./ase-stdio.js"
+import { writeStdout }    from "./ase-util-stdio.js"
 
 /*  the length metrics of a text  */
 export type Metric = {

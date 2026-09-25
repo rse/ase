@@ -15,8 +15,8 @@ import { z }                             from "zod"
 
 import type { McpServer }                from "@modelcontextprotocol/sdk/server/mcp.js"
 
-import type Log                          from "./ase-log.js"
-import { readStdin }                     from "./ase-stdio.js"
+import type Log                          from "./ase-util-log.js"
+import { readStdin }                     from "./ase-util-stdio.js"
 
 /*  options accepted by the pure rendering helper  */
 export interface DiagramRenderOpts {

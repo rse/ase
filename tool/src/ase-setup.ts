@@ -19,9 +19,9 @@ import { mkdirp }        from "mkdirp"
 import JsonAsty          from "json-asty"
 import type { AstNode }  from "json-asty"
 
-import type Log          from "./ase-log.js"
-import Version           from "./ase-version.js"
-import { renderTable }   from "./ase-table.js"
+import type Log          from "./ase-util-log.js"
+import Version           from "./ase-util-version.js"
+import { renderTable }   from "./ase-util-table.js"
 
 /*  type of supported tool (host) systems  */
 type Tool = "claude" | "copilot" | "codex"

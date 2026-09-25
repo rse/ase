@@ -6,8 +6,8 @@
 */
 
 import { Command, CommanderError, Option } from "commander"
-import Log                         from "./ase-log.js"
-import type { LogLevel }           from "./ase-log.js"
+import Log                         from "./ase-util-log.js"
+import type { LogLevel }           from "./ase-util-log.js"
 import SetupCommand                from "./ase-setup.js"
 import ConfigCommand               from "./ase-config.js"
 import MCPCommand                  from "./ase-mcp.js"

@@ -13,7 +13,7 @@ import Hapi                     from "@hapi/hapi"
 import { WebSocketServer }      from "ws"
 import type { WebSocket }       from "ws"
 
-import type Log                 from "./ase-log.js"
+import type Log                 from "./ase-util-log.js"
 import type * as Delegate       from "./ase-task-store-plugin-delegate.js"
 import * as Core                from "./ase-task-store-core.js"
 import * as TaskFormat          from "./ase-task-format.js"
