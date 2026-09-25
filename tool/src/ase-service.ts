@@ -339,9 +339,14 @@ export default class ServiceCommand {
             }
         })
         server.route({
-            method:  "GET",
+            method:  "POST",
             path:    "/stop",
-            handler: (_request, h) => {
+            handler: (request, h) => {
+                /*  require a JSON content type, as browsers cannot send it cross-origin
+                    without a CORS preflight (which this service never grants)  */
+                const ct = ((request.headers["content-type"] as string | undefined) ?? "").toLowerCase()
+                if (!ct.startsWith("application/json"))
+                    return h.response({ error: "unsupported media type" }).code(415)
                 this.log.write("info", "service: stop requested")
                 setImmediate(async () => {
                     try {
@@ -682,7 +687,9 @@ export default class ServiceCommand {
             return 0
         }
         const r = await ofetch.raw(`http://${HOST}:${ctx.port}/stop`, {
-            method:              "GET",
+            method:              "POST",
+            headers:             { "Content-Type": "application/json" },
+            body:                {},
             signal:              AbortSignal.timeout(5000),
             ignoreResponseError: true
         })
