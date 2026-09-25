@@ -65,9 +65,17 @@ class LocalTaskStoreClient implements TaskStoreClient {
     private entry: LocalTaskStoreShared | undefined
     private core!: Core.TaskStoreCore
     constructor (private prjId: string, public lifecycle: TaskFormat.TaskLifecycle, private basedir: string, private log: Log) {}
-    setLifecycle (name: string): Promise<void> {
-        return Promise.reject(new Error("task: local task store always follows \"project.task.lifecycle\" " +
-            `(set it via "ase config --scope project set project.task.lifecycle ${name}")`))
+    /*  switch the lifecycle model by persisting "project.task.lifecycle" on scope "project"
+        (which the local store always follows) and re-registering the project (mapping the plan states)  */
+    async setLifecycle (name: string): Promise<void> {
+        const cfg = new Config("config", configSchema, this.log, parseScope("project"))
+        cfg.lock(() => {
+            cfg.read()
+            cfg.set("project.task.lifecycle", name)
+            cfg.write()
+        })
+        Task.invalidate()
+        await this.core.projectSet(this.prjId, name)
     }
     private async missing<T> (op: () => Promise<T>, fallback: T): Promise<T> {
         try {
@@ -501,9 +509,9 @@ export class Task {
         return Task.with(log, (client) => Promise.resolve(client.lifecycle))
     }
 
-    /*  set the lifecycle model of the project in a remote task store (a local
-        task store always follows "project.task.lifecycle"); returns the name
-        of the previous lifecycle model  */
+    /*  set the lifecycle model of the project in the task store (for a local
+        task store via "project.task.lifecycle" on scope "project"); returns
+        the name of the previous lifecycle model  */
     static async setLifecycle (log: Log, name: string): Promise<string> {
         if (TaskFormat.taskLifecycles[name] === undefined)
             throw new Error(`task: invalid lifecycle model "${name}" ` +
@@ -1085,8 +1093,8 @@ export default class TaskCommand {
         task
             .command("lifecycle")
             .description("Get or set the task lifecycle model of the project: without <name> the effective " +
-                "model is printed, with <name> the project in a remote task store is switched to it " +
-                "(a local task store always follows \"project.task.lifecycle\")")
+                "model is printed, with <name> the project in the task store is switched to it " +
+                "(for a local task store by setting \"project.task.lifecycle\" on scope \"project\")")
             .argument("[<name>]", `Lifecycle model name (${Object.keys(TaskFormat.taskLifecycles).join("|")})`)
             .action(async (name?: string) => {
                 if (name === undefined)
