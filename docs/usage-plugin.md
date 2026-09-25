@@ -148,6 +148,13 @@ The following ASE commands/skills exist on the task-level:
   `finished` sentinel stands for the finished states of the model, the
   `none` sentinel for no restriction.
 
+- **/ase-task-dashboard** \[`--web`|`-w`\] \[*number*\]:<br/>
+  Show all task plans in the lanes of the configured task lifecycle
+  model (`project.task.lifecycle`), grouped by its phases plus a final
+  `Done` group, each card with its sticky display number. With a
+  *number*, the corresponding task plan is shown. With `--web`, the live
+  web dashboard is opened in the browser.
+
 - **/ase-task-edit** \[`--plan`|`-p` *option*\] \[`--dry`|`-d`\] \[`--next`|`-n` *option*\[,...\]\] \[*id* | *id*`:` *instruction* | *instruction*\]:<br/>
   Iteratively craft and refine a named task plan through a
   conversational loop, without using *Anthropic Claude Code CLI Plan Mode*.

@@ -178,6 +178,11 @@ export class Task {
         return path.join(Task.projectRoot(), Task.spec(log).basedir)
     }
 
+    /*  resolve the configured "files" miniglob of task storage  */
+    static files (log: Log): string {
+        return Task.spec(log).files
+    }
+
     /*  ensure a task id's "TASK-<id>.md" filename satisfies
         the configured "files" miniglob  */
     private static enforceFiles (log: Log, id: string): void {
@@ -495,6 +500,66 @@ export class Task {
         if (m === null)
             return initial
         return m[1]
+    }
+
+    /*  split a (normalized) task plan into its frontmatter keys and its
+        Markdown body (without the backmatter), for read-only consumers
+        which must not parse plans themselves; returns null if no task exists  */
+    static parts (log: Log, id: string): { keys: Map<string, string>, body: string } | null {
+        const text = Task.load(log, id)
+        if (text === "")
+            return null
+        const fm = Task.parseFront(text)
+        if (fm === null)
+            return { keys: new Map(), body: text }
+        const rest = text.slice(fm.length)
+        const end  = /^---\r?$/m.exec(rest)
+        return { keys: fm.keys, body: end === null ? rest : rest.slice(0, end.index) }
+    }
+
+    /*  list the attachments of a (normalized) task plan, i.e. its backmatter
+        blocks, each with its type, description, and either the referenced
+        file (relative to the task storage) or the embedded data  */
+    static attachments (log: Log, id: string): { type: string, desc: string, file?: string, data?: string }[] {
+        const text = Task.load(log, id)
+        const fm   = text === "" ? null : Task.parseFront(text)
+        if (fm === null)
+            return []
+        const out = [] as { type: string, desc: string, file?: string, data?: string }[]
+        for (const block of text.slice(fm.length).split(/^---\r?\n/m).slice(1)) {
+            const keys = new Map<string, string>()
+            const data = [] as string[]
+            let   body = false
+            for (const line of block.split(/\r?\n/)) {
+                const m = body ? null : /^([A-Za-z]+):[ \t]*(.*?)[ \t]*$/.exec(line)
+                if (m !== null && m[1] === "Data")
+                    body = true
+                else if (m !== null)
+                    keys.set(m[1], m[2])
+                else if (body)
+                    data.push(line.replace(/^ {4}/, ""))
+            }
+            const type = keys.get("Type")
+            if (type === undefined)
+                continue
+            out.push({
+                type,
+                desc: keys.get("Desc") ?? "",
+                ...(keys.has("File") ? { file: keys.get("File")! } : {}),
+                ...(body ? { data: data.join("\n") } : {})
+            })
+        }
+        return out
+    }
+
+    /*  read a referenced attachment file of a task, resolved against the task
+        storage and confined to it; returns null if missing or escaping  */
+    static attachmentFile (log: Log, file: string): Buffer | null {
+        const base = Task.baseDir(log)
+        const full = path.resolve(base, file)
+        if (!full.startsWith(base + path.sep) || !fs.existsSync(full))
+            return null
+        return fs.readFileSync(full)
     }
 
     /*  get the lifecycle status of a task plan: the "Status:" frontmatter

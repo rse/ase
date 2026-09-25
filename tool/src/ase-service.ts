@@ -40,6 +40,7 @@ import { SkillsMCP }                     from "./ase-skills.js"
 import { WorktreeMCP }                   from "./ase-worktree.js"
 import { MintMCP }                       from "./ase-mint.js"
 import { MetricMCP }                     from "./ase-metric.js"
+import { registerDashboardRoutes }       from "./ase-dashboard-web.js"
 import pkg                               from "../package.json" with { type: "json" }
 
 /*  shared service host  */
@@ -429,6 +430,9 @@ export default class ServiceCommand {
                 return h.response({ error: "unknown command", command: cmd }).code(400)
             }
         })
+
+        /*  serve the web dashboard of the project  */
+        registerDashboardRoutes(server, this.log)
 
         /*  start service  */
         try {

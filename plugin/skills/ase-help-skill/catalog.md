@@ -53,6 +53,7 @@
 ⎈   **TASK MANAGEMENT**
 ○   `ase-task-id`:         Configure Task Id
 ○   `ase-task-list`:       List Task Plans
+○   `ase-task-dashboard`:  Show the Task Dashboard
 ○   `ase-task-view`:       View a Task Plan
 ○   `ase-task-edit`:       Iteratively Edit a Task Plan
 ○   `ase-task-grill`:      Iteratively Grill a Task Plan

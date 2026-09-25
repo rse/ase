@@ -23,6 +23,7 @@ import DiagramCommand              from "./ase-diagram.js"
 import WorktreeCommand             from "./ase-worktree.js"
 import MintCommand                 from "./ase-mint.js"
 import MetricCommand               from "./ase-metric.js"
+import DashboardCommand            from "./ase-dashboard.js"
 import pkg                         from "../package.json" with { type: "json" }
 
 /*  type of top-level (global) options  */
@@ -77,6 +78,7 @@ const main = async (): Promise<void> => {
     new WorktreeCommand().register(program)
     new MintCommand().register(program)
     new MetricCommand().register(program)
+    new DashboardCommand(log).register(program)
 
     /*  parse program arguments  */
     await program.parseAsync(process.argv)

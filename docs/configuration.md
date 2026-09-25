@@ -42,7 +42,9 @@ The following configuration parameters control the project:
 
     The lifecycle is exported by the session-start hook as the
     `<ase-project-task-lifecycle/>` placeholder (and as the
-    `ASE_PROJECT_TASK_LIFECYCLE` environment variable).
+    `ASE_PROJECT_TASK_LIFECYCLE` environment variable). It also fixes the
+    lane layout of `ase dashboard`, which offers no lane configuration of
+    its own.
 
 The project *artifacts* are configured per kind, each kind defined by a
 `.basedir` anchor and a `.files` miniglob spec. The `.basedir` is a

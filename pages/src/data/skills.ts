@@ -66,6 +66,7 @@ export const skillGroups: SkillGroup[] = [
             "ase-task-implement",
             "ase-task-view",
             "ase-task-list",
+            "ase-task-dashboard",
             "ase-task-status",
             "ase-task-rename",
             "ase-task-condense",

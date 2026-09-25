@@ -516,6 +516,23 @@ single-file layout on first access:
   value, where *unit* is one of `h` (hour), `d` (day), `m` (month), or
   `y` (year).
 
+The following top-level command exists for watching the persisted task
+plans of the current project:
+
+- `ase dashboard` \[`-g`|`--graph`\] \[`-w`|`--web`\] \[`-t`|`--text`\] \[`-r`|`--resolve` *number*\]:
+  Show the read-only task dashboard: all task plans as cards in the
+  lanes of the configured task lifecycle model (`project.task.lifecycle`),
+  grouped by the phases of the model plus a final `Done` group, with the
+  active lanes in blue and the parking lanes in grey. Without options,
+  the interactive terminal dashboard is started (`--graph` starts in the
+  dependency graph view derived from the `After:` keys); lanes can be
+  minimized and groups collapsed, and a card opens its plan in a
+  full-height dialog. `--web` serves the web dashboard through the ASE
+  service of the project and opens it in the browser. `--text` prints
+  the lane overview as plain text, which is also the fallback without an
+  interactive terminal. `--resolve` prints the task id of a sticky
+  display *number*. All views follow changes of the task plans live.
+
 The following top-level commands exist for resolving project artifact
 kinds to project-relative file lists, driven by the
 `project.artifact.*` configuration globs. Only the files Git tracks are
@@ -719,6 +736,11 @@ STATE FILES
   owned by *ASE* and removed by `ase task delete` and `ase task purge`.
   A legacy `<basedir>/`*id*`/plan.md` layout is auto-migrated to this
   single-file layout on first access.
+
+- `<project>/.ase/dashboard.yaml`:
+  Display state of `ase dashboard`: the sticky display numbers of the
+  task cards and, separately for the terminal and the web dashboard, the
+  minimized lanes and collapsed groups. It never holds task content.
 
 HISTORY
 -------
