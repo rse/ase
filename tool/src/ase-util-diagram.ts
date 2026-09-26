@@ -7,10 +7,6 @@
 import fs                                from "node:fs"
 
 import { Command, InvalidArgumentError } from "commander"
-import {
-    renderMermaidASCII,
-    renderMermaidSVG
-}                                        from "beautiful-mermaid"
 import { z }                             from "zod"
 
 import type { McpServer }                from "@modelcontextprotocol/sdk/server/mcp.js"
@@ -186,8 +182,11 @@ export class Diagram {
 
     /*  pure rendering helper: turn a Mermaid source string plus options into
         a rendered Unicode/ASCII diagram string, or an SVG document string
-        when "svg" format is requested. Throws on render failure.  */
-    static render (src: string, opts: DiagramRenderOpts): string {
+        when "svg" format is requested. Throws on render failure.
+        ("beautiful-mermaid" is loaded on first use only)  */
+    static async render (src: string, opts: DiagramRenderOpts): Promise<string> {
+        const { renderMermaidASCII, renderMermaidSVG } = await import("beautiful-mermaid")
+
         /*  render as a self-contained SVG document using the library's
             themed defaults (the ANSI "colorMode" and the terminal
             clipping below are meaningful only for ASCII art)  */
@@ -319,7 +318,7 @@ export default class DiagramCommand {
                 /*  create diagram rendering  */
                 let out: string
                 try {
-                    out = Diagram.render(src, opts)
+                    out = await Diagram.render(src, opts)
                 }
                 catch (err: unknown) {
                     const message = err instanceof Error ? err.message : String(err)
@@ -378,7 +377,7 @@ export class DiagramMCP {
             }
         }, async (args) => {
             try {
-                const out = Diagram.render(args.diagram, args)
+                const out = await Diagram.render(args.diagram, args)
                 return {
                     content: [ { type: "text", text: out } ]
                 }

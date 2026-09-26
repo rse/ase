@@ -12,8 +12,9 @@ import { isScalar }             from "yaml"
 import { z }                    from "zod"
 import sourceCodeError          from "source-code-error"
 import type { McpServer }       from "@modelcontextprotocol/sdk/server/mcp.js"
-import { SpecBook, renderDiagnostic, renderVerbose, formats, parseOutputSpec, previewAddr, previewPort } from "@rse/specbook"
-import type { Diagnostic, ExportFormat, VerboseLevel }                                                  from "@rse/specbook"
+import { renderDiagnostic }     from "@rse/specbook/dst/specbook-diagnostic.js"
+import { renderVerbose }        from "@rse/specbook/dst/specbook-verbose.js"
+import type { SpecBook, Diagnostic, ExportFormat, VerboseLevel } from "@rse/specbook"
 
 import type Log                 from "./ase-lib-log.js"
 import type { LogLevel }        from "./ase-lib-log.js"
@@ -27,6 +28,12 @@ import { writeStdout }          from "./ase-lib-stdio.js"
     project specification, located via the "project.artifact.spec.basedir"
     and "project.artifact.spec.schema" configuration  */
 export class Spec {
+    /*  the SpecBook export formats, mirrored here (and checked for completeness
+        against SpecBook at compile-time) to not load SpecBook for the MCP schema  */
+    static readonly formats = Object.keys({
+        json: true, json5: true, yaml: true, toon: true, html: true, pdf: true, md: true
+    } satisfies Record<ExportFormat, true>) as [ ExportFormat, ...ExportFormat[] ]
+
     /*  resolve the YAML schema configuration files: the whitespace-separated
         entries of the configured "project.artifact.spec.schema", merged in
         the given order, where each entry is either the literal "std" for the
@@ -62,8 +69,10 @@ export class Spec {
     /*  create the SpecBook API instance, routing its verbose processing
         messages into the log according to their verbosity level, while
         its "none" level messages, for consumers which never see the log,
-        additionally reach the given collector  */
-    private static api (log: Log, notices?: string[]): SpecBook {
+        additionally reach the given collector
+        (SpecBook itself is loaded on first use only)  */
+    private static async api (log: Log, notices?: string[]): Promise<SpecBook> {
+        const { SpecBook } = await import("@rse/specbook")
         return new SpecBook({
             verbose: (cmd, msg, level) => {
                 const text = renderVerbose(msg)
@@ -108,11 +117,11 @@ export class Spec {
     /*  lint the specification Markdown files below the "spec" artifact
         base directory against the schema configuration  */
     static async lint (log: Log): Promise<Diagnostic[]> {
-        const result = await Spec.unmarked(Spec.api(log).lint({
+        const result = await Spec.unmarked(Spec.api(log).then((api) => api.lint({
             config:    Spec.configFiles(log),
             basedir:   Artifact.basedir(log, "spec"),
             gitignore: Spec.gitignore
-        }))
+        })))
         return result.diagnostics.map((d) => ({ ...d, file: Spec.relativize(d.file) }))
     }
 
@@ -145,12 +154,12 @@ export class Spec {
         base directory into the requested formats, one buffer per format,
         collecting the emitted environment notices if requested  */
     static export (log: Log, formats: ExportFormat[], notices?: string[]): Promise<Buffer[]> {
-        return Spec.unmarked(Spec.api(log, notices).export({
+        return Spec.unmarked(Spec.api(log, notices).then((api) => api.export({
             config:    Spec.configFiles(log),
             basedir:   Artifact.basedir(log, "spec"),
             gitignore: Spec.gitignore,
             formats
-        }))
+        })))
     }
 
     /*  export the specification like "export" and then keep the export
@@ -163,27 +172,27 @@ export class Spec {
         outputs:  string[],
         onExport: (buffers: Buffer[]) => Promise<void>
     ): Promise<void> {
-        return Spec.unmarked(Spec.api(log).watch({
+        return Spec.unmarked(Spec.api(log).then((api) => api.watch({
             config:    Spec.configFiles(log),
             basedir:   Artifact.basedir(log, "spec"),
             gitignore: Spec.gitignore,
             formats,
             outputs,
             onExport
-        }))
+        })))
     }
 
     /*  serve the HTML export of the specification as a live preview,
         kept in sync with its sources and pushed into the connected
         browsers as an in-place document update  */
     static preview (log: Log, addr: string, port: number): Promise<void> {
-        return Spec.unmarked(Spec.api(log).preview({
+        return Spec.unmarked(Spec.api(log).then((api) => api.preview({
             config:    Spec.configFiles(log),
             basedir:   Artifact.basedir(log, "spec"),
             gitignore: Spec.gitignore,
             addr,
             port
-        }))
+        })))
     }
 }
 
@@ -228,6 +237,7 @@ export default class SpecCommand {
                 (value: string, previous: string[]) => previous.concat(value), new Array<string>())
             .option("-w, --watch", "keep the outputs in sync by re-exporting on every source change")
             .action(async (opts: { output: string[], watch?: boolean }) => {
+                const { parseOutputSpec } = await import("@rse/specbook")
                 const outputs  = (opts.output.length > 0 ? opts.output :
                     [ path.join(Artifact.basedir(this.log, "spec"), "index.html") ]).map(parseOutputSpec)
 
@@ -262,13 +272,14 @@ export default class SpecCommand {
         spec
             .command("preview")
             .description("Serve the HTML export of the specification Markdown files as a live preview")
-            .option("-a, --addr <ip-addr>", "IP address to listen on", previewAddr)
-            .option("-p, --port <tcp-port>", "TCP port to listen on", String(previewPort))
-            .action(async (opts: { addr: string, port: string }) => {
-                const port = Number(opts.port)
+            .option("-a, --addr <ip-addr>", "IP address to listen on (default: SpecBook preview address)")
+            .option("-p, --port <tcp-port>", "TCP port to listen on (default: SpecBook preview port)")
+            .action(async (opts: { addr?: string, port?: string }) => {
+                const { previewAddr, previewPort } = await import("@rse/specbook")
+                const port = Number(opts.port ?? previewPort)
                 if (!Number.isInteger(port) || port < 1 || port > 65535)
                     throw new Error(`invalid TCP port "${opts.port}"`)
-                await Spec.preview(this.log, opts.addr, port)
+                await Spec.preview(this.log, opts.addr ?? previewAddr, port)
                 await new Promise<void>(() => { /*  never resolves  */ })
             })
     }
@@ -347,7 +358,7 @@ export class SpecMCP {
                 "(like a PDF rendering falling back onto a system-installed browser), which are " +
                 "worth reporting to the user verbatim.",
             inputSchema: {
-                format: z.enum(formats).optional()
+                format: z.enum(Spec.formats).optional()
                     .describe("output format (default: inferred from the `output` file extension, else `json`)"),
                 output: z.string().optional()
                     .describe("output file path (\"-\" or omitted returns the result directly)")
@@ -359,6 +370,8 @@ export class SpecMCP {
         }, async (args) => {
             const notices = new Array<string>()
             try {
+                const { parseOutputSpec } = await import("@rse/specbook")
+
                 /*  an explicit format takes the output as a plain file path, while
                     otherwise the output is an "[<format>:]<file>" specification  */
                 const spec = args.format !== undefined || args.output === undefined ?
