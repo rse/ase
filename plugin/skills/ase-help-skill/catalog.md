@@ -48,6 +48,7 @@
 ○   `ase-meta-commit`:     Git Commit Message
 ○   `ase-meta-diff`:       Summarize Diff
 ○   `ase-meta-review`:     Review Staged Changes
+○   `ase-code-review`:     Review and Curate Uncommitted Changes
 ○   `ase-code-dissect`:    Dissect a Change Set
 
 ⎈   **TASK MANAGEMENT**
