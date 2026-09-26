@@ -72,10 +72,12 @@ untracked files -- into themes, let the user *confirm the grouping* from one
 compact table, then *stage* one theme at a time into the plain Git
 index -- no work branch, no stashing, no diff dumps, the user reviews
 the staged lines in their own editor -- and *commit* only what the
-user accepts. Demanding a *correction* instead of an accept is a
-regular outcome of a group review: it is carried out right there by
-delegating to `ase-code-edit`, after which the group is re-staged and
-re-presented. This skill *complements* its neighbours rather than
+user accepts. Before a group is presented at all, its `✗` findings
+are *corrected automatically* in one pass, so the user first sees the
+already corrected group. Demanding a further *correction* instead of an
+accept is a regular outcome of a group review: it is carried out right
+there by delegating to `ase-code-edit`, after which the group is
+re-staged and re-presented. This skill *complements* its neighbours rather than
 duplicating them: `ase-repo-diff` narrates *what changed*,
 `ase-repo-review` renders a reviewer's *judgement*,
 `ase-code-lint`/`ase-code-analyze` flag *quality/logic* problems, and
@@ -320,8 +322,9 @@ stay in their original form.
 
     -   *Index only*: staging happens exclusively in the plain Git
         index on the *current* branch -- no work branch, no
-        `git stash`, and no working-tree mutation *except* the
-        correction the user explicitly demands via `CHANGE`. The user's
+        `git stash`, and no working-tree mutation *except* the one
+        automatic correction pass of 5.4 and the correction the user
+        explicitly demands via `CHANGE`. The user's
         editor keeps showing staged changes and remaining unstaged
         changes side by side at all times.
     -   *No patch dumps*: never render raw diff text unprompted -- the
@@ -375,7 +378,7 @@ stay in their original form.
          still judge that file, as defined by `Evidence Budget` above.
          The sub-agents return *only* their evidence records,
          telegraphically; the reviewing skill translates them into the
-         user's language when it authors the card in 5.4. A group of a
+         user's language when it authors the card in 5.5. A group of a
          single small file is judged directly, without a sub-agent, as
          the dispatch would cost more than it saves.
 
@@ -501,7 +504,27 @@ stay in their original form.
          never average the statuses, and never let a reassuring summary
          outrank the lines above it.
 
-    5.4. Emit the *group card* as a *boxed* card, no diff, so each
+    5.4. *Auto-correct* the group *once*, before the user sees it.
+         <if condition="the verdict carries at least one `✗` and this group was not auto-corrected yet">
+         Mark the group as auto-corrected -- this pass runs at most
+         *once* per group, so the user always decides the *second*
+         round -- and output one line `G<n/>: <count/> ✗ findings --
+         correcting automatically before the review`. Then carry out
+         steps 2 to 5 of the `CHANGE` dispatch in 5.6, with the
+         *correction wish* composed of every `✗` evidence line of the
+         group (file, dimension, cited spot, and named repair) and the
+         instruction to leave a finding untouched when its repair needs
+         a design decision the sources do not settle. `?` and `–` lines
+         are never auto-corrected. Record for the card as
+         <auto-corrected/> the addressed findings, each as
+         `<filename/> <dimension/>` in a few words.
+         </if>
+         <else>
+         Continue with 5.5; a group without `✗` records no
+         <auto-corrected/> at all.
+         </else>
+
+    5.5. Emit the *group card* as a *boxed* card, no diff, so each
          group reads as one visually self-contained unit the user can
          give a *single* ok for. Every file contributes a block -- name
          with layer and line counts, its directory, what changed, and
@@ -530,6 +553,8 @@ stay in their original form.
          <separator/>
 
          *Verdict*: <verdict/>
+
+         *Auto-corrected*: <auto-corrected/>
 
          *Staged*: <staged-count/>/<planned-count/> files verified in the Git
          index -- review them in your editor (VSCode Source Control:
@@ -605,18 +630,24 @@ stay in their original form.
          -   The *Verdict* line is the honest sum of the evidence: it
              is what flips the recommendation of the following dialog
              from `ACCEPT` to `CHANGE`, so it is never dressed up.
+             After an auto-correction it sums the *re-gathered*
+             evidence, so a remaining `✗` is one the first pass could
+             not repair.
+         -   The *Auto-corrected* line is *conditional*: it appears only
+             when 5.4 ran for this group and lists what that pass
+             addressed, as the user did not see these findings before.
          -   The *Staged* line is *mandatory*: it is the user's only
              proof that the index matches the card, and it points them
              at where the actual lines are reviewed.
 
-    5.5. Let the *user interactively choose* (omit `ACCEPT` while a
+    5.6. Let the *user interactively choose* (omit `ACCEPT` while a
          VERTICAL build is non-green, and offer `RETRY-BUILD` only
          then):
 
          <expand name="user-dialog">
              Group G<n/>/<group-count/>: What should happen with this group?
              ACCEPT: Commit the staged group on the current branch.
-             CHANGE: Demand a correction; the code is edited and the group re-staged.
+             CHANGE: Correct the remaining ✗ findings (or a described wish) and re-stage.
              DISCUSS: Ask a question about this group.
              SKIP: Unstage this group and move it to the end of the queue.
              REGROUP: Unstage and recut the remaining groups.
@@ -637,8 +668,10 @@ stay in their original form.
              an exception -- carry it out *now*, in this review run:
 
              1.  Take the *correction wish* from the free text
-                 accompanying the answer; when it carries none, ask the
-                 user in one sentence what has to change.
+                 accompanying the answer; when it carries none, take the
+                 remaining `✗` findings of the card as the wish, and
+                 only when there are none, ask the user in one sentence
+                 what has to change.
              2.  `git reset` -- the correction must not land on top of a
                  partially staged index. The working tree stays
                  untouched, so nothing of the group is lost.

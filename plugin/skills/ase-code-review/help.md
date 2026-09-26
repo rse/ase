@@ -73,7 +73,13 @@ wrong is hunted first -- and never against the changed code itself: a
 red if the change were reverted, and every boundary partition the
 change touches without a covering test is a `✗`. A *Verdict* line sums
 the statuses honestly; a single `✗` flips the recommended answer of the
-group dialog from *accept* to *change*. The card closes with a *Staged*
+group dialog from *accept* to *change*. Before a group is shown at all,
+its `✗` findings are corrected automatically in *one* pass via
+`ase-code-edit`, the group is re-staged and its evidence re-gathered, and
+the card lists the addressed findings in an *Auto-corrected* line; the
+user thus always decides the *second* round, where *change* without a
+further wish corrects the `✗` findings that remain. The card closes
+with a *Staged*
 line reporting the verified file count in the Git index and pointing at
 the editor. Every line is pre-wrapped at 96 columns, the box width, so
 no line overflows and loses its box prefix. Raw diff text is *not*
