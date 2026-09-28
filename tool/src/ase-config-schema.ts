@@ -92,6 +92,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
     "agent.task":                    [ "session" ],
     "agent.skill":                   [ "session" ],
+    "project.basedir":               [ "session" ],
     "project.task.store":            [ "user", "project" ],
     "project.task.token":            [ "user" ],
     "project.task.lifecycle":        [ "user", "project" ],
@@ -178,6 +179,7 @@ export const configSchema = v.nullish(v.strictObject({
     project: v.optional(v.strictObject({
         id:      v.optional(v.pipe(v.string(), v.minLength(1))),
         name:    v.optional(v.pipe(v.string(), v.minLength(1))),
+        basedir: v.optional(v.pipe(v.string(), v.minLength(1))),
         boxing:  v.optional(v.picklist(projectClassification.boxing)),
         task: v.optional(v.strictObject({
             lifecycle: v.optional(v.picklist(projectClassification.lifecycle)),

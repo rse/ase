@@ -4,6 +4,7 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
+import path                   from "node:path"
 import { fileURLToPath }      from "node:url"
 
 import { Command }            from "commander"
@@ -14,6 +15,9 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import type { JSONRPCMessage }           from "@modelcontextprotocol/sdk/types.js"
 
 import type Log                 from "./ase-lib-log.js"
+import { Config }               from "./ase-config-core.js"
+import { configSchema }         from "./ase-config-schema.js"
+import { parseScope }           from "./ase-config-scope.js"
 import { SERVICE_HOST as HOST, probe, isConnRefused, loadServiceContext } from "./ase-service.js"
 
 /*  CLI command "ase mcp"  */
@@ -51,6 +55,42 @@ export default class MCPCommand {
         if (match !== true)
             throw new Error(`mcp: service not responding on port ${ctx.port} after start`)
         return { projectId: ctx.projectId, port: ctx.port }
+    }
+
+    /*  determine the agent session id from the environment: unlike the hook
+        handlers, which receive it in their event payload, the bridge can only
+        learn it from what its agent tool exports -- GitHub Copilot CLI offers
+        COPILOT_AGENT_SESSION_ID, and an empty result disables the project
+        directory lookup, which is what agent tools starting the bridge in the
+        project directory need anyway  */
+    private sessionIdFromEnv (): string {
+        for (const name of [ "COPILOT_AGENT_SESSION_ID", "ASE_SESSION_ID" ]) {
+            const value = process.env[name] ?? ""
+            if (/^[A-Za-z0-9._-]+$/.test(value))
+                return value
+        }
+        return ""
+    }
+
+    /*  read the project directory which the session-start hook recorded for a
+        session; the session scope resolves below the home directory and hence
+        does not itself depend on the working directory to be correct already  */
+    private readSessionProjectDir (sessionId: string): string | null {
+        try {
+            /*  read without locking: this runs on the hot path until the
+                session-start hook has recorded the directory, and locking
+                would both create the session files prematurely and contend
+                with that very hook -- writers use atomic replacement, so a
+                plain read can never observe a partial file  */
+            const cfg = new Config("config", configSchema, this.log, parseScope(`session:${sessionId}`))
+            cfg.read()
+            const value = cfg.getExplicit("project.basedir")
+            return typeof value === "string" && value !== "" ? value : null
+        }
+        catch (_e) {
+            /*  best-effort: an unreadable session config just defers the lookup  */
+            return null
+        }
     }
 
     /*  coerce an unknown thrown value into an Error  */
@@ -191,8 +231,58 @@ export default class MCPCommand {
             })
         }
 
+        /*  resolve the project directory lazily: GitHub Copilot CLI starts the
+            MCP server in the plugin installation directory and reveals the
+            project only in its hook payloads, which arrive much later. The
+            session-start hook records it in the session-scoped configuration,
+            from where it is picked up here as soon as it shows up  */
+        const sessionId = this.sessionIdFromEnv()
+        let   migrated  = sessionId === ""
+
+        /*  adopt the recorded project directory and move over to the service
+            of that project: the working directory is switched before
+            "ensureService", so the service is looked up -- and if needed
+            started -- inside the project instead of wherever the agent tool
+            happened to start this bridge  */
+        const migrate = (dir: string) => {
+            migrated = true
+            process.chdir(dir)
+
+            /*  detach from the old service first, so every message arriving
+                meanwhile is buffered instead of sent to the wrong project  */
+            const stale = client
+            client = null
+            if (stale !== null)
+                closedByUs.add(stale)
+            const run = async () => {
+                if (stale !== null)
+                    await stale.close()
+                const ctx = await this.ensureService()
+                port      = ctx.port
+                projectId = ctx.projectId
+                await connectClient()
+                this.log.write("info", `mcp: moved to service of project "${projectId}" on port ${port}`)
+            }
+            run().catch((err: unknown) => {
+                triggerReconnect(`migration failed: ${this.asError(err).message}`)
+            })
+        }
+
+        /*  look for a recorded project directory until one shows up  */
+        const checkProjectDir = () => {
+            if (migrated)
+                return
+            const dir = this.readSessionProjectDir(sessionId)
+            if (dir === null || path.resolve(dir) === path.resolve(process.cwd()))
+                return
+            migrate(dir)
+        }
+
         /*  wire stdio server  */
-        server.onmessage = sendToClient
+        server.onmessage = (msg: JSONRPCMessage) => {
+            checkProjectDir()
+            sendToClient(msg)
+        }
         server.onerror = (err: Error) => {
             this.log.write("error", `mcp: stdio: ${err.message}`)
         }

@@ -188,6 +188,13 @@ ChangeLog
     instead of a per-tool declaration, so the object-shaped `toolArgs` of the GitHub Copilot
     CLI is parsed again and its `bash`, `Skill`, `Read`, and `Edit` auto-approvals work.
 
+-   BUGFIX [tool]: Project directory of GitHub Copilot CLI sessions
+    GitHub Copilot CLI runs the hooks and starts the MCP server in the plugin installation
+    directory instead of the project, so every working-directory-relative lookup missed the
+    project. The session-start hook now adopts the `cwd` of its event payload and records the
+    resolved project directory in the new session-scoped configuration key `project.basedir`,
+    from where the MCP bridge picks it up and migrates to the service of that project.
+
 1.0.6 (2026-09-14)
 ------------------
 

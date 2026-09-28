@@ -268,9 +268,23 @@ export default class HookCommand {
         return versionHints.length > 0 ? "(" + versionHints.join(", ") + ")" : ""
     }
 
-    /*  determine the project id: the valid configured "project.id", or else
-        the id derived from the Git top-level directory of "cwd" (or "cwd" itself)  */
-    private determineProjectId (cwd: string, cfg: Config): string {
+    /*  switch to the project directory announced in the event payload: GitHub
+        Copilot CLI runs its hooks in the plugin installation directory, so
+        every working-directory-relative lookup -- most notably the layered
+        configuration files -- would otherwise miss the project entirely  */
+    private switchDir (dir: string | undefined): void {
+        if (dir === undefined || dir === "")
+            return
+        if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
+            this.log.write("warning", `hook: ignoring invalid project directory: ${dir}`)
+            return
+        }
+        process.chdir(dir)
+    }
+
+    /*  determine the project directory: the Git top-level directory of "cwd",
+        or "cwd" itself when outside a Git working tree  */
+    private determineProjectDir (cwd: string): string {
         let projectDir = cwd
         try {
             const result = execaSync("git", [ "rev-parse", "--show-toplevel" ], {
@@ -282,6 +296,15 @@ export default class HookCommand {
         catch {
             /*  not inside a Git working tree  */
         }
+
+        /*  normalize the path separators, as Git reports the top-level
+            directory with forward slashes even on Windows  */
+        return path.resolve(projectDir)
+    }
+
+    /*  determine the project id: the valid configured "project.id", or else
+        the id derived from the already resolved project directory  */
+    private determineProjectId (projectDir: string, cfg: Config): string {
         let configuredId = String(cfg.get("project.id") ?? "")
         if (configuredId !== "" && !TaskFormat.ID_RE.test(configuredId)) {
             this.log.write("warning", `hook: ignoring invalid configured "project.id" "${configuredId}" ` +
@@ -341,6 +364,10 @@ export default class HookCommand {
         /*  determine session id  */
         const sessionId = this.pickSessionId(input)
 
+        /*  adopt the project directory before any context is derived from the
+            working directory, especially the layered configuration below  */
+        this.switchDir(input.cwd)
+
         /*  garbage-collect orphaned session directories of previous agent runs  */
         this.pruneStaleSessions(sessionId)
 
@@ -349,12 +376,19 @@ export default class HookCommand {
         const cfg = new Config("config", configSchema, this.log,
             hasSession ? parseScope(`session:${sessionId}`) : parseScope(undefined))
 
+        /*  determine the project directory, persisted below because it is the single
+            piece of context an agent tool may withhold from the MCP server: GitHub
+            Copilot CLI starts the MCP server in the plugin installation directory,
+            long before this hook runs, so the server can only learn it from here  */
+        const projectDir = this.determineProjectDir(input.cwd ?? process.cwd())
+
         /*  determine task id (only persist when scoped to a real session)  */
         const taskId = process.env.ASE_TASK_ID ?? "default"
         if (hasSession)
             cfg.lock(() => {
                 cfg.read()
                 cfg.set("agent.task", taskId)
+                cfg.set("project.basedir", projectDir)
                 cfg.write()
             })
         else
@@ -364,7 +398,7 @@ export default class HookCommand {
         this.writeAgentStatus("ready")
 
         /*  determine project id  */
-        const projectId = this.determineProjectId(input.cwd ?? process.cwd(), cfg)
+        const projectId = this.determineProjectId(projectDir, cfg)
 
         /*  determine user id  */
         const userId = process.env.USER ?? process.env.LOGNAME ?? "unknown"
