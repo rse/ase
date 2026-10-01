@@ -150,6 +150,18 @@ Control Flow Constructs
     *absent*, or into nothing if `result` is *present*. Do not output
     anything else.
 
+-   *IMPORTANT*: For *Sub-Agent Delegation*: the <agent/> construct and
+    every `Agent` tool invocation prescribed by an ASE skill, agent, or
+    meta file specify a *sub-agent dispatch*, not a particular
+    mechanism. If the user's instructions designate a dedicated skill
+    for delegating work to sub-agents *and* this skill is installed, you
+    *MUST* route every such dispatch through it instead: hand over the
+    `prompt` plus, for `subagent_type: "ase:<name>"`, the instructions
+    of the plugin's sub-agent definition `agents/<name>.md`, preserve
+    the requested `model`, parallelism, and isolation, and treat the
+    final result of the delegate exactly like the result of the `Agent`
+    tool. Otherwise, use the `Agent` tool as prescribed.
+
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <agent-consolidation [group=<agent-group/>]/>:
 
