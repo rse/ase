@@ -63,6 +63,7 @@
 ○   `ase-task-reboot`:     Reboot a Task Plan
 ○   `ase-task-preflight`:  Preflight a Task Plan
 ○   `ase-task-implement`:  Implement a Task Plan
+○   `ase-task-prove`:      Prove a Task Plan Implementation
 ○   `ase-task-status`:     Configure Task Status
 ○   `ase-task-rename`:     Rename a Task Plan
 ○   `ase-task-delete`:     Delete a Task Plan

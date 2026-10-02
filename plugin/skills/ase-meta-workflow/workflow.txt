@@ -88,6 +88,7 @@ ase-task-dissect    -> TASK
 TASK                -> ase-task-reboot
 ase-task-reboot     -> TASK
 TASK                -> ase-task-implement
+TASK                -> ase-task-prove
 TASK                -> ase-task-preflight
 ase-task-preflight  -> TASK
 TASK                -> ase-task-view
@@ -99,6 +100,7 @@ ase-task-view       -> END
 ase-task-list       -> END
 ase-task-rename     -> END
 ase-task-delete     -> END
+ase-task-prove      -> END
 ase-sync-import     -> ARTIFACT
 ARTIFACT            -> ase-sync-export
 ARTIFACT            -> ase-sync-reconcile

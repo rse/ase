@@ -147,5 +147,5 @@ implied branch `hello`:
 ##  SEE ALSO
 
 [`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-preflight`](../ase-task-preflight/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md),
-[`ase-task-view`](../ase-task-view/help.md), [`ase-task-delete`](../ase-task-delete/help.md).
+[`ase-task-view`](../ase-task-view/help.md), [`ase-task-delete`](../ase-task-delete/help.md), [`ase-task-prove`](../ase-task-prove/help.md).
 

@@ -462,6 +462,10 @@ Procedure
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan implemented -- done**
             </template>
 
+            <ase-tpl-hint level="normal">
+            Use `/ase-task-prove` to obtain evidence that the implementation satisfies the `REG` and `CON` claims of the plan, as a green test run alone is not evidence.
+            </ase-tpl-hint>
+
         -   If <result/> is `DELETE`:
             Set <args></args> (empty). Do *not* forward any remaining
             `--next` list tokens, because the `ase:ase-task-delete`
