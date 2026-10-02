@@ -48,6 +48,7 @@
 ○   `ase-repo-commit`:     Git Commit Message
 ○   `ase-repo-diff`:       Summarize Diff
 ○   `ase-repo-review`:     Review Staged Changes
+○   `ase-code-review`:     Review and Curate Uncommitted Changes
 ○   `ase-repo-dissect`:    Dissect a Change Set
 ○   `ase-repo-merge`:      Merge a Branch
 ○   `ase-repo-resolve`:    Resolve Merge Conflicts
