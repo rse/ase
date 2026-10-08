@@ -44,9 +44,9 @@ side. The skill emits the *group card* as a *boxed* card, so each group
 reads as one visually self-contained unit: a short rationale, then a
 block per staged file, fenced off by separator lines -- its bare name
 with layer and line counts, its full repo-relative directory, a compact
-explanation in simple words of *what* the file now does differently and
-*why* (one to two sentences for a colleague who did not write the code
--- never an enumeration of methods), a
+explanation of *what* the file now does differently and *why*, starting
+from the situation before (one to three very simple sentences which
+keep the established IT and domain terms but avoid symbol names), a
 *Touched* line naming the changed symbols as the index into the editor,
 ordered foundations-first -- and per file five *evidence* lines, one
 each for `DOMAIN` (including whether the change can actually reach the
