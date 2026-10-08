@@ -20,7 +20,7 @@ Lint Source Code
 
 <expand name="getopt"
     arg1="ase-code-lint"
-    arg2="--auto|-a --severity|-S=(LOW|MEDIUM|HIGH) --include|-i=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --exclude|-e=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)...">
+    arg2="--auto|-a --severity|-S=(LOW|MEDIUM|HIGH) --include|-i=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21|A22)... --exclude|-e=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21|A22)...">
     $ARGUMENTS
 </expand>
 
@@ -53,16 +53,16 @@ related to a set of code quality aspects.
     <getopt-option-include/> and <getopt-option-exclude/> as
     comma-separated token lists, silently dropping the `none` sentinel
     and any empty token. If a token <token/> is *not* one of the aspect
-    ids `A01`...`A21`, only output the following <template/> and then
+    ids `A01`...`A22`, only output the following <template/> and then
     *STOP* the entire flow (do not perform any further steps):
 
     <template>
     ⧉ **ASE**: ✪ skill: **ase-code-lint**, ▶ ERROR: invalid aspect id: **<token/>**
     </template>
 
-    Otherwise set <aspects/> to *all* twenty-one aspect ids `A01`...`A21`
+    Otherwise set <aspects/> to *all* twenty-two aspect ids `A01`...`A22`
     if both lists are empty, to the *include* list if only it is
-    non-empty, to all twenty-one *minus* the *exclude* list if only it is
+    non-empty, to all twenty-two *minus* the *exclude* list if only it is
     non-empty, and to the *include* list *minus* the *exclude* list if
     both are non-empty. If the resulting <aspects/> is *empty*, only
     output the following <template/> and then *STOP* the entire flow
@@ -143,7 +143,7 @@ related to a set of code quality aspects.
 
     Use the following <template/> to output a summary of the detected
     problems in <problems/> (if any were found), in the original aspect
-    ordering `A01 - XXX`...`A21 - XXX`.
+    ordering `A01 - XXX`...`A22 - XXX`.
 
     <template>
     <ase-tpl-bullet-secondary/> **LINT SUMMARY**:

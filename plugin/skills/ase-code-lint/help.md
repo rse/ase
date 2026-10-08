@@ -27,19 +27,19 @@ correction interactively (or refine it via a free-text hint, which
 re-proposes the correction without limit) or - with `--auto` - applies
 all corrections automatically.
 
-By default all twenty-one code quality aspects are checked. The `--include`
+By default all twenty-two code quality aspects are checked. The `--include`
 and `--exclude` options narrow this to an *effective aspect set*: with
 `--include` only, exactly the listed aspects are checked; with
 `--exclude` only, all aspects except the listed ones; with both, the
 included ones minus the excluded ones. An unknown aspect id, or a
 combination which cancels out to an empty set, aborts the skill with an
-error. The twenty-one aspect ids are:
+error. The twenty-two aspect ids are:
 
 ```text
 A01 FORMATTING     A07 PATTERNS         A13 MEMORY-LEAK    A19 FLOW
 A02 COMPREHENSION  A08 COMPLICATEDNESS  A14 CONCURRENCY    A20 DEAD-CODE
 A03 CLEANLINESS    A09 CONCISENESS      A15 PERFORMANCE    A21 DOCUMENTATION
-A04 SPELLING       A10 SMELLS           A16 SECURITY
+A04 SPELLING       A10 SMELLS           A16 SECURITY       A22 TESTING
 A05 COMPLEXITY     A11 TYPING           A17 ARCHITECTURE
 A06 REDUNDANCY     A12 ERROR-HANDLING   A18 LOGIC
 ```
@@ -51,6 +51,16 @@ idiomatic documentation convention of the target language, *and* it
 flags excessive comments (narrated decision logs, change history,
 line-by-line explanations of the obvious), comments merely restating
 the code, and comments contradicting the code.
+
+The `A22 TESTING` aspect checks the *test code* for tests which cannot
+fail for the reason they exist: insensitive assertions (none, or a weak
+proxy instead of the decisive value), expected values derived from the
+code under test itself, assertions echoing a configured mock,
+nondeterministic outcomes (clock, locale, randomness, sleeps, ordering),
+and leftover focus markers.
+It judges the *structure* of a test only -- the *deep* check of test
+completeness, edge cases, and the domain correctness of expected values
+is `ase-code-analyze --tests`.
 
 ##  OPTIONS
 
@@ -69,7 +79,7 @@ the code, and comments contradicting the code.
 -   `--include`|`-i`=*aspect*[`,`...]:
     Restrict the checked code quality aspects to the given
     comma-separated list of aspect ids (e.g. `A01,A04`). Without this
-    option, all twenty-one aspects are checked.
+    option, all twenty-two aspects are checked.
 
 -   `--exclude`|`-e`=*aspect*[`,`...]:
     Remove the given comma-separated list of aspect ids from the checked
@@ -88,6 +98,7 @@ the code, and comments contradicting the code.
 -   You want all quality corrections applied automatically
 -   You want only specific quality aspects like formatting or spelling checked
 -   You want missing or excessive code documentation flagged
+-   You want tests flagged which cannot fail
 
 ##  EXAMPLES
 
@@ -125,6 +136,12 @@ Lint a directory for the documentation aspect only:
 
 ```text
 ❯ /ase-code-lint -i A21 src/handlers/
+```
+
+Lint a test directory for the testing aspect only:
+
+```text
+❯ /ase-code-lint -i A22 test/
 ```
 
 ##  SEE ALSO

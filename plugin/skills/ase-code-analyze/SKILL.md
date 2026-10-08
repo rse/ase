@@ -1,10 +1,10 @@
 ---
 name: ase-code-analyze
-argument-hint: "[--help|-h] [--performance|-p] [--security|-s] [--severity|-S=(LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] <source-reference>"
+argument-hint: "[--help|-h] [--performance|-p] [--security|-s] [--tests|-t] [--severity|-S=(LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] <source-reference>"
 description: >
     Analyze the source code for problems in either the logic and
     semantics and its related control flow, performance and efficiency,
-    or security.
+    security, or the evidentiary quality of its tests.
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -23,7 +23,7 @@ Analyze Source Code
 
 <expand name="getopt"
     arg1="ase-code-analyze"
-    arg2="--performance|-p --security|-s --severity|-S=(LOW|MEDIUM|HIGH) --prefix|-P=">
+    arg2="--performance|-p --security|-s --tests|-t --severity|-S=(LOW|MEDIUM|HIGH) --prefix|-P=">
     $ARGUMENTS
 </expand>
 
@@ -32,20 +32,21 @@ Analyze Source Code
 related source code, for problems - read-only, *without* applying any
 changes. The *analysis lens* depends on the selected options: problems
 in its *logic* and *semantics* and its related *control flow*, or
-problems in *performance* and *efficiency*, or problems in *security*.
+problems in *performance* and *efficiency*, or problems in *security*,
+or problems in the *evidentiary quality* of its *tests*.
 </objective>
 
 <flow>
 
 1.  <step id="STEP 1: Sanity Check Usage">
 
-    <if condition="<getopt-option-performance/> is equal `true` and <getopt-option-security/> is equal `true`">
+    <if condition="more than one of <getopt-option-performance/>, <getopt-option-security/>, and <getopt-option-tests/> is equal `true`">
 
     Only output the following <template/> and then *STOP* the entire flow
     (do not perform any further steps):
 
     <template>
-    ⧉ **ASE**: ✪ skill: **ase-code-analyze**, ▶ ERROR: options `--performance` and `--security` are mutually exclusive
+    ⧉ **ASE**: ✪ skill: **ase-code-analyze**, ▶ ERROR: options `--performance`, `--security`, and `--tests` are mutually exclusive
     </template>
 
     </if>
@@ -82,6 +83,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
     For this, first determine the *analysis lens* <lens/>: set
     <lens>performance</lens> if <getopt-option-performance/> is equal
     `true`, set <lens>security</lens> if <getopt-option-security/> is
+    equal `true`, set <lens>tests</lens> if <getopt-option-tests/> is
     equal `true`, and set <lens>logic</lens> otherwise.
 
     Then *silently* resolve `<getopt-arguments/>` to the list
@@ -184,7 +186,21 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     </if>
 
-    <if condition="<getopt-option-performance/> is NOT equal `true`">
+    <if condition="<getopt-option-tests/> is equal `true`">
+
+    <template>
+
+    <ase-tpl-bullet-signal/> **PROBLEM** (Severity: **<severity/>**): **<id-prefix/>P<n/>**: **<title/>**
+
+    <description/>
+
+    ⊙ SOURCE: <evidence/>
+
+    </template>
+
+    </if>
+
+    <if condition="<getopt-option-performance/> is NOT equal `true` and <getopt-option-tests/> is NOT equal `true`">
 
     <template>
 

@@ -262,6 +262,11 @@ You *MUST* honor the following hints on this *task* format:
     Changes to `CHANGELOG.md` files should be classified as `IMP`. Running linting (static code
     analysis) and build (generating files) procedures should be classified as `REG`.
 
+    A `CON` <text/> states a *falsifiable* claim: the *observable* outcome, the *expected* value or
+    property together with its *implementation-independent source* (specification, standard, hand
+    computation, or domain decision), and the check deciding it -- never an expectation read off the
+    implementation.
+
     Bullet-points of types `DOM` and `IFC` (in this order) belong to the `SPECIFICATION (WHAT)` section.
     Bullet-points of types `ARC` and `IMP` (in this order) belong to the `DESIGN (HOW)` section.
     Bullet-points of types `REG` and `CON` (in this order) belong to the `VERIFICATION (WHEN)` section.

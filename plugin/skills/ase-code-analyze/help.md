@@ -9,6 +9,7 @@
     [`--help`|`-h`]
     [`--performance`|`-p`]
     [`--security`|`-s`]
+    [`--tests`|`-t`]
     [`--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`)]
     [`--prefix`|`-P` *prefix*]
     *source-reference*
@@ -21,14 +22,20 @@ location, and its directly related source code, for problems. It is
 
 The *analysis lens* depends on the selected options:
 
-- **default** (neither `--performance` nor `--security`): problems in
-  its *logic*, *semantics*, and related *control flow*.
+- **default** (none of `--performance`, `--security`, and `--tests`):
+  problems in its *logic*, *semantics*, and related *control flow*.
 
 - `--performance`|`-p`: problems in *performance* and *efficiency*.
 
 - `--security`|`-s`: problems in *security*.
 
-The `--performance` and `--security` options are *mutually exclusive*.
+- `--tests`|`-t`: problems in its *tests*: expected values contradicting
+  or lacking an *implementation-independent source* (specification, task
+  plan, contract, or standard), and behaviors or edge cases without any
+  test. Tests and the code under test are analyzed as pairs.
+
+The `--performance`, `--security`, and `--tests` options are *mutually
+exclusive*.
 
 The `--severity`|`-S`=(`LOW`|`MEDIUM`|`HIGH`) option sets a *severity
 floor* (default `LOW`): problems below the chosen threshold are silently
@@ -50,7 +57,8 @@ covers the *entire* `ase-issue-*` space, including any prefixed results.
 The skill investigates the code base silently, reports each detected
 problem as a `PROBLEM` entry with severity (`LOW`, `MEDIUM`, `HIGH`) and
 inline file/line references (in the performance lens, each entry
-additionally carries an *evidence* and a *trade-off* line), and persists
+additionally carries an *evidence* and a *trade-off* line, and in the
+tests lens a *source* line), and persists
 results in the `ase` MCP key/value store as `ase-issue-P<n>` entries so
 they can later be resolved via `ase-code-resolve P<n>` or directly
 fixed via `ase-code-edit P<n>`.
@@ -67,6 +75,7 @@ fixed via `ase-code-edit P<n>`.
 -   You want a read-only report of problems without any changes applied
 -   You want performance and efficiency opportunities surfaced
 -   You want a security-focused inspection of your code
+-   You want to know whether your tests are complete and domain-wise correct
 -   You want problems persisted as issue ids like `P1` for later resolving
 
 ##  EXAMPLES
@@ -93,6 +102,12 @@ Analyze a source file for security aspects only:
 
 ```text
 ❯ /ase-code-analyze -s src/handlers/
+```
+
+Analyze the tests of a module for missing claims, edge cases, and wrong oracles:
+
+```text
+❯ /ase-code-analyze --tests src/tax.ts
 ```
 
 Analyze a directory, reporting only `MEDIUM` and `HIGH` problems:
