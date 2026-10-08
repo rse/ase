@@ -144,9 +144,10 @@ evidence texts, verdicts, and discussion answers -- in the *user's
 conversation language* (e.g. German when the user talks German) and in
 *simply understandable* wording, as for a colleague who did not write
 the code and is building a mental model of it; the evidence texts even
-for a *beginner*. Explain what is *logically achieved*, never merely
-what was edited. Technical identifiers, filenames, and quoted code
-stay in their original form.
+for a *beginner*, and the per-file explanations *very simply*, but in
+the established *technical and domain language*. Explain what is *logically achieved*,
+never merely what was edited. Technical identifiers, filenames, and
+quoted code stay in their original form.
 
 <flow>
 
@@ -598,17 +599,20 @@ stay in their original form.
              user has to locate the file in their editor from the card
              alone. A full path plus its metadata exceeds the box width
              on its own, which is why it occupies two lines.
-         -   `<explanation/>` is the *primary* text of the block: *1-2
-             short sentences* in simple words, in the user's language,
-             which tell a colleague who did not write the code *what*
-             this file now does differently and *why* -- the reason in
-             terms of the group's goal. Compact, but never cryptic:
-             "Fragt jetzt den Kalender, ob der Handelstag wirklich zu
-             Ende ist, statt ein Fenster schon als bedient zu werten,
-             sobald nichts mehr gelesen wird" -- never "fügt drei
-             Methoden hinzu" or a paraphrase of the diff. Symbol names
-             appear in it only where they are needed to follow the
-             thought, never as an enumeration.
+         -   `<explanation/>` is the *primary* text of the block: *1-3
+             short, very simple sentences* in the user's language which
+             *pick up* a reader who no longer remembers the change:
+             first the *situation before* in one clause, then *what* this
+             file now does differently and *why* -- the reason in terms
+             of the group's goal. Keep the *established terms* -- the IT
+             terms of software engineering (e.g. "Interface", "Cache",
+             "Endpoint", "Migration") as well as the domain terms of the
+             project (e.g. "Handelstag", "Order") -- instead of lay or
+             childlike substitutes, but avoid symbol names: "Bisher galt ein Zeitfenster als bedient, sobald
+             keine Kurse mehr kamen. Jetzt prüft die Datei erst im
+             Handelskalender, ob der Handelstag wirklich zu Ende ist,
+             damit Feiertage keine Lücken erzeugen." -- never "fügt drei
+             Methoden hinzu" or a paraphrase of the diff.
          -   `<symbols/>` on the *Touched* line are the file's changed
              symbols -- the added or touched functions, methods,
              classes, types, or config keys, comma-separated in
