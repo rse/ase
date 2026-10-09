@@ -10,12 +10,14 @@ import { Command, InvalidArgumentError } from "commander"
 import { z }                             from "zod"
 
 import type { McpServer }                from "@modelcontextprotocol/sdk/server/mcp.js"
+import type { D2 }                       from "@d2lang/d2"
 
 import type Log                          from "./ase-lib-log.js"
 import { readStdin }                     from "./ase-lib-stdio.js"
 
 /*  options accepted by the pure rendering helper  */
 export interface DiagramRenderOpts {
+    lang:           "mermaid" | "d2"
     format:         "ascii" | "svg"
     ascii:          boolean
     colorMode:      "none" | "ansi16" | "ansi256"
@@ -48,11 +50,36 @@ const parseColorMode = (name: string) => (value: string): "none" | "ansi16" | "a
     return value
 }
 
+/*  custom argument parser for Commander: diagram language  */
+const parseLang = (name: string) => (value: string): "mermaid" | "d2" => {
+    if (value !== "mermaid" && value !== "d2")
+        throw new InvalidArgumentError(`${name} must be "mermaid" or "d2"`)
+    return value
+}
+
 /*  custom argument parser for Commander: output format  */
 const parseFormat = (name: string) => (value: string): "ascii" | "svg" => {
     if (value !== "ascii" && value !== "svg")
         throw new InvalidArgumentError(`${name} must be "ascii" or "svg"`)
     return value
+}
+
+/*  the D2 compiler, created on first use only (as it spins up the
+    WebAssembly build of D2 in a worker thread, which keeps the process
+    alive until the compiler is disposed)  */
+let d2: Promise<D2> | null = null
+
+/*  turn a D2 compile failure (a JSON-encoded list of errors) into a message  */
+const d2Error = (err: unknown): string => {
+    const message = err instanceof Error ? err.message : String(err)
+    try {
+        return (JSON.parse(message) as { errmsg: string }[])
+            .map((error) => error.errmsg.replace(/^index:/, "line "))
+            .join("; ")
+    }
+    catch {
+        return message
+    }
 }
 
 /*  scan a CSI escape sequence starting at line[i] (where line[i]===ESC and
@@ -180,16 +207,45 @@ export class Diagram {
         return mode
     }
 
-    /*  pure rendering helper: turn a Mermaid source string plus options into
-        a rendered Unicode/ASCII diagram string, or an SVG document string
-        when "svg" format is requested. Throws on render failure.
+    /*  dispose the D2 compiler (if any), so its worker thread no longer
+        keeps the process alive (used by the short-lived CLI only)  */
+    static async dispose (): Promise<void> {
+        if (d2 === null)
+            return
+        const compiler = d2
+        d2 = null
+        await (await compiler).dispose()
+    }
+
+    /*  render a D2 source string as Unicode/ASCII art or SVG document
+        ("@d2lang/d2" is loaded on first use only; the ANSI "colorMode"
+        and the node margins/padding are not supported by D2)  */
+    static async renderD2 (src: string, opts: DiagramRenderOpts): Promise<string> {
+        d2 ??= import("@d2lang/d2").then((module) => new module.D2()).catch((err: unknown) => {
+            d2 = null
+            throw err
+        })
+        const compiler = await d2
+        try {
+            const result = await compiler.compile(src)
+            return await compiler.render(result.diagram, {
+                ...result.renderOptions,
+                ascii:     opts.format === "ascii",
+                asciiMode: opts.ascii ? "standard" : "extended"
+            })
+        }
+        catch (err: unknown) {
+            throw new Error(d2Error(err), { cause: err })
+        }
+    }
+
+    /*  render a Mermaid source string as Unicode/ASCII art or SVG document
         ("beautiful-mermaid" is loaded on first use only)  */
-    static async render (src: string, opts: DiagramRenderOpts): Promise<string> {
+    static async renderMermaid (src: string, opts: DiagramRenderOpts): Promise<string> {
         const { renderMermaidASCII, renderMermaidSVG } = await import("beautiful-mermaid")
 
         /*  render as a self-contained SVG document using the library's
-            themed defaults (the ANSI "colorMode" and the terminal
-            clipping below are meaningful only for ASCII art)  */
+            themed defaults (the ANSI "colorMode" is meaningful only for ASCII art)  */
         if (opts.format === "svg")
             return renderMermaidSVG(src)
 
@@ -197,7 +253,7 @@ export class Diagram {
         const colored = opts.colorMode !== "none"
 
         /*  create diagram rendering  */
-        let out = renderMermaidASCII(src, {
+        return renderMermaidASCII(src, {
             useAscii:         opts.ascii,
             paddingX:         opts.nodeMarginX,
             paddingY:         opts.nodeMarginY,
@@ -212,6 +268,26 @@ export class Diagram {
                 corner:   colored ? "#707070" : "#000000"
             }
         })
+    }
+
+    /*  pure rendering helper: turn a Mermaid or D2 source string plus
+        options into a rendered Unicode/ASCII diagram string, or an SVG
+        document string when "svg" format is requested. Throws on render
+        failure. (the terminal clipping is meaningful only for ASCII art)  */
+    static async render (src: string, opts: DiagramRenderOpts): Promise<string> {
+        /*  create diagram rendering  */
+        let out = opts.lang === "d2" ?
+            await Diagram.renderD2(src, opts) :
+            await Diagram.renderMermaid(src, opts)
+        if (opts.format === "svg")
+            return out
+
+        /*  determine language-specific regeneration hints  */
+        const lang     = opts.lang === "d2" ? "D2" : "Mermaid"
+        const portrait = opts.lang === "d2" ?
+            "(\"direction: down\", top-to-bottom) over landscape (\"direction: right\"/\"left\"/\"up\")" :
+            "(\"flowchart TB\", top-to-bottom) over landscape (\"LR\"/\"RL\"/\"BT\")"
+        const nesting  = opts.lang === "d2" ? "nested container" : "nested subgraph"
 
         /*  optionally clip diagram rendering  */
         const termWidth  = opts.terminalWidth
@@ -228,18 +304,18 @@ export class Diagram {
                 if (widest > maxWidth)
                     widthWarn =
                         `ase util diagram: WARNING: rendered diagram width ${widest} exceeds budget ${maxWidth}; ` +
-                        "rightmost content was clipped. Please regenerate the Mermaid source to fit " +
+                        `rightmost content was clipped. Please regenerate the ${lang} source to fit ` +
                         `within ${maxWidth} chars by preferring a portrait orientation ` +
-                        "(\"flowchart TB\", top-to-bottom) over landscape (\"LR\"/\"RL\"/\"BT\"), " +
+                        `${portrait}, ` +
                         "reducing siblings per row, abbreviating node labels, or restructuring " +
-                        "into nested subgraph hierarchies."
+                        `into ${nesting} hierarchies.`
                 lines = lines.map((l) => truncateAnsiLine(l, maxWidth))
             }
             if (maxHeight > 0 && lines.length > maxHeight) {
                 const overflow = lines.length - maxHeight
                 heightWarn =
                     `ase util diagram: WARNING: rendered diagram height ${lines.length} exceeds budget ${maxHeight}; ` +
-                    `bottom ${overflow} line(s) were clipped. Please regenerate the Mermaid source to fit ` +
+                    `bottom ${overflow} line(s) were clipped. Please regenerate the ${lang} source to fit ` +
                     `within ${maxHeight} lines by reducing depth or splitting into multiple diagrams.`
                 lines = lines.slice(0, maxHeight)
             }
@@ -262,9 +338,12 @@ export default class DiagramCommand {
     register (program: Command): void {
         program
             .command("diagram")
-            .description("Render Mermaid diagram specification as Unicode/ASCII art or SVG")
+            .description("Render Mermaid or D2 diagram specification as Unicode/ASCII art or SVG")
             .option("-i, --input <file>",
-                "read Mermaid source from file instead of stdin")
+                "read diagram source from file instead of stdin")
+            .option("-l, --lang <lang>",
+                "diagram language (\"mermaid\" or \"d2\")",
+                parseLang("--lang"), "mermaid")
             .option("-f, --format <format>",
                 "output format (\"ascii\" or \"svg\")",
                 parseFormat("--format"), "ascii")
@@ -272,16 +351,16 @@ export default class DiagramCommand {
                 "emit plain ASCII (+-|) instead of Unicode box-drawing",
                 false)
             .option("-c, --color-mode <mode>",
-                "force color mode (\"none\", \"ansi16\", or \"ansi256\")",
+                "force color mode (\"none\", \"ansi16\", or \"ansi256\") (Mermaid only)",
                 parseColorMode("--color-mode"), Diagram.detectColorMode())
             .option("--node-margin-x <n>",
-                "horizontal margin between nodes of <n> characters",
+                "horizontal margin between nodes of <n> characters (Mermaid only)",
                 parseInteger("--node-margin-x"), 3)
             .option("--node-margin-y <n>",
-                "vertical margin between nodes of <n> lines",
+                "vertical margin between nodes of <n> lines (Mermaid only)",
                 parseInteger("--node-margin-y"), 3)
             .option("--node-padding <n>",
-                "horizontal and vertical inner node padding with <n> characters",
+                "horizontal and vertical inner node padding with <n> characters (Mermaid only)",
                 parseInteger("--node-padding"), 1)
             .option("--diagram-clip-x <n>",
                 "extra horizontal clipping of diagram to terminal width minus <n> characters",
@@ -296,7 +375,7 @@ export default class DiagramCommand {
                 "height of terminal of <n> lines (for diagram clipping)",
                 parseInteger("--terminal-height"), Diagram.detectTermHeight())
             .action(async (opts: DiagramOpts) => {
-                /*  fetch Mermaid diagram specification from file or stdin  */
+                /*  fetch diagram specification from file or stdin  */
                 let src: string
                 if (opts.input !== undefined) {
                     try {
@@ -311,7 +390,7 @@ export default class DiagramCommand {
                 else
                     src = await readStdin()
                 if (src.trim() === "") {
-                    this.log.write("error", "diagram: empty Mermaid diagram specification")
+                    this.log.write("error", "diagram: empty diagram specification")
                     process.exit(1)
                 }
 
@@ -324,6 +403,9 @@ export default class DiagramCommand {
                     const message = err instanceof Error ? err.message : String(err)
                     this.log.write("error", `diagram: render failed: ${message}`)
                     process.exit(1)
+                }
+                finally {
+                    await Diagram.dispose()
                 }
 
                 /*  output diagram rendering  */
@@ -340,7 +422,7 @@ export class DiagramMCP {
         mcp.registerTool("ase_diagram", {
             title:       "ASE diagram render",
             description:
-                "Render a Mermaid diagram as Unicode/ASCII art or SVG. " +
+                "Render a Mermaid or D2 diagram as Unicode/ASCII art or SVG. " +
                 "Use for visualizing " +
                 "structure/layout/components/dependencies as a Flowchart, " +
                 "control-flow/branching/concurrency as a Flowchart, " +
@@ -349,23 +431,26 @@ export class DiagramMCP {
                 "data-structure/classes/methods as a UML Class Diagram, " +
                 "data-model/entities/relationships as an ER Diagram, or " +
                 "metrics/distributions/time-series as an XY-Chart. " +
-                "Pass the Mermaid diagram specification as `diagram`. " +
+                "Pass the diagram specification as `diagram` and its language as `lang` " +
+                "(\"mermaid\" by default, or \"d2\"). " +
                 "Returns the rendered art (or SVG document, for `format` \"svg\") as `text`.",
             inputSchema: {
                 diagram: z.string()
-                    .describe("Mermaid diagram specification"),
+                    .describe("Mermaid or D2 diagram specification"),
+                lang: z.enum([ "mermaid", "d2" ]).default("mermaid")
+                    .describe("diagram language: \"mermaid\" for Mermaid, \"d2\" for D2"),
                 format: z.enum([ "ascii", "svg" ]).default("ascii")
                     .describe("output format: \"ascii\" for Unicode/ASCII art, \"svg\" for an SVG document"),
                 ascii: z.boolean().default(false)
                     .describe("emit plain ASCII (+-|) instead of Unicode box-drawing characters"),
                 colorMode: z.enum([ "none", "ansi16", "ansi256" ]).default("none")
-                    .describe("color mode for ANSI escape sequences in the rendered output"),
+                    .describe("color mode for ANSI escape sequences in the rendered output (Mermaid only)"),
                 nodeMarginX: z.number().int().min(0).default(3)
-                    .describe("horizontal margin between nodes, in characters"),
+                    .describe("horizontal margin between nodes, in characters (Mermaid only)"),
                 nodeMarginY: z.number().int().min(0).default(3)
-                    .describe("vertical margin between nodes, in lines"),
+                    .describe("vertical margin between nodes, in lines (Mermaid only)"),
                 nodePadding: z.number().int().min(0).default(1)
-                    .describe("inner horizontal and vertical padding within each node, in characters"),
+                    .describe("inner horizontal and vertical padding within each node, in characters (Mermaid only)"),
                 diagramClipX: z.number().int().min(0).default(0)
                     .describe("extra horizontal clipping: subtract this many characters from `terminalWidth`"),
                 diagramClipY: z.number().int().min(0).default(0)

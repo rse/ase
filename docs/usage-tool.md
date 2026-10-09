@@ -316,21 +316,23 @@ The following top-level commands exist for miscellaneous utilities:
   `--create`, the base directory is created if it does not exist yet.
 
 - `ase util diagram`:
-  Render a *Mermaid* diagram specification (read from standard
+  Render a *Mermaid* or *D2* diagram specification (read from standard
   input or from `--input` *file*) as Unicode/ASCII art or SVG. Supports
   the following options:
     - \[`-i`|`--input` *file*\]:
-      read *Mermaid* source from *file* instead of standard input.
+      read diagram source from *file* instead of standard input.
+    - \[`-l`|`--lang` `mermaid`|`d2`\]:
+      select the diagram language (default: `mermaid`).
     - \[`-f`|`--format` `ascii`|`svg`\]:
       select the output format (default: `ascii`).
     - \[`-a`|`--ascii`\]:
       emit plain ASCII (`+-|`) instead of Unicode box-drawing.
     - \[`-c`|`--color-mode` *mode*\]:
-      force color mode (`none`, `ansi16`, or `ansi256`).
+      force color mode (`none`, `ansi16`, or `ansi256`) (Mermaid only).
     - \[`--node-margin-x` *n*\] / \[`--node-margin-y` *n*\]:
-      horizontal/vertical margin between nodes.
+      horizontal/vertical margin between nodes (Mermaid only).
     - \[`--node-padding` *n*\]:
-      horizontal and vertical inner node padding.
+      horizontal and vertical inner node padding (Mermaid only).
     - \[`--diagram-clip-x` *n*\] / \[`--diagram-clip-y` *n*\]:
       extra clipping of the diagram relative to terminal width/height.
     - \[`--terminal-width` *n*\] / \[`--terminal-height` *n*\]:

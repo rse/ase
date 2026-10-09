@@ -5,6 +5,11 @@ ChangeLog
 1.1.0 (2026-09-XX)
 ------------------
 
+-   FEATURE [tool,plugin]: D2 Diagram Rendering
+    The `ase util diagram` command and the `ase_diagram` MCP tool render, with the new `--lang d2`
+    option (resp. `lang` field), also *D2* diagram specifications as Unicode/ASCII art or SVG,
+    through the WebAssembly build of D2 (`@d2lang/d2`). The default language stays *Mermaid*.
+
 -   FEATURE [tool,plugin]: Task Groups in the Task Board
     The task board (TUI and web) shows the `Group` (epic) of a task. An explicit epic task (whose
     `Id` equals its own `Group`) implicitly comes `After` all other tasks of its group, as now
