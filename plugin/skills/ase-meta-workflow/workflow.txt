@@ -88,13 +88,13 @@ ase-task-dissect    -> TASK
 TASK                -> ase-task-reboot
 ase-task-reboot     -> TASK
 TASK                -> ase-task-implement
-TASK                -> ase-task-preflight
-ase-task-preflight  -> TASK
+TASK                -> ase-task-integrate
 TASK                -> ase-task-view
 TASK                -> ase-task-list
 TASK                -> ase-task-rename
 TASK                -> ase-task-delete
 ase-task-implement  -> ARTIFACT
+ase-task-integrate  -> ARTIFACT
 ase-task-view       -> END
 ase-task-list       -> END
 ase-task-rename     -> END

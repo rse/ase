@@ -7,7 +7,7 @@
 import { Box, Text }                          from "ink"
 
 import type { Task }                          from "./ase-task.js"
-import { cardLabel, groupLabel, attachmentTabs, isPreflightDiff, diffTones } from "./ase-task-board-core.js"
+import { cardLabel, groupLabel, attachmentTabs, isDraftDiff, diffTones } from "./ase-task-board-core.js"
 import type { Card }                          from "./ase-task-board-core.js"
 import { h }                                  from "./ase-task-board-tui-view.js"
 import { palette, cx, spinnerFrames, eighths } from "./ase-task-board-tui-style.js"
@@ -93,7 +93,7 @@ type DialogLine = { text: string, color?: string, bold?: boolean, mask?: number[
 /*  the key/value header lines of the read dialog, separated from the
     content by a line, so that the content starts after a blank line  */
 const headerLines = (keys: [ string, string ][], width: number): DialogLine[] => {
-    const out = keys.map(([ key, val ]): DialogLine => ({ text: `${(key + ":").padEnd(10)}${sanitize(val)}`, color: palette.dim }))
+    const out = keys.map(([ key, val ]): DialogLine => ({ text: `${(key + ":").padEnd(11)}${sanitize(val)}`, color: palette.dim }))
     if (out.length > 0)
         out.push({ text: "─".repeat(width), color: palette.dim }, { text: "" })
     return out
@@ -151,11 +151,11 @@ export const attachmentLines = (att: Attachment, content: Buffer | Error | undef
     if (/^text\/markdown\b/i.test(att.type.trim()))
         return [ ...out, ...markdownLines(text, width) ]
 
-    /*  a preflight diff is colored per line: its file headers up to and
+    /*  a draft diff is colored per line: its file headers up to and
         including the hunk headers dimmed, inserted lines accented, removed
         lines signaled, and context lines in the default color  */
     const lines = text.replace(/^(?:[ \t]*\r?\n)+/, "").split(/\r?\n/).map(sanitize)
-    const tones = isPreflightDiff(att.type) ? diffTones(lines) : null
+    const tones = isDraftDiff(att.type) ? diffTones(lines) : null
     const tint  = { head: palette.dim, add: palette.accent, del: palette.signal, ctx: palette.normal }
     lines.forEach((line, i) => {
         const color = tones !== null ? tint[tones[i]] : palette.accent

@@ -21,7 +21,7 @@ Reboot a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-reboot"
-    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT|PREFLIGHT)... --int-reuse-task">
+    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -140,10 +140,14 @@ Procedure
             <ase-project-task-lifecycle/>, as the rebooted plan starts
             its lifecycle anew,
         -   the frontmatter keys `Group:`, `Phase:`, `After:`, `Kind:`,
-            `Tags:`, and `Branch:` are taken over from the previous plan
-            *verbatim* where present, except that all `grilled:` tags
+            and `Tags:` are taken over from the previous plan *verbatim*
+            where present, except that all `grilled:` tags
             are *dropped* from `Tags:` (the whole key is dropped if no
-            other tag remains), as the grilled plan content is gone, and
+            other tag remains), as the grilled plan content is gone,
+        -   the frontmatter keys `Source:`, `Changeset:`, and `Target:`
+            are *dropped*, so they are *reset* to their configured
+            defaults according to the plan <format/>, as the rebooted
+            plan starts its change set flow anew, and
         -   the entire "backmatter" of the previous plan is passed
             through *verbatim*.
 
@@ -155,12 +159,12 @@ Procedure
 
         <expand name="task-next-select"
             arg1="ase-task-reboot"
-            arg2="DONE|EDIT|IMPLEMENT|PREFLIGHT">
+            arg2="DONE|EDIT|IMPLEMENT|DRAFT">
             Next Step: How would you like to proceed with the plan?
             DONE: Stop processing.
             EDIT: Hand off plan to editing.
             IMPLEMENT: Hand off plan to implementation.
-            PREFLIGHT: Hand off plan to pre-flighting.
+            DRAFT: Hand off plan to implementation drafting.
         </expand>
 
     2.  Check the tool <result/> and dispatch accordingly:
@@ -180,7 +184,8 @@ Procedure
             <expand name="task-next-handoff" arg1="ase-task-implement"
                 arg2="plan rebooted -- hand-off to implementation"></expand>
 
-        -   If <result/> is `PREFLIGHT`:
-            <expand name="task-next-handoff" arg1="ase-task-preflight"
-                arg2="plan rebooted -- hand-off to pre-flight"></expand>
+        -   If <result/> is `DRAFT`:
+            <expand name="task-next-handoff" arg1="ase-task-implement"
+                arg2="plan rebooted -- hand-off to implementation draft"
+                arg3="--draft"></expand>
 

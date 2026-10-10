@@ -109,8 +109,8 @@ const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
 
 /*  the ASE session information determined by the session-start hook  */
 type SessionInfo = Record<"version" | "versionHint" | "pluginRoot" | "persona" | "guidance" |
-    "userId" | "projectId" | "boxing" | "lifecycle" | "specBasedir" | "specSchema" |
-    "taskId" | "sessionId" | "headless", string>
+    "userId" | "projectId" | "boxing" | "lifecycle" | "defaultSource" | "defaultChangeset" |
+    "defaultTarget" | "specBasedir" | "specSchema" | "taskId" | "sessionId" | "headless", string>
 
 /*  CLI command "ase hook"  */
 export default class HookCommand {
@@ -385,6 +385,11 @@ export default class HookCommand {
         const boxing    = setting("project.boxing",         "ASE_PROJECT_BOXING",         "white")
         const lifecycle = setting("project.task.lifecycle", "ASE_PROJECT_TASK_LIFECYCLE", "solo")
 
+        /*  determine the defaults of the change set flow keys of the task plans  */
+        const defaultSource    = setting("project.task.default.source",    "ASE_PROJECT_TASK_DEFAULT_SOURCE",    "worktree")
+        const defaultChangeset = setting("project.task.default.changeset", "ASE_PROJECT_TASK_DEFAULT_CHANGESET", "worktree")
+        const defaultTarget    = setting("project.task.default.target",    "ASE_PROJECT_TASK_DEFAULT_TARGET",    "source")
+
         /*  determine the specification base directory and the whitespace-separated
             list of SpecBook schema configurations (empty: the bundled standard schema)  */
         const specBasedir = String(cfg.get("project.artifact.spec.basedir") ?? "")
@@ -396,7 +401,8 @@ export default class HookCommand {
         /*  publish the ASE session information and emit it as the hook output payload  */
         const payload = this.publishSessionInfo(tool, {
             version: versionCurrentPlugin, versionHint, pluginRoot, persona, guidance, userId, projectId,
-            boxing, lifecycle, specBasedir, specSchema, taskId, sessionId, headless
+            boxing, lifecycle, defaultSource, defaultChangeset, defaultTarget,
+            specBasedir, specSchema, taskId, sessionId, headless
         }, md, path.dirname(fileMd), style)
         await writeStdout(JSON.stringify(payload))
         return 0
@@ -408,24 +414,28 @@ export default class HookCommand {
     private publishSessionInfo (tool: Tool, info: SessionInfo, md: string, mdDir: string, style: string): Record<string, unknown> {
         const {
             version, versionHint, pluginRoot, persona, guidance, userId, projectId,
-            boxing, lifecycle, specBasedir, specSchema, taskId, sessionId, headless
+            boxing, lifecycle, defaultSource, defaultChangeset, defaultTarget,
+            specBasedir, specSchema, taskId, sessionId, headless
         } = info
 
         /*  provide ASE information to Anthropic Claude Code CLI shell commands
             (Anthropic Claude Code CLI only -- GitHub Copilot CLI has no equivalent mechanism)  */
         this.writeEnvFile(tool, {
-            ASE_VERSION:                version,
-            ASE_PLUGIN_ROOT:            pluginRoot,
-            ASE_USER_ID:                userId,
-            ASE_PROJECT_ID:             projectId,
-            ASE_PROJECT_BOXING:         boxing,
-            ASE_PROJECT_TASK_LIFECYCLE: lifecycle,
-            ASE_SPEC_BASEDIR:           specBasedir,
-            ASE_SPEC_SCHEMA:            specSchema,
-            ASE_TASK_ID:                taskId,
-            ASE_SESSION_ID:             sessionId,
-            ASE_HEADLESS:               headless,
-            ASE_AGENT_TOOL:             tool
+            ASE_VERSION:                        version,
+            ASE_PLUGIN_ROOT:                    pluginRoot,
+            ASE_USER_ID:                        userId,
+            ASE_PROJECT_ID:                     projectId,
+            ASE_PROJECT_BOXING:                 boxing,
+            ASE_PROJECT_TASK_LIFECYCLE:         lifecycle,
+            ASE_PROJECT_TASK_DEFAULT_SOURCE:    defaultSource,
+            ASE_PROJECT_TASK_DEFAULT_CHANGESET: defaultChangeset,
+            ASE_PROJECT_TASK_DEFAULT_TARGET:    defaultTarget,
+            ASE_SPEC_BASEDIR:                   specBasedir,
+            ASE_SPEC_SCHEMA:                    specSchema,
+            ASE_TASK_ID:                        taskId,
+            ASE_SESSION_ID:                     sessionId,
+            ASE_HEADLESS:                       headless,
+            ASE_AGENT_TOOL:                     tool
         })
 
         /*  prepend ASE information to constitution markdown  */
@@ -439,6 +449,9 @@ export default class HookCommand {
             `<ase-project-id>${projectId}</ase-project-id>\n` +
             `<ase-project-boxing>${boxing}</ase-project-boxing>\n` +
             `<ase-project-task-lifecycle>${lifecycle}</ase-project-task-lifecycle>\n` +
+            `<ase-project-task-default-source>${defaultSource}</ase-project-task-default-source>\n` +
+            `<ase-project-task-default-changeset>${defaultChangeset}</ase-project-task-default-changeset>\n` +
+            `<ase-project-task-default-target>${defaultTarget}</ase-project-task-default-target>\n` +
             `<ase-spec-basedir>${specBasedir}</ase-spec-basedir>\n` +
             `<ase-spec-schema>${specSchema}</ase-spec-schema>\n` +
             `<ase-task-id>${taskId}</ase-task-id>\n` +

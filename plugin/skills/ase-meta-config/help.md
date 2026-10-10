@@ -28,7 +28,8 @@ the strongest (target) scope of the chain.
 
 The recognized keys are grouped under `project.*` (`project.id`,
 `project.name`, `project.boxing`, `project.task.lifecycle`,
-`project.task.idscheme`, and the `project.artifact.`*kind*`.{basedir,files}`
+`project.task.idscheme`, `project.task.default.{source,changeset,target}`,
+and the `project.artifact.`*kind*`.{basedir,files}`
 globs) and `agent.*` (`agent.persona`, `agent.guidance`, `agent.task`, and
 `agent.skill`).
 Some keys are writable on selected scopes only; in particular
@@ -55,7 +56,12 @@ of `slug[:<words>]` (the default, the first *words* (default: 2) words of
 the task title, lower-cased and joined with `-`), `seq[:<template>]` (a
 continuously increasing sequence number, rendered through a sprintf-style
 *template* like `FOO-%03d`, `#%d`, or `%d` (the default)), or `any` (an
-arbitrary unique id chosen by the agent).
+arbitrary unique id chosen by the agent). Additionally,
+`project.task.default.{source,changeset,target}` select the defaults of
+the `Source:`, `Changeset:`, and `Target:` task plan keys (`worktree`,
+`worktree`, and `source` by default), which an absent key reads as; they
+are exported at session start as
+`<ase-project-task-default-{source,changeset,target}/>`.
 
 The following *operations* exist:
 

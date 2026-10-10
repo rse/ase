@@ -100,12 +100,14 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-task-grill`](plugin/skills/ase-task-grill/help.md)
   `hello`
 
-- **Implementation Preflights**:
-  You prefer a plan-driven approach, but want to pre-flight the
+- **Implementation Drafts**:
+  You prefer a plan-driven approach, but want to draft and review the
   implementation without later having to rewind artifacts via the version
   control system or the agent harness's session history?
-  &rarr; [`/ase-task-preflight`](plugin/skills/ase-task-preflight/help.md)
-  `hello`
+  &rarr; [`/ase-task-implement`](plugin/skills/ase-task-implement/help.md)
+  `--draft hello`
+  &rarr; [`/ase-task-integrate`](plugin/skills/ase-task-integrate/help.md)
+  `--draft hello`
 
 - **Project Insights**:
   You want to get a quick insight into a project by determining
@@ -168,6 +170,13 @@ see whether **ASE** is right for you:
   You have a named, persisted task plan and now want it implemented as a
   single, complete change set across your project artifacts?
   &rarr; [`/ase-task-implement`](plugin/skills/ase-task-implement/help.md)
+  `hello`
+
+- **Change Set Integration**:
+  You have implemented a task plan into a change set and now want it
+  delivered into its target branch, with merge conflicts resolved
+  semantically and the task closed afterwards?
+  &rarr; [`/ase-task-integrate`](plugin/skills/ase-task-integrate/help.md)
   `hello`
 
 - **Epic Plan Dissection**:

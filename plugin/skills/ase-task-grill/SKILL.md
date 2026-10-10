@@ -22,7 +22,7 @@ Iteratively Grill a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-grill"
-    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --focus|-f=(all|SPECIFICATION|SPEC|DESIGN|DES|VERIFICATION|VER)... --next|-n=(none|DONE|EDIT|IMPLEMENT|PREFLIGHT)... --int-reuse-task">
+    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --focus|-f=(all|SPECIFICATION|SPEC|DESIGN|DES|VERIFICATION|VER)... --next|-n=(none|DONE|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -309,11 +309,11 @@ Set <args>--int-reuse-task</args>.
 
         <expand name="task-next-select"
             arg1="ase-task-grill"
-            arg2="DONE|EDIT|IMPLEMENT|PREFLIGHT">
+            arg2="DONE|EDIT|IMPLEMENT|DRAFT">
             Next Step: How would you like to proceed with the plan?
             DONE: Stop processing.
             EDIT: Hand off plan to editing.
-            PREFLIGHT: Hand off plan to pre-flighting.
+            DRAFT: Hand off plan to implementation drafting.
             IMPLEMENT: Hand off plan to implementation.
         </expand>
 
@@ -339,14 +339,15 @@ Set <args>--int-reuse-task</args>.
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan updated -- hand-off to edit**
             </template>
 
-        -   If <result/> is `PREFLIGHT`:
+        -   If <result/> is `DRAFT`:
             <expand name="handoff-args"/>
-            Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-preflight", args: "<args/>")` tool
-            to *apply* the plan.
+            Set <args><args/> --draft</args>. Only output the following
+            <template/> and then call the
+            `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
+            to *draft* the implementation of the plan.
 
             <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan updated -- hand-off to pre-flight**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan updated -- hand-off to implementation draft**
             </template>
 
         -   If <result/> is `IMPLEMENT`:

@@ -48,6 +48,13 @@ ChangeLog
     or `FAILED`. The resolution procedure is shared with `ase-repo-merge` via the new
     `ase-common-resolve.md` meta file.
 
+-   FEATURE [tool,plugin]: Change Set Flow of Tasks
+    The task plan key `Branch:` is superseded by `Source:`, `Changeset:`, and `Target:` (values
+    `worktree`, `branch:<name>`, or `attachment:<name>`, defaulting to the new configuration
+    `project.task.default.{source,changeset,target}`). `ase-task-implement` now creates the change
+    set from the source into the changeset (`--draft` for `attachment:draft`, else ignored with a
+    warning) and the new `ase-task-integrate` delivers it into the target via `ase-repo-merge`.
+
 -   FEATURE [tool]: GitHub Issues task store
     The new built-in storage plugin `github` persists the task plans as the issues of a GitHub
     repository, selected either by `ase task store start --module github` (with the repositories
@@ -65,6 +72,14 @@ ChangeLog
     `ase-meta-changelog`, `ase-meta-commit`, and `ase-code-dissect` to `ase-repo-review`,
     `ase-repo-diff`, `ase-repo-changelog`, `ase-repo-commit`, and `ase-repo-dissect`, and the
     `ase-meta-review` sub-agent to `ase-repo-review`.
+
+-   CHANGE [plugin,tool,pages]: Replace `ase-task-preflight` by `ase-task-implement --draft`
+    The `ase-task-preflight` skill no longer performs a throw-away dry-run, but persists its change
+    set as the implementation draft attachment of the task plan. Hence, it is dropped in favor of
+    the new `--draft` option of `ase-task-implement` (and `ase-task-integrate`, to deliver the
+    draft), its attachment is renamed from `kind="preflight"` to `kind="draft"`, and the
+    `PREFLIGHT` next-step token of the task and code skills is renamed to `DRAFT`. A legacy
+    `kind="preflight"` attachment is migrated into `kind="draft"` on load.
 
 -   FEATURE [tool,plugin]: Task id schemes
     The new `project.task.idscheme` configuration (`ase task idscheme`) selects the scheme of new
@@ -182,7 +197,7 @@ ChangeLog
 -   FEATURE [plugin]: Reworked task plan format
     Task plans now carry the frontmatter keys `Type`, `Assignee`, `Group`, `Phase`, `After`, `Tags`,
     and `Branch`, sections with `DOM`/`IFC`, `ARC`/`IMP`, `REG`/`CON` bullet-points in checkbox
-    states, and backmatter attachments (e.g. the preflight draft).
+    states, and backmatter attachments (e.g. the implementation draft).
 
 -   FEATURE [plugin]: Timestamped task plan attachments and stale implementation drafts
     Attachments carry `Created`/`Modified` keys, the frontmatter `Modified` key tracks body changes
@@ -190,7 +205,7 @@ ChangeLog
     and `ase-task-view` warn about it, while `ase-task-implement` stops with an error.
 
 -   FEATURE [plugin]: Branch-driven task implementation
-    `ase-task-implement` and `ase-task-preflight` honor the `Branch:` frontmatter key by switching
+    `ase-task-implement` honors the `Branch:` frontmatter key by switching
     the working copy in place (guarded against uncommitted changes) or, with `--worktree`, inside
     `.ase/worktree/<id>`. `ase-code-edit` and `ase-spec-edit` gained the counterpart `--branch`.
 
@@ -204,10 +219,10 @@ ChangeLog
     `finished` sentinel expands to its finished states, the default is now `--exclude finished`,
     and a plan with an unknown `Status:` is kept in the listing (with a warning).
 
--   FEATURE [plugin]: Checkbox-state aware grilling, preflight, and implementation
+-   FEATURE [plugin]: Checkbox-state aware grilling and implementation
     `ase-task-grill` marks unanswered bullet-points as `[?]`, resets them to `[ ]` once answered,
-    and re-asks only those of an already grilled section. `ase-task-grill`, `ase-task-preflight`,
-    and `ase-task-implement` skip `[-]` (cancelled) and `[>]` (deferred) bullet-points entirely.
+    and re-asks only those of an already grilled section. `ase-task-grill` and
+    `ase-task-implement` skip `[-]` (cancelled) and `[>]` (deferred) bullet-points entirely.
 
 -   FEATURE [plugin]: Severity-bounded grilling with maximum round count
     The round count of `ase-code-edit`/`ase-spec-edit` (`--grill-rounds`) and `ase-task-grill`
@@ -242,7 +257,7 @@ ChangeLog
     way loads 15 instead of 2337 modules, so the startup overhead of about three seconds is gone.
 
 -   BUGFIX [plugin]: Task plan kind `SPECIFYING` honored
-    `ase-task-preflight` and `ase-task-implement` now recognize the `Kind: SPECIFYING`
+    `ase-task-implement` now recognizes the `Kind: SPECIFYING`
     frontmatter key of a task plan and internalize the SPECIFYING TENETS, and also infer
     `SPECIFYING` for a plan which predominantly revises the specification (`ase-common-code.md`).
 

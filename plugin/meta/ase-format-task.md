@@ -6,18 +6,20 @@ Every *task* uses a strict and fixed textual format:
 
 <format>
 ---
-Type:     text/vnd.ase.task
-Id:       <task-id/>
-Created:  <timestamp-created/>
-Modified: <timestamp-modified/>
-Group:    <task-group/>
-Phase:    <task-phase/>
-After:    <task-after/>
-Status:   <task-status/>
-Assignee: <task-assigned/>
-Kind:     <task-kind/>
-Tags:     <task-tags/>
-Branch:   <task-branch/>
+Type:      text/vnd.ase.task
+Id:        <task-id/>
+Created:   <timestamp-created/>
+Modified:  <timestamp-modified/>
+Group:     <task-group/>
+Phase:     <task-phase/>
+After:     <task-after/>
+Status:    <task-status/>
+Assignee:  <task-assigned/>
+Kind:      <task-kind/>
+Tags:      <task-tags/>
+Source:    <task-source/>
+Changeset: <task-changeset/>
+Target:    <task-target/>
 ---
 
 #   TASK: <task-title/>
@@ -53,18 +55,18 @@ Branch:   <task-branch/>
 -   [...]
 
 ---
-Type:     <task-attachment-type/>
-Desc:     <task-attachment-desc/>
-Created:  <task-attachment-created/>
-Modified: <task-attachment-modified/>
-Data:     |4+
+Type:      <task-attachment-type/>
+Desc:      <task-attachment-desc/>
+Created:   <task-attachment-created/>
+Modified:  <task-attachment-modified/>
+Data:      |4+
     <task-attachment-payload/>
 ---
-Type:     <task-attachment-type/>
-Desc:     <task-attachment-desc/>
-Created:  <task-attachment-created/>
-Modified: <task-attachment-modified/>
-File:     <task-attachment-file/>
+Type:      <task-attachment-type/>
+Desc:      <task-attachment-desc/>
+Created:   <task-attachment-created/>
+Modified:  <task-attachment-modified/>
+File:      <task-attachment-file/>
 </format>
 
 You *MUST* honor the following hints on this *task* format:
@@ -93,14 +95,14 @@ You *MUST* honor the following hints on this *task* format:
     fenced code block of the *body* *MUST* be closed.
 
 -   The *frontmatter* can carry the keys `Type`, `Id`, `Created`, `Modified`,
-    `Group`, `Phase`, `After`, `Status`, `Kind`, `Tags`, and `Branch` in exactly
-    this order, with their values being *unquoted* plain scalars and vertically
-    aligned at a *fixed* column: each `<key/>:` is padded with spaces to a
-    width of 10 characters, so every value starts at column 11 (one space
-    after `Modified:`, the longest key) -- independent of which keys are
-    actually present. Only `Type` and `Id` are *mandatory* -- every other key
-    is *optional* and, when absent, falls back to its default value. A skill
-    *writing* an optional key which is still *absent* inserts it at its
+    `Group`, `Phase`, `After`, `Status`, `Assignee`, `Kind`, `Tags`, `Source`,
+    `Changeset`, and `Target` in exactly this order, with their values being
+    *unquoted* plain scalars and vertically aligned at a *fixed* column: each
+    `<key/>:` is padded with spaces to a width of 11 characters, so every value
+    starts at column 12 (one space after `Changeset:`) -- independent of which
+    keys are actually present. Only `Type` and `Id` are *mandatory* -- every
+    other key is *optional* and, when absent, falls back to its default value.
+    A skill *writing* an optional key which is still *absent* inserts it at its
     position in the key order above, aligned at the same fixed column.
 
 -   The `Type` frontmatter key has to use the value `text/vnd.ase.task` for
@@ -119,7 +121,7 @@ You *MUST* honor the following hints on this *task* format:
     timestamp when this task plan was created. The <timestamp-modified/>
     of the `Modified` frontmatter key is the timestamp when the *body*
     of this task plan was last modified: a change to *frontmatter* keys
-    only (like `Status` or `Branch`) or to the *backmatter* only *MUST
+    only (like `Status` or `Changeset`) or to the *backmatter* only *MUST
     NOT* refresh it. Both use an ISO-style format value. The value of
     both has to be determined by a call to the `ase_timestamp(format:
     "yyyy-LL-dd HH:mm")` tool of the `ase` MCP server, using the `text`
@@ -155,7 +157,7 @@ You *MUST* honor the following hints on this *task* format:
 
 -   The `Kind` frontmatter key states the *kind of change* the task plan
     describes, and hence which *operation-specific tenet set* of the **ASE
-    Tenets** a subsequent preflight or implementation has to honor. The
+    Tenets** a subsequent draft or implementation has to honor. The
     <task-kind/> value is *strictly* one of `SPECIFYING`, `CRAFTING`,
     `REFACTORING`, or `RESOLVING`. The `Kind` frontmatter key is *optional*:
     a skill *authoring* or *updating* a task plan *CAN* update an already
@@ -168,16 +170,50 @@ You *MUST* honor the following hints on this *task* format:
     formatted `<key/>[:<value/>], <key/>[:<value/>][, ...]`. A plain `<key/>`
     tag is a boolean marker, e.g. `foo` marks the task as `foo`.
 
--   The `Branch` frontmatter key references the Git branch on which the
-    implementation of the task lands. The default value is the special literal
-    `current` which indicates the currently checked-out branch of the underlying
-    Git working copy. If the value is `current` or equals the checked-out branch,
-    `ase-task-implement` applies the change set on the checked-out branch.
-    Otherwise it applies the change set on that branch -- checked out if it
-    already exists, created from `HEAD` otherwise -- by switching the clean
-    working copy to it in place, or, with `--worktree`, by checking it out
-    inside the Git worktree `.ase/worktree/<task-id/>`. `ase-task-preflight`
-    drafts against the same branch.
+-   The `Source`, `Changeset`, and `Target` frontmatter keys control the *flow*
+    of the change set of the task: `ase-task-implement` creates the change set
+    from the `Source` into the `Changeset`, and `ase-task-integrate` delivers
+    the change set from the `Changeset` into the `Target`. Their `worktree`
+    values refer to the *origin working copy* (the current Git working copy)
+    for `Source` and `Target`, and to the *context worktree* for `Changeset`:
+    the ASE worktree `.ase/worktree/<name/>` selected by the
+    `--worktree <name/>` option of these skills, or else the origin working
+    copy itself.
+
+    -   The <task-source/> of the `Source` key is the *code basis* of the
+        change set: `worktree` (built-in default) is the origin working copy with its
+        checked-out branch, and `branch:<name/>` is the existing Git branch
+        <name/>.
+
+    -   The <task-changeset/> of the `Changeset` key is the *location* of the
+        change set: `worktree` (built-in default) leaves it *uncommitted* in the context
+        worktree, `branch:<name/>` *commits* it onto the Git branch <name/>
+        (created from the `Source` if missing) inside a worktree carrying this
+        branch, and `attachment:<name/>` stores it as a *unified diff* in the
+        attachment block of `Type: text/x-diff; charset=utf-8; kind="<name/>"`
+        of the task, leaving all artifacts untouched.
+
+    -   The <task-target/> of the `Target` key is the *integration target* of
+        the change set: `worktree` is the origin working copy with its
+        checked-out branch, `branch:<name/>` is the existing Git branch
+        <name/>, and `source` (built-in default) is whatever the `Source` key refers to.
+
+    A branch <name/> is non-empty, consists of the characters `A-Z`, `a-z`,
+    `0-9`, `_`, `-`, `.`, and `/` only, does *not* start with `-`, `.`, or
+    `/`, does *not* end with `/`, `.`, or `.lock`, and does *not* contain
+    `..` or `//`. An attachment <name/> is non-empty and consists of the
+    characters `A-Z`, `a-z`, `0-9`, `_`, and `-` only. The attachment name
+    `draft` is the *implementation draft*, selected by the `--draft` option
+    of `ase-task-implement` and `ase-task-integrate`.
+
+    An *absent* `Source`, `Changeset`, or `Target` key reads as its
+    *configured default* at the time of use: <ase-project-task-default-source/>,
+    <ase-project-task-default-changeset/>, resp. <ase-project-task-default-target/>
+    (configuration `project.task.default.{source,changeset,target}`, with the
+    built-in defaults `worktree`, `worktree`, resp. `source`). Hence, a skill
+    *creating* or *rebooting* a task plan *MUST* leave these keys *out*, and a
+    skill *writing* one of these keys *MUST* leave it out if its value equals
+    the configured default, so the plan keeps following the configuration.
 
 -   A task can have zero or more attachments in the "backmatter". Each attachment is
     realized with its own dedicated block. When no attachments exist, these
@@ -205,22 +241,27 @@ You *MUST* honor the following hints on this *task* format:
     The keys of an attachment block are ordered `Type`, `Desc`, `Created`,
     `Modified`, and `Data` or `File`, with their values aligned at the same
     *fixed* column as the frontmatter keys (each `<key/>:` padded to a width of
-    10 characters).
+    11 characters).
 
 -   An attachment is *stale* when its `Modified` key is *absent* or *older*
     than the `Modified` key of the frontmatter, as its content was then
-    produced for an *earlier* version of the plan "body". In particular, the
-    *implementation draft* attachment produced by the skill
-    `ase-task-preflight` carries the `Type` key value `text/x-diff;
-    charset=utf-8; kind="preflight"` and is consumed *1:1* by the skill
-    `ase-task-implement` only while it is *not* stale.
+    produced for an *earlier* version of the plan "body". In particular, a
+    *change set* attachment produced by the skill `ase-task-implement` for a
+    `Changeset` of `attachment:<name/>` (like the *implementation draft*
+    of `--draft`) carries the `Type` key value `text/x-diff; charset=utf-8;
+    kind="<name/>"` and is delivered by the skill `ase-task-integrate` only
+    while it is *not* stale. Its `Desc` key carries `base <commit/>`, the full Git commit id the
+    unified diff is based on. Once it is delivered and kept (`ase-task-integrate --no-cleanup`),
+    its `Desc` key additionally carries `, merged <commit/>`, the full Git commit id of the target
+    branch after the integration, and the attachment is *delivered*: it is then neither delivered
+    again by `ase-task-integrate` nor re-applied by `ase-task-implement`.
 
     A skill which changes the content of an attachment refreshes its `Modified`
     key with the current timestamp -- the very same value it writes into the
-    `Modified` key of the frontmatter if it changes the "body", too. A skill
-    which *consumes* the implementation draft and thereby changes the "body"
-    (like `ase-task-implement` ticking checkboxes) stamps the consumed draft
-    with the same value, so it does not fall behind the plan it was applied to.
+    `Modified` key of the frontmatter if it changes the "body", too. Hence,
+    `ase-task-implement` stamps a change set attachment with the same value
+    it writes into the frontmatter when ticking checkboxes, so the attachment
+    does not fall behind the plan it was produced for.
 
 -   A skill which *rewrites* the "frontmatter" or the "body" of a task *MUST*
     pass the entire "backmatter" through *verbatim* -- every attachment block
@@ -244,7 +285,7 @@ You *MUST* honor the following hints on this *task* format:
     grilling question stayed *unanswered* and *reset* to `[ ]` once the
     question is answered in a later grilling. The `[-]` and `[>]` states
     make a bullet-point *inert*: grilling asks *no* question about it,
-    pre-flighting and implementation neither realize nor check it, and
+    drafting and implementation neither realize nor check it, and
     *every* skill leaves its checkbox *untouched* until the user changes it.
     On implementation, a `[?]` bullet-point is a *regular* todo like `[ ]`,
     a `[x]` bullet-point is *skipped* as already resolved, and a `[/]`

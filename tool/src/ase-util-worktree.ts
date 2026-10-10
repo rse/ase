@@ -19,6 +19,10 @@ import { writeStdout }   from "./ase-lib-stdio.js"
     which holds all ASE-managed Git worktrees  */
 const baseComponents = [ ".ase", "worktree" ]
 
+/*  the extra path component of the base directory holding the temporary
+    worktrees: as ids never contain ".", it is disjoint from all regular ids  */
+const tempComponent = ".temp"
+
 /*  reusable functionality: safe resolution of the ASE worktree
     directories under <repo-root>/.ase/worktree/<id>  */
 export class Worktree {
@@ -75,9 +79,9 @@ export class Worktree {
     /*  resolve the base directory holding all ASE worktrees, asserting
         that every path component below the repository root is a real
         directory; the base directory is created on demand only  */
-    static baseDir (create = false): string {
+    static baseDir (create = false, temp = false): string {
         let dir = Worktree.repoRoot()
-        for (const component of baseComponents) {
+        for (const component of temp ? [ ...baseComponents, tempComponent ] : baseComponents) {
             dir = path.join(dir, component)
             Worktree.assertRealDir(dir)
         }
@@ -91,9 +95,9 @@ export class Worktree {
     /*  resolve the worktree directory of a single id; the leaf itself is
         created by "git worktree add" and hence only has to be free of an
         aliasing entry left behind by an earlier run  */
-    static dir (id: string, create = false): string {
+    static dir (id: string, create = false, temp = false): string {
         Worktree.validateId(id)
-        const dir = path.join(Worktree.baseDir(create), id)
+        const dir = path.join(Worktree.baseDir(create, temp), id)
         Worktree.assertRealDir(dir)
         return dir
     }
@@ -117,8 +121,9 @@ export default class WorktreeCommand {
             .command("base")
             .description("Print the validated base directory holding all ASE worktrees")
             .option("-c, --create", "create the base directory if it does not exist yet")
-            .action(async (opts: { create?: boolean }) => {
-                await writeStdout(`${Worktree.baseDir(opts.create ?? false)}\n`)
+            .option("-t, --temp", "use the base directory of the temporary worktrees")
+            .action(async (opts: { create?: boolean, temp?: boolean }) => {
+                await writeStdout(`${Worktree.baseDir(opts.create ?? false, opts.temp ?? false)}\n`)
             })
 
         /*  register CLI sub-sub-command "ase util worktree path"  */
@@ -127,8 +132,9 @@ export default class WorktreeCommand {
             .description("Print the validated worktree directory of a single <id>")
             .argument("<id>", "Worktree identifier")
             .option("-c, --create", "create the base directory if it does not exist yet")
-            .action(async (id: string, opts: { create?: boolean }) => {
-                await writeStdout(`${Worktree.dir(id, opts.create ?? false)}\n`)
+            .option("-t, --temp", "resolve the id below the base directory of the temporary worktrees")
+            .action(async (id: string, opts: { create?: boolean, temp?: boolean }) => {
+                await writeStdout(`${Worktree.dir(id, opts.create ?? false, opts.temp ?? false)}\n`)
             })
     }
 }
@@ -153,6 +159,9 @@ export class WorktreeMCP {
                 "link, through a non-directory, or out of the repository, which `git worktree " +
                 "add` would otherwise silently follow and thereby write outside the repository. " +
                 "Set `create` to `true` to also create the base directory. " +
+                "Set `temp` to `true` for a *temporary* worktree, which is a worktree the caller " +
+                "may remove forcibly: it is then resolved below `<repo-root>/.ase/worktree/.temp` " +
+                "instead, a namespace disjoint from all regular worktrees. " +
                 "Fails with an error if the path is unsafe or the current directory is not a " +
                 "Git working tree; in that case you MUST NOT create the worktree at all.",
             inputSchema: {
@@ -160,14 +169,17 @@ export class WorktreeMCP {
                     .describe("worktree identifier (allowed characters: A-Z, a-z, 0-9, '_', '-'); " +
                         "if omitted, the base directory holding all ASE worktrees is returned"),
                 create: z.boolean().optional()
-                    .describe("if true, create the base directory if it does not exist yet (default: false)")
+                    .describe("if true, create the base directory if it does not exist yet (default: false)"),
+                temp: z.boolean().optional()
+                    .describe("if true, resolve below the base directory of the temporary worktrees (default: false)")
             }
         }, async (args) => {
             try {
                 const create = args.create ?? false
+                const temp   = args.temp   ?? false
                 const text   = args.id !== undefined ?
-                    Worktree.dir(args.id, create) :
-                    Worktree.baseDir(create)
+                    Worktree.dir(args.id, create, temp) :
+                    Worktree.baseDir(create, temp)
                 return {
                     content: [ { type: "text", text } ]
                 }

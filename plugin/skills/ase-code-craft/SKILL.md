@@ -24,7 +24,7 @@ Craft Source Code
 
 <expand name="getopt"
     arg1="ase-code-craft"
-    arg2="--auto|-a --dry|-d --direct|-D --interactive|-i --quick|-Q --next|-n=(none|DONE|EDIT|GRILL|PREFLIGHT|IMPLEMENT)...">
+    arg2="--auto|-a --dry|-d --direct|-D --interactive|-i --quick|-Q --next|-n=(none|DONE|EDIT|GRILL|DRAFT|IMPLEMENT)...">
     $ARGUMENTS
 </expand>
 

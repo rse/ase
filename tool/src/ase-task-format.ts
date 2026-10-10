@@ -312,7 +312,7 @@ export const TASK_TYPE = "text/vnd.ase.task"
 /*  the frontmatter keys of the task plan format in their canonical
     order, the array-typed ones among them, and the attachment keys
     in their canonical order (see "ase-format-task.md")  */
-const frontKeys        = [ "Type", "Id", "Created", "Modified", "Group", "Phase", "After", "Status", "Assignee", "Kind", "Tags", "Branch" ]
+const frontKeys        = [ "Type", "Id", "Created", "Modified", "Group", "Phase", "After", "Status", "Assignee", "Kind", "Tags", "Source", "Changeset", "Target" ]
 export const arrayKeys = [ "After", "Tags" ]
 const attachKeys       = [ "Type", "Desc", "Created", "Modified", "Data", "File" ]
 
@@ -339,11 +339,27 @@ const legacyStates: Record<string, string[]> = {
     CANCELLED: [ "CANCELLED" ]
 }
 
-/*  render a single key line with a column-aligned key  */
+/*  migrate the legacy "Branch:" key (the branch the change set lands on, created
+    from HEAD on demand) into "Changeset:" (created from the source on demand),
+    where the legacy "current" (the checked-out branch) is the default "worktree":
+    returns the "Changeset:" value, or undefined if the key is to be dropped only  */
+export const migrateBranch = (branch: string): string | undefined =>
+    branch !== "" && branch !== "current" ? `branch:${branch}` : undefined
+
+/*  migrate the legacy "preflight" kind of an implementation draft attachment
+    into "draft" (in place)  */
+export const migrateAttachment = (att: API.TaskAttachment): API.TaskAttachment => {
+    if (att.Type !== undefined && /^text\/x-diff\s*(?:;|$)/i.test(att.Type))
+        att.Type = att.Type.replace(/(;\s*kind\s*=\s*)("?)preflight\2(\s*(?:;|$))/i, "$1$2draft$2$3")
+    return att
+}
+
+/*  render a single key line with a column-aligned key
+    (a key too long for the column keeps at least one separating space)  */
 const keyLine = (key: string, value: string): string => {
     if (!/^[A-Za-z]+$/.test(key) || /[\r\n]/.test(value))
         throw new Error(`invalid key line for key "${key}" (key has to be alphabetic and value single-line)`)
-    return value === "" ? key + ":" : (key + ":").padEnd(10) + value
+    return value === "" ? key + ":" : (key + ":").padEnd(Math.max(11, key.length + 2)) + value
 }
 
 /*  the key line pattern of the frontmatter and attachment blocks
@@ -387,10 +403,11 @@ const assembleFront = (keys: Map<string, string>, other: string[]): string => {
     frontmatter block; then the frontmatter block is migrated by
     inserting the mandatory "Type:" key, mapping a legacy "Status:" value
     onto the configured lifecycle model, rewriting the legacy "Properties:"
-    key into "Tags:", and re-ordering and re-aligning the keys; any content
-    without a frontmatter block or task heading is passed through
-    verbatim; absent optional keys are never materialized, as they read
-    as their default value  */
+    key into "Tags:", rewriting the legacy "Branch:" key into "Changeset:",
+    and re-ordering and re-aligning the keys; any content without a
+    frontmatter block or task heading is passed through verbatim; absent
+    optional keys are never materialized, as they read as their default
+    value  */
 export const normalizeTaskText = (id: string, text: string, lifecycle: TaskLifecycle): string => {
     if (text === "")
         return text
@@ -453,6 +470,15 @@ export const normalizeTaskText = (id: string, text: string, lifecycle: TaskLifec
             keys.set("Tags", [ keys.get("Tags") ?? "", ...tags ].filter((tag) => tag !== "").join(", "))
     }
 
+    /*  rewrite the legacy "Branch:" key into "Changeset:" (see migrateBranch)  */
+    const branch = keys.get("Branch")
+    if (branch !== undefined) {
+        keys.delete("Branch")
+        const changeset = migrateBranch(branch)
+        if (changeset !== undefined && !keys.has("Changeset"))
+            keys.set("Changeset", changeset)
+    }
+
     /*  re-assemble the frontmatter block, followed by the untouched
         remainder of the plan  */
     return assembleFront(keys, fm.other) + text.slice(fm.length)
@@ -494,7 +520,8 @@ export const bodyConflict = (body: string): string | null => {
     split into arrays and "Id" taken from the authoritative id), the
     second block the body (without its leading and trailing empty line),
     and every further block an attachment (with a "Data: |4+" or "|4-" literal
-    block scalar de-indented); a text without a closed frontmatter is taken as body;
+    block scalar de-indented and a legacy "preflight" diff kind migrated into
+    "draft"); a text without a closed frontmatter is taken as body;
     a "---" line not starting a block stays part of the body  */
 export const parseTaskText = (id: string, text: string, lifecycle: TaskLifecycle): API.TaskPlan => {
     text = normalizeTaskText(id, text, lifecycle)
@@ -560,7 +587,7 @@ export const parseTaskText = (id: string, text: string, lifecycle: TaskLifecycle
                 else
                     att[m[1]] = m[2].trimEnd()
             }
-            attachment.push(att)
+            attachment.push(migrateAttachment(att))
         }
     }
     header.Type ??= TASK_TYPE

@@ -93,23 +93,25 @@ Procedure
         change <task-content/> itself:
 
         <format>
-        ◉   **Id:**       <task-id/>
-        ⎈   **Created:**  <timestamp-created/>
-        ⚙   **Modified:** <timestamp-modified/>
-        ⊞   **Group:**    <task-group/>
-        ◷   **Phase:**    <task-phase/>
-        ⇢   **After:**    <task-after/>
-        ◐   **Status:**   <task-status/>
-        ☯   **Kind:**     <task-kind/>
-        ⚑   **Tags:**     <task-tags/>
-        ⎇   **Branch:**   <task-branch/>
+        ◉   **Id:**        <task-id/>
+        ⎈   **Created:**   <timestamp-created/>
+        ⚙   **Modified:**  <timestamp-modified/>
+        ⊞   **Group:**     <task-group/>
+        ◷   **Phase:**     <task-phase/>
+        ⇢   **After:**     <task-after/>
+        ◐   **Status:**    <task-status/>
+        ☯   **Kind:**      <task-kind/>
+        ⚑   **Tags:**      <task-tags/>
+        ⇤   **Source:**    <task-source/>
+        ⇢   **Changeset:** <task-changeset/>
+        ⇥   **Target:**    <task-target/>
         </format>
 
         *Render plan*: Only output the following <template/>. If
         <getopt-option-full/> is *not* `true`, <task-content/> is longer than
         90 lines, and the backmatter contains an attachment block with the
-        `Type` key value `text/x-diff; charset=utf-8; kind="preflight"` (the implementation
-        draft from the companion skill `ase-task-preflight`), replace the
+        `Type` key value `text/x-diff; charset=utf-8; kind="draft"` (the implementation
+        draft from `ase-task-implement --draft`), replace the
         entire payload of the `Data` key of this attachment block with
         `[...]`. Else, do *not* truncate, summarize, or partially show the
         plan. Use the following <template/>:
@@ -121,7 +123,7 @@ Procedure
         </template>
 
         <if condition="the backmatter of <task-content/> contains an attachment
-            block with the `Type` key value `text/x-diff; charset=utf-8; kind="preflight"`
+            block with the `Type` key value `text/x-diff; charset=utf-8; kind="draft"`
             which is *stale*, i.e. its `Modified` key is absent or older
             than the `Modified` key of the frontmatter">
         Directly *after* this <template/>, only output the following
@@ -139,7 +141,7 @@ Procedure
 
         <if condition="<task-content/> is not empty">
         <ase-tpl-hint level="normal">
-        Use `/ase-task-edit` or `/ase-task-grill` to refine this plan, `/ase-task-preflight` to dry-run it, and `/ase-task-implement` to realize it.
+        Use `/ase-task-edit` or `/ase-task-grill` to refine this plan, `/ase-task-implement --draft` to draft its implementation, `/ase-task-implement` to realize it, and `/ase-task-integrate` to deliver it.
         </ase-tpl-hint>
 
         <if condition="<getopt-option-full/> is not equal `true` and the payload of the implementation draft attachment block was replaced with `[...]`">
@@ -150,7 +152,7 @@ Procedure
 
         <if condition="the implementation draft attachment block was reported as *stale* above">
         <ase-tpl-hint level="minimal">
-        Run `/ase-task-preflight` again to re-create the implementation draft for the changed plan, as `/ase-task-implement` refuses a stale draft.
+        Run `/ase-task-implement --draft` again to re-create the implementation draft for the changed plan, as `/ase-task-integrate --draft` refuses a stale draft.
         </ase-tpl-hint>
         </if>
         </if>

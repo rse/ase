@@ -59,7 +59,7 @@ its own tag `grilled:`*section* (lower-case, kept alongside the tags of
 previously grilled sections, e.g. `grilled:specification,
 grilled:design`), and a `PLAN CHANGES` box shows the bullet-points
 changed by the round. Finally, the user is offered a hand-off to
-editing, implementation, or preflight.
+editing, implementation, or draft.
 
 The *open* questions are recorded in the checkboxes of the plan's
 bullet-points: a bullet-point whose question stayed *unanswered*
@@ -113,8 +113,8 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
     pre-scripted in one shot. Recognized tokens at this skill: `none`
     (default, interactive answer required), `DONE` (no next step),
     `EDIT` (hand-over to `ase-task-edit`), `IMPLEMENT` (hand-over to
-    `ase-task-implement`), or `PREFLIGHT` (hand-over to
-    `ase-task-preflight`).
+    `ase-task-implement`), or `DRAFT` (hand-over to
+    `ase-task-implement --draft`).
 
 ##  ARGUMENTS
 
@@ -165,6 +165,6 @@ Grill the current task plan and then hand off to editing:
 
 ##  SEE ALSO
 
-[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md), [`ase-task-preflight`](../ase-task-preflight/help.md),
+[`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-reboot`](../ase-task-reboot/help.md),
 [`ase-task-implement`](../ase-task-implement/help.md), [`ase-task-view`](../ase-task-view/help.md), [`ase-task-list`](../ase-task-list/help.md),
 [`ase-task-rename`](../ase-task-rename/help.md), [`ase-task-delete`](../ase-task-delete/help.md), [`ase-code-edit`](../ase-code-edit/help.md).

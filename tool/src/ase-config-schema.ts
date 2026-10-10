@@ -57,18 +57,21 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "agent.guidance":  "normal",
         "project.name":    "Example Project",
         "project.boxing":  "white",
-        "project.task.lifecycle":        "solo",
-        "project.task.idscheme":         "slug",
-        "project.task.store":            "ase:./.ase/task",
-        "project.artifact.spec.basedir": "docs/specbook",
-        "project.artifact.spec.files":   "*.{md,txt,svg,png,jpg}",
-        "project.artifact.spec.schema":  "",
-        "project.artifact.code.basedir": "src",
-        "project.artifact.code.files":   "** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
-        "project.artifact.docs.basedir": "doc",
-        "project.artifact.docs.files":   "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**",
-        "project.artifact.infr.basedir": "",
-        "project.artifact.infr.files":   "**/{.github,.claude*,etc}/** **/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}",
+        "project.task.lifecycle":         "solo",
+        "project.task.idscheme":          "slug",
+        "project.task.store":             "ase:./.ase/task",
+        "project.task.default.source":    "worktree",
+        "project.task.default.changeset": "worktree",
+        "project.task.default.target":    "source",
+        "project.artifact.spec.basedir":  "docs/specbook",
+        "project.artifact.spec.files":    "*.{md,txt,svg,png,jpg}",
+        "project.artifact.spec.schema":   "",
+        "project.artifact.code.basedir":  "src",
+        "project.artifact.code.files":    "** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
+        "project.artifact.docs.basedir":  "doc",
+        "project.artifact.docs.files":    "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**",
+        "project.artifact.infr.basedir":  "",
+        "project.artifact.infr.files":    "**/{.github,.claude*,etc}/** **/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}",
         "board.tui.color.dim":           tuiColorDefaults.dim,
         "board.tui.color.normal":        tuiColorDefaults.normal,
         "board.tui.color.accent":        tuiColorDefaults.accent,
@@ -90,21 +93,24 @@ export const projectClassificationPresets: Record<string, Record<string, string>
     (reads always cascade through the full chain; this restricts writes only);
     keys absent from this map default to all non-"default" scope kinds  */
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
-    "agent.task":                    [ "session" ],
-    "agent.skill":                   [ "session" ],
-    "project.task.store":            [ "user", "project" ],
-    "project.task.token":            [ "user" ],
-    "project.task.lifecycle":        [ "user", "project" ],
-    "project.task.idscheme":         [ "user", "project" ],
-    "project.artifact.spec.basedir": [ "user", "project" ],
-    "project.artifact.spec.files":   [ "user", "project" ],
-    "project.artifact.spec.schema":  [ "user", "project" ],
-    "project.artifact.code.basedir": [ "user", "project" ],
-    "project.artifact.code.files":   [ "user", "project" ],
-    "project.artifact.docs.basedir": [ "user", "project" ],
-    "project.artifact.docs.files":   [ "user", "project" ],
-    "project.artifact.infr.basedir": [ "user", "project" ],
-    "project.artifact.infr.files":   [ "user", "project" ],
+    "agent.task":                     [ "session" ],
+    "agent.skill":                    [ "session" ],
+    "project.task.store":             [ "user", "project" ],
+    "project.task.token":             [ "user" ],
+    "project.task.lifecycle":         [ "user", "project" ],
+    "project.task.idscheme":          [ "user", "project" ],
+    "project.task.default.source":    [ "user", "project" ],
+    "project.task.default.changeset": [ "user", "project" ],
+    "project.task.default.target":    [ "user", "project" ],
+    "project.artifact.spec.basedir":  [ "user", "project" ],
+    "project.artifact.spec.files":    [ "user", "project" ],
+    "project.artifact.spec.schema":   [ "user", "project" ],
+    "project.artifact.code.basedir":  [ "user", "project" ],
+    "project.artifact.code.files":    [ "user", "project" ],
+    "project.artifact.docs.basedir":  [ "user", "project" ],
+    "project.artifact.docs.files":    [ "user", "project" ],
+    "project.artifact.infr.basedir":  [ "user", "project" ],
+    "project.artifact.infr.files":    [ "user", "project" ],
     "board.tui.color.dim":           [ "user", "project" ],
     "board.tui.color.normal":        [ "user", "project" ],
     "board.tui.color.accent":        [ "user", "project" ],
@@ -173,6 +179,23 @@ const webColorSchema = v.optional(v.pipe(v.string(), v.check((s) =>
     || /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(s),
 `expected "default", a color name (${Object.keys(webColorNames).join(", ")}), "#rgb", or "#rrggbb"`)))
 
+/*  schema for a default value of the "Source", "Changeset", or "Target" task
+    frontmatter key, restricted to the permitted forms "worktree", "source",
+    "branch:<name>" (a safe Git branch name), and "attachment:<name>"  */
+const flowSchema = (forms: ReadonlyArray<string>) => v.optional(v.pipe(v.string(), v.check((s) => {
+    const i    = s.indexOf(":")
+    const type = i < 0 ? s : s.slice(0, i)
+    const name = i < 0 ? "" : s.slice(i + 1)
+    if (!forms.includes(type))
+        return false
+    else if (type === "branch")
+        return /^[A-Za-z0-9_][A-Za-z0-9_./-]*$/.test(name) && !/(?:\/|\.|\.lock)$/.test(name) && !/\.\.|\/\//.test(name)
+    else if (type === "attachment")
+        return /^[A-Za-z0-9_-]+$/.test(name)
+    else
+        return i < 0
+}, `expected ${forms.map((form) => form === "branch" || form === "attachment" ? `"${form}:<name>"` : `"${form}"`).join(", ")}`)))
+
 /*  schema for ".ase/config.yaml"  */
 export const configSchema = v.nullish(v.strictObject({
     project: v.optional(v.strictObject({
@@ -184,7 +207,12 @@ export const configSchema = v.nullish(v.strictObject({
             store:     v.optional(v.pipe(v.string(), v.minLength(1))),
             token:     v.optional(v.pipe(v.string(), v.minLength(1))),
             idscheme:  v.optional(v.pipe(v.string(), v.check((s) => checkIdScheme(s) === "",
-                "expected \"slug[:<words>]\", \"seq[:<template>]\", or \"any\"")))
+                "expected \"slug[:<words>]\", \"seq[:<template>]\", or \"any\""))),
+            default:   v.optional(v.strictObject({
+                source:    flowSchema([ "worktree", "branch" ]),
+                changeset: flowSchema([ "worktree", "branch", "attachment" ]),
+                target:    flowSchema([ "worktree", "branch", "source" ])
+            }))
         })),
         artifact: v.optional(v.strictObject({
             spec: artifactSpecSchema,

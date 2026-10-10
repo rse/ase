@@ -61,8 +61,8 @@
 ○   `ase-task-condense`:   Condense a Task Plan
 ○   `ase-task-dissect`:    Dissect a Task Plan
 ○   `ase-task-reboot`:     Reboot a Task Plan
-○   `ase-task-preflight`:  Preflight a Task Plan
 ○   `ase-task-implement`:  Implement a Task Plan
+○   `ase-task-integrate`:  Integrate a Task Change Set
 ○   `ase-task-status`:     Configure Task Status
 ○   `ase-task-rename`:     Rename a Task Plan
 ○   `ase-task-delete`:     Delete a Task Plan

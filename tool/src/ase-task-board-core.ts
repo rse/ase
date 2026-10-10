@@ -304,9 +304,9 @@ export const attachmentTabs = (atts: { type: string, desc: string }[]): string[]
     ]
 }
 
-/*  determine whether an attachment type is a preflight diff  */
-export const isPreflightDiff = (type: string): boolean =>
-    /^text\/x-diff\s*(?:;|$)/i.test(type.trim()) && /;\s*kind\s*=\s*"?preflight"?\s*(?:;|$)/i.test(type)
+/*  determine whether an attachment type is an implementation draft diff  */
+export const isDraftDiff = (type: string): boolean =>
+    /^text\/x-diff\s*(?:;|$)/i.test(type.trim()) && /;\s*kind\s*=\s*"?draft"?\s*(?:;|$)/i.test(type)
 
 /*  classify the lines of a diff: its file headers up to and including the
     hunk headers as "head", and within hunks the inserted lines as "add", the
@@ -497,7 +497,8 @@ export const cardMoves = (board: Board, lifecycle: TaskLifecycle, card: Card): s
     card.actual === card.status ? undefined : reachableStates(board, lifecycle, card)
 
 /*  the pre-filled text of a new task: all frontmatter keys (the optional ones
-    empty), the next free id of the task id scheme (derived from the sample title),
+    empty, except for the change set flow keys, left out to read their configured
+    defaults), the next free id of the task id scheme (derived from the sample title),
     the initial state, and the body template of the task format with a sample
     title, the three sections, and their placeholder items  */
 export const newTaskText = async (log: Log, board: Board, lifecycle: TaskLifecycle): Promise<string> => {
@@ -506,7 +507,7 @@ export const newTaskText = async (log: Log, board: Board, lifecycle: TaskLifecyc
     return TaskFormat.formatTaskText({
         header: {
             Type: TaskFormat.TASK_TYPE, Id: id, Created: now, Modified: now, Group: "", Phase: "",
-            After: "", Status: lifecycle.initial, Assignee: "", Kind: "", Tags: "", Branch: ""
+            After: "", Status: lifecycle.initial, Assignee: "", Kind: "", Tags: ""
         },
         body: "#   TASK: New Task\n\n" +
             "##  SPECIFICATION (WHAT)\n\n-   [ ] DOM: **[...]**: [...]\n\n-   [ ] IFC: **[...]**: [...]\n\n" +

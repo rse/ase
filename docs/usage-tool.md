@@ -60,7 +60,7 @@ The following top-level commands exist for configuration handling:
   in-memory view; on set/write, they cause a fatal error.
   Recognized keys are grouped under three top-level sections:
   `project.*` (project identity, classification, and artifact
-  globs: `project.id`, `project.name`, `project.boxing`, `project.task.lifecycle`, `project.task.idscheme`, `project.task.store`, `project.task.token` (masked as `***` by `list`), and the
+  globs: `project.id`, `project.name`, `project.boxing`, `project.task.lifecycle`, `project.task.idscheme`, `project.task.default.{source,changeset,target}`, `project.task.store`, `project.task.token` (masked as `***` by `list`), and the
   `project.artifact.`*kind*`.{basedir,files}` globs plus the `project.artifact.spec.schema` file list) and `agent.*`
   (`agent.persona`, `agent.guidance`, `agent.task` -- the active
   task identifier -- and `agent.skill`), and `board.*`
@@ -305,15 +305,19 @@ The following top-level commands exist for miscellaneous utilities:
   intended to be invoked by the skill (after it has recorded all actual
   probe results) and not directly by end users.
 
-- `ase util worktree base` \[`-c`|`--create`\]:
+- `ase util worktree base` \[`-c`|`--create`\] \[`-t`|`--temp`\]:
   Print the validated base directory `<repo-root>/.ase/worktree`
   holding all *ASE* worktrees. With `--create`, the directory is
-  created if it does not exist yet.
+  created if it does not exist yet. With `--temp`, the base directory
+  `<repo-root>/.ase/worktree/.temp` of the *temporary* worktrees is
+  printed instead.
 
-- `ase util worktree path` *id* \[`-c`|`--create`\]:
+- `ase util worktree path` *id* \[`-c`|`--create`\] \[`-t`|`--temp`\]:
   Print the validated worktree directory `<repo-root>/.ase/worktree/<id>`
   of a single *id*, which has to match `[A-Za-z0-9_-]+`. With
   `--create`, the base directory is created if it does not exist yet.
+  With `--temp`, the *id* is resolved below the base directory of the
+  *temporary* worktrees, a namespace disjoint from all regular ones.
 
 - `ase util diagram`:
   Render a *Mermaid* or *D2* diagram specification (read from standard

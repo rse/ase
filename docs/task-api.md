@@ -173,7 +173,9 @@ deliberately agnostic of them:
   client serializes and unserializes.
 
 - **Normalization**: the client lifts a *legacy* plan (glyph header
-  lines, missing `Type`, legacy `Status` values, `Properties` key) into
+  lines, missing `Type`, legacy `Status` values, `Properties` key,
+  `Branch` key rewritten into `Changeset`, `preflight` draft kind
+  rewritten into `draft`) into
   the current task format *before* a `PUT`, as the API rejects a
   non-conformant plan with `422` instead of storing it as-is.
 
@@ -226,21 +228,21 @@ CONVENTIONS
   ```json
   {
       "header": {
-          "Type":     "text/vnd.ase.task",
-          "Id":       "T1",
-          "Created":  "2026-09-14 21:27",
-          "Modified": "2026-09-14 21:27",
-          "Group":    "rest-api",
-          "After":    [ "T0" ],
-          "Status":   "OPEN",
-          "Kind":     "CRAFTING",
-          "Tags":     [ "grilled:specification", "grilled:design" ],
-          "Branch":   "current"
+          "Type":      "text/vnd.ase.task",
+          "Id":        "T1",
+          "Created":   "2026-09-14 21:27",
+          "Modified":  "2026-09-14 21:27",
+          "Group":     "rest-api",
+          "After":     [ "T0" ],
+          "Status":    "OPEN",
+          "Kind":      "CRAFTING",
+          "Tags":      [ "grilled:specification", "grilled:design" ],
+          "Changeset": "branch:rest-api"
       },
       "body": "#   TASK: Add REST API\n\n##  SPECIFICATION (WHAT)\n\n-   [ ] DOM: **[...]**: [...]\n[...]",
       "attachment": [
           {
-              "Type":     "text/x-diff; charset=utf-8; kind=\"preflight\"",
+              "Type":     "text/x-diff; charset=utf-8; kind=\"draft\"",
               "Desc":     "implementation draft",
               "Created":  "2026-09-14 21:30",
               "Modified": "2026-09-14 21:30",
@@ -258,20 +260,22 @@ CONVENTIONS
   - `header`: a flat key/value object of the header metadata
     with the following keys and value types:
 
-    | Key        | Type       | Value                                                        |
-    | ---------- | ---------- | ------------------------------------------------------------ |
-    | `Type`     | `string`   | always `text/vnd.ase.task`                                   |
-    | `Id`       | `string`   | always the *taskId* of the request path                      |
-    | `Created`  | `string`   | creation timestamp (`YYYY-MM-DD HH:MM`)                      |
-    | `Modified` | `string`   | body modification timestamp (`YYYY-MM-DD HH:MM`)             |
-    | `Group`    | `string`   | name of the group (epic) the task belongs to                 |
-    | `Phase`    | `string`   | name of the phase (stage, sprint) the task belongs to        |
-    | `After`    | `string[]` | ids of the tasks this task is executed after                 |
-    | `Status`   | `string`   | lifecycle state (see *Lifecycle model* below)                |
-    | `Assignee` | `string`   | name of the assigned human or agent                          |
-    | `Kind`     | `string`   | `SPECIFYING`, `CRAFTING`, `REFACTORING`, or `RESOLVING`      |
-    | `Tags`     | `string[]` | tags, each a plain `key` marker or a `key:value` pair        |
-    | `Branch`   | `string`   | Git branch of the implementation (`current` for checked-out) |
+    | Key         | Type       | Value                                                        |
+    | ----------- | ---------- | ------------------------------------------------------------ |
+    | `Type`      | `string`   | always `text/vnd.ase.task`                                   |
+    | `Id`        | `string`   | always the *taskId* of the request path                      |
+    | `Created`   | `string`   | creation timestamp (`YYYY-MM-DD HH:MM`)                      |
+    | `Modified`  | `string`   | body modification timestamp (`YYYY-MM-DD HH:MM`)             |
+    | `Group`     | `string`   | name of the group (epic) the task belongs to                 |
+    | `Phase`     | `string`   | name of the phase (stage, sprint) the task belongs to        |
+    | `After`     | `string[]` | ids of the tasks this task is executed after                 |
+    | `Status`    | `string`   | lifecycle state (see *Lifecycle model* below)                |
+    | `Assignee`  | `string`   | name of the assigned human or agent                          |
+    | `Kind`      | `string`   | `SPECIFYING`, `CRAFTING`, `REFACTORING`, or `RESOLVING`      |
+    | `Tags`      | `string[]` | tags, each a plain `key` marker or a `key:value` pair        |
+    | `Source`    | `string`   | code basis (`worktree` or `branch:<name>`)                   |
+    | `Changeset` | `string`   | change set location (`worktree`, `branch:`, `attachment:`)   |
+    | `Target`    | `string`   | integration target (`worktree`, `branch:<name>`, `source`)   |
 
     Every key except `Type` and `Id` is optional and, when absent,
     reads as its default value (an empty array for the array-typed
@@ -905,16 +909,16 @@ curl -X PUT -H "Authorization: Bearer $TOKEN" \
 Get the entire header of the task plan in its textual form, i.e., the
 key lines of the frontmatter of the task plan text (see *Task plans*),
 without the enclosing `---` lines: the keys in canonical order (unknown
-keys trailing), each `Key:` padded to a width of 10 characters, and the
+keys trailing), each `Key:` padded to a width of 11 characters, and the
 array values comma-joined.
 
 Response `200`: the key lines as `text/plain; charset=utf-8`:
 
 ```text
-Type:     text/vnd.ase.task
-Id:       T1
-Status:   OPEN
-Tags:     api, rest
+Type:      text/vnd.ase.task
+Id:        T1
+Status:    OPEN
+Tags:      api, rest
 ```
 
 ```sh
@@ -1000,7 +1004,7 @@ Errors: `404` if the key is absent, `422` for the non-deletable keys
 
 ```sh
 curl -X DELETE -H "Authorization: Bearer $TOKEN" \
-    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/key/Branch"
+    "http://127.0.0.1:42042/projects/ase/tasks/T1/header/key/Changeset"
 ```
 
 ### GET {task}/body
@@ -1048,7 +1052,7 @@ particular `Type`.
 Query parameters:
 
 - `type` (optional): the `Type` to find. A value *with* MIME
-  parameters (like `text/x-diff; charset=utf-8; kind="preflight"`)
+  parameters (like `text/x-diff; charset=utf-8; kind="draft"`)
   matches an attachment `Type` *exactly*; a value *without* parameters
   (like `text/x-diff`) matches every attachment whose `Type` has this
   media type, regardless of its parameters. Matching is
@@ -1067,7 +1071,7 @@ Response `200` with `type`: the matching attachments, each with its
         {
             "index": 0,
             "attachment": {
-                "Type":     "text/x-diff; charset=utf-8; kind=\"preflight\"",
+                "Type":     "text/x-diff; charset=utf-8; kind=\"draft\"",
                 "Desc":     "implementation draft",
                 "Created":  "2026-09-14 21:30",
                 "Modified": "2026-09-14 21:30",
@@ -1087,7 +1091,7 @@ Response `200` with `type`: the matching attachments, each with its
 curl -H "Authorization: Bearer $TOKEN" \
     "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment"
 curl -H "Authorization: Bearer $TOKEN" \
-    --data-urlencode 'type=text/x-diff; charset=utf-8; kind="preflight"' --get \
+    --data-urlencode 'type=text/x-diff; charset=utf-8; kind="draft"' --get \
     "http://127.0.0.1:42042/projects/ase/tasks/T1/attachment"
 ```
 

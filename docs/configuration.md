@@ -89,6 +89,23 @@ The following configuration parameters control the project:
     registered per project in a remote task store (see `ase task
     idscheme`), and it is writable on the `user` and `project` scopes only.
 
+-   **project.task.default.{source,changeset,target}**: the *defaults* of
+    the change set flow frontmatter keys `Source:`, `Changeset:`, and
+    `Target:` of the project *task plans* (see `ase-format-task.md`):
+
+    -   `source`:    ...`worktree` (default) or `branch:`*name*.
+    -   `changeset`: ...`worktree` (default), `branch:`*name*, or `attachment:`*name*.
+    -   `target`:    ...`worktree`, `branch:`*name*, or `source` (default).
+
+    An *absent* key of a task plan reads as its configured default at
+    the time of use, so newly created and rebooted plans leave these keys
+    out, and a key whose value equals the configured default is left out
+    as well. The defaults are exported by the session-start hook as the
+    `<ase-project-task-default-{source,changeset,target}/>` placeholders
+    (and as the `ASE_PROJECT_TASK_DEFAULT_{SOURCE,CHANGESET,TARGET}`
+    environment variables), and they are writable on the `user` and
+    `project` scopes only.
+
 -   **project.task.store**: the *task store* URL the `ase task` commands
     and `ase_task_*` MCP tools forward the project *task plans* to:
 

@@ -35,8 +35,8 @@ further reduction is possible, the plan is left untouched (including its
 `Modified:` frontmatter timestamp) and reported as *already condensed*.
 
 After condensing, the user is asked whether to stop or hand off to
-`ase-task-edit`, `ase-task-implement`, or `ase-task-preflight`, unless
-`--next` pre-selects this choice.
+`ase-task-edit` or `ase-task-implement` (optionally with `--draft`),
+unless `--next` pre-selects this choice.
 
 ##  OPTIONS
 
@@ -49,7 +49,7 @@ After condensing, the user is asked whether to stop or hand off to
     Recognized tokens at this skill: `none` (default, interactive
     answer required), `DONE` (stop), `EDIT` (hand off to
     `ase-task-edit`), `IMPLEMENT` (hand off to `ase-task-implement`),
-    or `PREFLIGHT` (hand off to `ase-task-preflight`). Example:
+    or `DRAFT` (hand off to `ase-task-implement --draft`). Example:
     `--next EDIT,DONE` condenses, hands off to editing, and the editing
     loop will exit immediately.
 

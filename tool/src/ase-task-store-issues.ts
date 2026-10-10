@@ -76,22 +76,31 @@ export const registryContext = (prjId: string, entry: RegistryEntry, service: st
 }
 
 /*  decode the labels of an issue into the header: the "ase:<key>:<value>" labels of the
-    keys without native counterpart (and of an unassignable "Assignee") and the tags;
+    keys without native counterpart (and of an unassignable "Assignee") and the tags, with
+    a legacy "ase:Branch:<name>" label migrated into "Changeset" (see TaskFormat.migrateBranch);
     returns the state of the "ase:Status:<state>" label, as it only refines the issue state  */
 export const labelHeader = (header: API.TaskHeader, names: string[], nativeKeys: string[]): string | undefined => {
     const tags: string[] = []
     let status: string | undefined
+    let branch: string | undefined
     for (const name of names) {
         const m = LABEL_KEY_RE.exec(name)
         if (m === null && !name.startsWith("ase:"))
             tags.push(name)
         else if (m !== null && m[1] === "Status")
             status = m[2]
+        else if (m !== null && m[1] === "Branch")
+            branch = m[2]
         else if (m !== null && (!nativeKeys.includes(m[1]) || m[1] === "Assignee"))
             header[m[1]] = m[2]
     }
     if (tags.length > 0)
         header.Tags = tags
+    if (branch !== undefined) {
+        const changeset = TaskFormat.migrateBranch(branch)
+        if (changeset !== undefined && header.Changeset === undefined)
+            header.Changeset = changeset
+    }
     return status
 }
 
@@ -144,8 +153,9 @@ export const same = (a: API.TaskAttachment, b: API.TaskAttachment): boolean => {
 
 /*  derive the attachment of a comment: an attachment comment carries its keys in
     the hidden metadata header (with "Data" giving the "|4+" or "|4-" chomping)
-    followed by the data (fenced, unless Markdown), and any other comment reads
-    as a Markdown attachment  */
+    followed by the data (fenced, unless Markdown), with a legacy "preflight" draft
+    kind migrated into "draft" (see TaskFormat.migrateAttachment), and any other
+    comment reads as a Markdown attachment  */
 export const commentAttachment = (body: string | null | undefined, author: string,
     created: string, modified: string): API.TaskAttachment => {
     const text = (body ?? "").replace(/\r\n/g, "\n")
@@ -176,17 +186,18 @@ export const commentAttachment = (body: string | null | undefined, author: strin
         data = data.replace(/\n+$/, "")
         attachment.Data = data !== "" && chomp !== "|4-" ? `${data}\n` : data
     }
-    return attachment
+    return TaskFormat.migrateAttachment(attachment)
 }
 
-/*  render the comment of an attachment (see above)  */
+/*  render the comment of an attachment (see above), with the key column rule
+    of TaskFormat.keyLine (a key too long for the column keeps one space)  */
 export const attachmentComment = (attachment: API.TaskAttachment): string => {
     const lines = Object.keys(attachment).filter((key) => key !== "Data")
-        .map((key) => `${key}:`.padEnd(10) + escapeValue(attachment[key]))
+        .map((key) => `${key}:`.padEnd(Math.max(11, key.length + 2)) + escapeValue(attachment[key]))
     let text = ""
     if (attachment.Data !== undefined) {
         const data = attachment.Data.replace(/\n$/, "")
-        lines.push("Data:".padEnd(10) + (attachment.Data !== "" && !attachment.Data.endsWith("\n") ? "|4-" : "|4+"))
+        lines.push("Data:".padEnd(11) + (attachment.Data !== "" && !attachment.Data.endsWith("\n") ? "|4-" : "|4+"))
         if (isMarkdown(attachment.Type))
             text = data
         else {

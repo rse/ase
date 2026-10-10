@@ -228,22 +228,45 @@ The following ASE commands/skills exist on the task-level:
   `--next` passes a comma-separated list of pre-selected next-step tokens
   to chain the subsequent skill.
 
-- **/ase-task-preflight** \[`--next`|`-n` *option*\[,...\]\] \[*id*\]:<br/>
-  Preflight the implementation of the current or given task plan. The
-  draft is based on the branch named by the plan's `Branch:` key (or
-  `HEAD` if it does not exist yet) whenever it differs from the
-  checked-out branch. `--next` passes a comma-separated list of
-  pre-selected next-step tokens to chain the subsequent skill.
+- **/ase-task-implement** \[`--next`|`-n` *option*\[,...\]\] \[`--worktree`|`-w` *name*\] \[`--source`|`-s` *source*\] \[`--changeset`|`-c` *changeset*\] \[`--draft`|`-d`\] \[`--stateless`|`-S`\] \[*id*\]:<br/>
+  Implement the current or given task plan by creating its change set
+  from the plan's `Source:` (`worktree` or `branch:<name>`) into the
+  plan's `Changeset:` (`worktree` for uncommitted changes, `branch:<name>`
+  for a commit on a branch in its own worktree, or `attachment:<name>`
+  for an attachment of the plan only, made in a *temporary* worktree
+  below `.ase/worktree/.temp/`), overridable via `--source` and
+  `--changeset`. `--draft` is a shorthand for `--changeset attachment:draft`,
+  creating the *implementation draft* of the plan only, leaving all
+  artifacts untouched. `--worktree` selects the context worktree
+  `.ase/worktree/<name>` (reused, or created with its own branch `<name>`
+  starting at the source) to which the `worktree` value of `Changeset:`
+  refers, while the `worktree` value of `Source:` keeps referring to the
+  origin working copy; it is permitted for a `worktree` changeset only.
+  Unless `--stateless` is
+  given, the plan's `Status:` becomes `IMPLEMENTING` and then
+  `IMPLEMENTED` or `STALLED` (`team` and `enterprise` only). `--next`
+  passes a comma-separated list of pre-selected next-step tokens to
+  chain the subsequent skill.
 
-- **/ase-task-implement** \[`--next`|`-n` *option*\[,...\]\] \[`--worktree`|`-w`\] \[*id*\]:<br/>
-  Implement the current or given task plan. The plan's `Branch:` key
-  selects the branch the change set lands on: a value differing from
-  the checked-out branch switches the (clean) working copy to that
-  branch in place, or, with `--worktree`, checks it out inside the
-  dedicated Git worktree `.ase/worktree/<id>` (on an implied branch
-  `<id>` if the plan targets the checked-out branch). `--next` passes
-  a comma-separated list of pre-selected next-step tokens to chain the
-  subsequent skill.
+- **/ase-task-integrate** \[`--next`|`-n` *option*\[,...\]\] \[`--worktree`|`-w` *name*\] \[`--changeset`|`-c` *changeset*\] \[`--draft`|`-d`\] \[`--target`|`-t` *target*\] \[`--no-cleanup`|`-K`\] \[`--stateless`|`-S`\] \[*id*\]:<br/>
+  Integrate the change set of the current or given task plan from the
+  plan's `Changeset:` into the plan's `Target:` (`worktree`,
+  `branch:<name>`, or `source` for the plan's `Source:`), overridable
+  via `--changeset` and `--target`, through **/ase-repo-merge**.
+  `--draft` is a shorthand for `--changeset attachment:draft`, delivering
+  the *implementation draft* of the plan. `--worktree` selects an
+  *existing* context worktree for `Changeset: worktree` (and is permitted
+  for this changeset only), while
+  `Target: worktree` keeps referring to the origin working copy. An
+  empty change set, or one identical to the target branch, is refused.
+  The delivered change set is removed afterwards, unless `--no-cleanup`
+  keeps it (a kept attachment is marked `merged` in its `Desc:` key and
+  refused on any further integration). Unless
+  `--stateless` is given, the plan's `Status:` becomes `CLOSED` (`solo`)
+  or `INTEGRATING` and then `INTEGRATED`, `APPROVED` (on a no-op merge),
+  or `DEFERRED` (`enterprise`).
+  `--next` passes a comma-separated list of pre-selected next-step
+  tokens to chain the subsequent skill.
 
 - **/ase-task-condense** \[`--next`|`-n` *option*\[,...\]\] \[*id*\]:<br/>
   Condense the current or given task plan by compressing its wording
@@ -267,7 +290,7 @@ The following ASE commands/skills exist on the code-level:
   applying each one in place. `--quick` is a shorthand that
   enables `--auto`, `--dry`, and a preselected `--next`. `--next` passes
   a comma-separated chronological list of pre-selected next-step tokens
-  (out of `none`, `DONE`, `EDIT`, `PREFLIGHT`, `IMPLEMENT`) to chain the
+  (out of `none`, `DONE`, `EDIT`, `DRAFT`, `IMPLEMENT`) to chain the
   subsequent skill. An optional leading *task-id*`:` scopes the work to a
   persisted task plan.
 
@@ -295,7 +318,7 @@ The following ASE commands/skills exist on the code-level:
   Refactor source code. The `--auto`, `--dry`, `--direct`, `--quick`,
   `--next`, and *task-id*`:` options behave as for **/ase-code-craft**.
 
-- **/ase-code-edit** \[`--mode`|`-m` `auto`|`craft`|`refactor`|`resolve`\] \[`--grill`|`-g`\] \[`--grill-rounds`|`-r` *n*\] \[`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`\] \[`--verify`|`-v`\] \[`--branch`|`-b` *name*\] \[`--worktree`|`-w`\] \[`--loop`|`-l`\] \[*query*\]:<br/>
+- **/ase-code-edit** \[`--mode`|`-m` `auto`|`craft`|`refactor`|`resolve`\] \[`--grill`|`-g`\] \[`--grill-rounds`|`-r` *n*\] \[`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`\] \[`--verify`|`-v`\] \[`--worktree`|`-w` *name*\[`:`*branch*\]\] \[`--loop`|`-l`\] \[*query*\]:<br/>
   Edit the code base directly from a *query* in a plan-less state
   machine (querying, discovering, grilling, implementing, verifying)
   which fuses **/ase-code-craft**, **/ase-code-refactor**,
@@ -306,10 +329,10 @@ The following ASE commands/skills exist on the code-level:
   implementing, stopping early once all open points of severity
   `--grill-until` or higher are clear (default: `MUST`).
   With `--verify`, the implementation is verified until it passes;
-  otherwise strictly no verification is performed. `--branch` names the
-  branch the change sets land on, switching the (clean) working copy to
-  it in place. With `--worktree`, all change sets land in one dedicated
-  Git worktree on that branch. With `--loop`, the skill repeatedly asks
+  otherwise strictly no verification is performed. With `--worktree`,
+  all change sets land in the dedicated Git worktree
+  `.ase/worktree/<name>` (reused or created, optionally on the branch
+  *branch*). With `--loop`, the skill repeatedly asks
   for the next query until the user answers `STOP SKILL`.
 
 - **/ase-code-lint** \[`--auto`|`-a`\] \[`--severity`|`-S` `LOW`|`MEDIUM`|`HIGH`\] \[`--include`|`-i` *aspect*\[,...\]\] \[`--exclude`|`-e` *aspect*\[,...\]\] *source-reference*:<br/>
@@ -372,7 +395,7 @@ The following ASE commands/skills exist on the specification-level:
   with outside of the dedicated specification skills, which activate
   the know-how implicitly.
 
-- **/ase-spec-edit** \[`--grill`|`-g`\] \[`--grill-rounds`|`-r` *n*\] \[`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`\] \[`--verify`|`-v`\] \[`--branch`|`-b` *name*\] \[`--worktree`|`-w`\] \[`--loop`|`-l`\] \[*query*\]:<br/>
+- **/ase-spec-edit** \[`--grill`|`-g`\] \[`--grill-rounds`|`-r` *n*\] \[`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`\] \[`--verify`|`-v`\] \[`--worktree`|`-w` *name*\[`:`*branch*\]\] \[`--loop`|`-l`\] \[*query*\]:<br/>
   Edit the *SpecBook*-based specification (`SPEC`) directly from a
   *query* in a plan-less state machine (querying, discovering, grilling,
   implementing, verifying), the specification-level counterpart of
@@ -385,9 +408,9 @@ The following ASE commands/skills exist on the specification-level:
   `MUST`). With `--verify`, the specification is
   validated via *SpecBook* linting and the diagnostics are fixed in at
   most three rounds; otherwise strictly no validation is performed.
-  `--branch` names the branch the change sets land on, switching the
-  (clean) working copy to it in place. With `--worktree`, all change
-  sets land in one dedicated Git worktree on that branch. With
+  With `--worktree`, all change sets land in the dedicated Git
+  worktree `.ase/worktree/<name>` (reused or created, optionally on
+  the branch *branch*). With
   `--loop`, the skill repeatedly asks for the next query until the user
   answers `STOP SKILL`.
 

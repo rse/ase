@@ -11,8 +11,7 @@
     [`--grill-rounds`|`-r` *n*]
     [`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`]
     [`--verify`|`-v`]
-    [`--branch`|`-b` *name*]
-    [`--worktree`|`-w`]
+    [`--worktree`|`-w` *name*[`:`*branch*]]
     [`--loop`|`-l`]
     [*query*]
 
@@ -104,27 +103,22 @@ timestamp refreshed.
     the last round are listed as `REMAINING DIAGNOSTICS`. Without
     `--verify`, strictly no validation is performed at all.
 
--   `--branch`|`-b` *name*:
-    The Git branch the change sets land on, the plan-less counterpart
-    of the `Branch:` key of a task plan. The default `current` denotes
-    the currently checked-out branch. Any other *name* not equal to
-    the checked-out branch makes the skill *switch* the working copy
-    to that branch in place (created from `HEAD` if it does not exist
-    yet) -- but only if the working copy has *no* uncommitted changes,
-    otherwise the skill stops and touches nothing -- or, together with
-    `--worktree`, check that branch out inside the worktree.
-
--   `--worktree`|`-w`:
-    Apply the change sets inside a dedicated Git worktree (as
-    `ase-task-implement --worktree`) instead of the current working
-    copy. One single worktree `.ase/worktree/<id>`, named by a
-    two-word id derived from the first query, serves the whole skill
-    run: all `--loop` iterations land in it and it is left uncommitted
-    for review. The worktree carries the `--branch` branch, or -- as
-    the checked-out branch cannot be checked out a second time -- an
-    equally named branch created from `HEAD` by default. Under
+-   `--worktree`|`-w` *name*[`:`*branch*]:
+    Apply the change sets inside the dedicated Git worktree
+    `.ase/worktree/<name>` instead of the current working copy. The
+    worktree is *reused* if it already exists -- then switched to
+    *branch* if given and it has no uncommitted changes --, otherwise
+    it is *created* with the branch *branch* (default: *name*),
+    checked out if it exists or created from `HEAD` otherwise. One
+    single worktree serves the whole skill run: it is prepared before
+    the first discovery, so discovering, grilling, and implementing all
+    operate on it, all `--loop` iterations land in it, and it is left
+    uncommitted for review. Under
     `--verify`, the validation then runs as the `ase spec lint` command
-    inside the worktree.
+    inside the worktree. If *name* is a bare lower-case word naming no
+    existing worktree and a *query* follows (like `-w fix the crash`, a
+    former boolean `-w` usage), the skill asks whether *name* is the
+    worktree name or the first query word.
 
 -   `--loop`|`-l`:
     Loop the whole state cycle: after each iteration, ask for the next
@@ -145,7 +139,7 @@ timestamp refreshed.
 -   You want `SPEC` changes without the task plan ceremony
 -   You want the query stress-tested by grilling before the spec is edited
 -   You want specification edits validated by SpecBook linting
--   You want the change set to land on a specific Git branch
+-   You want the change set to land on a specific Git branch or worktree
 
 ##  EXAMPLES
 
@@ -164,7 +158,7 @@ Grill the query with two rounds first, then edit and validate:
 Loop over multiple specification edits inside a dedicated Git worktree:
 
 ```text
-❯ /ase-spec-edit -l -w
+❯ /ase-spec-edit -l -w event-series
 ```
 
 ##  SEE ALSO

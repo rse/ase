@@ -223,8 +223,9 @@ Procedure
                 part is a *newly created* plan,
             -   the `Group:` key carries <ase-task-id/>, the id of the
                 epic, so all parts are grouped under it,
-            -   the `Kind:`, `Phase:`, `Tags:`, and `Branch:` keys are
-                taken over from the epic *verbatim* (the kind being
+            -   the `Kind:`, `Phase:`, `Tags:`, `Source:`, `Changeset:`,
+                and `Target:` keys are taken over from the epic
+                *verbatim* (the kind being
                 inferred from the part content if the epic carries no
                 `Kind:` key), while the `After:` key of a part lists the
                 parts it depends on, if any,

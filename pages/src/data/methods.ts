@@ -78,7 +78,7 @@ export const methods: Method[] = [
     { icon: ArrowUpDown,         name: "Ladder of Abstraction",    note: "move up and down topics",   skill: "ase-meta-proximity"  },
     { icon: Split,               name: "Divide & Conquer",         note: "split an epic into parts",  skill: "ase-task-dissect"    },
     { icon: GitCommitHorizontal, name: "Atomic Commits",           note: "one purpose per commit",    skill: "ase-repo-dissect"    },
-    { icon: FlaskConical,        name: "Dry Run",                  note: "rehearse before applying",  skill: "ase-task-preflight"  },
+    { icon: FlaskConical,        name: "Dry Run",                  note: "rehearse before applying",  skill: "ase-task-implement"  },
     { icon: Gavel,               name: "Peer Review",              note: "judge diff before merge",   skill: "ase-repo-review"     },
     { icon: RefreshCw,           name: "Round-Trip Engineering",   note: "keep artifacts in sync",    skill: "ase-sync-reconcile"  },
     { icon: Bomb,                name: "Blast Radius",             note: "see what a change hits",    skill: "ase-repo-diff"       },

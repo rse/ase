@@ -19,17 +19,22 @@ between a `( TASK )` header and footer rule. If *id* is omitted, the
 
 By default, when the plan is longer than 90 lines and its backmatter
 contains an implementation draft attachment (an attachment block of
-type `text/x-diff; charset=utf-8; kind="preflight"`, produced by `ase-task-preflight`),
-the payload of that attachment is collapsed to `[...]` to keep the view
-compact. The `--full`|`-f` option suppresses this collapsing and renders
-the plan in full, without any truncation or summarization.
+type `text/x-diff; charset=utf-8; kind="draft"`, produced by
+`ase-task-implement --draft`), the payload of that attachment is
+collapsed to `[...]` to keep the view compact. The `--full`|`-f` option
+suppresses this collapsing and renders the plan in full, without any
+truncation or summarization.
 
 An implementation draft attachment whose `Modified:` key is absent or
 older than the `Modified:` key of the plan frontmatter is *stale*, as
 the plan changed after the draft was created. Such a draft is reported
 with a warning after the rendering, together with a hint that
-`ase-task-preflight` has to be run again, as `ase-task-implement`
-refuses a stale draft.
+`ase-task-implement --draft` has to be run again, as
+`ase-task-integrate --draft` refuses a stale draft.
+
+The frontmatter keys `Source:`, `Changeset:`, and `Target:` are
+rendered as well, stating where the change set of the plan is
+created from, stored in, and delivered to.
 
 ##  OPTIONS
 

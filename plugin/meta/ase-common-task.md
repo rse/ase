@@ -163,6 +163,9 @@ Set <args>--int-reuse-task</args>.
 <if condition="<getopt-option-next/> is not equal `none`">
     Set <args><args/> --next <getopt-option-next/></args>
 </if>
+<if condition="<arg3/> is given and not empty">
+    Set <args><args/> <arg3/></args>
+</if>
 Only output the following <template/> and then call the tool
 `Skill(skill: "ase:<arg1/>", args: "<args/>")` to invoke the
 `ase:<arg1/>` skill to continue with the updated plan. Immediately

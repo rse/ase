@@ -155,14 +155,16 @@ Set <args>--int-reuse-task</args>.
     to *implement* the freshly composed plan, bypassing `ase-task-edit`.
     </elseif>
 
-3.  <elseif condition="<head/> is equal `PREFLIGHT`">
+3.  <elseif condition="<head/> is equal `DRAFT`">
     Consume the head: set <getopt-option-next/> to the remaining
     tokens (joined back with `,`, or `none` if empty).
     <if condition="<getopt-option-next/> is not equal `none`">
         Set <args><args/> --next <getopt-option-next/></args>
     </if>
-    Call the tool `Skill(skill: "ase:ase-task-preflight", args: "<args/>")`
-    to *preflight* the freshly composed plan, bypassing `ase-task-edit`.
+    Set <args><args/> --draft</args>.
+    Call the tool `Skill(skill: "ase:ase-task-implement", args: "<args/>")`
+    to *draft* the implementation of the freshly composed plan, bypassing
+    `ase-task-edit`.
     </elseif>
 
 4.  <elseif condition="<head/> is equal `GRILL`">

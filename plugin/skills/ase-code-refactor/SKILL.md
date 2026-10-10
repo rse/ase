@@ -24,7 +24,7 @@ Refactor Source Code
 
 <expand name="getopt"
     arg1="ase-code-refactor"
-    arg2="--auto|-a --dry|-d --direct|-D --quick|-Q --next|-n=(none|DONE|EDIT|GRILL|PREFLIGHT|IMPLEMENT)...">
+    arg2="--auto|-a --dry|-d --direct|-D --quick|-Q --next|-n=(none|DONE|EDIT|GRILL|DRAFT|IMPLEMENT)...">
     $ARGUMENTS
 </expand>
 

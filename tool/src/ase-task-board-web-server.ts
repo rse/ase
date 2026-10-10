@@ -17,7 +17,7 @@ import type Log                  from "./ase-lib-log.js"
 import { Task }                  from "./ase-task.js"
 import { Config }                from "./ase-config-core.js"
 import { configSchema, webColorDefaults, webColorNames } from "./ase-config-schema.js"
-import { buildBoard, watchTasks, toneOf, laneMoves, cardMoves, BoardState, attachmentTabs, isPreflightDiff, diffTones, newTaskText, createTask, saveTask, TaskConflict } from "./ase-task-board-core.js"
+import { buildBoard, watchTasks, toneOf, laneMoves, cardMoves, BoardState, attachmentTabs, isDraftDiff, diffTones, newTaskText, createTask, saveTask, TaskConflict } from "./ase-task-board-core.js"
 import { layoutGraph, drawGraphSVG } from "./ase-task-board-graph.js"
 import { filterBoard, dropStandalone } from "./ase-task-board-filter.js"
 import type { Board, StoreState } from "./ase-task-board-core.js"
@@ -194,7 +194,7 @@ const taskDocument = async (keys: Map<string, string>, body: string): Promise<st
     fieldsDocument([ ...keys ].filter(([ k ]) => k !== "Type"), await renderPlan(body))
 
 /*  render a task plan attachment as a standalone document: its fields and
-    its content, with images embedded, Markdown rendered, a preflight diff
+    its content, with images embedded, Markdown rendered, a draft diff
     colored per line, binary content as a placeholder, and else verbatim text  */
 const attachmentDocument = async (log: Log, id: string, n: number): Promise<string | null> => {
     const att = (await Task.attachments(log, id))[n]
@@ -224,7 +224,7 @@ const attachmentDocument = async (log: Log, id: string, n: number): Promise<stri
     }
     if (type === "text/markdown")
         return fieldsDocument(fields, await renderPlan(text, true))
-    if (isPreflightDiff(att.type)) {
+    if (isDraftDiff(att.type)) {
         const lines = text.split(/\r?\n/)
         const tones = diffTones(lines)
         return fieldsDocument(fields, "<pre class=\"textart diff\"><code>" +

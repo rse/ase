@@ -82,7 +82,7 @@ export const comparison: Comparison[] = [
         native:   "Tell the agent to \"refactor this\" and get a **plausible but " +
                   "unbounded** change set to review after the fact.",
         ase:      "Run `/ase-code-refactor` for a surgical, scoped change set, " +
-                  "**guided by refactoring tenets** and an optional **preflight** you approve first."
+                  "**guided by refactoring tenets** and an optional **draft** you approve first."
     },
     {
         topic:    "Specification First",

@@ -384,12 +384,12 @@ export const useCases: UseCase[] = [
             {
                 icon:     PlaneTakeoff,
                 eyebrow:  "Realization",
-                title:    "Preflight, Then Implement",
-                body:     "A dry run drafts the change set first; only then does the implementation " +
-                          "run, isolated in its own Git worktree.",
+                title:    "Draft, Then Apply",
+                body:     "A draft creates the change set as an attachment of the plan first; only " +
+                          "after its review is it applied to the code base.",
                 commands: [
-                    "**/ase-task-preflight** skeleton",
-                    "**/ase-task-implement** --worktree skeleton"
+                    "**/ase-task-implement** --draft skeleton",
+                    "**/ase-task-integrate** --draft skeleton"
                 ]
             },
             {
@@ -573,13 +573,13 @@ export const useCases: UseCase[] = [
             {
                 icon:     PlaneTakeoff,
                 eyebrow:  "Realization",
-                title:    "Preflight, Then Implement",
-                body:     "With `tokens` being the current task, the id can be left out: the dry run " +
-                          "drafts the change set, then the implementation runs isolated in its own " +
-                          "Git worktree.",
+                title:    "Draft, Then Apply",
+                body:     "With `tokens` being the current task, the id can be left out: the draft " +
+                          "creates the change set as an attachment, then it is applied to the " +
+                          "code base.",
                 commands: [
-                    "**/ase-task-preflight**",
-                    "**/ase-task-implement** --worktree"
+                    "**/ase-task-implement** --draft",
+                    "**/ase-task-integrate** --draft"
                 ]
             },
             {
@@ -599,7 +599,7 @@ export const useCases: UseCase[] = [
         label:       "Coding",
         title:       "Use Case: Coding",
         description: "How to craft a new feature with ASE: mint the name, plan it, grill the plan, " +
-                     "preflight it, and implement it in an isolated Git worktree.",
+                     "draft its implementation, and implement it in an isolated Git worktree.",
         abstract:    "Feature work is where the operation modes pay off. The running example here is " +
                      "*a `--json` output mode for `ase task list`* — walked through the full Task Mode, " +
                      "with the one-shot Quick Mode shown as its alternative.",
@@ -648,11 +648,11 @@ export const useCases: UseCase[] = [
             {
                 icon:     PlaneTakeoff,
                 eyebrow:  "Dry Run",
-                title:    "Preflight, Then Adjust",
-                body:     "The preflight drafts the change set and shows what would be touched; the " +
+                title:    "Draft, Then Adjust",
+                body:     "The draft creates the change set and shows what would be touched; the " +
                           "plan is then given its final adjustments, before a single file is written.",
                 commands: [
-                    "**/ase-task-preflight** json-output",
+                    "**/ase-task-implement** --draft json-output",
                     "**/ase-task-edit** json-output: emit the JSON to stdout only, never to a file"
                 ]
             },
@@ -663,7 +663,7 @@ export const useCases: UseCase[] = [
                 body:     "The implementation runs isolated in its own Git worktree, so it never " +
                           "collides with whatever else is in flight on the branch.",
                 commands: [
-                    "**/ase-task-implement** --worktree json-output"
+                    "**/ase-task-implement** --worktree json json-output"
                 ]
             },
             {
@@ -673,7 +673,7 @@ export const useCases: UseCase[] = [
                 body:     "For a change this size, the fused one-shot variant does the very same work " +
                           "with grilling and verification, but without a persisted plan.",
                 commands: [
-                    "**/ase-code-edit** --mode craft --grill --verify --worktree add a --json output mode to `ase task list`"
+                    "**/ase-code-edit** --mode craft --grill --verify --worktree json-output add a --json output mode to `ase task list`"
                 ]
             }
         ]
@@ -724,10 +724,10 @@ export const useCases: UseCase[] = [
                 eyebrow:  "Task Mode",
                 title:    "Or Plan the Whole Fix",
                 body:     "Where the defect touches more than one place, the very same call without " +
-                          "`--quick` produces a persisted plan to grill and preflight first.",
+                          "`--quick` produces a persisted plan to grill and draft first.",
                 commands: [
                     "**/ase-code-resolve** rename-bug: the statusline keeps the old task id after `ase task rename`",
-                    "**/ase-task-preflight** rename-bug"
+                    "**/ase-task-implement** --draft rename-bug"
                 ]
             }
         ]
@@ -769,12 +769,12 @@ export const useCases: UseCase[] = [
             {
                 icon:     PlaneTakeoff,
                 eyebrow:  "Realization",
-                title:    "Preflight, Then Implement",
-                body:     "The dry run shows every call site the consolidation touches; only then " +
+                title:    "Draft, Then Implement",
+                body:     "The draft shows every call site the consolidation touches; only then " +
                           "does the implementation run, isolated in its own Git worktree.",
                 commands: [
-                    "**/ase-task-preflight** getopt",
-                    "**/ase-task-implement** --worktree getopt"
+                    "**/ase-task-implement** --draft getopt",
+                    "**/ase-task-implement** --worktree consolidate getopt"
                 ]
             },
             {
@@ -796,7 +796,7 @@ export const useCases: UseCase[] = [
                           "grills, and verifies in a single call.",
                 commands: [
                     "**/ase-code-refactor** --direct rename parseArgs to parseOptions in src/ase-getopt.ts",
-                    "**/ase-code-edit** --mode refactor --grill --verify --worktree " +
+                    "**/ase-code-edit** --mode refactor --grill --verify --worktree option-table " +
                     "extract the shared option table of the CLI commands into src/ase-getopt.ts"
                 ]
             }

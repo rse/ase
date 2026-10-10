@@ -5,7 +5,7 @@ description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. Each round, the current plan is shown and the
     user is asked whether to keep refining, mark the plan as done, or
-    proceed to the implementation or preflight. Use when the user wants
+    proceed to the implementation or draft. Use when the user wants
     to plan a task purely through chat-driven refinement.
 user-invocable: true
 disable-model-invocation: false
@@ -23,7 +23,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --dry|-d --next|-n=(none|DONE|GRILL|PREFLIGHT|IMPLEMENT)... --int-reuse-task">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --dry|-d --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -31,7 +31,7 @@ Iteratively Edit a Task Plan
 Establish and refine the *task plan* purely through a *chat-driven
 loop*. The user steers each round via an interactive dialog that offers
 continued refinement, finalization, or hand-off to implementation or
-preflight.
+draft.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
@@ -54,7 +54,7 @@ applied <instruction/> changed as *touched*, so its `Modified` key is
 refreshed together with the frontmatter in step 3.1. An attachment the
 <instruction/> did not change stays *verbatim* -- an implementation
 draft attachment (`Type` key value `text/x-diff; charset=utf-8;
-kind="preflight"`, from the companion skill `ase-task-preflight`) hence
+kind="draft"`, from `ase-task-implement --draft`) hence
 turns *stale* through a "body" change by its `Modified` key falling
 behind the frontmatter, which step 3.3 reports.
 
@@ -335,7 +335,7 @@ Set <args></args> (set args to empty).
 
     *REPEAT* the following steps from 3.1 up to and including 3.4 in
     a *LOOP* until the user selects `DONE`, `GRILL`, `IMPLEMENT`, or
-    `PREFLIGHT`, or declines/cancels in the dialog of step 3.4:
+    `DRAFT`, or declines/cancels in the dialog of step 3.4:
 
     1.  *Update timestamp*:
         <if condition="<task-content-dirty/> is 'true'">
@@ -402,24 +402,25 @@ Set <args></args> (set args to empty).
         change <task-render/> or <task-content/> itself:
 
         <format>
-        ◉   **Id:**       <task-id/>
-        ⎈   **Created:**  <timestamp-created/>
-        ⚙   **Modified:** <timestamp-modified/>
-        ⊞   **Group:**    <task-group/>
-        ◷   **Phase:**    <task-phase/>
-        ⇢   **After:**    <task-after/>
-        ◐   **Status:**   <task-status/>
-        ☯   **Kind:**     <task-kind/>
-        ⚑   **Tags:**     <task-tags/>
-        ⎇   **Branch:**   <task-branch/>
+        ◉   **Id:**        <task-id/>
+        ⎈   **Created:**   <timestamp-created/>
+        ⚙   **Modified:**  <timestamp-modified/>
+        ⊞   **Group:**     <task-group/>
+        ◷   **Phase:**     <task-phase/>
+        ⇢   **After:**     <task-after/>
+        ◐   **Status:**    <task-status/>
+        ☯   **Kind:**      <task-kind/>
+        ⚑   **Tags:**      <task-tags/>
+        ⇤   **Source:**    <task-source/>
+        ⇢   **Changeset:** <task-changeset/>
+        ⇥   **Target:**    <task-target/>
         </format>
 
         Only output the following <template/>, so the user
         can read the plan and react to it. If <task-render/> is longer
         than 90 lines and the backmatter contains an attachment block
-        with the `Type` key value `text/x-diff; charset=utf-8; kind="preflight"` (the
-        implementation draft from the companion skill
-        `ase-task-preflight`), replace the entire payload of the `Data`
+        with the `Type` key value `text/x-diff; charset=utf-8; kind="draft"` (the
+        implementation draft from `ase-task-implement --draft`), replace the entire payload of the `Data`
         key of this attachment block with `[...]`. Else, do *not*
         truncate, summarize, or partially show the plan. Use the
         following <template/>:
@@ -431,7 +432,7 @@ Set <args></args> (set args to empty).
         </template>
 
         <if condition="the backmatter of <task-content/> contains an attachment
-            block with the `Type` key value `text/x-diff; charset=utf-8; kind="preflight"`
+            block with the `Type` key value `text/x-diff; charset=utf-8; kind="draft"`
             which is *stale* according to the plan <format/> (its `Modified` key
             is absent or older than the `Modified` key of the frontmatter)">
         Directly *after* this <template/>, only output the following
@@ -445,7 +446,7 @@ Set <args></args> (set args to empty).
         </template>
 
         <ase-tpl-hint level="minimal">
-        Run `/ase-task-preflight` again to re-create the implementation draft for the changed plan, as `/ase-task-implement` refuses a stale draft.
+        Run `/ase-task-implement --draft` again to re-create the implementation draft for the changed plan, as `/ase-task-integrate --draft` refuses a stale draft.
         </ase-tpl-hint>
         </if>
 
@@ -459,7 +460,7 @@ Set <args></args> (set args to empty).
             <getopt-option-next/> so subsequent loop iterations or
             downstream skills can consume the tail.
 
-            -   If <head/> matches the regex `^(DONE|GRILL|IMPLEMENT|PREFLIGHT)$`:
+            -   If <head/> matches the regex `^(DONE|GRILL|IMPLEMENT|DRAFT)$`:
                 Honor the pre-selected token.
                 Set <result><head/></result>.
 
@@ -488,7 +489,7 @@ Set <args></args> (set args to empty).
                 Next Step: How would you like to proceed with the plan?
                 DONE: Mark plan finalized, exit planning loop.
                 GRILL: Hand off plan to grilling.
-                PREFLIGHT: Hand off plan to pre-flighting.
+                DRAFT: Hand off plan to implementation drafting.
                 IMPLEMENT: Hand off plan to implementation.
             </expand>
 
@@ -515,16 +516,17 @@ Set <args></args> (set args to empty).
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan finalized -- hand-off to grilling**
             </template>
 
-        -   If <result/> is `PREFLIGHT`:
+        -   If <result/> is `DRAFT`:
 
             *Break* out of the *loop*.
             <expand name="handoff-args"/>
-            Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-preflight", args: "<args/>")` tool
-            to *apply* the finalized plan.
+            Set <args><args/> --draft</args>. Only output the following
+            <template/> and then call the
+            `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
+            to *draft* the implementation of the finalized plan.
 
             <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan finalized -- hand-off to pre-flight**
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan finalized -- hand-off to implementation draft**
             </template>
 
         -   If <result/> is `IMPLEMENT`:

@@ -1,6 +1,6 @@
 ---
 name: ase-code-edit
-argument-hint: "[--help|-h] [--mode|-m auto|craft|refactor|resolve] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--verify|-v] [--branch|-b <name>] [--worktree|-w] [--loop|-l] [<query>|<issue-id>]"
+argument-hint: "[--help|-h] [--mode|-m auto|craft|refactor|resolve] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--verify|-v] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>|<issue-id>]"
 description: >
     Edit Source Code: Use when the user wants to "edit" the code base in
     one shot from a query or a bare analyzer issue id like "P1", fusing
@@ -22,7 +22,7 @@ Edit Source Code
 
 <expand name="getopt"
     arg1="ase-code-edit"
-    arg2="--mode|-m=(auto|craft|refactor|resolve) --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --verify|-v --branch|-b=current --worktree|-w --loop|-l">
+    arg2="--mode|-m=(auto|craft|refactor|resolve) --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --verify|-v --worktree|-w= --loop|-l">
     $ARGUMENTS
 </expand>
 
@@ -34,6 +34,7 @@ resolving in one shot -- through the states *querying*, *discovering*,
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-grill.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-changeset.md
 
 Procedure
 ---------
@@ -76,6 +77,12 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         <template>
         ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ ERROR: invalid `--grill-rounds` value: **<getopt-option-grill-rounds/>**
         </template>
+
+    3.  Resolve a potentially misparsed former boolean `--worktree`
+        option:
+
+        <expand name="changeset-ambiguity"
+            arg1="✪ skill: **ase-code-edit**"></expand>
 
 2.  **Iterate:**
 
@@ -157,10 +164,32 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
 4.  **State: discovering:**
 
-    Check the existing source files for all code which is related to
-    <todo-what/> and <todo-how/>, and check the architecture of the
-    existing code base to understand the overall structures and
-    dynamics. Do not output anything in this state.
+    1.  <if condition="<getopt-option-worktree/> is not empty and <worktree-dir/> is empty">
+
+        One *single* worktree serves the whole skill run: it is
+        prepared *once* before the first discovery, so discovering,
+        grilling, and implementing all operate on the *same* tree, and
+        all further `--loop` iterations land in it, too.
+
+        <expand name="changeset-context"
+            arg1="<getopt-option-worktree/>"
+            arg2="✪ skill: **ase-code-edit**"
+            arg3="true"
+            arg4="true"></expand>
+
+        Set <worktree-dir><context-dir/></worktree-dir>. Do not output
+        anything.
+
+        </if>
+
+    2.  <if condition="<worktree-dir/> is not empty">
+        <expand name="changeset-land" arg1="<worktree-dir/>"></expand>
+        </if>
+
+    3.  Check the existing source files for all code which is related to
+        <todo-what/> and <todo-how/>, and check the architecture of the
+        existing code base to understand the overall structures and
+        dynamics. Do not output anything.
 
 5.  **State: grilling:**
 
@@ -285,154 +314,17 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         in the following creation and updating of code. Do not output
         anything.
 
-    2.  Determine the *target branch* <target-branch/>: Determine the
-        *checked-out branch* by running the command
-        `git branch --show-current` (taken exactly as given) and
-        capturing its output into <current-branch/>. If
-        <getopt-option-branch/> is `current` or equal to
-        <current-branch/>, set <target-branch></target-branch> (empty:
-        the change set lands on the checked-out branch); otherwise set
-        <target-branch><getopt-option-branch/></target-branch>. Do not
-        output anything.
-
-    3.  <if condition="<getopt-option-worktree/> is not equal `true` and <target-branch/> is not empty">
-
-        The change set lands on a *different* branch inside the
-        *current* working copy, so the working copy is *switched* to
-        <target-branch/> in place -- which happens only *once* per
-        skill run, as afterwards the checked-out branch equals the
-        target branch.
-
-        1.  Determine the *uncommitted changes* by running the command
-            `git status --porcelain` (taken exactly as given) and
-            capturing its output. If the output is *not* empty, the
-            working copy is *dirty* and switching would drag the
-            uncommitted changes onto the other branch. Only output the
-            following <template/> and then immediately *STOP*
-            processing the entire current skill, leaving the working
-            copy *untouched*:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ ERROR: working copy has uncommitted changes -- cannot switch to branch **<target-branch/>** in place
-            </template>
-
-            Directly *after* this error <template/>, and *before*
-            stopping, give the corrective hint by expanding the
-            following (which, depending on the configured
-            <ase-guidance-level/>, may expand into nothing and hence
-            emit no output at all):
-
-            <ase-tpl-hint level="minimal">
-            Commit or stash the uncommitted changes first, or use `--worktree` to edit inside an isolated worktree instead.
-            </ase-tpl-hint>
-
-        2.  Determine the *existing branches* by running the command
-            `git branch --list` (taken exactly as given) and capturing
-            its output. If the branch <target-branch/> already exists,
-            switch to it by running the command
-            `git switch "<target-branch/>"`, otherwise create it from
-            `HEAD` and switch to it by running the command
-            `git switch -c "<target-branch/>"` (each taken exactly as
-            given). If the command fails, only output the following
-            <template/> and then immediately *STOP* processing the
-            entire current skill, leaving the working copy *untouched*:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ ERROR: branch **<target-branch/>** failed to switch
-            </template>
-
-        3.  Only output the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-code-edit**, ⎇ branch: **<target-branch/>**, ▶ status: **branch switched**
-            </template>
-
-        </if>
-
-    4.  <if condition="<getopt-option-worktree/> is equal `true` and <worktree-dir/> is empty">
-
-        One *single* worktree serves the whole skill run: it is created
-        *once* before the first change set is applied, and all further
-        `--loop` iterations land in it, too.
-
-        1.  Set <worktree-name/> to a unique name, derived from
-            <todo-what/>, which consists of two lower-case words
-            concatenated with a `-` character. Do not output anything.
-
-        2.  Set <worktree-branch><target-branch/></worktree-branch> if
-            <target-branch/> is not empty. Otherwise set
-            <worktree-branch><worktree-name/></worktree-branch>, as the
-            checked-out branch cannot be checked out a second time in
-            the worktree. Do not output anything.
-
-        3.  Determine the *worktree directory* by calling the
-            `ase_worktree_path(id: "<worktree-name/>", create: true)`
-            tool of the `ase` MCP server and capturing its output into
-            <worktree-dir/>. You *MUST* *NEVER* assemble this path
-            yourself. If this tool call fails, only output the following
-            <template/> and then immediately *STOP* processing the
-            entire current skill, leaving the working copy *untouched*:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ ERROR: no Git repository or unsafe worktree directory -- cannot create worktree
-            </template>
-
-        4.  Determine the *existing worktrees* and *existing branches*
-            by running the commands `git worktree list --porcelain` and
-            `git branch --list` (taken exactly as given) and capturing
-            their outputs. If the branch <worktree-branch/> already
-            exists, it is *checked out* into the worktree instead of
-            being created, so set
-            <worktree-add-args>"<worktree-dir/>" "<worktree-branch/>"</worktree-add-args>;
-            otherwise it is *created* from `HEAD` together with the
-            worktree, so set
-            <worktree-add-args>-b "<worktree-branch/>" "<worktree-dir/>"</worktree-add-args>.
-            If the worktree directory <worktree-dir/> already exists,
-            only output the following <template/> and then immediately
-            *STOP* processing the entire current skill, leaving the
-            existing worktree and the working copy *untouched*:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ ERROR: worktree **<worktree-name/>** already exists
-            </template>
-
-        5.  Create the worktree by running the command
-            `git worktree add <worktree-add-args/>` (taken exactly as
-            given), which creates the directory <worktree-dir/> with the
-            branch <worktree-branch/> checked out. If this command
-            fails, only output the following <template/> and then
-            immediately *STOP* processing the entire current skill,
-            leaving the working copy *untouched*:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ ERROR: worktree **<worktree-name/>** failed to create
-            </template>
-
-        6.  Only output the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-code-edit**, ◉ worktree: **.ase/worktree/<worktree-name/>**, ⎇ branch: **<worktree-branch/>**, ▶ status: **worktree created**
-            </template>
-
-        </if>
-
-    5.  Apply the edit by modifying the affected *artifacts* with a
+    2.  Apply the edit by modifying the affected *artifacts* with a
         corresponding, complete *change set*, honoring *only*
         <todo-what/> and <todo-how/> plus the information gathered in
         the *discovering* state. Also, if a `CHANGELOG.md` file exists,
         make an appropriate entry there, too.
 
         <if condition="<worktree-dir/> is not empty">
-        The change set *MUST* land *exclusively inside* the worktree
-        <worktree-dir/>: resolve *every* file path relative to
-        <worktree-dir/> instead of the original working copy. You *MUST*
-        *NEVER* modify, stage, stash, revert, or commit anything
-        *outside* of this worktree. Leave the worktree *uncommitted*:
-        do *not* run `git add` and do *not* run `git commit`, so the
-        user keeps full control over the final commit.
+        <expand name="changeset-land" arg1="<worktree-dir/>"></expand>
         </if>
 
-    6.  <if condition="<issue-id/> is not empty">
+    3.  <if condition="<issue-id/> is not empty">
         Call the `ase_kv_delete(key: "ase-issue-<issue-id/>")` tool of
         the `ase` MCP server to remove the now-resolved analyzer result
         from the key/value store, then set <issue-id></issue-id> (empty),
@@ -440,7 +332,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         Do not output anything.
         </if>
 
-    7.  Output only the following <template/>. You *MUST* *NOT* output a
+    4.  Output only the following <template/>. You *MUST* *NOT* output a
         change summary, a list of modified artifacts, a rationale, or a
         unified diff of the changes -- *independent* of
         <ase-project-boxing/>, whose exposure rules are explicitly

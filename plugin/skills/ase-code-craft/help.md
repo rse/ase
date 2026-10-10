@@ -26,8 +26,8 @@ with the existing architecture.
 
 By default the skill does *not* directly modify source files. It
 persists the plan via `ase_task_save` and then hands off to
-`ase-task-edit`, `ase-task-preflight`, or `ase-task-implement`, as
-selected by `--next`. Only under `--direct` it skips the plan
+`ase-task-edit` or `ase-task-implement` (optionally with `--draft`),
+as selected by `--next`. Only under `--direct` it skips the plan
 entirely and applies the change set to the affected artifacts itself.
 
 ##  OPTIONS
@@ -68,7 +68,7 @@ entirely and applies the change set to the affected artifacts itself.
 -   `--next`|`-n` *option*[,...]:
     Automatically choose the next step after composing the plan.
     *option* is a single token or a *comma-separated chronological
-    list* of tokens; an `IMPLEMENT`, `PREFLIGHT`, or `GRILL` head token
+    list* of tokens; an `IMPLEMENT`, `DRAFT`, or `GRILL` head token
     is consumed by this skill (bypassing `ase-task-edit`), and any
     remaining tokens are *forwarded* (via `--next`) to the downstream
     skill. For all other head tokens, the *entire* list is forwarded
@@ -77,10 +77,10 @@ entirely and applies the change set to the affected artifacts itself.
     this skill: `none` (default, hand off to `ase-task-edit`
     interactively), `DONE` (stop), `EDIT` (hand off to
     `ase-task-edit`), `GRILL` (hand off to `ase-task-grill`),
-    `PREFLIGHT` (hand off to `ase-task-preflight`),
+    `DRAFT` (hand off to `ase-task-implement --draft`),
     or `IMPLEMENT` (hand off to `ase-task-implement`). Example:
-    `--next PREFLIGHT,IMPLEMENT,DONE` crafts the plan, preflights it,
-    implements it, and exits without further dialog.
+    `--next DRAFT,INTEGRATE,DONE` crafts the plan, drafts its
+    implementation, applies the draft, and exits without further dialog.
 
 ##  ARGUMENTS
 
@@ -119,4 +119,4 @@ Craft interactively, applying one change after the other in place:
 ##  SEE ALSO
 
 [`ase-code-refactor`](../ase-code-refactor/help.md), [`ase-code-resolve`](../ase-code-resolve/help.md), [`ase-task-edit`](../ase-task-edit/help.md),
-[`ase-task-grill`](../ase-task-grill/help.md), [`ase-task-preflight`](../ase-task-preflight/help.md), [`ase-task-implement`](../ase-task-implement/help.md).
+[`ase-task-grill`](../ase-task-grill/help.md), [`ase-task-implement`](../ase-task-implement/help.md).
