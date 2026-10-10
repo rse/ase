@@ -154,8 +154,9 @@ export class SetupMcp {
         { type: "http",  url: string, headers?: Record<string, string> }, scope: Scope): Promise<void> {
         const args: string[] = [ "mcp", "add" ]
         if (tool === "claude") {
-            if (scope !== "user")
-                args.push("--scope", scope)
+            /*  always pass the scope explicitly, as the Anthropic Claude Code CLI
+                defaults to the "local" scope (and not the "user" scope) for "mcp add"  */
+            args.push("--scope", scope)
             args.push("--transport", transport.type)
             if (transport.type === "stdio") {
                 for (const [ key, val ] of Object.entries(env))
@@ -198,7 +199,9 @@ export class SetupMcp {
     /*  unregister an MCP server from the tool; the per-tool command line
         differs between Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI  */
     private async mcpRemove (tool: Tool, name: string, scope: Scope): Promise<void> {
-        const scopeArgs = tool === "claude" && scope !== "user" ? [ "--scope", scope ] : []
+        /*  always pass the scope explicitly, as the Anthropic Claude Code CLI
+            does not default to the "user" scope for its "mcp" commands  */
+        const scopeArgs = tool === "claude" ? [ "--scope", scope ] : []
         const args = [ "mcp", "remove", ...scopeArgs, name ]
         await this.runner.run(toolSpecs[tool].cli, args,
             { ignoreError: `MCP server "${name}" not registered` })
