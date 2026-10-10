@@ -19,6 +19,12 @@ through a *chat-driven loop*. The user steers each round via an
 interactive dialog that offers continued refinement, finalization, or
 hand-off to implementation or draft.
 
+A newly generated plan is grounded in the relevant specification
+(`SPEC`), source code (`CODE`), and infrastructure (`INFR`) files of the
+project: it names the actual files and symbols to change, the actual
+build, lint, and test procedures, and a `CHANGELOG.md` entry if such a
+file exists.
+
 Attachments in the plan's backmatter are never removed by a refinement.
 A refinement which changes an attachment refreshes the attachment's
 `Modified:` key; a refinement which changes the plan body refreshes the

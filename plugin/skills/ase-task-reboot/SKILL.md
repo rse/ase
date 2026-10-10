@@ -31,6 +31,7 @@ based on the existing `SPECIFICATION (WHAT)`.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 
 Procedure
@@ -108,11 +109,13 @@ Procedure
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
         </template>
 
-    7.  Create a new plan from scratch and store the result as
+    7.  <expand name="task-ground-plan"/>
+
+        Create a new plan from scratch and store the result as
         <task-content/> by closely following the defined plan format
         <format/> and injecting into it all the information from
-        the <instruction/> and all decisions you derived from the
-        <instruction/>, where:
+        the <instruction/>, all decisions you derived from the
+        <instruction/>, and the grounding in the project, where:
 
         -   <if condition="<mode/> is `structured`">
             the `##  SPECIFICATION (WHAT)` section is *seeded* by the

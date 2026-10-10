@@ -95,6 +95,50 @@ Only output the following <template/>:
 
 </define>
 
+<define name="task-ground-plan">
+
+Before deriving any plan content from the <instruction/>, *ground* the
+plan in the *current state* of the project, instead of deriving it from
+the <instruction/> alone. Do not output anything during this grounding.
+
+1.  Call the `ase_artifact_list(kind: [ "spec", "code", "infr" ])` tool
+    of the `ase` MCP server *once* and read the returned `artifacts`
+    array of `{ kind, files }` objects to obtain the project-relative
+    file lists of the **Artifact Set**s `SPEC` (specification), `CODE`
+    (source code), and `INFR` (infrastructure, like build, deployment,
+    and operations configuration).
+
+2.  From these file lists, determine the files which the <instruction/>
+    *affects* or *depends on* -- the specification parts it touches or
+    which constrain it, the source code modules, interfaces, and symbols
+    it changes or uses, and the build, lint, test, packaging, and
+    deployment configuration it relies on -- and *read* them. Read only
+    the relevant files (or their relevant parts), not all files, but
+    always consider all three **Artifact Set**s.
+
+3.  Build a precise understanding of the *current state* and the
+    *conventions* of the project (structure, naming, coding style, build,
+    lint, and test procedures) from them.
+
+Then derive the plan from this grounding, where:
+
+-   the `##  SPECIFICATION (WHAT)` bullet-points are *consistent* with the
+    existing specification, and explicitly state any intended deviation
+    from it,
+-   the `##  DESIGN (HOW)` bullet-points name the *actual* files, modules,
+    interfaces, symbols, and configuration items to change, and place new
+    ones according to the existing structure and conventions, instead of
+    naming hypothetical ones,
+-   the `##  VERIFICATION (WHEN)` bullet-points (if any) refer to the
+    *actual* build, lint, and test procedures of the project, and
+-   if a `CHANGELOG.md` file exists in the project (or in any affected
+    sub-package), the `##  DESIGN (HOW)` section *MUST* include an
+    explicit `IMP` bullet-point describing the addition of a
+    corresponding new entry to that `CHANGELOG.md` file, aligned with
+    its existing style and conventions.
+
+</define>
+
 <define name="task-save-content">
 
 Update <timestamp-modified/> with the current time in ISO-style

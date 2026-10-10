@@ -16,7 +16,11 @@ The `ase-task-reboot` skill re-creates an existing task plan *from
 scratch* by extracting the `DOM` and `IFC` bullet points of the
 `SPECIFICATION (WHAT)` section (if present) from the current plan,
 using them as the new instruction, re-deriving the `DESIGN (HOW)` and
-`VERIFICATION (WHEN)` sections, preserving the original creation
+`VERIFICATION (WHEN)` sections grounded in the relevant specification
+(`SPEC`), source code (`CODE`), and infrastructure (`INFR`) files of the
+project (naming the actual files and symbols to change, the actual build,
+lint, and test procedures, and a `CHANGELOG.md` entry if such a file
+exists), preserving the original creation
 timestamp, the remaining frontmatter keys, and all attachments, and
 writing fresh plan content via `ase_task_save`. As the rebooted plan
 starts its lifecycle anew, its `Status:` key is reset to the default

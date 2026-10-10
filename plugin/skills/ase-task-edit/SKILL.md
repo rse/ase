@@ -35,6 +35,8 @@ draft.
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 
 Procedure
 ---------
@@ -62,18 +64,13 @@ Set <task-content-dirty>true</task-content-dirty>.
 </define>
 
 <define name="generate-plan">
+<expand name="task-ground-plan"/>
+
 Create a new plan from scratch and store the result as
 <task-content/> by closely following the defined plan format
 <format/> and injecting into it all the information from
-the <instruction/> and all decisions you derived from the
-<instruction/>.
-
-If a `CHANGELOG.md` file exists in the project (or in any
-affected sub-package), the plan *MUST* include, as an `IMP`
-bullet-point of its `##  DESIGN (HOW)` section, an explicit
-bullet-point describing the addition of a corresponding new
-entry to that `CHANGELOG.md` file, aligned with its existing
-style and conventions.
+the <instruction/>, all decisions you derived from the
+<instruction/>, and the grounding in the project.
 
 <if condition="<getopt-option-dry/> is equal `true`">
 You *MUST* completely omit the `##  VERIFICATION (WHEN)` section
