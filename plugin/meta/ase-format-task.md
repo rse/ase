@@ -14,7 +14,7 @@ Group:     <task-group/>
 Phase:     <task-phase/>
 After:     <task-after/>
 Status:    <task-status/>
-Assignee:  <task-assigned/>
+Assignee:  <task-assignee/>
 Kind:      <task-kind/>
 Tags:      <task-tags/>
 Source:    <task-source/>
@@ -152,7 +152,7 @@ You *MUST* honor the following hints on this *task* format:
 
 -   The `Assignee` frontmatter key states the current *assignee* of the task,
     which is either a human or an agent. A *newly created* task carries no
-    assignee and there is no default value. The <task-asignee/> is an arbitrary
+    assignee and there is no default value. The <task-assignee/> is an arbitrary
     but unique name of the assignee.
 
 -   The `Kind` frontmatter key states the *kind of change* the task plan
