@@ -248,11 +248,13 @@ The following ASE commands/skills exist on the task-level:
   passes a comma-separated list of pre-selected next-step tokens to
   chain the subsequent skill.
 
-- **/ase-task-integrate** \[`--next`|`-n` *option*\[,...\]\] \[`--worktree`|`-w` *name*\] \[`--changeset`|`-c` *changeset*\] \[`--draft`|`-d`\] \[`--target`|`-t` *target*\] \[`--no-cleanup`|`-K`\] \[`--stateless`|`-S`\] \[*id*\]:<br/>
+- **/ase-task-integrate** \[`--next`|`-n` *option*\[,...\]\] \[`--worktree`|`-w` *name*\] \[`--changeset`|`-c` *changeset*\] \[`--draft`|`-d`\] \[`--target`|`-t` *target*\] \[`--mode`|`-m` `merge`|`rebase`|`squash`\] \[`--no-cleanup`|`-K`\] \[`--stateless`|`-S`\] \[*id*\]:<br/>
   Integrate the change set of the current or given task plan from the
   plan's `Changeset:` into the plan's `Target:` (`worktree`,
   `branch:<name>`, or `source` for the plan's `Source:`), overridable
-  via `--changeset` and `--target`, through **/ase-repo-merge**.
+  via `--changeset` and `--target`, through **/ase-repo-merge**,
+  whose merge mode `--mode` (`merge`, `rebase`, or `squash`) is passed
+  through.
   `--draft` is a shorthand for `--changeset attachment:draft`, delivering
   the *implementation draft* of the plan. `--worktree` selects an
   *existing* context worktree for `Changeset: worktree` (and is permitted

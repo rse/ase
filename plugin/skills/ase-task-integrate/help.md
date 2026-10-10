@@ -12,6 +12,7 @@
     [`--changeset`|`-c` *changeset*]
     [`--draft`|`-d`]
     [`--target`|`-t` *target*]
+    [`--mode`|`-m` `merge`|`rebase`|`squash`]
     [`--no-cleanup`|`-K`]
     [`--stateless`|`-S`]
     [*id*]
@@ -23,9 +24,10 @@ plan, as created by `ase-task-implement`, from the plan's *changeset*
 (the location of the change set) into the plan's *target* (the place
 of integration). The integration itself is performed by the skill
 `ase-repo-merge`, which commits still uncommitted changes of the
-change set, merges them into the target branch, resolves merge
-conflicts semantically, and reports the verdict `MERGED`, `CONFLICT`,
-or `FAILED`.
+change set, merges them into the target branch (through a regular
+merge, a rebase with fast-forward, or a squash merge, as selected via
+`--mode`), resolves merge conflicts semantically, and reports the
+verdict `MERGED`, `CONFLICT`, or `FAILED`.
 
 The *changeset* is selected by the plan's `Changeset:` frontmatter
 key (if absent, the configured default `project.task.default.changeset`),
@@ -109,14 +111,22 @@ or delete the task plan, unless `--next` pre-selects this choice.
     Override the plan's `Target:` key (`worktree`, `branch:`*name*, or
     `source`) for this run, without changing the plan.
 
+-   `--mode`|`-m` `merge`|`rebase`|`squash`:
+    The merge mode, passed through to `ase-repo-merge` (default:
+    `merge`): `merge` creates a merge commit, `rebase` rebases the
+    change set branch (rewriting its commits) onto the target branch
+    and fast-forwards the target branch, and `squash` combines all
+    changes of the change set into one new commit on the target branch.
+
 -   `--no-cleanup`|`-K`:
     After a successful integration, keep the delivered change set
     instead of removing it: the branch and its worktree, or the
     attachment block, which is then marked as delivered by appending
     `, merged <commit>` to its `Desc:` key, so it is never delivered
     again. Without this option, a delivered branch is removed only if
-    Git considers it merged and its worktree has no uncommitted
-    changes. A temporary branch of an attachment is always removed.
+    Git considers it merged (always for `--mode squash`) and its
+    worktree has no uncommitted changes. A temporary branch of an
+    attachment is always removed.
 
 -   `--stateless`|`-S`:
     Leave the plan's `Status:` key untouched.
@@ -155,6 +165,13 @@ keep the branch afterwards:
 
 ```text
 ❯ /ase-task-integrate --changeset branch:feature-hello --target branch:main --no-cleanup hello
+```
+
+Squash the change set branch of the task `hello` into one commit on
+its target:
+
+```text
+❯ /ase-task-integrate --changeset branch:feature-hello --mode squash hello
 ```
 
 ##  SEE ALSO

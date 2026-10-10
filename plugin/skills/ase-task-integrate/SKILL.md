@@ -1,6 +1,6 @@
 ---
 name: ase-task-integrate
-argument-hint: "[--help|-h] [--next|-n <option>[,...]] [--worktree|-w <name>] [--changeset|-c <changeset>] [--draft|-d] [--target|-t <target>] [--no-cleanup|-K] [--stateless|-S] [<id>]"
+argument-hint: "[--help|-h] [--next|-n <option>[,...]] [--worktree|-w <name>] [--changeset|-c <changeset>] [--draft|-d] [--target|-t <target>] [--mode|-m merge|rebase|squash] [--no-cleanup|-K] [--stateless|-S] [<id>]"
 description: >
     Integrate the change set or implementation draft of the current or given
     task plan into its target. Use when the user calls to "deliver" or
@@ -22,7 +22,7 @@ Integrate a Task Change Set
 
 <expand name="getopt"
     arg1="ase-task-integrate"
-    arg2="--next|-n=(none|DONE|DELETE)... --worktree|-w= --changeset|-c= --draft|-d --target|-t= --no-cleanup|-K --stateless|-S --int-reuse-task">
+    arg2="--next|-n=(none|DONE|DELETE)... --worktree|-w= --changeset|-c= --draft|-d --target|-t= --mode|-m=(merge|rebase|squash) --no-cleanup|-K --stateless|-S --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -398,14 +398,15 @@ Procedure
         <target-before/> and <target-tree-before/>, the target branch
         and its content *before* the merge. Do not output anything.
 
-    3.  Set <merge-args>--target "<target-branch/>"</merge-args>. If
-        <changeset-type/> is `attachment`, or <getopt-option-no-cleanup/>
-        is not equal `true`, append ` --cleanup` to <merge-args/>, so the
-        merged source branch (and its worktree) is removed afterwards. Then
-        merge the change set by invoking the `ase-repo-merge` skill,
-        which commits still uncommitted changes of the source branch,
-        resolves merge conflicts semantically, and checks that the source
-        branch landed:
+    3.  Set <merge-args>--target "<target-branch/>" --mode "<getopt-option-mode/>"</merge-args>,
+        which passes the merge mode (`merge`, `rebase`, or `squash`)
+        through. If <changeset-type/> is `attachment`, or
+        <getopt-option-no-cleanup/> is not equal `true`, append
+        ` --cleanup` to <merge-args/>, so the merged source branch (and
+        its worktree) is removed afterwards. Then merge the change set by
+        invoking the `ase-repo-merge` skill, which commits still
+        uncommitted changes of the source branch, resolves merge
+        conflicts semantically, and checks that the source branch landed:
 
         <skill name="ase:ase-repo-merge" args="<merge-args/> <merge-source/>" result="merge-result"/>
 
@@ -422,7 +423,7 @@ Procedure
         <target-after/>, and if it differs from <target-before/> and the
         output of the command
         `git rev-parse "refs/heads/<target-branch/>^1"` equals
-        <target-before/>, drop the resulting empty merge commit by running
+        <target-before/>, drop the resulting empty commit by running
         the command
         `git update-ref "refs/heads/<target-branch/>" "<target-before/>" "<target-after/>"`
         (taken exactly as given), which leaves the index and working tree
