@@ -4,22 +4,22 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import fs                                   from "node:fs"
-import os                                   from "node:os"
-import path                                 from "node:path"
-import { execFileSync }                     from "node:child_process"
+import fs                                           from "node:fs"
+import os                                           from "node:os"
+import path                                         from "node:path"
+import { execFileSync }                             from "node:child_process"
 
-import { Command, InvalidArgumentError }    from "commander"
-import { execaSync }                        from "execa"
-import { Chalk }                            from "chalk"
-import type { ForegroundColorName }         from "chalk"
+import { Command, InvalidArgumentError }            from "commander"
+import { execaSync }                                from "execa"
+import { Chalk }                                    from "chalk"
+import type { ForegroundColorName }                 from "chalk"
 
-import type Log                             from "./ase-lib-log.js"
-import { Config }                           from "./ase-config-core.js"
-import { configSchema }                     from "./ase-config-schema.js"
-import { parseScope, userStateDir }         from "./ase-config-scope.js"
-import { readStdin, writeStdout }           from "./ase-lib-stdio.js"
-import pkg                                  from "../package.json" with { type: "json" }
+import type Log                                     from "./ase-lib-log.js"
+import { Config }                                   from "./ase-config-core.js"
+import { configSchema }                             from "./ase-config-schema.js"
+import { parseScope, userStateDir, projectIdOf }    from "./ase-config-scope.js"
+import { readStdin, writeStdout }                   from "./ase-lib-stdio.js"
+import pkg                                          from "../package.json" with { type: "json" }
 
 /*  forced-color chalk instance: stdout is a pipe under Anthropic Claude Code CLI,
     so chalk auto-detection would yield level 0; force level 1 to keep
@@ -552,8 +552,8 @@ export default class StatuslineCommand {
                         emit(`${prefix("※", "user")}${c.bold(user)}`)
                     },
                     p: () => {
-                        const dir = path.basename(data.workspace?.current_dir ?? "")
-                        emit(`${prefix("⚑", "project")}${c.bold(dir)}`)
+                        const id = projectIdOf(data.workspace?.current_dir ?? "")
+                        emit(`${prefix("⚑", "project")}${c.bold(id)}`)
                     },
                     T: cfgValue("taskId", "◉", "task"),
                     s: () => emit(`${prefix("⏻", "session")}${c.bold(getSession())}`),

@@ -4,7 +4,6 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import path                                 from "node:path"
 import { fileURLToPath }                    from "node:url"
 
 import { Command }                          from "commander"
@@ -27,7 +26,7 @@ const textOverview = async (log: Log): Promise<string> => {
     const { buildBoard, cardLabel } = await import("./ase-task-board-core.js")
     const board = await buildBoard(log)
     const out   = [
-        `⧉ ASE: Task Board · project: ${path.basename(Task.projectRoot())} · mode: ${board.mode} · tasks: ${board.cards.size}`,
+        `⧉ ASE: Task Board · project: ${Task.projectIdOf(Task.projectRoot())} · mode: ${board.mode} · tasks: ${board.cards.size}`,
         ""
     ]
     for (const group of board.groups) {

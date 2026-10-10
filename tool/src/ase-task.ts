@@ -19,7 +19,7 @@ import type { McpServer }                                 from "@modelcontextpro
 import type Log                                           from "./ase-lib-log.js"
 import { Config }                                         from "./ase-config-core.js"
 import { configSchema }                                   from "./ase-config-schema.js"
-import { parseScope, userStateDir }                       from "./ase-config-scope.js"
+import { parseScope, userStateDir, projectIdOf }          from "./ase-config-scope.js"
 import { Markdown }                                       from "./ase-service-markdown.js"
 import { readStdin, writeStdout }                         from "./ase-lib-stdio.js"
 import TaskStoreCommand, { storeSchema }                  from "./ase-task-store-server-cli.js"
@@ -86,10 +86,10 @@ export class Task {
         return root
     }
 
-    /*  derive the fallback project id from the sanitized basename of a
-        project root (shared by task store, hook, and service)  */
+    /*  derive the fallback project id from a project root
+        (shared by task store, hook, and service)  */
     static projectIdOf (root: string): string {
-        return path.basename(root).replace(/[^A-Za-z0-9_-]/g, "_") || "project"
+        return projectIdOf(root)
     }
 
     /*  cached task store specification (TTL-bounded, mirroring the project

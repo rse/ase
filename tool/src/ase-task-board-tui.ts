@@ -4,8 +4,6 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import path                                   from "node:path"
-
 import { render, Box, Text, useInput }        from "ink"
 
 import type Log                               from "./ase-lib-log.js"
@@ -153,7 +151,7 @@ const App = ({ log, initial, project }: { log: Log, initial: Board, project: str
 /*  run the terminal board until the user quits  */
 export const runTUI = async (log: Log): Promise<void> => {
     const initial = await buildBoard(log)
-    const project = path.basename(Task.projectRoot())
+    const project = Task.projectIdOf(Task.projectRoot())
     loadPalette(log)
 
     /*  defer stderr log output while Ink draws, as it bypasses patchConsole  */

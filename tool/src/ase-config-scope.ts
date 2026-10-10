@@ -135,6 +135,26 @@ export const projectRoot = (): string | null => {
     }
 }
 
+/*  derive the fallback project id from the sanitized basename of a
+    project root (shared by task store, hook, service, and statusline);
+    for a multi-worktree setup "<basedir>/<branch>/" with an "active" symlink
+    in "<basedir>/" (pointing to one of the worktrees) the id is
+    "<basedir>-<branch>", as the bare branch name (e.g. "master") is not unique  */
+export const projectIdOf = (root: string): string => {
+    let name = path.basename(root)
+    const parent = path.dirname(root)
+    if (name !== "" && parent !== root) {
+        try {
+            if (fs.lstatSync(path.join(parent, "active")).isSymbolicLink())
+                name = `${path.basename(parent)}-${name}`
+        }
+        catch {
+            /*  no "active" symlink, so no multi-worktree setup  */
+        }
+    }
+    return name.replace(/[^A-Za-z0-9_-]/g, "_") || "project"
+}
+
 /*  detect whether a project context exists, i.e. either we are inside
     a Git working tree or a ".ase" directory is present at or above cwd  */
 const hasProjectContext = (): boolean =>

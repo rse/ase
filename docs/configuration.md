@@ -15,7 +15,9 @@ earlier scopes):
 The following configuration parameters control the project:
 
 -   **project.id**: the unique id of the project
-    (default: the basename of the project root; required for a remote
+    (default: the basename of the project root, or `<basedir>-<worktree>`
+    if the project root is a worktree `<basedir>/<worktree>/` next to an
+    `active` symlink in `<basedir>/`; required for a remote
     task store, as a basename likely collides with unrelated projects
     on a shared task store server)
 

@@ -236,7 +236,7 @@ const attachmentDocument = async (log: Log, id: string, n: number): Promise<stri
 /*  serialize the board for the browser  */
 const boardJSON = (board: Board, lifecycle: TaskFormat.TaskLifecycle) => ({
     mode:     board.mode,
-    project:  path.basename(Task.projectRoot()),
+    project:  Task.projectIdOf(Task.projectRoot()),
     version:  pkg.version,
     warnings: board.warnings,
     surface:  BoardState.load().web,
