@@ -225,7 +225,12 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 arg2="✪ skill: **ase-code-edit**"
                 arg3="file and directory paths, identifiers, symbols, types, commands, options, configuration keys, and literal values"
                 arg4="the code base"
-                arg5=""></expand>
+                arg5="">
+                <if condition="<getopt-option-verify/> is not equal `true`">
+                Raise *no* questions at all of focus area `REGRESSION`
+                or `CONFIRMATION`, as without `--verify` no verification
+                takes place which could honor their decisions.
+                </if></expand>
 
             If <grill-stop/> is `true`, skip the remaining items of
             this round and all remaining rounds, and continue with

@@ -55,7 +55,9 @@ implementation until it passes). The *querying* state and every
     should be clarified) -- and a 1-2 word `TOPIC` hint. The questions
     of a round are sorted by descending focus area importance
     (`DOMAIN`, `INTERFACE`, `ARCHITECTURE`, `IMPLEMENTATION`,
-    `REGRESSION`, `CONFIRMATION`).
+    `REGRESSION`, `CONFIRMATION`). Questions of focus area
+    `REGRESSION` and `CONFIRMATION` are raised only together with
+    `--verify`, as only then a verification honors their decisions.
     All questions of a round are announced together below a
     `GRILLING ROUND K/L` line (the announcement line and round numbering
     are omitted when only a single round is performed) as an

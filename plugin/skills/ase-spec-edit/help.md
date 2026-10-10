@@ -59,8 +59,10 @@ timestamp refreshed.
     should be clarified) -- and a 1-3 word `TOPIC` hint. The questions
     of a round are sorted by descending focus area importance
     (`DOMAIN`, `INTERFACE`, `ARCHITECTURE`, `IMPLEMENTATION`,
-    `REGRESSION`, `CONFIRMATION`) and are announced
-    together below a `GRILLING ROUND K/L` line (the round numbering is
+    `REGRESSION`, `CONFIRMATION`). Questions of focus area
+    `REGRESSION` and `CONFIRMATION` are raised only together with
+    `--verify`, as only then a verification honors their decisions.
+    All questions of a round are announced together below a `GRILLING ROUND K/L` line (the round numbering is
     omitted when only a single round is performed) as a
     `QUESTION`/`ANSWERS` table with one row per question, each row
     carrying two to three grounded answer alternatives (with the
