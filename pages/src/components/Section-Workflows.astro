@@ -70,6 +70,9 @@ import BookCheck     from "@lucide/astro/icons/book-check"
                     the underlying <b>ASE</b> tenets are still applied
                     and honored and optionally the prompt and its intent
                     can be relentlessly "grilled" as in <b>Task Mode</b>.
+                    Additionally, the result can be optionally verified,
+                    the operation can be looped until it converges, and
+                    the changes can be isolated in a Git worktree.
                     </p>
 
                     <p class="text-foreground-secondary ase-indent-p ase-justify">
@@ -81,7 +84,9 @@ import BookCheck     from "@lucide/astro/icons/book-check"
                     most prominent feature is that the task plan can be
                     relentlessly "grilled" to ensure that the later
                     implementation by the AI really meets the intentions
-                    of the user.
+                    of the user. Afterwards, the task plan can be drafted,
+                    implemented, and finally integrated, either step by step
+                    interactively or even fully autonomously.
                     </p>
 
                     <p class="text-foreground-secondary ase-indent-p ase-justify">
@@ -92,7 +97,9 @@ import BookCheck     from "@lucide/astro/icons/book-check"
                     for this approach, and then finally this switches
                     over to the regular <b>Task Mode</b>. The task plan
                     has a fixed format and is persisted and hence is
-                    available across agent sessions.
+                    available across agent sessions. This mode is especially
+                    useful when the solution approach is not obvious and
+                    multiple alternatives have to be evaluated first.
                     </p>
 
                     <p class="text-foreground-secondary ase-indent-p ase-justify">
@@ -101,17 +108,16 @@ import BookCheck     from "@lucide/astro/icons/book-check"
                     to the specification and architecture ("forward
                     engineering") or even aligns the specification and
                     architecture to the code and documentation ("reverse
-                    engineering").
+                    engineering"). Additionally, information from foreign
+                    sources can be imported into the artifacts, and the
+                    specification can be exported into ready-to-consume
+                    renderings like HTML or PDF.
                     </p>
                 </div>
             </div>
             <div class="lg:order-2 relative" data-reveal="left">
-                <Annotation flat class="hidden sm:block right-0 -translate-x-1/2">
-                    Get 4 new powerful<br/>
-                    operation modes in<br/>
-                    your Claude Code!
-                </Annotation>
-                <Diagram src="/assets/operation-modes.svg" label="ASE operation modes diagram" />
+                <Diagram src="/assets/operation-modes-diagram.svg" label="ASE operation modes diagram" />
+                <Diagram src="/assets/operation-modes.svg" label="ASE operation modes table" />
             </div>
         </div>
     </div>
