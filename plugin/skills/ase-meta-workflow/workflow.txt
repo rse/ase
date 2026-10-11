@@ -20,6 +20,7 @@ START               -> ase-docs-refine
 START               -> ase-docs-proofread
 START               -> ase-docs-distill
 START               -> ase-repo-review
+START               -> ase-code-review
 START               -> ase-repo-diff
 START               -> ase-repo-changelog
 START               -> ase-repo-commit
@@ -51,6 +52,7 @@ ase-docs-refine     -> END
 ase-docs-proofread  -> END
 ase-docs-distill    -> END
 ase-repo-review     -> END
+ase-code-review     -> END
 ase-repo-diff       -> END
 ase-repo-changelog  -> END
 ase-repo-commit     -> END
