@@ -562,7 +562,7 @@ export const saveTask = async (log: Log, id: string, text: string, tag?: string)
         throw err
     }
     if (next !== id)
-        warning = await Task.rename(log, id, next) ?? ""
+        warning = (await Task.rename(log, id, next))?.warning ?? ""
     return { id: next, warning }
 }
 

@@ -531,16 +531,20 @@ export class Task {
         return Task.with(log, (client) => client.delete(id))
     }
 
-    /*  rename a task, rewriting its "Id:" frontmatter key; returns null if
-        the source task does not exist, else a warning (else empty) if the new
-        id does not conform to the task id scheme; throws if the target id
-        already exists  */
-    static async rename (log: Log, oldId: string, newId: string): Promise<string | null> {
+    /*  rename a task, rewriting its "Id:" frontmatter key and the "Group" and
+        "After" references of all other tasks; returns null if the source task
+        does not exist, else the number of updated referring tasks plus a
+        warning (else empty) if the new id does not conform to the task id
+        scheme; throws if the target id already exists  */
+    static async rename (log: Log, oldId: string, newId: string): Promise<{ warning: string, references: number } | null> {
         Task.validateId(oldId)
         Task.validateId(newId)
         try {
-            return await Task.with(log, async (client) =>
-                await client.patch(oldId, { id: newId }) === null ? null : TaskFormat.idWarning(client.idscheme, newId))
+            return await Task.with(log, async (client) => {
+                const result = await client.patch(oldId, { id: newId })
+                return result === null ? null :
+                    { warning: TaskFormat.idWarning(client.idscheme, newId), references: result.references ?? 0 }
+            })
         }
         catch (err: unknown) {
             if (err instanceof Core.Problem && err.status === 409)
@@ -800,7 +804,7 @@ export default class TaskCommand {
                         throw err
                     }
                     if (next !== id)
-                        warning = await Task.rename(this.log, id, next) ?? ""
+                        warning = (await Task.rename(this.log, id, next))?.warning ?? ""
                     if (warning !== "")
                         this.log.write("warning", `task: ${warning}`)
                 }
@@ -990,15 +994,16 @@ export default class TaskCommand {
             .argument("<old>", "Old task identifier")
             .argument("<new>", "New task identifier")
             .action(async (oldId: string, newId: string) => {
-                const warning = await Task.rename(this.log, oldId, newId)
-                if (warning !== null) {
-                    if (warning !== "")
-                        this.log.write("warning", `task: ${warning}`)
-                    this.log.write("info", `task: renamed "${oldId}" to "${newId}"`)
+                const result = await Task.rename(this.log, oldId, newId)
+                if (result !== null) {
+                    if (result.warning !== "")
+                        this.log.write("warning", `task: ${result.warning}`)
+                    this.log.write("info", `task: renamed "${oldId}" to "${newId}" ` +
+                        `(updated references in ${result.references} other task(s))`)
                 }
                 else
                     this.log.write("info", `task: no task "${oldId}" to rename`)
-                process.exit(warning !== null ? 0 : 1)
+                process.exit(result !== null ? 0 : 1)
             })
 
         /*  register CLI sub-command "ase task newid"  */
@@ -1344,7 +1349,8 @@ export class TaskMCP {
             title: "ASE task rename",
             description:
                 "Rename a previously persisted task from `old` to `new`, " +
-                "rewriting its embedded `Id:` frontmatter key. " +
+                "rewriting its embedded `Id:` frontmatter key and the `Group:` and `After:` " +
+                "references of all other tasks. " +
                 "Returns a status `text` indicating whether the rename succeeded. " +
                 "Fails with an error if the target id already exists.",
             inputSchema: {
@@ -1355,9 +1361,10 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                const warning = await Task.rename(this.log, args.old, args.new)
-                const msg     = warning !== null ?
-                    `OK: renamed task "${args.old}" to "${args.new}"` + notice(warning) :
+                const result = await Task.rename(this.log, args.old, args.new)
+                const msg    = result !== null ?
+                    `OK: renamed task "${args.old}" to "${args.new}" ` +
+                    `(updated references in ${result.references} other task(s))` + notice(result.warning) :
                     `WARNING: no task "${args.old}" to rename`
                 return {
                     content: [ { type: "text", text: msg } ]

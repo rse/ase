@@ -840,8 +840,10 @@ Request body (at least one field is mandatory):
   state not reachable from the current status is rejected.
 
 - `id` (optional): the new task identifier, unique within the project.
-  The `Id` header key of the plan is rewritten accordingly. A task
-  plan cannot be moved to another project.
+  The `Id` header key of the plan is rewritten accordingly, and so are
+  the references to it in the `Group` and `After` header keys of all
+  other plans of the project (header only, so their `Modified` key is
+  left alone). A task plan cannot be moved to another project.
 
 If both fields are given, the status change is applied *before* the
 rename. The response reports the *resulting* task.
@@ -859,11 +861,15 @@ Response `200`:
 - `id`: the (possibly new) task identifier.
 - `status`: the (possibly new) lifecycle status.
 - `from`: the previous lifecycle status (present only if `status` was given).
+- `references`: the number of other plans whose `Group` or `After`
+  references were rewritten (present only on a rename).
 
 Errors: `400` for a malformed body or a body without any field, `404`
 if no project *prjId* or no task plan *taskId* exists, `409` if the
 rename target already exists, `422` for an invalid *taskId*, an invalid
-new `id`, or an unknown or unreachable `status`.
+new `id`, or an unknown or unreachable `status`, and `500` if the plan
+was renamed but rewriting a reference failed (naming the plans left
+with the old reference).
 
 ```sh
 curl -X PATCH -H "Authorization: Bearer $TOKEN" \
