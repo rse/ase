@@ -920,6 +920,50 @@ const openTask = async (id: string, background = false) => {
 }
 const restorePlanScroll = () => {
     planEl.value?.contentWindow?.scrollTo(0, tabScrolls.get(tab.value) ?? 0)
+    bindImageZoom()
+}
+
+/*  zoom the embedded image of an attachment tab with the mouse wheel, keeping
+    the point under the pointer in place, and pan it by dragging, as in the graph  */
+const bindImageZoom = () => {
+    const doc  = planEl.value?.contentDocument
+    const img  = doc?.querySelector<HTMLImageElement>(".embedding img")
+    const view = doc?.scrollingElement
+    if (img === null || img === undefined || view === null || view === undefined)
+        return
+    let scale = 1
+    let base  = 0
+    let drag: { x: number, y: number, left: number, top: number } | null = null
+    img.addEventListener("wheel", (ev) => {
+        ev.preventDefault()
+        if (base === 0)
+            base = img.getBoundingClientRect().width
+        const delta = ev.deltaY * (ev.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : ev.deltaMode === WheelEvent.DOM_DELTA_PAGE ? 400 : 1)
+        const old   = img.getBoundingClientRect()
+        const rx    = (ev.clientX - old.left) / old.width
+        const ry    = (ev.clientY - old.top)  / old.height
+        scale = Math.min(16, Math.max(0.1, scale * Math.exp(-delta * 0.002)))
+        img.style.maxWidth = "none"
+        img.style.width    = `${base * scale}px`
+        const now = img.getBoundingClientRect()
+        view.scrollLeft += now.left + rx * now.width  - ev.clientX
+        view.scrollTop  += now.top  + ry * now.height - ev.clientY
+    }, { passive: false })
+    img.addEventListener("pointerdown", (ev) => {
+        if (ev.button !== 0)
+            return
+        ev.preventDefault()
+        img.setPointerCapture(ev.pointerId)
+        drag = { x: ev.clientX, y: ev.clientY, left: view.scrollLeft, top: view.scrollTop }
+    })
+    img.addEventListener("pointermove", (ev) => {
+        if (drag === null)
+            return
+        view.scrollLeft = drag.left - (ev.clientX - drag.x)
+        view.scrollTop  = drag.top  - (ev.clientY - drag.y)
+    })
+    img.addEventListener("pointerup",     () => { drag = null })
+    img.addEventListener("pointercancel", () => { drag = null })
 }
 const closeTask = () => {
     stopEdit()

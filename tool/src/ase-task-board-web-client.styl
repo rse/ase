@@ -1316,6 +1316,14 @@ body.plan
     img
         max-width: 100%
         height: auto
+
+        /*  an SVG attachment fits the tab width, as it may lack an intrinsic size  */
+        &.svg
+            width: 100%
+
+    /*  an embedded attachment image is zoomed with the mouse wheel and panned by dragging  */
+    .embedding img
+        cursor: grab
     hr
         border: 0
         border-top: 1px solid var(--c-fill)

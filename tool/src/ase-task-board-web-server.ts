@@ -207,8 +207,10 @@ const attachmentDocument = async (log: Log, id: string, n: number): Promise<stri
     ] as [ string, string ][]).filter(([ , v ]) => v !== "")
     const url  = `/task-board/api/task/${encodeURIComponent(id)}/attachment/${n}`
     const type = att.type.split(";")[0].trim().toLowerCase()
-    if (type.startsWith("image/") && type !== "image/svg+xml")
-        return fieldsDocument(fields, `<div class="embedding"><img src="${url}" alt="${escapeHTML(att.desc || att.type)}"></div>`)
+    /*  embed images, SVG included: loaded via "img" an SVG never runs scripts  */
+    if (type.startsWith("image/"))
+        return fieldsDocument(fields, `<div class="embedding"><img${type === "image/svg+xml" ? " class=\"svg\"" : ""} ` +
+            `src="${url}" alt="${escapeHTML(att.desc || att.type)}"></div>`)
     let text = att.data
     if (text === undefined) {
         const a = await Task.attachmentContent(log, id, n)
