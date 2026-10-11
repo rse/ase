@@ -130,9 +130,10 @@ npm start build         # lint, then regenerate skills/ase-help-intent/data.md
 
 cd tool
 npm start lint          # eslint over src/*.{ts,vue} + vue-tsc type-check of the web board client
-npm start build         # lint + build-cmd + build-plugin
+npm start build         # lint + build-cmd + build-plugin + test
 npm start build-cmd     # tsc + vite build of the web board client (emits into dst/)
 npm start build-plugin  # copy ../plugin and ../.claude-plugin into the package
+npm start test          # node --test over test/*.test.mjs against the built dst/
 npm start build-watch   # nodemon rebuild on src/**/*.{ts,vue,styl,html}
 npm start lint-watch    # nodemon relint on src/**/*.{ts,vue}
 
@@ -145,7 +146,7 @@ npm start typing-demo   # re-record the typing demo GIF via Playwright
 ```
 
 Each of `plugin`, `tool`, and `pages` additionally provides `clean` and
-`distclean`. No test target is defined anywhere.
+`distclean`. Only `tool` defines a `test` target, which `build` runs last.
 
 ## Setup
 
