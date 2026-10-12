@@ -15,7 +15,7 @@ Workflow
 1.  Set the requested context: <context>$ARGUMENTS</context>.
     The *first* whitespace-separated token of <context/> is the
     comma-separated *aspect set* <aspects/> (a non-empty subset of the
-    aspect ids `A01`...`A21`). The *remaining* tokens are the source
+    aspect ids `A01`...`A22`). The *remaining* tokens are the source
     code files to check.
 
 2.  Use the `Read` tool to read all source code files referenced by
@@ -28,7 +28,7 @@ Workflow
 
 4.  Set <problems/> to empty.
     Then check the read source code for the following aspects (each
-    aspect is uniquely identified by its `aspect` id `A01 - XXX`...`A21
+    aspect is uniquely identified by its `aspect` id `A01 - XXX`...`A22
     - XXX`), but *strictly limited* to those aspects whose id is
     contained in the aspect set <aspects/> -- all other aspects are
     *not* checked and their problems are *never* reported:
@@ -310,6 +310,56 @@ Workflow
         MEDIUM when the noise dominates the file; and C4 defaults to
         MEDIUM (it actively misleads).
 
+    -   **A22 - TESTING**:
+        Check the *test code* for tests which *cannot fail* for the
+        reason they exist, across the following sub-aspects. This aspect
+        applies to test files, test suites, and their fixtures only --
+        for production code it reports nothing. It judges the *structure*
+        of a test only; whether an expected value is correct from the
+        *domain* perspective is out of its scope and left to
+        `ase-code-analyze --tests`.
+
+        -   **T1 INSENSITIVE-ASSERTION**: an assertion which does not
+            decide the tested behavior: no assertion at all, a weak
+            proxy (truthiness, non-nullness, type, length) instead of
+            the decisive value, an assertion whose both sides are the
+            same expression, an assertion after an early return or in
+            an unreached branch, a loop asserting over a possibly empty
+            collection, a `try`/`catch` swallowing the failure, an
+            asynchronous assertion neither awaited nor returned, or an
+            exception test passing without any exception or accepting
+            any exception type and message. Propose the *exact*
+            assertion on the decisive value.
+
+        -   **T2 SELF-CONFIRMING-ORACLE**: an expected value derived
+            from the code under test itself: computed by calling the
+            tested function or a sibling of it, mirroring its formula,
+            or built from constants imported from the production code.
+            Report it only if the *literal* expected value follows
+            *directly* from the test input, and propose that literal;
+            all other cases are left to `ase-code-analyze --tests`.
+
+        -   **T3 MOCK-ECHO**: an assertion checking a value which the
+            same test configured on a mock or stub, so the assertion
+            observes the mock instead of the code under test. Propose
+            asserting the *effect* of the code under test instead.
+
+        -   **T4 NONDETERMINISM**: a test outcome depending on the
+            wall clock, the time zone or locale, unseeded randomness,
+            fixed sleeps instead of awaited conditions, the iteration
+            order of maps, sets, or the filesystem, the network, or
+            state shared with other tests. Propose a fixed clock, seed,
+            or locale, an awaited condition, or an order-independent
+            comparison.
+
+        -   **T5 FOCUSED-TEST**: a leftover focus marker (`only`,
+            `fit`, `fdescribe`) silently disabling all other tests.
+            Propose removing the marker.
+
+        Severity guidance: T1, T2, and T3 default to HIGH when the test
+        cannot fail at all, else MEDIUM; T4 defaults to MEDIUM, and T5
+        to HIGH.
+
     Be conservative - only report clear, well-grounded issues
     that require an actual *code change*. Think twice to avoid
     *false positives*.
@@ -321,7 +371,7 @@ Workflow
 
     For *each* found problem which requires a code change:
 
-    1.  Set <aspect/> to the identifier `A01 - XXX`...`A21 - XXX`,
+    1.  Set <aspect/> to the identifier `A01 - XXX`...`A22 - XXX`,
         indicating the aspect under which the problem was detected.
 
     2.  Set <severity/> to the string `LOW`, `MEDIUM`, or `HIGH`,

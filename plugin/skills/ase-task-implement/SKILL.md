@@ -638,6 +638,10 @@ Procedure
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan implemented -- done**
             </template>
 
+            <ase-tpl-hint level="normal">
+            Use `/ase-task-prove` to obtain evidence that the implementation satisfies the `REG` and `CON` claims of the plan, as a green test run alone is not evidence.
+            </ase-tpl-hint>
+
         -   If <result/> is `EDIT`:
             <expand name="task-next-handoff" arg1="ase-task-edit"
                 arg2="plan implemented -- hand-off to edit"></expand>

@@ -77,6 +77,11 @@ anything.
         <arg1/>, i.e. decisions on what proves the specified
         behavior. These aspects *SHOULD* be clarified, as they
         decide when the solution counts as complete and correct.
+        A confirmation is only clear once it is *falsifiable*: the
+        observable outcome, the expected value or property, and its
+        *implementation-independent source* (specification, standard,
+        hand computation, or explicit domain decision) are fixed, and
+        every domain and interface aspect is confirmed by at least one.
 
 -   SEVERITY:
 
