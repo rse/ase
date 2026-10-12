@@ -367,7 +367,11 @@ questions:
     ▶ **<answer-N-1-label/>**: <answer-N-1-description/>,
     **<answer-N-2-id/>** ▶ **<answer-N-2-label/>**:
     <answer-N-2-description/>[, ...]`, and a <recommend-N/> out
-    of `★ **<recommend-N-id/>**: <recommend-N-reason/>`.
+    of `★ **<recommend-N-id/>**: <recommend-N-reason/>` -- with a
+    space after the `★` and the answer letter in bold. Every
+    <answer-N/> *MUST* carry exactly one ` ★` inside the bold label
+    of its recommended answer, e.g. `**A** ▶ **Keep Order ⚑ ★**:
+    ...` or `**B** ▶ **Split Class ★**: ...`.
 
     Keep every assembled <answer-N/> at most *240 characters*
     long -- drop the least relevant alternative (but *never* the
