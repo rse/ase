@@ -304,6 +304,12 @@ export const modGrill = () => {
             grid.push(k < rows.length - 1 ? rule("├", "┼", "┤") : rule("└", "┴", "┘"))
         })
 
+        /*  hint below the latest table that the terminal reports presses in
+            the fullscreen layout only, so the cells cannot be clicked here  */
+        if (e.requestId === latest && e.viewport?.isFullscreen === false)
+            grid.push(Text({ dimColor: true, children:
+                "Clicking needs the fullscreen layout (/config → fullscreen); typing \"nX\" works anyway." }))
+
         /*  mimic the reply row of the engine: blank row above and bullet gutter  */
         return Box({ flexDirection: "row", marginTop: 1, width: "100%", children: [
             Box({ flexShrink: 0, minWidth: 2, children: Text({ children: e.props.isFirstOfReply ? "⏺" : " " }) }),
