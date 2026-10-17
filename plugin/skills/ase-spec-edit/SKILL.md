@@ -253,8 +253,14 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
             custom dialog according to the expanded `custom-dialog`
             definition. You *MUST* closely follow this definition. The
-            dialog below carries the two fixed answer options
-            `SKIP GRILLING` and `STOP SKILL`, dispatched as follows:
+            dialog below carries the three fixed answer options
+            `ACCEPT RECOMMENDATIONS`, `SKIP GRILLING`, and
+            `STOP SKILL`, dispatched as follows:
+
+            -   If a <result/> is `ACCEPT RECOMMENDATIONS`, accept the
+                `★` answer of every question of the round:
+
+                <expand name="grill-accept-recommendations"></expand>
 
             -   If a <result/> is `SKIP GRILLING` or `CANCEL`, ask no
                 further questions, continue with item 4 below (merging
@@ -271,17 +277,19 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 </template>
 
             Show a custom dialog. Its only answer options are the
-            two fixed ones, so the user normally answers all aspects in
-            *one* free-text reply:
+            three fixed ones, so the user either accepts all
+            recommendations at once or answers all aspects in *one*
+            free-text reply:
 
             <expand name="custom-dialog" arg1="--other">
                 <round-id/>: What is your (combined) answer to all (or a subset) of the above questions? (keywords or `nX` short responses are sufficient)
+                ACCEPT RECOMMENDATIONS: accept the recommended `★` answer of every question
                 SKIP GRILLING: skip all remaining grilling and continue with the implementation
                 STOP SKILL: stop the entire skill immediately
             </expand>
 
-            Dispatch `SKIP GRILLING`, `STOP SKILL`, and `CANCEL` as
-            defined above. Otherwise, strip any leading `OTHER: `
+            Dispatch `ACCEPT RECOMMENDATIONS`, `SKIP GRILLING`,
+            `STOP SKILL`, and `CANCEL` as defined above. Otherwise, strip any leading `OTHER: `
             prefix from <result/> and treat the remainder as the
             combined free-text answers to all questions of the
             round.

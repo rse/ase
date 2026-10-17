@@ -44,11 +44,15 @@ for *fuzzy language*, *conflicting terminology*, *conflicting code*,
 
 As with `ase-code-edit --grill`, all questions of a round are announced
 together below a `GRILLING ROUND K/L` line (plain `GRILLING` for a
-single round) as a `QUESTION`/`ANSWERS` table with one row per
-question, each row carrying two to three *grounded* answer alternatives
-(the one reflecting the current plan marked with `⚑`). They are then
+single round) as a `QUESTION`/`ANSWERS`/`RECOMMENDATION` table with
+one row per question, preceded by a plain-language summary of the plan,
+each row carrying two to three *grounded* answer alternatives (the one
+reflecting the current plan marked with `⚑`, the recommended one marked
+with `★`) and a brief rationale why the recommended alternative beats
+the others. They are then
 asked in *one* batch via a single interactive dialog, whose only answer
-option is the fixed `SKIP GRILLING` (skip the remaining grilling, but
+options are the fixed `ACCEPT RECOMMENDATIONS` (accept the `★` answer
+of every question) and `SKIP GRILLING` (skip the remaining grilling, but
 still update the plan with the answers of the previous rounds), plus
 free-text input. The questions are numbered `1`, `2`, etc. and their
 answer alternatives are lettered `A`, `B`, etc., so the free-text input
