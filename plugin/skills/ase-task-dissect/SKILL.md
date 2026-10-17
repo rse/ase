@@ -110,6 +110,34 @@ Procedure
         `ase-code-craft`, or `ase-task-edit` skills first to create a
         task plan. Then immediately stop processing this skill.
 
+    3.  Determine the *placement* of the parts from the frontmatter of
+        <task-content/>: set <task-group/> to the value of its `Group:`
+        key and <task-after/> to the list of task ids of its `After:`
+        key (each empty if the key is absent).
+
+        <if condition="<task-group/> is not empty AND <task-group/> is not equal <ase-task-id/>">
+        The task already is a *member* of the epic <task-group/>, so its
+        parts *replace* it within this very epic. Set
+        <part-group><task-group/></part-group> and
+        <dissect-mode>member</dissect-mode> and only output the following
+        <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⊂ epic: **<task-group/>**, ▶ mode: **parts replace task in epic**
+        </template>
+        </if>
+        <else>
+        The task belongs to *no* epic (or already is an explicit epic
+        itself), so it *becomes* the epic of its parts. Set
+        <part-group><ase-task-id/></part-group> and
+        <dissect-mode>epic</dissect-mode> and only output the following
+        <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⊂ epic: **<ase-task-id/>**, ▶ mode: **task becomes epic of parts**
+        </template>
+        </else>
+
 3.  **Dissect Task Plan:**
 
     1.  *Derive the parts* of the epic:
@@ -151,20 +179,30 @@ Procedure
         of its response -- you *MUST* *NEVER* assemble such an id
         yourself. Do not output anything related to these MCP tool calls.
 
+        Then *derive the dependencies* of the parts: for *every* part,
+        set <part-after/> to the <part-id/> of exactly those *earlier*
+        parts it *directly* depends on (a part never depends on a later
+        one, see the derived order). A part with an empty <part-after/>
+        is a *root* part: set its <part-after/> to <task-after/>, so it
+        inherits the predecessors of the dissected task. Finally, set
+        <terminal-parts/> to the <part-id/> of all parts which *no* other
+        part lists in its <part-after/>.
+
     3.  *Report the parts*:
 
         <expand name="dissect-report" arg1="<ase-task-id/>"></expand>
 
 4.  **Materialize Sub-Task Plans:**
 
-    You *MUST* *NOT* modify, re-save, or delete the epic plan
-    <task-content/> of <ase-task-id/> itself -- it always stays
-    *untouched*.
+    The *body* of the dissected plan <task-content/> of <ase-task-id/>
+    *MUST* stay *untouched*: it is either only re-grouped (frontmatter
+    only, sub-step 4.4) or, as a whole, replaced by its parts and
+    deleted (sub-step 4.5) -- *NEVER* edit any of its sections.
 
     1.  <if condition="<getopt-option-dry/> is equal `true`">
         The dissection is *reported only*, so no artifacts are created at
         all. Only output the following <template/> and then *SKIP* the
-        remaining sub-steps 4.2 to 4.4 and continue with step 5:
+        remaining sub-steps 4.2 to 4.6 and continue with step 5:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ dissection: **<n/>** parts, ▶ status: **dry-run -- no sub-task plans created**
@@ -221,14 +259,16 @@ Procedure
             -   the <task-status/> is the *default* state of the task
                 lifecycle model <ase-project-task-lifecycle/>, as every
                 part is a *newly created* plan,
-            -   the `Group:` key carries <ase-task-id/>, the id of the
-                epic, so all parts are grouped under it,
+            -   the `Group:` key carries <part-group/>, so all parts are
+                grouped under the same epic,
+            -   the `After:` key carries <part-after/>, formatted as a
+                comma-and-space-separated list, and is omitted if
+                <part-after/> is empty,
             -   the `Kind:`, `Phase:`, `Tags:`, `Source:`, `Changeset:`,
-                and `Target:` keys are taken over from the epic
+                and `Target:` keys are taken over from the dissected task
                 *verbatim* (the kind being
-                inferred from the part content if the epic carries no
-                `Kind:` key), while the `After:` key of a part lists the
-                parts it depends on, if any,
+                inferred from the part content if the task carries no
+                `Kind:` key),
             -   the <task-title/> is derived from the part's <scope/>,
             -   the `##  SPECIFICATION (WHAT)` section carries *exactly*
                 the `DOM` and `IFC` bullet points assigned to this part,
@@ -279,10 +319,59 @@ Procedure
             ⧉ **ASE**: ◉ task: **<part-id/>**, ▶ status: **sub-task plan created**
             </template>
 
-    4.  *Report the overall result* with the following <template/>:
+    4.  <if condition="<dissect-mode/> is equal `epic` AND <task-group/> is not equal <ase-task-id/>">
+        *Turn the task into an explicit epic*: call the
+        `ase_task_load(id: "<ase-task-id/>", tag: true)` tool of the `ase`
+        MCP server, set the `Group:` frontmatter key of the loaded plan
+        to <ase-task-id/> (inserting the key at its position in the key
+        order if absent), change *nothing* else, and save it with the
+        `ase_task_save(id: "<ase-task-id/>", text: "<epic-content/>",
+        base: "<tag/>")` tool of the `ase` MCP server, where <tag/> is
+        the entity tag of the load. As an explicit epic, the task now
+        implicitly comes `After` all of its parts. Do not output anything
+        related to these MCP tool calls except the following <template/>:
 
         <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ dissection: **<n/>** parts, ▶ status: **epic dissected**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **turned into epic**
+        </template>
+        </if>
+
+    5.  <if condition="<dissect-mode/> is equal `member`">
+        *Replace the task by its parts* in the epic <task-group/>,
+        strictly *after* *all* parts were saved in sub-step 4.3:
+
+        1.  *Re-wire the successors*: call the `ase_task_list(verbose:
+            false)` tool of the `ase` MCP server, and for *every* listed
+            task id <other-id/> which is neither <ase-task-id/> nor a
+            <part-id/>, call the `ase_task_load(id: "<other-id/>", tag:
+            true)` tool of the `ase` MCP server. If its `After:` key
+            lists <ase-task-id/>, replace this entry by the
+            <terminal-parts/> (dropping duplicates and keeping the order
+            of the other entries), change *nothing* else, and save it
+            with the `ase_task_save(id: "<other-id/>", text:
+            "<other-content/>", base: "<tag/>")` tool of the `ase` MCP
+            server. Do not output anything related to these MCP tool
+            calls except the following <template/> per re-wired task:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<other-id/>**, ▶ status: **re-wired to parts**
+            </template>
+
+        2.  *Delete the dissected task*: call the
+            `ase_task_delete(id: "<ase-task-id/>")` tool of the `ase` MCP
+            server, as its parts now carry its entire content. Do not
+            output anything related to this MCP tool call except the
+            following <template/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **replaced by parts**
+            </template>
+        </if>
+
+    6.  *Report the overall result* with the following <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ✪ dissection: **<n/>** parts, ⊂ epic: **<part-group/>**, ▶ status: **task dissected**
         </template>
 
 5.  **Give Final Hints:**
