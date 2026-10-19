@@ -196,6 +196,16 @@ Set <args>--int-reuse-task</args>.
 
         3.  INTERACTIVE DIALOG:
 
+            <if condition="<ase-headless/> is equal `true`">
+            In headless mode nobody can answer the dialog, so do *not*
+            show it: set <result>ACCEPT RECOMMENDATIONS</result>, accept
+            the `★` answer of every question of the round:
+
+            <expand name="grill-accept-recommendations"></expand>
+
+            and skip the rest of this item.
+            </if>
+
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
             custom dialog according to the expanded `custom-dialog`
