@@ -59,9 +59,10 @@ free-text input. The questions are numbered `1`, `2`, etc. and their
 answer alternatives are lettered `A`, `B`, etc., so the free-text input
 can cherry-pick answers with short responses matching `\d+[a-zA-Z]`
 (like `1A 2c`), freely mixed with keyword text. A question not
-addressed by the reply accepts its `⚑` answer, if one exists.
-Cancelling the dialog stops the skill without updating the plan with
-the current round. After every round, the plan is updated and
+addressed by the reply accepts its `⚑` answer, if one exists. In
+headless mode, the dialog is not shown and the `★` answer of every
+question is accepted automatically. Cancelling the dialog stops the
+skill without updating the plan with the current round. After every round, the plan is updated and
 persisted, its `Tags:` frontmatter key records each grilled section as
 its own tag `grilled:`*section* (lower-case, kept alongside the tags of
 previously grilled sections, e.g. `grilled:specification,
