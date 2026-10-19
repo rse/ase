@@ -34,6 +34,12 @@ const GRID_GAP   = 1
 const clean = (text: string): string =>
     text.replace(/\p{Cc}/gu, "")
 
+/*  append to the content of an info line (" " if empty) the hint how to show the
+    hidden key hints again, so it need not be remembered while the key hints are hidden  */
+const keysHint = (surface: Surface, info: React.ReactNode): React.ReactNode =>
+    surface.keys ? info : info === " " ? "?: show key hints" :
+        [ ...(Array.isArray(info) ? info : [ info ]), " · ?: show key hints" ]
+
 /*  compute the visible group range starting at a first group, with the
     width of each visible group (collapsed groups stay narrow, expanded
     groups share the remaining width but never drop below the minimum)  */
@@ -424,7 +430,8 @@ export const renderLanes = (ctx: BoardCtx) => {
     const arrows = shown < total && !grown
     const group  = board.groups[sel.g]
     const info   = grown ? `lane ${group.lanes[sel.l].status} of group ${group.title} grown · g shrinks` :
-        `groups ${fit.first + 1}–${fit.last + 1} of ${total} · ${arrows ? "←/→ scrolls" : "all visible"}`
+        `groups ${fit.first + 1}–${fit.last + 1} of ${total} · ${arrows ? "←/→ scrolls" : "all visible"}` +
+        (surface.keys ? "" : " · ?: show key hints")
     const view   = { board, surface, sel, dim, carry, titles: surface.titles, scroll: { left: -1, right: -1 }, pulse, cardRef, laneRef, groupRef, agents, working }
 
     /*  the scroll bar consumes the entire width remaining besides the info  */
@@ -506,8 +513,8 @@ export const renderGraph = (ctx: BoardCtx) => {
                 h(Text, { ...cx("dim", dim && "dimmed"), wrap: "truncate" },
                     `[ ${board.cards.size} tasks, ${deps} dependencies ]`))),
         h(Box, { key: "info", ...cx("bar") },
-            h(Text, cx("hint", dim && "dimmed"), card === undefined ? " " :
-                [ "task: ", h(Text, { key: "id", ...cx("bold") }, card.id), " · status: ", h(Text, { key: "status", ...cx("bold") }, card.status) ])),
+            h(Text, cx("hint", dim && "dimmed"), keysHint(surface, card === undefined ? " " :
+                [ "task: ", h(Text, { key: "id", ...cx("bold") }, card.id), " · status: ", h(Text, { key: "status", ...cx("bold") }, card.status) ]))),
         h(Box, { key: "keys1", ...cx("bar") },
             h(Text, cx("hint", dim && "dimmed"),
                 "↑/↓/←/→/Left-Click: select task · ⏎/Double-Click: view task · e: edit task · T: transition task")),
@@ -567,7 +574,7 @@ export const renderFlow = (ctx: BoardCtx) => {
                 h(Text, { ...cx("dim", dim && "dimmed"), wrap: "truncate" },
                     `[ ${agents?.agents.length ?? 0} agents, ${flow.states.length} states ]`))),
         h(Box, { key: "info", ...cx("bar") },
-            h(Text, cx("hint", dim && "dimmed"), rel !== null ? [
+            h(Text, cx("hint", dim && "dimmed"), keysHint(ctx.surface, rel !== null ? [
                 "state: ",          h(Text, { key: "state", ...cx("bold") }, rel.state),
                 " · observed by: ", h(Text, { key: "in",    ...cx("bold") }, names(rel.input)),
                 " · written by: ",  h(Text, { key: "out",   ...cx("bold") }, names(rel.output)),
@@ -579,7 +586,7 @@ export const renderFlow = (ctx: BoardCtx) => {
                     " · input: ",  h(Text, { key: "in",  ...cx("bold") }, states.input.join(", ") || "none"),
                     ...(states.activity !== undefined ? [ " · activity: ", h(Text, { key: "act", ...cx("bold") }, states.activity) ] : []),
                     " · output: ", h(Text, { key: "out", ...cx("bold") }, states.output.join(", ") || "none"),
-                    ...(states.gate !== undefined ? [ " · gate: ", h(Text, { key: "gate", ...cx("bold") }, states.gate) ] : []) ]) ])),
+                    ...(states.gate !== undefined ? [ " · gate: ", h(Text, { key: "gate", ...cx("bold") }, states.gate) ] : []) ]) ]))),
         h(Box, { key: "keys1", ...cx("bar") },
             h(Text, cx("hint", dim && "dimmed"),
                 "↑/↓/←/→/Left-Click: select agent/state · ⏎/Double-Click: view agent · " +
@@ -745,10 +752,10 @@ export const renderAgents = (ctx: BoardCtx) => {
     return [
         h(Box, { key: "agents", height: boardH, paddingX: 1 }, master, detail),
         h(Box, { key: "info", ...cx("bar") },
-            h(Text, cx("hint", "truncate", dim && "dimmed"), agent === undefined ? " " : [
+            h(Text, cx("hint", "truncate", dim && "dimmed"), keysHint(ctx.surface, agent === undefined ? " " : [
                 "agent: ",    h(Text, { key: "agent",  ...cx("bold") }, clean(agentLabel(agent))),
                 ...(agentOp.title !== "" ? [
-                    " · operation: ", h(Text, { key: "op", ...cx("bold") }, agentOp.title) ] : []) ])),
+                    " · operation: ", h(Text, { key: "op", ...cx("bold") }, agentOp.title) ] : []) ]))),
         h(Box, { key: "keys1", ...cx("bar") },
             h(Text, cx("hint", dim && "dimmed"),
                 "↑/↓/Left-Click: select agent · ⇈/⇊/⇤/⇥: page/top/bottom agent log · Mouse-Wheel: scroll agent log")),
@@ -1112,8 +1119,8 @@ export const renderStats = (ctx: BoardCtx) => {
     return [
         h(Box, { key: "stats", height: boardH, paddingX: 1, flexDirection: "column", overflow: "hidden" }, ranges, chart, progress, usages, tops),
         h(Box, { key: "info", ...cx("bar") },
-            h(Text, cx("hint", dim && "dimmed"), [ "statistics of ", h(Text, { key: "n", ...cx("bold") }, String(shown)),
-                ` ${filter !== "" ? "filtered " : ""}tasks`, ...(range !== "total" ? [ " ", h(Text, { key: "r", ...cx("bold") }, statsRangeLabels[range]) ] : []) ])),
+            h(Text, cx("hint", dim && "dimmed"), keysHint(ctx.surface, [ "statistics of ", h(Text, { key: "n", ...cx("bold") }, String(shown)),
+                ` ${filter !== "" ? "filtered " : ""}tasks`, ...(range !== "total" ? [ " ", h(Text, { key: "r", ...cx("bold") }, statsRangeLabels[range]) ] : []) ]))),
         h(Box, { key: "keys1", ...cx("bar") },
             h(Text, cx("hint", dim && "dimmed"), `←/→: select time range · /: filter tasks · v/V: ${viewCycleHint("stats", agents !== null)}`)),
         h(Box, { key: "keys2", ...cx("bar") },

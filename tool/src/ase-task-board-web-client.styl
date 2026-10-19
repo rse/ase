@@ -577,6 +577,17 @@ header
         margin: 0 0.6rem
         color: var(--c-mute)
 
+    /*  the hint to show the hidden key hints again, separated only from a preceding info
+        (and then joined to it, without the gap of the flex layout)  */
+    .keys
+        white-space: nowrap
+        kbd
+            margin-right: 0.4rem
+    span + .keys
+        margin-left: -8px
+    button + .keys > .sep
+        display: none
+
 /*  the agents view: the framed master list of the agent cards (selected one in signal color,
     busy ones in accent color, and waiting ones in normal color),
     and the framed detail view with the agent log, whose lines are broken with a hanging indent
@@ -1253,8 +1264,8 @@ footer
     .action
         margin-left: 0.4rem
 
-/*  the key caps of the board footer, the dialog footer, the deletion confirmation, the transfer popup, the assign popup, and the prompt popup  */
-footer kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys kbd, #assign .keys kbd, #prompt .keys kbd
+/*  the key caps of the board footer, the info line, the dialog footer, the deletion confirmation, the transfer popup, the assign popup, and the prompt popup  */
+footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys kbd, #assign .keys kbd, #prompt .keys kbd
     display: inline-block
     padding: 0 5px
     border: 1px solid var(--c-border)

@@ -69,7 +69,8 @@ Its header shows the project, the task lifecycle model, the number of
 unfinished and of all tasks, the current view, and the `filter:` field
 (with its `✕` clear button), below it the warnings of the board (e.g. on
 dependency cycles), and its footer shows the information line, up to
-three key hint lines (hidden and shown via `?`), and the status line
+three key hint lines (hidden and shown via `?`, where the information
+line reminds of `?` while they are hidden), and the status line
 with the kind and connection state of the task store (`●` connected,
 `○` disconnected), the number of agents and the connection state of
 the agent relay (if any), and the *ASE* version, or a notice instead.
@@ -423,7 +424,8 @@ letter under the kitty keyboard protocol.
 - `V`: Cycle the view backward.
 - `/`: Focus the `filter:` field (not in the agent logs and agent graph
   views).
-- `?`: Hide or show the key hint lines (persisted).
+- `?`: Hide or show the key hint lines (persisted); while hidden, the
+  information line ends with `?: show key hints`.
 - `D`: Delete the selected task, after a confirmation (not in the
   agent logs and statistics views).
 - `T`: Transfer the selected task to another state via the transfer

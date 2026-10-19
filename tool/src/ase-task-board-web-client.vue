@@ -31,7 +31,8 @@
     <!--  the horizontal scroll bar of the lanes view, resp. the info line
           of the graph view with the selected task and its status, of the agents
           view with the selected agent, of the agent graph view with the selected agent card
-          and its states, and of the stats view with its number of tasks  -->
+          and its states, and of the stats view with its number of tasks, followed by the
+          hint how to show the hidden key hints again  -->
     <div id="hscroll">
         <button :style="{ visibility: view === 'lanes' && !scroll.all && !grown ? 'visible' : 'hidden' }" @click="scrollBy(-240)">◀</button>
         <span v-if="grown">lane <b>{{ board?.groups[sel.g]?.lanes[sel.l]?.status }}</b> of group <b>{{ board?.groups[sel.g]?.title }}</b> grown<span class="sep">·</span>g shrinks</span>
@@ -41,6 +42,7 @@
         <span v-else-if="view === 'agents' && agentSel !== null">agent: <b>{{ agentLabel(agentSel) }}</b><template v-if="agentSel.title"><span class="sep">·</span>operation: <b>{{ agentSel.title }}</b></template></span>
         <span v-else-if="view === 'flow' && flowStateInfo !== null">state: <b>{{ flowStateInfo.state }}</b><span class="sep">·</span>observed by: <b>{{ flowStateInfo.input }}</b><span class="sep">·</span>written by: <b>{{ flowStateInfo.output }}</b><template v-if="flowStateInfo.gate !== ''"><span class="sep">·</span>gate of: <b>{{ flowStateInfo.gate }}</b></template></span>
         <span v-else-if="view === 'flow' && flowInfo !== null">agent: <b>{{ flowInfo.label }}</b><template v-if="flowInfo.states === undefined"><span class="sep">·</span>requests: <b>{{ flowInfo.request }}</b></template><template v-else><span class="sep">·</span>input: <b>{{ flowInfo.states.input.join(", ") || "none" }}</b><template v-if="flowInfo.states.activity !== undefined"><span class="sep">·</span>activity: <b>{{ flowInfo.states.activity }}</b></template><span class="sep">·</span>output: <b>{{ flowInfo.states.output.join(", ") || "none" }}</b><template v-if="flowInfo.states.gate !== undefined"><span class="sep">·</span>gate: <b>{{ flowInfo.states.gate }}</b></template></template></span>
+        <span v-if="!surface.keys" class="keys"><span class="sep">·</span><kbd>?</kbd> show key hints</span>
         <button :style="{ visibility: view === 'lanes' && !scroll.all && !grown ? 'visible' : 'hidden' }" @click="scrollBy(240)">▶</button>
     </div>
     <footer>
