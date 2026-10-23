@@ -4,7 +4,7 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import { giteaApi, type HttpResponse } from "gitea-js"
+import { giteaApi, ContentType, type HttpResponse } from "gitea-js"
 import { LRUCache }                    from "lru-cache"
 
 import * as API                        from "./ase-task-store-plugin-api.js"
@@ -488,7 +488,7 @@ class GiteaTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> imp
         for (const blocker of after) {
             if (have.has(blocker.number))
                 continue
-            await this.call(loc, this.gt.repos.issueCreateIssueDependencies(loc.owner, loc.repo, String(issue.number), meta(blocker)))
+            await this.call(loc, this.gt.repos.issueCreateIssueDependencies(loc.owner, loc.repo, String(issue.number), meta(blocker), { type: ContentType.Json }))
                 .catch((err: unknown) => {
                     if (statusOf(err) === 404)
                         throw new Error(`Gitea rejected the dependency of issue #${issue.number} on issue #${blocker.number} ` +
@@ -498,7 +498,7 @@ class GiteaTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> imp
         }
         for (const blocker of current)
             if (!want.has(blocker.number))
-                await found(this.call(loc, this.gt.repos.issueRemoveIssueDependencies(loc.owner, loc.repo, String(issue.number), meta(blocker))))
+                await found(this.call(loc, this.gt.repos.issueRemoveIssueDependencies(loc.owner, loc.repo, String(issue.number), meta(blocker), { type: ContentType.Json })))
     }
 
     /*  synchronize the comments with the attachments, touching changed ones only
