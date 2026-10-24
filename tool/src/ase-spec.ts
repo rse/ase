@@ -7,6 +7,7 @@
 import path                     from "node:path"
 import fs                       from "node:fs"
 import os                       from "node:os"
+import { Worker }               from "node:worker_threads"
 
 import { Command }              from "commander"
 import { isScalar }             from "yaml"
@@ -24,6 +25,16 @@ import { configSchema }         from "./ase-config-schema.js"
 import { Task }                 from "./ase-task.js"
 import { Artifact }             from "./ase-artifact.js"
 import { writeStdout }          from "./ase-lib-stdio.js"
+
+/*  a job of the SpecBook worker thread (see "Spec.isolated") and its replies  */
+export type SpecJob =
+    { op: "lint",   markdown: boolean } |
+    { op: "export", formats:  ExportFormat[] }
+export type SpecReply =
+    { type: "log",    level: LogLevel, msg: string } |
+    { type: "lint",   diagnostics: Diagnostic[] } |
+    { type: "export", buffers: Uint8Array[], notices: string[] } |
+    { type: "error",  message: string }
 
 /*  reusable functionality: initialize, lint, export, and preview the
     SpecBook-based project specification, located via the
@@ -148,6 +159,50 @@ export class Spec {
         })))
         const diagnostics = result.diagnostics.map((d) => ({ ...d, file: Spec.relativize(d.file) }))
         return markdown ? diagnostics.concat(await Spec.markdownlint(log)) : diagnostics
+    }
+
+    /*  run a job like "lint" or "export", but in a worker thread, as the
+        SpecBook processing is CPU-bound for seconds and would otherwise
+        block the event loop of the service for all parallel requests  */
+    private static isolated (log: Log, job: SpecJob): Promise<SpecReply> {
+        return new Promise((resolve, reject) => {
+            const worker = new Worker(new URL("./ase-spec-worker.js", import.meta.url), { workerData: job })
+            let settled = false
+            const settle = (fn: () => void) => {
+                if (settled)
+                    return
+                settled = true
+                fn()
+                worker.terminate().catch(() => {})
+            }
+            worker.on("message", (reply: SpecReply) => {
+                if (reply.type === "log")
+                    log.write(reply.level, reply.msg)
+                else if (reply.type === "error")
+                    settle(() => { reject(new Error(reply.message)) })
+                else
+                    settle(() => { resolve(reply) })
+            })
+            worker.on("error", (err) => { settle(() => { reject(err) }) })
+            worker.on("exit",  (code) => { settle(() => { reject(new Error(`SpecBook worker exited with code ${code}`)) }) })
+        })
+    }
+
+    /*  lint like "lint", but in a worker thread  */
+    static async lintIsolated (log: Log, markdown: boolean): Promise<Diagnostic[]> {
+        const reply = await Spec.isolated(log, { op: "lint", markdown })
+        if (reply.type !== "lint")
+            throw new Error(`SpecBook worker: unexpected "${reply.type}" reply`)
+        return reply.diagnostics
+    }
+
+    /*  export like "export", but in a worker thread  */
+    static async exportIsolated (log: Log, formats: ExportFormat[], notices: string[]): Promise<Buffer[]> {
+        const reply = await Spec.isolated(log, { op: "export", formats })
+        if (reply.type !== "export")
+            throw new Error(`SpecBook worker: unexpected "${reply.type}" reply`)
+        notices.push(...reply.notices)
+        return reply.buffers.map((data) => Buffer.from(data.buffer, data.byteOffset, data.byteLength))
     }
 
     /*  the markdownlint rules conflicting with the SpecBook format
@@ -419,7 +474,7 @@ export class SpecMCP {
         }, async (args) => {
             try {
                 const verbose = args.verbose ?? false
-                const diagnostics: Array<Diagnostic & { snippet?: string }> = (await Spec.lint(this.log, args.markdown ?? false))
+                const diagnostics: Array<Diagnostic & { snippet?: string }> = (await Spec.lintIsolated(this.log, args.markdown ?? false))
                     .map((d) => verbose ? { ...d, snippet: Spec.render(d, false) } : d)
                 const text = diagnostics.length === 0 ? "specification valid" :
                     verbose ?
@@ -466,7 +521,7 @@ export class SpecMCP {
                 const spec = args.format !== undefined || args.output === undefined ?
                     { format: args.format ?? "json", output: args.output } :
                     parseOutputSpec(args.output)
-                const [ data ] = await Spec.export(this.log, [ spec.format ], notices)
+                const [ data ] = await Spec.exportIsolated(this.log, [ spec.format ], notices)
                 if (spec.output !== undefined && spec.output !== "-") {
                     await fs.promises.writeFile(path.resolve(Task.projectRoot(), spec.output), data)
                     return {
