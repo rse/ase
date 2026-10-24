@@ -58,6 +58,7 @@ export const skillGroups: SkillGroup[] = [
         label: "Standalone Mode 3/3",
         skills: [
             "ase-repo-review",
+            "ase-code-review",
             "ase-repo-diff",
             "ase-repo-changelog",
             "ase-repo-commit",
