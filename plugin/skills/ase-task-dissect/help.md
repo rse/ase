@@ -44,10 +44,18 @@ The derived parts are first reported as a *dissection table* (part
 number, sub-task id, scope, and rationale). Then -- unless `--dry` is
 given -- each part is materialized as its own *complete* sub-task plan
 (with its own `##  SPECIFICATION (WHAT)`, `##  DESIGN (HOW)`, and
-`##  VERIFICATION (WHEN)` sections, grouped under the epic via its
-`Group:` frontmatter key) and persisted under the task id
-`<task-id>-<feature-slug>`. The epic plan itself always stays
-*untouched*.
+`##  VERIFICATION (WHEN)` sections) and persisted under the task id
+`<task-id>-<feature-slug>`.
+
+The parts are placed via their `Group:` and `After:` frontmatter keys.
+If the task already is a *member* of an epic (its `Group:` names another
+task), the parts join this very epic and *replace* the task: every other
+task listing it in its `After:` key is re-wired to the final parts, and
+the task itself is deleted. Otherwise the task *becomes* the explicit
+epic of its parts: its `Group:` key is set to its own id, so it comes
+after all of its parts. In both cases, each part lists the parts it
+depends on in its `After:` key, and the first parts inherit the `After:`
+predecessors of the task. The body of the task is never edited.
 
 ##  OPTIONS
 
