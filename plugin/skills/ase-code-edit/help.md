@@ -73,14 +73,19 @@ information.
     `--verify`, as only then a verification honors their decisions.
     All questions of a round are announced together below a
     `GRILLING ROUND K/L` line (the round numbering is omitted when only
-    a single round is performed) as a `QUESTION`/`ANSWERS` table with
-    one row per question, each row carrying two to three grounded answer
-    alternatives (with the alternative reflecting the current understanding
-    marked with `⚑`). They are then asked in *one* batch via a single
+    a single round is performed) as a
+    `QUESTION`/`ANSWERS`/`RECOMMENDATION` table with one row per
+    question, preceded by a plain-language summary of the edit query,
+    each row carrying two to three grounded answer alternatives (with
+    the alternative reflecting the current understanding marked with
+    `⚑` and the recommended alternative marked with `★`) and a brief
+    rationale why the recommended alternative beats the others. They
+    are then asked in *one* batch via a single
     interactive dialog titled `GRILLING ROUND K/L` (or plain `GRILLING`
     for a single round), whose question asks for the combined answer to
     all (or a subset) of the listed aspect questions and whose only
-    answer options are the fixed `STOP SKILL` (stop the skill) and
+    answer options are the fixed `ACCEPT RECOMMENDATIONS` (accept the
+    `★` answer of every question), `STOP SKILL` (stop the skill), and
     `SKIP GRILLING` (skip the remaining grilling) ones, plus free-text
     input. The questions are numbered `1`, `2`, etc. and their answer
     alternatives are lettered `A`, `B`, etc., so the free-text input can
