@@ -10,6 +10,7 @@
 \[`-p`|`--padding` *n*\]
 \[`--no-icons`\]
 \[`--no-labels`\]
+\[`--month-cost-ttl` *n*\]
 \[*line* \[...\]\]
 
 ## DESCRIPTION
@@ -84,6 +85,11 @@ up via `#{@ase_task_id}`.
 - \[`--no-labels`\]:
   Disable the textual label (e.g., `user:`, `project:`, or `model:`)
   in front of the bold value of each placeholder rendering.
+
+- \[`--month-cost-ttl` *n*\]:
+  Cache the `%Y` current-month total cost for *n* seconds, a
+  non-negative integer, before a non-blocking background refresh is
+  triggered (default: `300`).
 
 ## ARGUMENTS
 
@@ -207,6 +213,31 @@ Costs:
   The session costs in USD (`cost.total_cost_usd`), e.g., `$54.44`,
   with icon `$`, *suppressed*.
 
+- `%Y`:
+  The cumulative costs in USD of *all* sessions of *all* supported
+  agent tools within the current calendar month, e.g., `$1102.11`,
+  *suppressed* if no session logs exist (unlike `%X`, which only
+  reflects the current session). The month boundary is a *UTC* one,
+  matching the day on which the model vendors bill and reset their
+  usage windows. The figure is computed locally from the session logs
+  of *Anthropic Claude Code CLI*
+  (`~/.claude/projects/**/*.jsonl`, honoring `CLAUDE_CONFIG_DIR`),
+  *OpenAI Codex CLI*
+  (`~/.codex/{sessions,archived_sessions}/**/rollout-*.jsonl`, honoring
+  `CODEX_HOME`), and *GitHub Copilot CLI*
+  (`~/.copilot/session-state/**/*.jsonl`, honoring
+  `COPILOT_CONFIG_DIR`). Per logged model call, the token counts
+  (uncached input, output including reasoning, cache-read, and
+  5-minute / 1-hour cache-write) are multiplied by the per-model prices
+  of the *LiteLLM* price database. The background recomputation
+  downloads these prices whenever the cached ones are absent or older
+  than a day, and keeps using the cached ones while offline; until a
+  first download succeeds, `%Y` stays hidden, and changed prices
+  discard the cached figure. A call logged more than once is billed
+  only once, and a model absent from the prices contributes nothing. To keep rendering fast, the result is cached and
+  recomputed at most once per `--month-cost-ttl` window by a detached
+  background process, so a rendering never blocks on the log scan.
+
 Version control:
 
 - `%a`:
@@ -296,6 +327,12 @@ Invalid JSON is an error.
   The *tmux* pane to publish the task id `@ase_task_id` to.
 
 ## FILES
+
+- *temporary directory*`/ase-statusline-month-cost-`*user*`.json`:
+  The cache of the `%Y` current-month total cost.
+
+- *temporary directory*`/ase-statusline-prices-`*user*`.json`:
+  The cache of the *LiteLLM* token prices of `%Y`.
 
 - *per-user state directory*`/statusline-codex-usage.json`:
   The cache of the rate-limit windows fetched for the `gpt-*` models.
