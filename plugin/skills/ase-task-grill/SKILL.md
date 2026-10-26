@@ -210,12 +210,28 @@ Set <args>--int-reuse-task</args>.
 
         3.  INTERACTIVE DIALOG:
 
+            <if condition="<ase-headless/> is equal `true`">
+            In headless mode nobody can answer the dialog, so do *not*
+            show it: set <result>ACCEPT RECOMMENDATIONS</result>, accept
+            the `★` answer of every question of the round:
+
+            <expand name="grill-accept-recommendations"></expand>
+
+            and skip the rest of this item.
+            </if>
+
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
             custom dialog according to the expanded `custom-dialog`
             definition. You *MUST* closely follow this definition. The
-            dialog below carries the fixed answer option
-            `SKIP GRILLING`, dispatched as follows:
+            dialog below carries the two fixed answer options
+            `ACCEPT RECOMMENDATIONS` and `SKIP GRILLING`, dispatched
+            as follows:
+
+            -   If a <result/> is `ACCEPT RECOMMENDATIONS`, accept the
+                `★` answer of every question of the round:
+
+                <expand name="grill-accept-recommendations"></expand>
 
             -   If a <result/> is `SKIP GRILLING`, ask no further
                 questions -- *all* questions of this round stay
@@ -234,16 +250,18 @@ Set <args>--int-reuse-task</args>.
                 ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **grilling stopped**
                 </template>
 
-            Show a custom dialog. Its only answer option is the fixed
-            one, so the user normally answers all aspects in *one*
-            free-text reply:
+            Show a custom dialog. Its only answer options are the two
+            fixed ones, so the user either accepts all recommendations
+            at once or answers all aspects in *one* free-text reply:
 
             <expand name="custom-dialog" arg1="--other">
                 <round-id/>: What is your (combined) answer to all (or a subset) of the above questions? (keywords or `nX` short responses are sufficient)
+                ACCEPT RECOMMENDATIONS: accept the recommended `★` answer of every question
                 SKIP GRILLING: skip all remaining grilling and continue with the plan update
             </expand>
 
-            Dispatch `SKIP GRILLING` and `CANCEL` as defined above.
+            Dispatch `ACCEPT RECOMMENDATIONS`, `SKIP GRILLING`, and
+            `CANCEL` as defined above.
             Otherwise, strip any leading `OTHER: ` prefix from
             <result/> and treat the remainder as the combined free-text
             answers to all questions of the round.

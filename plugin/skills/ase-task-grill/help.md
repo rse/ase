@@ -44,19 +44,24 @@ for *fuzzy language*, *conflicting terminology*, *conflicting code*,
 
 As with `ase-code-edit --grill`, all questions of a round are announced
 together below a `GRILLING ROUND K/L` line (plain `GRILLING` for a
-single round) as a `QUESTION`/`ANSWERS` table with one row per
-question, each row carrying two to three *grounded* answer alternatives
-(the one reflecting the current plan marked with `⚑`). They are then
+single round) as a `QUESTION`/`ANSWERS`/`RECOMMENDATION` table with
+one row per question, preceded by a plain-language summary of the plan,
+each row carrying two to three *grounded* answer alternatives (the one
+reflecting the current plan marked with `⚑`, the recommended one marked
+with `★`) and a brief rationale why the recommended alternative beats
+the others. They are then
 asked in *one* batch via a single interactive dialog, whose only answer
-option is the fixed `SKIP GRILLING` (skip the remaining grilling, but
+options are the fixed `ACCEPT RECOMMENDATIONS` (accept the `★` answer
+of every question) and `SKIP GRILLING` (skip the remaining grilling, but
 still update the plan with the answers of the previous rounds), plus
 free-text input. The questions are numbered `1`, `2`, etc. and their
 answer alternatives are lettered `A`, `B`, etc., so the free-text input
 can cherry-pick answers with short responses matching `\d+[a-zA-Z]`
 (like `1A 2c`), freely mixed with keyword text. A question not
-addressed by the reply accepts its `⚑` answer, if one exists.
-Cancelling the dialog stops the skill without updating the plan with
-the current round. After every round, the plan is updated and
+addressed by the reply accepts its `⚑` answer, if one exists. In
+headless mode, the dialog is not shown and the `★` answer of every
+question is accepted automatically. Cancelling the dialog stops the
+skill without updating the plan with the current round. After every round, the plan is updated and
 persisted, its `Tags:` frontmatter key records each grilled section as
 its own tag `grilled:`*section* (lower-case, kept alongside the tags of
 previously grilled sections, e.g. `grilled:specification,
