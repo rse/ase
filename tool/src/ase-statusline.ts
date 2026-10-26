@@ -20,6 +20,7 @@ import { configSchema }                             from "./ase-config-schema.js
 import { parseScope, userStateDir, projectIdOf }    from "./ase-config-scope.js"
 import { readStdin, writeStdout }                   from "./ase-lib-stdio.js"
 import { parseTool, type Tool }                     from "./ase-setup-common.js"
+import { monthCostForRender, refreshMonthCostCache } from "./ase-statusline-cost.js"
 import pkg                                          from "../package.json" with { type: "json" }
 
 /*  forced-color chalk instance: stdout is a pipe under Anthropic Claude Code CLI,
@@ -101,12 +102,14 @@ interface StatuslineInput {
 
 /*  internal command options type  */
 interface StatuslineOpts {
-    tool:    string
-    width:   number
-    margin:  number
-    padding: number
-    icons:   boolean
-    labels:  boolean
+    tool:             string
+    width:            number
+    margin:           number
+    padding:          number
+    icons:            boolean
+    labels:           boolean
+    monthCostTtl:     number
+    refreshMonthCost: boolean
 }
 
 /*  custom argument parser for Commander: non-negative integer  */
@@ -376,22 +379,23 @@ type StatuslineCfg = { taskId: string, persona: string, guidance: string, boxing
 /*  type of the context of the placeholder renderers: the input data, the target tool,
     the rate-limit windows, the output helpers, and the lazy memoized probes  */
 type RenderCtx = {
-    data:       StatuslineInput
-    tool:       Tool
-    limits:     RateLimits | undefined
-    emit:       (chunk: string) => void
-    prefix:     (icon: string, label: string) => string
-    getSession: () => string
-    getCfg:     () => StatuslineCfg
-    getModel:   () => { name: string, effort: string }
-    getGit:     () => ReturnType<typeof probeGit>
-    getMem:     () => ReturnType<typeof probeMemory>
+    data:         StatuslineInput
+    tool:         Tool
+    limits:       RateLimits | undefined
+    emit:         (chunk: string) => void
+    prefix:       (icon: string, label: string) => string
+    getSession:   () => string
+    getCfg:       () => StatuslineCfg
+    getModel:     () => { name: string, effort: string }
+    getGit:       () => ReturnType<typeof probeGit>
+    getMem:       () => ReturnType<typeof probeMemory>
+    monthCostTtl: number
 }
 
 /*  create the identifier to renderer map: each callback fetches its own information
     directly from data (or via the lazy probes for shared values)  */
 const createRenderers = (ctx: RenderCtx): Record<string, () => void> => {
-    const { data, tool, limits, emit, prefix, getSession, getCfg, getModel, getGit, getMem } = ctx
+    const { data, tool, limits, emit, prefix, getSession, getCfg, getModel, getGit, getMem, monthCostTtl } = ctx
 
     /*  render a configuration value (if non-empty) with its icon and label  */
     const cfgValue = (key: keyof StatuslineCfg, icon: string, label: string) => () => {
@@ -495,6 +499,11 @@ const createRenderers = (ctx: RenderCtx): Record<string, () => void> => {
             if (sessCost !== undefined)
                 emit(`${prefix("$", "cost")}${c.bold(formatCostUsd(sessCost))}`)
         },
+        Y: () => {
+            const monthCost = monthCostForRender(new Date(), monthCostTtl)
+            if (monthCost !== null)
+                emit(`${prefix("∑", "month")}${c.bold(formatCostUsd(monthCost))}`)
+        },
 
         /*  ==== VERSION CONTROL ====  */
         a: () => {
@@ -577,12 +586,25 @@ export default class StatuslineCommand {
                 "disable icons in placeholder rendering")
             .option("--no-labels",
                 "disable labels in front of bold values")
+            .option("--month-cost-ttl <n>",
+                "seconds to cache the %Y current-month total cost before a background refresh",
+                parseInteger("--month-cost-ttl"), 300)
+            .option("--refresh-month-cost",
+                "(internal) recompute and cache the current-month total cost, then exit")
             .argument("[lines...]",
                 "one or more template lines with %u %p %T %s %m %e %t %O %P %h %B %L %c %C %a %r " +
-                "%S %D %W %Q %H %X %b %g %G %d %M %V placeholders and <color>...</color> markup " +
+                "%S %D %W %Q %H %X %Y %b %g %G %d %M %V placeholders and <color>...</color> markup " +
                 "(color: black, red, green, yellow, blue, magenta, cyan, white, default) " +
                 "(default: single line \"%m %e %t\")")
             .action(async (lines: string[], opts: StatuslineOpts) => {
+                /*  internal mode: recompute the current-month cost cache and
+                    exit, as invoked by the detached background refresh that
+                    %Y spawns during a normal render (no stdin, no rendering)  */
+                if (opts.refreshMonthCost) {
+                    await refreshMonthCostCache(new Date())
+                    return
+                }
+
                 /*  validate target tool  */
                 const tool = parseTool(opts.tool)
 
@@ -712,7 +734,7 @@ export default class StatuslineCommand {
                     limits = await fetchCodexLimits()
 
                 /*  identifier to renderer map (see "createRenderers")  */
-                const renderers = createRenderers({ data, tool, limits, emit, prefix, getSession, getCfg, getModel, getGit, getMem })
+                const renderers = createRenderers({ data, tool, limits, emit, prefix, getSession, getCfg, getModel, getGit, getMem, monthCostTtl: opts.monthCostTtl })
 
                 /*  walk each template line and render  */
                 const closeSpan = () => {
