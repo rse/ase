@@ -27,6 +27,10 @@ service:
   (up to 100 messages, dropping the oldest ones on overflow) and sent
   once the connection is (re-)established.
 
+- A message whose connection breaks before the service responds is sent
+  once more, and a request still failing is answered with a JSON-RPC
+  error (`ase service unreachable:` *reason*).
+
 - On a lost or refused connection, the service is auto-started again
   and the connection is re-established, with a delay growing from 0.5
   up to 10 seconds between the attempts.

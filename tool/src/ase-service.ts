@@ -329,6 +329,12 @@ export default class ServiceCommand {
         /*  establish HAPI HTTP/REST service  */
         const server = Hapi.server({ host: HOST, port: ctx.port })
 
+        /*  keep idle connections long (default: 5s), as a request on an idle connection,
+            not yet read during a busy event loop, races the service closing that connection
+            (the clients adopt the advertised timeout minus a safety margin)  */
+        server.listener.keepAliveTimeout = 65 * 1000
+        server.listener.headersTimeout   = 66 * 1000
+
         /*  track start time and last activity  */
         const startTime  = Date.now()
         let lastActivity = Date.now()
