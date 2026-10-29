@@ -47,6 +47,9 @@ ChangeLog
     deletes orphaned target files, instead of copying everything (including the 465 MB of
     `plugin/node_modules`) and then removing the excluded parts again (7.9s down to 0.6s).
 
+-   UPDATE [infr]: NPM dependencies
+    Updated NPM dependencies.
+
 2.0.5 (2026-10-24)
 ------------------
 
