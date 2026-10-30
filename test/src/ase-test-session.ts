@@ -113,9 +113,16 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
         })
     }
 
+    /*  send a user turn, recording it, as the SDK does not echo the
+        streaming-input user messages back into its message stream  */
+    const sendUser = (text: string) => {
+        push(userMessage(text))
+        result.dialog.push({ role: "user", text })
+        record.onMessage({ type: "user", synthetic: true, message: { role: "user", content: text } })
+    }
+
     /*  drive the conversation  */
-    push(userMessage(prompt))
-    result.dialog.push({ role: "user", text: prompt })
+    sendUser(prompt)
     let userTurns = 1
     try {
         for await (const msg of query({ prompt: input(), options })) {
@@ -148,8 +155,7 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
                     if (turn === null)
                         push(null)
                     else {
-                        push(userMessage(turn))
-                        result.dialog.push({ role: "user", text: turn })
+                        sendUser(turn)
                         userTurns += 1
                     }
                 }

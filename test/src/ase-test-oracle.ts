@@ -13,7 +13,7 @@ import { execa } from "execa"
 import type { TestCase, OracleSpec } from "./ase-test-case.js"
 import type { Sandbox }              from "./ase-test-sandbox.js"
 import type { SessionResult }        from "./ase-test-session.js"
-import { judgeRubric }               from "./ase-test-judge.js"
+import { judgeRubric, judgeSimilar } from "./ase-test-judge.js"
 
 /*  the verdict of one oracle  */
 export type OracleResult = { kind: string, pass: boolean, detail: string }
@@ -229,7 +229,22 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
             })
         }
         else if ("rubric" in oracle)
-            results.push(await judgeRubric(caze, sandbox, result, oracle.rubric))
+            results.push(await judgeRubric(sandbox, result, oracle.rubric))
+        else if ("similar" in oracle) {
+            const spec = oracle.similar
+            if ((spec.in ?? "lastMessage") === "taskBody") {
+                const task = taskFile(sandbox, spec.id!)
+                if (task === null) {
+                    results.push({ kind: "similar", pass: false, detail: `task "${spec.id}" missing` })
+                    continue
+                }
+                results.push(await judgeSimilar(sandbox,
+                    fs.readFileSync(spec.expected, "utf8"), task.body, spec))
+            }
+            else
+                results.push(await judgeSimilar(sandbox,
+                    fs.readFileSync(spec.expected, "utf8"), targetText(spec, caze, sandbox, result), spec))
+        }
     }
     return results
 }

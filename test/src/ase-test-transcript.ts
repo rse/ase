@@ -40,25 +40,26 @@ export const transcriptOpen = (resultsDir: string, caze: TestCase, run: number):
             const lines: string[] = []
             if (msg.type === "system" && msg.subtype === "init")
                 lines.push(`**SESSION**: \`${msg.session_id}\` (model: \`${msg.model}\`)`)
-            else if (msg.type === "assistant")
+            else if (msg.type === "assistant") {
                 for (const block of (Array.isArray(msg.message?.content) ? msg.message.content : []))
                     if (block.type === "text" && block.text.trim() !== "")
                         lines.push(`**ASSISTANT**:\n\n${block.text}`)
                     else if (block.type === "tool_use")
                         lines.push(`**TOOL** \`${block.name}\`: ${brief(block.input)}`)
-                    else if (msg.type === "user") {
-                        const content = msg.message?.content
-                        if (typeof content === "string")
-                            lines.push(`**USER**:\n\n${content}`)
-                        else if (Array.isArray(content))
-                            for (const block of content)
-                                if (block.type === "text")
-                                    lines.push(`**USER**:\n\n${block.text}`)
-                                else if (block.type === "tool_result" && block.is_error === true)
-                                    lines.push(`**TOOL FAILED**: ${brief(block.content)}`)
-                    }
-                    else if (msg.type === "result")
-                        lines.push(`**RESULT**: ${msg.subtype} (turns: ${msg.num_turns}, ` +
+            }
+            else if (msg.type === "user") {
+                const content = msg.message?.content
+                if (typeof content === "string")
+                    lines.push(`**USER**:\n\n${content}`)
+                else if (Array.isArray(content))
+                    for (const block of content)
+                        if (block.type === "text")
+                            lines.push(`**USER**:\n\n${block.text}`)
+                        else if (block.type === "tool_result" && block.is_error === true)
+                            lines.push(`**TOOL FAILED**: ${brief(block.content)}`)
+            }
+            else if (msg.type === "result")
+                lines.push(`**RESULT**: ${msg.subtype} (turns: ${msg.num_turns}, ` +
                     `cost: $${Number(msg.total_cost_usd ?? 0).toFixed(4)})`)
             if (lines.length > 0)
                 fs.appendFileSync(md, `${lines.join("\n\n")}\n\n`, "utf8")

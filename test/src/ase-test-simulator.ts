@@ -89,6 +89,10 @@ const llmSimulator = (caze: TestCase, sandbox: Sandbox): Simulator => {
         "You simulate the human user of an interactive AI coding assistant session under test.\n" +
         "Stay fully in character and answer the assistant's questions consistently and concisely.\n" +
         (persona !== "" ? `\nYour persona and goals:\n\n${persona}\n` : "") +
+        "\nWhen the assistant offers lettered or numbered answer alternatives, first check EVERY " +
+        "alternative of EVERY question against your persona and goals, and pick exactly the one " +
+        "which matches them; NEVER pick an alternative which contradicts your persona, even when " +
+        "it is marked as the current or recommended one.\n" +
         "\nReply with the user's next message only (no commentary, no tools). When the assistant " +
         `has finished its work, asks for nothing more, or your goals are reached, reply with exactly "${END_TOKEN}".`
     const complete = async (dialog: DialogEntry[], ask: string): Promise<string> => {

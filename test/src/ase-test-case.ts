@@ -83,6 +83,18 @@ const oracleSchema = z.union([
             threshold:    z.number().min(0).max(1).optional(),
             votes:        z.number().int().min(1).optional()
         })
+    }),
+
+    /*  an LLM judge scoring the semantic similarity of a target text against
+        the golden expected output of a file (majority of votes)  */
+    z.strictObject({
+        similar: z.strictObject({
+            expected:     z.string(),
+            in:           z.enum([ "lastMessage", "output", "transcript", "taskBody" ]).optional(),
+            id:           z.string().optional(),
+            threshold:    z.number().min(0).max(1).optional(),
+            votes:        z.number().int().min(1).optional()
+        })
     })
 ])
 export type OracleSpec = z.infer<typeof oracleSchema>
@@ -194,6 +206,11 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
         oracles: spec.oracles.map((oracle) => {
             if ("rubric" in oracle)
                 return { rubric: { ...oracle.rubric, file: resolve(oracle.rubric.file, "rubric") } }
+            else if ("similar" in oracle) {
+                if ((oracle.similar.in ?? "lastMessage") === "taskBody" && oracle.similar.id === undefined)
+                    throw new Error(`case "${name}": similar oracle target "taskBody" requires the "id" key`)
+                return { similar: { ...oracle.similar, expected: resolve(oracle.similar.expected, "expected") } }
+            }
             return oracle
         })
     }

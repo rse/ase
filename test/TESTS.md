@@ -72,9 +72,14 @@ of runs and the pass@k threshold (`runs`/`minPass`), the per-run budget,
 the fixture (Git repository, ASE configuration, seeded task store, file
 tree), the optional interactive turns (a scripted `answers.yaml` or an
 LLM-driven persona), and the oracles (`notErrored`, `verdict`, `regex`,
-`fileExists`, `gitDiff`, `taskStore`, `textMetric`, and `rubric`). See
-the existing cases for the shapes, and `src/ase-test-case.ts` for the
-authoritative schema.
+`fileExists`, `gitDiff`, `taskStore`, `textMetric`, `rubric`, and
+`similar`). The `similar` oracle checks against a golden expected
+output: a separate file in the case directory states the decisions,
+facts, and constraints the result must carry, and an LLM judge scores
+the semantic similarity of the actual result (the skill output, the
+transcript, or the final task plan body via `in: taskBody`) against it,
+ignoring wording, structure, and ordering. See the existing cases for
+the shapes, and `src/ase-test-case.ts` for the authoritative schema.
 
 ## Sandboxing
 
