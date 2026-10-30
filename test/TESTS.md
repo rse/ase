@@ -64,6 +64,45 @@ threshold, `2` infrastructure error or cost ceiling hit.
 > task names. Invoking `node --import tsx src/ase-test.ts` directly has
 > no such restriction.
 
+## Third-Party Gateways
+
+By default the sessions run against the Anthropic API with the
+credentials above. Alternatively the whole harness (sessions, rubric
+judge, user simulator) can be routed to any Anthropic-compatible
+gateway -- e.g. a [LiteLLM](https://docs.litellm.ai) proxy in front of a
+locally served model -- via an env-file profile:
+
+```
+npm start test -- --llm=etc/llm-local.env --cases=meta/mint-uuid
+```
+
+See `etc/llm-local.env.sample` for the profile format: it sets
+`ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY` (and optionally
+`CLAUDE_CODE_*` tuning for small context windows), which the harness
+loads into its process environment and passes through into the
+sandboxed sessions. Variables already exported take precedence over the
+profile, and `ASE_TEST_LLM=<file>` is honored as a default for `--llm`.
+
+The harness intentionally does *not* remap model names: hard-coded
+defaults (`claude-haiku-5-5` for judge and simulator) and per-case
+`turns.model` declarations reach the gateway as-is, so the gateway
+should alias the `claude-*` model names onto its local model (in
+LiteLLM: several `model_name` entries pointing to the same deployment).
+Alternatively `ASE_TEST_MODEL`, `ASE_TEST_JUDGE_MODEL` and
+`ASE_TEST_SIM_MODEL` can be set in the profile.
+
+Caveats in gateway mode:
+
+-   cost accounting (`total_cost_usd`) is meaningless for models
+    unknown to the agent tool, so the per-case `budget.maxUsd`, the
+    global `--max-cost-usd` ceiling, and the reported costs are
+    unreliable
+-   rubric/`similar` judging by a small local model is markedly weaker
+    than by the default judge -- consider pointing
+    `ASE_TEST_JUDGE_MODEL` at a stronger model
+-   the startup line prints the active `endpoint:` so a run visibly
+    states which backend it used
+
 ## Cases
 
 A case is a directory `cases/<group>/<name>/` with a `case.yaml`

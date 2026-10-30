@@ -35,9 +35,24 @@ program
     .option("-K, --keep-failed", "keep the sandboxes of failed runs", false)
     .option("-m, --max-cost-usd <n>", "global cost ceiling in USD", "20")
     .option("-r, --results <dir>", "results directory (default: results/<timestamp>)")
+    .option("--llm <file>", "env-file profile for an Anthropic-compatible " +
+        "gateway (default: $ASE_TEST_LLM)")
     .parse(process.argv)
 const opts  = program.opts()
 const globs = [ ...program.args, ...(opts.cases ?? []) ]
+
+/*  optionally load an LLM gateway profile: an env file routing the harness and its
+    sandboxed sessions to an Anthropic-compatible endpoint (e.g. a LiteLLM proxy in
+    front of a local model) -- already exported variables take precedence  */
+const llmProfile = opts.llm ?? process.env.ASE_TEST_LLM
+if (llmProfile !== undefined && llmProfile !== "") {
+    const file = path.resolve(llmProfile)
+    if (!fs.existsSync(file)) {
+        console.error(chalk.red(`LLM gateway profile not found: ${file}`))
+        process.exit(2)
+    }
+    process.loadEnvFile(file)
+}
 
 /*  discover and filter the cases  */
 const casesDir = path.join(repoRoot, "test", "cases")
@@ -169,7 +184,9 @@ const worker = async (): Promise<void> => {
     }
 }
 console.log(`running ${work.length} run(s) of ${cases.length} case(s) ` +
-    chalk.dim(`(jobs: ${jobs}, budget: $${maxCostUsd.toFixed(2)}, results: ${resultsDir})`))
+    chalk.dim(`(jobs: ${jobs}, budget: $${maxCostUsd.toFixed(2)}` +
+        (process.env.ANTHROPIC_BASE_URL !== undefined ? `, endpoint: ${process.env.ANTHROPIC_BASE_URL}` : "") +
+        `, results: ${resultsDir})`))
 await Promise.all(Array.from({ length: Math.min(jobs, work.length) }, () => worker()))
 
 /*  aggregate the outcomes per case (pass@k) and report  */

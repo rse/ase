@@ -77,6 +77,13 @@ export const sandboxCreate = async (caze: TestCase, run: number): Promise<Sandbo
     env.GIT_TERMINAL_PROMPT = "0"
     credentials(home, env)
 
+    /*  optionally route the sessions through an Anthropic-compatible gateway (e.g. a
+        LiteLLM proxy in front of a local model): pass through the endpoint and model settings  */
+    for (const [ key, value ] of Object.entries(process.env))
+        if (value !== undefined
+            && /^(ANTHROPIC_BASE_URL|ANTHROPIC_(DEFAULT_[A-Z]+_)?MODEL|CLAUDE_CODE_(AUTO_COMPACT_WINDOW|MAX_OUTPUT_TOKENS|DISABLE_NONESSENTIAL_TRAFFIC))$/.test(key))
+            env[key] = value
+
     /*  keep the account-level claude.ai cloud connectors out of the session  */
     await fs.promises.writeFile(path.join(home, ".claude", "settings.json"),
         JSON.stringify({ disableClaudeAiConnectors: true }), "utf8")

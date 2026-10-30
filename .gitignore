@@ -12,3 +12,4 @@ node_modules/
 package-lock.json
 
 test/results/
+test/etc/llm-*.env
