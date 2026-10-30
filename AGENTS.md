@@ -208,6 +208,8 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `comparison.ts`, `fit.ts`, `methods.ts`,
         `nav.ts`, `previews.ts`, `site.ts`, `testimonials.ts`,
         `usecases.ts`, and `usps.ts`
+-   `test/`: the non-shipped skill test harness, documented in
+    `test/TESTS.md`
 
 Additionally, the repository root carries `docs/` (hand-written
 documentation and diagram sources), `etc/` (the top-level `stx.conf` and the
@@ -230,8 +232,9 @@ The top-level targets in the repository root fan out into all three
 deliverables:
 
 ```
-npm start lint          # lint  plugin, tool, and pages
+npm start lint          # lint  plugin, tool, pages, and test
 npm start build         # build plugin, tool, and pages
+npm start test          # run the skill test harness of test/ (burns AI tokens, see test/TESTS.md)
 npm start upd           # update all package.json dependency versions
 npm start tokei         # show project statistics
 npm start clean         # remove regularly built files
@@ -270,8 +273,10 @@ npm start preview       # astro preview
 npm start typing-demo   # re-record the typing demo GIF via Playwright
 ```
 
-Each of `plugin`, `tool`, and `pages` additionally provides `clean` and
-`distclean`. No test target is defined anywhere.
+Each of `plugin`, `tool`, `pages`, and `test` additionally provides
+`clean` and `distclean`. The only test target is the skill test harness
+of `test/` (see `test/TESTS.md`), which burns real AI tokens and is
+hence never part of `build` or `publish`.
 
 ## Setup
 
