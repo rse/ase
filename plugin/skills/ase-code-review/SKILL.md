@@ -73,8 +73,8 @@ compact table, then *stage* one theme at a time into the plain Git
 index -- no work branch, no stashing, no diff dumps, the user reviews
 the staged lines in their own editor -- and *commit* only what the
 user accepts. Before a group is presented at all, its `✗` findings
-are *corrected automatically* in one pass, so the user first sees the
-already corrected group. Demanding a further *correction* instead of an
+are *corrected automatically* in up to three rounds, so the user first
+sees the already corrected group. Demanding a further *correction* instead of an
 accept is a regular outcome of a group review: it is carried out right
 there by delegating to `ase-code-edit`, after which the group is
 re-staged and re-presented. This skill *complements* its neighbours rather than
@@ -146,8 +146,11 @@ conversation language* (e.g. German when the user talks German) and in
 the code and is building a mental model of it; the evidence texts even
 for a *beginner*, and the per-file explanations *very simply*, but in
 the established *technical and domain language*. Explain what is *logically achieved*,
-never merely what was edited. Technical identifiers, filenames, and
-quoted code stay in their original form.
+never merely what was edited, and *why it is correct* -- what makes the
+result do what it should (the case it now covers, the check guarding it,
+the test proving it) -- so the user can follow the reasoning instead of
+taking it on trust. Technical identifiers, filenames, and quoted code
+stay in their original form.
 
 <flow>
 
@@ -400,7 +403,8 @@ quoted code stay in their original form.
          one of:
 
          -   `✓` *shown*: a source line the reviewer *read* carries the
-             claim *verbatim*; the text cites it as `<file/>:<line/>`.
+             claim *verbatim*; the text cites it as `<file/>:<line/>`
+             and says in plain words *why* that line settles the claim.
              No citation, no `✓`.
          -   `✗` *gap*: something is wrong or missing; the text names the
              concrete spot, the input or case that exposes it, and the
@@ -505,20 +509,24 @@ quoted code stay in their original form.
          never average the statuses, and never let a reassuring summary
          outrank the lines above it.
 
-    5.4. *Auto-correct* the group *once*, before the user sees it.
-         <if condition="the verdict carries at least one `✗` and this group was not auto-corrected yet">
-         Mark the group as auto-corrected -- this pass runs at most
-         *once* per group, so the user always decides the *second*
-         round -- and output one line `G<n/>: <count/> ✗ findings --
-         correcting automatically before the review`. Then carry out
+    5.4. *Auto-correct* the group in up to *three rounds*, before the
+         user sees it.
+         <if condition="the verdict carries at least one `✗`, fewer than three rounds ran for this group, and the previous round (if any) lowered its `✗` count">
+         Count this round for the group -- at most *three* rounds run
+         per group, and a round that repaired nothing ends them, so the
+         user only sees the group once its findings are resolved or
+         need their decision -- and output one line `G<n/>: <count/> ✗
+         findings -- correcting automatically before the review (round
+         <round/>/3)`. Then carry out
          steps 2 to 5 of the `CHANGE` dispatch in 5.6, with the
          *correction wish* composed of every `✗` evidence line of the
          group (file, dimension, cited spot, and named repair) and the
          instruction to leave a finding untouched when its repair needs
          a design decision the sources do not settle. `?` and `–` lines
-         are never auto-corrected. Record for the card as
-         <auto-corrected/> the addressed findings, each as
-         `<filename/> <dimension/>` in a few words.
+         are never auto-corrected. Add to the card's <auto-corrected/>
+         the addressed findings, each as `<filename/> <dimension/>` in a
+         few words. Step 5 of the dispatch re-enters 5.1, so the group is
+         re-staged and its evidence re-gathered before the next round.
          </if>
          <else>
          Continue with 5.5; a group without `✗` records no
@@ -599,20 +607,24 @@ quoted code stay in their original form.
              user has to locate the file in their editor from the card
              alone. A full path plus its metadata exceeds the box width
              on its own, which is why it occupies two lines.
-         -   `<explanation/>` is the *primary* text of the block: *1-3
+         -   `<explanation/>` is the *primary* text of the block: *2-4
              short, very simple sentences* in the user's language which
              *pick up* a reader who no longer remembers the change:
              first the *situation before* in one clause, then *what* this
              file now does differently and *why* -- the reason in terms
-             of the group's goal. Keep the *established terms* -- the IT
-             terms of software engineering (e.g. "Interface", "Cache",
+             of the group's goal -- and finally *why this is correct*:
+             what guarantees that it works as intended (the case it now
+             covers, the check guarding it, the test proving it). Keep
+             the *established terms* -- the IT terms of software engineering (e.g. "Interface", "Cache",
              "Endpoint", "Migration") as well as the domain terms of the
              project (e.g. "Handelstag", "Order") -- instead of lay or
              childlike substitutes, but avoid symbol names: "Bisher galt ein Zeitfenster als bedient, sobald
              keine Kurse mehr kamen. Jetzt prüft die Datei erst im
              Handelskalender, ob der Handelstag wirklich zu Ende ist,
-             damit Feiertage keine Lücken erzeugen." -- never "fügt drei
-             Methoden hinzu" or a paraphrase of the diff.
+             damit Feiertage keine Lücken erzeugen. Das ist richtig, weil
+             der Kalender jeden Feiertag kennt und ein Test genau so einen
+             Tag durchspielt." -- never "fügt drei Methoden hinzu" or a
+             paraphrase of the diff.
          -   `<symbols/>` on the *Touched* line are the file's changed
              symbols -- the added or touched functions, methods,
              classes, types, or config keys, comma-separated in
@@ -634,9 +646,9 @@ quoted code stay in their original form.
          -   The *Verdict* line is the honest sum of the evidence: it
              is what flips the recommendation of the following dialog
              from `ACCEPT` to `CHANGE`, so it is never dressed up.
-             After an auto-correction it sums the *re-gathered*
-             evidence, so a remaining `✗` is one the first pass could
-             not repair.
+             After the auto-correction it sums the *re-gathered*
+             evidence, so a remaining `✗` is one the rounds could not
+             repair.
          -   The *Auto-corrected* line is *conditional*: it appears only
              when 5.4 ran for this group and lists what that pass
              addressed, as the user did not see these findings before.
