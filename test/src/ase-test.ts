@@ -18,6 +18,7 @@ import { runSession }                      from "./ase-test-session.js"
 import { simulatorCreate }                 from "./ase-test-simulator.js"
 import { transcriptOpen, transcriptFinish } from "./ase-test-transcript.js"
 import { oraclesRun, changesetDiff }       from "./ase-test-oracle.js"
+import { describeCase }                    from "./ase-test-describe.js"
 import { reportRun, reportSummary }        from "./ase-test-report.js"
 import type { RunOutcome, CaseOutcome }    from "./ase-test-report.js"
 
@@ -31,6 +32,7 @@ program
         "whose positional words stx consumes as task names)")
     .option("-j, --jobs <n>", "number of parallel runs", "4")
     .option("-l, --list", "list the discovered cases and exit", false)
+    .option("-d, --describe", "describe the matched cases (input, fixture, simulator, oracles) and exit", false)
     .option("-k, --keep", "keep the sandboxes of all runs", false)
     .option("-K, --keep-failed", "keep the sandboxes of failed runs", false)
     .option("-m, --max-cost-usd <n>", "global cost ceiling in USD", "20")
@@ -70,6 +72,10 @@ if (opts.list) {
 if (cases.length === 0) {
     console.error(chalk.red("no test cases matched"))
     process.exit(1)
+}
+if (opts.describe) {
+    console.log(cases.map((caze) => describeCase(caze)).join("\n\n"))
+    process.exit(0)
 }
 
 /*  preflight: the fully built tool (the "ase" CLI of the plugin MCP server) and credentials  */

@@ -52,6 +52,7 @@ npm start lint                            # eslint + tsc over src/
 npm start test                            # run all cases
 npm start test -- -c 'task/*'             # run the cases matching a glob
 npm start test -- -l                      # list the discovered cases
+npm start test -- -d -c 'task/grill-*'    # describe the matched cases
 npm start test -- --jobs=8 --max-cost-usd=10  # 8 parallel runs, $10 ceiling
 npm start test -- -K -c 'meta/*'          # keep the sandboxes of failed runs
 ```
@@ -119,6 +120,11 @@ the semantic similarity of the actual result (the skill output, the
 transcript, or the final task plan body via `in: taskBody`) against it,
 ignoring wording, structure, and ordering. See the existing cases for
 the shapes, and `src/ase-test-case.ts` for the authoritative schema.
+
+To see the exact input (the first user turn, the fixture, and the
+simulator) and the expected output (the oracles in prose, with the
+golden/rubric files inlined) of a case, run `npm start test -- --describe`
+(optionally with `-c <glob>`) -- it is free, as no session is started.
 
 ## Sandboxing
 
