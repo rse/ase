@@ -44,9 +44,10 @@ side. The skill emits the *group card* as a *boxed* card, so each group
 reads as one visually self-contained unit: a short rationale, then a
 block per staged file, fenced off by separator lines -- its bare name
 with layer and line counts, its full repo-relative directory, a compact
-explanation of *what* the file now does differently and *why*, starting
-from the situation before (one to three very simple sentences which
-keep the established IT and domain terms but avoid symbol names), a
+explanation of *what* the file now does differently, *why*, and *why
+that is correct*, starting from the situation before (two to four very
+simple sentences which keep the established IT and domain terms but
+avoid symbol names), a
 *Touched* line naming the changed symbols as the index into the editor,
 ordered foundations-first -- and per file five *evidence* lines, one
 each for `DOMAIN` (including whether the change can actually reach the
@@ -74,12 +75,12 @@ red if the change were reverted, and every boundary partition the
 change touches without a covering test is a `✗`. A *Verdict* line sums
 the statuses honestly; a single `✗` flips the recommended answer of the
 group dialog from *accept* to *change*. Before a group is shown at all,
-its `✗` findings are corrected automatically in *one* pass via
-`ase-code-edit`, the group is re-staged and its evidence re-gathered, and
-the card lists the addressed findings in an *Auto-corrected* line; the
-user thus always decides the *second* round, where *change* without a
-further wish corrects the `✗` findings that remain. The card closes
-with a *Staged*
+its `✗` findings are corrected automatically in up to *three* rounds via
+`ase-code-edit` -- each round re-stages the group and re-gathers its
+evidence, and a round that repairs nothing ends them -- and the card
+lists the addressed findings in an *Auto-corrected* line; *change*
+without a further wish corrects the `✗` findings that remain. The card
+closes with a *Staged*
 line reporting the verified file count in the Git index and pointing at
 the editor. Every line is pre-wrapped at 96 columns, the box width, so
 no line overflows and loses its box prefix. Raw diff text is *not*
