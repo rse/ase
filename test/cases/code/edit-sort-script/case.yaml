@@ -1,0 +1,34 @@
+skill: ase-code-edit
+args: >-
+  create a Python script "sort.py" which reads integer numbers from stdin
+  (one number per line), sorts them, and prints them in reverse (descending)
+  order to stdout, one number per line; it must not use any library
+  functions (no import, no sorted(), no list.sort()) and must implement
+  the sorting completely inline
+runs: 2
+minPass: 1
+timeoutSec: 600
+budget: { maxUsd: 2.50 }
+fixture:
+  git: true
+oracles:
+  - notErrored: true
+  - fileExists: sort.py
+  - regex:
+      in: file
+      file: sort.py
+      not:
+        - "^\\s*import\\s"
+        - "\\bsorted\\s*\\("
+        - "\\.sort\\s*\\("
+  - exec:
+      command: "python3 sort.py"
+      oracle:  "python3 oracle.py"
+      stdin:
+        - "3\n1\n2\n"
+        - "10\n-5\n10\n0\n"
+        - "7\n"
+        - ""
+  - gitDiff:
+      changed:
+        - sort.py

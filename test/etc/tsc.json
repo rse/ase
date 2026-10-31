@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target":                  "esnext",
+        "module":                  "nodenext",
+        "moduleResolution":        "nodenext",
+        "useDefineForClassFields": true,
+        "composite":               false,
+        "strict":                  true,
+        "resolveJsonModule":       true,
+        "isolatedModules":         true,
+        "esModuleInterop":         true,
+        "lib":                     [ "ESNext" ],
+        "skipLibCheck":            true,
+        "noEmit":                  true,
+        "types":                   [ "node" ],
+        "rootDir":                 "../src"
+    },
+    "include": [
+        "../src/**/*.ts"
+    ]
+}

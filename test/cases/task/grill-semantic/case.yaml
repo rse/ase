@@ -1,0 +1,29 @@
+skill: ase-task-grill
+args: "--rounds 2 --next DONE alpha"
+runs: 1
+timeoutSec: 900
+budget: { maxUsd: 4.00 }
+fixture:
+  lifecycle: solo
+  tasks:
+    - fixture/TASK-alpha.md
+turns:
+  simulator: llm
+  persona: persona.md
+  model: claude-sonnet-5-5
+  maxTurns: 10
+oracles:
+  - notErrored: true
+  - regex:
+      in: output
+      match:
+        - "GRILLING"
+  - taskStore:
+      id: alpha
+      status: OPEN
+  - similar:
+      expected: expected-plan.md
+      in: taskBody
+      id: alpha
+      threshold: 0.6
+      votes: 3

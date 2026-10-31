@@ -1,0 +1,19 @@
+skill: ase-task-edit
+args: "--plan REFINE --next DONE alpha: the greet function must also validate that the name argument is a non-empty string and report a usage error otherwise"
+runs: 2
+minPass: 1
+timeoutSec: 600
+budget: { maxUsd: 2.50 }
+fixture:
+  git: true
+  lifecycle: solo
+  tasks:
+    - fixture/TASK-alpha.md
+  files: fixture/tree
+oracles:
+  - notErrored: true
+  - taskStore:
+      id: alpha
+      status: OPEN
+      bodyMatch: "valid"
+  - gitDiff: { empty: true }
