@@ -94,6 +94,13 @@ const describeOracle = (caze: TestCase, oracle: OracleSpec): string[] => {
         if (spec.maxWords !== undefined) bounds.push(`<= ${spec.maxWords} words`)
         lines.push(`    - ${target} is ${bounds.join(" and ")}`)
     }
+    else if ("exec" in oracle) {
+        lines.push(`    - output of "${oracle.exec.command}" (in the project) matches the output of ` +
+            `"${oracle.exec.oracle}" (the oracle code, in the case directory) for ` +
+            `${oracle.exec.stdin.length} stdin vector(s):`)
+        for (const input of oracle.exec.stdin)
+            lines.push(`        ${JSON.stringify(input)}`)
+    }
     else if ("rubric" in oracle) {
         lines.push(`    - LLM judge scores the output against rubric "${path.relative(caze.dir, oracle.rubric.file)}" ` +
             `(threshold: ${(oracle.rubric.threshold ?? 0.7).toFixed(2)}, votes: ${oracle.rubric.votes ?? 3}):`)

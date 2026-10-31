@@ -78,6 +78,17 @@ const oracleSchema = z.union([
         })
     }),
 
+    /*  a behavioral comparison: a command run in the sandbox project must produce
+        the same stdout as a case-local oracle command for every stdin vector  */
+    z.strictObject({
+        exec: z.strictObject({
+            command:      z.string(),
+            oracle:       z.string(),
+            stdin:        z.array(z.string()).min(1),
+            timeoutSec:   z.number().int().min(1).optional()
+        })
+    }),
+
     /*  an LLM judge scoring the run output against a rubric (majority of votes)  */
     z.strictObject({
         rubric: z.strictObject({

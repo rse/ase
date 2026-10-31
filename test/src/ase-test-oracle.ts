@@ -242,6 +242,33 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
                 detail: faults.join(", ") || `chars: ${chars}, words: ${words}`
             })
         }
+        else if ("exec" in oracle) {
+            const spec    = oracle.exec
+            const timeout = (spec.timeoutSec ?? 10) * 1000
+            const norm    = (text: string): string =>
+                text.split("\n").map((line) => line.replace(/\s+$/, "")).join("\n").replace(/\n+$/, "")
+            const run     = (command: string, cwd: string, input: string) =>
+                execa(command, { shell: true, cwd, env: sandbox.env, extendEnv: false, input, timeout, reject: false })
+            const faults: string[] = []
+            for (const [ index, input ] of spec.stdin.entries()) {
+                const expected = await run(spec.oracle, caze.dir, input)
+                if (expected.exitCode !== 0) {
+                    faults.push(`vector ${index}: oracle command failed (exit ${expected.exitCode})`)
+                    continue
+                }
+                const actual = await run(spec.command, sandbox.project, input)
+                if (actual.exitCode !== 0)
+                    faults.push(`vector ${index}: command failed (exit ${actual.exitCode}): ` +
+                        `${actual.stderr.split("\n")[0] ?? ""}`)
+                else if (norm(actual.stdout) !== norm(expected.stdout))
+                    faults.push(`vector ${index}: expected ${JSON.stringify(norm(expected.stdout))}, ` +
+                        `got ${JSON.stringify(norm(actual.stdout))}`)
+            }
+            results.push({
+                kind: "exec", pass: faults.length === 0,
+                detail: faults.join("; ") || `${spec.stdin.length}/${spec.stdin.length} vectors match`
+            })
+        }
         else if ("rubric" in oracle)
             results.push(await judgeRubric(sandbox, result, oracle.rubric))
         else if ("similar" in oracle) {
