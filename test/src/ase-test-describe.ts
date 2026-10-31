@@ -7,11 +7,11 @@
 import * as fs   from "node:fs"
 import * as path from "node:path"
 
-import YAML      from "yaml"
 import chalk     from "chalk"
 
 import type { TestCase, OracleSpec } from "./ase-test-case.js"
 import { skillPrompt }               from "./ase-test-session.js"
+import { scriptLoad }                from "./ase-test-simulator.js"
 
 /*  normalize a string-or-list oracle value into a list  */
 const asList = (value: string | string[] | undefined): string[] =>
@@ -138,8 +138,7 @@ export const describeCase = (caze: TestCase): string => {
     lines.push(`    fixture:   ${fixture.join(", ")}`)
     if (caze.turns !== null) {
         if (caze.turns.simulator === "scripted") {
-            const script = YAML.parse(fs.readFileSync(caze.turns.script, "utf8")) as
-                { rules?: unknown[], default?: string, end?: string }
+            const script = scriptLoad(caze.turns.script, caze.name)
             lines.push(`    simulator: scripted "${path.relative(caze.dir, caze.turns.script)}" ` +
                 `(rules: ${script.rules?.length ?? 0}` +
                 (script.default !== undefined ? `, default: "${script.default}"` : "") +
@@ -147,9 +146,11 @@ export const describeCase = (caze: TestCase): string => {
                 `, max turns: ${caze.turns.maxTurns})`)
         }
         else {
-            const model = caze.turns.model !== "" ? caze.turns.model :
+            const model   = caze.turns.model !== "" ? caze.turns.model :
                 (process.env.ASE_TEST_SIM_MODEL ?? "claude-haiku-5-5")
-            lines.push(`    simulator: llm persona "${path.relative(caze.dir, caze.turns.persona)}" ` +
+            const persona = caze.turns.persona !== "" ?
+                `"${path.relative(caze.dir, caze.turns.persona)}"` : "(none)"
+            lines.push(`    simulator: llm persona ${persona} ` +
                 `(model: ${model}, max turns: ${caze.turns.maxTurns})`)
         }
     }

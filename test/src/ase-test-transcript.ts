@@ -27,9 +27,10 @@ const brief = (value: unknown, max = 160): string => {
     return line.length > max ? `${line.slice(0, max - 1)}…` : line
 }
 
-/*  open the transcript of one run, creating its artifact directory  */
-export const transcriptOpen = (resultsDir: string, caze: TestCase, run: number): Transcript => {
-    const dir = path.join(resultsDir, ...caze.name.split("/"), `run-${run}`)
+/*  open the transcript of one run, creating its artifact directory (a retried
+    run gets its own directory, so the attempts' artifacts never interleave)  */
+export const transcriptOpen = (resultsDir: string, caze: TestCase, run: number, retried = false): Transcript => {
+    const dir = path.join(resultsDir, ...caze.name.split("/"), `run-${run}${retried ? "-retry" : ""}`)
     fs.mkdirSync(dir, { recursive: true })
     const jsonl = path.join(dir, "transcript.jsonl")
     const md    = path.join(dir, "transcript.md")

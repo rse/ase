@@ -20,12 +20,14 @@ export type RunOutcome = {
     durationMs: number
     failure:    string
     artifacts:  string
+    model:      string
     oracles:    OracleResult[]
 }
 
 /*  the aggregated outcome of one case  */
 export type CaseOutcome = {
     name:    string
+    skill:   string
     runs:    RunOutcome[]
     minPass: number
     pass:    boolean
@@ -41,7 +43,8 @@ export const reportRun = (name: string, outcome: RunOutcome): void => {
     for (const oracle of outcome.oracles)
         if (!oracle.pass)
             console.log(`    ${chalk.red(`✘ ${oracle.kind}`)}: ${oracle.detail}`)
-    if (outcome.outcome === "fail" && outcome.oracles.length === 0 && outcome.failure !== "")
+    if (outcome.outcome === "fail" && outcome.failure !== ""
+        && !outcome.oracles.some((oracle) => !oracle.pass))
         console.log(`    ${chalk.red("✘ evaluation")}: ${outcome.failure}`)
     if (outcome.outcome === "error")
         console.log(`    ${chalk.red("⚠ infra")}: ${outcome.failure}`)
@@ -51,7 +54,7 @@ export const reportRun = (name: string, outcome: RunOutcome): void => {
 
 /*  print the console summary and write the "summary.json", resolving to the exit code  */
 export const reportSummary = (resultsDir: string, cases: CaseOutcome[],
-    totalUsd: number, aborted: string): number => {
+    totalUsd: number, aborted: string, meta: Record<string, string>): number => {
     console.log("")
     for (const caze of cases) {
         const passed = caze.runs.filter((run) => run.outcome === "pass").length
@@ -66,8 +69,10 @@ export const reportSummary = (resultsDir: string, cases: CaseOutcome[],
         `total cost: $${totalUsd.toFixed(2)}${aborted !== "" ? chalk.red(` (aborted: ${aborted})`) : ""}`)
     fs.mkdirSync(resultsDir, { recursive: true })
     fs.writeFileSync(path.join(resultsDir, "summary.json"), JSON.stringify({
+        meta,
         cases: cases.map((caze) => ({
             name:    caze.name,
+            skill:   caze.skill,
             pass:    caze.pass,
             minPass: caze.minPass,
             runs:    caze.runs.map((run) => ({
@@ -77,6 +82,7 @@ export const reportSummary = (resultsDir: string, cases: CaseOutcome[],
                 durationMs: run.durationMs,
                 failure:    run.failure,
                 artifacts:  run.artifacts,
+                model:      run.model,
                 oracles:    run.oracles
             }))
         })),

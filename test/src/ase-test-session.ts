@@ -20,18 +20,21 @@ export type SessionRecord = {
     onStderr:  (data: string)             => void
 }
 
-/*  the outcome of one session run  */
+/*  the outcome of one session run ("costUsd" is only a lower bound of the real
+    spend when "costAccurate" is false, as a timed-out or crashed session may
+    never deliver the final result message carrying the cost of its last turn)  */
 export type SessionResult = {
-    output:    string[]
-    lastText:  string
-    dialog:    DialogEntry[]
-    sessionId: string
-    model:     string
-    costUsd:   number
-    turns:     number
-    errored:   boolean
-    timedOut:  boolean
-    failure:   string
+    output:       string[]
+    lastText:     string
+    dialog:       DialogEntry[]
+    sessionId:    string
+    model:        string
+    costUsd:      number
+    costAccurate: boolean
+    turns:        number
+    errored:      boolean
+    timedOut:     boolean
+    failure:      string
 }
 
 /*  render the invocation of the skill <skill> with the arguments <args>, adding the
@@ -50,7 +53,7 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
     simulator: Simulator | null, record: SessionRecord): Promise<SessionResult> => {
     const result: SessionResult = {
         output: [], lastText: "", dialog: [], sessionId: "", model: "",
-        costUsd: 0, turns: 0, errored: false, timedOut: false, failure: ""
+        costUsd: 0, costAccurate: true, turns: 0, errored: false, timedOut: false, failure: ""
     }
     const prompt = caze.skill !== "" ? skillPrompt(caze.skill, caze.args) : caze.prompt
 
@@ -77,9 +80,14 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
         type: "user", message: { role: "user", content: text }, parent_tool_use_id: null
     })
 
-    /*  the wall-clock timeout of the whole run  */
-    const abort = new AbortController()
-    const timer = setTimeout(() => {
+    /*  the wall-clock timeout of the whole run (the "finished" flag keeps a timer
+        firing in the same tick the session completed from marking a successful,
+        fully paid run as timed out and provoking a pointless paid retry)  */
+    let finished = false
+    const abort  = new AbortController()
+    const timer  = setTimeout(() => {
+        if (finished)
+            return
         result.timedOut = true
         abort.abort()
     }, caze.timeoutSec * 1000)
@@ -142,7 +150,11 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
             }
             else if (msg.type === "result") {
                 result.turns  += 1
-                result.costUsd = msg.total_cost_usd ?? result.costUsd
+
+                /*  the cost is cumulative, so the latest value replaces the previous one,
+                    but a crash result may carry a zeroed cost which must never erase the
+                    already accumulated spend  */
+                result.costUsd = Math.max(result.costUsd, msg.total_cost_usd ?? 0)
                 if (msg.is_error) {
                     result.errored = true
                     result.failure = `session error: ${msg.subtype}`
@@ -161,17 +173,20 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
                 }
             }
         }
+        finished = true
     }
     catch (err) {
-        result.errored = true
-        result.failure = result.timedOut ? `timeout after ${caze.timeoutSec}s` :
+        result.errored      = true
+        result.costAccurate = false
+        result.failure      = result.timedOut ? `timeout after ${caze.timeoutSec}s` :
             `session crashed: ${err instanceof Error ? err.message : String(err)}`
     }
     finally {
         clearTimeout(timer)
     }
     if (result.timedOut) {
-        result.errored = true
+        result.errored      = true
+        result.costAccurate = false
         if (result.failure === "")
             result.failure = `timeout after ${caze.timeoutSec}s`
     }

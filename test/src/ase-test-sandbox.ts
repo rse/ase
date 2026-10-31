@@ -54,19 +54,32 @@ const credentials = (home: string, env: Record<string, string>): void => {
     and the fixture file tree, with the final fixture commit serving as the baseline
     of the Git changeset diff oracle  */
 export const sandboxCreate = async (caze: TestCase, run: number): Promise<Sandbox> => {
-    const slug    = caze.name.replace(/[^a-zA-Z0-9]+/g, "-")
-    const root    = await fs.promises.mkdtemp(path.join(os.tmpdir(), `ase-test-${slug}-r${run}-`))
+    const slug = caze.name.replace(/[^a-zA-Z0-9]+/g, "-")
+    const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), `ase-test-${slug}-r${run}-`))
+    try {
+        return await sandboxPopulate(caze, root)
+    }
+    catch (err) {
+        /*  a half-created sandbox has no owner to tear it down, so remove it here  */
+        await fs.promises.rm(root, { recursive: true, force: true })
+        throw err
+    }
+}
+
+/*  populate a fresh sandbox root with the environment and the fixture  */
+const sandboxPopulate = async (caze: TestCase, root: string): Promise<Sandbox> => {
     const home    = path.join(root, "home")
     const project = path.join(root, "project")
     await fs.promises.mkdir(path.join(home, ".claude"),  { recursive: true })
     await fs.promises.mkdir(path.join(project, ".ase"),  { recursive: true })
 
     /*  the sandboxed environment: a controlled HOME and XDG directories, the built
-        "ase" CLI on the PATH (required by the MCP server of the plugin), and no
-        inherited agent tool, ASE, tmux, or Copilot state  */
+        "ase" CLI on the PATH (required by the MCP server of the plugin), no
+        inherited agent tool, ASE, tmux, or Copilot state, and no common credential
+        variables of the developer's shell (the session runs autonomous skill code)  */
     const env: Record<string, string> = {}
     for (const [ key, value ] of Object.entries(process.env))
-        if (value !== undefined && !/^(TMUX|COPILOT_|ASE_|CLAUDE|ANTHROPIC_)/.test(key))
+        if (value !== undefined && !/^(TMUX|COPILOT_|ASE_|CLAUDE|ANTHROPIC_|GITHUB_|GH_|AWS_|NPM_TOKEN$|NODE_AUTH_TOKEN$|OPENAI_|GOOGLE_|GEMINI_)/.test(key))
             env[key] = value
     env.HOME               = home
     env.XDG_CONFIG_HOME    = path.join(home, ".config")
@@ -81,7 +94,7 @@ export const sandboxCreate = async (caze: TestCase, run: number): Promise<Sandbo
         LiteLLM proxy in front of a local model): pass through the endpoint and model settings  */
     for (const [ key, value ] of Object.entries(process.env))
         if (value !== undefined
-            && /^(ANTHROPIC_BASE_URL|ANTHROPIC_(DEFAULT_[A-Z]+_)?MODEL|CLAUDE_CODE_(AUTO_COMPACT_WINDOW|MAX_OUTPUT_TOKENS|DISABLE_NONESSENTIAL_TRAFFIC))$/.test(key))
+            && /^(ANTHROPIC_BASE_URL|ANTHROPIC_AUTH_TOKEN|ANTHROPIC_(DEFAULT_[A-Z]+_)?MODEL|CLAUDE_CODE_(AUTO_COMPACT_WINDOW|MAX_OUTPUT_TOKENS|DISABLE_NONESSENTIAL_TRAFFIC))$/.test(key))
             env[key] = value
 
     /*  keep the account-level claude.ai cloud connectors out of the session  */

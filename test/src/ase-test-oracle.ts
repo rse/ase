@@ -15,8 +15,8 @@ import type { Sandbox }              from "./ase-test-sandbox.js"
 import type { SessionResult }        from "./ase-test-session.js"
 import { judgeRubric, judgeSimilar } from "./ase-test-judge.js"
 
-/*  the verdict of one oracle  */
-export type OracleResult = { kind: string, pass: boolean, detail: string }
+/*  the verdict of one oracle (with the raw judge scores of the LLM judge oracles)  */
+export type OracleResult = { kind: string, pass: boolean, detail: string, scores?: number[] }
 
 /*  whether a skill reported an error in its output lines, as the skills report
     their errors as "▶ ERROR: ..." while the agent tool still exits successfully
@@ -24,10 +24,14 @@ export type OracleResult = { kind: string, pass: boolean, detail: string }
 export const skillErrored = (output: string[]): boolean =>
     output.some((line) => /(?:^|▶ )ERROR:/.test(line.trim()))
 
+/*  quote a literal string for interpolation into a regular expression  */
+const reQuote = (text: string): string =>
+    text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+
 /*  the last verdict word following the label <label> in the output lines of a
     skill (see "verdictOf" of "tool/src/ase-agent-runtime-tool.ts")  */
 export const verdictOf = (output: string[], label: string): string => {
-    const re = new RegExp(`${label}\\W*([A-Z]+)`)
+    const re = new RegExp(`${reQuote(label)}\\W*([A-Z]+)`)
     let verdict = ""
     for (const line of output) {
         const m = re.exec(line)
@@ -87,9 +91,9 @@ const taskFile = (sandbox: Sandbox, id: string): { front: Record<string, string>
     if (!fs.existsSync(file))
         return null
     const text  = fs.readFileSync(file, "utf8")
-    const m     = /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/.exec(text)
+    const m     = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(text)
     const front: Record<string, string> = {}
-    for (const line of (m?.[1] ?? "").split("\n")) {
+    for (const line of (m?.[1] ?? "").split(/\r?\n/)) {
         const kv = /^([A-Za-z]+):[ \t]*(.*)$/.exec(line)
         if (kv !== null)
             front[kv[1]] = kv[2].trim()
@@ -97,9 +101,11 @@ const taskFile = (sandbox: Sandbox, id: string): { front: Record<string, string>
     return { front, body: m?.[2] ?? text }
 }
 
-/*  the target text of a "regex" or "textMetric" oracle  */
+/*  the target text of a "regex", "textMetric", or "similar" oracle, where a missing
+    target file yields null (the oracle must fail then, as matching "not" patterns or
+    length bounds against an empty string would pass vacuously)  */
 const targetText = (spec: { in?: string, file?: string }, caze: TestCase,
-    sandbox: Sandbox, result: SessionResult): string => {
+    sandbox: Sandbox, result: SessionResult): string | null => {
     const target = spec.in ?? "lastMessage"
     if (target === "lastMessage")
         return result.lastText
@@ -111,7 +117,7 @@ const targetText = (spec: { in?: string, file?: string }, caze: TestCase,
         if (spec.file === undefined)
             throw new Error(`case "${caze.name}": oracle target "file" requires the "file" key`)
         const file = path.resolve(sandbox.project, spec.file)
-        return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : ""
+        return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null
     }
 }
 
@@ -137,7 +143,11 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
             })
         }
         else if ("regex" in oracle) {
-            const text    = targetText(oracle.regex, caze, sandbox, result)
+            const text = targetText(oracle.regex, caze, sandbox, result)
+            if (text === null) {
+                results.push({ kind: "regex", pass: false, detail: `target file missing: ${oracle.regex.file}` })
+                continue
+            }
             const flags   = oracle.regex.flags ?? "m"
             const missing = asList(oracle.regex.match).filter((re) => !new RegExp(re, flags).test(text))
             const illegal = asList(oracle.regex.not).filter((re) => new RegExp(re, flags).test(text))
@@ -214,8 +224,12 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
             })
         }
         else if ("textMetric" in oracle) {
-            const spec  = oracle.textMetric
-            const text  = targetText(spec, caze, sandbox, result)
+            const spec = oracle.textMetric
+            const text = targetText(spec, caze, sandbox, result)
+            if (text === null) {
+                results.push({ kind: "textMetric", pass: false, detail: `target file missing: ${spec.file}` })
+                continue
+            }
             const chars = text.length
             const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length
             const faults: string[] = []
@@ -241,9 +255,15 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
                 results.push(await judgeSimilar(sandbox,
                     fs.readFileSync(spec.expected, "utf8"), task.body, spec))
             }
-            else
+            else {
+                const text = targetText(spec, caze, sandbox, result)
+                if (text === null) {
+                    results.push({ kind: "similar", pass: false, detail: "target file missing" })
+                    continue
+                }
                 results.push(await judgeSimilar(sandbox,
-                    fs.readFileSync(spec.expected, "utf8"), targetText(spec, caze, sandbox, result), spec))
+                    fs.readFileSync(spec.expected, "utf8"), text, spec))
+            }
         }
     }
     return results

@@ -10,6 +10,8 @@ import * as path from "node:path"
 import { z }     from "zod"
 import YAML      from "yaml"
 
+import { scriptLoad } from "./ase-test-simulator.js"
+
 /*  the oracle specifications: each oracle is an object with exactly one key
     naming the oracle kind, mirroring the evaluation criteria of the agent
     engine (see "tool/src/ase-agent-runtime-engine.ts", "DefinedCore.evaluate")  */
@@ -215,6 +217,8 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
         })
     }
     caseCheckRes(result)
+    if (result.turns?.simulator === "scripted")
+        scriptLoad(result.turns.script, name)
     return result
 }
 

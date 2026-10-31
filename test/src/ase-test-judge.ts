@@ -15,35 +15,44 @@ const TEXT_MAX = 40000
 
 /*  the shared vote loop of the LLM judges: each of the <votes> independent votes
     scores from 0.0 to 1.0 as a JSON object, a vote passes when its score reaches
-    the threshold, and the majority of the votes decides  */
+    the threshold, and the majority of the votes decides, while a majority of
+    unparsable votes signals a malfunctioning judge instead of a quality failure  */
 const judgeVotes = async (sandbox: Sandbox, system: string, prompt: string,
     threshold: number, votes: number, kind: string):
-Promise<{ kind: string, pass: boolean, detail: string }> => {
+Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
     const model  = process.env.ASE_TEST_JUDGE_MODEL ?? "claude-haiku-5-5"
-    const scores: { score: number, reason: string }[] = []
+    const scores: { score: number, reason: string, parsed: boolean }[] = []
     for (let vote = 0; vote < votes; vote++) {
         const text = await llmText(sandbox, model, system, prompt)
         const m    = /\{[\s\S]*\}/.exec(text)
         let score  = 0
         let reason = "unparsable judge response"
+        let parsed = false
         if (m !== null) {
             try {
-                const parsed = JSON.parse(m[0])
-                if (typeof parsed.score === "number" && parsed.score >= 0 && parsed.score <= 1) {
-                    score  = parsed.score
-                    reason = typeof parsed.reason === "string" ? parsed.reason : ""
+                const json = JSON.parse(m[0])
+                if (typeof json.score === "number" && json.score >= 0 && json.score <= 1) {
+                    score  = json.score
+                    reason = typeof json.reason === "string" ? json.reason : ""
+                    parsed = true
                 }
             }
             catch (_err) {
                 /*  keep the unparsable default  */
             }
         }
-        scores.push({ score, reason })
+        scores.push({ score, reason, parsed })
     }
-    const passed = scores.filter((entry) => entry.score >= threshold).length
+    const unparsable = scores.filter((entry) => !entry.parsed).length
+    if (unparsable > votes / 2)
+        return {
+            kind, pass: false, scores: scores.map((entry) => entry.score),
+            detail: `judge malfunctioned: ${unparsable}/${votes} votes unparsable (model: ${model})`
+        }
+    const passed = scores.filter((entry) => entry.parsed && entry.score >= threshold).length
     const pass   = passed > votes / 2
     return {
-        kind, pass,
+        kind, pass, scores: scores.map((entry) => entry.score),
         detail: `${passed}/${votes} votes >= ${threshold} ` +
             `(scores: ${scores.map((entry) => entry.score.toFixed(2)).join(", ")}; ` +
             `${scores.map((entry) => entry.reason).filter((reason) => reason !== "").at(-1) ?? ""})`
@@ -53,7 +62,7 @@ Promise<{ kind: string, pass: boolean, detail: string }> => {
 /*  judge the output of one run against a rubric  */
 export const judgeRubric = async (sandbox: Sandbox, result: SessionResult,
     spec: { file: string, threshold?: number, votes?: number }):
-Promise<{ kind: string, pass: boolean, detail: string }> => {
+Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
     const rubric = fs.readFileSync(spec.file, "utf8")
     const output = result.output.join("\n").slice(0, TEXT_MAX)
     const system =
@@ -71,7 +80,7 @@ Promise<{ kind: string, pass: boolean, detail: string }> => {
 export const judgeSimilar = async (sandbox: Sandbox,
     expectedText: string, actualText: string,
     spec: { threshold?: number, votes?: number }):
-Promise<{ kind: string, pass: boolean, detail: string }> => {
+Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
     const system =
         "You are a strict, impartial evaluator of the semantic similarity of two texts: " +
         "the EXPECTED text states the decisions, facts, and constraints a result must carry, " +

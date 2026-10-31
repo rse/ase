@@ -43,13 +43,31 @@ const scriptSchema = z.strictObject({
     default: z.string().optional(),
     end:     z.string().optional()
 })
+export type Script = z.infer<typeof scriptSchema>
+
+/*  load and validate a scripted simulator script, including the compilation of
+    its regular expressions, so an invalid script fails at case load time and
+    never as a crash inside an already paid session  */
+export const scriptLoad = (file: string, name: string): Script => {
+    const parsed = scriptSchema.safeParse(YAML.parse(fs.readFileSync(file, "utf8")))
+    if (!parsed.success)
+        throw new Error(`case "${name}": invalid simulator script: ${z.prettifyError(parsed.error)}`)
+    for (const re of [ ...(parsed.data.rules ?? []).map((rule) => rule.when), parsed.data.end ])
+        if (re !== undefined) {
+            try {
+                RegExp(re, "s")
+            }
+            catch (err) {
+                throw new Error(`case "${name}": invalid simulator script regular expression ` +
+                    `"${re}": ${err instanceof Error ? err.message : String(err)}`, { cause: err })
+            }
+        }
+    return parsed.data
+}
 
 /*  the scripted simulator: deterministic regular-expression rules  */
 const scriptedSimulator = (caze: TestCase): Simulator => {
-    const parsed = scriptSchema.safeParse(YAML.parse(fs.readFileSync(caze.turns!.script, "utf8")))
-    if (!parsed.success)
-        throw new Error(`case "${caze.name}": invalid simulator script: ${z.prettifyError(parsed.error)}`)
-    const script = parsed.data
+    const script = scriptLoad(caze.turns!.script, caze.name)
     const match = (text: string): string | null => {
         for (const rule of script.rules ?? [])
             if (new RegExp(rule.when, "s").test(text))
