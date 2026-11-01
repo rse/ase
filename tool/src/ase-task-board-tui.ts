@@ -6,6 +6,7 @@
 
 import React                                  from "react"
 import { render, Box, Text, useInput, useStdin } from "ink"
+import stringWidth                            from "string-width"
 
 import type Log                               from "./ase-lib-log.js"
 import { Task }                               from "./ase-task.js"
@@ -225,6 +226,28 @@ const App = ({ log, initial, project, relay }: { log: Log, initial: Board, proje
     return renderScreen(ctx, project)
 }
 
+/*  wrap stdout to erase the tail of each changed line ("CSI <n> G" plus "CSI K" plus
+    its styled text) after instead of before its text, as otherwise the line is shown
+    blanked in terminals redrawing between the reads of a frame, like tmux popups;
+    a text reaching the last column needs no erasing, which would there erase its
+    last character, as the cursor rests on it  */
+const lateErasing = (stream: NodeJS.WriteStream): NodeJS.WriteStream => {
+    /*  eslint-disable-next-line no-control-regex  */
+    const changed = /\x1b\[(\d+)G\x1b\[K((?:[^\x1b\n]|\x1b\[[\d;:]*m)*)/g
+    const write = (data: unknown, ...args: unknown[]) =>
+        (stream.write as (...args: unknown[]) => boolean)(typeof data !== "string" ? data :
+            data.replace(changed, (_all, col: string, text: string) =>
+                `\x1b[${col}G${text}` + (Number(col) - 1 + stringWidth(text) < stream.columns ? "\x1b[K" : "")), ...args)
+    return new Proxy(stream, {
+        get: (target, prop) => {
+            if (prop === "write")
+                return write
+            const value: unknown = Reflect.get(target, prop, target)
+            return typeof value === "function" ? (value as (...args: unknown[]) => unknown).bind(target) : value
+        }
+    })
+}
+
 /*  run the terminal board until the user quits  */
 export const runTUI = async (log: Log, relay?: string): Promise<void> => {
     const initial = await buildBoard(log)
@@ -242,9 +265,13 @@ export const runTUI = async (log: Log, relay?: string): Promise<void> => {
     process.once("exit", reset)
     try {
         /*  enable the kitty keyboard protocol (if the terminal supports it),
-            as only under it the Shift modifier of RETURN is reported  */
+            as only under it the Shift modifier of RETURN is reported, and
+            rewrite only the changed lines of a frame, as otherwise every frame
+            is erased and redrawn entirely, which flickers in terminals not
+            honoring synchronized output (DEC mode 2026), like tmux popups  */
         const app = render(h(App, { log, initial, project, relay }), {
-            alternateScreen: true, exitOnCtrlC: true, patchConsole: true, kittyKeyboard: { mode: "auto" }
+            alternateScreen: true, exitOnCtrlC: true, patchConsole: true, kittyKeyboard: { mode: "auto" },
+            incrementalRendering: true, stdout: lateErasing(process.stdout)
         })
         await app.waitUntilExit()
     }

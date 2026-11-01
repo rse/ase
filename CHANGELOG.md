@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.0.6 (2026-10-26)
+2.0.6 (2026-11-02)
 ------------------
 
 -   FEATURE [code]: Sortable Decision Matrix
@@ -46,6 +46,20 @@ ChangeLog
     `node_modules`, `package.json`, `etc/`, and `.gitignore` already during the traversal and
     deletes orphaned target files, instead of copying everything (including the 465 MB of
     `plugin/node_modules`) and then removing the excluded parts again (7.9s down to 0.6s).
+
+-   IMPROVEMENT [code]: Flicker-Free Terminal Task Board in tmux Popups
+    The terminal UI of `ase task board` (`tool/src/ase-task-board-tui.ts`) now renders
+    incrementally, rewriting only the changed lines of a frame instead of erasing and redrawing
+    every frame, which flickered in terminals not honoring synchronized output (DEC mode 2026),
+    like tmux popups. Additionally, a wrapper of stdout erases the tail of each changed line only
+    after instead of before its text (using the new dependency `string-width`), so lines are no
+    longer shown blanked in terminals redrawing between the reads of a frame.
+
+-   BUGFIX [code]: Clamp Task Board Graph Viewport to Shown Graph
+    The scroll position of the graph and flow views of the terminal task board
+    (`tool/src/ase-task-board-tui-model.ts`) is shared by both graphs, so a position carried over
+    from the other graph could show only the tail of the current one. The viewport is now kept
+    within the bounds of the shown graph.
 
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
