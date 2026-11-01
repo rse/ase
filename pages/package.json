@@ -11,7 +11,7 @@
         "@rse/stx":                               "1.1.7",
         "@astrojs/check":                         "0.9.12",
         "typescript":                             "6.0.3",
-        "eslint":                                 "10.13.0",
+        "eslint":                                 "10.14.0",
         "@eslint/js":                             "10.0.1",
         "@typescript-eslint/parser":              "8.72.1",
         "typescript-eslint":                      "8.72.1",
@@ -19,7 +19,7 @@
         "@types/fast-levenshtein":                "0.0.4",
         "eslint-plugin-astro":                    "3.2.1",
         "astro-eslint-parser":                    "3.2.0",
-        "globals":                                "17.13.0",
+        "globals":                                "17.14.0",
         "playwright":                             "1.64.1"
     },
     "dependencies": {
@@ -28,7 +28,7 @@
         "@astro-community/astro-embed-youtube":   "0.5.10",
         "astro-robots-txt":                       "1.0.0",
         "astro-swiper":                           "2.11.0",
-        "@lucide/astro":                          "1.64.0",
+        "@lucide/astro":                          "1.66.0",
         "tailwindcss":                            "4.3.3",
         "@tailwindcss/vite":                      "4.3.3",
         "typopro-web":                            "4.2.9",
