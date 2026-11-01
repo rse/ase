@@ -1,4 +1,4 @@
-# ase-spec(1) -- Initialize, Lint, Export, and Preview the Project Specification
+# ase-spec(1) -- Initialize, Lint, Export, Query, and Preview the Project Specification
 
 ## SYNOPSIS
 
@@ -6,6 +6,7 @@
 \[`-h`|`--help`\]
 
 `ase spec init`
+\[`-s`|`--sample`\]
 
 `ase spec lint`
 \[`-m`|`--markdown`\]
@@ -14,27 +15,42 @@
 `ase spec export`
 \[`-o`|`--output` \[*format*`:`\]*file*\] \[...\]
 \[`-w`|`--watch`\]
+\[`-S`|`--schema`\]
+
+`ase spec query`
+\[`-P`|`--param` *name*`=`*value*\] \[...\]
+\[`-f`|`--format` *format*\]
+\[`-o`|`--output` \[*format*`:`\]*file*\]
+\[`-S`|`--schema`\]
+*selector*
 
 `ase spec preview`
 \[`-a`|`--addr` *ip-addr*\]
 \[`-p`|`--port` *tcp-port*\]
+\[`-S`|`--schema`\]
 
 ## DESCRIPTION
 
 **ase spec** is the entry point group for initializing, linting,
-exporting, and previewing the *SpecBook*-based project specification
-(SPEC), i.e., the Markdown files (plus their embedded assets) of the
-artifact kind `spec` below the base directory
+exporting, querying, and previewing the *SpecBook*-based project
+specification (SPEC), i.e., the Markdown files (plus their embedded
+assets) of the artifact kind `spec` below the base directory
 `project.artifact.spec.basedir` (default: `docs/specbook`, relative to
-the project root).
+the project root). Every `.md` file below the base directory
+(recursively, except below `.`-prefixed entries), whatever its name,
+is taken as a specification file.
 
 The specification is governed by the *SpecBook* YAML schema
 configuration `project.artifact.spec.schema`: a whitespace-separated
 list of schema files, merged in the given order, where the entry `std`
 names the full standard schema bundled with *SpecBook* (not its
 compressed variant `ase-format-specbook.yaml` bundled with the plugin
-for the agents, see `ase-util-meta`(1)) and every other entry is a file
-path relative to the project root. An unset or empty value means `std`.
+for the agents, see `ase-util-meta`(1)), the entries `meta` and `pm`
+name the meta and project management schemas bundled with *SpecBook*,
+the entries prefixed with `npm:`, `github:`, `http://`, or `https://`
+name remote schemas (fetched and cached by *SpecBook*), and every other
+entry is a file path or glob pattern relative to the project root. An
+unset or empty value means `std`.
 
 All reading specification commands honor the Git exclude rules exactly
 like `ase artifact list` does (see `ase-artifact`(1)): an artifact file
@@ -55,7 +71,7 @@ exits with status `1`.
 
 ## COMMANDS
 
-- `ase spec init`:
+- `ase spec init` \[`-s`|`--sample`\]:
   Initialize the absent specification Markdown files of the schema
   configuration. See `ase-spec-init`(1).
 
@@ -63,11 +79,15 @@ exits with status `1`.
   Lint the specification against the schema configuration, and
   optionally for its generic Markdown formatting. See `ase-spec-lint`(1).
 
-- `ase spec export` \[`-o`|`--output` \[*format*`:`\]*file*\] \[...\] \[`-w`|`--watch`\]:
+- `ase spec export` \[`-o`|`--output` \[*format*`:`\]*file*\] \[...\] \[`-w`|`--watch`\] \[`-S`|`--schema`\]:
   Export the specification as JSON, JSON5, YAML, TOON, HTML, PDF, or
   normalized Markdown. See `ase-spec-export`(1).
 
-- `ase spec preview` \[`-a`|`--addr` *ip-addr*\] \[`-p`|`--port` *tcp-port*\]:
+- `ase spec query` \[`-P`|`--param` *name*`=`*value*\] \[...\] \[`-f`|`--format` *format*\] \[`-o`|`--output` \[*format*`:`\]*file*\] \[`-S`|`--schema`\] *selector*:
+  Query the specification with an *ASTq* selector, writing the matched
+  nodes as JSON, JSON5, YAML, or TOON. See `ase-spec-query`(1).
+
+- `ase spec preview` \[`-a`|`--addr` *ip-addr*\] \[`-p`|`--port` *tcp-port*\] \[`-S`|`--schema`\]:
   Serve the HTML export of the specification as a live preview. See
   `ase-spec-preview`(1).
 
@@ -78,7 +98,8 @@ The group command without a sub-command exits with status `1`.
 ## SEE ALSO
 
 `ase`(1), `ase-spec-init`(1), `ase-spec-lint`(1), `ase-spec-export`(1),
-`ase-spec-preview`(1), `ase-artifact`(1), `ase-config`(1).
+`ase-spec-query`(1), `ase-spec-preview`(1), `ase-artifact`(1),
+`ase-config`(1).
 
 ## AUTHOR
 

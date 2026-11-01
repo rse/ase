@@ -25,8 +25,8 @@ hook handlers, the statusline rendering, the persisted task plan
 management (including a task store server and an interactive task
 board), the autonomous task lifecycle agents (plus their agent relay
 and fleet supervisor), the project artifact resolution, the
-*SpecBook*-based specification initializing, linting, exporting and
-previewing, and miscellaneous utilities like diagram rendering,
+*SpecBook*-based specification initializing, linting, exporting,
+querying, and previewing, and miscellaneous utilities like diagram rendering,
 identifier minting, and text measuring.
 
 Most commands are sub-command groups. Each group and each command has
@@ -100,7 +100,7 @@ The following top-level commands exist:
   `ase-artifact`(1).
 
 - `ase spec` *command* \[...\]:
-  Initialize, lint, export, and preview the *SpecBook*-based project
+  Initialize, lint, export, query, and preview the *SpecBook*-based project
   specification. See `ase-spec`(1).
 
 - `ase util` *command* \[...\]:

@@ -21,7 +21,7 @@ which provide the same) to locate the files of a kind. The recognized
 kinds are:
 
 - `spec`: the specification (by default below `docs/specbook`,
-  the files `*.{md,txt,svg,png,jpg}`).
+  the files `**/*.{md,txt,svg,png,jpg}`).
 - `code`: the source code (by default below `src`, all files
   except `**/etc/**` and `**/{.gitignore,.npmignore,package.json}`).
 - `docs`: the documentation (by default below `doc`, all files plus

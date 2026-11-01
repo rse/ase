@@ -61,6 +61,25 @@ ChangeLog
     from the other graph could show only the tail of the current one. The viewport is now kept
     within the bounds of the shown graph.
 
+-   FEATURE [code, docs]: Specification Query via SpecBook 1.6.1
+    The new CLI command `ase spec query` (with `-P`/`--param`, `-f`/`--format`, `-o`/`--output`,
+    and `-S`/`--schema`) and the new MCP tool `ase_specbook_query` (`tool/src/ase-spec.ts`) query
+    the strictly validated specification (or the effective schema configuration) through the new
+    `load()` API of SpecBook with an XPath-like ASTq selector, writing the matched nodes as JSON,
+    JSON5, YAML, or TOON. The plugin meta file `ase-format-spec.md` and the skill
+    `ase-spec-activate` point the agents onto it for structural questions about the specification.
+
+-   IMPROVEMENT [code, docs]: SpecBook 1.6 Alignment
+    For the upgrade from SpecBook 1.5.2 to 1.6.1, `project.artifact.spec.schema` passes the
+    bundled `std`, `meta`, and `pm` and the remote `npm:`, `github:`, and `http[s]://` entries
+    through to SpecBook instead of resolving them as project files, `ase spec init` got
+    `-s`/`--sample`, `ase spec export` and `ase spec preview` (and `ase_specbook_export`) got
+    `-S`/`--schema` for rendering the effective schema configuration, and the exports pass the
+    output directories of the normalized Markdown for re-basing its image references, which
+    also refuses a Markdown output below the base directory. As SpecBook now takes every `.md`
+    file below the base directory as specification, the default of `project.artifact.spec.files`
+    changed from `*.{md,txt,svg,png,jpg}` to `**/*.{md,txt,svg,png,jpg}`.
+
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
 

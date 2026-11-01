@@ -6,6 +6,7 @@
 \[`-h`|`--help`\]
 \[`-a`|`--addr` *ip-addr*\]
 \[`-p`|`--port` *tcp-port*\]
+\[`-S`|`--schema`\]
 
 ## DESCRIPTION
 
@@ -33,6 +34,10 @@ interrupted (e.g., via `CTRL+C`).
   The TCP port to listen on, an integer in the range `1`..`65535`
   (default: `12345`).
 
+- \[`-S`|`--schema`\]:
+  Preview the effective schema configuration `project.artifact.spec.schema`
+  itself, rendered as a *SpecBook* document, instead of the specification.
+
 ## EXIT STATUS
 
 Runs until interrupted. Exits with status `1` on an invalid TCP port
@@ -46,11 +51,15 @@ $ ase spec preview
 
 # serve the live preview on all interfaces on port 8080
 $ ase spec preview -a 0.0.0.0 -p 8080
+
+# serve the live preview of the schema configuration
+$ ase spec preview -S
 ```
 
 ## SEE ALSO
 
-`ase`(1), `ase-spec`(1), `ase-spec-export`(1), `ase-spec-lint`(1).
+`ase`(1), `ase-spec`(1), `ase-spec-export`(1), `ase-spec-lint`(1),
+`ase-spec-query`(1).
 
 ## AUTHOR
 

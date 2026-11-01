@@ -6,6 +6,7 @@
 \[`-h`|`--help`\]
 \[`-o`|`--output` \[*format*`:`\]*file*\] \[...\]
 \[`-w`|`--watch`\]
+\[`-S`|`--schema`\]
 
 ## DESCRIPTION
 
@@ -55,8 +56,10 @@ The MCP tool `ase_specbook_export` provides the same to the skills.
   mixes into the export on standard output. An unknown format prefix and
   a not inferable format are errors. A relative *file* is relative to the
   current working directory. Default: the HTML rendering into
-  `index.html` inside the specification base directory (e.g.,
-  `docs/specbook/index.html`).
+  `index.html` (resp. `schema.html` under `--schema`) inside the
+  specification base directory (e.g., `docs/specbook/index.html`).
+  A `md` output inside the specification base directory is refused,
+  as it would be parsed as a specification file itself.
 
 - \[`-w`|`--watch`\]:
   Do not terminate after the initial export, but keep the outputs in
@@ -66,6 +69,10 @@ The MCP tool `ase_specbook_export` provides the same to the skills.
   As a re-export has to land somewhere it can be picked up again,
   `--watch` rejects the `-` standard output. The command then runs
   until it is interrupted (e.g., via `CTRL+C`).
+
+- \[`-S`|`--schema`\]:
+  Export the effective schema configuration `project.artifact.spec.schema`
+  itself, rendered as a *SpecBook* document, instead of the specification.
 
 ## EXIT STATUS
 
@@ -88,11 +95,15 @@ $ ase spec export -o md:-
 
 # keep an HTML export in sync with the sources
 $ ase spec export -o /tmp/spec.html -w
+
+# export the schema configuration as PDF
+$ ase spec export -S -o schema.pdf
 ```
 
 ## SEE ALSO
 
-`ase`(1), `ase-spec`(1), `ase-spec-lint`(1), `ase-spec-preview`(1).
+`ase`(1), `ase-spec`(1), `ase-spec-lint`(1), `ase-spec-query`(1),
+`ase-spec-preview`(1).
 
 ## AUTHOR
 
