@@ -55,11 +55,11 @@ and where the harness touches ASE.
 ```
 npm start lint                            # eslint + tsc over src/
 npm start test                            # run all cases
-npm start test -- -c 'task/*'             # run the cases matching a glob
+npm start test -- --cases='task/*'        # run the cases matching a glob
 npm start test -- -l                      # list the discovered cases
-npm start test -- -d -c 'task/grill-*'    # describe the matched cases
+npm start test -- -d --cases='task/grill-*'  # describe the matched cases
 npm start test -- --jobs=8 --max-cost-usd=10  # 8 parallel runs, $10 ceiling
-npm start test -- -K -c 'meta/*'          # keep the sandboxes of failed runs
+npm start test -- -K --cases='meta/*'     # keep the sandboxes of failed runs
 ./run_all_tests.sh                        # run all cases, after a cost confirmation
 ./run_all_tests_local.sh [<profile>]      # run all cases against a local model gateway
 ```
@@ -67,9 +67,16 @@ npm start test -- -K -c 'meta/*'          # keep the sandboxes of failed runs
 Exit codes: `0` all cases passed, `1` a case failed its pass@k
 threshold, `2` infrastructure error or cost ceiling hit.
 
-> **Notice:** with `npm start` the option *values* must be attached with
-> `=` (`--jobs=8`, not `--jobs 8`), as stx consumes detached words as
-> task names. Invoking `node --import tsx src/ase-test.ts` directly has
+> **Notice:** stx treats every bare word after the task name as another
+> task name, so with `npm start` case globs and detached option values
+> get lost (`-c 'meta/*'` fails with "argument missing"). Inside `test/`,
+> use the `=` form (`--cases='meta/*'`, `--jobs=8`), the stx `+` prefix
+> (`npm start test -- +meta/mint-uuid`), or the stx single-task mode
+> (`npm start -- -s test -c 'meta/*' --jobs 8`). From the repository
+> root, two stx layers are involved: only the `=` form and a doubled
+> `++` prefix survive, while a single `+` or `-s` *silently* drops the
+> case filter and selects *all* cases. Invoking
+> `node --import tsx src/ase-test.ts` (or the run scripts) directly has
 > no such restriction.
 
 ## Third-Party Gateways
@@ -142,7 +149,7 @@ ordering. See the existing cases for the shapes, and
 To see the exact input (the first user turn, the fixture, and the
 simulator) and the expected output (the oracles in prose, with the
 golden/rubric files inlined) of a case, run `npm start test -- --describe`
-(optionally with `-c <glob>`) -- it is free, as no session is started.
+(optionally with `--cases=<glob>`) -- it is free, as no session is started.
 
 ### Contract
 

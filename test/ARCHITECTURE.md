@@ -23,9 +23,10 @@ flowchart LR
 All roads end in one program, `src/ase-test.ts`. *stx* is the task
 runner of the repository: `npm start <target>` runs the named target of
 the local `etc/stx.conf`, and both `test` targets merely forward. The
-two scripts call the final command directly, as *stx* would swallow
-case names and option values as target names. `--import tsx` runs the
-TypeScript source directly, so the harness needs no build step.
+two scripts call the final command directly, as *stx* treats bare case
+names and detached option values as target names (with `npm start`,
+write `--cases=<glob>` and `--jobs=8`; see `TESTS.md`). `--import tsx`
+runs the TypeScript source directly, so the harness needs no build step.
 
 ### One Test Run
 
@@ -133,9 +134,9 @@ Steps:
     ```
 
 3.  Check the case for free (no session is started):
-    `npm start test -- --describe -c 'meta/mint-uuid'`.
+    `npm start test -- --describe --cases=meta/mint-uuid`.
 4.  Run it, keeping the sandbox of a failed run for inspection:
-    `npm start test -- -K -c 'meta/mint-uuid'`.
+    `npm start test -- -K --cases=meta/mint-uuid`.
 5.  For non-deterministic skills, raise `runs` and set `minPass`
     (e.g. `runs: 3`, `minPass: 2`).
 

@@ -41,9 +41,13 @@ The scripts invoke the final command directly for three reasons:
 
 -   *stx* consumes arguments: it treats every bare word after `--` as an
     additional target name, so `npm start test -- task/grill-semantic`
-    tries to run a target of that name, and `--jobs 6` loses its value
-    (hence the `-c`/`--cases` option and the `--jobs=6` form required by
-    `TESTS.md`), while the direct call passes every argument verbatim.
+    tries to run a target of that name, and `--jobs 6` loses its value,
+    while the direct call passes every argument verbatim. *stx* offers
+    escape hatches (a `+` prefix marks a word as an argument, `-s` makes
+    all words after the first task its arguments), but through the
+    two-layer chain from the repository root only the `=` form
+    (`--cases=<glob>`, `--jobs=6`) and a doubled `++` survive -- a single
+    `+` or `-s` silently drops the case filter (see `TESTS.md`).
 -   It removes the npm → stx → npm → stx → node layering, so the startup
     is faster and errors are not wrapped into *stx* output.
 -   `--import tsx` registers *tsx* as a Node.js module loader hook, which
