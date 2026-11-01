@@ -24,6 +24,13 @@ export type OracleResult = { kind: string, pass: boolean, detail: string, scores
 export const skillErrored = (output: string[]): boolean =>
     output.some((line) => /(?:^|▶ )ERROR:/.test(line.trim()))
 
+/*  whether a skill produced any output of its own at all, recognized by the
+    "⧉ **ASE**" header or the "▶ ERROR:" line of the skill output conventions
+    (see "plugin/meta/ase-skill.md"), which separates a session crashing before
+    the skill ran (infrastructure) from a skill failing (a case failure)  */
+export const skillSpoke = (output: string[]): boolean =>
+    output.some((line) => /⧉ \*\*ASE\*\*|▶ ERROR:/.test(line))
+
 /*  quote a literal string for interpolation into a regular expression  */
 const reQuote = (text: string): string =>
     text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -101,18 +108,22 @@ const taskFile = (sandbox: Sandbox, id: string): { front: Record<string, string>
     return { front, body: m?.[2] ?? text }
 }
 
-/*  the target text of a "regex", "textMetric", or "similar" oracle, where a missing
-    target file yields null (the oracle must fail then, as matching "not" patterns or
-    length bounds against an empty string would pass vacuously)  */
-const targetText = (spec: { in?: string, file?: string }, caze: TestCase,
+/*  the target text of a "regex", "textMetric", or "similar" oracle: "lastMessage"
+    is the last assistant text block, "output" all assistant text, "dialog" the
+    user/assistant texts without tool calls (not the "transcript.md" artifact),
+    "file" a project file, and "taskBody" the body of a task plan, where a missing
+    file or task yields null (the oracle must fail then, as matching "not" patterns
+    or length bounds against an empty string would pass vacuously)  */
+const targetText = (spec: { in: string, file?: string, id?: string }, caze: TestCase,
     sandbox: Sandbox, result: SessionResult): string | null => {
-    const target = spec.in ?? "lastMessage"
-    if (target === "lastMessage")
+    if (spec.in === "lastMessage")
         return result.lastText
-    else if (target === "output")
+    else if (spec.in === "output")
         return result.output.join("\n")
-    else if (target === "transcript")
+    else if (spec.in === "dialog")
         return result.dialog.map((entry) => `${entry.role}: ${entry.text}`).join("\n")
+    else if (spec.in === "taskBody")
+        return taskFile(sandbox, spec.id!)?.body ?? null
     else {
         if (spec.file === undefined)
             throw new Error(`case "${caze.name}": oracle target "file" requires the "file" key`)
@@ -120,6 +131,10 @@ const targetText = (spec: { in?: string, file?: string }, caze: TestCase,
         return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null
     }
 }
+
+/*  the failure detail of a missing target of a "regex", "textMetric", or "similar" oracle  */
+const targetMissing = (spec: { in: string, file?: string, id?: string }): string =>
+    spec.in === "taskBody" ? `target task "${spec.id}" missing` : `target file "${spec.file}" missing`
 
 /*  evaluate all oracles of a test case against the outcome of one run  */
 export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
@@ -145,10 +160,10 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
         else if ("regex" in oracle) {
             const text = targetText(oracle.regex, caze, sandbox, result)
             if (text === null) {
-                results.push({ kind: "regex", pass: false, detail: `target file missing: ${oracle.regex.file}` })
+                results.push({ kind: "regex", pass: false, detail: targetMissing(oracle.regex) })
                 continue
             }
-            const flags   = oracle.regex.flags ?? "m"
+            const flags   = oracle.regex.flags
             const missing = asList(oracle.regex.match).filter((re) => !new RegExp(re, flags).test(text))
             const illegal = asList(oracle.regex.not).filter((re) => new RegExp(re, flags).test(text))
             results.push({
@@ -227,7 +242,7 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
             const spec = oracle.textMetric
             const text = targetText(spec, caze, sandbox, result)
             if (text === null) {
-                results.push({ kind: "textMetric", pass: false, detail: `target file missing: ${spec.file}` })
+                results.push({ kind: "textMetric", pass: false, detail: targetMissing(spec) })
                 continue
             }
             const chars = text.length
@@ -244,16 +259,16 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
         }
         else if ("exec" in oracle) {
             const spec    = oracle.exec
-            const timeout = (spec.timeoutSec ?? 10) * 1000
+            const timeout = spec.timeoutSec * 1000
             const norm    = (text: string): string =>
                 text.split("\n").map((line) => line.replace(/\s+$/, "")).join("\n").replace(/\n+$/, "")
             const run     = (command: string, cwd: string, input: string) =>
                 execa(command, { shell: true, cwd, env: sandbox.env, extendEnv: false, input, timeout, reject: false })
             const faults: string[] = []
             for (const [ index, input ] of spec.stdin.entries()) {
-                const expected = await run(spec.oracle, caze.dir, input)
+                const expected = await run(spec.reference, caze.dir, input)
                 if (expected.exitCode !== 0) {
-                    faults.push(`vector ${index}: oracle command failed (exit ${expected.exitCode})`)
+                    faults.push(`vector ${index}: reference command failed (exit ${expected.exitCode})`)
                     continue
                 }
                 const actual = await run(spec.command, sandbox.project, input)
@@ -273,24 +288,12 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
             results.push(await judgeRubric(sandbox, result, oracle.rubric))
         else if ("similar" in oracle) {
             const spec = oracle.similar
-            if ((spec.in ?? "lastMessage") === "taskBody") {
-                const task = taskFile(sandbox, spec.id!)
-                if (task === null) {
-                    results.push({ kind: "similar", pass: false, detail: `task "${spec.id}" missing` })
-                    continue
-                }
-                results.push(await judgeSimilar(sandbox,
-                    fs.readFileSync(spec.expected, "utf8"), task.body, spec))
+            const text = targetText(spec, caze, sandbox, result)
+            if (text === null) {
+                results.push({ kind: "similar", pass: false, detail: targetMissing(spec) })
+                continue
             }
-            else {
-                const text = targetText(spec, caze, sandbox, result)
-                if (text === null) {
-                    results.push({ kind: "similar", pass: false, detail: "target file missing" })
-                    continue
-                }
-                results.push(await judgeSimilar(sandbox,
-                    fs.readFileSync(spec.expected, "utf8"), text, spec))
-            }
+            results.push(await judgeSimilar(sandbox, fs.readFileSync(spec.expected, "utf8"), text, spec))
         }
     }
     return results

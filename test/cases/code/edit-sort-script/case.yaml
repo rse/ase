@@ -22,8 +22,8 @@ oracles:
         - "\\bsorted\\s*\\("
         - "\\.sort\\s*\\("
   - exec:
-      command: "python3 sort.py"
-      oracle:  "python3 oracle.py"
+      command:   "python3 sort.py"
+      reference: "python3 oracle.py"
       stdin:
         - "3\n1\n2\n"
         - "10\n-5\n10\n0\n"

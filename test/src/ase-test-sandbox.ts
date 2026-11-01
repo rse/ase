@@ -73,10 +73,12 @@ const sandboxPopulate = async (caze: TestCase, root: string): Promise<Sandbox> =
     await fs.promises.mkdir(path.join(home, ".claude"),  { recursive: true })
     await fs.promises.mkdir(path.join(project, ".ase"),  { recursive: true })
 
-    /*  the sandboxed environment: a controlled HOME and XDG directories, the built
-        "ase" CLI on the PATH (required by the MCP server of the plugin), no
-        inherited agent tool, ASE, tmux, or Copilot state, and no common credential
-        variables of the developer's shell (the session runs autonomous skill code)  */
+    /*  the sandboxed environment, assembled in three passes with the final policy:
+        (1) everything of the developer's shell EXCEPT agent tool, ASE, tmux, and
+        Copilot state and common credential variables (the session runs autonomous
+        skill code), plus a controlled HOME and XDG directories and the built "ase"
+        CLI on the PATH (required by the MCP server of the plugin); (2) PLUS exactly
+        one agent tool credential; (3) PLUS the optional gateway endpoint and tuning  */
     const env: Record<string, string> = {}
     for (const [ key, value ] of Object.entries(process.env))
         if (value !== undefined && !/^(TMUX|COPILOT_|ASE_|CLAUDE|ANTHROPIC_|GITHUB_|GH_|AWS_|NPM_TOKEN$|NODE_AUTH_TOKEN$|OPENAI_|GOOGLE_|GEMINI_)/.test(key))

@@ -19,7 +19,7 @@ import type { Sandbox }                    from "./ase-test-sandbox.js"
 import { runSession }                      from "./ase-test-session.js"
 import { simulatorCreate }                 from "./ase-test-simulator.js"
 import { transcriptOpen, transcriptFinish } from "./ase-test-transcript.js"
-import { oraclesRun, changesetDiff }       from "./ase-test-oracle.js"
+import { oraclesRun, changesetDiff, skillSpoke } from "./ase-test-oracle.js"
 import { describeCase }                    from "./ase-test-describe.js"
 import { reportRun, reportSummary }        from "./ase-test-report.js"
 import type { RunOutcome, CaseOutcome }    from "./ase-test-report.js"
@@ -32,7 +32,7 @@ program
     .argument("[globs...]", "case name globs to run (default: all cases)")
     .option("-c, --cases <glob...>", "case name globs to run (for \"npm start test\", " +
         "whose positional words stx consumes as task names)")
-    .option("-j, --jobs <n>", "number of parallel runs", "4")
+    .option("-j, --jobs <n>", "number of parallel runs (default: $ASE_TEST_JOBS, else 4)")
     .option("-l, --list", "list the discovered cases and exit", false)
     .option("-d, --describe", "describe the matched cases (input, fixture, simulator, oracles) and exit", false)
     .option("-k, --keep", "keep the sandboxes of all runs", false)
@@ -80,7 +80,9 @@ if (opts.describe) {
     process.exit(0)
 }
 
-/*  preflight: the fully built tool (the "ase" CLI of the plugin MCP server) and credentials  */
+/*  preflight: the fully built tool (the "ase" CLI of the plugin MCP server) and credentials,
+    where the Vite-built web board client is the artifact of the last build stage (the
+    service crash-loops on its absence, so "dst/ase.js" alone proves too little)  */
 for (const file of [ "dst/ase.js", "dst/ase-task-board-web-client.html" ])
     if (!fs.existsSync(path.join(repoRoot, "tool", file))) {
         console.error(chalk.red(`tool is not fully built ("tool/${file}" missing) -- run: cd tool && npm start build`))
@@ -98,18 +100,23 @@ const timestamp  = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)
 const resultsDir = opts.results !== undefined ?
     path.resolve(opts.results) : path.join(repoRoot, "test", "results", timestamp)
 
-/*  the global budget state (non-numeric option values must never silently
-    disable the ceiling or starve the worker pool)  */
+/*  the global budget state and the parallelism, where the jobs default is resolved
+    only here, after the LLM gateway profile could set "ASE_TEST_JOBS" (non-numeric
+    values must never silently disable the ceiling or starve the worker pool)  */
 const maxCostUsd = Number(opts.maxCostUsd)
-const jobs       = Number(opts.jobs)
+const jobsValue  = opts.jobs ?? process.env.ASE_TEST_JOBS ?? "4"
+const jobs       = Number(jobsValue)
 if (!Number.isFinite(maxCostUsd) || maxCostUsd <= 0) {
     console.error(chalk.red(`invalid --max-cost-usd value: "${opts.maxCostUsd}"`))
     process.exit(2)
 }
 if (!Number.isInteger(jobs) || jobs < 1) {
-    console.error(chalk.red(`invalid --jobs value: "${opts.jobs}"`))
+    console.error(chalk.red(`invalid --jobs resp. $ASE_TEST_JOBS value: "${jobsValue}"`))
     process.exit(2)
 }
+
+/*  the money actually booked against the ceiling, and the reason why scheduling
+    stopped ("" while it did not, so the string doubles as the stop flag)  */
 let totalUsd = 0
 let aborted  = ""
 
@@ -141,9 +148,7 @@ Promise<{ outcome: RunOutcome, retry: boolean }> => {
         /*  an infrastructure failure is a crash without any skill output -- a
             timeout is never one, as retrying the most expensive failure mode
             would double the spend of a merely too slow case  */
-        const infra = result.errored && !result.timedOut
-            && result.failure.startsWith("session crashed")
-            && !result.output.some((line) => /⧉ \*\*ASE\*\*|▶ ERROR:/.test(line))
+        const infra = result.crashed && !result.timedOut && !skillSpoke(result.output)
         if (infra) {
             outcome.outcome = "error"
             outcome.failure = result.failure
@@ -206,8 +211,10 @@ const executeRun = async (caze: TestCase, run: number): Promise<RunOutcome> => {
     console.log(chalk.yellow(`⚠ ${caze.name} run ${run}: ${first.outcome.failure} -- retrying once`))
     const second = await executeAttempt(caze, run, true)
 
-    /*  carry the first attempt's spend into the reported outcome,
-        so the per-run costs of the summary sum up to the total  */
+    /*  carry the first attempt's spend into the reported outcome (the per-run costs
+        report the measured spend, a lower bound after a timeout or crash, while the
+        global total books such runs pessimistically at their full budget, so both
+        sums agree only when every cost was accurate)  */
     second.outcome.costUsd += first.outcome.costUsd
     return second.outcome
 }

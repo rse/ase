@@ -11,7 +11,6 @@ import chalk     from "chalk"
 
 import type { TestCase, OracleSpec } from "./ase-test-case.js"
 import { skillPrompt }               from "./ase-test-session.js"
-import { scriptLoad }                from "./ase-test-simulator.js"
 
 /*  normalize a string-or-list oracle value into a list  */
 const asList = (value: string | string[] | undefined): string[] =>
@@ -44,8 +43,7 @@ const describeOracle = (caze: TestCase, oracle: OracleSpec): string[] => {
     else if ("verdict" in oracle)
         lines.push(`    - verdict after label "${oracle.verdict.label}" is "${oracle.verdict.expect}"`)
     else if ("regex" in oracle) {
-        const target = oracle.regex.in === "file" ?
-            `file "${oracle.regex.file ?? "?"}"` : (oracle.regex.in ?? "lastMessage")
+        const target = oracle.regex.in === "file" ? `file "${oracle.regex.file ?? "?"}"` : oracle.regex.in
         const match  = asList(oracle.regex.match)
         const not    = asList(oracle.regex.not)
         if (match.length > 0)
@@ -86,7 +84,7 @@ const describeOracle = (caze: TestCase, oracle: OracleSpec): string[] => {
     }
     else if ("textMetric" in oracle) {
         const spec   = oracle.textMetric
-        const target = spec.in === "file" ? `file "${spec.file ?? "?"}"` : (spec.in ?? "lastMessage")
+        const target = spec.in === "file" ? `file "${spec.file ?? "?"}"` : spec.in
         const bounds: string[] = []
         if (spec.minChars !== undefined) bounds.push(`>= ${spec.minChars} chars`)
         if (spec.maxChars !== undefined) bounds.push(`<= ${spec.maxChars} chars`)
@@ -96,22 +94,22 @@ const describeOracle = (caze: TestCase, oracle: OracleSpec): string[] => {
     }
     else if ("exec" in oracle) {
         lines.push(`    - output of "${oracle.exec.command}" (in the project) matches the output of ` +
-            `"${oracle.exec.oracle}" (the oracle code, in the case directory) for ` +
+            `"${oracle.exec.reference}" (the oracle code, in the case directory) for ` +
             `${oracle.exec.stdin.length} stdin vector(s):`)
         for (const input of oracle.exec.stdin)
             lines.push(`        ${JSON.stringify(input)}`)
     }
     else if ("rubric" in oracle) {
         lines.push(`    - LLM judge scores the output against rubric "${path.relative(caze.dir, oracle.rubric.file)}" ` +
-            `(threshold: ${(oracle.rubric.threshold ?? 0.7).toFixed(2)}, votes: ${oracle.rubric.votes ?? 3}):`)
+            `(threshold: ${oracle.rubric.threshold.toFixed(2)}, votes: ${oracle.rubric.votes}):`)
         fileBlock(oracle.rubric.file)
     }
     else if ("similar" in oracle) {
-        const target = (oracle.similar.in ?? "lastMessage") === "taskBody" ?
-            `task "${oracle.similar.id ?? "?"}" body` : (oracle.similar.in ?? "lastMessage")
+        const target = oracle.similar.in === "taskBody" ?
+            `task "${oracle.similar.id ?? "?"}" body` : oracle.similar.in
         lines.push(`    - LLM judge scores ${target} as semantically similar to ` +
             `"${path.relative(caze.dir, oracle.similar.expected)}" ` +
-            `(threshold: ${(oracle.similar.threshold ?? 0.7).toFixed(2)}, votes: ${oracle.similar.votes ?? 3}):`)
+            `(threshold: ${oracle.similar.threshold.toFixed(2)}, votes: ${oracle.similar.votes}):`)
         fileBlock(oracle.similar.expected)
     }
     return lines
@@ -145,7 +143,7 @@ export const describeCase = (caze: TestCase): string => {
     lines.push(`    fixture:   ${fixture.join(", ")}`)
     if (caze.turns !== null) {
         if (caze.turns.simulator === "scripted") {
-            const script = scriptLoad(caze.turns.script, caze.name)
+            const script = caze.turns.scriptData!
             lines.push(`    simulator: scripted "${path.relative(caze.dir, caze.turns.script)}" ` +
                 `(rules: ${script.rules?.length ?? 0}` +
                 (script.default !== undefined ? `, default: "${script.default}"` : "") +

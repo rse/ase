@@ -14,9 +14,11 @@ import type { Sandbox } from "./ase-test-sandbox.js"
 const LLM_TIMEOUT_MS = 120 * 1000
 
 /*  a single-shot, tool-less LLM text completion for the user simulator and the
-    rubric judge: with an API key the plain Anthropic SDK is used directly, else
-    the completion runs through the Agent SDK, whose process authenticates with
-    the same (OAuth) credentials of the sandboxed HOME as the tested sessions  */
+    rubric judge: with an API key the plain Anthropic SDK is used directly (cheap,
+    no subprocess per judge vote), else the completion runs through the Agent SDK,
+    whose process authenticates with the same (OAuth) credentials of the sandboxed
+    HOME as the tested sessions -- both paths are needed, as the plain SDK cannot
+    authenticate with OAuth credentials at all  */
 export const llmText = async (sandbox: Sandbox, model: string,
     system: string, prompt: string): Promise<string> => {
     const abort = new AbortController()

@@ -10,11 +10,13 @@ import * as path from "node:path"
 import { z }     from "zod"
 import YAML      from "yaml"
 
-import { scriptLoad } from "./ase-test-simulator.js"
+import { scriptLoad }  from "./ase-test-simulator.js"
+import type { Script } from "./ase-test-simulator.js"
 
 /*  the oracle specifications: each oracle is an object with exactly one key
     naming the oracle kind, mirroring the evaluation criteria of the agent
-    engine (see "tool/src/ase-agent-runtime-engine.ts", "DefinedCore.evaluate")  */
+    engine (see "tool/src/ase-agent-runtime-engine.ts", "DefinedCore.evaluate"),
+    where all oracle defaults live here only (the parsed specs are complete)  */
 const oracleSchema = z.union([
 
     /*  the skill reported no "▶ ERROR:" line (see "skillErrored" of
@@ -32,9 +34,9 @@ const oracleSchema = z.union([
     /*  regular expressions which must (not) match a target text  */
     z.strictObject({
         regex: z.strictObject({
-            in:           z.enum([ "lastMessage", "output", "transcript", "file" ]).optional(),
+            in:           z.enum([ "lastMessage", "output", "dialog", "file" ]).default("lastMessage"),
             file:         z.string().optional(),
-            flags:        z.string().optional(),
+            flags:        z.string().default("m"),
             match:        z.union([ z.string(), z.array(z.string()) ]).optional(),
             not:          z.union([ z.string(), z.array(z.string()) ]).optional()
         })
@@ -69,7 +71,7 @@ const oracleSchema = z.union([
     /*  length metrics of a target text  */
     z.strictObject({
         textMetric: z.strictObject({
-            in:           z.enum([ "lastMessage", "output", "file" ]).optional(),
+            in:           z.enum([ "lastMessage", "output", "file" ]).default("lastMessage"),
             file:         z.string().optional(),
             minChars:     z.number().int().optional(),
             maxChars:     z.number().int().optional(),
@@ -79,13 +81,14 @@ const oracleSchema = z.union([
     }),
 
     /*  a behavioral comparison: a command run in the sandbox project must produce
-        the same stdout as a case-local oracle command for every stdin vector  */
+        the same stdout as a case-local reference command (the "oracle code", run
+        in the case directory) for every stdin vector  */
     z.strictObject({
         exec: z.strictObject({
             command:      z.string(),
-            oracle:       z.string(),
+            reference:    z.string(),
             stdin:        z.array(z.string()).min(1),
-            timeoutSec:   z.number().int().min(1).optional()
+            timeoutSec:   z.number().int().min(1).default(10)
         })
     }),
 
@@ -93,8 +96,8 @@ const oracleSchema = z.union([
     z.strictObject({
         rubric: z.strictObject({
             file:         z.string(),
-            threshold:    z.number().min(0).max(1).optional(),
-            votes:        z.number().int().min(1).optional()
+            threshold:    z.number().min(0).max(1).default(0.7),
+            votes:        z.number().int().min(1).default(3)
         })
     }),
 
@@ -103,10 +106,10 @@ const oracleSchema = z.union([
     z.strictObject({
         similar: z.strictObject({
             expected:     z.string(),
-            in:           z.enum([ "lastMessage", "output", "transcript", "taskBody" ]).optional(),
+            in:           z.enum([ "lastMessage", "output", "dialog", "taskBody" ]).default("lastMessage"),
             id:           z.string().optional(),
-            threshold:    z.number().min(0).max(1).optional(),
-            votes:        z.number().int().min(1).optional()
+            threshold:    z.number().min(0).max(1).default(0.7),
+            votes:        z.number().int().min(1).default(3)
         })
     })
 ])
@@ -116,7 +119,7 @@ export type OracleSpec = z.infer<typeof oracleSchema>
 const caseSchema = z.strictObject({
     skill:      z.string().optional(),
     args:       z.string().optional(),
-    prompt:     z.string().optional(),
+    promptFile: z.string().optional(),
     runs:       z.number().int().min(1).optional(),
     minPass:    z.number().int().min(1).optional(),
     timeoutSec: z.number().int().min(1).optional(),
@@ -161,6 +164,7 @@ export type TestCase = {
     turns: {
         simulator:  "scripted" | "llm"
         script:     string
+        scriptData: Script | null
         persona:    string
         model:      string
         maxTurns:   number
@@ -177,8 +181,10 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
     if (!raw.success)
         throw new Error(`case "${name}": invalid "case.yaml": ${z.prettifyError(raw.error)}`)
     const spec = raw.data
-    if ((spec.skill === undefined) === (spec.prompt === undefined))
-        throw new Error(`case "${name}": exactly one of "skill" or "prompt" is required`)
+
+    /*  exactly one of the two inputs: both set or both unset is an error  */
+    if ((spec.skill === undefined) === (spec.promptFile === undefined))
+        throw new Error(`case "${name}": exactly one of "skill" or "promptFile" is required`)
     const resolve = (ref: string, kind: string): string => {
         const resolved = path.resolve(dir, ref)
         if (!resolved.startsWith(dir + path.sep))
@@ -197,7 +203,8 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
         dir,
         skill:      spec.skill ?? "",
         args:       spec.args ?? "",
-        prompt:     spec.prompt !== undefined ? fs.readFileSync(resolve(spec.prompt, "prompt"), "utf8").trim() : "",
+        prompt:     spec.promptFile !== undefined ?
+            fs.readFileSync(resolve(spec.promptFile, "prompt"), "utf8").trim() : "",
         runs,
         minPass:    spec.minPass ?? runs,
         timeoutSec: spec.timeoutSec ?? 300,
@@ -212,6 +219,7 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
         turns: spec.turns !== undefined ? {
             simulator:  spec.turns.simulator,
             script:     spec.turns.script  !== undefined ? resolve(spec.turns.script,  "script")  : "",
+            scriptData: spec.turns.script  !== undefined ? scriptLoad(resolve(spec.turns.script, "script"), name) : null,
             persona:    spec.turns.persona !== undefined ? resolve(spec.turns.persona, "persona") : "",
             model:      spec.turns.model ?? "",
             maxTurns:   spec.turns.maxTurns ?? 16
@@ -220,7 +228,7 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
             if ("rubric" in oracle)
                 return { rubric: { ...oracle.rubric, file: resolve(oracle.rubric.file, "rubric") } }
             else if ("similar" in oracle) {
-                if ((oracle.similar.in ?? "lastMessage") === "taskBody" && oracle.similar.id === undefined)
+                if (oracle.similar.in === "taskBody" && oracle.similar.id === undefined)
                     throw new Error(`case "${name}": similar oracle target "taskBody" requires the "id" key`)
                 return { similar: { ...oracle.similar, expected: resolve(oracle.similar.expected, "expected") } }
             }
@@ -228,8 +236,6 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
         })
     }
     caseCheckRes(result)
-    if (result.turns?.simulator === "scripted")
-        scriptLoad(result.turns.script, name)
     return result
 }
 
@@ -254,7 +260,7 @@ const caseCheckRes = (caze: TestCase): void => {
     for (const oracle of caze.oracles) {
         if ("regex" in oracle)
             check([ ...asList(oracle.regex.match), ...asList(oracle.regex.not) ],
-                oracle.regex.flags ?? "m", "regex oracle")
+                oracle.regex.flags, "regex oracle")
         else if ("gitDiff" in oracle)
             check([ ...(oracle.gitDiff.mustMatch ?? []), ...(oracle.gitDiff.mustNotMatch ?? []) ],
                 "m", "gitDiff oracle")

@@ -18,7 +18,7 @@ oracles:
       match:
         - "GRILLING"
   - regex:
-      in: transcript
+      in: dialog
       match:
         - "alternative A"
   - taskStore:

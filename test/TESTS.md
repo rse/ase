@@ -55,6 +55,8 @@ npm start test -- -l                      # list the discovered cases
 npm start test -- -d -c 'task/grill-*'    # describe the matched cases
 npm start test -- --jobs=8 --max-cost-usd=10  # 8 parallel runs, $10 ceiling
 npm start test -- -K -c 'meta/*'          # keep the sandboxes of failed runs
+./run_all_tests.sh                        # run all cases, after a cost confirmation
+./run_all_tests_local.sh [<profile>]      # run all cases against a local model gateway
 ```
 
 Exit codes: `0` all cases passed, `1` a case failed its pass@k
@@ -90,9 +92,15 @@ defaults (`claude-haiku-5-5` for judge and simulator) and per-case
 should alias the `claude-*` model names onto its local model (in
 LiteLLM: several `model_name` entries pointing to the same deployment).
 Alternatively `ASE_TEST_MODEL`, `ASE_TEST_JUDGE_MODEL` and
-`ASE_TEST_SIM_MODEL` can be set in the profile.
+`ASE_TEST_SIM_MODEL` can be set in the profile. A profile can also set
+`ASE_TEST_JOBS` (the default of `--jobs`), e.g. `1` to serialize the
+runs for a single locally served model.
 
 Caveats in gateway mode:
+
+-   a full suite run against a locally served model can take more than
+    an hour, as local generation is far slower and the runs are usually
+    serialized (`ASE_TEST_JOBS=1`)
 
 -   cost accounting (`total_cost_usd`) is meaningless for models
     unknown to the agent tool, so the per-case `budget.maxUsd`, the
@@ -107,28 +115,84 @@ Caveats in gateway mode:
 ## Cases
 
 A case is a directory `cases/<group>/<name>/` with a `case.yaml`
-declaring the skill and arguments (or a free-text prompt), the number
-of runs and the pass@k threshold (`runs`/`minPass`), the per-run budget,
-the fixture (Git repository, ASE configuration, seeded task store, file
-tree), the optional interactive turns (a scripted `answers.yaml` or an
-LLM-driven persona), and the oracles (`notErrored`, `verdict`, `regex`,
-`fileExists`, `gitDiff`, `taskStore`, `textMetric`, `exec`, `rubric`,
-and `similar`). The `exec` oracle compares behavior instead of text: a
-command run in the sandbox project (e.g. a generated program) must
-produce the same stdout as a case-local oracle command (a reference
-implementation, run in the case directory) for every declared stdin
-vector. The `similar` oracle checks against a golden expected
-output: a separate file in the case directory states the decisions,
-facts, and constraints the result must carry, and an LLM judge scores
-the semantic similarity of the actual result (the skill output, the
-transcript, or the final task plan body via `in: taskBody`) against it,
-ignoring wording, structure, and ordering. See the existing cases for
-the shapes, and `src/ase-test-case.ts` for the authoritative schema.
+declaring the skill and arguments (or, via `promptFile`, a file holding
+a free-text prompt), the number of runs and the pass@k threshold
+(`runs`/`minPass`), the per-run budget, the fixture (Git repository,
+ASE configuration, seeded task store, file tree), the optional
+interactive turns (a scripted `answers.yaml` or an LLM-driven persona),
+and the oracles (`notErrored`, `verdict`, `regex`, `fileExists`,
+`gitDiff`, `taskStore`, `textMetric`, `exec`, `rubric`, and `similar`).
+The `exec` oracle compares behavior instead of text: a command run in
+the sandbox project (e.g. a generated program) must produce the same
+stdout as a case-local `reference` command (the "oracle code", run in
+the case directory) for every declared stdin vector. The `similar`
+oracle checks against a golden expected output: a separate file in the
+case directory states the decisions, facts, and constraints the result
+must carry, and an LLM judge scores the semantic similarity of the
+actual result (the skill output, the dialog, or the final task plan
+body via `in: taskBody`) against it, ignoring wording, structure, and
+ordering. See the existing cases for the shapes, and
+`src/ase-test-case.ts` for the authoritative schema.
 
 To see the exact input (the first user turn, the fixture, and the
 simulator) and the expected output (the oracles in prose, with the
 golden/rubric files inlined) of a case, run `npm start test -- --describe`
 (optionally with `-c <glob>`) -- it is free, as no session is started.
+
+### Contract
+
+The defaults of an omitted `case.yaml` key:
+
+| Key                                       | Default            | Note                                          |
+|-------------------------------------------|--------------------|-----------------------------------------------|
+| `runs`                                    | `1`                |                                               |
+| `minPass`                                 | `runs`             | i.e., by default *all* runs must pass         |
+| `timeoutSec`                              | `300`              | wall-clock limit of one session               |
+| `budget.maxUsd`                           | `2.00`             | per run, see the budget layers below          |
+| `turns.maxTurns`                          | `16`               | *user* turns (the agentic turn cap is 4×)     |
+| `turns.model`                             | `claude-haiku-5-5` | resp. `$ASE_TEST_SIM_MODEL`                   |
+| `in` (`regex`, `textMetric`, `similar`)   | `lastMessage`      |                                               |
+| `regex.flags`                             | `m`                | a JavaScript regex: no inline `(?i)`          |
+| `threshold`/`votes` (`rubric`, `similar`) | `0.7`/`3`          | judge model resp. `$ASE_TEST_JUDGE_MODEL`     |
+| `exec.timeoutSec`                         | `10`               | per command execution                         |
+
+The oracle targets (`in`): `lastMessage` is the last assistant text
+block, `output` all assistant text, `dialog` the user/assistant texts
+*without* tool calls (not the `transcript.md` artifact, which records
+everything), `file` a project file (with `file:`), and `taskBody` the
+body of a task plan (with `id:`, `similar` only). A missing target file
+or task fails the oracle. The `exec` oracle runs both commands with the
+sandbox environment and compares stdout with trailing whitespace
+stripped; a failing `reference` command reports a case bug.
+
+The LLM judges cast `votes` independent votes, each scoring 0.0 to 1.0,
+and pass when the majority reaches the `threshold`; when the majority
+of the votes is unparsable, the oracle reports a malfunctioning judge
+instead of a quality failure.
+
+The scripted simulator matches its `rules` against a question plus its
+option labels (for an `AskUserQuestion` call) resp. against the last
+assistant message (for a free-text turn); unmatched questions take the
+`default`, else the first option, else `proceed`, and a free-text turn
+matching `end:` (or lacking a `default`) ends the session. The LLM
+simulator ends the session by replying `<<END>>`. Every other
+permission request of the session is allowed.
+
+The money is guarded in three layers: the agent tool aborts a session
+at `budget.maxUsd` itself, a run exceeding `budget.maxUsd` fails even
+when all its oracles pass, and the global `--max-cost-usd` ceiling
+stops scheduling further runs (in-flight runs complete). A run whose
+cost is inaccurate (a timeout or crash before the final result message)
+is booked at its full budget against the ceiling, while its reported
+cost stays the measured lower bound.
+
+A session crashing before the skill produced any output is an
+infrastructure error and retried exactly once, into its own
+`run-<n>-retry/` artifact directory, with both attempts' costs merged
+into the reported run; a timeout is never retried, as it is the most
+expensive failure mode. The exit code is `2` for a hit ceiling, else
+`1` for a failed case, else `2` for any infrastructure error or skipped
+run, else `0`.
 
 ## Sandboxing
 

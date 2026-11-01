@@ -22,7 +22,9 @@ export type SessionRecord = {
 
 /*  the outcome of one session run ("costUsd" is only a lower bound of the real
     spend when "costAccurate" is false, as a timed-out or crashed session may
-    never deliver the final result message carrying the cost of its last turn)  */
+    never deliver the final result message carrying the cost of its last turn;
+    "turns" counts the result messages, i.e. the completed agentic turns, not
+    the user turns of the "turns.maxTurns" case setting)  */
 export type SessionResult = {
     output:       string[]
     lastText:     string
@@ -33,6 +35,7 @@ export type SessionResult = {
     costAccurate: boolean
     turns:        number
     errored:      boolean
+    crashed:      boolean
     timedOut:     boolean
     failure:      string
 }
@@ -53,12 +56,15 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
     simulator: Simulator | null, record: SessionRecord): Promise<SessionResult> => {
     const result: SessionResult = {
         output: [], lastText: "", dialog: [], sessionId: "", model: "",
-        costUsd: 0, costAccurate: true, turns: 0, errored: false, timedOut: false, failure: ""
+        costUsd: 0, costAccurate: true, turns: 0, errored: false, crashed: false, timedOut: false, failure: ""
     }
     const prompt = caze.skill !== "" ? skillPrompt(caze.skill, caze.args) : caze.prompt
 
     /*  the streaming input queue: user messages are pushed as the conversation
-        unfolds, and a null entry ends the input stream (and with it the session)  */
+        unfolds, and a null entry ends the input stream (and with it the session);
+        the queue is fed only from the output loop below, whose "result" message
+        marks the end of one agentic turn and is the only place to inject the next
+        user turn (the single "notify" slot suffices for the single consumer)  */
     const pending: (SDKUserMessage | null)[] = []
     let notify: (() => void) | null = null
     const push = (msg: SDKUserMessage | null) => {
@@ -93,7 +99,9 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
     }, caze.timeoutSec * 1000)
 
     /*  the session options: the working-copy plugin, the sandboxed environment and
-        settings, automatically classified permissions, and a hard budget and turn cap  */
+        settings, automatically classified permissions, and a hard budget and turn cap
+        (the SDK "maxTurns" counts agentic turns: a generous 4 per allowed user turn,
+        resp. 32 for a single-shot session, as a mere runaway backstop)  */
     const options: Options = {
         cwd:             sandbox.project,
         env:             sandbox.env,
@@ -105,6 +113,10 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
         abortController: abort,
         stderr:          record.onStderr,
         ...(process.env.ASE_TEST_MODEL !== undefined ? { model: process.env.ASE_TEST_MODEL } : {}),
+
+        /*  an "AskUserQuestion" call is answered by allowing it with the simulator's
+            answers injected into its input (pre-supplied answers skip the interactive
+            dialog), while every other permission request is blanket-allowed  */
         ...(simulator === null ? { disallowedTools: [ "AskUserQuestion" ] } : {
             canUseTool: async (toolName, toolInput) => {
                 if (toolName === "AskUserQuestion") {
@@ -177,6 +189,7 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
     }
     catch (err) {
         result.errored      = true
+        result.crashed      = !result.timedOut
         result.costAccurate = false
         result.failure      = result.timedOut ? `timeout after ${caze.timeoutSec}s` :
             `session crashed: ${err instanceof Error ? err.message : String(err)}`

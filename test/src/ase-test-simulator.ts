@@ -65,12 +65,21 @@ export const scriptLoad = (file: string, name: string): Script => {
     return parsed.data
 }
 
-/*  the scripted simulator: deterministic regular-expression rules  */
+/*  the answer to a question of an intercepted "AskUserQuestion" call when neither
+    a rule nor the script default matched and the question offers no options  */
+const FALLBACK_ANSWER = "proceed"
+
+/*  the scripted simulator: deterministic regular-expression rules, matched against
+    a question plus its option labels (for an "AskUserQuestion" call) resp. against
+    the last assistant message (for a free-text turn), with the script parsed and
+    validated once at case load time  */
 const scriptedSimulator = (caze: TestCase): Simulator => {
-    const script = scriptLoad(caze.turns!.script, caze.name)
-    const match = (text: string): string | null => {
-        for (const rule of script.rules ?? [])
-            if (new RegExp(rule.when, "s").test(text))
+    const script = caze.turns!.scriptData!
+    const rules  = (script.rules ?? []).map((rule) => ({ when: new RegExp(rule.when, "s"), answer: rule.answer }))
+    const end    = script.end !== undefined ? new RegExp(script.end, "s") : null
+    const match  = (text: string): string | null => {
+        for (const rule of rules)
+            if (rule.when.test(text))
                 return rule.answer
         return script.default ?? null
     }
@@ -79,7 +88,7 @@ const scriptedSimulator = (caze: TestCase): Simulator => {
             const answers: Record<string, string> = {}
             for (const question of questions) {
                 const scope = [ question.question, ...(question.options ?? []).map((o) => o.label) ].join("\n")
-                answers[question.question] = match(scope) ?? question.options?.[0]?.label ?? "proceed"
+                answers[question.question] = match(scope) ?? question.options?.[0]?.label ?? FALLBACK_ANSWER
             }
             return answers
         },
@@ -87,7 +96,7 @@ const scriptedSimulator = (caze: TestCase): Simulator => {
             const last = dialog.filter((entry) => entry.role === "assistant").at(-1)
             if (last === undefined)
                 return null
-            if (script.end !== undefined && new RegExp(script.end, "s").test(last.text))
+            if (end !== null && end.test(last.text))
                 return null
             return match(last.text)
         }
@@ -128,7 +137,7 @@ const llmSimulator = (caze: TestCase, sandbox: Sandbox): Simulator => {
                     `${question.question}\n${options !== "" ? `Options:\n${options}\n` : ""}` +
                     "Reply with the chosen option label or a short free-text answer only.")
                 answers[question.question] = reply !== "" && reply !== END_TOKEN ?
-                    reply : (question.options?.[0]?.label ?? "proceed")
+                    reply : (question.options?.[0]?.label ?? FALLBACK_ANSWER)
             }
             return answers
         },

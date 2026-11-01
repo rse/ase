@@ -61,7 +61,7 @@ Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
 
 /*  judge the output of one run against a rubric  */
 export const judgeRubric = async (sandbox: Sandbox, result: SessionResult,
-    spec: { file: string, threshold?: number, votes?: number }):
+    spec: { file: string, threshold: number, votes: number }):
 Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
     const rubric = fs.readFileSync(spec.file, "utf8")
     const output = result.output.join("\n").slice(0, TEXT_MAX)
@@ -71,7 +71,7 @@ Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
         "Respond with a single JSON object of the form { \"score\": <number>, \"reason\": \"<one sentence>\" } " +
         "only, without using any tools."
     const prompt = `# Rubric\n\n${rubric}\n\n# Output Under Evaluation\n\n${output}`
-    return judgeVotes(sandbox, system, prompt, spec.threshold ?? 0.7, spec.votes ?? 3, "rubric")
+    return judgeVotes(sandbox, system, prompt, spec.threshold, spec.votes, "rubric")
 }
 
 /*  judge the semantic similarity of the actual text of one run against the golden
@@ -79,7 +79,7 @@ Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
     structure, ordering, and extra elaboration do not  */
 export const judgeSimilar = async (sandbox: Sandbox,
     expectedText: string, actualText: string,
-    spec: { threshold?: number, votes?: number }):
+    spec: { threshold: number, votes: number }):
 Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
     const system =
         "You are a strict, impartial evaluator of the semantic similarity of two texts: " +
@@ -94,5 +94,5 @@ Promise<{ kind: string, pass: boolean, detail: string, scores?: number[] }> => {
     const prompt =
         `# EXPECTED\n\n${expectedText.slice(0, TEXT_MAX)}\n\n` +
         `# ACTUAL\n\n${actualText.slice(0, TEXT_MAX)}`
-    return judgeVotes(sandbox, system, prompt, spec.threshold ?? 0.7, spec.votes ?? 3, "similar")
+    return judgeVotes(sandbox, system, prompt, spec.threshold, spec.votes, "similar")
 }

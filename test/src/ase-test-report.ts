@@ -90,5 +90,8 @@ export const reportSummary = (resultsDir: string, cases: CaseOutcome[],
         aborted
     }, null, 4), "utf8")
     console.log(chalk.dim(`summary: ${path.join(resultsDir, "summary.json")}`))
+
+    /*  the exit code precedence: a hit cost ceiling (2) beats a failed case (1),
+        which beats an infrastructure error or skipped run of a passed case (2)  */
     return aborted !== "" ? 2 : (failed > 0 ? 1 : (errored ? 2 : 0))
 }
