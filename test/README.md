@@ -21,7 +21,8 @@ Anthropic API and hence *burns AI tokens* -- this is why no `build` or
 See `ARCHITECTURE.md` for a visual quick overview (execution,
 architecture, and adding a test), and `TECH_OVERVIEW.md` for how the
 tests are executed, which parts are framework and which harness code,
-and where the harness touches ASE.
+and where the harness touches ASE. `EXAMPLE_RUNS.md` shows example runs
+of the whole test suit on the anthropic models and local models. 
 
 ## Layout
 
