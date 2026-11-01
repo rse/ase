@@ -18,8 +18,10 @@ exactly. Every case run executes real agent sessions against the
 Anthropic API and hence *burns AI tokens* -- this is why no `build` or
 `publish` target ever triggers it.
 
-See `TECH_OVERVIEW.md` for how the tests are executed, which parts are
-framework and which harness code, and where the harness touches ASE.
+See `ARCHITECTURE.md` for a visual quick overview (execution,
+architecture, and adding a test), and `TECH_OVERVIEW.md` for how the
+tests are executed, which parts are framework and which harness code,
+and where the harness touches ASE.
 
 ## Layout
 
