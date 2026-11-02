@@ -8,6 +8,12 @@ ChangeLog
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
 
+-   BUGFIX [code]: Silent parallel sub-agents
+    Forbid any output while concurrently dispatched sub-agents report back one by one, as Claude
+    Code runs them in the background despite `run_in_background: false`, so skills like
+    `ase-code-lint` and `ase-docs-proofread` no longer print progress messages per returned batch
+    (`ase-control.md`).
+
 2.0.6 (2026-11-02)
 ------------------
 
