@@ -20,6 +20,11 @@ ChangeLog
     `REGRESSION` questions under `light` and `full`, and `CONFIRMATION` questions under `full`
     only. Both skills now fix and re-verify for at most ten rounds and list the remaining failures.
 
+-   IMPROVEMENT [code, docs]: ChangeLog Entries in File Style
+    The skill `ase-repo-changelog` now follows the style of the existing entries instead of a fixed
+    60-80 character summary, keeps each entry within about 5 lines, writes the section via `Edit`
+    (so its changes show up as a diff), and triggers on prompts like "add a changelog entry".
+
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
 
