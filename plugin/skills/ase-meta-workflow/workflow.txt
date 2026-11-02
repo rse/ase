@@ -28,6 +28,7 @@ START               -> ase-meta-proximity
 START               -> ase-meta-mint
 START               -> ase-meta-workflow
 START               -> ase-repo-dissect
+START               -> ase-repo-stage
 START               -> ase-repo-merge
 START               -> ase-repo-resolve
 ase-help-skill      -> END
@@ -60,6 +61,7 @@ ase-meta-proximity  -> END
 ase-meta-mint       -> END
 ase-meta-workflow   -> END
 ase-repo-dissect    -> END
+ase-repo-stage      -> END
 ase-repo-merge      -> END
 ase-repo-resolve    -> END
 START               -> SKETCH

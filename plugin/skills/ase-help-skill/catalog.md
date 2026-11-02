@@ -47,6 +47,7 @@
 ○   `ase-repo-diff`:       Summarize Diff
 ○   `ase-repo-review`:     Review Changes
 ○   `ase-repo-dissect`:    Dissect a Change Set
+○   `ase-repo-stage`:      Stage a Part of the Changes
 ○   `ase-repo-merge`:      Merge a Branch
 ○   `ase-repo-resolve`:    Resolve Merge Conflicts
 

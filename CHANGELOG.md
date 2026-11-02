@@ -5,6 +5,13 @@ ChangeLog
 2.0.7 (2026-11-XX)
 ------------------
 
+-   FEATURE [code, docs]: Partial Staging Skill
+    The new skill `ase-repo-stage` stages only the part of the working copy changes which belongs
+    to a topic, to the last `CHANGELOG.md` entry (`--entry`), to the last turn (`--turn`), or to
+    the session (`--session`), splitting mixed hunks and including untracked files. It checks
+    that the staged state builds on its own (in place via stash, or in a temporary worktree under
+    `--worktree`), and optionally chains into `ase-repo-changelog` and `ase-repo-commit`.
+
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
 
