@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+2.0.7 (2026-11-XX)
+------------------
+
+-   UPDATE [infr]: NPM dependencies
+    Updated NPM dependencies.
+
 2.0.6 (2026-11-02)
 ------------------
 
