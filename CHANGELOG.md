@@ -6,19 +6,16 @@ ChangeLog
 ------------------
 
 -   FEATURE [code, docs]: Partial Staging Skill
-    The new skill `ase-repo-stage` stages only the part of the working copy changes which belongs
-    to a topic, to the last `CHANGELOG.md` entry (`--entry`), to the last turn (`--turn`), or to
-    the session (`--session`), splitting mixed hunks and including untracked files. It checks
-    that the staged state builds on its own (in place via stash, or in a temporary worktree under
-    `--worktree`), and optionally chains into `ase-repo-changelog` and `ase-repo-commit`.
+    The new skill `ase-repo-stage` stages only the working copy changes belonging to a topic, the
+    last `CHANGELOG.md` entry (`--entry`), the last turn (`--turn`), or the session (`--session`),
+    splitting mixed hunks, checks that the staged state builds on its own (optionally in a temporary
+    worktree), and optionally chains into `ase-repo-changelog` and `ase-repo-commit`.
 
 -   IMPROVEMENT [code, docs]: Verification Levels for Edit Skills
-    The former boolean option `--verify`|`-v` of `ase-code-edit` and `ase-spec-edit` now takes a
-    level: `none` (the former default, no verification at all), `light` (the new default: lint,
-    build, and an existing regression test suite resp. the SpecBook lint), and `full` (for
-    `ase-code-edit` additionally ad-hoc, change-specific manual tests). Grilling raises
-    `REGRESSION` questions under `light` and `full`, and `CONFIRMATION` questions under `full`
-    only. Both skills now fix and re-verify for at most ten rounds and list the remaining failures.
+    The boolean option `--verify`|`-v` of `ase-code-edit` and `ase-spec-edit` now takes a level:
+    `none` (former default), `light` (new default: lint, build, and regression tests resp. SpecBook
+    lint), or `full` (additionally ad-hoc manual tests), also steering the grilling questions. Both
+    skills now fix and re-verify for at most ten rounds and list the remaining failures.
 
 -   IMPROVEMENT [code, docs]: ChangeLog Entries in File Style
     The skill `ase-repo-changelog` now follows the style of the existing entries instead of a fixed
