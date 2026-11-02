@@ -227,9 +227,17 @@ related to this MCP call except the following <template/>:
     custom dialog according to the expanded `custom-dialog`
     definition. You *MUST* closely follow this definition:
 
-    <expand name="custom-dialog" arg1="--no-other">
+    <expand name="custom-dialog" arg1="--other">
         <content/>
     </expand>
+
+    If <result/> matches `OTHER: <text/>`, the user typed a free-text
+    request instead of choosing an option: treat it as an implicit
+    `DONE`, i.e., set <result>DONE</result>, and let the calling skill
+    finish along its `DONE` dispatch (output its `DONE` template).
+    Its *STOP* then ends only the skill, *not* the current turn:
+    immediately afterwards, handle <text/> as a regular user request,
+    outside of any skill, without re-opening this dialog.
 
 </define>
 

@@ -25,6 +25,12 @@ ChangeLog
     60-80 character summary, keeps each entry within about 5 lines, writes the section via `Edit`
     (so its changes show up as a diff), and triggers on prompts like "add a changelog entry".
 
+-   IMPROVEMENT [code]: Free-Text Replies in Next-Step Dialogs
+    The next-step dialogs of `ase-task-implement`, `ase-task-integrate`, `ase-task-grill`,
+    `ase-task-reboot`, and `ase-task-condense` now accept a free-text reply as an implicit `DONE`:
+    the skill finishes, and the text is then handled as a regular request, instead of the dialog
+    being re-opened with an "Invalid option selected!" error.
+
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
 
