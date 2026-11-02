@@ -14,7 +14,7 @@
     [`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`]
     [`--grill-perspective`|`-p` *perspective*]
     [`--grill-ground`|`-G`]
-    [`--verify`|`-v`]
+    [`--verify`|`-v` `light`|`none`|`full`]
     [`--worktree`|`-w` *name*[`:`*branch*]]
     [`--loop`|`-l`]
     [*query*]
@@ -34,7 +34,8 @@ parts), *discovering* (read the source artifacts related to the query),
 *grilling* (optionally stress-test the query with rounds of questions),
 *implementing* (optionally select an approach, then apply the change
 set in place, honoring the tenet set selected via `--mode`), and
-*verifying* (optionally verify the implementation until it passes). The
+*verifying* (verify the implementation until it passes, unless
+disabled via `--verify none`). The
 *querying* state, every *grilling* round, and the approach selection
 close with an `EDIT TODO` box showing the established `WHAT` and `HOW`
 information.
@@ -69,8 +70,9 @@ information.
     of a round are sorted by descending focus area importance
     (`DOMAIN`, `INTERFACE`, `ARCHITECTURE`, `IMPLEMENTATION`,
     `REGRESSION`, `CONFIRMATION`). Questions of focus area
-    `REGRESSION` and `CONFIRMATION` are raised only together with
-    `--verify`, as only then a verification honors their decisions.
+    `REGRESSION` are raised only under `--verify light` or `full`, and
+    those of focus area `CONFIRMATION` only under `--verify full`, as
+    only then a verification honors their decisions.
     All questions of a round are announced together below a
     `GRILLING ROUND K/L` line (the round numbering is omitted when only
     a single round is performed) as a `QUESTION`/`ANSWERS` table with
@@ -130,12 +132,17 @@ information.
     no usable facts are found, a warning is shown and the grilling falls
     back to model knowledge. Only effective together with `--grill`.
 
--   `--verify`|`-v`:
-    Verify whether the implementation fulfills the requirements, by
-    running the available verification commands (build, tests, linter,
-    type-checker) and adjusting the failing parts of the change set
-    until the verification passes. Without `--verify`, strictly no
-    verification is performed at all.
+-   `--verify`|`-v` `light`|`none`|`full`:
+    Verify whether the implementation fulfills the requirements, and
+    adjust the failing parts of the change set until the verification
+    passes, for at most ten rounds, listing any failures remaining after
+    the last round as `REMAINING FAILURES`. The default `light` runs the
+    available lint and build commands (including the type-checker) and
+    the already existing regression test suite, if any. The level `full`
+    additionally performs individual, change-specific manual tests
+    through ad-hoc scratch tests and program runs, which are cleaned up
+    afterwards. The level `none` strictly performs no verification at
+    all.
 
 -   `--worktree`|`-w` *name*[`:`*branch*]:
     Apply the change sets inside the dedicated Git worktree
@@ -176,16 +183,22 @@ information.
 
 ##  EXAMPLES
 
-Edit in one shot, without any questions or verification:
+Edit in one shot, without any questions, but with light verification:
 
 ```text
 ❯ /ase-code-edit add a --verbose option to the CLI
 ```
 
-Grill the query with two rounds first, then implement and verify:
+Edit in one shot, without any questions or verification:
 
 ```text
-❯ /ase-code-edit -g -r 2 -v refactor the config loading into layers
+❯ /ase-code-edit -v none add a --verbose option to the CLI
+```
+
+Grill the query with two rounds first, then implement and fully verify:
+
+```text
+❯ /ase-code-edit -g -r 2 -v full refactor the config loading into layers
 ```
 
 Let the user pick one of several resolution approaches first, then

@@ -453,7 +453,7 @@ export const useCases: UseCase[] = [
                 body:     "The edit runs again with validation and looping enabled, so the SpecBook " +
                           "schema violations are resolved rather than reported.",
                 commands: [
-                    "**/ase-spec-edit** --verify --loop rate limiting"
+                    "**/ase-spec-edit** --verify full --loop rate limiting"
                 ]
             },
             {
@@ -673,7 +673,7 @@ export const useCases: UseCase[] = [
                 body:     "For a change this size, the fused one-shot variant does the very same work " +
                           "with grilling and verification, but without a persisted plan.",
                 commands: [
-                    "**/ase-code-edit** --mode craft --grill --verify --worktree json-output add a --json output mode to `ase task list`"
+                    "**/ase-code-edit** --mode craft --grill --verify full --worktree json-output add a --json output mode to `ase task list`"
                 ]
             }
         ]
@@ -716,7 +716,7 @@ export const useCases: UseCase[] = [
                 body:     "Where the fix has to prove itself, the fused editor resolves and verifies in " +
                           "a single call, looping until the verification actually passes.",
                 commands: [
-                    "**/ase-code-edit** --mode resolve --verify --loop stale task id in the statusline after a rename"
+                    "**/ase-code-edit** --mode resolve --verify full --loop stale task id in the statusline after a rename"
                 ]
             },
             {
@@ -796,7 +796,7 @@ export const useCases: UseCase[] = [
                           "grills, and verifies in a single call.",
                 commands: [
                     "**/ase-code-edit** --mode refactor rename parseArgs to parseOptions in src/ase-getopt.ts",
-                    "**/ase-code-edit** --mode refactor --grill --verify --worktree option-table " +
+                    "**/ase-code-edit** --mode refactor --grill --verify full --worktree option-table " +
                     "extract the shared option table of the CLI commands into src/ase-getopt.ts"
                 ]
             }
@@ -901,7 +901,7 @@ export const useCases: UseCase[] = [
                 body:     "Just when you thought you were done, the review flags a defect in your own " +
                           "changes, so it is fixed ad hoc — grilled and verified — and reviewed once more.",
                 commands: [
-                    "**/ase-code-edit** --mode resolve --grill --verify " +
+                    "**/ase-code-edit** --mode resolve --grill --verify full " +
                     "the JSON output omits tasks without a title",
                     "**/ase-repo-review** --severity=MEDIUM"
                 ]

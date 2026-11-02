@@ -12,6 +12,14 @@ ChangeLog
     that the staged state builds on its own (in place via stash, or in a temporary worktree under
     `--worktree`), and optionally chains into `ase-repo-changelog` and `ase-repo-commit`.
 
+-   IMPROVEMENT [code, docs]: Verification Levels for Edit Skills
+    The former boolean option `--verify`|`-v` of `ase-code-edit` and `ase-spec-edit` now takes a
+    level: `none` (the former default, no verification at all), `light` (the new default: lint,
+    build, and an existing regression test suite resp. the SpecBook lint), and `full` (for
+    `ase-code-edit` additionally ad-hoc, change-specific manual tests). Grilling raises
+    `REGRESSION` questions under `light` and `full`, and `CONFIRMATION` questions under `full`
+    only. Both skills now fix and re-verify for at most ten rounds and list the remaining failures.
+
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
 
