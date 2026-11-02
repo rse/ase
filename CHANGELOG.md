@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.0.7 (2026-11-XX)
+2.0.7 (2026-11-02)
 ------------------
 
 -   FEATURE [code, docs]: Partial Staging Skill
@@ -31,14 +31,27 @@ ChangeLog
     the skill finishes, and the text is then handled as a regular request, instead of the dialog
     being re-opened with an "Invalid option selected!" error.
 
--   UPDATE [infr]: NPM dependencies
-    Updated NPM dependencies.
+-   IMPROVEMENT [code]: Commit Message Skill Activation
+    The frontmatter description of `ase-repo-commit` now lists trigger phrases (like "write" or
+    "propose" a "commit message"), so the skill is activated under more circumstances.
+
+-   IMPROVEMENT [code]: find(1) Fallback for Source Resolution
+    `ase-code-lint` now resolves directory and wildcard source references with `find` via `Bash`
+    (newly allowed) if the `Glob` tool is not available, to support foreign LLMs.
 
 -   BUGFIX [code]: Silent parallel sub-agents
     Forbid any output while concurrently dispatched sub-agents report back one by one, as Claude
     Code runs them in the background despite `run_in_background: false`, so skills like
     `ase-code-lint` and `ase-docs-proofread` no longer print progress messages per returned batch
     (`ase-control.md`).
+
+-   BUGFIX [code]: Skill Started Message First
+    `ase-skill.md` now requires the "skill started" message as the very first output, before any
+    tool call (including `ase_getopt`) and also for skills invoked via the `Skill` tool, so that
+    "do not output anything" instructions of later steps no longer suppress or defer it.
+
+-   UPDATE [infr]: NPM dependencies
+    Updated NPM dependencies.
 
 2.0.6 (2026-11-02)
 ------------------
