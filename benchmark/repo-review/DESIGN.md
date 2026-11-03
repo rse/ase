@@ -183,7 +183,8 @@ run. `results/` is not versioned; the reference measurement is committed under
 
 The parser reads the verdict line and the findings table in the fixed output
 format of the skill. It tolerates small variations (with or without the checkbox
-character and backticks, single lines or ranges, escaped `|`) but does not
+character and backticks, single lines or ranges, several ranges of one file such
+as `order.ts:29,51-52`, escaped `|`) but does not
 interpret free text. Without a verdict, or without a table or the line
 `**NO FINDINGS**`, the run is `unparseable`. A finding without a recognizable
 location is unassignable.
@@ -194,8 +195,8 @@ ASE version can make runs unparseable; the report counts them visibly.
 
 ### Matching by location, with a tolerance
 
-A finding matches an entry if it names the same file and its line range, widened
-by three lines on each side, overlaps one of the entry's locations. Among several
+A finding matches an entry if it names the same file and one of its line ranges,
+widened by three lines on each side, overlaps one of the entry's locations. Among several
 candidates the largest overlap wins, then the smallest distance, then the
 smallest id. Each entry counts at most once per run; further matches are counted
 as duplicates. `ACCEPTED` findings are neither hits nor false alarms but are
@@ -206,8 +207,9 @@ of the MERIT effectiveness test. *Price:* coarse line ranges can hit a
 neighboring entry by accident, so entries in the same file keep at least eight
 lines apart. And a correct finding placed one hop away, at a call or a
 declaration, is missed; the log in `MEASUREMENTS.md` documents the cases seen so
-far. The parser also reads only the first range of a location that lists several
-(`order.ts:29,51-52`); this is a known defect of the scorer, not a design choice.
+far. Until 2026-11-03 the parser read only the first range of a location that
+lists several; the log holds the reference measurement scored both before and
+after that fix.
 
 ### Metrics that cannot be gamed by failure
 
@@ -262,8 +264,9 @@ of the test case and of the expected-results list at run time and at scoring
 time, threshold version, and the commit of the scoring code), the automated
 figures, a defect-by-run and a decoy-by-run matrix with the short titles of the
 expected-results list, and the text of every unassignable finding. A series is
-identified by the names of its result folders; the log refuses a series it
-already holds and does not accept dry runs. The manual reading is written by
+identified by the names of its result folders together with the commit of the
+scoring code; the log refuses a series it already holds, does not accept dry
+runs, and refuses to log while the scoring code has uncommitted changes. The manual reading is written by
 hand below the generated part. Entries are never rewritten: a correction is a
 dated note, a re-scoring with a changed scorer is a new entry.
 

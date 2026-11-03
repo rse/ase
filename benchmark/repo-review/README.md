@@ -84,11 +84,13 @@ The figures below come from the deterministic scorer. It assigns each finding of
 a review to an expected entry **only by file name and line overlap** (details in
 [Scoring and limitations](#scoring-and-limitations)). A correct finding placed
 at a different line, say at the caller instead of the faulty function, does not
-count. All values are means over three runs.
+count. All values are means over three runs, scored with the current scorer
+(entry "Re-scoring … with the fixed location parser" in the log; the original
+figures of the first scoring are kept there as well).
 
 | Configuration | Location-matched recall, overall | Location-matched recall, obvious | Decoy match rate | Unassignable findings per run | Pilot thresholds |
 |---|---|---|---|---|---|
-| Opus 5.5 | 0.90 | 0.83 | 0.17 | 1.0 | met |
+| Opus 5.5 | 0.95 | 0.83 | 0.17 | 0.3 | met |
 | Sonnet 5.5 | 0.90 | 0.67 | 0.50 | 2.0 | not met |
 
 ### Manual reading
@@ -101,10 +103,11 @@ independently verified). The reading changes the picture considerably:
 | Opus 5.5 | 21 of 21 (all 7 in every run) | 6 of 6 | 0 of 12 |
 | Sonnet 5.5 | 20 of 21 (missed the discount defect once) | 5 of 6 | 2 of 12 |
 
-- Three automated "misses" were defects that the model described correctly. Two
-  were placed at the call site or at a neighboring `switch`. The third named the
-  right lines as `order.ts:29,51-52`, but the parser reads only the first range of
-  such a location; that is a scorer defect, recorded in the log.
+- Two automated "misses" were defects that the model described correctly but
+  placed at the call site or at a neighboring `switch`. A third one was a scorer
+  defect: Opus named the right lines as `order.ts:29,51-52`, and the parser read
+  only the first range. The parser now reads all ranges; the log keeps both the
+  original and the corrected scoring.
 - Most automated decoy matches were unrelated findings whose line range happened
   to overlap a decoy, or a misplaced real defect.
 - Two Sonnet findings claim that the non-null assertion on the optional customer
@@ -151,7 +154,9 @@ its generated part:
 node benchmark/repo-review/compare.mjs --journal benchmark/repo-review/MEASUREMENTS.md --title "2026-11-20: Sonnet 5.5, second case" benchmark/repo-review/results
 ```
 
-The log refuses a series it already holds and does not accept dry runs.
+The log refuses a series it already holds, does not accept dry runs, and requires
+the scoring code to be committed. Scoring the same runs again with a changed
+scorer gives a new entry; the earlier one stays.
 
 ## Scoring and limitations
 
@@ -159,7 +164,8 @@ The log refuses a series it already holds and does not accept dry runs.
 
 A parser reads the findings table of the review (the format is fixed by the
 skill). Each finding is assigned to an expected entry if it names the same file
-and its line range overlaps the expected lines, with a tolerance of three lines.
+and one of its line ranges overlaps the expected lines, with a tolerance of three
+lines; a location may list several ranges, such as `order.ts:29,51-52`.
 If several entries qualify, the largest overlap wins, then the smallest distance,
 then the smallest id. Findings the skill marks as `ACCEPTED` are ignored. No
 language model judges anything; the same reviews always give the same scores.
@@ -215,9 +221,6 @@ below 1.0 while the manual reading found every defect.
   and credits unrelated findings with wide ranges. Recording alternative
   locations per defect and keeping decoys away from genuine weaknesses of the code
   would help (see the log entry in `MEASUREMENTS.md`).
-- **Several line ranges in one location** (such as `order.ts:29,51-52`) are read
-  only up to the first range. This cost Opus one hit in the reference
-  measurement and is the first thing to fix in the scorer.
 - **Three runs per model** show tendencies, not significant differences.
 - **Cost figures assume Anthropic prices.** For other endpoints the number means
   little.

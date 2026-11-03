@@ -14,20 +14,20 @@ Runs: 3 total, 3 evaluated, 0 unparseable, 0 aborted, 0 error
 
 | Metric | Mean (min–max) |
 |---|---|
-| Recall overall | 0.90 (0.86–1.00) |
+| Recall overall | 0.95 (0.86–1.00) |
 | Recall obvious | 0.83 (0.50–1.00) |
-| Recall medium | 0.89 (0.67–1.00) |
+| Recall medium | 1.00 (1.00–1.00) |
 | Recall hidden | 1.00 (1.00–1.00) |
 | Decoy false-alarm rate (n=3) | 0.17 (0.00–0.25) |
-| Unassignable findings per run | 1.00 (0.00–2.00) |
+| Unassignable findings per run | 0.33 (0.00–1.00) |
 | Duration per run (s) | 116 |
 | Total cost (USD) | 2.29 |
 
 | Run | Status | Skill verdict | Hits | Decoys reported | Unassignable | Duration (s) | Cost (USD) |
 |---|---|---|---|---|---|---|---|
 | 20261103T073704Z-opus-1 | ok | REJECT - DEMANDS CHANGES | B-01, B-02, B-03, B-04, B-05, B-06, B-07 | – | 0 | 113 | 0.89 |
-| 20261103T073856Z-opus-2 | ok | REJECT - DEMANDS CHANGES | B-01, B-02, B-03, B-05, B-06, B-07 | K-01 | 1 | 115 | 0.70 |
-| 20261103T074051Z-opus-3 | ok | REJECT - DEMANDS CHANGES | B-01, B-03, B-04, B-05, B-06, B-07 | K-01 | 2 | 121 | 0.70 |
+| 20261103T073856Z-opus-2 | ok | REJECT - DEMANDS CHANGES | B-01, B-02, B-03, B-04, B-05, B-06, B-07 | K-01 | 0 | 115 | 0.70 |
+| 20261103T074051Z-opus-3 | ok | REJECT - DEMANDS CHANGES | B-01, B-03, B-04, B-05, B-06, B-07 | K-01 | 1 | 121 | 0.70 |
 
 ## Model sonnet
 

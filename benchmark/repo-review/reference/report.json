@@ -34,8 +34,8 @@
                 },
                 "medium": {
                     "max": 1,
-                    "mean": 0.8889,
-                    "min": 0.6667,
+                    "mean": 1,
+                    "min": 1,
                     "n": 3
                 },
                 "obvious": {
@@ -46,7 +46,7 @@
                 },
                 "overall": {
                     "max": 1,
-                    "mean": 0.9047,
+                    "mean": 0.9524,
                     "min": 0.8571,
                     "n": 3
                 }
@@ -103,6 +103,7 @@
                         "B-01",
                         "B-02",
                         "B-03",
+                        "B-04",
                         "B-05",
                         "B-06",
                         "B-07"
@@ -112,15 +113,15 @@
                     "reason": null,
                     "recall": {
                         "hidden": 1,
-                        "medium": 0.6667,
+                        "medium": 1,
                         "obvious": 1,
-                        "overall": 0.8571
+                        "overall": 1
                     },
                     "reported": [
                         "claude-opus-5-5"
                     ],
                     "status": "ok",
-                    "unassignable": 1,
+                    "unassignable": 0,
                     "verdict": "REJECT - DEMANDS CHANGES"
                 },
                 {
@@ -130,7 +131,7 @@
                     "decoys_reported": [
                         "K-01"
                     ],
-                    "duplicates": 2,
+                    "duplicates": 3,
                     "duration": 121407,
                     "endpoint": "default",
                     "false_alarm_rate": 0.25,
@@ -156,7 +157,7 @@
                         "claude-opus-5-5"
                     ],
                     "status": "ok",
-                    "unassignable": 2,
+                    "unassignable": 1,
                     "verdict": "REJECT - DEMANDS CHANGES"
                 }
             ],
@@ -186,14 +187,14 @@
                         "kind": "min",
                         "limit": 0.6,
                         "met": true,
-                        "value": 0.9047
+                        "value": 0.9524
                     }
                 },
                 "verdict": "threshold met"
             },
             "unassignable": {
-                "max": 2,
-                "mean": 1,
+                "max": 1,
+                "mean": 0.3333,
                 "min": 0,
                 "n": 3
             }
