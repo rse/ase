@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- stand-in for a hanging claude process (abort-time dry run, SCN-025):
+**  ASE review benchmark -- stand-in for a hanging claude process (abort-time dry run):
 **  starts a grandchild, records its PID, and never finishes
 */
 

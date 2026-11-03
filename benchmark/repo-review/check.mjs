@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-**  ASE review benchmark -- check the expected-results list against the fixture (AC-001, AC-002)
+**  ASE review benchmark -- check the expected-results list against the fixture
 **  Usage: node check.mjs [--expected <file>]
 */
 

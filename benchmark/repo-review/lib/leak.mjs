@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- leak check of a throw-away copy (SDD-004)
+**  ASE review benchmark -- leak check of a throw-away copy
 */
 
 import fs   from "node:fs"
@@ -9,7 +9,7 @@ import { git, listFiles } from "./common.mjs"
 import { expectedFiles }  from "./copy.mjs"
 
 /*  terms which must not appear in file names, contents, or commit messages; the German
-    terms are search data for German-language hints in the fixture (AC-015 exception)  */
+    terms are search data for German-language hints in the fixture (the only exemption of the language check)  */
 export const DENY_TERMS = [
     "sollliste", "köder", "koeder", "decoy", "bait", "befund",
     "bug", "todo", "fixme", "xxx", "hack", "intentional", "absichtlich"

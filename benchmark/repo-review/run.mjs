@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-**  ASE review benchmark -- runner (AC-003 to AC-005, AC-008, AC-012, AC-013)
+**  ASE review benchmark -- runner
 **  Usage: node run.mjs --help
 */
 
@@ -84,7 +84,7 @@ function options (argv) {
     return o
 }
 
-/*  preconditions before any model call (PRD section 4, SDD-013)  */
+/*  preconditions before any model call  */
 function preflight (o) {
     const problems = []
     try {
@@ -135,7 +135,7 @@ async function oneRun (o, nr, env, program, pre) {
     const name    = `${stamp(started)}-${modelShort(o.model)}-${nr}${o.dryRun ? "-dry" : ""}`
     const dir     = createRunDir(o.out, name)
     const copy    = buildCopy()
-    /*  MCP configuration outside the parent of the copy, so ".." does not lead to the repository path (CR-004)  */
+    /*  MCP configuration outside the parent of the copy, so ".." does not lead to the repository path  */
     const mcpDir  = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-mcp-"))
     const mcpFile = path.join(mcpDir, "ase-mcp.json")
     fs.writeFileSync(mcpFile, JSON.stringify(mcpConfig(), null, 4))
@@ -180,7 +180,7 @@ async function oneRun (o, nr, env, program, pre) {
         return await runInCopy(o, dir, copy, args, env, before, meta, finish, program, pre)
     }
     catch (err) {
-        /*  unexpected failure: still write a protocol (CR-009)  */
+        /*  unexpected failure: still write a protocol  */
         meta.status  = "error"
         meta.reason  = "internal"
         meta.details = [ err.message ]
@@ -209,7 +209,7 @@ function safeUrl (url) {
 /*  the part of a run that works on the copy  */
 async function runInCopy (o, dir, copy, args, env, before, meta, finish, program, pre) {
 
-    /*  leak check before any model call (SDD-004)  */
+    /*  leak check before any model call  */
     if (o.simulate === "leak") {
         fs.appendFileSync(path.join(copy.dir, "src", "api.ts"), "\n// see sollliste\n")
         fs.writeFileSync(path.join(copy.dir, "NOTES.md"), "B-03\n")
@@ -292,7 +292,7 @@ async function runInCopy (o, dir, copy, args, env, before, meta, finish, program
         return finish(null)
     }
     if (facts.result.is_error) {
-        /*  infrastructure failure of the CLI, not a review result (CR-008)  */
+        /*  infrastructure failure of the CLI, not a review result  */
         meta.status = "error"
         meta.reason = facts.result.subtype ?? "is_error"
         return finish(facts.text)
@@ -338,7 +338,7 @@ async function main () {
             return 3
         }
         const meta = await oneRun(o, nr, env, program, pre)
-        /*  a run without cost report (time, isolation, start) counts with its full limit (CR-001)  */
+        /*  a run without cost report (time, isolation, start) counts with its full limit  */
         spent += meta.cost_usd ?? (o.dryRun ? 0 : o.budget)
         process.stdout.write(`run ${nr}/${o.runs}: ${meta.status}${meta.reason ? ` (${meta.reason})` : ""}, `
             + `cost ${meta.cost_usd === null ? "–" : meta.cost_usd.toFixed(2)} USD, `

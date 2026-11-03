@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
 **  ASE review benchmark -- self-test of parser, assignment, metrics, and runner helpers
-**  Expected values are computed by hand from the PRD rules, not derived from the code.
+**  Expected values are computed by hand from the rules in DESIGN.md, not derived from the code.
 **  Usage: node selftest.mjs
 */
 
@@ -36,7 +36,7 @@ const review = (rows) => head + rows.join("\n") + "\n"
 const replayText = (file) => transcriptFacts(fs.readFileSync(path.join(TESTDATA_DIR, file), "utf8")
     .split("\n").filter(Boolean).map((l) => JSON.parse(l))).text
 
-/*  SCN-011: parser format variants  */
+/*  parser format variants  */
 {
     const p = parseReview(review([ row("HIGH", "▢ `src/cart.ts:30`") ]))
     check("parser: standard row with ▢ and backticks", p.status === "ok" && eq(p.findings[0].location, { file: "src/cart.ts", from: 30, to: 30 }))
@@ -60,11 +60,11 @@ const replayText = (file) => transcriptFacts(fs.readFileSync(path.join(TESTDATA_
     check("parser: verdict without table and without NO FINDINGS is unparseable (negative case)", y.status === "unparseable")
 }
 
-/*  SCN-016: unparseable output of the replay file  */
+/*  unparseable output of the replay file  */
 check("parser: foreign output from testdata/unparseable.jsonl is unparseable",
     parseReview(replayText("unparseable.jsonl")).status === "unparseable")
 
-/*  SCN-012: assignment with tolerance 3  */
+/*  assignment with tolerance 3  */
 {
     const f = (file, from, to = from, severity = "HIGH") => ({ severity, location: { file, from, to } })
     check("matching: distance 3 hits (B-01 at 30-31, finding at 34)", assignFinding(f("src/cart.ts", 34), expected)?.id === "B-01")
@@ -80,7 +80,7 @@ check("parser: foreign output from testdata/unparseable.jsonl is unparseable",
     check("matching: finding without location stays unassigned", assignFinding({ severity: "HIGH", location: null }, expected) === null)
 }
 
-/*  SCN-014, SCN-017: metrics computed by hand
+/*  metrics computed by hand
     run 1 (testdata/normal.jsonl): hits B-01, B-02 (obvious 2/2), B-03 (medium 1/3), B-06 (hidden 1/2),
            overall 4/7 = 0.5714; decoy K-04 1/4 = 0.25; unassignable 1 (inventory.ts); ACCEPTED 1; duplicate 1 (cart.ts:31)
     run 2: unparseable -> recall 0, not in false alarm rate
@@ -112,23 +112,23 @@ check("parser: foreign output from testdata/unparseable.jsonl is unparseable",
     const agg3 = aggregate(runs, { recall_overall_min: 0.1, recall_obvious_min: 0.3, decoy_false_alarm_max: 0.1 })
     check("threshold: false-alarm rate 0.125 above limit 0.1 (negative case)", agg3.threshold.verdict === "threshold not met")
 
-    /*  SCN-023: calibration  */
+    /*  calibration  */
     const full = { ...r1, recall: { ...r1.recall, overall: 1 } }
     check("calibration: all runs with recall 1 give \"too easy\" with a next step",
         calibrate([ full, full, full ]).statement === "too easy" && calibrate([ full ]).next_step !== null)
     check("calibration: one run below gives \"adequate\"", calibrate([ full, full, r1 ]).statement === "adequate")
 }
 
-/*  SCN-004 (part): leak terms  */
+/*  leak terms  */
 check("leak: a deny-listed term is detected", findLeak("// see sollliste") === "sollliste")
 check("leak: an expected-results id is detected", findLeak("Fix B-03 now") === "B-03")
 check("leak: \"debug\" is no hit for \"bug\" (negative case)", findLeak("debug output") === null)
 check("leak: \"falls through\" is allowed", findLeak("/* falls through */") === null)
-check("leak: plural forms like \"bugs\" and \"todos\" are detected (CR-010)", findLeak("two bugs here") === "bug" && findLeak("open todos") === "todo")
+check("leak: plural forms like \"bugs\" and \"todos\" are detected", findLeak("two bugs here") === "bug" && findLeak("open todos") === "todo")
 
-/*  SCN-005, SCN-008, SCN-010, SCN-026: runner helpers  */
+/*  runner helpers  */
 check("series budget: 26 + 5 > 30 refused", seriesAllows(26, 5, 30) === false)
-check("series budget: 25 + 5 with 10 % reserve (5.5) > 30 refused (CR-005)", seriesAllows(25, 5, 30) === false)
+check("series budget: 25 + 5 with 10 % reserve (5.5) > 30 refused", seriesAllows(25, 5, 30) === false)
 check("series budget: 24.5 + 5.5 = 30 allowed", seriesAllows(24.5, 5, 30) === true)
 {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-selftest-"))
@@ -150,7 +150,7 @@ check("isolation: built-in CLI plugins (@builtin) are allowed",
 check("isolation: foreign MCP server (account connector) is detected (negative case)",
     eq(checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase" }, { name: "claude.ai Notion" } ] }), [ "foreign MCP server loaded: claude.ai Notion" ]))
 check("isolation: missing ASE MCP server is detected", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [] }).length === 1)
-check("isolation: unconnected ASE MCP server is detected (CR-007)", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase", status: "failed" } ] }).length === 1)
+check("isolation: unconnected ASE MCP server is detected", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase", status: "failed" } ] }).length === 1)
 {
     const args = claudeArgs({ model: "sonnet", budget: 5, mcpConfigFile: "x.json" })
     const i = args.indexOf("--mcp-config")
@@ -159,14 +159,14 @@ check("isolation: unconnected ASE MCP server is detected (CR-007)", checkInit({ 
     check("MCP configuration: exactly the server ase", eq(Object.keys(mcpConfig().mcpServers), [ "ase" ]) && mcpConfig().mcpServers.ase.args.at(-1) === "mcp")
 }
 {
-    /*  CR-002: a multibyte character split across two output chunks stays intact  */
+    /*  a multibyte character split across two output chunks stays intact  */
     const tmp    = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-selftest-"))
     const text   = "range 12–15 ▢ café señor"
     const script = `const b = Buffer.from(JSON.stringify({ type: "result", result: ${JSON.stringify(text)} }) + "\\n"); `
         + "const i = b.indexOf(0xe2) + 1; process.stdout.write(b.subarray(0, i)); setTimeout(() => process.stdout.write(b.subarray(i)), 100)"
     const res = await runChild({ program: process.execPath, args: [ "-e", script ], cwd: tmp, env: process.env, timeoutMs: 10000,
         transcriptFile: path.join(tmp, "t.jsonl"), stderrFile: path.join(tmp, "e.txt"), onInit: () => [] })
-    check("transcript: a split multibyte character stays intact (CR-002)", res.events[0]?.result === text)
+    check("transcript: a split multibyte character stays intact", res.events[0]?.result === text)
     fs.rmSync(tmp, { recursive: true, force: true })
 }
 {
@@ -183,7 +183,7 @@ check("isolation: unconnected ASE MCP server is detected (CR-007)", checkInit({ 
     check("child environment: tool/bin first in PATH", env.PATH.split(path.delimiter)[0].endsWith(path.join("tool", "bin")))
 }
 
-/*  SCN-013 (part): deterministic serialization  */
+/*  deterministic serialization  */
 check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c: 3 } }) === stableStringify({ a: { c: 3, d: 2 }, b: 1 }))
 
 process.stdout.write(`\n${passed} passed, ${failed} failed\n`)

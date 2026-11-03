@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- metrics, aggregation, threshold and calibration (SDD-011)
+**  ASE review benchmark -- metrics, aggregation, threshold and calibration
 **  Approach modelled after the MERIT effectiveness test (tests/effectiveness/, scoring module);
 **  re-implemented, not copied.
 */
@@ -115,7 +115,7 @@ export function judge (agg, t) {
     return { verdict: met ? "threshold met" : "threshold not met", criteria: checks }
 }
 
-/*  calibration statement from the runs of the strongest model (AC-011)  */
+/*  calibration statement from the runs of the strongest model  */
 export function calibrate (runs) {
     const evaluated = runs.filter((r) => r.status === "ok" || r.status === "unparseable")
     if (evaluated.length === 0)

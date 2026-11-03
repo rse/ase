@@ -12,10 +12,12 @@ when reading the raw outputs. They change no figure in the report.
   Claude Code CLI 2.1.302.
 - Not included: two earlier Sonnet plumbing runs with the original invocation
   (`20261103T071925Z`: stopped by the isolation check, `20261103T072901Z`: `unparseable`
-  because the sub-agent was not allowed to run `git`). Both led to SD/TP revision 1.
+  because the sub-agent was not allowed to run `git`). Both led to the isolation
+  setup and the tool permissions described in `DESIGN.md`.
 - Cost of the entire measurement including plumbing runs: 3.59 USD.
 - The run protocols (`run.json`) were translated to English keys and values on
-  2026-11-03 by a fixed mapping (SDD-016, marked by the field `migrated`);
+  2026-11-03 by a fixed mapping (see "English deliverable" in `DESIGN.md`; marked
+  by the field `migrated`);
   `transcript.jsonl` and `review.md` are unchanged. All metrics of the report are
   identical before and after the translation.
 - The threshold values were committed in `c3f00a57` before the first paid run. The
@@ -42,7 +44,7 @@ branching is criticized, not the comparison).
 
 Rule-based, the calibration is "adequate" (Opus did not find all findings in two
 runs). On reading, Opus found **all 7 findings in all three runs**; by the intent
-of AC-011 the test would therefore be **too easy**. Sonnet actually missed B-02 in
+of the calibration statement the test would therefore be **too easy**. Sonnet actually missed B-02 in
 one run.
 
 ## Recommended improvements for a next case (not implemented)

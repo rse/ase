@@ -88,7 +88,7 @@
     "leftovers_killed": [
         "C:\\nvm4w\\nodejs\\node.exe C:\\AI\\rse\\ase-review-benchmark\\tool\\dst\\ase.js service start"
     ],
-    "migrated": "2026-11-03: keys and values translated to English (SDD-016); transcript.jsonl and review.md unchanged",
+    "migrated": "2026-11-03: keys and values translated to English (see \"English deliverable\" in DESIGN.md); transcript.jsonl and review.md unchanged",
     "model": {
         "reported": [
             "claude-opus-5-5"

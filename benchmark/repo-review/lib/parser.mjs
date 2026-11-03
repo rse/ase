@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- rule-based parser of the ase-repo-review output (SDD-009)
+**  ASE review benchmark -- rule-based parser of the ase-repo-review output
 **  Format source: plugin/skills/ase-repo-review/SKILL.md, STEP 3
 */
 

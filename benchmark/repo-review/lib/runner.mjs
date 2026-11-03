@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- runner building blocks (SDD-005 to SDD-008, SDD-013, SDD-014)
+**  ASE review benchmark -- runner building blocks (design rationale: DESIGN.md)
 */
 
 import fs                    from "node:fs"
@@ -9,10 +9,10 @@ import { spawn, spawnSync }  from "node:child_process"
 
 import { REPO_DIR, BENCH_DIR, git } from "./common.mjs"
 
-/*  the fixed skill invocation (PRD approval decision)  */
+/*  the fixed skill invocation  */
 export const PROMPT = "/ase:ase-repo-review -c HEAD -S LOW"
 
-/*  tool permissions (TP planning decision)  */
+/*  tool permissions: read, search, and git only; no writing and no web access  */
 export const ALLOWED_TOOLS = [
     "Read", "Grep", "Glob", "Skill", "Task", "Agent", "ToolSearch",
     "Bash(git:*)", "Bash(cd:*)", "PowerShell(git:*)", "PowerShell(cd:*)",
@@ -20,12 +20,12 @@ export const ALLOWED_TOOLS = [
 ]
 export const DISALLOWED_TOOLS = [ "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch" ]
 
-/*  MCP configuration with exactly the ASE server (SDD-005, revision 1)  */
+/*  MCP configuration with exactly the ASE server  */
 export function mcpConfig () {
     return { mcpServers: { ase: { command: process.execPath, args: [ path.join(REPO_DIR, "tool", "bin", "ase"), "mcp" ] } } }
 }
 
-/*  command-line arguments of the claude invocation (SDD-005)  */
+/*  command-line arguments of the claude invocation  */
 export function claudeArgs ({ model, budget, mcpConfigFile = "{ase.json}" }) {
     return [
         "-p", PROMPT,
@@ -94,7 +94,7 @@ export function claudeProgram (bin = process.env.BENCH_CLAUDE_BIN || "claude") {
     return /\.(m?js)$/i.test(bin) ? { program: process.execPath, pre: [ bin ] } : { program: bin, pre: [] }
 }
 
-/*  kill a process tree (SDD-007)  */
+/*  kill a process tree  */
 export function killTree (child) {
     if (!child.pid)
         return
@@ -121,8 +121,8 @@ export function isAlive (pid) {
     }
 }
 
-/*  series budget: may another run start? (SDD-007); a run can overshoot its limit
-    slightly before the CLI stops it, so a margin is reserved (CR-005)  */
+/*  series budget: may another run start? A run can overshoot its limit
+    slightly before the CLI stops it, so a margin is reserved  */
 export const OVERSHOOT = 1.1
 export function seriesAllows (spent, perRun, total) {
     return spent + perRun * OVERSHOOT <= total + 1e-9
@@ -133,7 +133,7 @@ export function isBuiltinPlugin (p) {
     return typeof p === "object" && p !== null && (p.path === "builtin" || /@builtin$/.test(p.source ?? ""))
 }
 
-/*  isolation check of the init event (SDD-006, revision 1): built-in CLI plugins are
+/*  isolation check of the init event: built-in CLI plugins are
     allowed (and logged), any other plugin besides "ase" and any MCP server besides "ase" is not  */
 export function checkInit (event) {
     const problems = []
@@ -193,7 +193,7 @@ export function killLeftovers (before) {
     return left.map((p) => p.cmd.replace(/\s+/g, " ").slice(0, 200))
 }
 
-/*  collect all strings of a tool input (any tool, including MCP and sub-agent prompts, CR-004)  */
+/*  collect all strings of a tool input (any tool, including MCP and sub-agent prompts)  */
 function toolStrings (input) {
     const out  = []
     const walk = (v) => {
@@ -208,11 +208,11 @@ function toolStrings (input) {
     return out
 }
 
-/*  contamination check of all tool calls (SDD-006): any access to the benchmark itself or
+/*  contamination check of all tool calls: any access to the benchmark itself or
     to the ASE repository outside of plugin/ and tool/ (which the run legitimately uses)  */
 export function checkContamination (events) {
     const problems = []
-    /*  normalize Windows and Git Bash forms ("C:\x", "C:/x", "/c/x") to "c:/x" (CR-004)  */
+    /*  normalize Windows and Git Bash forms ("C:\x", "C:/x", "/c/x") to "c:/x"  */
     const norm     = (p) => p.replace(/\\/g, "/").toLowerCase().replace(/(^|[\s"'=(])\/([a-z])\//g, "$1$2:/")
     const bench    = norm(BENCH_DIR)
     const repo     = norm(REPO_DIR)
@@ -292,7 +292,7 @@ export function userAseConfig () {
     return candidates.filter((c) => fs.existsSync(c))
 }
 
-/*  create a fresh result folder; never overwrite (SDD-008)  */
+/*  create a fresh result folder; never overwrite  */
 export function createRunDir (parent, name) {
     const dir = path.join(parent, name)
     if (fs.existsSync(dir))
@@ -311,7 +311,7 @@ export function modelShort (model) {
     return model.replace(/^claude-/, "").replace(/[^A-Za-z0-9.-]/g, "_")
 }
 
-/*  run the child and collect its stream-json output (SDD-006, SDD-007)  */
+/*  run the child and collect its stream-json output  */
 export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, stderrFile, onInit, graceMs = 5000 }) {
     return new Promise((resolve) => {
         const out     = fs.createWriteStream(transcriptFile)
@@ -335,7 +335,7 @@ export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, 
             err.end()
             resolve({ events, exitCode: code, stopped, pid: child?.pid ?? null })
         }
-        /*  resolve even if a surviving descendant keeps the pipes open (CR-006)  */
+        /*  resolve even if a surviving descendant keeps the pipes open  */
         const armGrace = () => {
             if (grace === null)
                 grace = setTimeout(() => finish(null), graceMs)
@@ -376,7 +376,7 @@ export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, 
             killTree(child)
             armGrace()
         }, timeoutMs)
-        /*  decode as a stream, so multibyte characters split across chunks stay intact (CR-002)  */
+        /*  decode as a stream, so multibyte characters split across chunks stay intact  */
         child.stdout.setEncoding("utf8")
         child.stdout.on("data", (text) => {
             out.write(text)

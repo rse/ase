@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-**  ASE review benchmark -- deterministic comparison against the expected-results list (AC-006 to AC-009, AC-011)
+**  ASE review benchmark -- deterministic comparison against the expected-results list
 **  Usage: node compare.mjs [--out <folder>] <result folder or parent folder>...
 */
 

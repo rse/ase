@@ -165,6 +165,13 @@ that happened to overlap a decoy. `reference/NOTES.md` lists every such case.
 - **Cost figures assume Anthropic prices.** For other endpoints the CLI still
   reports `total_cost_usd`, but the number means little.
 
+## Going deeper
+
+What the test promises, what it deliberately leaves out, and every design
+decision with its reason and its price are written down in
+[DESIGN.md](DESIGN.md). Read it before you change the fixture, the matching
+rule, or the isolation of the runner.
+
 ## Reference
 
 ### Layout
@@ -173,6 +180,7 @@ that happened to overlap a decoy. `reference/NOTES.md` lists every such case.
 |---|---|
 | `fixture/base/`, `fixture/change/` | example project "shop-core": defect-free base and the reviewed change |
 | `solution/expected.json` | expected-results list: defects in three tiers and decoys with locations (never part of a working copy) |
+| `DESIGN.md` | guarantees, non-goals, design decisions, and known risks |
 | `thresholds.json` | pre-registered thresholds (committed before the first measurement) |
 | `check.mjs` | checks the expected-results list against the fixture |
 | `run.mjs` | runner: throw-away copy, leak check, `claude -p`, result folder |

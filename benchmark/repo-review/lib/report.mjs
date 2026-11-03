@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- report from result folders (SDD-011, SDD-012)
+**  ASE review benchmark -- report from result folders
 */
 
 import fs   from "node:fs"
@@ -42,7 +42,7 @@ export function loadRun (dir) {
     }
 }
 
-/*  version of the threshold file: last commit and dirty flag (AC-009)  */
+/*  version of the threshold file: last commit and dirty flag  */
 export function thresholdVersion () {
     const rel = path.relative(REPO_DIR, THRESH_FILE).replace(/\\/g, "/")
     let commit = null, dirty = true

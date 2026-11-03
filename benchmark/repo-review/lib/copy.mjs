@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- throw-away copy of the fixture project (SDD-002, SDD-003)
+**  ASE review benchmark -- throw-away copy of the fixture project
 */
 
 import fs   from "node:fs"

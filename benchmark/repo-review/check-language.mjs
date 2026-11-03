@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-**  ASE review benchmark -- language check of the deliverable (AC-015)
+**  ASE review benchmark -- language check of the deliverable
 **  Reports German words and umlauts in file names and file contents. The deny-list terms of
 **  the leak check are exempt, as they are search data for German-language hints in the fixture.
 **  Recorded model output (transcript.jsonl, review.md, stderr.txt of result folders) is not checked.

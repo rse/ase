@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- assignment of findings to the expected-results list (SDD-010)
+**  ASE review benchmark -- assignment of findings to the expected-results list (design rationale: DESIGN.md)
 **  Approach modelled after the MERIT effectiveness test (tests/effectiveness/, matching module):
 **  file name plus line overlap with a fixed tolerance; re-implemented, not copied.
 */

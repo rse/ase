@@ -1,5 +1,5 @@
 /*
-**  ASE review benchmark -- expected-results list: loading and validation (SDD-015)
+**  ASE review benchmark -- expected-results list: loading and validation
 */
 
 import fs   from "node:fs"
@@ -90,7 +90,7 @@ export function validateExpected (expected, dir) {
         results.push({ id: e.id, ok: problems.length === 0, problems })
     }
 
-    /*  minimum numbers (AC-001)  */
+    /*  minimum numbers  */
     const findings = expected.entries.filter((e) => e.kind === "finding")
     for (const tier of TIERS) {
         const n = findings.filter((e) => e.tier === tier).length
@@ -105,7 +105,7 @@ export function validateExpected (expected, dir) {
     if (decoys < MIN_DECOYS)
         global.push(`${decoys} decoys, at least ${MIN_DECOYS} required`)
 
-    /*  minimum distance between entries of the same file (SDD-010)  */
+    /*  minimum distance between entries of the same file  */
     const ranges = []
     for (const e of expected.entries)
         for (const f of e.locations || [])

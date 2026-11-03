@@ -1,6 +1,6 @@
 /*
 **  ASE review benchmark -- common helpers
-**  Node.js built-ins only (SDD-001)
+**  Node.js built-ins only
 */
 
 import fs            from "node:fs"
@@ -74,7 +74,7 @@ export function git (cwd, args, env = {}) {
     return res.stdout
 }
 
-/*  JSON serialization with sorted object keys (deterministic output, SDD-012)  */
+/*  JSON serialization with sorted object keys (deterministic output)  */
 export function stableStringify (value) {
     const sort = (v) => {
         if (Array.isArray(v))
@@ -90,7 +90,7 @@ export function stableStringify (value) {
     return JSON.stringify(sort(value), null, 4) + "\n"
 }
 
-/*  round to four decimals (SDD-012)  */
+/*  round to four decimals  */
 export function round4 (x) {
     return x === null || x === undefined ? null : Math.round(x * 10000) / 10000
 }
