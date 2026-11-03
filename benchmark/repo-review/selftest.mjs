@@ -13,6 +13,8 @@ import { TESTDATA_DIR, resolveCase, stableStringify, readJson } from "./lib/comm
 import { collectRunDirs, buildReport }             from "./lib/report.mjs"
 import { seriesId, renderSection, appendJournal }  from "./lib/journal.mjs"
 import { parseReview, parseLocation }              from "./lib/parser.mjs"
+import { buildCopy, removeCopy }                   from "./lib/copy.mjs"
+import { validateExpected }                        from "./lib/expected.mjs"
 import { assignFinding }                           from "./lib/matching.mjs"
 import { evaluateRun, aggregate, calibrate }       from "./lib/scoring.mjs"
 import { findLeak }                                from "./lib/leak.mjs"
@@ -227,6 +229,79 @@ check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c
         && second.includes(first.slice(first.indexOf("<!-- overview:end -->"))))
     check("log: new overview row lands inside the table", /\| Series B [^\n]*\n<!-- overview:end -->/.test(second))
     fs.rmSync(tmp, { recursive: true, force: true })
+}
+
+/*  case resolution  */
+{
+    const sec = resolveCase("security")
+    check("cases: the default case is shop-core at the root paths", resolveCase().name === "shop-core" && shop.expectedFile.endsWith(path.join("solution", "expected.json")))
+    check("cases: security lives under cases/security", sec.dir.endsWith(path.join("cases", "security")) && sec.thresholdFile.startsWith(sec.dir))
+    let refused = false
+    try {
+        resolveCase("other")
+    }
+    catch (err) {
+        refused = /unknown case "other"/.test(err.message)
+    }
+    check("cases: an unknown case is refused (negative case)", refused)
+}
+
+/*  expected-results list version 4: minimum severity and double locations
+    the security list is validated against its own copy; three altered copies must fail  */
+{
+    const sec    = resolveCase("security")
+    const secExp = readJson(sec.expectedFile)
+    const copy   = buildCopy(sec)
+    try {
+        const clone = () => JSON.parse(JSON.stringify(secExp))
+        check("list v4: the security list is valid", validateExpected(secExp, copy.dir).results.every((r) => r.ok) && validateExpected(secExp, copy.dir).global.length === 0)
+        const noSev = clone()
+        delete noSev.entries[0].min_severity
+        check("list v4: a finding without min_severity is invalid (negative case)", validateExpected(noSev, copy.dir).results[0].problems.some((p) => /min_severity/.test(p)))
+        const single = clone()
+        single.entries[1].locations = [ single.entries[1].locations[0] ]
+        single.entries[5].locations = single.entries[5].locations.slice(0, 2)
+        check("list v4: no finding with two locations in one file is invalid (negative case)", validateExpected(single, copy.dir).global.some((g) => /two locations/.test(g)))
+        const near = clone()
+        near.entries.find((e) => e.id === "K-04").locations = [ { file: "src/api.ts", lines: [ 40, 41 ] } ]
+        check("list v4: a decoy 3 lines after a finding is invalid (negative case)", validateExpected(near, copy.dir).global.some((g) => /less than 8 lines/.test(g)))
+        const v3 = clone()
+        v3.version = 3
+        delete v3.entries[0].min_severity
+        check("list v3: without the version the severity rules do not apply", validateExpected(v3, copy.dir).results[0].ok)
+    }
+    finally {
+        removeCopy(copy)
+    }
+}
+
+/*  hits with adequate severity, computed by hand from cases/security/testdata/normal.jsonl:
+    B-01 HIGH (min HIGH, adequate), B-02 MEDIUM (min HIGH, not adequate), B-03 HIGH (adequate),
+    B-05 LOW (min MEDIUM, not adequate), B-06 HIGH (adequate); K-01 reported; store.ts unassignable
+    hits 5/7 = 0.7143, obvious 1, medium 0.6667, hidden 0.5; adequate 3/7 = 0.4286; decoys 1/4 = 0.25  */
+{
+    const sec    = resolveCase("security")
+    const secExp = readJson(sec.expectedFile)
+    const text   = transcriptFacts(fs.readFileSync(path.join(sec.testdataDir, "normal.jsonl"), "utf8")
+        .split("\n").filter(Boolean).map((l) => JSON.parse(l))).text
+    const r = evaluateRun({ name: "s1", status: "ok", model: "m", review: text, cost: 0.5, duration: 1000 }, secExp)
+    check("severity: hits B-01, B-02, B-03, B-05, B-06", eq(r.hits, [ "B-01", "B-02", "B-03", "B-05", "B-06" ]))
+    check("severity: adequate hits B-01, B-03, B-06", eq(r.hits_adequate, [ "B-01", "B-03", "B-06" ]))
+    check("severity: recall overall 0.7143, adequate 0.4286", r.recall.overall === 0.7143 && r.recall.adequate === 0.4286)
+    check("severity: decoy K-01, 1 unassignable", eq(r.decoys_reported, [ "K-01" ]) && r.unassignable === 1)
+    const dup = evaluateRun({ name: "s2", status: "ok", model: "m", cost: 0.1, duration: 100,
+        review: review([ row("LOW", "▢ `src/admin.ts:21`"), row("HIGH", "▢ `src/admin.ts:31`") ]) }, secExp)
+    check("severity: the highest severity of duplicate findings decides (LOW and HIGH on B-02)", eq(dup.hits_adequate, [ "B-02" ]))
+    const low = evaluateRun({ name: "s3", status: "ok", model: "m", cost: 0.1, duration: 100,
+        review: review([ row("MEDIUM", "▢ `src/mail.ts:20`"), row("LOW", "▢ `src/api.ts:34`") ]) }, secExp)
+    check("severity: MEDIUM on a MEDIUM minimum is adequate, LOW on a HIGH minimum is not", eq(low.hits, [ "B-03", "B-05" ]) && eq(low.hits_adequate, [ "B-05" ]))
+    const base = { recall_overall_min: 0.6, recall_obvious_min: 0.8, decoy_false_alarm_max: 0.25 }
+    check("threshold: met without the fourth criterion (0.7143 / 1 / 0.25)", aggregate([ r ], base).threshold.verdict === "threshold met")
+    check("threshold: not met with recall_adequate_min 0.5 at 0.4286 (negative case)", aggregate([ r ], { ...base, recall_adequate_min: 0.5 }).threshold.verdict === "threshold not met")
+    check("threshold: met with recall_adequate_min 0.4", aggregate([ r ], { ...base, recall_adequate_min: 0.4 }).threshold.verdict === "threshold met")
+    const first = evaluateRun({ name: "r1", status: "ok", model: "m", review: replayText("normal.jsonl"), cost: 0.4, duration: 1000 }, expected)
+    check("severity: the version 3 list of shop-core yields no severity fields", first.hits_adequate === undefined && first.recall.adequate === undefined
+        && aggregate([ first ], base).recall.adequate === undefined)
 }
 
 process.stdout.write(`\n${passed} passed, ${failed} failed\n`)

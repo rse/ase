@@ -138,20 +138,27 @@ export function renderSection ({ title, dirs, report, expected, c }) {
     out.push(`| Expected-results list | at run time \`${uniq(runs.map((r) => short(r.meta.expected))).join("`, `")}\`; `
         + `used for scoring \`${short(report.expected)}\` |`)
     out.push(`| Pilot thresholds | overall recall ≥ ${t.recall_overall_min}, obvious ≥ ${t.recall_obvious_min}, `
-        + `decoy match rate ≤ ${t.decoy_false_alarm_max}; file version \`${(report.thresholds.file.commit ?? "not committed").slice(0, 8)}\``
+        + `decoy match rate ≤ ${t.decoy_false_alarm_max}`
+        + (t.recall_adequate_min !== undefined ? `, recall with adequate severity ≥ ${t.recall_adequate_min}` : "")
+        + `; file version \`${(report.thresholds.file.commit ?? "not committed").slice(0, 8)}\``
         + `${report.thresholds.file.modified ? " (uncommitted changes)" : ""} |`)
     out.push(`| Scorer | benchmark code at \`${(scorer.commit ?? "not committed").slice(0, 8)}\``
         + `${scorer.modified ? " with uncommitted changes" : ""} |`, "")
 
     out.push("### Automated results (location-matched)", "")
     out.push("Mean (minimum–maximum) over the evaluated runs.", "")
+    /*  the severity column exists only for cases whose list records a minimum severity  */
+    const adequate = groups.some((g) => g.m.recall.adequate !== undefined)
     out.push("| Configuration | Runs evaluated / total | Recall overall | Recall obvious | Recall medium | Recall hidden "
+        + (adequate ? "| Recall adequate severity " : "")
         + "| Decoy match rate | Unassignable per run | Pilot thresholds | Ceiling-effect check | Duration per run (s) | Cost (USD) |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|")
+        `|---|---|---|---|---|---|${adequate ? "---|" : ""}---|---|---|---|---|---|`)
     for (const g of groups) {
         const m = g.m
         out.push(`| ${configLabel(g.runs)} | ${m.runs.evaluated} / ${m.runs.total} | ${rate(m.recall.overall)} | `
-            + `${rate(m.recall.obvious)} | ${rate(m.recall.medium)} | ${rate(m.recall.hidden)} | ${rate(m.false_alarm_rate)} | `
+            + `${rate(m.recall.obvious)} | ${rate(m.recall.medium)} | ${rate(m.recall.hidden)} | `
+            + (adequate ? `${m.recall.adequate ? rate(m.recall.adequate) : "–"} | ` : "")
+            + `${rate(m.false_alarm_rate)} | `
             + `${rate(m.unassignable)} | ${m.threshold.verdict.replace("threshold ", "")} | ${m.calibration?.statement ?? "–"} | `
             + `${m.duration_ms.mean === null ? "–" : fmt(m.duration_ms.mean / 1000, 0)} | ${fmt(m.cost_usd.sum)} |`)
     }
@@ -173,12 +180,22 @@ export function renderSection ({ title, dirs, report, expected, c }) {
         out.push(`| ${kind === "finding" ? "Defect | Tier" : "Decoy"} | ${runs.map((r) => r.label).join(" | ")} |`,
             `|---${kind === "finding" ? "|---" : ""}|${runs.map(() => "---").join("|")}|`)
         for (const e of entries) {
-            const cells = runs.map((r) => r.detail.recall === undefined ? "n/a" : (r.detail[field] ?? []).includes(e.id) ? "✓" : "–")
+            const cells = runs.map((r) => {
+                const d = r.detail
+                if (d.recall === undefined)
+                    return "n/a"
+                if (!(d[field] ?? []).includes(e.id))
+                    return "–"
+                /*  a hit below the minimum severity of the entry is shown in parentheses  */
+                return d.hits_adequate !== undefined && field === "hits" && !d.hits_adequate.includes(e.id) ? "(✓)" : "✓"
+            })
             out.push(`| ${e.id} ${e.title}${kind === "finding" ? ` | ${e.tier}` : ""} | ${cells.join(" | ")} |`)
         }
         out.push("")
     }
-    matrix("finding", "Seeded defects per run", "✓ = a finding at a matching location, – = none, n/a = run not evaluated.", "hits")
+    matrix("finding", "Seeded defects per run", adequate
+        ? "✓ = a finding at a matching location with at least the minimum severity, (✓) = matched but reported below the minimum severity, – = none, n/a = run not evaluated."
+        : "✓ = a finding at a matching location, – = none, n/a = run not evaluated.", "hits")
     matrix("decoy", "Decoys per run", "✓ = a finding at the decoy's location (whatever it says), – = none.", "decoys_reported")
 
     out.push("### Unassignable findings", "")

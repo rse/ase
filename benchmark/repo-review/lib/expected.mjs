@@ -7,15 +7,21 @@ import path from "node:path"
 
 import { git, readJson, compareIds } from "./common.mjs"
 
-export const TIERS      = [ "obvious", "medium", "hidden" ]
-export const MIN_GAP    = 8
-const        MIN_TIER   = 2
-const        MIN_DECOYS = 3
-const        TITLE_MAX  = 80
+export const TIERS          = [ "obvious", "medium", "hidden" ]
+export const MIN_GAP        = 8
+export const MIN_SEVERITIES = [ "HIGH", "MEDIUM" ]
+const        MIN_TIER       = 2
+const        MIN_DECOYS     = 3
+const        TITLE_MAX      = 80
 
 /*  load the list  */
 export function loadExpected (file) {
     return readJson(file)
+}
+
+/*  whether the list records a minimum severity per finding (version 4 and later)  */
+export function hasMinSeverity (expected) {
+    return Number(expected?.version) >= 4
 }
 
 /*  changed lines per file of the change commit of a copy  */
@@ -48,6 +54,8 @@ export function validateExpected (expected, dir) {
         return { results, global: [ "field \"entries\" is missing" ] }
     const changed = changedLines(dir)
     const ids     = new Set()
+    /*  lists from version 4 on record a minimum severity per finding  */
+    const withSeverity = hasMinSeverity(expected)
     for (const e of expected.entries) {
         const problems = []
         if (typeof e.id !== "string" || !/^[BK]-\d+$/.test(e.id))
@@ -63,6 +71,8 @@ export function validateExpected (expected, dir) {
             problems.push("decoy without rationale")
         if (typeof e.title !== "string" || e.title.trim() === "" || e.title.length > TITLE_MAX)
             problems.push(`title is missing or longer than ${TITLE_MAX} characters`)
+        if (withSeverity && e.kind === "finding" && !MIN_SEVERITIES.includes(e.min_severity))
+            problems.push(`min_severity must be one of ${MIN_SEVERITIES.join(", ")}`)
         if (typeof e.description !== "string" || e.description.trim() === "")
             problems.push("description is missing")
         if (!Array.isArray(e.locations) || e.locations.length === 0)
@@ -107,6 +117,14 @@ export function validateExpected (expected, dir) {
     const decoys = expected.entries.filter((e) => e.kind === "decoy").length
     if (decoys < MIN_DECOYS)
         global.push(`${decoys} decoys, at least ${MIN_DECOYS} required`)
+    if (withSeverity) {
+        const twice = findings.some((e) => {
+            const files = (e.locations || []).map((f) => f.file)
+            return files.length > new Set(files).size
+        })
+        if (!twice)
+            global.push("no finding with two locations in the same file")
+    }
 
     /*  minimum distance between entries of the same file  */
     const ranges = []

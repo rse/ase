@@ -1,0 +1,13 @@
+{
+    "version": 1,
+    "source": "PRD approval decisions of 2026-11-03 for the case security (run run-7c2e9a4b-5d18-4f36-9b0a-3e6c1d8f2a75)",
+    "recall_overall_min": 0.6,
+    "recall_obvious_min": 0.8,
+    "decoy_false_alarm_max": 0.25,
+    "recall_adequate_min": 0.5,
+    "runs_per_model": 3,
+    "budget_per_run_usd": 5,
+    "budget_total_usd": 30,
+    "timeout_per_run_min": 20,
+    "matching_tolerance_lines": 3
+}

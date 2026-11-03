@@ -1,0 +1,111 @@
+{
+    "version": 4,
+    "fixture": "shop-core (security)",
+    "entries": [
+        {
+            "id": "B-01",
+            "kind": "finding",
+            "tier": "obvious",
+            "min_severity": "HIGH",
+            "title": "Refund amount is taken from the request instead of the order",
+            "description": "adminRefund passes req.amount to issueRefund instead of the paid amount of the order; whoever can call the endpoint can refund any amount, far above what was paid.",
+            "locations": [ { "file": "src/admin.ts", "lines": [ 40, 40 ] } ]
+        },
+        {
+            "id": "B-02",
+            "kind": "finding",
+            "tier": "obvious",
+            "min_severity": "HIGH",
+            "title": "Admin check lets callers without a role through",
+            "description": "requireAdmin only rejects users whose role is set and not admin; a user without a role (undefined) passes, so anonymous or freshly created accounts can issue refunds.",
+            "locations": [
+                { "file": "src/admin.ts", "lines": [ 20, 21 ] },
+                { "file": "src/admin.ts", "lines": [ 31, 31 ] }
+            ]
+        },
+        {
+            "id": "B-03",
+            "kind": "finding",
+            "tier": "medium",
+            "min_severity": "HIGH",
+            "title": "Order lookup ignores the customer who asks",
+            "description": "handleGetOrder loads the order by id and never compares order.customer.id with query.customerId; any signed-in customer can read any order, including the e-mail of its owner, by guessing ids like O1, O2 (insecure direct object reference).",
+            "locations": [ { "file": "src/api.ts", "lines": [ 33, 37 ] } ]
+        },
+        {
+            "id": "B-04",
+            "kind": "finding",
+            "tier": "medium",
+            "min_severity": "HIGH",
+            "title": "Webhook signature is only checked when a signature is sent",
+            "description": "handlePaymentEvent verifies the signature only if the header is present; a request without a signature is accepted, so anyone can mark orders as paid or failed by omitting the header.",
+            "locations": [ { "file": "src/webhook.ts", "lines": [ 46, 47 ] } ]
+        },
+        {
+            "id": "B-05",
+            "kind": "finding",
+            "tier": "medium",
+            "min_severity": "MEDIUM",
+            "title": "Discount code is inserted into the HTML mail unescaped",
+            "description": "renderConfirmation escapes the order id and the e-mail but inserts the discount code from the order form verbatim into the HTML; a customer can inject markup or script into the confirmation mail.",
+            "locations": [ { "file": "src/mail.ts", "lines": [ 19, 20 ] } ]
+        },
+        {
+            "id": "B-06",
+            "kind": "finding",
+            "tier": "hidden",
+            "min_severity": "HIGH",
+            "title": "Refund pays the subtotal before the discount",
+            "description": "The change introduces order.subtotal (amount before the discount code) next to order.total; refundOrder refunds order.subtotal, so a customer who paid with a 15 % code gets back more than was paid.",
+            "locations": [
+                { "file": "src/refund.ts", "lines": [ 23, 26 ] },
+                { "file": "src/order.ts", "lines": [ 25, 26 ] },
+                { "file": "src/order.ts", "lines": [ 71, 72 ] }
+            ]
+        },
+        {
+            "id": "B-07",
+            "kind": "finding",
+            "tier": "hidden",
+            "min_severity": "MEDIUM",
+            "title": "A failed payment keeps the stock reserved",
+            "description": "On a failed payment event the webhook calls markFailed, which only sets the status; unlike cancelOrder it never releases the reserved items, so repeated failed payments (or forged failed events) block the stock for everyone else.",
+            "locations": [
+                { "file": "src/webhook.ts", "lines": [ 59, 59 ] },
+                { "file": "src/order.ts", "lines": [ 105, 107 ] }
+            ]
+        },
+        {
+            "id": "K-01",
+            "kind": "decoy",
+            "title": "Byte-wise signature comparison with a running XOR",
+            "description": "signaturesMatch compares all characters and collects the differences with |= instead of returning early.",
+            "rationale": "This is a constant-time comparison: it deliberately does not stop at the first difference, so the response time does not reveal how many leading bytes matched. The length check before it is the usual exception.",
+            "locations": [ { "file": "src/webhook.ts", "lines": [ 16, 21 ] } ]
+        },
+        {
+            "id": "K-02",
+            "kind": "decoy",
+            "title": "Amount parsed with Number() from provider input",
+            "description": "parseAmount converts the string from the webhook with Number(raw).",
+            "rationale": "The conversion is immediately followed by Number.isSafeInteger and a sign check, so NaN, Infinity, fractions, and negative values are rejected before the amount is used; handlePaymentEvent additionally compares it with the order total.",
+            "locations": [ { "file": "src/webhook.ts", "lines": [ 31, 33 ] } ]
+        },
+        {
+            "id": "K-03",
+            "kind": "decoy",
+            "title": "Mail errors are caught and only logged",
+            "description": "sendConfirmation swallows every error of the outbox and writes it to the console.",
+            "rationale": "The order is already stored when the mail is queued, and the comment states the rule: a mail problem must not fail the order, the outbox job retries later. Swallowing is the documented business decision, not an oversight.",
+            "locations": [ { "file": "src/mail.ts", "lines": [ 36, 39 ] } ]
+        },
+        {
+            "id": "K-04",
+            "kind": "decoy",
+            "title": "Math.random in the recommendation shuffle",
+            "description": "recommendations shuffles items with Math.random.",
+            "rationale": "The shuffle only varies the order of product recommendations on the start page; nothing depends on the randomness being unpredictable, so a cryptographic generator is not required.",
+            "locations": [ { "file": "src/api.ts", "lines": [ 55, 61 ] } ]
+        }
+    ]
+}

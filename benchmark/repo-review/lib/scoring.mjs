@@ -4,10 +4,13 @@
 **  re-implemented, not copied.
 */
 
-import { round4, compareIds } from "./common.mjs"
-import { TIERS }              from "./expected.mjs"
-import { parseReview }        from "./parser.mjs"
-import { assignAll }          from "./matching.mjs"
+import { round4, compareIds }   from "./common.mjs"
+import { TIERS, hasMinSeverity } from "./expected.mjs"
+import { parseReview }          from "./parser.mjs"
+import { assignAll }            from "./matching.mjs"
+
+/*  rank of the severities of the skill, for the minimum severity of a finding  */
+export const SEVERITY_RANK = { HIGH: 3, MEDIUM: 2, LOW: 1 }
 
 /*  evaluate a single run from its status and review text  */
 export function evaluateRun (run, expected) {
@@ -29,6 +32,7 @@ export function evaluateRun (run, expected) {
     const bugs   = expected.entries.filter((e) => e.kind === "finding")
     const decoys = expected.entries.filter((e) => e.kind === "decoy")
     const hit    = new Map()
+    const best   = new Map()
     let accepted = 0, unassignable = 0
     for (const f of findings) {
         if (f.severity === "ACCEPTED") {
@@ -40,6 +44,8 @@ export function evaluateRun (run, expected) {
             continue
         }
         hit.set(f.assigned.id, (hit.get(f.assigned.id) ?? 0) + 1)
+        /*  the highest severity reported for an entry decides whether the hit is adequate  */
+        best.set(f.assigned.id, Math.max(best.get(f.assigned.id) ?? 0, SEVERITY_RANK[f.severity] ?? 0))
     }
     const hitBugs   = bugs.filter((e) => hit.has(e.id)).map((e) => e.id).sort(compareIds)
     const hitDecoys = decoys.filter((e) => hit.has(e.id)).map((e) => e.id).sort(compareIds)
@@ -56,6 +62,12 @@ export function evaluateRun (run, expected) {
     out.accepted           = accepted
     out.duplicates         = [ ...hit.values() ].reduce((s, n) => s + (n - 1), 0)
     out.findings_reported  = findings.length
+    /*  hits reported with at least the minimum severity; only for lists that record one  */
+    if (hasMinSeverity(expected)) {
+        const adequate = bugs.filter((e) => hit.has(e.id) && best.get(e.id) >= (SEVERITY_RANK[e.min_severity] ?? 0))
+        out.hits_adequate   = adequate.map((e) => e.id).sort(compareIds)
+        out.recall.adequate = round4(adequate.length / bugs.length)
+    }
     return out
 }
 
@@ -96,6 +108,8 @@ export function aggregate (runs, thresholds) {
     }
     for (const key of [ ...TIERS, "overall" ])
         out.recall[key] = stats(evaluated.map((r) => r.recall[key]))
+    if (evaluated.some((r) => r.recall.adequate !== undefined))
+        out.recall.adequate = stats(evaluated.map((r) => r.recall.adequate))
     out.threshold = judge(out, thresholds)
     return out
 }
@@ -107,6 +121,9 @@ export function judge (agg, t) {
         recall_obvious:   { value: agg.recall.obvious.mean,   limit: t.recall_obvious_min,    kind: "min" },
         false_alarm_rate: { value: agg.false_alarm_rate.mean, limit: t.decoy_false_alarm_max, kind: "max" }
     }
+    /*  the fourth criterion applies only to threshold files that name it  */
+    if (t.recall_adequate_min !== undefined)
+        checks.recall_adequate = { value: agg.recall.adequate?.mean ?? null, limit: t.recall_adequate_min, kind: "min" }
     let met = agg.runs.evaluated > 0
     for (const c of Object.values(checks)) {
         c.met = c.value !== null && (c.kind === "min" ? c.value >= c.limit : c.value <= c.limit)

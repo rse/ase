@@ -91,7 +91,9 @@ export function renderMarkdown (report) {
     out.push("# Effectiveness test ase-repo-review", "")
     out.push(`Expected-results list: \`${report.expected}\``, "")
     out.push(`Thresholds: overall recall ≥ ${t.recall_overall_min}, obvious ≥ ${t.recall_obvious_min}, `
-        + `decoy false-alarm rate ≤ ${t.decoy_false_alarm_max}; file version \`${report.thresholds.file.commit ?? "not committed"}\``
+        + `decoy false-alarm rate ≤ ${t.decoy_false_alarm_max}`
+        + (t.recall_adequate_min !== undefined ? `, recall with adequate severity ≥ ${t.recall_adequate_min}` : "")
+        + `; file version \`${report.thresholds.file.commit ?? "not committed"}\``
         + (report.thresholds.file.modified ? " (**warning: uncommitted changes**)" : ""), "")
     for (const [ model, m ] of Object.entries(report.models)) {
         out.push(`## Model ${model}`, "")
@@ -106,15 +108,20 @@ export function renderMarkdown (report) {
         out.push(`| Recall obvious | ${rate(m.recall.obvious)} |`)
         out.push(`| Recall medium | ${rate(m.recall.medium)} |`)
         out.push(`| Recall hidden | ${rate(m.recall.hidden)} |`)
+        /*  the severity figures exist only for cases whose list records a minimum severity  */
+        const adequate = m.recall.adequate !== undefined
+        if (adequate)
+            out.push(`| Recall with adequate severity | ${rate(m.recall.adequate)} |`)
         out.push(`| Decoy false-alarm rate (n=${m.false_alarm_rate.n}) | ${rate(m.false_alarm_rate)} |`)
         out.push(`| Unassignable findings per run | ${rate(m.unassignable)} |`)
         out.push(`| Duration per run (s) | ${m.duration_ms.mean === null ? "–" : fmt(m.duration_ms.mean / 1000, 0)} |`)
         out.push(`| Total cost (USD) | ${fmt(m.cost_usd.sum)} |`, "")
-        out.push("| Run | Status | Skill verdict | Hits | Decoys reported | Unassignable | Duration (s) | Cost (USD) |",
-            "|---|---|---|---|---|---|---|---|")
+        out.push(`| Run | Status | Skill verdict | Hits |${adequate ? " Adequate severity |" : ""} Decoys reported | Unassignable | Duration (s) | Cost (USD) |`,
+            `|---|---|---|---|${adequate ? "---|" : ""}---|---|---|---|`)
         for (const r of m.run_details) {
             const status = r.reason ? `${r.status} (${r.reason})` : r.status
             out.push(`| ${r.name} | ${status} | ${r.verdict ?? "–"} | ${(r.hits ?? []).join(", ") || "–"} | `
+                + (adequate ? `${(r.hits_adequate ?? []).join(", ") || "–"} | ` : "")
                 + `${(r.decoys_reported ?? []).join(", ") || "–"} | ${r.unassignable ?? "–"} | `
                 + `${r.duration === null ? "–" : fmt(r.duration / 1000, 0)} | ${fmt(r.cost)} |`)
         }
