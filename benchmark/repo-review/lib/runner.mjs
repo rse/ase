@@ -121,9 +121,11 @@ export function isAlive (pid) {
     }
 }
 
-/*  series budget: may another run start? (SDD-007)  */
+/*  series budget: may another run start? (SDD-007); a run can overshoot its limit
+    slightly before the CLI stops it, so a margin is reserved (CR-005)  */
+export const OVERSHOOT = 1.1
 export function seriesAllows (spent, perRun, total) {
-    return spent + perRun <= total + 1e-9
+    return spent + perRun * OVERSHOOT <= total + 1e-9
 }
 
 /*  whether a plugin of the init event is built into the CLI itself  */
@@ -146,8 +148,11 @@ export function checkInit (event) {
     for (const s of servers)
         if (s.name !== "ase")
             problems.push(`fremder MCP-Server geladen: ${s.name}`)
-    if (!servers.some((s) => s.name === "ase"))
+    const ase = servers.find((s) => s.name === "ase")
+    if (!ase)
         problems.push("MCP-Server von ASE fehlt")
+    else if (ase.status !== undefined && ase.status !== "connected")
+        problems.push(`MCP-Server von ASE nicht verbunden: ${ase.status}`)
     return problems
 }
 
@@ -188,12 +193,18 @@ export function killLeftovers (before) {
     return left.map((p) => p.cmd.replace(/\s+/g, " ").slice(0, 200))
 }
 
-/*  collect strings of a tool input that may name paths  */
+/*  collect all strings of a tool input (any tool, including MCP and sub-agent prompts, CR-004)  */
 function toolStrings (input) {
-    const out = []
-    for (const key of [ "file_path", "path", "pattern", "command", "notebook_path", "glob" ])
-        if (typeof input?.[key] === "string")
-            out.push(input[key])
+    const out  = []
+    const walk = (v) => {
+        if (typeof v === "string")
+            out.push(v)
+        else if (Array.isArray(v))
+            v.forEach(walk)
+        else if (v !== null && typeof v === "object")
+            Object.values(v).forEach(walk)
+    }
+    walk(input)
     return out
 }
 
@@ -201,7 +212,8 @@ function toolStrings (input) {
     to the ASE repository outside of plugin/ and tool/ (which the run legitimately uses)  */
 export function checkContamination (events) {
     const problems = []
-    const norm     = (p) => p.replace(/\\/g, "/").toLowerCase()
+    /*  normalize Windows and Git Bash forms ("C:\x", "C:/x", "/c/x") to "c:/x" (CR-004)  */
+    const norm     = (p) => p.replace(/\\/g, "/").toLowerCase().replace(/(^|[\s"'=(])\/([a-z])\//g, "$1$2:/")
     const bench    = norm(BENCH_DIR)
     const repo     = norm(REPO_DIR)
     const allowed  = [ norm(path.join(REPO_DIR, "plugin")), norm(path.join(REPO_DIR, "tool")) ]
@@ -300,21 +312,34 @@ export function modelShort (model) {
 }
 
 /*  run the child and collect its stream-json output (SDD-006, SDD-007)  */
-export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, stderrFile, onInit }) {
+export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, stderrFile, onInit, graceMs = 5000 }) {
     return new Promise((resolve) => {
         const out     = fs.createWriteStream(transcriptFile)
         const err     = fs.createWriteStream(stderrFile)
         const events  = []
         let   stopped = null
         let   buffer  = ""
-        const child = spawn(program, args, {
-            cwd, env, stdio: [ "ignore", "pipe", "pipe" ],
-            detached: process.platform !== "win32", windowsHide: true
-        })
-        const timer = setTimeout(() => {
-            stopped = { status: "abgebrochen", reason: "zeit" }
-            killTree(child)
-        }, timeoutMs)
+        let   done    = false
+        let   grace   = null
+        let   child   = null
+        let   timer   = null
+        const finish = (code) => {
+            if (done)
+                return
+            done = true
+            clearTimeout(timer)
+            clearTimeout(grace)
+            handle(buffer)
+            buffer = ""
+            out.end()
+            err.end()
+            resolve({ events, exitCode: code, stopped, pid: child?.pid ?? null })
+        }
+        /*  resolve even if a surviving descendant keeps the pipes open (CR-006)  */
+        const armGrace = () => {
+            if (grace === null)
+                grace = setTimeout(() => finish(null), graceMs)
+        }
         const handle = (line) => {
             if (line.trim() === "")
                 return
@@ -331,12 +356,31 @@ export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, 
                 if (problems.length > 0) {
                     stopped = { status: "fehler", reason: "isolation", details: problems }
                     killTree(child)
+                    armGrace()
                 }
             }
         }
-        child.stdout.on("data", (chunk) => {
-            out.write(chunk)
-            buffer += chunk.toString("utf8")
+        try {
+            child = spawn(program, args, {
+                cwd, env, stdio: [ "ignore", "pipe", "pipe" ],
+                detached: process.platform !== "win32", windowsHide: true
+            })
+        }
+        catch (e) {
+            stopped = { status: "fehler", reason: "start", details: [ e.message ] }
+            finish(null)
+            return
+        }
+        timer = setTimeout(() => {
+            stopped = stopped ?? { status: "abgebrochen", reason: "zeit" }
+            killTree(child)
+            armGrace()
+        }, timeoutMs)
+        /*  decode as a stream, so multibyte characters split across chunks stay intact (CR-002)  */
+        child.stdout.setEncoding("utf8")
+        child.stdout.on("data", (text) => {
+            out.write(text)
+            buffer += text
             let i
             while ((i = buffer.indexOf("\n")) >= 0) {
                 handle(buffer.slice(0, i))
@@ -345,15 +389,13 @@ export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, 
         })
         child.stderr.on("data", (chunk) => err.write(chunk))
         child.on("error", (e) => {
-            clearTimeout(timer)
             stopped = stopped ?? { status: "fehler", reason: "start", details: [ e.message ] }
+            finish(null)
         })
-        child.on("close", (code) => {
+        child.on("exit", () => {
             clearTimeout(timer)
-            handle(buffer)
-            out.end()
-            err.end()
-            resolve({ events, exitCode: code, stopped, pid: child.pid })
+            armGrace()
         })
+        child.on("close", (code) => finish(code))
     })
 }

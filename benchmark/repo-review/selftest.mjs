@@ -14,7 +14,7 @@ import { parseReview }                             from "./lib/parser.mjs"
 import { assignFinding }                           from "./lib/zuordnung.mjs"
 import { evaluateRun, aggregate, calibrate }       from "./lib/auswertung.mjs"
 import { findLeak }                                from "./lib/leck.mjs"
-import { seriesAllows, createRunDir, checkInit, claudeArgs, mcpConfig, checkContamination, childEnv, envSummary, transcriptFacts } from "./lib/runner.mjs"
+import { seriesAllows, createRunDir, checkInit, claudeArgs, mcpConfig, checkContamination, runChild, childEnv, envSummary, transcriptFacts } from "./lib/runner.mjs"
 
 let passed = 0, failed = 0
 function check (name, cond, info = "") {
@@ -127,7 +127,8 @@ check("Leck: \"falls through\" ist erlaubt", findLeak("/* falls through */") ===
 
 /*  SCN-005, SCN-008, SCN-010, SCN-026: runner helpers  */
 check("Serienbudget: 26 + 5 > 30 verweigert", seriesAllows(26, 5, 30) === false)
-check("Serienbudget: 25 + 5 = 30 erlaubt", seriesAllows(25, 5, 30) === true)
+check("Serienbudget: 25 + 5 mit 10 % Reserve (5,5) > 30 verweigert (CR-005)", seriesAllows(25, 5, 30) === false)
+check("Serienbudget: 24,5 + 5,5 = 30 erlaubt", seriesAllows(24.5, 5, 30) === true)
 {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-selftest-"))
     createRunDir(tmp, "x")
@@ -155,6 +156,18 @@ check("Isolation: fremder MCP-Server (Konto-Konnektor) wird erkannt (Negativfall
     check("MCP-Konfiguration: genau der Server ase", eq(Object.keys(mcpConfig().mcpServers), [ "ase" ]) && mcpConfig().mcpServers.ase.args.at(-1) === "mcp")
 }
 check("Isolation: fehlender ASE-MCP-Server wird erkannt", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [] }).length === 1)
+check("Isolation: nicht verbundener ASE-MCP-Server wird erkannt (CR-007)", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase", status: "failed" } ] }).length === 1)
+check("Leck: Pluralformen wie \"bugs\" und \"todos\" werden erkannt (CR-010)", findLeak("two bugs here") === "bug" && findLeak("open todos") === "todo")
+{
+    /*  CR-002: a multibyte character split across two output chunks stays intact  */
+    const tmp    = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-selftest-"))
+    const script = "const b = Buffer.from(JSON.stringify({ type: \"result\", result: \"Grenze 12–15 ▢ äöü\" }) + \"\\n\"); "
+        + "const i = b.indexOf(0xe2) + 1; process.stdout.write(b.subarray(0, i)); setTimeout(() => process.stdout.write(b.subarray(i)), 100)"
+    const res = await runChild({ program: process.execPath, args: [ "-e", script ], cwd: tmp, env: process.env, timeoutMs: 10000,
+        transcriptFile: path.join(tmp, "t.jsonl"), stderrFile: path.join(tmp, "e.txt"), onInit: () => [] })
+    check("Mitschrift: geteiltes Mehrbyte-Zeichen bleibt erhalten (CR-002)", res.events[0]?.result === "Grenze 12–15 ▢ äöü")
+    fs.rmSync(tmp, { recursive: true, force: true })
+}
 {
     const use = (input) => ({ type: "assistant", message: { content: [ { type: "tool_use", name: "Read", input } ] } })
     check("Kontamination: Zugriff auf die Sollliste wird erkannt", checkContamination([ use({ file_path: "../../solution/sollliste.json" }) ]).length > 0)

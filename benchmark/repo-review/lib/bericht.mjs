@@ -20,7 +20,8 @@ export function collectRunDirs (paths) {
                 if (entry.isDirectory() && fs.existsSync(path.join(abs, entry.name, "run.json")))
                     dirs.add(path.join(abs, entry.name))
     }
-    return [ ...dirs ].sort((a, b) => path.basename(a).localeCompare(path.basename(b)) || a.localeCompare(b))
+    const cmp = (x, y) => x < y ? -1 : x > y ? 1 : 0
+    return [ ...dirs ].sort((a, b) => cmp(path.basename(a), path.basename(b)) || cmp(a, b))
 }
 
 /*  load one result folder  */
@@ -31,7 +32,7 @@ export function loadRun (dir) {
         name:     path.basename(dir),
         status:   meta.status,
         reason:   meta.reason ?? null,
-        model:    meta.model?.requested ?? "unbekannt",
+        model:    (meta.model?.requested ?? "unbekannt") + (meta.dry_run ? " (Trockenlauf)" : ""),
         reported: meta.model?.reported ?? [],
         cost:     meta.cost_usd ?? null,
         duration: meta.duration_ms ?? null,

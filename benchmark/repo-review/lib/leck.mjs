@@ -13,7 +13,7 @@ export const DENY_TERMS = [
     "sollliste", "köder", "koeder", "decoy", "bait", "befund",
     "bug", "todo", "fixme", "xxx", "hack", "intentional", "absichtlich"
 ]
-const DENY_RE = new RegExp(`(?<![\\p{L}\\p{N}_])(${DENY_TERMS.join("|")})(?![\\p{L}\\p{N}_])`, "iu")
+const DENY_RE = new RegExp(`(?<![\\p{L}\\p{N}_])(${DENY_TERMS.join("|")})(?:s|e|en|es)?(?![\\p{L}\\p{N}_])`, "iu")
 const ID_RE   = /\b[BK]-\d+\b/
 
 /*  check a single text and return the offending term (or null)  */

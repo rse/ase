@@ -5,6 +5,7 @@
 */
 
 import fs   from "node:fs"
+import os   from "node:os"
 import path from "node:path"
 
 import { REPO_DIR, RESULTS_DIR, TESTDATA_DIR, SOLL_FILE, THRESH_FILE, readJson, sha256, stableStringify, git } from "./lib/common.mjs"
@@ -134,7 +135,9 @@ async function oneRun (o, nr, env, program, pre) {
     const name    = `${stamp(started)}-${modelShort(o.model)}-${nr}${o.dryRun ? "-dry" : ""}`
     const dir     = createRunDir(o.out, name)
     const copy    = buildCopy()
-    const mcpFile = path.join(copy.root, "ase-mcp.json")
+    /*  MCP configuration outside the parent of the copy, so ".." does not lead to the repository path (CR-004)  */
+    const mcpDir  = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-mcp-"))
+    const mcpFile = path.join(mcpDir, "ase-mcp.json")
     fs.writeFileSync(mcpFile, JSON.stringify(mcpConfig(), null, 4))
     const args    = claudeArgs({ ...o, mcpConfigFile: mcpFile })
     const before  = o.dryRun ? [] : aseProcesses()
@@ -147,7 +150,7 @@ async function oneRun (o, nr, env, program, pre) {
         simulate:        o.simulate,
         replay:          o.replay ? path.basename(o.replay) : (o.dryRun ? "normal.jsonl" : null),
         model:           { requested: o.model, reported: [] },
-        endpoint:        { base_url: o.baseUrl ?? "default", token_gesetzt: Boolean(o.authTokenEnv) },
+        endpoint:        { base_url: safeUrl(o.baseUrl), token_gesetzt: Boolean(o.authTokenEnv) },
         child_env:       envSummary(env),
         cli_version:     o.dryRun ? null : cliVersion(program, pre),
         ase:             aseInfo(),
@@ -171,10 +174,40 @@ async function oneRun (o, nr, env, program, pre) {
         if (review !== null)
             fs.writeFileSync(path.join(dir, "review.md"), review)
         fs.writeFileSync(path.join(dir, "run.json"), stableStringify(meta))
-        if (!o.keep)
-            removeCopy(copy)
         return meta
     }
+    try {
+        return await runInCopy(o, dir, copy, args, env, before, meta, finish, program, pre)
+    }
+    catch (err) {
+        /*  unexpected failure: still write a protocol (CR-009)  */
+        meta.status  = "fehler"
+        meta.reason  = "intern"
+        meta.details = [ err.message ]
+        return finish(null)
+    }
+    finally {
+        fs.rmSync(mcpDir, { recursive: true, force: true })
+        if (!o.keep)
+            removeCopy(copy)
+    }
+}
+
+/*  base URL for the protocol, without user info, query, or fragment  */
+function safeUrl (url) {
+    if (!url)
+        return "default"
+    try {
+        const u = new URL(url)
+        return `${u.protocol}//${u.host}${u.pathname}`
+    }
+    catch (err) {
+        return "(ungültige URL)"
+    }
+}
+
+/*  the part of a run that works on the copy  */
+async function runInCopy (o, dir, copy, args, env, before, meta, finish, program, pre) {
 
     /*  leak check before any model call (SDD-004)  */
     if (o.simulate === "leak") {
@@ -258,6 +291,12 @@ async function oneRun (o, nr, env, program, pre) {
         meta.reason = "kein Ergebnis"
         return finish(null)
     }
+    if (facts.result.is_error) {
+        /*  infrastructure failure of the CLI, not a review result (CR-008)  */
+        meta.status = "fehler"
+        meta.reason = facts.result.subtype ?? "is_error"
+        return finish(facts.text)
+    }
     meta.status = parseReview(facts.text).status
     return finish(facts.text)
 }
@@ -299,7 +338,8 @@ async function main () {
             return 3
         }
         const meta = await oneRun(o, nr, env, program, pre)
-        spent += meta.cost_usd ?? 0
+        /*  a run without cost report (time, isolation, start) counts with its full limit (CR-001)  */
+        spent += meta.cost_usd ?? (o.dryRun ? 0 : o.budget)
         process.stdout.write(`Lauf ${nr}/${o.runs}: ${meta.status}${meta.reason ? ` (${meta.reason})` : ""}, `
             + `Kosten ${meta.cost_usd === null ? "–" : meta.cost_usd.toFixed(2)} USD, `
             + `Dauer ${Math.round(meta.duration_ms / 1000)} s\n`)
