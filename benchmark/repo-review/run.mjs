@@ -7,7 +7,7 @@
 import fs   from "node:fs"
 import path from "node:path"
 
-import { REPO_DIR, RESULTS_DIR, TESTDATA_DIR, SOLL_FILE, THRESH_FILE, readJson, sha256, stableStringify } from "./lib/common.mjs"
+import { REPO_DIR, RESULTS_DIR, TESTDATA_DIR, SOLL_FILE, THRESH_FILE, readJson, sha256, stableStringify, git } from "./lib/common.mjs"
 import { buildCopy, removeCopy, fixtureDigest } from "./lib/kopie.mjs"
 import { checkCopy }                            from "./lib/leck.mjs"
 import { parseReview }                          from "./lib/parser.mjs"
@@ -172,6 +172,7 @@ async function oneRun (o, nr, env, program, pre) {
     if (o.simulate === "leak") {
         fs.appendFileSync(path.join(copy.dir, "src", "api.ts"), "\n// see sollliste\n")
         fs.writeFileSync(path.join(copy.dir, "NOTES.md"), "B-03\n")
+        git(copy.dir, [ "commit", "-q", "--allow-empty", "-m", "Fix K-02" ])
     }
     const leaks = checkCopy(copy.dir)
     if (leaks.length > 0) {
