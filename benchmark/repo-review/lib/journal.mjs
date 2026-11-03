@@ -197,7 +197,7 @@ export function renderSection ({ title, dirs, report, expected }) {
     out.push("### Manual reading", "")
     out.push("_Not recorded yet. Write it here by hand; do not change the generated parts above._", "")
 
-    const rows = groups.map((g) => `| ${title} | ${configLabel(g.runs)} | ${uniq(g.runs.map((r) => r.meta.endpoint)).join(", ")} | `
+    const rows = groups.map((g) => `| ${title.replace(/\|/g, "\\|")} | ${configLabel(g.runs)} | ${uniq(g.runs.map((r) => r.meta.endpoint)).join(", ")} | `
         + `${g.m.runs.evaluated} / ${g.m.runs.total} | ${fmt(g.m.recall.overall.mean)} | ${fmt(g.m.recall.obvious.mean)} | `
         + `${fmt(g.m.false_alarm_rate.mean)} | ${fmt(g.m.unassignable.mean, 1)} | ${g.m.threshold.verdict.replace("threshold ", "")} | `
         + `${fmt(g.m.cost_usd.sum)} | not yet |`)
