@@ -185,7 +185,7 @@ export function killLeftovers (before) {
             }
         }
     }
-    return left.map((p) => p.cmd.replace(/s+/g, " ").slice(0, 200))
+    return left.map((p) => p.cmd.replace(/\s+/g, " ").slice(0, 200))
 }
 
 /*  collect strings of a tool input that may name paths  */
