@@ -14,10 +14,8 @@ export const PROMPT = "/ase:ase-repo-review -c HEAD -S LOW"
 
 /*  tool permissions (TP planning decision)  */
 export const ALLOWED_TOOLS = [
-    "Read", "Grep", "Glob", "Skill", "Task",
-    "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)", "Bash(git rev-parse:*)",
-    "Bash(git rev-list:*)", "Bash(git merge-base:*)", "Bash(git status:*)",
-    "Bash(git branch:*)", "Bash(git for-each-ref:*)",
+    "Read", "Grep", "Glob", "Skill", "Task", "Agent", "ToolSearch",
+    "Bash(git:*)", "Bash(cd:*)", "PowerShell(git:*)", "PowerShell(cd:*)",
     "mcp__ase__*"
 ]
 export const DISALLOWED_TOOLS = [ "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch" ]
