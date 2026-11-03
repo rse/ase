@@ -26,11 +26,13 @@ this benchmark.
 
 ## Current status: pilot
 
-One TypeScript test case with seven seeded defects and four decoys, run three
-times per model. Automated scores rely on file and line matching and can disagree
-with manual inspection. The reference measurement identified limitations in both
-the test case and the scorer that need addressing before broader conclusions
-about model performance.
+Two TypeScript test cases on the same small shop project, each with seven seeded
+defects and four decoys: `shop-core` (correctness defects, measured three times
+per model) and `security` (defects an attacker could exploit, with a minimum
+severity per defect; not measured yet). Automated scores rely on file and line
+matching and can disagree with manual inspection. The reference measurement of
+the first case identified limitations in both the test case and the scorer that
+need addressing before broader conclusions about model performance.
 
 ## How the test works
 
@@ -65,6 +67,21 @@ currency, and some validation. The seven seeded defects come in three tiers:
 - **hidden** defects only show up when you follow the change across files, for
   example a function that now returns cents while its caller in another module
   still formats the value as euros, so the API shows a hundred times the amount.
+
+The second case, `security`, starts from the same shop with those defects fixed
+and adds an admin refund endpoint, a customer order lookup, a payment webhook,
+and HTML confirmation mails. Its seven defects are the kind an attacker would
+look for: a refund amount taken from the request, a role check that lets callers
+without a role through, an order lookup that never asks who is asking, a webhook
+that only verifies the signature when one is sent, a discount code pasted into
+HTML unescaped, a refund of the amount before the discount, and a failed payment
+that keeps the stock reserved. Its four decoys look like security smells but are
+fine: a constant-time signature comparison, a `Number()` conversion followed by
+strict validation, a `catch` that deliberately swallows mail errors, and
+`Math.random` used only to shuffle recommendations. Each defect also records the
+**minimum severity** a review should assign (`HIGH` for money, other people's
+data, and payment events, `MEDIUM` for injection into mails and blocked stock).
+The lists live in `solution/expected.json` and `cases/security/solution/expected.json`.
 
 ## Results so far
 
@@ -137,21 +154,31 @@ node benchmark/repo-review/run.mjs --dry-run
 node benchmark/repo-review/compare.mjs
 ```
 
+Every command takes `--case <name>` and works on `shop-core` without it; the
+second case is `security`:
+
+```
+node benchmark/repo-review/check.mjs --case security
+node benchmark/repo-review/run.mjs --dry-run --case security
+node benchmark/repo-review/compare.mjs --case security
+```
+
 A real measurement additionally needs the Claude Code CLI (`claude`) with a login
 and the built `tool/` of this repository (`cd tool && npm start build`). It costs
 money, so it must be confirmed explicitly:
 
 ```
-node benchmark/repo-review/run.mjs --model sonnet --runs 3 --confirm-paid
-node benchmark/repo-review/compare.mjs
+node benchmark/repo-review/run.mjs --case security --model sonnet --runs 3 --confirm-paid
+node benchmark/repo-review/compare.mjs --case security
 ```
 
-`compare.mjs` writes `report.md` and `report.json` to `results/report/`. To keep
-the series, append it to the log and then add the manual reading by hand below
-its generated part:
+`compare.mjs` writes `report.md` and `report.json` to the `results/report/`
+folder of the case and only evaluates result folders of that case. To keep the
+series, append it to the log and then add the manual reading by hand below its
+generated part:
 
 ```
-node benchmark/repo-review/compare.mjs --journal benchmark/repo-review/MEASUREMENTS.md --title "2026-11-20: Sonnet 5.5, second case" benchmark/repo-review/results
+node benchmark/repo-review/compare.mjs --case security --journal benchmark/repo-review/MEASUREMENTS.md --title "2026-11-20: security, Sonnet 5.5" benchmark/repo-review/cases/security/results
 ```
 
 The log refuses a series it already holds, does not accept dry runs, and requires
@@ -178,6 +205,10 @@ From that assignment come three figures:
   four predefined decoys with a finding at a matching location. It counts any
   such finding, whatever it says, so it can include unrelated remarks.
 - **Unassignable findings**: findings that match neither a defect nor a decoy.
+- **Recall with adequate severity** (case `security` only): the share of defects
+  that were not only matched but reported with at least their minimum severity;
+  the highest severity among the findings matched to a defect counts. A security
+  hole reported as `LOW` is half missed, and this figure says so.
 
 On manual reading, a finding on a decoy counts as a false alarm only if it claims
 the code behaves wrongly. A hint on readability or maintainability is not a false
@@ -198,11 +229,12 @@ or unfounded complaints, and only a manual review can tell.
 
 A configuration meets the predefined pilot thresholds if, on average, overall
 recall is at least 0.6, recall on the obvious tier is at least 0.8, and the
-decoy match rate is at most 0.25. These are provisional criteria chosen for this
-pilot case, not requirements derived from a concrete use. Their strength is that
-they were committed in `thresholds.json` *before* the first paid run, so nobody
-could tune them to the results; the runner refuses paid runs if that file is
-uncommitted or modified.
+decoy match rate is at most 0.25; the case `security` adds a fourth: recall with
+adequate severity of at least 0.5. These are provisional criteria chosen for the
+pilot cases, not requirements derived from a concrete use. Their strength is that
+they are committed in the `thresholds.json` of the case *before* its first paid
+run, so nobody can tune them to the results; the runner refuses paid runs if that
+file is uncommitted or modified.
 
 ### Ceiling-effect check
 
@@ -266,7 +298,8 @@ CLI error result).
 
 ### Options
 
-`--budget`, `--timeout-min`, and `--total-budget` change the limits;
+`--case` selects the test case (`shop-core` or `security`); `--budget`,
+`--timeout-min`, and `--total-budget` change the limits;
 `--prior-spent` carries over costs already spent in a series; `--keep` keeps the
 throw-away copy for inspection; `--out` sets the location of the result folders.
 `node benchmark/repo-review/run.mjs --help` lists all options. Built-in CLI
@@ -300,18 +333,21 @@ node benchmark/repo-review/run.mjs --dry-run --simulate unparseable
 node benchmark/repo-review/run.mjs --dry-run --simulate abort-cost
 node benchmark/repo-review/run.mjs --dry-run --simulate abort-time
 node benchmark/repo-review/run.mjs --dry-run --simulate leak
+node benchmark/repo-review/run.mjs --dry-run --case security --simulate leak
 ```
 
 `--replay <file>` plays back a custom `stream-json` transcript, for example
-`testdata/isolation.jsonl` or `testdata/contamination.jsonl`. Dry runs appear in
-the report as a separate model group "(dry run)".
+`testdata/isolation.jsonl` or `testdata/contamination.jsonl`; the special cases
+are shared by all test cases, the normal transcript belongs to the case. Dry runs
+appear in the report as a separate model group "(dry run)" and are never logged.
 
 ### Layout
 
 | Path | Content |
 |---|---|
-| `fixture/base/`, `fixture/change/` | example project "shop-core": base without seeded defects and the reviewed change |
-| `solution/expected.json` | expected-results list: defects in three tiers and decoys with locations (never part of a working copy) |
+| `fixture/base/`, `fixture/change/` | case `shop-core`: base without seeded defects and the reviewed change |
+| `solution/expected.json` | expected-results list of `shop-core`: defects in three tiers and decoys with locations (never part of a working copy) |
+| `cases/security/` | case `security`: its own `fixture/`, `solution/expected.json` (with minimum severities), `thresholds.json`, `testdata/`, `reference/`, and `results/` |
 | `DESIGN.md` | guarantees, non-goals, design decisions, and known risks |
 | `thresholds.json` | pre-registered pilot thresholds (committed before the first measurement) |
 | `check.mjs` | checks the expected-results list against the fixture |

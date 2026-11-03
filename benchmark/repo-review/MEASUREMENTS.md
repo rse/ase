@@ -4,7 +4,9 @@ This file is a log. Each measurement series is appended by
 `node benchmark/repo-review/compare.mjs --journal MEASUREMENTS.md --title "..." <result folders>`
 with the values computed at that time. Existing entries are never rewritten:
 corrections and re-scorings are added as dated notes or as new entries. The
-manual reading of a series is written by hand below its generated part.
+manual reading of a series is written by hand below its generated part. The
+series title and the configuration table of an entry name the test case; the two
+entries of 2026-11-03 below predate the second case and belong to `shop-core`.
 
 ## Overview
 

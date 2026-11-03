@@ -12,10 +12,12 @@ These are the properties the test was built and checked against. If a change
 breaks one of them, the change is wrong or the property needs an explicit,
 documented revision.
 
-1. **A defined case.** The example project consists of a defect-free base and
-   exactly one change. The expected-results list holds at least two defects per
-   tier (obvious, medium, hidden), at least one hidden defect spanning two files,
-   and at least three decoys, each with its locations.
+1. **Defined cases.** Each test case consists of a base without intentionally
+   seeded defects and exactly one change. Its expected-results list holds at
+   least two defects per tier (obvious, medium, hidden), at least one hidden
+   defect spanning two files, and at least three decoys, each with its locations.
+   A list that records minimum severities (version 4 and later) names one for
+   every defect and has at least one defect with two locations in the same file.
 2. **A valid expected-results list.** Every entry points to existing lines that
    the change touches; `check.mjs` reports "valid" for every entry.
 3. **No hint at the answers.** The working copy of a run contains neither the
@@ -34,7 +36,8 @@ documented revision.
    the same result folders, the comparison produces byte-identical JSON reports.
 7. **A complete report.** Per model: recall per tier and overall (mean, minimum,
    maximum over the runs), decoy false-alarm rate, unassignable findings, the
-   skill's verdict per run, the number of unparseable runs, duration, and cost.
+   skill's verdict per run, the number of unparseable runs, duration, and cost;
+   for a case with minimum severities also the recall with adequate severity.
 8. **No silent zeros.** A review output that cannot be recognized is counted as
    `unparseable` and scored with zero hits, never quietly as "no findings".
 9. **Pre-registered pilot thresholds.** The thresholds are committed before the
@@ -255,6 +258,40 @@ their language would waste money. *Price:* the reference protocols are no longer
 byte-identical to their original form; the first entry of `MEASUREMENTS.md`
 records this.
 
+### Several cases, one scorer
+
+A test case is a directory with `fixture/`, `solution/expected.json`,
+`thresholds.json`, `testdata/`, `reference/`, and `results/`. The first case,
+`shop-core`, keeps these at the root of the benchmark; every later case lives
+under `cases/<name>/`. One table in `lib/common.mjs` maps case names to
+directories, and `resolveCase(name)` is the only place that knows the paths;
+`run.mjs`, `check.mjs`, and `compare.mjs` take `--case` and default to
+`shop-core`. Every run protocol records its case, and the comparison evaluates
+only result folders of the selected case; protocols that predate the field count
+as `shop-core`.
+
+*Why:* the first case turned out too easy and carries only correctness defects,
+and comparisons across cases need the same runner, scorer, and log. Leaving the
+first case at its original paths keeps its digests, the version of its threshold
+file, and its log entries untouched. *Price:* the layout is asymmetric, and a
+result folder cannot be moved from one case to another.
+
+### A minimum severity per defect
+
+Lists from version 4 on record for every defect the lowest severity a review
+should assign (`HIGH` or `MEDIUM`). A matched defect counts as adequately
+reported when the highest severity among the findings matched to it reaches that
+minimum. The report shows the recall with adequate severity next to the plain
+recall, and a case may add a fourth threshold, `recall_adequate_min`, which the
+verdict applies only when the threshold file names it. All of this exists only
+for lists with minimum severities, so the reports of the first case stay
+byte-identical.
+
+*Why:* for security defects, finding the spot is not enough; a refund hole
+reported as a `LOW` style remark would be waved through. *Price:* the minimum
+severity is a judgement recorded in the list, made before the measurement and
+open to argument like the thresholds.
+
 ### An append-only measurement log
 
 `compare.mjs --journal MEASUREMENTS.md` renders one section per measurement
@@ -287,6 +324,10 @@ since been fixed; the scorer commit in each entry says which.
   must be read together with a manual check until the matching improves.
 - **Unknown precision.** Unassignable findings are not classified, so the share
   of unfounded complaints outside the decoys is not measured.
+- **Security decoys provoke.** The decoys of the case `security` look like
+  security smells, so reviews may flag them with high severity more readily than
+  the style decoys of the first case; the decoy rates of the two cases are not
+  comparable with each other.
 - **Training data.** Once published, the fixture may end up in future training
   data; a new, unpublished case would then be needed.
 - **Skill format drift.** The output of the skill can change with new ASE
