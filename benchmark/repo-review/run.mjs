@@ -8,35 +8,35 @@ import fs   from "node:fs"
 import os   from "node:os"
 import path from "node:path"
 
-import { REPO_DIR, RESULTS_DIR, TESTDATA_DIR, SOLL_FILE, THRESH_FILE, readJson, sha256, stableStringify, git } from "./lib/common.mjs"
-import { buildCopy, removeCopy, fixtureDigest } from "./lib/kopie.mjs"
-import { checkCopy }                            from "./lib/leck.mjs"
+import { REPO_DIR, RESULTS_DIR, TESTDATA_DIR, EXPECTED_FILE, THRESH_FILE, readJson, sha256, stableStringify, git } from "./lib/common.mjs"
+import { buildCopy, removeCopy, fixtureDigest } from "./lib/copy.mjs"
+import { checkCopy }                            from "./lib/leak.mjs"
 import { parseReview }                          from "./lib/parser.mjs"
-import { thresholdVersion }                     from "./lib/bericht.mjs"
+import { thresholdVersion }                     from "./lib/report.mjs"
 import {
     PROMPT, claudeArgs, childEnv, envSummary, claudeProgram, runChild, checkInit, checkContamination,
     transcriptFacts, cliVersion, aseInfo, userAseConfig, createRunDir, stamp, modelShort, seriesAllows, isAlive,
     mcpConfig, aseProcesses, killLeftovers
 } from "./lib/runner.mjs"
 
-const HELP = `Aufruf: node run.mjs [Optionen]
+const HELP = `Usage: node run.mjs [options]
 
-  --model <modell>          Modell für claude -p (Standard: sonnet)
-  --runs <n>                Zahl der Läufe (Standard: 1)
-  --budget <usd>            Kostengrenze je Lauf (Standard: 5)
-  --timeout-min <min>       Zeitgrenze je Lauf in Minuten (Standard: 20)
-  --total-budget <usd>      Serienbudget aller Läufe dieses Aufrufs (Standard: 30)
-  --prior-spent <usd>       bereits verbrauchte Kosten der Serie (Standard: 0)
-  --confirm-paid            ausdrückliches Kennzeichen für bezahlte Läufe
-  --base-url <url>          anderer API-Endpunkt (setzt ANTHROPIC_BASE_URL)
-  --auth-token-env <VAR>    Name der Umgebungsvariable mit dem Token (setzt ANTHROPIC_AUTH_TOKEN)
-  --out <ordner>            Ablage der Ergebnisordner (Standard: results/)
-  --keep                    Wegwerfkopie nach dem Lauf behalten
-  --dry-run                 Trockenlauf ohne Modellaufruf
-  --replay <datei>          gestellte stream-json-Mitschrift für den Trockenlauf
-                            (Standard: testdata/normal.jsonl)
-  --simulate <fall>         Sonderfall im Trockenlauf: abort-cost, abort-time, unparseable, leak
-  --help                    diese Hilfe
+  --model <model>           model for claude -p (default: sonnet)
+  --runs <n>                number of runs (default: 1)
+  --budget <usd>            cost limit per run (default: 5)
+  --timeout-min <min>       time limit per run in minutes (default: 20)
+  --total-budget <usd>      series budget of all runs of this call (default: 30)
+  --prior-spent <usd>       cost already spent in the series (default: 0)
+  --confirm-paid            explicit flag for paid runs
+  --base-url <url>          other API endpoint (sets ANTHROPIC_BASE_URL)
+  --auth-token-env <VAR>    name of the environment variable holding the token (sets ANTHROPIC_AUTH_TOKEN)
+  --out <folder>            location of the result folders (default: results/)
+  --keep                    keep the throw-away copy after the run
+  --dry-run                 dry run without a model call
+  --replay <file>           canned stream-json transcript for the dry run
+                            (default: testdata/normal.jsonl)
+  --simulate <case>         special case in the dry run: abort-cost, abort-time, unparseable, leak
+  --help                    this help
 `
 
 /*  parse the command line  */
@@ -49,14 +49,14 @@ function options (argv) {
     const num = (v, name) => {
         const n = Number(v)
         if (!Number.isFinite(n) || n < 0)
-            throw new Error(`${name} braucht eine Zahl ≥ 0`)
+            throw new Error(`${name} needs a number >= 0`)
         return n
     }
     for (let i = 0; i < argv.length; i++) {
         const a = argv[i]
         const v = () => {
             if (i + 1 >= argv.length)
-                throw new Error(`${a} braucht einen Wert`)
+                throw new Error(`${a} needs a value`)
             return argv[++i]
         }
         if      (a === "--model")          o.model        = v()
@@ -75,12 +75,12 @@ function options (argv) {
         else if (a === "--simulate")       o.simulate     = v()
         else if (a === "--help")           o.help         = true
         else
-            throw new Error(`unbekannte Option: ${a}`)
+            throw new Error(`unknown option: ${a}`)
     }
     if (o.simulate !== null && ![ "abort-cost", "abort-time", "unparseable", "leak" ].includes(o.simulate))
-        throw new Error(`unbekannter Sonderfall: ${o.simulate}`)
+        throw new Error(`unknown special case: ${o.simulate}`)
     if (!o.dryRun && (o.replay !== null || o.simulate !== null))
-        throw new Error("--replay und --simulate nur mit --dry-run")
+        throw new Error("--replay and --simulate only with --dry-run")
     return o
 }
 
@@ -88,33 +88,33 @@ function options (argv) {
 function preflight (o) {
     const problems = []
     try {
-        const soll = readJson(SOLL_FILE)
-        if (!Array.isArray(soll.eintraege))
-            problems.push("Sollliste ungültig: node check.mjs ausführen")
+        const expected = readJson(EXPECTED_FILE)
+        if (!Array.isArray(expected.entries))
+            problems.push("expected-results list invalid: run node check.mjs")
     }
     catch (err) {
-        problems.push(`Sollliste fehlt oder ist kein JSON (${SOLL_FILE})`)
+        problems.push(`expected-results list missing or not JSON (${EXPECTED_FILE})`)
     }
     let thresholds = null
     try {
         thresholds = readJson(THRESH_FILE)
     }
     catch (err) {
-        problems.push(`Schwellendatei fehlt oder ist kein JSON (${THRESH_FILE})`)
+        problems.push(`threshold file missing or not JSON (${THRESH_FILE})`)
     }
     if (o.dryRun)
         return problems
     if (!o.confirmPaid)
-        problems.push("bezahlter Lauf ohne --confirm-paid: erst Kostenfreigabe einholen, dann mit --confirm-paid starten")
+        problems.push("paid run without --confirm-paid: obtain the cost approval first, then start with --confirm-paid")
     const tv = thresholdVersion()
-    if (thresholds !== null && (tv.commit === null || tv.geaendert))
-        problems.push("thresholds.json ist nicht committet oder geändert: Schwellendatei vor dem Messlauf committen")
+    if (thresholds !== null && (tv.commit === null || tv.modified))
+        problems.push("thresholds.json is not committed or modified: commit the threshold file before the measurement")
     if (!fs.existsSync(path.join(REPO_DIR, "tool", "dst", "ase.js")))
-        problems.push("tool/ ist nicht gebaut: cd tool && npm start build")
+        problems.push("tool/ is not built: cd tool && npm start build")
     if (o.budget > 5 || o.totalBudget > 30)
-        problems.push("Grenzen über den freigegebenen Werten (5 USD je Lauf, 30 USD gesamt)")
+        problems.push("limits above the approved values (5 USD per run, 30 USD in total)")
     if (o.timeoutMin > 20)
-        problems.push("Zeitgrenze über 20 Minuten")
+        problems.push("time limit above 20 minutes")
     return problems
 }
 
@@ -150,7 +150,7 @@ async function oneRun (o, nr, env, program, pre) {
         simulate:        o.simulate,
         replay:          o.replay ? path.basename(o.replay) : (o.dryRun ? "normal.jsonl" : null),
         model:           { requested: o.model, reported: [] },
-        endpoint:        { base_url: safeUrl(o.baseUrl), token_gesetzt: Boolean(o.authTokenEnv) },
+        endpoint:        { base_url: safeUrl(o.baseUrl), token_set: Boolean(o.authTokenEnv) },
         child_env:       envSummary(env),
         cli_version:     o.dryRun ? null : cliVersion(program, pre),
         ase:             aseInfo(),
@@ -161,12 +161,12 @@ async function oneRun (o, nr, env, program, pre) {
         budget_usd:      o.budget,
         timeout_min:     o.timeoutMin,
         permission_denials: null,
-        invocation:      { program: o.dryRun ? "(Trockenlauf)" : program, args: [ ...pre, ...args ], prompt: PROMPT, mcp_config: mcpConfig() },
+        invocation:      { program: o.dryRun ? "(dry run)" : program, args: [ ...pre, ...args ], prompt: PROMPT, mcp_config: mcpConfig() },
         init_plugins:    [],
         init_mcp:        [],
-        uebrig_beendet:  [],
+        leftovers_killed: [],
         fixture_digest:  fixtureDigest(),
-        sollliste_digest: sha256(fs.readFileSync(SOLL_FILE)),
+        expected_digest: sha256(fs.readFileSync(EXPECTED_FILE)),
         copy_dir:        o.keep ? copy.dir : null
     }
     const finish = (review) => {
@@ -181,8 +181,8 @@ async function oneRun (o, nr, env, program, pre) {
     }
     catch (err) {
         /*  unexpected failure: still write a protocol (CR-009)  */
-        meta.status  = "fehler"
-        meta.reason  = "intern"
+        meta.status  = "error"
+        meta.reason  = "internal"
         meta.details = [ err.message ]
         return finish(null)
     }
@@ -202,7 +202,7 @@ function safeUrl (url) {
         return `${u.protocol}//${u.host}${u.pathname}`
     }
     catch (err) {
-        return "(ungültige URL)"
+        return "(invalid URL)"
     }
 }
 
@@ -217,8 +217,8 @@ async function runInCopy (o, dir, copy, args, env, before, meta, finish, program
     }
     const leaks = checkCopy(copy.dir)
     if (leaks.length > 0) {
-        meta.status  = "fehler"
-        meta.reason  = "leck"
+        meta.status  = "error"
+        meta.reason  = "leak"
         meta.details = leaks
         fs.writeFileSync(path.join(dir, "transcript.jsonl"), "")
         fs.writeFileSync(path.join(dir, "stderr.txt"), "")
@@ -233,9 +233,9 @@ async function runInCopy (o, dir, copy, args, env, before, meta, finish, program
         fs.writeFileSync(path.join(dir, "transcript.jsonl"), events.map((e) => JSON.stringify(e)).join("\n") + "\n")
         fs.writeFileSync(path.join(dir, "stderr.txt"), "")
         const init = events.find((e) => e.type === "system" && e.subtype === "init")
-        const problems = init ? checkInit(init) : [ "kein init-Ereignis" ]
+        const problems = init ? checkInit(init) : [ "no init event" ]
         if (problems.length > 0)
-            stopped = { status: "fehler", reason: "isolation", details: problems }
+            stopped = { status: "error", reason: "isolation", details: problems }
     }
     else {
         const child = o.simulate === "abort-time"
@@ -251,13 +251,13 @@ async function runInCopy (o, dir, copy, args, env, before, meta, finish, program
         stopped = res.stopped
         if (!o.dryRun) {
             await new Promise((r) => setTimeout(r, 1000))
-            meta.uebrig_beendet = killLeftovers(before)
+            meta.leftovers_killed = killLeftovers(before)
         }
         if (o.simulate === "abort-time") {
             const pidFile = path.join(dir, "grandchild.pid")
             const gpid    = fs.existsSync(pidFile) ? Number(fs.readFileSync(pidFile, "utf8")) : null
             await new Promise((r) => setTimeout(r, 500))
-            meta.prozessbaum_beendet = { kind: !isAlive(res.pid), enkel: gpid === null ? null : !isAlive(gpid) }
+            meta.process_tree_killed = { child: !isAlive(res.pid), grandchild: gpid === null ? null : !isAlive(gpid) }
         }
     }
 
@@ -275,25 +275,25 @@ async function runInCopy (o, dir, copy, args, env, before, meta, finish, program
         return finish(facts.text)
     }
     if (facts.result?.subtype === "error_max_budget_usd" || (facts.cost !== null && facts.cost > o.budget)) {
-        meta.status = "abgebrochen"
-        meta.reason = "kosten"
+        meta.status = "aborted"
+        meta.reason = "cost"
         return finish(facts.text)
     }
     const contamination = checkContamination(events)
     if (contamination.length > 0) {
-        meta.status  = "fehler"
-        meta.reason  = "kontamination"
+        meta.status  = "error"
+        meta.reason  = "contamination"
         meta.details = contamination
         return finish(facts.text)
     }
     if (facts.result === null) {
-        meta.status = "fehler"
-        meta.reason = "kein Ergebnis"
+        meta.status = "error"
+        meta.reason = "no-result"
         return finish(null)
     }
     if (facts.result.is_error) {
         /*  infrastructure failure of the CLI, not a review result (CR-008)  */
-        meta.status = "fehler"
+        meta.status = "error"
         meta.reason = facts.result.subtype ?? "is_error"
         return finish(facts.text)
     }
@@ -317,7 +317,7 @@ async function main () {
     }
     const problems = preflight(o)
     if (problems.length > 0) {
-        process.stderr.write("Voraussetzungen nicht erfüllt, kein Modellaufruf:\n" + problems.map((p) => `  - ${p}\n`).join(""))
+        process.stderr.write("preconditions not met, no model call:\n" + problems.map((p) => `  - ${p}\n`).join(""))
         return 1
     }
     let env
@@ -333,16 +333,16 @@ async function main () {
     let spent = o.priorSpent
     for (let nr = 1; nr <= o.runs; nr++) {
         if (!o.dryRun && !seriesAllows(spent, o.budget, o.totalBudget)) {
-            process.stderr.write(`Serienbudget erreicht: ${spent.toFixed(2)} USD verbraucht, `
-                + `nächster Lauf könnte ${o.budget} USD kosten, Grenze ${o.totalBudget} USD. Kein weiterer Lauf.\n`)
+            process.stderr.write(`series budget reached: ${spent.toFixed(2)} USD spent, `
+                + `next run could cost ${o.budget} USD, limit ${o.totalBudget} USD. No further run.\n`)
             return 3
         }
         const meta = await oneRun(o, nr, env, program, pre)
         /*  a run without cost report (time, isolation, start) counts with its full limit (CR-001)  */
         spent += meta.cost_usd ?? (o.dryRun ? 0 : o.budget)
-        process.stdout.write(`Lauf ${nr}/${o.runs}: ${meta.status}${meta.reason ? ` (${meta.reason})` : ""}, `
-            + `Kosten ${meta.cost_usd === null ? "–" : meta.cost_usd.toFixed(2)} USD, `
-            + `Dauer ${Math.round(meta.duration_ms / 1000)} s\n`)
+        process.stdout.write(`run ${nr}/${o.runs}: ${meta.status}${meta.reason ? ` (${meta.reason})` : ""}, `
+            + `cost ${meta.cost_usd === null ? "–" : meta.cost_usd.toFixed(2)} USD, `
+            + `duration ${Math.round(meta.duration_ms / 1000)} s\n`)
         for (const d of meta.details)
             process.stdout.write(`  - ${d}\n`)
     }

@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url"
 export const BENCH_DIR     = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 export const REPO_DIR      = path.resolve(BENCH_DIR, "..", "..")
 export const FIXTURE_DIR   = path.join(BENCH_DIR, "fixture")
-export const SOLL_FILE     = path.join(BENCH_DIR, "solution", "sollliste.json")
+export const EXPECTED_FILE = path.join(BENCH_DIR, "solution", "expected.json")
 export const THRESH_FILE   = path.join(BENCH_DIR, "thresholds.json")
 export const RESULTS_DIR   = path.join(BENCH_DIR, "results")
 export const TESTDATA_DIR  = path.join(BENCH_DIR, "testdata")

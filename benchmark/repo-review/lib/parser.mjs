@@ -53,7 +53,7 @@ export function parseLocation (text) {
 
 /*  parse the review text  */
 export function parseReview (text) {
-    const result = { status: "unauswertbar", verdict: null, findings: [], noFindings: false, hidden: 0 }
+    const result = { status: "unparseable", verdict: null, findings: [], noFindings: false, hidden: 0 }
     if (typeof text !== "string")
         return result
     const v = VERDICT_RE.exec(text)

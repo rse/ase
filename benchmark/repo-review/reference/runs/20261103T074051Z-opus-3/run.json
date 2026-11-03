@@ -1,8 +1,8 @@
 {
     "ase": {
-        "arbeitskopie_geaendert": false,
         "commit": "25f351207f8fb542502709209cd91c75181f6b8b",
-        "version": "2.0.6"
+        "version": "2.0.6",
+        "working_copy_modified": false
     },
     "budget_usd": 5,
     "child_env": [
@@ -16,8 +16,9 @@
     "duration_ms": 121407,
     "endpoint": {
         "base_url": "default",
-        "token_gesetzt": false
+        "token_set": false
     },
+    "expected_digest": "sha256:54dfafdba69546f4b59d7e89093624cf002bc8518f5aa967d95d4b24a4089f83",
     "fixture_digest": "sha256:7f2bc71830ee5dad28ad6db3ad274a72a587ed65fa93f5f44a0cc05e1bc1b6bd",
     "init_mcp": [
         "ase:connected"
@@ -84,6 +85,10 @@
         "program": "claude",
         "prompt": "/ase:ase-repo-review -c HEAD -S LOW"
     },
+    "leftovers_killed": [
+        "C:\\nvm4w\\nodejs\\node.exe C:\\AI\\rse\\ase-review-benchmark\\tool\\dst\\ase.js service start"
+    ],
+    "migrated": "2026-11-03: keys and values translated to English (SDD-016); transcript.jsonl and review.md unchanged",
     "model": {
         "reported": [
             "claude-opus-5-5"
@@ -95,12 +100,8 @@
     "replay": null,
     "schema": 1,
     "simulate": null,
-    "sollliste_digest": "sha256:54dfafdba69546f4b59d7e89093624cf002bc8518f5aa967d95d4b24a4089f83",
     "started_at": "2026-11-03T07:40:51.614Z",
     "status": "ok",
     "timeout_min": 20,
-    "uebrig_beendet": [
-        "C:\\nvm4w\\nodejs\\node.exe C:\\AI\\rse\\ase-review-benchmark\\tool\\dst\\ase.js service start"
-    ],
     "user_ase_config": []
 }

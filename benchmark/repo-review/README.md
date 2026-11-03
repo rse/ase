@@ -1,35 +1,37 @@
-# Wirksamkeitstest für `ase-repo-review`
+# Effectiveness test for `ase-repo-review`
 
-Misst reproduzierbar, wie viele eingebaute Fehler der Skill `ase-repo-review` mit
-einem gegebenen Modell findet und wie oft er korrekten Code beanstandet. Die
-Auswertung ist rein regelbasiert, ohne bewertendes Modell.
+Measures reproducibly how many seeded defects the skill `ase-repo-review` finds
+with a given model, and how often it flags correct code. The evaluation is purely
+rule-based, without a judging model.
 
-## Aufbau
+## Layout
 
-| Pfad | Inhalt |
+| Path | Content |
 |---|---|
-| `fixture/base/`, `fixture/change/` | Beispielprojekt „shop-core“: fehlerfreier Grundstand und die begutachtete Änderung |
-| `solution/sollliste.json` | verborgene Sollliste: Befunde in drei Stufen und Köder mit Fundstellen (gelangt nie in eine Arbeitskopie) |
-| `thresholds.json` | vorab festgelegte Schwellen (vor dem ersten Messlauf committet) |
-| `check.mjs` | prüft die Sollliste gegen das Fixture |
-| `run.mjs` | Runner: Wegwerfkopie, Leckprüfung, `claude -p`, Ergebnisordner |
-| `compare.mjs` | Vergleich der Ergebnisordner mit der Sollliste, Bericht in Markdown und JSON |
-| `selftest.mjs` | Selbsttest von Parser, Zuordnung, Kennzahlen und Runner-Bausteinen |
-| `testdata/` | gestellte `stream-json`-Mitschriften für Trockenläufe |
-| `reference/` | Referenzmessung mit Claude Opus 5.5 und Sonnet 5.5 |
-| `results/` | lokale Ergebnisordner (nicht versioniert) |
+| `fixture/base/`, `fixture/change/` | example project "shop-core": defect-free base and the reviewed change |
+| `solution/expected.json` | hidden expected-results list: findings in three tiers and decoys with locations (never part of a working copy) |
+| `thresholds.json` | pre-registered thresholds (committed before the first measurement) |
+| `check.mjs` | checks the expected-results list against the fixture |
+| `run.mjs` | runner: throw-away copy, leak check, `claude -p`, result folder |
+| `compare.mjs` | compares result folders with the expected-results list, report in Markdown and JSON |
+| `selftest.mjs` | self-test of parser, matching, metrics, and runner helpers |
+| `check-language.mjs` | language check of the deliverable (English only) |
+| `testdata/` | canned `stream-json` transcripts for dry runs |
+| `reference/` | reference measurement with Claude Opus 5.5 and Sonnet 5.5 |
+| `results/` | local result folders (not versioned) |
 
-## Voraussetzungen
+## Prerequisites
 
-- Node.js 22 oder neuer, Git; unter Windows genügt PowerShell, Bash ist nicht nötig
-- für bezahlte Läufe zusätzlich: Claude-Code-CLI (`claude`) mit Anmeldung und das
-  gebaute `tool/` dieses Repos (`cd tool && npm start build`)
+- Node.js 22 or newer and Git; on Windows PowerShell is sufficient, Bash is not required
+- for paid runs additionally: the Claude Code CLI (`claude`) with a login and the
+  built `tool/` of this repository (`cd tool && npm start build`)
 
-## Trockenlauf (ohne Modellaufruf, ohne Kosten)
+## Dry run (no model call, no cost)
 
 ```
 node benchmark/repo-review/check.mjs
 node benchmark/repo-review/selftest.mjs
+node benchmark/repo-review/check-language.mjs
 node benchmark/repo-review/run.mjs --dry-run
 node benchmark/repo-review/run.mjs --dry-run --simulate unparseable
 node benchmark/repo-review/run.mjs --dry-run --simulate abort-cost
@@ -38,13 +40,14 @@ node benchmark/repo-review/run.mjs --dry-run --simulate leak
 node benchmark/repo-review/compare.mjs
 ```
 
-`--replay <datei>` spielt eine eigene `stream-json`-Mitschrift ein, zum Beispiel
-`testdata/isolation.jsonl` oder `testdata/kontamination.jsonl`.
+`--replay <file>` plays back a custom `stream-json` transcript, for example
+`testdata/isolation.jsonl` or `testdata/contamination.jsonl`. Dry runs appear in
+the report as a separate model group "(dry run)".
 
-## Messlauf (bezahlt)
+## Measurement (paid)
 
-Ein Messlauf startet nur, wenn `thresholds.json` committet und unverändert ist,
-`tool/` gebaut ist und `--confirm-paid` angegeben wird:
+A measurement starts only if `thresholds.json` is committed and unmodified,
+`tool/` is built, and `--confirm-paid` is given:
 
 ```
 node benchmark/repo-review/run.mjs --model sonnet --runs 3 --confirm-paid
@@ -52,51 +55,52 @@ node benchmark/repo-review/run.mjs --model opus   --runs 3 --confirm-paid
 node benchmark/repo-review/compare.mjs
 ```
 
-Jeder Lauf ruft fest `/ase:ase-repo-review -c HEAD -S LOW` auf, mit Kostengrenze
-5 USD und Zeitgrenze 20 Minuten. Das Serienbudget eines Aufrufs (Standard 30 USD)
-wird vor jedem weiteren Lauf geprüft; `--prior-spent` übernimmt bereits
-verbrauchte Kosten einer Serie. Geerbte `CLAUDE*`- und `ANTHROPIC_*`-Variablen
-werden für den Kindprozess entfernt; geladen wird nur das Plugin dieser
-Arbeitskopie. MCP-Server kommen ausschließlich über `--strict-mcp-config` und eine
-erzeugte `--mcp-config` mit genau dem Server `ase`; die claude.ai-Konnektoren des
-Kontos bleiben damit außen vor. Die eingebauten Plugins der CLI (`@builtin`) werden
-nur protokolliert. Lädt `claude` ein anderes Plugin oder einen anderen MCP-Server,
-bricht der Runner sofort ab (Status `fehler`, Grund `isolation`). Nach jedem Lauf
-beendet der Runner übrig gebliebene ASE-Prozesse (etwa den Projektdienst) und
-vermerkt sie im Protokoll.
+Each run invokes exactly `/ase:ase-repo-review -c HEAD -S LOW`, with a cost limit
+of 5 USD and a time limit of 20 minutes. The series budget of one call (default
+30 USD) is checked before every further run, with a 10 % reserve for overshooting
+the per-run limit; a run without a cost report counts with its full limit.
+`--prior-spent` carries over costs already spent in a series. Inherited
+`CLAUDE*` and `ANTHROPIC_*` variables are removed for the child process; only the
+plugin of this working copy is loaded. MCP servers come exclusively through
+`--strict-mcp-config` and a generated `--mcp-config` with exactly the server
+`ase`, so the claude.ai connectors of the account stay out. Built-in CLI plugins
+(`@builtin`) are only logged. If `claude` loads another plugin or MCP server, the
+runner aborts immediately (status `error`, reason `isolation`). After every run
+the runner kills leftover ASE processes (such as the project service) and records
+them in the protocol.
 
-Status eines Laufs: `ok`, `unauswertbar` (Ausgabe nicht als Review erkennbar,
-zählt mit 0 Treffern), `abgebrochen` (Kosten oder Zeit), `fehler` (Leck,
-Isolation, Kontamination, Start).
+Run status: `ok`, `unparseable` (output not recognizable as a review, counts with
+0 hits), `aborted` (cost or time), `error` (leak, isolation, contamination, start,
+CLI error result).
 
-## Bericht
+## Report
 
-`compare.mjs` liefert je Modell die Trefferquote je Stufe (offensichtlich, mittel,
-versteckt) und gesamt (Mittel, Minimum, Maximum), die Köder-Fehlalarmquote, die
-nicht zuordenbaren Befunde, das Urteil des Skills je Lauf, Dauer und Kosten sowie
-das Schwellenurteil „Schwelle erreicht“ bzw. „nicht erreicht“. Für Opus kommt eine
-Kalibrierungsaussage hinzu: „zu leicht“, wenn alle Läufe alle Befunde finden.
-Zweimal auf dieselben Ordner angewendet, ist `report.json` byte-gleich.
+`compare.mjs` reports per model the recall per tier (obvious, medium, hidden) and
+overall (mean, minimum, maximum), the decoy false-alarm rate, the unassignable
+findings, the skill verdict per run, duration and cost, and the threshold verdict
+"threshold met" or "threshold not met". For Opus a calibration statement is added:
+"too easy" if all runs find all findings, otherwise "adequate". Applied twice to
+the same folders, `report.json` is byte-identical.
 
-Zuordnung: Dateiname und Zeilenüberlappung mit Toleranz 3 Zeilen; bei mehreren
-Kandidaten gewinnt die größte Überlappung, dann der kleinste Abstand, dann die
-kleinste ID. `ACCEPTED`-Befunde zählen weder als Treffer noch als Fehlalarm.
+Matching: file name and line overlap with a tolerance of 3 lines; with several
+candidates the largest overlap wins, then the smallest distance, then the
+smallest id. `ACCEPTED` findings count neither as hits nor as false alarms.
 
-## Andere Endpunkte (offene Modelle)
+## Other endpoints (open models)
 
 ```
-$env:BENCH_TOKEN = "<token des Anbieters>"
-node benchmark/repo-review/run.mjs --model <modell-id> --base-url https://anbieter.example/v1 --auth-token-env BENCH_TOKEN --confirm-paid
+$env:BENCH_TOKEN = "<provider token>"
+node benchmark/repo-review/run.mjs --model <model-id> --base-url https://provider.example/v1 --auth-token-env BENCH_TOKEN --confirm-paid
 ```
 
-`--base-url` setzt `ANTHROPIC_BASE_URL`, `--auth-token-env` liest das Token aus der
-genannten Variable und setzt `ANTHROPIC_AUTH_TOKEN`. Das Laufprotokoll vermerkt den
-Endpunkt, aber nie das Token. Die Kostenangaben der CLI (`total_cost_usd`) beruhen
-auf Anthropic-Preisen und sind für andere Endpunkte unzuverlässig; der Bericht
-weist darauf hin. Zum Ausprobieren ohne Kosten:
+`--base-url` sets `ANTHROPIC_BASE_URL`, `--auth-token-env` reads the token from the
+named variable and sets `ANTHROPIC_AUTH_TOKEN`. The run protocol records the
+endpoint (scheme, host, and path only), never the token. The cost figures of the
+CLI (`total_cost_usd`) are based on Anthropic prices and are unreliable for other
+endpoints; the report points this out. To try it without cost:
 `node benchmark/repo-review/run.mjs --dry-run --base-url https://example.invalid --auth-token-env BENCH_TOKEN`.
 
-## Herkunft
+## Origin
 
-Vorgehen und Zuordnungsregel folgen dem Wirksamkeitstest von MERIT
-(`tests/effectiveness/`); der Code ist neu geschrieben.
+Approach and matching rule follow the effectiveness test of MERIT
+(`tests/effectiveness/`); the code is written from scratch.

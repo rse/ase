@@ -1,47 +1,47 @@
 #!/usr/bin/env node
 /*
 **  ASE review benchmark -- check the expected-results list against the fixture (AC-001, AC-002)
-**  Usage: node check.mjs [--sollliste <file>]
+**  Usage: node check.mjs [--expected <file>]
 */
 
 import path from "node:path"
 
-import { SOLL_FILE }                         from "./lib/common.mjs"
-import { buildCopy, removeCopy }             from "./lib/kopie.mjs"
-import { loadSoll, validateSoll, summarize } from "./lib/sollliste.mjs"
+import { EXPECTED_FILE }                             from "./lib/common.mjs"
+import { buildCopy, removeCopy }                     from "./lib/copy.mjs"
+import { loadExpected, validateExpected, summarize } from "./lib/expected.mjs"
 
-let file = SOLL_FILE
+let file = EXPECTED_FILE
 const argv = process.argv.slice(2)
 for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === "--sollliste")
+    if (argv[i] === "--expected")
         file = path.resolve(argv[++i])
     else {
-        process.stderr.write(`unbekannte Option: ${argv[i]}\nAufruf: node check.mjs [--sollliste <datei>]\n`)
+        process.stderr.write(`unknown option: ${argv[i]}\nUsage: node check.mjs [--expected <file>]\n`)
         process.exit(2)
     }
 }
 
-const soll = loadSoll(file)
-const copy = buildCopy()
+const expected = loadExpected(file)
+const copy     = buildCopy()
 let failed = false
 try {
-    const { results, global } = validateSoll(soll, copy.dir)
+    const { results, global } = validateExpected(expected, copy.dir)
     for (const r of results) {
         if (r.ok)
-            process.stdout.write(`${r.id}: gültig\n`)
+            process.stdout.write(`${r.id}: valid\n`)
         else {
             failed = true
-            process.stdout.write(`${r.id}: ungültig -- ${r.problems.join("; ")}\n`)
+            process.stdout.write(`${r.id}: invalid -- ${r.problems.join("; ")}\n`)
         }
     }
     for (const g of global) {
         failed = true
-        process.stdout.write(`Sollliste: ${g}\n`)
+        process.stdout.write(`expected-results list: ${g}\n`)
     }
-    const s = summarize(soll)
-    process.stdout.write(`Zusammenfassung: ${s.befunde} Befunde (offensichtlich ${s.offensichtlich}, `
-        + `mittel ${s.mittel}, versteckt ${s.versteckt}), ${s.koeder} Köder\n`)
-    process.stdout.write(failed ? "Ergebnis: FEHLER\n" : "Ergebnis: OK\n")
+    const s = summarize(expected)
+    process.stdout.write(`summary: ${s.findings} findings (obvious ${s.obvious}, `
+        + `medium ${s.medium}, hidden ${s.hidden}), ${s.decoys} decoys\n`)
+    process.stdout.write(failed ? "result: FAILED\n" : "result: OK\n")
 }
 finally {
     removeCopy(copy)

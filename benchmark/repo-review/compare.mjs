@@ -7,9 +7,9 @@
 import fs   from "node:fs"
 import path from "node:path"
 
-import { RESULTS_DIR, SOLL_FILE, stableStringify } from "./lib/common.mjs"
-import { loadSoll }                                from "./lib/sollliste.mjs"
-import { collectRunDirs, buildReport, renderMarkdown } from "./lib/bericht.mjs"
+import { RESULTS_DIR, EXPECTED_FILE, stableStringify }  from "./lib/common.mjs"
+import { loadExpected }                                 from "./lib/expected.mjs"
+import { collectRunDirs, buildReport, renderMarkdown }  from "./lib/report.mjs"
 
 const argv  = process.argv.slice(2)
 let   out   = path.join(RESULTS_DIR, "report")
@@ -18,7 +18,7 @@ for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--out")
         out = path.resolve(argv[++i])
     else if (argv[i] === "--help") {
-        process.stdout.write("Aufruf: node compare.mjs [--out <ordner>] <ergebnisordner oder übergeordneter ordner>...\n")
+        process.stdout.write("Usage: node compare.mjs [--out <folder>] <result folder or parent folder>...\n")
         process.exit(0)
     }
     else
@@ -29,14 +29,14 @@ if (paths.length === 0)
 
 const dirs = collectRunDirs(paths).filter((d) => path.resolve(d) !== path.resolve(out))
 if (dirs.length === 0) {
-    process.stderr.write("keine abgeschlossenen Ergebnisordner gefunden (run.json fehlt)\n")
+    process.stderr.write("no completed result folders found (run.json is missing)\n")
     process.exit(1)
 }
-const report = buildReport(dirs, loadSoll(SOLL_FILE))
+const report = buildReport(dirs, loadExpected(EXPECTED_FILE))
 fs.mkdirSync(out, { recursive: true })
 fs.writeFileSync(path.join(out, "report.json"), stableStringify(report))
 fs.writeFileSync(path.join(out, "report.md"), renderMarkdown(report))
-process.stdout.write(`${dirs.length} Läufe ausgewertet, Bericht in ${out}\n`)
-for (const [ model, m ] of Object.entries(report.modelle))
-    process.stdout.write(`  ${model}: ${m.schwelle.urteil}`
-        + (m.kalibrierung?.aussage ? `, Kalibrierung: ${m.kalibrierung.aussage}` : "") + "\n")
+process.stdout.write(`${dirs.length} runs evaluated, report in ${out}\n`)
+for (const [ model, m ] of Object.entries(report.models))
+    process.stdout.write(`  ${model}: ${m.threshold.verdict}`
+        + (m.calibration?.statement ? `, calibration: ${m.calibration.statement}` : "") + "\n")

@@ -6,9 +6,10 @@ import fs   from "node:fs"
 import path from "node:path"
 
 import { git, listFiles } from "./common.mjs"
-import { expectedFiles }  from "./kopie.mjs"
+import { expectedFiles }  from "./copy.mjs"
 
-/*  terms which must not appear in file names, contents, or commit messages  */
+/*  terms which must not appear in file names, contents, or commit messages; the German
+    terms are search data for German-language hints in the fixture (AC-015 exception)  */
 export const DENY_TERMS = [
     "sollliste", "köder", "koeder", "decoy", "bait", "befund",
     "bug", "todo", "fixme", "xxx", "hack", "intentional", "absichtlich"
@@ -34,24 +35,24 @@ export function checkCopy (dir) {
     const expected = expectedFiles()
     for (const file of actual)
         if (!expected.includes(file))
-            problems.push(`unerwartete Datei: ${file}`)
+            problems.push(`unexpected file: ${file}`)
     for (const file of expected)
         if (!actual.includes(file))
-            problems.push(`fehlende Datei: ${file}`)
+            problems.push(`missing file: ${file}`)
     for (const file of actual) {
         const inName = findLeak(file)
         if (inName)
-            problems.push(`Dateiname ${file} enthält "${inName}"`)
+            problems.push(`file name ${file} contains "${inName}"`)
         const lines = fs.readFileSync(path.join(dir, file), "utf8").split(/\r?\n/)
         lines.forEach((line, i) => {
             const hit = findLeak(line)
             if (hit)
-                problems.push(`${file}:${i + 1} enthält "${hit}"`)
+                problems.push(`${file}:${i + 1} contains "${hit}"`)
         })
     }
     const log = git(dir, [ "log", "--format=%an%n%ae%n%B" ])
     const hit = findLeak(log)
     if (hit)
-        problems.push(`Commit-Historie enthält "${hit}"`)
+        problems.push(`commit history contains "${hit}"`)
     return problems
 }

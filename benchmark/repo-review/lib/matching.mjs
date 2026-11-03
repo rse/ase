@@ -1,6 +1,6 @@
 /*
 **  ASE review benchmark -- assignment of findings to the expected-results list (SDD-010)
-**  Approach modelled after the MERIT effectiveness test (tests/effectiveness/lib/zuordnung.js):
+**  Approach modelled after the MERIT effectiveness test (tests/effectiveness/, matching module):
 **  file name plus line overlap with a fixed tolerance; re-implemented, not copied.
 */
 
@@ -16,17 +16,17 @@ export function sameFile (findingFile, expectedFile) {
 }
 
 /*  assign one finding; returns { id, overlap, distance } or null  */
-export function assignFinding (finding, soll, tolerance = TOLERANCE) {
+export function assignFinding (finding, expected, tolerance = TOLERANCE) {
     if (finding.location === null)
         return null
     const { file, from, to } = finding.location
     const candidates = []
-    for (const e of soll.eintraege) {
+    for (const e of expected.entries) {
         let best = null
-        for (const f of e.fundstellen) {
-            if (!sameFile(file, f.datei))
+        for (const f of e.locations) {
+            if (!sameFile(file, f.file))
                 continue
-            const [ a, b ]  = f.zeilen
+            const [ a, b ]  = f.lines
             const overlap   = Math.min(to + tolerance, b) - Math.max(from - tolerance, a) + 1
             if (overlap <= 0)
                 continue
@@ -44,6 +44,6 @@ export function assignFinding (finding, soll, tolerance = TOLERANCE) {
 }
 
 /*  assign all findings of a run  */
-export function assignAll (findings, soll, tolerance = TOLERANCE) {
-    return findings.map((f) => ({ ...f, assigned: assignFinding(f, soll, tolerance) }))
+export function assignAll (findings, expected, tolerance = TOLERANCE) {
+    return findings.map((f) => ({ ...f, assigned: assignFinding(f, expected, tolerance) }))
 }

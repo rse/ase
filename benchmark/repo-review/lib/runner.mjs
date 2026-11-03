@@ -78,7 +78,7 @@ export function childEnv ({ baseUrl = null, authTokenEnv = null, base = process.
     if (authTokenEnv) {
         const token = base[authTokenEnv]
         if (!token)
-            throw new Error(`Umgebungsvariable ${authTokenEnv} ist nicht gesetzt`)
+            throw new Error(`environment variable ${authTokenEnv} is not set`)
         env.ANTHROPIC_AUTH_TOKEN = token
     }
     return env
@@ -141,18 +141,18 @@ export function checkInit (event) {
     const name     = (p) => typeof p === "string" ? p : p.name
     for (const p of plugins)
         if (name(p) !== "ase" && !isBuiltinPlugin(p))
-            problems.push(`fremdes Plugin geladen: ${name(p)}`)
+            problems.push(`foreign plugin loaded: ${name(p)}`)
     if (!plugins.some((p) => name(p) === "ase"))
-        problems.push("ASE-Plugin nicht geladen")
+        problems.push("ASE plugin not loaded")
     const servers = Array.isArray(event.mcp_servers) ? event.mcp_servers : []
     for (const s of servers)
         if (s.name !== "ase")
-            problems.push(`fremder MCP-Server geladen: ${s.name}`)
+            problems.push(`foreign MCP server loaded: ${s.name}`)
     const ase = servers.find((s) => s.name === "ase")
     if (!ase)
-        problems.push("MCP-Server von ASE fehlt")
+        problems.push("ASE MCP server missing")
     else if (ase.status !== undefined && ase.status !== "connected")
-        problems.push(`MCP-Server von ASE nicht verbunden: ${ase.status}`)
+        problems.push(`ASE MCP server not connected: ${ase.status}`)
     return problems
 }
 
@@ -227,9 +227,9 @@ export function checkContamination (events) {
             for (const s of toolStrings(block.input)) {
                 const n = norm(s)
                 if (/sollliste|benchmark\/repo-review|solution\//.test(n) || n.includes(bench))
-                    problems.push(`${block.name}: Zugriff auf ${s}`)
+                    problems.push(`${block.name}: access to ${s}`)
                 else if (n.includes(repo) && !allowed.some((a) => n.includes(a)))
-                    problems.push(`${block.name}: Zugriff auf das ASE-Repository ${s}`)
+                    problems.push(`${block.name}: access to the ASE repository ${s}`)
             }
         }
     }
@@ -276,7 +276,7 @@ export function aseInfo () {
     catch (err) {
         commit = null
     }
-    return { version: manifest.version, commit, arbeitskopie_geaendert: dirty }
+    return { version: manifest.version, commit, working_copy_modified: dirty }
 }
 
 /*  candidate locations of a per-user ASE configuration (protocol only)  */
@@ -296,7 +296,7 @@ export function userAseConfig () {
 export function createRunDir (parent, name) {
     const dir = path.join(parent, name)
     if (fs.existsSync(dir))
-        throw new Error(`Ergebnisordner existiert bereits: ${dir}`)
+        throw new Error(`result folder already exists: ${dir}`)
     fs.mkdirSync(dir, { recursive: true })
     return dir
 }
@@ -354,7 +354,7 @@ export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, 
             if (ev.type === "system" && ev.subtype === "init" && stopped === null) {
                 const problems = onInit(ev)
                 if (problems.length > 0) {
-                    stopped = { status: "fehler", reason: "isolation", details: problems }
+                    stopped = { status: "error", reason: "isolation", details: problems }
                     killTree(child)
                     armGrace()
                 }
@@ -367,12 +367,12 @@ export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, 
             })
         }
         catch (e) {
-            stopped = { status: "fehler", reason: "start", details: [ e.message ] }
+            stopped = { status: "error", reason: "start", details: [ e.message ] }
             finish(null)
             return
         }
         timer = setTimeout(() => {
-            stopped = stopped ?? { status: "abgebrochen", reason: "zeit" }
+            stopped = stopped ?? { status: "aborted", reason: "time" }
             killTree(child)
             armGrace()
         }, timeoutMs)
@@ -389,7 +389,7 @@ export function runChild ({ program, args, cwd, env, timeoutMs, transcriptFile, 
         })
         child.stderr.on("data", (chunk) => err.write(chunk))
         child.on("error", (e) => {
-            stopped = stopped ?? { status: "fehler", reason: "start", details: [ e.message ] }
+            stopped = stopped ?? { status: "error", reason: "start", details: [ e.message ] }
             finish(null)
         })
         child.on("exit", () => {
