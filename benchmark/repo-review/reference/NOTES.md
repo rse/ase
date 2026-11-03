@@ -18,6 +18,9 @@ when reading the raw outputs. They change no figure in the report.
   2026-11-03 by a fixed mapping (SDD-016, marked by the field `migrated`);
   `transcript.jsonl` and `review.md` are unchanged. All metrics of the report are
   identical before and after the translation.
+- The threshold values were committed in `c3f00a57` before the first paid run. The
+  report names `f03489e6`, which only translated the `source` text of
+  `thresholds.json`; the threshold values are unchanged (`git diff c3f00a57 f03489e6 -- thresholds.json`).
 
 ## Visible matching errors
 
