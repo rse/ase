@@ -14,7 +14,7 @@ import { parseReview }                             from "./lib/parser.mjs"
 import { assignFinding }                           from "./lib/zuordnung.mjs"
 import { evaluateRun, aggregate, calibrate }       from "./lib/auswertung.mjs"
 import { findLeak }                                from "./lib/leck.mjs"
-import { seriesAllows, createRunDir, checkInit, checkContamination, childEnv, envSummary, transcriptFacts } from "./lib/runner.mjs"
+import { seriesAllows, createRunDir, checkInit, claudeArgs, mcpConfig, checkContamination, childEnv, envSummary, transcriptFacts } from "./lib/runner.mjs"
 
 let passed = 0, failed = 0
 function check (name, cond, info = "") {
@@ -141,8 +141,19 @@ check("Serienbudget: 25 + 5 = 30 erlaubt", seriesAllows(25, 5, 30) === true)
     check("Ergebnisordner wird nie überschrieben", threw)
     fs.rmSync(tmp, { recursive: true, force: true })
 }
-check("Isolation: fremdes Plugin wird erkannt", checkInit({ plugins: [ { name: "ase" }, { name: "agdf" } ], mcp_servers: [ { name: "plugin:ase:ase" } ] }).length === 1)
-check("Isolation: nur ASE ist in Ordnung", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [ { name: "plugin:ase:ase" } ] }).length === 0)
+check("Isolation: fremdes Plugin wird erkannt", checkInit({ plugins: [ { name: "ase" }, { name: "agdf", source: "agdf@market" } ], mcp_servers: [ { name: "ase" } ] }).length === 1)
+check("Isolation: nur ASE ist in Ordnung", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase" } ] }).length === 0)
+check("Isolation: eingebaute CLI-Plugins (@builtin) sind zugelassen",
+    checkInit({ plugins: [ { name: "ase" }, { name: "cc-plugin-telemetry", path: "builtin", source: "cc-plugin-telemetry@builtin" } ], mcp_servers: [ { name: "ase" } ] }).length === 0)
+check("Isolation: fremder MCP-Server (Konto-Konnektor) wird erkannt (Negativfall)",
+    eq(checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase" }, { name: "claude.ai Notion" } ] }), [ "fremder MCP-Server geladen: claude.ai Notion" ]))
+{
+    const args = claudeArgs({ model: "sonnet", budget: 5, mcpConfigFile: "x.json" })
+    const i = args.indexOf("--mcp-config")
+    check("Aufruf: --strict-mcp-config und --mcp-config mit Datei", args.includes("--strict-mcp-config") && args[i + 1] === "x.json")
+    check("Aufruf: MCP-Werkzeuge mcp__ase__*", args.includes("mcp__ase__*") && !args.some((a) => a.includes("plugin_ase")))
+    check("MCP-Konfiguration: genau der Server ase", eq(Object.keys(mcpConfig().mcpServers), [ "ase" ]) && mcpConfig().mcpServers.ase.args.at(-1) === "mcp")
+}
 check("Isolation: fehlender ASE-MCP-Server wird erkannt", checkInit({ plugins: [ { name: "ase" } ], mcp_servers: [] }).length === 1)
 {
     const use = (input) => ({ type: "assistant", message: { content: [ { type: "tool_use", name: "Read", input } ] } })

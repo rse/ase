@@ -1,4 +1,4 @@
-{"type":"system","subtype":"init","model":"claude-sonnet-5-5","cwd":"/tmp/shop","plugins":[{"name":"ase","path":"plugin"}],"mcp_servers":[{"name":"plugin:ase:ase","status":"connected"}]}
+{"type":"system","subtype":"init","model":"claude-sonnet-5-5","cwd":"/tmp/shop","plugins":[{"name":"ase","path":"plugin","source":"ase@inline"},{"name":"cc-plugin-telemetry","path":"builtin","source":"cc-plugin-telemetry@builtin"}],"mcp_servers":[{"name":"ase","status":"connected"}]}
 {"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t125ce4","name":"Skill","input":{"skill":"ase:ase-repo-review"}}]}}
 {"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tcfab1a","name":"Bash","input":{"command":"git diff HEAD~1 HEAD"}}]}}
 {"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t40c393","name":"Read","input":{"file_path":"src/cart.ts"}}]}}

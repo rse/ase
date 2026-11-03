@@ -57,8 +57,13 @@ Jeder Lauf ruft fest `/ase:ase-repo-review -c HEAD -S LOW` auf, mit Kostengrenze
 wird vor jedem weiteren Lauf geprüft; `--prior-spent` übernimmt bereits
 verbrauchte Kosten einer Serie. Geerbte `CLAUDE*`- und `ANTHROPIC_*`-Variablen
 werden für den Kindprozess entfernt; geladen wird nur das Plugin dieser
-Arbeitskopie. Lädt `claude` ein anderes Plugin, bricht der Runner sofort ab
-(Status `fehler`, Grund `isolation`).
+Arbeitskopie. MCP-Server kommen ausschließlich über `--strict-mcp-config` und eine
+erzeugte `--mcp-config` mit genau dem Server `ase`; die claude.ai-Konnektoren des
+Kontos bleiben damit außen vor. Die eingebauten Plugins der CLI (`@builtin`) werden
+nur protokolliert. Lädt `claude` ein anderes Plugin oder einen anderen MCP-Server,
+bricht der Runner sofort ab (Status `fehler`, Grund `isolation`). Nach jedem Lauf
+beendet der Runner übrig gebliebene ASE-Prozesse (etwa den Projektdienst) und
+vermerkt sie im Protokoll.
 
 Status eines Laufs: `ok`, `unauswertbar` (Ausgabe nicht als Review erkennbar,
 zählt mit 0 Treffern), `abgebrochen` (Kosten oder Zeit), `fehler` (Leck,

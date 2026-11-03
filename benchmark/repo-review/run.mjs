@@ -14,7 +14,8 @@ import { parseReview }                          from "./lib/parser.mjs"
 import { thresholdVersion }                     from "./lib/bericht.mjs"
 import {
     PROMPT, claudeArgs, childEnv, envSummary, claudeProgram, runChild, checkInit, checkContamination,
-    transcriptFacts, cliVersion, aseInfo, userAseConfig, createRunDir, stamp, modelShort, seriesAllows, isAlive
+    transcriptFacts, cliVersion, aseInfo, userAseConfig, createRunDir, stamp, modelShort, seriesAllows, isAlive,
+    mcpConfig, aseProcesses, killLeftovers
 } from "./lib/runner.mjs"
 
 const HELP = `Aufruf: node run.mjs [Optionen]
@@ -120,7 +121,7 @@ function preflight (o) {
 function dryEvents (o) {
     if (o.simulate === "abort-cost")
         return [
-            { type: "system", subtype: "init", model: "claude-sonnet-5-5", plugins: [ { name: "ase" } ], mcp_servers: [ { name: "plugin:ase:ase", status: "connected" } ] },
+            { type: "system", subtype: "init", model: "claude-sonnet-5-5", plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase", status: "connected" } ] },
             { type: "result", subtype: "error_max_budget_usd", is_error: true, total_cost_usd: 5.03, modelUsage: { "claude-sonnet-5-5": {} }, permission_denials: [] }
         ]
     const file = o.replay ?? path.join(TESTDATA_DIR, o.simulate === "unparseable" ? "unparseable.jsonl" : "normal.jsonl")
@@ -133,6 +134,10 @@ async function oneRun (o, nr, env, program, pre) {
     const name    = `${stamp(started)}-${modelShort(o.model)}-${nr}${o.dryRun ? "-dry" : ""}`
     const dir     = createRunDir(o.out, name)
     const copy    = buildCopy()
+    const mcpFile = path.join(copy.root, "ase-mcp.json")
+    fs.writeFileSync(mcpFile, JSON.stringify(mcpConfig(), null, 4))
+    const args    = claudeArgs({ ...o, mcpConfigFile: mcpFile })
+    const before  = o.dryRun ? [] : aseProcesses()
     const meta    = {
         schema:          1,
         status:          null,
@@ -153,7 +158,10 @@ async function oneRun (o, nr, env, program, pre) {
         budget_usd:      o.budget,
         timeout_min:     o.timeoutMin,
         permission_denials: null,
-        invocation:      { program: o.dryRun ? "(Trockenlauf)" : program, args: [ ...pre, ...claudeArgs(o) ], prompt: PROMPT },
+        invocation:      { program: o.dryRun ? "(Trockenlauf)" : program, args: [ ...pre, ...args ], prompt: PROMPT, mcp_config: mcpConfig() },
+        init_plugins:    [],
+        init_mcp:        [],
+        uebrig_beendet:  [],
         fixture_digest:  fixtureDigest(),
         sollliste_digest: sha256(fs.readFileSync(SOLL_FILE)),
         copy_dir:        o.keep ? copy.dir : null
@@ -199,7 +207,7 @@ async function oneRun (o, nr, env, program, pre) {
     else {
         const child = o.simulate === "abort-time"
             ? { program: process.execPath, args: [ path.join(TESTDATA_DIR, "sim-hang.mjs"), path.join(dir, "grandchild.pid") ] }
-            : { program, args: [ ...pre, ...claudeArgs(o) ] }
+            : { program, args: [ ...pre, ...args ] }
         const res = await runChild({
             program: child.program, args: child.args, cwd: copy.dir, env, timeoutMs,
             transcriptFile: path.join(dir, "transcript.jsonl"),
@@ -208,6 +216,10 @@ async function oneRun (o, nr, env, program, pre) {
         })
         events  = res.events
         stopped = res.stopped
+        if (!o.dryRun) {
+            await new Promise((r) => setTimeout(r, 1000))
+            meta.uebrig_beendet = killLeftovers(before)
+        }
         if (o.simulate === "abort-time") {
             const pidFile = path.join(dir, "grandchild.pid")
             const gpid    = fs.existsSync(pidFile) ? Number(fs.readFileSync(pidFile, "utf8")) : null
@@ -219,6 +231,8 @@ async function oneRun (o, nr, env, program, pre) {
     /*  facts, limits, contamination  */
     const facts = transcriptFacts(events)
     meta.model.reported      = facts.reported
+    meta.init_plugins        = facts.plugins
+    meta.init_mcp            = facts.mcp
     meta.cost_usd            = facts.cost
     meta.permission_denials  = facts.denials
     if (stopped !== null) {

@@ -18,12 +18,17 @@ export const ALLOWED_TOOLS = [
     "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)", "Bash(git rev-parse:*)",
     "Bash(git rev-list:*)", "Bash(git merge-base:*)", "Bash(git status:*)",
     "Bash(git branch:*)", "Bash(git for-each-ref:*)",
-    "mcp__plugin_ase_ase__*"
+    "mcp__ase__*"
 ]
 export const DISALLOWED_TOOLS = [ "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch" ]
 
+/*  MCP configuration with exactly the ASE server (SDD-005, revision 1)  */
+export function mcpConfig () {
+    return { mcpServers: { ase: { command: process.execPath, args: [ path.join(REPO_DIR, "tool", "bin", "ase"), "mcp" ] } } }
+}
+
 /*  command-line arguments of the claude invocation (SDD-005)  */
-export function claudeArgs ({ model, budget }) {
+export function claudeArgs ({ model, budget, mcpConfigFile = "{ase.json}" }) {
     return [
         "-p", PROMPT,
         "--plugin-dir", path.join(REPO_DIR, "plugin"),
@@ -33,6 +38,8 @@ export function claudeArgs ({ model, budget }) {
         "--max-budget-usd", String(budget),
         "--no-session-persistence",
         "--setting-sources", "",
+        "--strict-mcp-config",
+        "--mcp-config", mcpConfigFile,
         "--permission-mode", "dontAsk",
         "--allowedTools", ...ALLOWED_TOOLS,
         "--disallowedTools", ...DISALLOWED_TOOLS
@@ -121,21 +128,66 @@ export function seriesAllows (spent, perRun, total) {
     return spent + perRun <= total + 1e-9
 }
 
-/*  isolation check of the init event (SDD-006)  */
+/*  whether a plugin of the init event is built into the CLI itself  */
+export function isBuiltinPlugin (p) {
+    return typeof p === "object" && p !== null && (p.path === "builtin" || /@builtin$/.test(p.source ?? ""))
+}
+
+/*  isolation check of the init event (SDD-006, revision 1): built-in CLI plugins are
+    allowed (and logged), any other plugin besides "ase" and any MCP server besides "ase" is not  */
 export function checkInit (event) {
     const problems = []
     const plugins  = Array.isArray(event.plugins) ? event.plugins : []
-    for (const p of plugins) {
-        const name = typeof p === "string" ? p : p.name
-        if (name !== "ase")
-            problems.push(`fremdes Plugin geladen: ${name}`)
-    }
-    if (!plugins.some((p) => (typeof p === "string" ? p : p.name) === "ase"))
+    const name     = (p) => typeof p === "string" ? p : p.name
+    for (const p of plugins)
+        if (name(p) !== "ase" && !isBuiltinPlugin(p))
+            problems.push(`fremdes Plugin geladen: ${name(p)}`)
+    if (!plugins.some((p) => name(p) === "ase"))
         problems.push("ASE-Plugin nicht geladen")
     const servers = Array.isArray(event.mcp_servers) ? event.mcp_servers : []
-    if (!servers.some((s) => /ase/i.test(s.name ?? "")))
+    for (const s of servers)
+        if (s.name !== "ase")
+            problems.push(`fremder MCP-Server geladen: ${s.name}`)
+    if (!servers.some((s) => s.name === "ase"))
         problems.push("MCP-Server von ASE fehlt")
     return problems
+}
+
+/*  PIDs and command lines of running ASE processes of this working copy (R3)  */
+export function aseProcesses () {
+    const marker = path.join(REPO_DIR, "tool").toLowerCase()
+    let rows = []
+    if (process.platform === "win32") {
+        const res = spawnSync("powershell", [ "-NoProfile", "-NonInteractive", "-Command",
+            "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | ForEach-Object { \"$($_.ProcessId)`t$($_.CommandLine)\" }" ],
+            { encoding: "utf8", windowsHide: true })
+        rows = (res.stdout || "").split(/\r?\n/)
+    }
+    else {
+        const res = spawnSync("ps", [ "-eo", "pid=,args=" ], { encoding: "utf8" })
+        rows = (res.stdout || "").split("\n").map((l) => l.trim().replace(/^(\d+)\s+/, "$1\t"))
+    }
+    return rows.map((l) => l.split("\t")).filter(([ pid, cmd ]) => /^\d+$/.test(pid ?? "") && (cmd ?? "").toLowerCase().includes(marker))
+        .map(([ pid, cmd ]) => ({ pid: Number(pid), cmd: cmd.trim() }))
+}
+
+/*  kill ASE processes started during the run (R3)  */
+export function killLeftovers (before) {
+    const known = new Set(before.map((p) => p.pid))
+    const left  = aseProcesses().filter((p) => !known.has(p.pid) && p.pid !== process.pid)
+    for (const p of left) {
+        if (process.platform === "win32")
+            killTree({ pid: p.pid })
+        else {
+            try {
+                process.kill(p.pid, "SIGKILL")
+            }
+            catch (err) {
+                /*  already gone  */
+            }
+        }
+    }
+    return left.map((p) => p.cmd.replace(/s+/g, " ").slice(0, 200))
 }
 
 /*  collect strings of a tool input that may name paths  */
@@ -184,9 +236,12 @@ export function transcriptFacts (events) {
             models.add(m)
     if (init?.model)
         models.add(init.model)
+    const plugins = Array.isArray(init?.plugins) ? init.plugins : []
     return {
         result,
         init,
+        plugins:  plugins.map((p) => typeof p === "string" ? p : `${p.name}${isBuiltinPlugin(p) ? " (builtin)" : ""}`).sort(),
+        mcp:      (Array.isArray(init?.mcp_servers) ? init.mcp_servers : []).map((s) => `${s.name}:${s.status}`).sort(),
         reported: [ ...models ].sort(),
         cost:     typeof result?.total_cost_usd === "number" ? result.total_cost_usd : null,
         denials:  Array.isArray(result?.permission_denials) ? result.permission_denials.length : null,
