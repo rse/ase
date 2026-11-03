@@ -5,7 +5,7 @@
 import fs   from "node:fs"
 import path from "node:path"
 
-import { REPO_DIR, THRESH_FILE, git, readJson, sha256 } from "./common.mjs"
+import { REPO_DIR, DEFAULT_CASE, git, readJson, sha256 } from "./common.mjs"
 import { evaluateRun, aggregate, calibrate }             from "./scoring.mjs"
 
 /*  collect completed result folders below the given paths (run.json is the completion mark)  */
@@ -30,6 +30,8 @@ export function loadRun (dir) {
     const review = fs.existsSync(path.join(dir, "review.md")) ? fs.readFileSync(path.join(dir, "review.md"), "utf8") : null
     return {
         name:     path.basename(dir),
+        /*  protocols of the first measurements predate the case field  */
+        case:     meta.case ?? DEFAULT_CASE,
         status:   meta.status,
         reason:   meta.reason ?? null,
         model:    (meta.model?.requested ?? "unknown") + (meta.dry_run ? " (dry run)" : ""),
@@ -42,9 +44,9 @@ export function loadRun (dir) {
     }
 }
 
-/*  version of the threshold file: last commit and dirty flag  */
-export function thresholdVersion () {
-    const rel = path.relative(REPO_DIR, THRESH_FILE).replace(/\\/g, "/")
+/*  version of the threshold file of a case: last commit and dirty flag  */
+export function thresholdVersion (c) {
+    const rel = path.relative(REPO_DIR, c.thresholdFile).replace(/\\/g, "/")
     let commit = null, dirty = true
     try {
         commit = git(REPO_DIR, [ "log", "-1", "--format=%H", "--", rel ]).trim() || null
@@ -56,9 +58,9 @@ export function thresholdVersion () {
     return { commit, modified: dirty }
 }
 
-/*  build the report data  */
-export function buildReport (dirs, expected) {
-    const thresholds = readJson(THRESH_FILE)
+/*  build the report data of a case  */
+export function buildReport (dirs, expected, c) {
+    const thresholds = readJson(c.thresholdFile)
     const loaded     = dirs.map(loadRun)
     const evaluated  = loaded.map((r) => ({ ...evaluateRun(r, expected), reported: r.reported, endpoint: r.endpoint, ase: r.ase }))
     const models     = [ ...new Set(evaluated.map((r) => r.model)) ].sort()
@@ -73,7 +75,7 @@ export function buildReport (dirs, expected) {
     return {
         schema:     2,
         expected:   sha256(JSON.stringify(expected)),
-        thresholds: { values: thresholds, file: thresholdVersion() },
+        thresholds: { values: thresholds, file: thresholdVersion(c) },
         models:     perModel
     }
 }

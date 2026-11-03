@@ -12,11 +12,35 @@ import { fileURLToPath } from "node:url"
 /*  well-known locations  */
 export const BENCH_DIR     = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 export const REPO_DIR      = path.resolve(BENCH_DIR, "..", "..")
-export const FIXTURE_DIR   = path.join(BENCH_DIR, "fixture")
-export const EXPECTED_FILE = path.join(BENCH_DIR, "solution", "expected.json")
-export const THRESH_FILE   = path.join(BENCH_DIR, "thresholds.json")
-export const RESULTS_DIR   = path.join(BENCH_DIR, "results")
 export const TESTDATA_DIR  = path.join(BENCH_DIR, "testdata")
+
+/*  the test cases: the first case keeps the original root paths, later cases live under cases/;
+    this table is the only source of case paths (design rationale: DESIGN.md)  */
+export const DEFAULT_CASE = "shop-core"
+const CASES = {
+    "shop-core": { dir: BENCH_DIR,                          changeMessage: "Update order handling" },
+    "security":  { dir: path.join(BENCH_DIR, "cases", "security"), changeMessage: "Add admin refunds and payment webhooks" }
+}
+export const CASE_NAMES = Object.keys(CASES)
+
+/*  resolve a case name to its paths; throws for an unknown name  */
+export function resolveCase (name = DEFAULT_CASE) {
+    const c = CASES[name]
+    if (c === undefined)
+        throw new Error(`unknown case "${name}" (known: ${CASE_NAMES.join(", ")})`)
+    return {
+        name,
+        dir:           c.dir,
+        fixtureDir:    path.join(c.dir, "fixture"),
+        expectedFile:  path.join(c.dir, "solution", "expected.json"),
+        thresholdFile: path.join(c.dir, "thresholds.json"),
+        resultsDir:    path.join(c.dir, "results"),
+        testdataDir:   path.join(c.dir, "testdata"),
+        referenceDir:  path.join(c.dir, "reference"),
+        project:       { id: "shop", name: "Shop", boxing: "white" },
+        changeMessage: c.changeMessage
+    }
+}
 
 /*  read and parse a JSON file  */
 export function readJson (file) {

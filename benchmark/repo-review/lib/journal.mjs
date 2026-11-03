@@ -36,16 +36,16 @@ const HEADER = [
     ""
 ]
 
-/*  identifier of a series: digest over the names of its result folders and the scorer
-    commit, so a re-scoring with a changed scorer becomes a new entry  */
-export function seriesId (dirs, scorerCommit) {
-    return sha256(dirs.map((d) => path.basename(d)).sort().join("\n") + "\n" + scorerCommit).slice(0, 19)
+/*  identifier of a series: digest over the case, the names of its result folders and the
+    scorer commit, so a re-scoring with a changed scorer becomes a new entry  */
+export function seriesId (dirs, scorerCommit, caseName) {
+    return sha256(caseName + "\n" + dirs.map((d) => path.basename(d)).sort().join("\n") + "\n" + scorerCommit).slice(0, 19)
 }
 
-/*  version of the scoring code: last commit and dirty flag of the files that decide a score  */
-export function scorerVersion () {
-    const rel = (p) => path.relative(REPO_DIR, path.join(BENCH_DIR, p)).replace(/\\/g, "/")
-    const paths = [ "lib", "compare.mjs", "solution", "thresholds.json" ].map(rel)
+/*  version of the scoring code: last commit and dirty flag of the files that decide a score of the case  */
+export function scorerVersion (c) {
+    const rel = (p) => path.relative(REPO_DIR, p).replace(/\\/g, "/")
+    const paths = [ path.join(BENCH_DIR, "lib"), path.join(BENCH_DIR, "compare.mjs"), c.expectedFile, c.thresholdFile ].map(rel)
     try {
         const commit = git(REPO_DIR, [ "log", "-1", "--format=%H", "--", ...paths ]).trim() || null
         const dirty  = git(REPO_DIR, [ "status", "--porcelain", "--", ...paths ]).trim() !== ""
@@ -104,9 +104,9 @@ function unassignableOf (review, expected) {
 }
 
 /*  render the generated section of one series  */
-export function renderSection ({ title, dirs, report, expected }) {
-    const scorer = scorerVersion()
-    const id     = seriesId(dirs, scorer.commit)
+export function renderSection ({ title, dirs, report, expected, c }) {
+    const scorer = scorerVersion(c)
+    const id     = seriesId(dirs, scorer.commit, c.name)
     const runs   = dirs.map((d, i) => {
         const meta   = runMeta(d)
         const detail = Object.values(report.models).flatMap((m) => m.run_details)
@@ -127,6 +127,7 @@ export function renderSection ({ title, dirs, report, expected }) {
         + folders.map((f) => `\`${f}\``).join(", ") + ".", "")
 
     out.push("### Configuration", "", "| Item | Value |", "|---|---|")
+    out.push(`| Case | ${c.name} |`)
     out.push(`| Runs started (UTC) | ${starts.length ? `${starts[0]} to ${starts[starts.length - 1]}` : "–"} |`)
     out.push(`| Invocation | ${uniq(runs.map((r) => r.meta.prompt)).map((s) => `\`${s}\``).join(", ") || "–"} |`)
     out.push(`| Models (requested → reported) | ${groups.map((g) => `${g.runs[0].meta.requested} → ${configLabel(g.runs)}`).join("; ")} |`)

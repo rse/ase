@@ -1,28 +1,40 @@
 #!/usr/bin/env node
 /*
 **  ASE review benchmark -- check the expected-results list against the fixture
-**  Usage: node check.mjs [--expected <file>]
+**  Usage: node check.mjs [--case <name>] [--expected <file>]
 */
 
 import path from "node:path"
 
-import { EXPECTED_FILE }                             from "./lib/common.mjs"
+import { DEFAULT_CASE, resolveCase }                 from "./lib/common.mjs"
 import { buildCopy, removeCopy }                     from "./lib/copy.mjs"
 import { loadExpected, validateExpected, summarize } from "./lib/expected.mjs"
 
-let file = EXPECTED_FILE
+const USAGE = "Usage: node check.mjs [--case <name>] [--expected <file>]\n"
+let caseName = DEFAULT_CASE
+let file     = null
 const argv = process.argv.slice(2)
 for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--expected")
         file = path.resolve(argv[++i])
+    else if (argv[i] === "--case")
+        caseName = argv[++i]
     else {
-        process.stderr.write(`unknown option: ${argv[i]}\nUsage: node check.mjs [--expected <file>]\n`)
+        process.stderr.write(`unknown option: ${argv[i]}\n${USAGE}`)
         process.exit(2)
     }
 }
+let c
+try {
+    c = resolveCase(caseName)
+}
+catch (err) {
+    process.stderr.write(`${err.message}\n${USAGE}`)
+    process.exit(2)
+}
 
-const expected = loadExpected(file)
-const copy     = buildCopy()
+const expected = loadExpected(file ?? c.expectedFile)
+const copy     = buildCopy(c)
 let failed = false
 try {
     const { results, global } = validateExpected(expected, copy.dir)
@@ -39,6 +51,7 @@ try {
         process.stdout.write(`expected-results list: ${g}\n`)
     }
     const s = summarize(expected)
+    process.stdout.write(`case: ${c.name}\n`)
     process.stdout.write(`summary: ${s.findings} findings (obvious ${s.obvious}, `
         + `medium ${s.medium}, hidden ${s.hidden}), ${s.decoys} decoys\n`)
     process.stdout.write(failed ? "result: FAILED\n" : "result: OK\n")

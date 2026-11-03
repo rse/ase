@@ -27,7 +27,7 @@ const WORD_RE   = new RegExp(`(?<![\\p{L}\\p{N}_])(${GERMAN_WORDS.join("|")})(?!
 const UMLAUT_RE = /[äöüÄÖÜß]/
 const EXEMPT_RE = new RegExp(`(?<![\\p{L}\\p{N}_])(${DENY_TERMS.join("|")})(?:s|e|en|es)?(?![\\p{L}\\p{N}_])`, "giu")
 const SELF      = "check-language.mjs"
-const RAW       = /(^|\/)(results|reference\/runs\/[^/]+)\/(transcript\.jsonl|review\.md|stderr\.txt)$/
+const RAW       = /(^|\/)(results|(cases\/[^/]+\/)?reference\/runs\/[^/]+)\/(transcript\.jsonl|review\.md|stderr\.txt)$/
 
 /*  check one text, returning the offending match (or null)  */
 export function findGerman (text) {

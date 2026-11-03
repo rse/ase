@@ -29,10 +29,10 @@ export function findLeak (text) {
 }
 
 /*  check a copy and return a list of problems (empty if clean)  */
-export function checkCopy (dir) {
+export function checkCopy (dir, c) {
     const problems = []
     const actual   = listFiles(dir)
-    const expected = expectedFiles()
+    const expected = expectedFiles(c)
     for (const file of actual)
         if (!expected.includes(file))
             problems.push(`unexpected file: ${file}`)

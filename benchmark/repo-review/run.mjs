@@ -8,7 +8,7 @@ import fs   from "node:fs"
 import os   from "node:os"
 import path from "node:path"
 
-import { REPO_DIR, RESULTS_DIR, TESTDATA_DIR, EXPECTED_FILE, THRESH_FILE, readJson, sha256, stableStringify, git } from "./lib/common.mjs"
+import { REPO_DIR, TESTDATA_DIR, DEFAULT_CASE, resolveCase, readJson, sha256, stableStringify, git } from "./lib/common.mjs"
 import { buildCopy, removeCopy, fixtureDigest } from "./lib/copy.mjs"
 import { checkCopy }                            from "./lib/leak.mjs"
 import { parseReview }                          from "./lib/parser.mjs"
@@ -21,6 +21,7 @@ import {
 
 const HELP = `Usage: node run.mjs [options]
 
+  --case <name>             test case (default: shop-core)
   --model <model>           model for claude -p (default: sonnet)
   --runs <n>                number of runs (default: 1)
   --budget <usd>            cost limit per run (default: 5)
@@ -30,11 +31,11 @@ const HELP = `Usage: node run.mjs [options]
   --confirm-paid            explicit flag for paid runs
   --base-url <url>          other API endpoint (sets ANTHROPIC_BASE_URL)
   --auth-token-env <VAR>    name of the environment variable holding the token (sets ANTHROPIC_AUTH_TOKEN)
-  --out <folder>            location of the result folders (default: results/)
+  --out <folder>            location of the result folders (default: results folder of the case)
   --keep                    keep the throw-away copy after the run
   --dry-run                 dry run without a model call
   --replay <file>           canned stream-json transcript for the dry run
-                            (default: testdata/normal.jsonl)
+                            (default: normal.jsonl in the testdata folder of the case)
   --simulate <case>         special case in the dry run: abort-cost, abort-time, unparseable, leak
   --help                    this help
 `
@@ -42,8 +43,9 @@ const HELP = `Usage: node run.mjs [options]
 /*  parse the command line  */
 function options (argv) {
     const o = {
+        caseName: DEFAULT_CASE,
         model: "sonnet", runs: 1, budget: 5, timeoutMin: 20, totalBudget: 30, priorSpent: 0,
-        confirmPaid: false, baseUrl: null, authTokenEnv: null, out: RESULTS_DIR, keep: false,
+        confirmPaid: false, baseUrl: null, authTokenEnv: null, out: null, keep: false,
         dryRun: false, replay: null, simulate: null
     }
     const num = (v, name) => {
@@ -59,7 +61,8 @@ function options (argv) {
                 throw new Error(`${a} needs a value`)
             return argv[++i]
         }
-        if      (a === "--model")          o.model        = v()
+        if      (a === "--case")           o.caseName     = v()
+        else if (a === "--model")          o.model        = v()
         else if (a === "--runs")           o.runs         = Math.max(1, Math.floor(num(v(), a)))
         else if (a === "--budget")         o.budget       = num(v(), a)
         else if (a === "--timeout-min")    o.timeoutMin   = num(v(), a)
@@ -81,34 +84,37 @@ function options (argv) {
         throw new Error(`unknown special case: ${o.simulate}`)
     if (!o.dryRun && (o.replay !== null || o.simulate !== null))
         throw new Error("--replay and --simulate only with --dry-run")
+    o.case = resolveCase(o.caseName)
+    o.out ??= o.case.resultsDir
     return o
 }
 
 /*  preconditions before any model call  */
 function preflight (o) {
     const problems = []
+    const c = o.case
     try {
-        const expected = readJson(EXPECTED_FILE)
+        const expected = readJson(c.expectedFile)
         if (!Array.isArray(expected.entries))
-            problems.push("expected-results list invalid: run node check.mjs")
+            problems.push(`expected-results list invalid: run node check.mjs --case ${c.name}`)
     }
     catch (err) {
-        problems.push(`expected-results list missing or not JSON (${EXPECTED_FILE})`)
+        problems.push(`expected-results list missing or not JSON (${c.expectedFile})`)
     }
     let thresholds = null
     try {
-        thresholds = readJson(THRESH_FILE)
+        thresholds = readJson(c.thresholdFile)
     }
     catch (err) {
-        problems.push(`threshold file missing or not JSON (${THRESH_FILE})`)
+        problems.push(`threshold file missing or not JSON (${c.thresholdFile})`)
     }
     if (o.dryRun)
         return problems
     if (!o.confirmPaid)
         problems.push("paid run without --confirm-paid: obtain the cost approval first, then start with --confirm-paid")
-    const tv = thresholdVersion()
+    const tv = thresholdVersion(c)
     if (thresholds !== null && (tv.commit === null || tv.modified))
-        problems.push("thresholds.json is not committed or modified: commit the threshold file before the measurement")
+        problems.push(`${path.relative(process.cwd(), c.thresholdFile)} is not committed or modified: commit the threshold file before the measurement`)
     if (!fs.existsSync(path.join(REPO_DIR, "tool", "dst", "ase.js")))
         problems.push("tool/ is not built: cd tool && npm start build")
     if (o.budget > 5 || o.totalBudget > 30)
@@ -125,7 +131,10 @@ function dryEvents (o) {
             { type: "system", subtype: "init", model: "claude-sonnet-5-5", plugins: [ { name: "ase" } ], mcp_servers: [ { name: "ase", status: "connected" } ] },
             { type: "result", subtype: "error_max_budget_usd", is_error: true, total_cost_usd: 5.03, modelUsage: { "claude-sonnet-5-5": {} }, permission_denials: [] }
         ]
-    const file = o.replay ?? path.join(TESTDATA_DIR, o.simulate === "unparseable" ? "unparseable.jsonl" : "normal.jsonl")
+    /*  the normal transcript belongs to the case, the special cases are shared  */
+    const file = o.replay ?? (o.simulate === "unparseable"
+        ? path.join(TESTDATA_DIR, "unparseable.jsonl")
+        : path.join(o.case.testdataDir, "normal.jsonl"))
     return fs.readFileSync(file, "utf8").split(/\r?\n/).filter((l) => l.trim() !== "").map((l) => JSON.parse(l))
 }
 
@@ -134,7 +143,7 @@ async function oneRun (o, nr, env, program, pre) {
     const started = new Date()
     const name    = `${stamp(started)}-${modelShort(o.model)}-${nr}${o.dryRun ? "-dry" : ""}`
     const dir     = createRunDir(o.out, name)
-    const copy    = buildCopy()
+    const copy    = buildCopy(o.case)
     /*  MCP configuration outside the parent of the copy, so ".." does not lead to the repository path  */
     const mcpDir  = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-mcp-"))
     const mcpFile = path.join(mcpDir, "ase-mcp.json")
@@ -143,6 +152,7 @@ async function oneRun (o, nr, env, program, pre) {
     const before  = o.dryRun ? [] : aseProcesses()
     const meta    = {
         schema:          1,
+        case:            o.case.name,
         status:          null,
         reason:          null,
         details:         [],
@@ -165,8 +175,8 @@ async function oneRun (o, nr, env, program, pre) {
         init_plugins:    [],
         init_mcp:        [],
         leftovers_killed: [],
-        fixture_digest:  fixtureDigest(),
-        expected_digest: sha256(fs.readFileSync(EXPECTED_FILE)),
+        fixture_digest:  fixtureDigest(o.case),
+        expected_digest: sha256(fs.readFileSync(o.case.expectedFile)),
         copy_dir:        o.keep ? copy.dir : null
     }
     const finish = (review) => {
@@ -215,7 +225,7 @@ async function runInCopy (o, dir, copy, args, env, before, meta, finish, program
         fs.writeFileSync(path.join(copy.dir, "NOTES.md"), "B-03\n")
         git(copy.dir, [ "commit", "-q", "--allow-empty", "-m", "Fix K-02" ])
     }
-    const leaks = checkCopy(copy.dir)
+    const leaks = checkCopy(copy.dir, o.case)
     if (leaks.length > 0) {
         meta.status  = "error"
         meta.reason  = "leak"
