@@ -36,9 +36,10 @@ const HEADER = [
     ""
 ]
 
-/*  identifier of a series: digest over the names of its result folders  */
-export function seriesId (dirs) {
-    return sha256(dirs.map((d) => path.basename(d)).sort().join("\n")).slice(0, 19)
+/*  identifier of a series: digest over the names of its result folders and the scorer
+    commit, so a re-scoring with a changed scorer becomes a new entry  */
+export function seriesId (dirs, scorerCommit) {
+    return sha256(dirs.map((d) => path.basename(d)).sort().join("\n") + "\n" + scorerCommit).slice(0, 19)
 }
 
 /*  version of the scoring code: last commit and dirty flag of the files that decide a score  */
@@ -104,7 +105,8 @@ function unassignableOf (review, expected) {
 
 /*  render the generated section of one series  */
 export function renderSection ({ title, dirs, report, expected }) {
-    const id     = seriesId(dirs)
+    const scorer = scorerVersion()
+    const id     = seriesId(dirs, scorer.commit)
     const runs   = dirs.map((d, i) => {
         const meta   = runMeta(d)
         const detail = Object.values(report.models).flatMap((m) => m.run_details)
@@ -115,7 +117,6 @@ export function renderSection ({ title, dirs, report, expected }) {
     const groups = Object.keys(report.models).map((model) => ({
         model, m: report.models[model], runs: runs.filter((r) => r.detail.model === model)
     }))
-    const scorer  = scorerVersion()
     const starts  = runs.map((r) => r.meta.started).filter(Boolean).sort()
     const folders = uniq(runs.map((r) => path.relative(BENCH_DIR, path.dirname(r.dir)).replace(/\\/g, "/")))
     const t       = report.thresholds.values
@@ -201,7 +202,7 @@ export function renderSection ({ title, dirs, report, expected }) {
         + `${g.m.runs.evaluated} / ${g.m.runs.total} | ${fmt(g.m.recall.overall.mean)} | ${fmt(g.m.recall.obvious.mean)} | `
         + `${fmt(g.m.false_alarm_rate.mean)} | ${fmt(g.m.unassignable.mean, 1)} | ${g.m.threshold.verdict.replace("threshold ", "")} | `
         + `${fmt(g.m.cost_usd.sum)} | not yet |`)
-    return { id, section: out.join("\n"), rows, dryRun: runs.some((r) => r.meta.dryRun) }
+    return { id, section: out.join("\n"), rows, dryRun: runs.some((r) => r.meta.dryRun), scorerModified: scorer.modified }
 }
 
 /*  append a series to the log; existing content is never changed except for new overview rows  */

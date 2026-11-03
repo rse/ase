@@ -20,19 +20,22 @@ export function assignFinding (finding, expected, tolerance = TOLERANCE) {
     if (finding.location === null)
         return null
     const { file, from, to } = finding.location
+    const ranges     = [ { from, to }, ...(finding.location.extra ?? []) ]
     const candidates = []
     for (const e of expected.entries) {
         let best = null
         for (const f of e.locations) {
             if (!sameFile(file, f.file))
                 continue
-            const [ a, b ]  = f.lines
-            const overlap   = Math.min(to + tolerance, b) - Math.max(from - tolerance, a) + 1
-            if (overlap <= 0)
-                continue
-            const distance  = Math.max(0, a - to, from - b)
-            if (best === null || overlap > best.overlap || (overlap === best.overlap && distance < best.distance))
-                best = { id: e.id, overlap, distance }
+            const [ a, b ] = f.lines
+            for (const r of ranges) {
+                const overlap  = Math.min(r.to + tolerance, b) - Math.max(r.from - tolerance, a) + 1
+                if (overlap <= 0)
+                    continue
+                const distance = Math.max(0, a - r.to, r.from - b)
+                if (best === null || overlap > best.overlap || (overlap === best.overlap && distance < best.distance))
+                    best = { id: e.id, overlap, distance }
+            }
         }
         if (best !== null)
             candidates.push(best)

@@ -12,7 +12,7 @@ import path from "node:path"
 import { BENCH_DIR, EXPECTED_FILE, TESTDATA_DIR, stableStringify, readJson } from "./lib/common.mjs"
 import { collectRunDirs, buildReport }             from "./lib/report.mjs"
 import { seriesId, renderSection, appendJournal }  from "./lib/journal.mjs"
-import { parseReview }                             from "./lib/parser.mjs"
+import { parseReview, parseLocation }              from "./lib/parser.mjs"
 import { assignFinding }                           from "./lib/matching.mjs"
 import { evaluateRun, aggregate, calibrate }       from "./lib/scoring.mjs"
 import { findLeak }                                from "./lib/leak.mjs"
@@ -80,6 +80,12 @@ check("parser: foreign output from testdata/unparseable.jsonl is unparseable",
     check("matching: larger overlap wins (finding 15: B-1 1 line, B-2 3 lines)", assignFinding(f("a.ts", 15), two)?.id === "B-2")
     check("matching: a tie is decided by the smallest id (finding 14)", assignFinding(f("a.ts", 14), two)?.id === "B-1")
     check("matching: finding without location stays unassigned", assignFinding({ severity: "HIGH", location: null }, expected) === null)
+    const multi = parseLocation("▢ `src/order.ts:29,51-52`: tags")
+    check("parser: several ranges are kept", eq(multi, { file: "src/order.ts", from: 29, to: 29, extra: [ { from: 51, to: 52 } ] }))
+    check("parser: ranges with blanks and single lines", eq(parseLocation("`src/order.ts:21, 33-35, 40`")?.extra, [ { from: 33, to: 35 }, { from: 40, to: 40 } ]))
+    check("parser: a comma followed by text is no range", parseLocation("`src/cart.ts:30`, and more")?.extra === undefined)
+    check("matching: a later range hits (B-04 at 51-52 via 29,51-52)", assignFinding({ severity: "HIGH", location: multi }, expected)?.id === "B-04")
+    check("matching: the first range alone misses B-04 (negative case)", assignFinding(f("src/order.ts", 29), expected) === null)
 }
 
 /*  metrics computed by hand
@@ -193,10 +199,12 @@ check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c
     const dirs    = collectRunDirs([ path.join(BENCH_DIR, "reference", "runs") ])
     const report  = buildReport(dirs, expected)
     const entry   = renderSection({ title: "Series A", dirs, report, expected })
-    check("log: series id does not depend on folder order", seriesId(dirs) === seriesId([ ...dirs ].reverse()))
+    check("log: series id does not depend on folder order", seriesId(dirs, "c1") === seriesId([ ...dirs ].reverse(), "c1"))
+    check("log: another scorer commit gives another series id", seriesId(dirs, "c1") !== seriesId(dirs, "c2"))
     check("log: one overview row per configuration", entry.rows.length === Object.keys(report.models).length)
     check("log: defect matrix names the defect in plain words", /\| B-01 countUnits [^|]*\| obvious( \| ✓){6} \|/.test(entry.section))
-    check("log: a location with several ranges is shown as written", entry.section.includes("`src/order.ts:29,51-52`"))
+    check("log: a finding at order.ts:29,51-52 now counts for B-04 in every run", /\| B-04 [^|]*\| medium( \| ✓){6} \|/.test(entry.section)
+        && !entry.section.includes("`src/order.ts:29,51-52`"))
     const tmp  = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-log-"))
     const file = path.join(tmp, "MEASUREMENTS.md")
     appendJournal(file, entry)

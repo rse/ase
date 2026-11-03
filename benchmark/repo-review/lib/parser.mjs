@@ -9,7 +9,8 @@ const VERDICT_RE  = /\*\*REVIEW VERDICT\*\*\s*:\s*\*\*([^*\n]+?)\*\*/
 const NOFIND_RE   = /\*\*NO FINDINGS\*\*/
 const HIDDEN_RE   = /\*\*HIDDEN FINDINGS\*\*\s*:\s*(\d+)/
 const SEVCELL_RE  = /^\*{0,2}(HIGH|MEDIUM|LOW|ACCEPTED)\*{0,2}$/i
-const LOCATION_RE = /(?:▢\s*)?`?((?:[A-Za-z]:)?[^\s`:|*]*[^\s`:|*./][^\s`:|*]*\.[A-Za-z0-9]+):(\d+)(?:\s*[-–]\s*(\d+))?`?/
+const LOCATION_RE = /(?:▢\s*)?`?((?:[A-Za-z]:)?[^\s`:|*]*[^\s`:|*./][^\s`:|*]*\.[A-Za-z0-9]+):(\d+)(?:\s*[-–]\s*(\d+))?((?:\s*,\s*\d+(?:\s*[-–]\s*\d+)?)*)`?/
+const RANGE_RE    = /(\d+)(?:\s*[-–]\s*(\d+))?/g
 
 /*  split a Markdown table row at unescaped pipes  */
 function splitRow (line) {
@@ -41,14 +42,24 @@ export function normalizePath (p) {
     return p.replace(/\\/g, "/").replace(/^\.\//, "")
 }
 
-/*  parse a location from the finding cell  */
+/*  one line range, ordered  */
+const range = (a, b) => {
+    const from = Number(a)
+    const to   = b !== undefined ? Number(b) : from
+    return { from: Math.min(from, to), to: Math.max(from, to) }
+}
+
+/*  parse a location from the finding cell; further ranges of the same file
+    ("order.ts:29,51-52") are kept in "extra"  */
 export function parseLocation (text) {
     const m = LOCATION_RE.exec(text)
     if (!m)
         return null
-    const from = Number(m[2])
-    const to   = m[3] !== undefined ? Number(m[3]) : from
-    return { file: normalizePath(m[1]), from: Math.min(from, to), to: Math.max(from, to) }
+    const location = { file: normalizePath(m[1]), ...range(m[2], m[3]) }
+    const extra    = [ ...(m[4] ?? "").matchAll(RANGE_RE) ].map((r) => range(r[1], r[2]))
+    if (extra.length > 0)
+        location.extra = extra
+    return location
 }
 
 /*  parse the review text  */

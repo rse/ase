@@ -63,6 +63,10 @@ if (journal !== null) {
         process.stderr.write("dry runs are not logged; pass only result folders of real runs\n")
         process.exit(1)
     }
+    if (entry.scorerModified) {
+        process.stderr.write("the scoring code has uncommitted changes; commit it first, so the log names the scorer that produced the figures\n")
+        process.exit(1)
+    }
     try {
         appendJournal(journal, entry)
     }
