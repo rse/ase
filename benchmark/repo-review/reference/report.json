@@ -1,0 +1,419 @@
+{
+    "modelle": {
+        "opus": {
+            "dauer_ms": {
+                "max": 121407,
+                "min": 112589,
+                "mittel": 116252,
+                "n": 3
+            },
+            "fehlalarmquote": {
+                "max": 0.25,
+                "min": 0,
+                "mittel": 0.1667,
+                "n": 3
+            },
+            "kalibrierung": {
+                "aussage": "angemessen",
+                "naechster_schritt": null
+            },
+            "kosten_usd": {
+                "max": 0.894,
+                "min": 0.6994,
+                "mittel": 0.7645,
+                "n": 3,
+                "summe": 2.2934
+            },
+            "laeufe": {
+                "abgebrochen": 0,
+                "ausgewertet": 3,
+                "fehler": 0,
+                "gesamt": 3,
+                "ok": 3,
+                "unauswertbar": 0
+            },
+            "laeufe_einzeln": [
+                {
+                    "accepted": 0,
+                    "ase": "2.0.6",
+                    "befunde_gemeldet": 10,
+                    "cost": 0.894005,
+                    "duplikate": 3,
+                    "duration": 112589,
+                    "endpoint": "default",
+                    "fehlalarmquote": 0,
+                    "koeder_gemeldet": [],
+                    "model": "opus",
+                    "name": "20261103T073704Z-opus-1",
+                    "nicht_zuordenbar": 0,
+                    "reason": null,
+                    "recall": {
+                        "gesamt": 1,
+                        "mittel": 1,
+                        "offensichtlich": 1,
+                        "versteckt": 1
+                    },
+                    "reported": [
+                        "claude-opus-5-5"
+                    ],
+                    "status": "ok",
+                    "treffer": [
+                        "B-01",
+                        "B-02",
+                        "B-03",
+                        "B-04",
+                        "B-05",
+                        "B-06",
+                        "B-07"
+                    ],
+                    "verdict": "REJECT - DEMANDS CHANGES"
+                },
+                {
+                    "accepted": 0,
+                    "ase": "2.0.6",
+                    "befunde_gemeldet": 11,
+                    "cost": 0.6999295999999999,
+                    "duplikate": 3,
+                    "duration": 114760,
+                    "endpoint": "default",
+                    "fehlalarmquote": 0.25,
+                    "koeder_gemeldet": [
+                        "K-01"
+                    ],
+                    "model": "opus",
+                    "name": "20261103T073856Z-opus-2",
+                    "nicht_zuordenbar": 1,
+                    "reason": null,
+                    "recall": {
+                        "gesamt": 0.8571,
+                        "mittel": 0.6667,
+                        "offensichtlich": 1,
+                        "versteckt": 1
+                    },
+                    "reported": [
+                        "claude-opus-5-5"
+                    ],
+                    "status": "ok",
+                    "treffer": [
+                        "B-01",
+                        "B-02",
+                        "B-03",
+                        "B-05",
+                        "B-06",
+                        "B-07"
+                    ],
+                    "verdict": "REJECT - DEMANDS CHANGES"
+                },
+                {
+                    "accepted": 0,
+                    "ase": "2.0.6",
+                    "befunde_gemeldet": 11,
+                    "cost": 0.6994316,
+                    "duplikate": 2,
+                    "duration": 121407,
+                    "endpoint": "default",
+                    "fehlalarmquote": 0.25,
+                    "koeder_gemeldet": [
+                        "K-01"
+                    ],
+                    "model": "opus",
+                    "name": "20261103T074051Z-opus-3",
+                    "nicht_zuordenbar": 2,
+                    "reason": null,
+                    "recall": {
+                        "gesamt": 0.8571,
+                        "mittel": 1,
+                        "offensichtlich": 0.5,
+                        "versteckt": 1
+                    },
+                    "reported": [
+                        "claude-opus-5-5"
+                    ],
+                    "status": "ok",
+                    "treffer": [
+                        "B-01",
+                        "B-03",
+                        "B-04",
+                        "B-05",
+                        "B-06",
+                        "B-07"
+                    ],
+                    "verdict": "REJECT - DEMANDS CHANGES"
+                }
+            ],
+            "nicht_zuordenbar": {
+                "max": 2,
+                "min": 0,
+                "mittel": 1,
+                "n": 3
+            },
+            "recall": {
+                "gesamt": {
+                    "max": 1,
+                    "min": 0.8571,
+                    "mittel": 0.9047,
+                    "n": 3
+                },
+                "mittel": {
+                    "max": 1,
+                    "min": 0.6667,
+                    "mittel": 0.8889,
+                    "n": 3
+                },
+                "offensichtlich": {
+                    "max": 1,
+                    "min": 0.5,
+                    "mittel": 0.8333,
+                    "n": 3
+                },
+                "versteckt": {
+                    "max": 1,
+                    "min": 1,
+                    "mittel": 1,
+                    "n": 3
+                }
+            },
+            "schwelle": {
+                "kriterien": {
+                    "fehlalarmquote": {
+                        "art": "max",
+                        "erfuellt": true,
+                        "grenze": 0.25,
+                        "wert": 0.1667
+                    },
+                    "recall_gesamt": {
+                        "art": "min",
+                        "erfuellt": true,
+                        "grenze": 0.6,
+                        "wert": 0.9047
+                    },
+                    "recall_offensichtlich": {
+                        "art": "min",
+                        "erfuellt": true,
+                        "grenze": 0.8,
+                        "wert": 0.8333
+                    }
+                },
+                "urteil": "Schwelle erreicht"
+            }
+        },
+        "sonnet": {
+            "dauer_ms": {
+                "max": 100133,
+                "min": 85678,
+                "mittel": 92929.6667,
+                "n": 3
+            },
+            "fehlalarmquote": {
+                "max": 0.75,
+                "min": 0.25,
+                "mittel": 0.5,
+                "n": 3
+            },
+            "kosten_usd": {
+                "max": 0.3526,
+                "min": 0.3164,
+                "mittel": 0.334,
+                "n": 3,
+                "summe": 1.0021
+            },
+            "laeufe": {
+                "abgebrochen": 0,
+                "ausgewertet": 3,
+                "fehler": 0,
+                "gesamt": 3,
+                "ok": 3,
+                "unauswertbar": 0
+            },
+            "laeufe_einzeln": [
+                {
+                    "accepted": 0,
+                    "ase": "2.0.6",
+                    "befunde_gemeldet": 17,
+                    "cost": 0.3330756,
+                    "duplikate": 6,
+                    "duration": 92978,
+                    "endpoint": "default",
+                    "fehlalarmquote": 0.5,
+                    "koeder_gemeldet": [
+                        "K-01",
+                        "K-04"
+                    ],
+                    "model": "sonnet",
+                    "name": "20261103T073102Z-sonnet-1",
+                    "nicht_zuordenbar": 3,
+                    "reason": null,
+                    "recall": {
+                        "gesamt": 0.8571,
+                        "mittel": 1,
+                        "offensichtlich": 0.5,
+                        "versteckt": 1
+                    },
+                    "reported": [
+                        "claude-sonnet-5-5"
+                    ],
+                    "status": "ok",
+                    "treffer": [
+                        "B-01",
+                        "B-03",
+                        "B-04",
+                        "B-05",
+                        "B-06",
+                        "B-07"
+                    ],
+                    "verdict": "REJECT - DEMANDS CHANGES"
+                },
+                {
+                    "accepted": 0,
+                    "ase": "2.0.6",
+                    "befunde_gemeldet": 11,
+                    "cost": 0.3164469,
+                    "duplikate": 1,
+                    "duration": 85678,
+                    "endpoint": "default",
+                    "fehlalarmquote": 0.75,
+                    "koeder_gemeldet": [
+                        "K-02",
+                        "K-03",
+                        "K-04"
+                    ],
+                    "model": "sonnet",
+                    "name": "20261103T073357Z-sonnet-1",
+                    "nicht_zuordenbar": 1,
+                    "reason": null,
+                    "recall": {
+                        "gesamt": 0.8571,
+                        "mittel": 1,
+                        "offensichtlich": 0.5,
+                        "versteckt": 1
+                    },
+                    "reported": [
+                        "claude-sonnet-5-5"
+                    ],
+                    "status": "ok",
+                    "treffer": [
+                        "B-01",
+                        "B-03",
+                        "B-04",
+                        "B-05",
+                        "B-06",
+                        "B-07"
+                    ],
+                    "verdict": "REJECT - DEMANDS CHANGES"
+                },
+                {
+                    "accepted": 0,
+                    "ase": "2.0.6",
+                    "befunde_gemeldet": 10,
+                    "cost": 0.3525752,
+                    "duplikate": 0,
+                    "duration": 100133,
+                    "endpoint": "default",
+                    "fehlalarmquote": 0.25,
+                    "koeder_gemeldet": [
+                        "K-02"
+                    ],
+                    "model": "sonnet",
+                    "name": "20261103T073523Z-sonnet-2",
+                    "nicht_zuordenbar": 2,
+                    "reason": null,
+                    "recall": {
+                        "gesamt": 1,
+                        "mittel": 1,
+                        "offensichtlich": 1,
+                        "versteckt": 1
+                    },
+                    "reported": [
+                        "claude-sonnet-5-5"
+                    ],
+                    "status": "ok",
+                    "treffer": [
+                        "B-01",
+                        "B-02",
+                        "B-03",
+                        "B-04",
+                        "B-05",
+                        "B-06",
+                        "B-07"
+                    ],
+                    "verdict": "REJECT - DEMANDS CHANGES"
+                }
+            ],
+            "nicht_zuordenbar": {
+                "max": 3,
+                "min": 1,
+                "mittel": 2,
+                "n": 3
+            },
+            "recall": {
+                "gesamt": {
+                    "max": 1,
+                    "min": 0.8571,
+                    "mittel": 0.9047,
+                    "n": 3
+                },
+                "mittel": {
+                    "max": 1,
+                    "min": 1,
+                    "mittel": 1,
+                    "n": 3
+                },
+                "offensichtlich": {
+                    "max": 1,
+                    "min": 0.5,
+                    "mittel": 0.6667,
+                    "n": 3
+                },
+                "versteckt": {
+                    "max": 1,
+                    "min": 1,
+                    "mittel": 1,
+                    "n": 3
+                }
+            },
+            "schwelle": {
+                "kriterien": {
+                    "fehlalarmquote": {
+                        "art": "max",
+                        "erfuellt": false,
+                        "grenze": 0.25,
+                        "wert": 0.5
+                    },
+                    "recall_gesamt": {
+                        "art": "min",
+                        "erfuellt": true,
+                        "grenze": 0.6,
+                        "wert": 0.9047
+                    },
+                    "recall_offensichtlich": {
+                        "art": "min",
+                        "erfuellt": false,
+                        "grenze": 0.8,
+                        "wert": 0.6667
+                    }
+                },
+                "urteil": "nicht erreicht"
+            }
+        }
+    },
+    "schema": 1,
+    "schwellen": {
+        "datei": {
+            "commit": "c3f00a577d903e21c8f991b1c583917680f11f7b",
+            "geaendert": false
+        },
+        "werte": {
+            "budget_per_run_usd": 5,
+            "budget_total_usd": 30,
+            "decoy_false_alarm_max": 0.25,
+            "matching_tolerance_lines": 3,
+            "recall_obvious_min": 0.8,
+            "recall_overall_min": 0.6,
+            "runs_per_model": 3,
+            "source": "PRD-Approval-Decisions vom 2026-11-02 (Run run-3f8b1c27-9a4e-4d61-b2c5-8e7f6a5d4c31)",
+            "timeout_per_run_min": 20,
+            "version": 1
+        }
+    },
+    "sollliste": "sha256:0b85107df3dd308fedc59f81b9832b687a9b7fa327402e2006f75e2f89d2decf"
+}
