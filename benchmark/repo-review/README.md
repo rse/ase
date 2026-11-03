@@ -1,3 +1,5 @@
+![Does your AI review catch the bugs? Find defects. Avoid false alarms.](assets/intro.png)
+
 # Does the review find the bugs? An effectiveness test for `ase-repo-review`
 
 [ASE](https://ase.tools) ships a skill called `ase-repo-review`. You point it at a
@@ -64,7 +66,13 @@ currency, and some validation. The seven seeded defects come in three tiers:
   example a function that now returns cents while its caller in another module
   still formats the value as euros, so the API shows a hundred times the amount.
 
-## Reference results
+## Results so far
+
+Every measurement series is kept in the log [MEASUREMENTS.md](MEASUREMENTS.md)
+with the values computed at the time, a defect-by-run matrix in plain words, the
+findings the scorer could not assign, and the manual reading. Entries are only
+ever added, never rewritten, so the original values stay available when the case
+or the scorer changes. The summary below is the latest series.
 
 On 2026-11-03 the setup ran three times each with Claude Opus 5.5 and Claude
 Sonnet 5.5. The whole measurement cost 3.59 USD, including two earlier plumbing
@@ -93,8 +101,10 @@ independently verified). The reading changes the picture considerably:
 | Opus 5.5 | 21 of 21 (all 7 in every run) | 6 of 6 | 0 of 12 |
 | Sonnet 5.5 | 20 of 21 (missed the discount defect once) | 5 of 6 | 2 of 12 |
 
-- Three automated "misses" were defects that the model described correctly but
-  placed at the call site, at the declaration, or at a neighboring `switch`.
+- Three automated "misses" were defects that the model described correctly. Two
+  were placed at the call site or at a neighboring `switch`. The third named the
+  right lines as `order.ts:29,51-52`, but the parser reads only the first range of
+  such a location; that is a scorer defect, recorded in the log.
 - Most automated decoy matches were unrelated findings whose line range happened
   to overlap a decoy, or a misplaced real defect.
 - Two Sonnet findings claim that the non-null assertion on the optional customer
@@ -109,20 +119,9 @@ independently verified). The reading changes the picture considerably:
 
 By the automated scores, Opus misses defects; by the reading, it found all of
 them in every run. The case is therefore too easy for Opus, and the scorer, not
-the model, accounts for most of the gap. `reference/NOTES.md` lists every case.
-
-### What was measured
-
-| Item | Value |
-|---|---|
-| Models (as reported by the CLI) | `claude-opus-5-5`, `claude-sonnet-5-5` |
-| Invocation | `/ase:ase-repo-review -c HEAD -S LOW` |
-| ASE | 2.0.6, commit `25f35120`, unmodified working copy |
-| Claude Code CLI | 2.1.302 |
-| Test case | fixture digest `sha256:7f2bc718…`; expected-results list as in `reference/report.md` |
-| Scorer | the code of this directory; it reproduces `reference/report.json` byte for byte |
-
-Each run protocol (`reference/runs/*/run.json`) records these values per run.
+the model, accounts for most of the gap. The log entry lists every case, together
+with the models, ASE and CLI versions, digests of the test case, and the version
+of the scorer that produced the figures.
 
 ## Quick start
 
@@ -144,7 +143,15 @@ node benchmark/repo-review/run.mjs --model sonnet --runs 3 --confirm-paid
 node benchmark/repo-review/compare.mjs
 ```
 
-`compare.mjs` writes `report.md` and `report.json` next to the result folders.
+`compare.mjs` writes `report.md` and `report.json` to `results/report/`. To keep
+the series, append it to the log and then add the manual reading by hand below
+its generated part:
+
+```
+node benchmark/repo-review/compare.mjs --journal benchmark/repo-review/MEASUREMENTS.md --title "2026-11-20: Sonnet 5.5, second case" benchmark/repo-review/results
+```
+
+The log refuses a series it already holds and does not accept dry runs.
 
 ## Scoring and limitations
 
@@ -207,7 +214,10 @@ below 1.0 while the manual reading found every defect.
 - **Location matching is blunt.** It misses correct findings placed one hop away
   and credits unrelated findings with wide ranges. Recording alternative
   locations per defect and keeping decoys away from genuine weaknesses of the code
-  would help (see `reference/NOTES.md`).
+  would help (see the log entry in `MEASUREMENTS.md`).
+- **Several line ranges in one location** (such as `order.ts:29,51-52`) are read
+  only up to the first range. This cost Opus one hit in the reference
+  measurement and is the first thing to fix in the scorer.
 - **Three runs per model** show tendencies, not significant differences.
 - **Cost figures assume Anthropic prices.** For other endpoints the number means
   little.
@@ -303,11 +313,13 @@ the report as a separate model group "(dry run)".
 | `thresholds.json` | pre-registered pilot thresholds (committed before the first measurement) |
 | `check.mjs` | checks the expected-results list against the fixture |
 | `run.mjs` | runner: throw-away copy, leak check, `claude -p`, result folder |
-| `compare.mjs` | compares result folders with the expected-results list, report in Markdown and JSON |
+| `compare.mjs` | compares result folders with the expected-results list, report in Markdown and JSON, optionally appended to the log |
+| `MEASUREMENTS.md` | log of all measurement series, never rewritten |
 | `selftest.mjs` | self-test of parser, matching, metrics, and runner helpers |
 | `check-language.mjs` | language check of the deliverable (English only) |
 | `testdata/` | canned `stream-json` transcripts for dry runs |
-| `reference/` | reference measurement with Claude Opus 5.5 and Sonnet 5.5, plus `NOTES.md` |
+| `reference/` | result folders and machine-readable report of the reference measurement |
+| `assets/` | images of this README |
 | `results/` | local result folders (not versioned) |
 
 ### Going deeper

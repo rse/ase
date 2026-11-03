@@ -205,7 +205,9 @@ listed. A match on a decoy is a false alarm; everything else is unassignable.
 of the MERIT effectiveness test. *Price:* coarse line ranges can hit a
 neighboring entry by accident, so entries in the same file keep at least eight
 lines apart. And a correct finding placed one hop away, at a call or a
-declaration, is missed; `reference/NOTES.md` documents the cases seen so far.
+declaration, is missed; the log in `MEASUREMENTS.md` documents the cases seen so
+far. The parser also reads only the first range of a location that lists several
+(`order.ts:29,51-52`); this is a known defect of the scorer, not a design choice.
 
 ### Metrics that cannot be gamed by failure
 
@@ -248,7 +250,29 @@ the report is identical before and after.
 
 *Why:* the target repository is English, and repeating paid runs only to change
 their language would waste money. *Price:* the reference protocols are no longer
-byte-identical to their original form; `reference/NOTES.md` records the mapping.
+byte-identical to their original form; the first entry of `MEASUREMENTS.md`
+records this.
+
+### An append-only measurement log
+
+`compare.mjs --journal MEASUREMENTS.md` renders one section per measurement
+series and appends it, together with one overview row per configuration. The
+section holds the configuration (models, endpoint, ASE and CLI versions, digests
+of the test case and of the expected-results list at run time and at scoring
+time, threshold version, and the commit of the scoring code), the automated
+figures, a defect-by-run and a decoy-by-run matrix with the short titles of the
+expected-results list, and the text of every unassignable finding. A series is
+identified by the names of its result folders; the log refuses a series it
+already holds and does not accept dry runs. The manual reading is written by
+hand below the generated part. Entries are never rewritten: a correction is a
+dated note, a re-scoring with a changed scorer is a new entry.
+
+*Why:* `report.md` and `report.json` are regenerated on every comparison and
+follow the current scorer and expected-results list. Comparisons across cases,
+scorer versions, and models over months need the figures as they were computed,
+next to what a person found when reading the reviews. *Price:* the log grows with
+every series, and the overview of an old series may describe a scorer that has
+since been fixed; the scorer commit in each entry says which.
 
 ## Known risks
 
