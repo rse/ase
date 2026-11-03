@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-**  ASE review benchmark -- self-test of parser, assignment, metrics, and runner helpers
+**  ASE review benchmark -- self-test of parser, assignment, metrics, runner helpers, and measurement log
 **  Expected values are computed by hand from the rules in DESIGN.md, not derived from the code.
 **  Usage: node selftest.mjs
 */
@@ -9,7 +9,9 @@ import fs   from "node:fs"
 import os   from "node:os"
 import path from "node:path"
 
-import { EXPECTED_FILE, TESTDATA_DIR, stableStringify, readJson } from "./lib/common.mjs"
+import { BENCH_DIR, EXPECTED_FILE, TESTDATA_DIR, stableStringify, readJson } from "./lib/common.mjs"
+import { collectRunDirs, buildReport }             from "./lib/report.mjs"
+import { seriesId, renderSection, appendJournal }  from "./lib/journal.mjs"
 import { parseReview }                             from "./lib/parser.mjs"
 import { assignFinding }                           from "./lib/matching.mjs"
 import { evaluateRun, aggregate, calibrate }       from "./lib/scoring.mjs"
@@ -185,6 +187,36 @@ check("isolation: unconnected ASE MCP server is detected", checkInit({ plugins: 
 
 /*  deterministic serialization  */
 check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c: 3 } }) === stableStringify({ a: { c: 3, d: 2 }, b: 1 }))
+
+/*  measurement log  */
+{
+    const dirs    = collectRunDirs([ path.join(BENCH_DIR, "reference", "runs") ])
+    const report  = buildReport(dirs, expected)
+    const entry   = renderSection({ title: "Series A", dirs, report, expected })
+    check("log: series id does not depend on folder order", seriesId(dirs) === seriesId([ ...dirs ].reverse()))
+    check("log: one overview row per configuration", entry.rows.length === Object.keys(report.models).length)
+    check("log: defect matrix names the defect in plain words", /\| B-01 countUnits [^|]*\| obvious( \| ✓){6} \|/.test(entry.section))
+    check("log: a location with several ranges is shown as written", entry.section.includes("`src/order.ts:29,51-52`"))
+    const tmp  = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-log-"))
+    const file = path.join(tmp, "MEASUREMENTS.md")
+    appendJournal(file, entry)
+    const first = fs.readFileSync(file, "utf8")
+    let refused = false
+    try {
+        appendJournal(file, entry)
+    }
+    catch (err) {
+        refused = true
+    }
+    check("log: the same series is refused a second time", refused && fs.readFileSync(file, "utf8") === first)
+    const other = { ...entry, id: "sha256:other", section: "## Series B\n", rows: [ "| Series B | x | default | 1 / 1 | 1.00 | 1.00 | 0.00 | 0.0 | met | 0.00 | not yet |" ] }
+    appendJournal(file, other)
+    const second = fs.readFileSync(file, "utf8")
+    check("log: earlier content stays unchanged", second.startsWith(first.slice(0, first.indexOf("<!-- overview:end -->")))
+        && second.includes(first.slice(first.indexOf("<!-- overview:end -->"))))
+    check("log: new overview row lands inside the table", /\| Series B [^\n]*\n<!-- overview:end -->/.test(second))
+    fs.rmSync(tmp, { recursive: true, force: true })
+}
 
 process.stdout.write(`\n${passed} passed, ${failed} failed\n`)
 process.exit(failed === 0 ? 0 : 1)

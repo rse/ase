@@ -1,9 +1,10 @@
 {
-    "version": 2,
+    "version": 3,
     "fixture": "shop-core",
     "entries": [
         {
             "id": "B-01",
+            "title": "countUnits loops one position past the end of the cart",
             "kind": "finding",
             "tier": "obvious",
             "description": "countUnits loops with `i <= items.length`, one position past the end of the array, and reads `items[items.length].quantity` (TypeError).",
@@ -11,6 +12,7 @@
         },
         {
             "id": "B-02",
+            "title": "percentOff returns the discount instead of the reduced total",
             "kind": "finding",
             "tier": "obvious",
             "description": "percentOff returns the discount amount instead of the discounted total: `total * percent / 100` instead of `total - total * percent / 100`; a 15 % code turns 100 EUR into 15 EUR.",
@@ -18,6 +20,7 @@
         },
         {
             "id": "B-03",
+            "title": "saveOrder without await inside try, so the catch never runs",
             "kind": "finding",
             "tier": "medium",
             "description": "saveOrder is called without await inside the try block; a rejected promise never reaches the catch, the reservations are not released, and the order counts as created.",
@@ -25,6 +28,7 @@
         },
         {
             "id": "B-04",
+            "title": "Default order options are mutated through the shared tags array",
             "kind": "finding",
             "tier": "medium",
             "description": "Without explicit options the shared DEFAULT_OPTIONS object is mutated (`options.tags.push(\"bulk\")`); all later orders without options then carry the `bulk` tag.",
@@ -32,6 +36,7 @@
         },
         {
             "id": "B-05",
+            "title": "Duplicate SKU throws without releasing the reservations",
             "kind": "finding",
             "tier": "medium",
             "description": "On a duplicate SKU an exception is thrown after the reservation succeeded, without releasing the reservations (unlike the other error paths, which call releaseAll).",
@@ -39,6 +44,7 @@
         },
         {
             "id": "B-06",
+            "title": "Cents formatted as euros in the API response",
             "kind": "finding",
             "tier": "hidden",
             "description": "After the change cartTotal returns cents instead of euros; the API response still formats order.total with formatEuro and shows a hundred times the amount.",
@@ -49,6 +55,7 @@
         },
         {
             "id": "B-07",
+            "title": "Refund ignores the order currency",
             "kind": "finding",
             "tier": "hidden",
             "description": "Orders now carry a currency, but refundOrder does not pass order.currency to issueRefund; refunds of CHF orders are booked as EUR.",
@@ -59,6 +66,7 @@
         },
         {
             "id": "K-01",
+            "title": "Documented fall-through from seasonal to percent",
             "kind": "decoy",
             "description": "Fall-through from `seasonal` to `percent` in the switch.",
             "rationale": "Seasonal codes are percentage codes with an expiry date; after the date check exactly the percentage calculation must follow. The `falls through` comment marks the fall-through by the usual lint convention.",
@@ -66,6 +74,7 @@
         },
         {
             "id": "K-02",
+            "title": "Non-null assertion on the optional customer",
             "kind": "decoy",
             "description": "Non-null assertion `order.customer!.email` although customer is optional.",
             "rationale": "sendConfirmation is only called in createOrder, after validateOrder, which throws when the customer is missing.",
@@ -73,6 +82,7 @@
         },
         {
             "id": "K-03",
+            "title": "Loop bound items.length - 1 in hasDuplicateSku",
             "kind": "decoy",
             "description": "Loop only up to `items.length - 1` in hasDuplicateSku.",
             "rationale": "Neighbouring pairs `items[i]` and `items[i + 1]` are compared; the last index has no successor, so the bound is correct. The only caller sorts by SKU first.",
@@ -80,6 +90,7 @@
         },
         {
             "id": "K-04",
+            "title": "Loose equality req.code == null",
             "kind": "decoy",
             "description": "Loose equality `req.code == null` instead of `===`.",
             "rationale": "`== null` deliberately checks for `null` and `undefined` at once; the field is declared optional as `string | null`.",

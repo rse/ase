@@ -11,6 +11,7 @@ export const TIERS      = [ "obvious", "medium", "hidden" ]
 export const MIN_GAP    = 8
 const        MIN_TIER   = 2
 const        MIN_DECOYS = 3
+const        TITLE_MAX  = 80
 
 /*  load the list  */
 export function loadExpected (file) {
@@ -60,6 +61,8 @@ export function validateExpected (expected, dir) {
             problems.push(`tier must be one of ${TIERS.join(", ")}`)
         if (e.kind === "decoy" && (typeof e.rationale !== "string" || e.rationale.trim() === ""))
             problems.push("decoy without rationale")
+        if (typeof e.title !== "string" || e.title.trim() === "" || e.title.length > TITLE_MAX)
+            problems.push(`title is missing or longer than ${TITLE_MAX} characters`)
         if (typeof e.description !== "string" || e.description.trim() === "")
             problems.push("description is missing")
         if (!Array.isArray(e.locations) || e.locations.length === 0)

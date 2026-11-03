@@ -1,6 +1,6 @@
 # Effectiveness test ase-repo-review
 
-Expected-results list: `sha256:498d34df09823361acd06f0fbbce51330cfa31f7f814f2ca70b4dc71b896da0f`
+Expected-results list: `sha256:dbf8a049ff941475de30048ce90fdd344f603f4fbb439e951a5a844b612bfa32`
 
 Thresholds: overall recall ≥ 0.6, obvious ≥ 0.8, decoy false-alarm rate ≤ 0.25; file version `f03489e665d1179cfe930f8f2a49ac49a3db4a73`
 
