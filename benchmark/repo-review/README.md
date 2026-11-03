@@ -2,44 +2,59 @@
 
 [ASE](https://ase.tools) ships a skill called `ase-repo-review`. You point it at a
 commit, and an AI model reads the change and writes a code review: a verdict plus
-a table of findings, each with a severity and a file location. The output always
-*looks* competent. The question this benchmark answers is a plainer one: if we
-know exactly what is wrong with a change, how much of it does the review catch,
-and how often does it complain about code that is fine?
+a table of findings, each with a severity and a file location. Such a review can
+look convincing even when it misses defects. This benchmark asks a plainer
+question: if we know exactly what is wrong with a change, how much of it does the
+review catch, and how often does it complain about code that is fine?
 
-That question gets sharper once you want to swap the model. A review that runs on
-Claude Opus may behave quite differently on a cheaper model or on an open-weight
-model behind another endpoint. Reading a handful of reviews and forming an
-impression does not survive that comparison; you need the same test, run the same
-way, scored by the same rules, with figures you can put side by side.
+## Purpose and scope
 
-## The idea: plant the bugs, lay decoys, hide the answers
+What is tested here is not a model on its own but a whole review setup: the
+model, the ASE skill and its sub-agent, the Claude Code CLI that runs them, the
+tools they may use, the fixed prompt, and the limits of a run. The benchmark
+therefore answers one question:
+
+> How does this ASE review setup behave with different models under the same
+> test conditions?
+
+It does not answer what the ASE skill itself contributes to review quality.
+That would need a second condition: the same model with an ordinary review
+prompt, comparable context, tools, and budget. Such a baseline is not part of
+this benchmark.
+
+## Current status: pilot
+
+One TypeScript test case with seven seeded defects and four decoys, run three
+times per model. Automated scores rely on file and line matching and can disagree
+with manual inspection. The reference measurement identified limitations in both
+the test case and the scorer that need addressing before broader conclusions
+about model performance.
+
+## How the test works
 
 The approach is old and simple. We wrote a small project, introduced a change to
 it, and deliberately seeded defects into that change. Since we put the defects
 there, we know where they are, so we can check whether the review reports them.
 
-Finding bugs is only half of a good review, though. A reviewer that flags every
-second line would score perfectly on seeded defects and still be useless. So the
-change also contains **decoys**: code that looks suspicious at first glance but is
-correct, such as a deliberate fall-through in a `switch` that carries a comment
-saying so, or a loose `== null` that deliberately covers both `null` and
-`undefined`. A review that reports a decoy has raised a false alarm.
+Finding defects is only half of a good review, though. A reviewer that flags
+every second line would score perfectly on seeded defects and still be useless.
+So the change also contains **decoys**: code that looks suspicious at first
+glance but is correct, such as a deliberate fall-through in a `switch` that
+carries a comment saying so, or a loose `== null` that deliberately covers both
+`null` and `undefined`. A review that reports a decoy may be raising a false
+alarm.
 
 The list of defects and decoys, the **expected-results list**, lives in
 `solution/expected.json` and never travels with the code under review. The model
 sees a plain Git repository with two commits and nothing else; no file name,
 commit message, or comment hints at what we expect to be found.
 
-## The example project
-
 The project under review is "shop-core", a little TypeScript shop with a cart,
 discount codes, orders, refunds, notifications, and an API layer. The base commit
-(`fixture/base/`) is free of defects. The change (`fixture/change/`) looks like a
-plausible piece of everyday work: it switches money amounts to integer cents, adds
-discount kinds, order options with a currency, and some validation.
-
-Into that change we seeded seven defects in three tiers of difficulty:
+(`fixture/base/`) contains no intentionally seeded defects. The change
+(`fixture/change/`) looks like a plausible piece of everyday work: it switches
+money amounts to integer cents, adds discount kinds, order options with a
+currency, and some validation. The seven seeded defects come in three tiers:
 
 - **obvious** defects are visible in a single line, for example a loop that runs
   one position past the end of an array;
@@ -49,22 +64,171 @@ Into that change we seeded seven defects in three tiers of difficulty:
   example a function that now returns cents while its caller in another module
   still formats the value as euros, so the API shows a hundred times the amount.
 
-Four decoys sit next to them. The exact entries, with locations and rationale, are
-in `solution/expected.json`.
+## Reference results
 
-## What happens in a run
+On 2026-11-03 the setup ran three times each with Claude Opus 5.5 and Claude
+Sonnet 5.5. The whole measurement cost 3.59 USD, including two earlier plumbing
+runs; a run took between one and a half and two minutes.
 
-A run starts by building a throw-away copy of the example project in the system's
-temporary directory: a fresh Git repository with the base commit, then the change
-commit, both with neutral messages and fixed dates. Before any model sees it, the
-runner performs a **leak check**: it scans every file of the copy for words that
-could give the answers away (such as "bug", "decoy", "TODO", or an entry id like
-`B-01`). If it finds one, the run stops.
+### Automated scores
 
-Then the runner calls the Claude Code CLI non-interactively (`claude -p`, the
-"print" mode that takes one prompt, works on it, and exits) with exactly one
-prompt: `/ase:ase-repo-review -c HEAD -S LOW`, that is, review the last commit and
-report everything down to severity LOW. The CLI is fenced in on purpose:
+The figures below come from the deterministic scorer. It assigns each finding of
+a review to an expected entry **only by file name and line overlap** (details in
+[Scoring and limitations](#scoring-and-limitations)). A correct finding placed
+at a different line, say at the caller instead of the faulty function, does not
+count. All values are means over three runs.
+
+| Configuration | Location-matched recall, overall | Location-matched recall, obvious | Decoy match rate | Unassignable findings per run | Pilot thresholds |
+|---|---|---|---|---|---|
+| Opus 5.5 | 0.90 | 0.83 | 0.17 | 1.0 | met |
+| Sonnet 5.5 | 0.90 | 0.67 | 0.50 | 2.0 | not met |
+
+### Manual reading
+
+The raw reviews were also read against the expected-results list (one reader, not
+independently verified). The reading changes the picture considerably:
+
+| Configuration | Defects described correctly | Obvious defects described correctly | Decoys claimed to be defects |
+|---|---|---|---|
+| Opus 5.5 | 21 of 21 (all 7 in every run) | 6 of 6 | 0 of 12 |
+| Sonnet 5.5 | 20 of 21 (missed the discount defect once) | 5 of 6 | 2 of 12 |
+
+- Three automated "misses" were defects that the model described correctly but
+  placed at the call site, at the declaration, or at a neighboring `switch`.
+- Most automated decoy matches were unrelated findings whose line range happened
+  to overlap a decoy, or a misplaced real defect.
+- Two Sonnet findings claim that the non-null assertion on the optional customer
+  can crash, which the code rules out; one of them sits at the type declaration,
+  so the scorer did not even see it. Several other findings of both models
+  criticize the optional customer as weak typing without claiming wrong
+  behavior, and one Sonnet finding suggests making the documented fall-through
+  more explicit. These are design or readability hints and are not counted
+  above.
+- The unassignable findings were not classified. They include remarks on dead
+  code and on the commit message, but they may also contain wrong claims.
+
+By the automated scores, Opus misses defects; by the reading, it found all of
+them in every run. The case is therefore too easy for Opus, and the scorer, not
+the model, accounts for most of the gap. `reference/NOTES.md` lists every case.
+
+### What was measured
+
+| Item | Value |
+|---|---|
+| Models (as reported by the CLI) | `claude-opus-5-5`, `claude-sonnet-5-5` |
+| Invocation | `/ase:ase-repo-review -c HEAD -S LOW` |
+| ASE | 2.0.6, commit `25f35120`, unmodified working copy |
+| Claude Code CLI | 2.1.302 |
+| Test case | fixture digest `sha256:7f2bc718…`; expected-results list as in `reference/report.md` |
+| Scorer | the code of this directory; it reproduces `reference/report.json` byte for byte |
+
+Each run protocol (`reference/runs/*/run.json`) records these values per run.
+
+## Quick start
+
+You need Node.js 22 or newer and Git; on Windows, PowerShell is enough. These
+commands cost nothing and show the whole pipeline with a canned review:
+
+```
+node benchmark/repo-review/check.mjs
+node benchmark/repo-review/run.mjs --dry-run
+node benchmark/repo-review/compare.mjs
+```
+
+A real measurement additionally needs the Claude Code CLI (`claude`) with a login
+and the built `tool/` of this repository (`cd tool && npm start build`). It costs
+money, so it must be confirmed explicitly:
+
+```
+node benchmark/repo-review/run.mjs --model sonnet --runs 3 --confirm-paid
+node benchmark/repo-review/compare.mjs
+```
+
+`compare.mjs` writes `report.md` and `report.json` next to the result folders.
+
+## Scoring and limitations
+
+### Deterministic scoring by file and line
+
+A parser reads the findings table of the review (the format is fixed by the
+skill). Each finding is assigned to an expected entry if it names the same file
+and its line range overlaps the expected lines, with a tolerance of three lines.
+If several entries qualify, the largest overlap wins, then the smallest distance,
+then the smallest id. Findings the skill marks as `ACCEPTED` are ignored. No
+language model judges anything; the same reviews always give the same scores.
+
+From that assignment come three figures:
+
+- **Location-matched recall**: the share of the seven defects with a finding at
+  a matching location, overall and per tier.
+- **Decoy match rate** (in the reports: decoy false-alarm rate): the share of the
+  four predefined decoys with a finding at a matching location. It counts any
+  such finding, whatever it says, so it can include unrelated remarks.
+- **Unassignable findings**: findings that match neither a defect nor a decoy.
+
+On manual reading, a finding on a decoy counts as a false alarm only if it claims
+the code behaves wrongly. A hint on readability or maintainability is not a false
+alarm.
+
+### What the decoy rate does not cover
+
+The decoy rate measures false alarms on four predefined spots only. Unassignable
+findings count neither as hits nor as false alarms. Take a review that finds all
+seven defects, leaves the four decoys alone, and adds twenty unfounded
+complaints elsewhere: it scores a recall of 1.0 and a decoy rate of 0, although
+only seven of its 27 findings are right. That is why the number of unassignable
+findings belongs next to the other figures. Counting them all as false alarms
+would be wrong as well: they can be real additional defects, fair suggestions,
+or unfounded complaints, and only a manual review can tell.
+
+### Pilot thresholds
+
+A configuration meets the predefined pilot thresholds if, on average, overall
+recall is at least 0.6, recall on the obvious tier is at least 0.8, and the
+decoy match rate is at most 0.25. These are provisional criteria chosen for this
+pilot case, not requirements derived from a concrete use. Their strength is that
+they were committed in `thresholds.json` *before* the first paid run, so nobody
+could tune them to the results; the runner refuses paid runs if that file is
+uncommitted or modified.
+
+### Ceiling-effect check
+
+If the strongest model finds every defect in every run, the report says "too
+easy". Otherwise it says "adequate", but that only means *no ceiling effect was
+detected*. A score below 1.0 does not prove that the case is hard enough or
+separates models well: in the reference measurement, the automated score stayed
+below 1.0 while the manual reading found every defect.
+
+### Known limitations
+
+- **One small case.** Seven defects in one change cannot rank strong models, and
+  this case is too easy for Opus. More runs of the same case show its variance
+  but fix neither the matching errors nor the lack of variety.
+- **Location matching is blunt.** It misses correct findings placed one hop away
+  and credits unrelated findings with wide ranges. Recording alternative
+  locations per defect and keeping decoys away from genuine weaknesses of the code
+  would help (see `reference/NOTES.md`).
+- **Three runs per model** show tendencies, not significant differences.
+- **Cost figures assume Anthropic prices.** For other endpoints the number means
+  little.
+
+The suggested order for developing the benchmark further: improve the matching
+and the manual check, then add independent test cases, then compare more models.
+
+## Technical reference
+
+### What happens in a run
+
+A run builds a throw-away copy of the example project in the system's temporary
+directory: a fresh Git repository with the base commit and the change commit,
+both with neutral messages and fixed dates. A **leak check** then scans every
+file of the copy for words that could give the answers away (such as "bug",
+"decoy", "TODO", or an entry id like `B-01`); a hit stops the run.
+
+The runner then calls the Claude Code CLI non-interactively (`claude -p`, the
+"print" mode that takes one prompt, works on it, and exits) with exactly the
+prompt `/ase:ase-repo-review -c HEAD -S LOW`, that is, review the last commit and
+report everything down to severity LOW. The CLI is fenced in:
 
 - only the ASE plugin of this working copy is loaded, and only the `ase` MCP
   server is reachable, so personal plugins and account connectors stay out;
@@ -75,174 +239,30 @@ report everything down to severity LOW. The CLI is fenced in on purpose:
   runs has an overall budget (30 USD) with a 10 % reserve, and a run that reports
   no cost counts with its full limit.
 
-While the model works, the runner watches its event stream. If the CLI loads
-anything beyond what was allowed, the run ends with an **isolation** error. If a
-tool call of the model reaches into this benchmark (where the expected-results
-list lives) or into the ASE repository outside the `plugin/` and `tool/` folders
-the run legitimately uses, the run ends with a **contamination** error. Afterwards the runner
-kills any processes the skill left behind, removes the copy, and writes a result
-folder with the protocol (`run.json`), the raw transcript, and the extracted
-review (`review.md`).
-
-The review that comes back looks like this (an excerpt from a reference run):
-
-```
-| **HIGH** | CORRECTNESS | ▢ `src/cart.ts:30-31`: Loop bound `i <= items.length` reads
-  `items[items.length]`, which is `undefined`, so `.quantity` throws a `TypeError`. ... |
-| **HIGH** | PROPAGATION | ▢ `src/api.ts:34`: `order.total` is now in cents but still goes
-  through `formatEuro`, which expects euros. Totals show 100× too large ... |
-```
-
-## Scoring without a judge
-
-The obvious way to score such a review would be to ask another model whether each
-finding matches an expected entry. We deliberately did not do that. A judging
-model brings its own variance and its own blind spots, and when you compare models
-you would no longer know which model you are measuring.
-
-Instead, scoring is purely rule-based and works on locations. A parser reads the
-findings table of the review (the format is fixed by the skill), and each finding
-is assigned to an expected entry if it names the same file and its line range
-overlaps the expected lines, with a tolerance of three lines. If several entries
-qualify, the largest overlap wins, then the smallest distance, then the smallest
-id. A finding that matches nothing is counted as **unassignable**; it is neither a
-hit nor a false alarm. Findings the skill marks as `ACCEPTED` are ignored.
-
-From that assignment come the two figures that matter:
-
-- **recall**: the share of the seven defects the review reported, overall and per
-  tier;
-- **decoy false-alarm rate**: the share of the four decoys the review reported.
-
-Because models are not deterministic, each model runs three times, and the report
-gives mean, minimum, and maximum. A model passes ("threshold met") if, on average,
-overall recall is at least 0.6, recall on the obvious tier is at least 0.8, and
-the decoy false-alarm rate is at most 0.25. These thresholds were written down in
-`thresholds.json` and committed *before* the first paid run, so nobody can tune
-them to the results afterwards; the runner refuses paid runs if that file is
-uncommitted or modified.
-
-There is one more check, aimed at the test rather than the model. If the strongest
-model finds every defect in every run, the test is **too easy** to tell models
-apart, and the report says so. Otherwise the calibration is called "adequate".
-
-## What the reference measurement showed
-
-On 2026-11-03 we ran the test three times each with Claude Opus 5.5 and Claude
-Sonnet 5.5. The whole measurement cost 3.59 USD, including two earlier plumbing runs; a run
-took between one and a half and two minutes.
-
-| Model | Recall overall | Recall obvious | Decoy false-alarm rate | Verdict |
-|---|---|---|---|---|
-| Opus 5.5 | 0.90 | 0.83 | 0.17 | threshold met |
-| Sonnet 5.5 | 0.90 | 0.67 | 0.50 | threshold not met |
-
-Both models found the hidden cross-file defects in every run, which is the
-encouraging part. Sonnet fails the thresholds on two counts: it reported more
-decoys, and it missed an obvious defect more often.
-
-Reading the raw reviews tells a more nuanced story than the table, and it is worth
-being honest about it. Several "misses" are not misses at all: the model described
-the right defect but placed it at the call site or the declaration rather than at
-the line we had recorded, and matching by location could not see that. Read by a
-human, Opus found **all seven defects in all three runs**, which means that by the
-intent of the calibration check the test is too easy, even though the rule-based
-calibration says "adequate". Some of Sonnet's decoy reports are genuine (it
-criticized the non-null assertion twice), others are artefacts of a wide line range
-that happened to overlap a decoy. `reference/NOTES.md` lists every such case.
-
-## What the numbers do not tell you
-
-- **The case is small and now known to be too easy.** Seven defects in one change
-  cannot rank strong models against each other. Before results are used as a
-  statement about open-weight models, harder cases are needed.
-- **Location matching is blunt.** It is reproducible and needs no judge, but it
-  misses correct findings placed one hop away and credits unrelated findings with
-  wide ranges. The notes recommend recording alternative locations for each defect
-  and keeping decoys away from genuine weaknesses of the code.
-- **Three runs are a small sample.** Means over three runs show tendencies, not
-  significant differences.
-- **Cost figures assume Anthropic prices.** For other endpoints the CLI still
-  reports `total_cost_usd`, but the number means little.
-
-## Going deeper
-
-What the test promises, what it deliberately leaves out, and every design
-decision with its reason and its price are written down in
-[DESIGN.md](DESIGN.md). Read it before you change the fixture, the matching
-rule, or the isolation of the runner.
-
-## Reference
-
-### Layout
-
-| Path | Content |
-|---|---|
-| `fixture/base/`, `fixture/change/` | example project "shop-core": defect-free base and the reviewed change |
-| `solution/expected.json` | expected-results list: defects in three tiers and decoys with locations (never part of a working copy) |
-| `DESIGN.md` | guarantees, non-goals, design decisions, and known risks |
-| `thresholds.json` | pre-registered thresholds (committed before the first measurement) |
-| `check.mjs` | checks the expected-results list against the fixture |
-| `run.mjs` | runner: throw-away copy, leak check, `claude -p`, result folder |
-| `compare.mjs` | compares result folders with the expected-results list, report in Markdown and JSON |
-| `selftest.mjs` | self-test of parser, matching, metrics, and runner helpers |
-| `check-language.mjs` | language check of the deliverable (English only) |
-| `testdata/` | canned `stream-json` transcripts for dry runs |
-| `reference/` | reference measurement with Claude Opus 5.5 and Sonnet 5.5, plus `NOTES.md` |
-| `results/` | local result folders (not versioned) |
-
-### Prerequisites
-
-- Node.js 22 or newer and Git; on Windows PowerShell is sufficient, Bash is not required
-- for paid runs additionally: the Claude Code CLI (`claude`) with a login and the
-  built `tool/` of this repository (`cd tool && npm start build`)
-
-### Dry run (no model call, no cost)
-
-```
-node benchmark/repo-review/check.mjs
-node benchmark/repo-review/selftest.mjs
-node benchmark/repo-review/check-language.mjs
-node benchmark/repo-review/run.mjs --dry-run
-node benchmark/repo-review/run.mjs --dry-run --simulate unparseable
-node benchmark/repo-review/run.mjs --dry-run --simulate abort-cost
-node benchmark/repo-review/run.mjs --dry-run --simulate abort-time
-node benchmark/repo-review/run.mjs --dry-run --simulate leak
-node benchmark/repo-review/compare.mjs
-```
-
-`--replay <file>` plays back a custom `stream-json` transcript, for example
-`testdata/isolation.jsonl` or `testdata/contamination.jsonl`. Dry runs appear in
-the report as a separate model group "(dry run)".
-
-### Measurement (paid)
-
-A measurement starts only if `thresholds.json` is committed and unmodified,
-`tool/` is built, and `--confirm-paid` is given:
-
-```
-node benchmark/repo-review/run.mjs --model sonnet --runs 3 --confirm-paid
-node benchmark/repo-review/run.mjs --model opus   --runs 3 --confirm-paid
-node benchmark/repo-review/compare.mjs
-```
-
-`--budget`, `--timeout-min`, and `--total-budget` change the limits;
-`--prior-spent` carries over costs already spent in a series; `--keep` keeps the
-throw-away copy for inspection. `node benchmark/repo-review/run.mjs --help` lists
-all options. Built-in CLI plugins (`@builtin`) are only logged, not treated as an
-isolation breach.
+If the CLI loads anything beyond what was allowed, the run ends with an
+**isolation** error. If a tool call of the model reaches into this benchmark
+(where the expected-results list lives) or into the ASE repository outside the
+`plugin/` and `tool/` folders the run legitimately uses, the run ends with a
+**contamination** error. Afterwards the runner kills processes the skill left
+behind, removes the copy, and writes a result folder with the protocol
+(`run.json`), the raw transcript, and the extracted review (`review.md`).
 
 Run status: `ok`, `unparseable` (output not recognizable as a review, counts with
 0 hits), `aborted` (cost or time), `error` (leak, isolation, contamination, start,
 CLI error result).
 
-### Report
+### Options
 
-`compare.mjs` writes `report.md` and `report.json`. Per model it reports recall
-per tier and overall (mean, minimum, maximum), the decoy false-alarm rate, the
-unassignable findings, the skill verdict per run, duration and cost, the
-threshold verdict, and for Opus the calibration statement. Applied twice to the
-same folders, `report.json` is byte-identical.
+`--budget`, `--timeout-min`, and `--total-budget` change the limits;
+`--prior-spent` carries over costs already spent in a series; `--keep` keeps the
+throw-away copy for inspection; `--out` sets the location of the result folders.
+`node benchmark/repo-review/run.mjs --help` lists all options. Built-in CLI
+plugins (`@builtin`) are only logged, not treated as an isolation breach.
+
+`compare.mjs` reports per model recall per tier and overall (mean, minimum,
+maximum), the decoy rate, the unassignable findings, the skill verdict per run,
+duration and cost, the threshold verdict, and the ceiling-effect statement.
+Applied twice to the same folders, `report.json` is byte-identical.
 
 ### Other endpoints (open-weight models)
 
@@ -255,6 +275,47 @@ node benchmark/repo-review/run.mjs --model <model-id> --base-url https://provide
 named variable and sets `ANTHROPIC_AUTH_TOKEN`. The run protocol records the
 endpoint (scheme, host, and path only), never the token. To try it without cost:
 `node benchmark/repo-review/run.mjs --dry-run --base-url https://example.invalid --auth-token-env BENCH_TOKEN`.
+
+### Testing the harness
+
+These commands check the benchmark itself, not a model, and cost nothing:
+
+```
+node benchmark/repo-review/selftest.mjs
+node benchmark/repo-review/check-language.mjs
+node benchmark/repo-review/run.mjs --dry-run --simulate unparseable
+node benchmark/repo-review/run.mjs --dry-run --simulate abort-cost
+node benchmark/repo-review/run.mjs --dry-run --simulate abort-time
+node benchmark/repo-review/run.mjs --dry-run --simulate leak
+```
+
+`--replay <file>` plays back a custom `stream-json` transcript, for example
+`testdata/isolation.jsonl` or `testdata/contamination.jsonl`. Dry runs appear in
+the report as a separate model group "(dry run)".
+
+### Layout
+
+| Path | Content |
+|---|---|
+| `fixture/base/`, `fixture/change/` | example project "shop-core": base without seeded defects and the reviewed change |
+| `solution/expected.json` | expected-results list: defects in three tiers and decoys with locations (never part of a working copy) |
+| `DESIGN.md` | guarantees, non-goals, design decisions, and known risks |
+| `thresholds.json` | pre-registered pilot thresholds (committed before the first measurement) |
+| `check.mjs` | checks the expected-results list against the fixture |
+| `run.mjs` | runner: throw-away copy, leak check, `claude -p`, result folder |
+| `compare.mjs` | compares result folders with the expected-results list, report in Markdown and JSON |
+| `selftest.mjs` | self-test of parser, matching, metrics, and runner helpers |
+| `check-language.mjs` | language check of the deliverable (English only) |
+| `testdata/` | canned `stream-json` transcripts for dry runs |
+| `reference/` | reference measurement with Claude Opus 5.5 and Sonnet 5.5, plus `NOTES.md` |
+| `results/` | local result folders (not versioned) |
+
+### Going deeper
+
+What the test promises, what it deliberately leaves out, and every design
+decision with its reason and its price are written down in
+[DESIGN.md](DESIGN.md). Read it before you change the fixture, the matching
+rule, or the isolation of the runner.
 
 ## Origin
 

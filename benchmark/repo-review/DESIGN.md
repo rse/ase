@@ -37,12 +37,14 @@ documented revision.
    skill's verdict per run, the number of unparseable runs, duration, and cost.
 8. **No silent zeros.** A review output that cannot be recognized is counted as
    `unparseable` and scored with zero hits, never quietly as "no findings".
-9. **Pre-registered thresholds.** The thresholds are committed before the first
-   paid run. The report names them, the version of their file, and the verdict
-   "threshold met" or "threshold not met" per model.
-10. **A calibration statement.** If the strongest model finds every defect in
+9. **Pre-registered pilot thresholds.** The thresholds are committed before the
+   first paid run. The report names them, the version of their file, and the
+   verdict "threshold met" or "threshold not met" per model. They are provisional
+   criteria for this pilot case, not requirements derived from a concrete use.
+10. **A ceiling-effect check.** If the strongest model finds every defect in
     every run, the report says "too easy" and names the next step (add harder
-    cases); otherwise it says "adequate".
+    cases); otherwise it says "adequate", which only means that no ceiling effect
+    was detected, not that the case is hard enough or separates models well.
 11. **Windows without Bash.** Runner, checks, and comparison run on Windows 11 with
     Node.js alone, also from paths containing spaces.
 12. **Other endpoints.** The model and an alternative endpoint
@@ -59,6 +61,10 @@ documented revision.
 ## What the test deliberately does not do
 
 - It does not let a language model judge the findings.
+- It tests a whole review setup (model, ASE skill, Claude Code CLI, tools, prompt,
+  and limits) and compares models within that setup. It does not measure what the
+  ASE skill itself contributes; that would need a baseline with the same model
+  and an ordinary review prompt.
 - It does not change `ase-repo-review`, its sub-agent, or any other part of ASE.
 - It measures one skill only; it is not a general harness for other skills, and
   it is not wired into the repository's `test/` directory.
@@ -212,7 +218,13 @@ separately. "Threshold met" requires all three thresholds at once.
 
 *Why:* a model must not be able to improve its score by producing unreadable
 output. *Price:* the false-alarm rate may rest on fewer runs than recall; the
-report shows both numbers.
+report shows both numbers. More importantly, the rate covers only the four
+predefined decoys and counts any finding located there, whatever it says, while
+unassignable findings count nowhere. A review with twenty unfounded complaints
+elsewhere still scores a rate of 0. The report therefore shows the unassignable
+findings next to the rates; whether they are real defects, fair suggestions, or
+false alarms can only be decided by reading them. On reading, a remark on a decoy
+counts as a false alarm only if it claims that the code behaves wrongly.
 
 ### A deterministic report
 
@@ -243,6 +255,11 @@ byte-identical to their original form; `reference/NOTES.md` records the mapping.
 - **Case too easy.** On reading the reviews, the strongest model found every
   defect in every run. Harder cases are needed before results say anything about
   open-weight models.
+- **Scorer and reading disagree.** Location matching both misses correctly
+  described defects and credits unrelated findings to decoys. Automated figures
+  must be read together with a manual check until the matching improves.
+- **Unknown precision.** Unassignable findings are not classified, so the share
+  of unfounded complaints outside the decoys is not measured.
 - **Training data.** Once published, the fixture may end up in future training
   data; a new, unpublished case would then be needed.
 - **Skill format drift.** The output of the skill can change with new ASE

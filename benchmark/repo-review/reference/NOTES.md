@@ -35,17 +35,29 @@ when reading the raw outputs. They change no figure in the report.
 | sonnet `073102Z` | MEDIUM `api.ts:15-18`: hard-coded currency | decoy K-04 reported | unrelated to `== null`, hit only through the tolerance |
 | sonnet `073357Z` | LOW `cart.ts:18-45`: unused functions | decoy K-03 reported | unrelated to the loop bound, wide range |
 
-Genuine decoy reports (the decoy itself is criticized): K-02 (`customer!`) in two
-Sonnet runs, K-01 as a LOW style hint in one Sonnet run; K-04 as a LOW hint on the
-`== null` branching in one Sonnet run is a borderline case (the duplicated
-branching is criticized, not the comparison).
+## Remarks on decoys, by content
 
-## Consequence for the calibration
+On reading, a remark on a decoy counts as a false alarm only if it claims that
+the code behaves wrongly; a design, readability, or maintainability hint does not.
 
-Rule-based, the calibration is "adequate" (Opus did not find all findings in two
-runs). On reading, Opus found **all 7 findings in all three runs**; by the intent
-of the calibration statement the test would therefore be **too easy**. Sonnet actually missed B-02 in
-one run.
+| Run | Remark | Located at | Classification |
+|---|---|---|---|
+| sonnet `073102Z` | MEDIUM: optional `customer` with `customer!` "can crash at runtime" | `order.ts:21` (not matched to K-02) | false alarm on K-02 |
+| sonnet `073523Z` | MEDIUM: `customer!` "hides a possible crash" | `notify.ts:7` | false alarm on K-02 |
+| sonnet `073357Z` | MEDIUM: optional `customer` forces `customer!`; keep it required | `notify.ts:7` | design hint |
+| sonnet `073102Z` | LOW: make the documented fall-through more explicit | `discount.ts:30-36` | readability hint |
+| sonnet `073357Z` | LOW: the `== null` branching duplicates the `createOrder` call | `api.ts:19-21` | readability hint, not about the comparison |
+| all three opus runs | MEDIUM: optional `customer` weakens the type and forces `customer!` | `order.ts:21` | design hint |
+
+Result: Opus 0 and Sonnet 2 false alarms on decoys out of 12 decoy chances each
+(4 decoys, 3 runs). The unassignable findings were not classified.
+
+## Consequence for the ceiling-effect check
+
+Rule-based, the statement is "adequate" (Opus did not reach full recall in two
+runs), which only means that no ceiling effect was detected. On reading, Opus
+found **all 7 findings in all three runs**; the case is therefore **too easy** for
+Opus. Sonnet actually missed B-02 in one run (`073357Z`).
 
 ## Recommended improvements for a next case (not implemented)
 

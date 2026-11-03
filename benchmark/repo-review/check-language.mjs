@@ -48,7 +48,10 @@ export function checkTree (root) {
         const inName = findGerman(file.replace(/[/._-]/g, " "))
         if (inName)
             problems.push(`${file}: file name contains "${inName}"`)
-        const lines = fs.readFileSync(path.join(root, file), "utf8").split(/\r?\n/)
+        const data = fs.readFileSync(path.join(root, file))
+        if (data.includes(0))
+            continue
+        const lines = data.toString("utf8").split(/\r?\n/)
         lines.forEach((line, i) => {
             const hit = findGerman(line)
             if (hit)
