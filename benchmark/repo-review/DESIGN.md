@@ -325,9 +325,11 @@ since been fixed; the scorer commit in each entry says which.
 - **Unknown precision.** Unassignable findings are not classified, so the share
   of unfounded complaints outside the decoys is not measured.
 - **Security decoys provoke.** The decoys of the case `security` look like
-  security smells, so reviews may flag them with high severity more readily than
-  the style decoys of the first case; the decoy rates of the two cases are not
-  comparable with each other.
+  security smells, so reviews flag them more readily than the style decoys of the
+  first case; the decoy rates of the two cases are not comparable with each
+  other. In the reference measurement the rate reached 0.50 for both models
+  without a false alarm on reading, and one decoy (`Number()` followed by
+  `isSafeInteger`) turned out flawed, because `""` and exponent forms pass.
 - **Training data.** Once published, the fixture may end up in future training
   data; a new, unpublished case would then be needed.
 - **Skill format drift.** The output of the skill can change with new ASE

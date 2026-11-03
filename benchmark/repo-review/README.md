@@ -27,12 +27,13 @@ this benchmark.
 ## Current status: pilot
 
 Two TypeScript test cases on the same small shop project, each with seven seeded
-defects and four decoys: `shop-core` (correctness defects, measured three times
-per model) and `security` (defects an attacker could exploit, with a minimum
-severity per defect; not measured yet). Automated scores rely on file and line
-matching and can disagree with manual inspection. The reference measurement of
-the first case identified limitations in both the test case and the scorer that
-need addressing before broader conclusions about model performance.
+defects and four decoys: `shop-core` (correctness defects) and `security`
+(defects an attacker could exploit, with a minimum severity per defect), each
+measured three times per model with Claude Opus 5.5 and Sonnet 5.5. Automated
+scores rely on file and line matching and can disagree with manual inspection.
+Both cases turned out too easy for Opus, and both measurements identified
+limitations in the test cases and the scorer that need addressing before broader
+conclusions about model performance.
 
 ## How the test works
 
@@ -142,6 +143,27 @@ them in every run. The case is therefore too easy for Opus, and the scorer, not
 the model, accounts for most of the gap. The log entry lists every case, together
 with the models, ASE and CLI versions, digests of the test case, and the version
 of the scorer that produced the figures.
+
+### The second case
+
+On the same day the setup ran three times per model on the case `security`
+(3.38 USD including a plumbing run; one and a half to two minutes per run).
+
+| Configuration | Location-matched recall | Recall with adequate severity | Decoy match rate | Unassignable per run | Pilot thresholds |
+|---|---|---|---|---|---|
+| Opus 5.5 | 1.00 | 1.00 | 0.50 | 2.3 | not met |
+| Sonnet 5.5 | 0.90 | 0.81 | 0.50 | 3.7 | not met |
+
+Opus found every defect in every run with adequate severity; the case is too easy
+for it. Sonnet, on reading, found 19 of 21 and reported the refund-amount defect
+as `MEDIUM` twice, which the new figure records. Both fail the thresholds only on
+the decoy rate, and on reading that rate holds **no false alarm at all**: the
+decoys drew intent remarks (`recommendations` is scope creep), design hints (use
+`crypto.timingSafeEqual`), a fair clarity remark (the `catch` cannot fail), and one
+correct observation that `Number("")` passes the amount check, which means that
+decoy is flawed. The reviews also found two real weaknesses the list does not
+record: an empty-secret fallback and missing state-transition guards. The log
+entry lists every case and what to change before the next series.
 
 ## Quick start
 
@@ -253,6 +275,10 @@ below 1.0 while the manual reading found every defect.
   and credits unrelated findings with wide ranges. Recording alternative
   locations per defect and keeping decoys away from genuine weaknesses of the code
   would help (see the log entry in `MEASUREMENTS.md`).
+- **The decoy rate measures locations, not claims.** In the case `security` it
+  reached 0.50 for both models without a single false alarm on reading. Decoys
+  that invite intent or style remarks inflate it, and one decoy of that case is
+  flawed. Decoy quality and a severity-aware decoy rate come before more models.
 - **Three runs per model** show tendencies, not significant differences.
 - **Cost figures assume Anthropic prices.** For other endpoints the number means
   little.
