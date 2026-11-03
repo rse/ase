@@ -400,8 +400,8 @@
     "schema": 2,
     "thresholds": {
         "file": {
-            "commit": "c3f00a577d903e21c8f991b1c583917680f11f7b",
-            "modified": true
+            "commit": "f03489e665d1179cfe930f8f2a49ac49a3db4a73",
+            "modified": false
         },
         "values": {
             "budget_per_run_usd": 5,

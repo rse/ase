@@ -2,7 +2,7 @@
 
 Expected-results list: `sha256:498d34df09823361acd06f0fbbce51330cfa31f7f814f2ca70b4dc71b896da0f`
 
-Thresholds: overall recall ≥ 0.6, obvious ≥ 0.8, decoy false-alarm rate ≤ 0.25; file version `c3f00a577d903e21c8f991b1c583917680f11f7b` (**warning: uncommitted changes**)
+Thresholds: overall recall ≥ 0.6, obvious ≥ 0.8, decoy false-alarm rate ≤ 0.25; file version `f03489e665d1179cfe930f8f2a49ac49a3db4a73`
 
 ## Model opus
 
