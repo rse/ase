@@ -1,0 +1,12 @@
+{
+    "version": 1,
+    "source": "PRD-Approval-Decisions vom 2026-11-02 (Run run-3f8b1c27-9a4e-4d61-b2c5-8e7f6a5d4c31)",
+    "recall_overall_min": 0.6,
+    "recall_obvious_min": 0.8,
+    "decoy_false_alarm_max": 0.25,
+    "runs_per_model": 3,
+    "budget_per_run_usd": 5,
+    "budget_total_usd": 30,
+    "timeout_per_run_min": 20,
+    "matching_tolerance_lines": 3
+}
