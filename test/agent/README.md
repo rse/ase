@@ -57,6 +57,7 @@ node agent/ase-agent-test.mts                    # full run of case "wordcount-p
 node agent/ase-agent-test.mts --keep-failed      # keep the sandbox of a failed run for inspection
 node agent/ase-agent-test.mts --tool codex --timeout 20m --max-cost-usd 3
 npm start test-agent                             # the same via stx (inside test/)
+./run_agent_test.sh                              # the same, after a cost confirmation (inside test/)
 ```
 
 Options:
