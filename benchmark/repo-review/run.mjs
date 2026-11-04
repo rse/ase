@@ -21,7 +21,7 @@ import {
 
 const HELP = `Usage: node run.mjs [options]
 
-  --case <name>             test case (default: shop-core)
+  --case <name>             test case (default: correctness-cents)
   --model <model>           model for claude -p (default: sonnet)
   --runs <n>                number of runs (default: 1)
   --budget <usd>            cost limit per run (default: 5)

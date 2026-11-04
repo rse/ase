@@ -1,7 +1,7 @@
 # Design of the `ase-repo-review` effectiveness test
 
 The [README](README.md) tells the story of the test: why it exists, how a run
-unfolds, and what the reference measurement showed. This document is for the
+unfolds, and what the pilot showed. This document is for the
 person who wants to change the test, extend it, or argue with it. It states what
 the test promises, what it deliberately leaves out, and the design decisions
 behind it, each with the reason it was taken and the price it costs.
@@ -74,7 +74,7 @@ documented revision.
 - It ships the parameters for open-weight models, but no measurement with them.
 - It runs neither in CI nor on a schedule. Every run is started by hand, and every
   group of paid runs needs a deliberate decision about its cost.
-- The reference measurement does not use `--thorough`.
+- The measurements do not use `--thorough`.
 
 ## Design decisions
 
@@ -90,8 +90,8 @@ check for the scripts. `selftest.mjs` compensates with hand-computed expectation
 
 ### A throw-away copy built from two directories
 
-The example project lives as two plain directories, `fixture/base/` and
-`fixture/change/`. Each run copies `base` into a fresh directory under the
+The example project of a case lives as two plain directories, `fixture/base/`
+and `fixture/change/`. Each run copies `base` into a fresh directory under the
 system's temporary folder, commits it, overlays `change`, and commits again, with
 neutral messages ("Initial version", "Update order handling"), fixed dates, and
 `core.autocrlf=false`. The copy also receives a minimal ASE project
@@ -107,7 +107,10 @@ after the second commit. *Price:* every change to the fixture requires re-runnin
 Before any model call, the runner verifies that the copy contains exactly the
 expected files and that no file content, file name, or commit message contains a
 term from a fixed deny list (such as "bug", "decoy", "TODO", "fixme", "hack", and
-their German counterparts) or an entry id like `B-01`. A hit ends the run as
+their German counterparts, and terms of intent such as "intentionally",
+"deliberately", "on purpose", "by design", "seeded", and "planted") or an entry
+id like `B-01`. Multi-word terms match with spaces, tabs, or hyphens between
+their words; file contents are checked line by line. A hit ends the run as
 `error` with reason `leak`.
 
 *Why:* "the fixture gives nothing away" has to be a check, not a matter of care.
@@ -163,7 +166,7 @@ the point.
 ### Dry runs cover everything but the model
 
 `--dry-run` executes every step except the model call and replays a canned
-`stream-json` transcript from `testdata/`. `--simulate` produces the special
+`stream-json` transcript from the `testdata/` folder of the case. `--simulate` produces the special
 cases (cost abort, time abort, unparseable output, leak), and the endpoint
 parameters are recorded in the dry-run protocol as well.
 
@@ -173,11 +176,11 @@ that, which is why the first paid run was a single, cheap one.
 
 ### One result folder per run, never overwritten
 
-Each run writes `results/{UTC time}-{model}-{n}/` with `run.json`,
+Each run writes `results/{UTC time}-{model}-{n}/` in the folder of its case with `run.json`,
 `transcript.jsonl`, `review.md`, and `stderr.txt`. An existing folder is never
 overwritten, and `run.json` is written last, so its presence marks a finished
 run. `results/` is not versioned; the reference measurement is committed under
-`reference/`.
+`reference/` of the case.
 
 *Why:* traceability, and a failed run must affect nothing but its own folder.
 *Price:* transcripts can be large.
@@ -209,10 +212,10 @@ listed. A match on a decoy is a false alarm; everything else is unassignable.
 of the MERIT effectiveness test. *Price:* coarse line ranges can hit a
 neighboring entry by accident, so entries in the same file keep at least eight
 lines apart. And a correct finding placed one hop away, at a call or a
-declaration, is missed; the log in `MEASUREMENTS.md` documents the cases seen so
-far. Until 2026-11-03 the parser read only the first range of a location that
-lists several; the log holds the reference measurement scored both before and
-after that fix.
+declaration, is missed; the pilot summary in [MEASUREMENTS.md](MEASUREMENTS.md)
+names the cases seen so far. Until 2026-11-03 the parser read only the first
+range of a location that lists several; the pilot entries at commit `13014184`
+hold the measurement scored both before and after that fix.
 
 ### Metrics that cannot be gamed by failure
 
@@ -248,33 +251,31 @@ protocols provide the time reference.
 
 Everything under `benchmark/repo-review/` is English, checked by
 `check-language.mjs`, whose only exemption is the deny list of the leak check.
-The protocols of the reference runs, which were paid for before this decision,
+The protocols of the pilot runs, which were paid for before this decision,
 were translated once by a fixed mapping of keys and values and marked with the
 field `migrated`; transcripts and raw reviews are untouched, and every figure of
 the report is identical before and after.
 
 *Why:* the target repository is English, and repeating paid runs only to change
-their language would waste money. *Price:* the reference protocols are no longer
-byte-identical to their original form; the first entry of `MEASUREMENTS.md`
-records this.
+their language would waste money. *Price:* the pilot protocols (six of them
+remain as test data under `testdata/runs/`) are no longer byte-identical to
+their original form; the first pilot entry at commit `13014184` records this.
 
 ### Several cases, one scorer
 
 A test case is a directory with `fixture/`, `solution/expected.json`,
-`thresholds.json`, `testdata/`, `reference/`, and `results/`. The first case,
-`shop-core`, keeps these at the root of the benchmark; every later case lives
-under `cases/<name>/`. One table in `lib/common.mjs` maps case names to
+`thresholds.json`, `testdata/`, `reference/`, and `results/`, and every case
+lives under `cases/<name>/`. One table in `lib/common.mjs` maps case names to
 directories, and `resolveCase(name)` is the only place that knows the paths;
 `run.mjs`, `check.mjs`, and `compare.mjs` take `--case` and default to
-`shop-core`. Every run protocol records its case, and the comparison evaluates
-only result folders of the selected case; protocols that predate the field count
-as `shop-core`.
+`correctness-cents`. Every run protocol records its case, and the comparison
+evaluates only result folders of the selected case; protocols without the field
+count as the default case.
 
 *Why:* the first case turned out too easy and carries only correctness defects,
-and comparisons across cases need the same runner, scorer, and log. Leaving the
-first case at its original paths keeps its digests, the version of its threshold
-file, and its log entries untouched. *Price:* the layout is asymmetric, and a
-result folder cannot be moved from one case to another.
+and comparisons across cases need the same runner, scorer, and log. One layout
+for all cases keeps the benchmark root free of case data. *Price:* a result
+folder cannot be moved from one case to another.
 
 ### A minimum severity per defect
 
@@ -284,18 +285,36 @@ reported when the highest severity among the findings matched to it reaches that
 minimum. The report shows the recall with adequate severity next to the plain
 recall, and a case may add a fourth threshold, `recall_adequate_min`, which the
 verdict applies only when the threshold file names it. All of this exists only
-for lists with minimum severities, so the reports of the first case stay
-byte-identical.
+for lists with minimum severities, so the reports of cases without them do not
+change.
 
 *Why:* for security defects, finding the spot is not enough; a refund hole
 reported as a `LOW` style remark would be waved through. *Price:* the minimum
 severity is a judgement recorded in the list, made before the measurement and
 open to argument like the thresholds.
 
+### Cases are revised in place, with a placement rule for decoys
+
+A case that needs better decoys or a cleaner fixture is changed in place. Its
+earlier state, together with the measurements taken on it, stays in the Git
+history; the log names the commit. Every decoy follows one placement rule: it is visibly correct in the
+code itself, not only in its comment; it belongs to the told change and has a
+caller; it contains no call of a seeded defect; it lies outside the matching
+tolerance of every defect location and of every known weakness outside the list;
+and no comment near it uses a term of intent.
+
+*Why:* the manual reading of the pilot showed decoys that measured the fixture,
+not the review: a validation weaker than its comment, a `catch` that could never
+run, dead code, and a decoy wrapped around the call of a defect. Keeping old and
+new fixtures side by side would only have multiplied the cases. *Price:* the
+pilot measurements cannot be re-scored without checking out their commit, and
+figures before and after a revision are comparable per defect only.
+
 ### An append-only measurement log
 
-`compare.mjs --journal MEASUREMENTS.md` renders one section per measurement
-series and appends it, together with one overview row per configuration. The
+`measure.mjs` (or `compare.mjs --journal MEASUREMENTS.md` for existing result
+folders) renders one section per measurement series and appends it, together
+with one overview row per configuration. The
 section holds the configuration (models, endpoint, ASE and CLI versions, digests
 of the test case and of the expected-results list at run time and at scoring
 time, threshold version, and the commit of the scoring code), the automated
@@ -303,8 +322,9 @@ figures, a defect-by-run and a decoy-by-run matrix with the short titles of the
 expected-results list, and the text of every unassignable finding. A series is
 identified by the names of its result folders together with the commit of the
 scoring code; the log refuses a series it already holds, does not accept dry
-runs, and refuses to log while the scoring code has uncommitted changes. The manual reading is written by
-hand below the generated part. Entries are never rewritten: a correction is a
+runs, and refuses to log while the scoring code has uncommitted changes. The section ends
+with a template for the manual reading, one table per run with every finding,
+its automated match, and two columns filled in by hand. Entries are never rewritten: a correction is a
 dated note, a re-scoring with a changed scorer is a new entry.
 
 *Why:* `report.md` and `report.json` are regenerated on every comparison and
@@ -324,12 +344,12 @@ since been fixed; the scorer commit in each entry says which.
   must be read together with a manual check until the matching improves.
 - **Unknown precision.** Unassignable findings are not classified, so the share
   of unfounded complaints outside the decoys is not measured.
-- **Security decoys provoke.** The decoys of the case `security` look like
-  security smells, so reviews flag them more readily than the style decoys of the
-  first case; the decoy rates of the two cases are not comparable with each
-  other. In the reference measurement the rate reached 0.50 for both models
-  without a false alarm on reading, and one decoy (`Number()` followed by
-  `isSafeInteger`) turned out flawed, because `""` and exponent forms pass.
+- **Security decoys provoke.** The decoys of the case `security-refunds` look
+  like security smells, so reviews flag them more readily than the style decoys
+  of `correctness-cents`; the decoy rates of the two cases are not comparable
+  with each other. In the pilot the rate reached 0.50 for both models without a
+  false alarm on reading, and one decoy (`Number()` followed by
+  `isSafeInteger`) turned out flawed; the revised case checks the format first.
 - **Training data.** Once published, the fixture may end up in future training
   data; a new, unpublished case would then be needed.
 - **Skill format drift.** The output of the skill can change with new ASE

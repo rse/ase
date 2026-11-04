@@ -30,7 +30,7 @@ export function loadRun (dir) {
     const review = fs.existsSync(path.join(dir, "review.md")) ? fs.readFileSync(path.join(dir, "review.md"), "utf8") : null
     return {
         name:     path.basename(dir),
-        /*  protocols of the first measurements predate the case field  */
+        /*  protocols without the case field (the test runs under testdata/runs) count as the default case  */
         case:     meta.case ?? DEFAULT_CASE,
         status:   meta.status,
         reason:   meta.reason ?? null,

@@ -18,6 +18,7 @@ import { validateExpected }                        from "./lib/expected.mjs"
 import { assignFinding }                           from "./lib/matching.mjs"
 import { evaluateRun, aggregate, calibrate }       from "./lib/scoring.mjs"
 import { findLeak }                                from "./lib/leak.mjs"
+import { options as measureOptions, preflight as measurePreflight } from "./measure.mjs"
 import { seriesAllows, createRunDir, checkInit, claudeArgs, mcpConfig, checkContamination, runChild, childEnv, envSummary, transcriptFacts } from "./lib/runner.mjs"
 
 let passed = 0, failed = 0
@@ -33,12 +34,12 @@ function check (name, cond, info = "") {
 }
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 
-const shop     = resolveCase("shop-core")
+const shop     = resolveCase("correctness-cents")
 const expected = readJson(shop.expectedFile)
 const row  = (sev, loc, text = "text") => `| **${sev}** | correctness | ${loc}: ${text} |`
 const head = "◉ **REVIEW VERDICT**: **REJECT - DEMANDS CHANGES**\n\n| Severity | Dimension | Finding |\n| --- | --- | --- |\n"
 const review = (rows) => head + rows.join("\n") + "\n"
-const replayText = (file) => transcriptFacts(fs.readFileSync(path.join(TESTDATA_DIR, file), "utf8")
+const replayText = (file, dir = TESTDATA_DIR) => transcriptFacts(fs.readFileSync(path.join(dir, file), "utf8")
     .split("\n").filter(Boolean).map((l) => JSON.parse(l))).text
 
 /*  parser format variants  */
@@ -92,7 +93,7 @@ check("parser: foreign output from testdata/unparseable.jsonl is unparseable",
 }
 
 /*  metrics computed by hand
-    run 1 (testdata/normal.jsonl): hits B-01, B-02 (obvious 2/2), B-03 (medium 1/3), B-06 (hidden 1/2),
+    run 1 (cases/correctness-cents/testdata/normal.jsonl): hits B-01, B-02 (obvious 2/2), B-03 (medium 1/3), B-06 (hidden 1/2),
            overall 4/7 = 0.5714; decoy K-04 1/4 = 0.25; unassignable 1 (inventory.ts); ACCEPTED 1; duplicate 1 (cart.ts:31)
     run 2: unparseable -> recall 0, not in false alarm rate
     run 3: NO FINDINGS -> recall 0, false alarm 0
@@ -100,7 +101,7 @@ check("parser: foreign output from testdata/unparseable.jsonl is unparseable",
     means: overall (0.5714 + 0 + 0) / 3 = 0.1905, obvious 1/3 = 0.3333, false alarm (0.25 + 0) / 2 = 0.125  */
 {
     const runs = [
-        { name: "r1", status: "ok", model: "m", review: replayText("normal.jsonl"), cost: 0.4, duration: 1000 },
+        { name: "r1", status: "ok", model: "m", review: replayText("normal.jsonl", shop.testdataDir), cost: 0.4, duration: 1000 },
         { name: "r2", status: "unparseable", model: "m", review: replayText("unparseable.jsonl"), cost: 0.1, duration: 1000 },
         { name: "r3", status: "ok", model: "m", review: "◉ **REVIEW VERDICT**: **APPROVE**\n\n○ **NO FINDINGS**: the change is clean, nothing to flag.\n", cost: 0.2, duration: 1000 },
         { name: "r4", status: "aborted", reason: "cost", model: "m", review: null, cost: 5.03, duration: 1000 }
@@ -136,6 +137,10 @@ check("leak: an expected-results id is detected", findLeak("Fix B-03 now") === "
 check("leak: \"debug\" is no hit for \"bug\" (negative case)", findLeak("debug output") === null)
 check("leak: \"falls through\" is allowed", findLeak("/* falls through */") === null)
 check("leak: plural forms like \"bugs\" and \"todos\" are detected", findLeak("two bugs here") === "bug" && findLeak("open todos") === "todo")
+for (const text of [ "set intentionally", "a deliberate choice", "done deliberately", "on purpose", "on  purpose", "on-purpose", "by design", "by\tdesign", "seeded here", "planted here" ])
+    check(`leak: the term of intent in "${text}" is detected`, findLeak(text) !== null)
+for (const text of [ "the purpose of", "design of the API", "seed data", "the plant list", "designed by" ])
+    check(`leak: "${text}" is no term of intent (negative case)`, findLeak(text) === null)
 
 /*  runner helpers  */
 check("series budget: 26 + 5 > 30 refused", seriesAllows(26, 5, 30) === false)
@@ -199,17 +204,21 @@ check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c
 
 /*  measurement log  */
 {
-    const dirs    = collectRunDirs([ path.join(shop.referenceDir, "runs") ])
+    const dirs    = collectRunDirs([ path.join(TESTDATA_DIR, "runs") ])
     const report  = buildReport(dirs, expected, shop)
     const entry   = renderSection({ title: "Series A", dirs, report, expected, c: shop })
     check("log: series id does not depend on folder order", seriesId(dirs, "c1", "x") === seriesId([ ...dirs ].reverse(), "c1", "x"))
     check("log: another scorer commit gives another series id", seriesId(dirs, "c1", "x") !== seriesId(dirs, "c2", "x"))
     check("log: another case gives another series id", seriesId(dirs, "c1", "x") !== seriesId(dirs, "c1", "y"))
-    check("log: the configuration table names the case", entry.section.includes("| Case | shop-core |"))
+    check("log: the configuration table names the case", entry.section.includes("| Case | correctness-cents |"))
     check("log: one overview row per configuration", entry.rows.length === Object.keys(report.models).length)
+    const reading = entry.section.slice(entry.section.indexOf("### Manual reading"))
+    check("log: the manual reading has a findings table per run with two empty columns",
+        dirs.every((d, i) => reading.includes(`#### R${i + 1} `)) && reading.includes("| Severity | Location | Finding | Matched | Correct? | False alarm? |"))
+    check("log: the reading table names the automated match of a finding", /\| `src\/cart\.ts:[^|]*\| [^|]*\| B-01 \|  \|  \|/.test(reading))
     check("log: defect matrix names the defect in plain words", /\| B-01 countUnits [^|]*\| obvious( \| ✓){6} \|/.test(entry.section))
     check("log: a finding at order.ts:29,51-52 now counts for B-04 in every run", /\| B-04 [^|]*\| medium( \| ✓){6} \|/.test(entry.section)
-        && !entry.section.includes("`src/order.ts:29,51-52`"))
+        && !entry.section.slice(entry.section.indexOf("### Unassignable findings"), entry.section.indexOf("### Manual reading")).includes("`src/order.ts:29,51-52`"))
     const tmp  = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-log-"))
     const file = path.join(tmp, "MEASUREMENTS.md")
     appendJournal(file, entry)
@@ -231,11 +240,30 @@ check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c
     fs.rmSync(tmp, { recursive: true, force: true })
 }
 
+/*  one-command measurement: options and preconditions  */
+{
+    const d = measureOptions([])
+    check("measure: defaults are the default case, opus and sonnet, three runs", d.case.name === "correctness-cents" && d.models.join(",") === "opus,sonnet" && d.runs === 3)
+    const m = measureOptions([ "--case", "security-refunds", "--models", "sonnet, opus", "--runs", "2" ])
+    check("measure: case, model list, and run count are taken over", m.case.name === "security-refunds" && m.models.join(",") === "sonnet,opus" && m.runs === 2)
+    let refused = false
+    try {
+        measureOptions([ "--dry-run", "--keep-reference" ])
+    }
+    catch (err) {
+        refused = /only for paid runs/.test(err.message)
+    }
+    check("measure: a reference copy of dry runs is refused (negative case)", refused)
+    check("measure: a dry run has no preconditions", measurePreflight(measureOptions([ "--dry-run" ])).length === 0)
+    check("measure: paid runs without --confirm-paid are refused (negative case)", measurePreflight(d).some((p) => /--confirm-paid/.test(p)))
+}
+
 /*  case resolution  */
 {
-    const sec = resolveCase("security")
-    check("cases: the default case is shop-core at the root paths", resolveCase().name === "shop-core" && shop.expectedFile.endsWith(path.join("solution", "expected.json")))
-    check("cases: security lives under cases/security", sec.dir.endsWith(path.join("cases", "security")) && sec.thresholdFile.startsWith(sec.dir))
+    const sec = resolveCase("security-refunds")
+    check("cases: the default case is correctness-cents under cases/correctness-cents", resolveCase().name === "correctness-cents"
+        && shop.expectedFile.endsWith(path.join("cases", "correctness-cents", "solution", "expected.json")))
+    check("cases: security-refunds lives under cases/security-refunds", sec.dir.endsWith(path.join("cases", "security-refunds")) && sec.thresholdFile.startsWith(sec.dir))
     let refused = false
     try {
         resolveCase("other")
@@ -246,15 +274,30 @@ check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c
     check("cases: an unknown case is refused (negative case)", refused)
 }
 
+/*  every case: its list is valid against its own copy and has four decoys  */
+for (const name of [ "correctness-cents", "security-refunds" ]) {
+    const c    = resolveCase(name)
+    const exp  = readJson(c.expectedFile)
+    const copy = buildCopy(c)
+    try {
+        const res = validateExpected(exp, copy.dir)
+        check(`cases: the ${name} list is valid`, res.results.every((r) => r.ok) && res.global.length === 0)
+    }
+    finally {
+        removeCopy(copy)
+    }
+    check(`cases: ${name} has four decoys`, exp.entries.filter((e) => e.kind === "decoy").length === 4)
+}
+
 /*  expected-results list version 4: minimum severity and double locations
-    the security list is validated against its own copy; three altered copies must fail  */
+    the security-refunds list is validated against its own copy; three altered copies must fail  */
 {
-    const sec    = resolveCase("security")
+    const sec    = resolveCase("security-refunds")
     const secExp = readJson(sec.expectedFile)
     const copy   = buildCopy(sec)
     try {
         const clone = () => JSON.parse(JSON.stringify(secExp))
-        check("list v4: the security list is valid", validateExpected(secExp, copy.dir).results.every((r) => r.ok) && validateExpected(secExp, copy.dir).global.length === 0)
+        check("list v4: the security-refunds list is valid", validateExpected(secExp, copy.dir).results.every((r) => r.ok) && validateExpected(secExp, copy.dir).global.length === 0)
         const noSev = clone()
         delete noSev.entries[0].min_severity
         check("list v4: a finding without min_severity is invalid (negative case)", validateExpected(noSev, copy.dir).results[0].problems.some((p) => /min_severity/.test(p)))
@@ -275,12 +318,12 @@ check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c
     }
 }
 
-/*  hits with adequate severity, computed by hand from cases/security/testdata/normal.jsonl:
+/*  hits with adequate severity, computed by hand from cases/security-refunds/testdata/normal.jsonl:
     B-01 HIGH (min HIGH, adequate), B-02 MEDIUM (min HIGH, not adequate), B-03 HIGH (adequate),
     B-05 LOW (min MEDIUM, not adequate), B-06 HIGH (adequate); K-01 reported; store.ts unassignable
     hits 5/7 = 0.7143, obvious 1, medium 0.6667, hidden 0.5; adequate 3/7 = 0.4286; decoys 1/4 = 0.25  */
 {
-    const sec    = resolveCase("security")
+    const sec    = resolveCase("security-refunds")
     const secExp = readJson(sec.expectedFile)
     const text   = transcriptFacts(fs.readFileSync(path.join(sec.testdataDir, "normal.jsonl"), "utf8")
         .split("\n").filter(Boolean).map((l) => JSON.parse(l))).text
@@ -293,14 +336,14 @@ check("serialization: key order is stable", stableStringify({ b: 1, a: { d: 2, c
         review: review([ row("LOW", "▢ `src/admin.ts:21`"), row("HIGH", "▢ `src/admin.ts:31`") ]) }, secExp)
     check("severity: the highest severity of duplicate findings decides (LOW and HIGH on B-02)", eq(dup.hits_adequate, [ "B-02" ]))
     const low = evaluateRun({ name: "s3", status: "ok", model: "m", cost: 0.1, duration: 100,
-        review: review([ row("MEDIUM", "▢ `src/mail.ts:20`"), row("LOW", "▢ `src/api.ts:34`") ]) }, secExp)
+        review: review([ row("MEDIUM", "▢ `src/mail.ts:26`"), row("LOW", "▢ `src/api.ts:34`") ]) }, secExp)
     check("severity: MEDIUM on a MEDIUM minimum is adequate, LOW on a HIGH minimum is not", eq(low.hits, [ "B-03", "B-05" ]) && eq(low.hits_adequate, [ "B-05" ]))
     const base = { recall_overall_min: 0.6, recall_obvious_min: 0.8, decoy_false_alarm_max: 0.25 }
     check("threshold: met without the fourth criterion (0.7143 / 1 / 0.25)", aggregate([ r ], base).threshold.verdict === "threshold met")
     check("threshold: not met with recall_adequate_min 0.5 at 0.4286 (negative case)", aggregate([ r ], { ...base, recall_adequate_min: 0.5 }).threshold.verdict === "threshold not met")
     check("threshold: met with recall_adequate_min 0.4", aggregate([ r ], { ...base, recall_adequate_min: 0.4 }).threshold.verdict === "threshold met")
-    const first = evaluateRun({ name: "r1", status: "ok", model: "m", review: replayText("normal.jsonl"), cost: 0.4, duration: 1000 }, expected)
-    check("severity: the version 3 list of shop-core yields no severity fields", first.hits_adequate === undefined && first.recall.adequate === undefined
+    const first = evaluateRun({ name: "r1", status: "ok", model: "m", review: replayText("normal.jsonl", shop.testdataDir), cost: 0.4, duration: 1000 }, expected)
+    check("severity: the version 3 list of correctness-cents yields no severity fields", first.hits_adequate === undefined && first.recall.adequate === undefined
         && aggregate([ first ], base).recall.adequate === undefined)
 }
 

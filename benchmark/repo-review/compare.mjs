@@ -13,7 +13,7 @@ import { collectRunDirs, loadRun, buildReport, renderMarkdown } from "./lib/repo
 import { renderSection, appendJournal }                     from "./lib/journal.mjs"
 
 const USAGE = "Usage: node compare.mjs [--case <name>] [--out <folder>] [--journal <file> [--title <text>]] <result folder or parent folder>...\n"
-    + "  --case <name>     test case (default: shop-core)\n"
+    + "  --case <name>     test case (default: correctness-cents)\n"
     + "  --out <folder>    location of report.md and report.json (default: results folder of the case)\n"
     + "  --journal <file>  append the series as a new section to a measurement log (never rewrites entries)\n"
     + "  --title <text>    heading of the new section (default: start date, case, and models)\n"
@@ -51,7 +51,7 @@ out ??= path.join(c.resultsDir, "report")
 if (paths.length === 0)
     paths.push(c.resultsDir)
 
-/*  only folders of the selected case; protocols without a case field belong to the first case  */
+/*  only folders of the selected case; protocols without a case field belong to the default case  */
 const dirs = collectRunDirs(paths).filter((d) => path.resolve(d) !== path.resolve(out)).filter((d) => {
     const runCase = loadRun(d).case
     if (runCase === c.name)

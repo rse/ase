@@ -15,6 +15,9 @@ with Claude Opus 5.5 and Claude Sonnet 5.5. Both cases turned out too easy for
 Opus, and both measurements showed limitations in the test cases and the scorer
 that need addressing before broader conclusions about model performance. The
 numbers show tendencies and the limits of the test itself, not a ranking.
+After the pilot both cases were revised (see
+[What changed after the pilot](#what-changed-after-the-pilot)); the revised
+cases are not yet measured.
 
 ## Purpose and scope
 
@@ -47,16 +50,16 @@ comment saying so, or a loose `== null` that deliberately covers both `null`
 and `undefined`. A review that reports a decoy may be raising a false alarm.
 
 The list of defects and decoys, the **expected-results list**, lives in
-`solution/expected.json` and never travels with the code under review. The
+`cases/<name>/solution/expected.json` and never travels with the code under review. The
 model sees a plain Git repository with two commits and nothing else; no file
 name, commit message, or comment hints at what we expect to be found.
 
-### Case `shop-core`
+### Case `correctness-cents`
 
-The project under review is "shop-core", a little TypeScript shop with a cart,
-discount codes, orders, refunds, notifications, and an API layer. The base
-commit (`fixture/base/`) contains no intentionally seeded defects. The change
-(`fixture/change/`) looks like a plausible piece of everyday work: it switches
+The project under review is a little TypeScript shop with a cart, discount
+codes, orders, refunds, notifications, and an API layer. The base commit
+(`cases/correctness-cents/fixture/base/`) contains no seeded defects. The change
+(`cases/correctness-cents/fixture/change/`) looks like a plausible piece of everyday work: it switches
 money amounts to integer cents, adds discount kinds, order options with a
 currency, and some validation. It carries seven seeded defects in three
 **tiers** and four decoys:
@@ -69,7 +72,7 @@ currency, and some validation. It carries seven seeded defects in three
   example a function that now returns cents while its caller in another module
   still formats the value as euros, so the API shows a hundred times the amount.
 
-### Case `security`
+### Case `security-refunds`
 
 The second case starts from the same shop with those defects fixed and adds an
 admin refund endpoint, a customer order lookup, a payment webhook, and HTML
@@ -84,20 +87,46 @@ confirmation mails. Its seven defects are the kind an attacker would look for:
 - a failed payment that keeps the stock reserved.
 
 Its four decoys look like security smells but are fine: a constant-time
-signature comparison, a `Number()` conversion followed by strict validation, a
-`catch` that deliberately swallows mail errors, and `Math.random` used only to
-shuffle recommendations. Each defect of this case also records a **minimum
+signature comparison, a `Number()` conversion after a strict format check, a
+`catch` that logs a mail with an invalid recipient instead of failing a stored
+order, and an early return that acknowledges a repeated payment event. Each defect of this case also records a **minimum
 severity** the review should assign: `HIGH` for money, other people's data, and
 payment events, `MEDIUM` for injection into mails and blocked stock. A security
-hole reported as `LOW` is half missed. The list lives in `cases/security/solution/expected.json`.
+hole reported as `LOW` is half missed. The list lives in `cases/security-refunds/solution/expected.json`.
 
-## Results so far
+### What changed after the pilot
 
-Every measurement series is kept in the log [MEASUREMENTS.md](MEASUREMENTS.md)
-with the values computed at the time, a defect-by-run matrix in plain words, the
-findings the scorer could not assign, and the manual reading. Entries are only
-ever added, never rewritten, so the original values stay available when the
-case or the scorer changes. The summary below is the latest series of each case.
+The manual reading of the pilot showed that the decoy match rate of both cases
+measured flaws of the fixtures more than false alarms of the review. In
+`security-refunds` (then called `security`) the amount check of the `Number()`
+decoy let `""`, `"1e3"`, `"0x10"`, and `"+5"` through although its comment said
+otherwise; the swallowed mail error could never occur and pointed to a retry
+job that does not exist; the `Math.random` shuffle had no caller and was reported as scope creep by every run;
+and two real weaknesses outside the list (an empty fallback for the webhook
+secret, no status check in `markPaid` and `markFailed`) drew findings. In
+`correctness-cents` (then called `shop-core`) the documented fall-through
+contained the call of `percentOff`, so a finding about that defect could land on
+the decoy.
+
+The revision fixes exactly this and leaves the defects as they are: same ids,
+tiers, titles, and minimum severities, same thresholds, only locations moved.
+`correctness-cents` moves the fall-through into `describeCode`, away from
+`percentOff`. `security-refunds` validates the amount format before `Number()`,
+lets the mail `catch` handle an invalid recipient, replaces the shuffle with an
+acknowledgement of repeated payment deliveries, fails when the webhook secret is
+missing, and lets `markPaid`/`markFailed` accept only pending orders, while a
+failed payment still keeps the stock reserved. The pilot fixtures, lists, and
+reference runs remain in the Git history at commit `13014184`.
+
+## Results
+
+The current cases are not yet measured. Every measurement series goes into the
+log [MEASUREMENTS.md](MEASUREMENTS.md) with the values computed at the time, a
+defect-by-run matrix in plain words, the findings the scorer could not assign,
+and the manual reading. The log also summarizes the pilot of 2026-11-03: both
+cases were too easy for Opus, location matching undercounted correct findings
+placed one hop away, and the decoy match rate mostly measured flaws of the
+pilot fixtures, which led to the revision described above.
 
 ### Reading the figures
 
@@ -105,7 +134,7 @@ The automated figures come from a deterministic scorer that assigns each
 finding to an expected entry **only by file name and line overlap** (the rule
 is in [Scoring and limitations](#scoring-and-limitations)); a correct finding
 placed at a different line, say at the caller, does not count. All values are
-means over three runs.
+means over the runs of a configuration.
 
 - **Location-matched recall**: the share of the seven defects with a finding at
   a matching location, overall and per tier.
@@ -114,79 +143,12 @@ means over three runs.
   same number "decoy false-alarm rate".
 - **Unassignable findings**: findings per run that match neither a defect nor a
   decoy; they may be real extra defects, fair remarks, or unfounded complaints.
-- **Recall with adequate severity** (case `security` only): the share of
+- **Recall with adequate severity** (case `security-refunds` only): the share of
   defects matched *and* reported with at least their minimum severity.
 - **Automated thresholds**: the pilot's provisional pass marks, fixed before
   the first paid run (overall recall ≥ 0.6, obvious tier ≥ 0.8, decoy match
-  rate ≤ 0.25; the case `security` adds recall with adequate severity ≥ 0.5).
+  rate ≤ 0.25; the case `security-refunds` adds recall with adequate severity ≥ 0.5).
   "Met" or "not met" judges the automated figures only, never the reading.
-
-### Case `shop-core`
-
-The whole measurement cost 3.59 USD, including two earlier plumbing runs; a run
-took between one and a half and two minutes. The table shows the re-scoring
-with the fixed location parser (log entry "Re-scoring … with the fixed location
-parser"); the original figures of the first scoring are kept in the log as well.
-
-| Configuration | Location-matched recall, overall | Location-matched recall, obvious | Decoy match rate | Unassignable findings per run | Automated thresholds |
-|---|---|---|---|---|---|
-| Opus 5.5 | 0.95 | 0.83 | 0.17 | 0.3 | met |
-| Sonnet 5.5 | 0.90 | 0.67 | 0.50 | 2.0 | not met |
-
-The raw reviews were also read against the expected-results list (one reader,
-not independently verified). The reading changes the picture considerably:
-
-| Configuration | Defects described correctly | Obvious defects described correctly | Decoys claimed to be defects |
-|---|---|---|---|
-| Opus 5.5 | 21 of 21 (all 7 in every run) | 6 of 6 | 0 of 12 |
-| Sonnet 5.5 | 20 of 21 (missed the discount defect once) | 5 of 6 | 2 of 12 |
-
-- Two automated "misses" were defects that the model described correctly but
-  placed at the call site or at a neighboring `switch`. A third one was a scorer
-  defect: Opus named the right lines as `order.ts:29,51-52`, and the parser read
-  only the first range. The parser now reads all ranges; the log keeps both the
-  original and the corrected scoring.
-- Most automated decoy matches were unrelated findings whose line range happened
-  to overlap a decoy, or a misplaced real defect.
-- Two Sonnet findings claim that the non-null assertion on the optional customer
-  can crash, which the code rules out; one of them sits at the type declaration,
-  so the scorer did not even see it. Other findings of both models criticize the
-  optional customer as weak typing without claiming wrong behavior, and one
-  suggests making the documented fall-through more explicit; such design or
-  readability hints are not counted above.
-- The unassignable findings were not classified. They include remarks on dead
-  code and on the commit message, but they may also contain wrong claims.
-
-By the automated scores, Opus misses defects; by the reading, it found all of
-them in every run. The case is therefore too easy for Opus, and the scorer, not
-the model, accounts for most of the gap.
-
-### Case `security`
-
-On the same day the setup ran three times per model on the case `security`
-(3.38 USD including a plumbing run; one and a half to two minutes per run).
-
-| Configuration | Location-matched recall, overall | Recall with adequate severity | Decoy match rate | Unassignable findings per run | Automated thresholds |
-|---|---|---|---|---|---|
-| Opus 5.5 | 1.00 | 1.00 | 0.50 | 2.3 | not met |
-| Sonnet 5.5 | 0.90 | 0.81 | 0.50 | 3.7 | not met |
-
-The raw reviews were read the same way as for `shop-core`:
-
-| Configuration | Defects described correctly | Defects reported with adequate severity | Decoys claimed to be defects |
-|---|---|---|---|
-| Opus 5.5 | 21 of 21 (all 7 in every run) | 21 of 21 | 0 of 12 |
-| Sonnet 5.5 | 19 of 21 (missed the stock-reservation defect twice) | 17 of 21 (refund amount as `MEDIUM` twice) | 0 of 12 |
-
-Opus found every defect in every run with adequate severity; the case is too
-easy for it. Both miss the automated thresholds only on the decoy match rate,
-and on reading that rate holds **no false alarm at all**. The decoys drew
-intent remarks (`recommendations` is scope creep), design hints (use
-`crypto.timingSafeEqual`), a fair clarity remark (the `catch` cannot fail), and
-one correct observation that `Number("")` passes the amount check, which means
-that decoy is flawed. The reviews also found two real weaknesses the list does
-not record: an empty-secret fallback and missing state-transition guards. The
-log entry lists every case and what to change before the next series.
 
 ## Quick start
 
@@ -199,36 +161,43 @@ node benchmark/repo-review/run.mjs --dry-run
 node benchmark/repo-review/compare.mjs
 ```
 
-Every command takes `--case <name>` and works on `shop-core` without it; the
-second case is `security`:
+Every command takes `--case <name>` and works on `correctness-cents` without it;
+the other case is `security-refunds`:
 
 ```
-node benchmark/repo-review/check.mjs --case security
-node benchmark/repo-review/run.mjs --dry-run --case security
-node benchmark/repo-review/compare.mjs --case security
+node benchmark/repo-review/check.mjs --case security-refunds
+node benchmark/repo-review/run.mjs --dry-run --case security-refunds
+node benchmark/repo-review/compare.mjs --case security-refunds
 ```
 
-A real measurement additionally needs the Claude Code CLI (`claude`) with a login
-and the built `tool/` of this repository (`cd tool && npm start build`). It costs
-money, so it must be confirmed explicitly:
+### A real measurement
+
+A real measurement costs money. It needs the Claude Code CLI (`claude`) with a
+login, the built `tool/` of this repository (`cd tool && npm start build`), and a
+commit of the case and the scoring code, so the log can name what produced the
+figures. One command runs the models, compares, and appends the log entry:
 
 ```
-node benchmark/repo-review/run.mjs --case security --model sonnet --runs 3 --confirm-paid
-node benchmark/repo-review/compare.mjs --case security
+node benchmark/repo-review/measure.mjs --case security-refunds --confirm-paid
 ```
 
-`compare.mjs` writes `report.md` and `report.json` to the `results/report/`
-folder of the case and only evaluates result folders of that case. To keep the
-series, append it to the log and then add the manual reading by hand below its
-generated part:
+By default it runs Opus and Sonnet three times each (`--models`, `--runs`). All
+runs of the call go into one series folder under `results/` of the case, and
+only these runs are compared and logged. The entry in
+[MEASUREMENTS.md](MEASUREMENTS.md) ends with a table per run for the manual
+reading: fill in its two columns by hand, then commit the log. `--keep-reference`
+also copies the runs into `reference/runs/` of the case, so they can be re-scored
+later without new cost. To try the whole pipeline for free first:
 
 ```
-node benchmark/repo-review/compare.mjs --case security --journal benchmark/repo-review/MEASUREMENTS.md --title "2026-11-20: security, Sonnet 5.5" benchmark/repo-review/cases/security/results
+node benchmark/repo-review/measure.mjs --case security-refunds --dry-run
 ```
 
-The log refuses a series it already holds, does not accept dry runs, and requires
-the scoring code to be committed. Scoring the same runs again with a changed
-scorer gives a new entry; the earlier one stays.
+The dry run writes a preview of the log entry into its series folder and leaves
+the log alone. The log refuses a series it already holds, does not accept dry
+runs, and requires the scoring code to be committed; `measure.mjs` checks this
+before the first paid run. For single steps, `run.mjs` and
+`compare.mjs --journal` remain available.
 
 ## Scoring and limitations
 
@@ -274,7 +243,7 @@ or modified.
 If the strongest model finds every defect in every run, the report says "too
 easy". Otherwise it says "adequate", but that only means *no ceiling effect was
 detected*. A score below 1.0 does not prove that the case is hard enough or
-separates models well: in the reference measurement, the automated score stayed
+separates models well: in the pilot, the automated score stayed
 below 1.0 while the manual reading found every defect.
 
 ### Known limitations
@@ -285,12 +254,12 @@ below 1.0 while the manual reading found every defect.
 - **Location matching is blunt.** It misses correct findings placed one hop away
   and credits unrelated findings with wide ranges. Recording alternative
   locations per defect and keeping decoys away from genuine weaknesses of the
-  code would help (see the log entry in `MEASUREMENTS.md`).
-- **The decoy match rate measures locations, not claims.** In the case
-  `security` it reached 0.50 for both models without a single false alarm on
-  reading. Decoys that invite intent or style remarks inflate it, and one decoy
-  of that case is flawed. Decoy quality and a severity-aware decoy match rate
-  come before more models.
+  code would help (see the pilot summary in [MEASUREMENTS.md](MEASUREMENTS.md)).
+- **The decoy match rate measures locations, not claims.** In the pilot of
+  `security-refunds` it reached 0.50 for both models without a single false
+  alarm on reading. Decoys that invite intent or style remarks inflate it; the
+  revised cases remove the flawed decoys, and a severity-aware decoy match rate
+  remains open.
 - **Three runs per model** show tendencies, not significant differences.
 - **Cost figures assume Anthropic prices.** For other endpoints the number means
   little.
@@ -337,7 +306,7 @@ CLI error result).
 
 ### Options
 
-`--case` selects the test case (`shop-core` or `security`); `--budget`,
+`--case` selects the test case (`correctness-cents` or `security-refunds`); `--budget`,
 `--timeout-min`, and `--total-budget` change the limits;
 `--prior-spent` carries over costs already spent in a series; `--keep` keeps the
 throw-away copy for inspection; `--out` sets the location of the result folders.
@@ -372,7 +341,7 @@ node benchmark/repo-review/run.mjs --dry-run --simulate unparseable
 node benchmark/repo-review/run.mjs --dry-run --simulate abort-cost
 node benchmark/repo-review/run.mjs --dry-run --simulate abort-time
 node benchmark/repo-review/run.mjs --dry-run --simulate leak
-node benchmark/repo-review/run.mjs --dry-run --case security --simulate leak
+node benchmark/repo-review/run.mjs --dry-run --case security-refunds --simulate leak
 ```
 
 `--replay <file>` plays back a custom `stream-json` transcript, for example
@@ -384,21 +353,18 @@ appear in the report as a separate model group "(dry run)" and are never logged.
 
 | Path | Content |
 |---|---|
-| `fixture/base/`, `fixture/change/` | case `shop-core`: base without seeded defects and the reviewed change |
-| `solution/expected.json` | expected-results list of `shop-core`: defects in three tiers and decoys with locations (never part of a working copy) |
-| `cases/security/` | case `security`: its own `fixture/`, `solution/expected.json` (with minimum severities), `thresholds.json`, `testdata/`, `reference/`, and `results/` |
-| `DESIGN.md` | guarantees, non-goals, design decisions, and known risks |
-| `thresholds.json` | pre-registered pilot thresholds (committed before the first measurement) |
+| `cases/correctness-cents/` | case `correctness-cents`: `fixture/base/` without seeded defects and `fixture/change/` with the reviewed change, `solution/expected.json` with defects in three tiers and decoys (never part of a working copy), `thresholds.json` (pre-registered pilot thresholds), `testdata/normal.jsonl`, and `results/`; a `reference/` folder follows with its first measurement |
+| `cases/security-refunds/` | case `security-refunds`: the same layout, with minimum severities in its list |
+| [DESIGN.md](DESIGN.md) | guarantees, non-goals, design decisions, and known risks |
 | `check.mjs` | checks the expected-results list against the fixture |
+| `measure.mjs` | one measurement in one command: runs of several models, comparison, log entry with a template for the manual reading |
 | `run.mjs` | runner: throw-away copy, leak check, `claude -p`, result folder |
 | `compare.mjs` | compares result folders with the expected-results list, report in Markdown and JSON, optionally appended to the log |
-| `MEASUREMENTS.md` | log of all measurement series, never rewritten |
+| [MEASUREMENTS.md](MEASUREMENTS.md) | log of all measurement series, never rewritten |
 | `selftest.mjs` | self-test of parser, matching, metrics, and runner helpers |
 | `check-language.mjs` | language check of the deliverable (English only) |
-| `testdata/` | canned `stream-json` transcripts for dry runs |
-| `reference/` | result folders and machine-readable report of the reference measurement |
+| `testdata/` | canned `stream-json` transcripts of the special cases, shared by all cases; `testdata/runs/` holds six real run protocols and reviews of the pilot as test data for the log |
 | `assets/` | images of this README |
-| `results/` | local result folders (not versioned) |
 
 ### Going deeper
 

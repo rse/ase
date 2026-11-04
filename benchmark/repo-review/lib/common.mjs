@@ -14,12 +14,12 @@ export const BENCH_DIR     = path.resolve(path.dirname(fileURLToPath(import.meta
 export const REPO_DIR      = path.resolve(BENCH_DIR, "..", "..")
 export const TESTDATA_DIR  = path.join(BENCH_DIR, "testdata")
 
-/*  the test cases: the first case keeps the original root paths, later cases live under cases/;
+/*  the test cases: every case lives under cases/<name>/;
     this table is the only source of case paths (design rationale: DESIGN.md)  */
-export const DEFAULT_CASE = "shop-core"
+export const DEFAULT_CASE = "correctness-cents"
 const CASES = {
-    "shop-core": { dir: BENCH_DIR,                          changeMessage: "Update order handling" },
-    "security":  { dir: path.join(BENCH_DIR, "cases", "security"), changeMessage: "Add admin refunds and payment webhooks" }
+    "correctness-cents": { dir: path.join(BENCH_DIR, "cases", "correctness-cents"), changeMessage: "Update order handling" },
+    "security-refunds":  { dir: path.join(BENCH_DIR, "cases", "security-refunds"),  changeMessage: "Add admin refunds and payment webhooks" }
 }
 export const CASE_NAMES = Object.keys(CASES)
 

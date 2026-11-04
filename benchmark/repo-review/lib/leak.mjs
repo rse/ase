@@ -9,10 +9,13 @@ import { git, listFiles } from "./common.mjs"
 import { expectedFiles }  from "./copy.mjs"
 
 /*  terms which must not appear in file names, contents, or commit messages; the German
-    terms are search data for German-language hints in the fixture (the only exemption of the language check)  */
+    terms are search data for German-language hints in the fixture (the only exemption of the language check);
+    the terms of intent keep a comment from telling that a passage was placed on purpose, and
+    a multi-word term allows spaces, tabs, or hyphens between its words within one line  */
 export const DENY_TERMS = [
     "sollliste", "köder", "koeder", "decoy", "bait", "befund",
-    "bug", "todo", "fixme", "xxx", "hack", "intentional", "absichtlich"
+    "bug", "todo", "fixme", "xxx", "hack", "intentional", "absichtlich",
+    "intentionally", "deliberate", "deliberately", "on[\\s-]+purpose", "by[\\s-]+design", "seeded", "planted"
 ]
 const DENY_RE = new RegExp(`(?<![\\p{L}\\p{N}_])(${DENY_TERMS.join("|")})(?:s|e|en|es)?(?![\\p{L}\\p{N}_])`, "iu")
 const ID_RE   = /\b[BK]-\d+\b/

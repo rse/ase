@@ -17,18 +17,30 @@ const TEXT_MAX     = 220
 const HEADER = [
     "# Measurements of the `ase-repo-review` effectiveness test",
     "",
-    "This file is a log. Each measurement series is appended by",
-    "`node benchmark/repo-review/compare.mjs --journal MEASUREMENTS.md --title \"...\" <result folders>`",
-    "with the values computed at that time. Existing entries are never rewritten:",
-    "corrections and re-scorings are added as dated notes or as new entries. The",
-    "manual reading of a series is written by hand below its generated part. The",
-    "series title and the configuration table of an entry name the test case.",
+    "This log records every paid measurement of the benchmark: how well the ASE review",
+    "setup finds the defects seeded into a test case, and how often it complains",
+    "about code that is correct. The [README](README.md) explains the test cases, the",
+    "figures, and how to run a measurement.",
+    "",
+    "Each series is appended by",
+    "`node benchmark/repo-review/measure.mjs --case <name> --confirm-paid` with the",
+    "values computed at that time; the manual reading is filled in by hand in the",
+    "table at the end of each entry. Existing entries are never rewritten:",
+    "corrections and re-scorings are added as dated notes or as new entries.",
     "",
     "## Overview",
     "",
-    "All automated figures are location-matched: a finding counts only if it names the",
-    "file and lines recorded in the expected-results list (see the README, \"Scoring and",
-    "limitations\"). Values are means over the evaluated runs of a configuration.",
+    "One row per model and series. All automated figures count a finding only if it",
+    "names the file and lines recorded in the expected-results list; values are means",
+    "over the evaluated runs.",
+    "",
+    "- **Recall overall / obvious**: share of all seeded defects, and of the obvious",
+    "  ones, that the review found at the right place.",
+    "- **Decoy match rate**: share of the decoys (correct code that looks suspicious)",
+    "  with a finding at their place.",
+    "- **Unassignable per run**: findings that match neither a defect nor a decoy.",
+    "- **Pilot thresholds**: whether the provisional pass marks of the case were met.",
+    "- **Manual reading**: what a person found when reading the reviews.",
     "",
     "<!-- overview:start -->",
     "| Series | Configuration | Endpoint | Runs evaluated | Recall overall | Recall obvious | Decoy match rate | Unassignable per run | Pilot thresholds | Cost (USD) | Manual reading |",
@@ -102,6 +114,32 @@ function unassignableOf (review, expected) {
         return []
     return assignAll(parsed.findings, expected)
         .filter((f) => f.severity !== "ACCEPTED" && f.assigned === null)
+}
+
+/*  template of the manual reading: every finding of every run with its automated match,
+    and two empty columns for the reader; the summary line is completed by hand as well  */
+function readingTemplate (runs, expected) {
+    const out = []
+    out.push("_To be completed by hand: read each review and fill in the two right-hand columns. "
+        + "Correct? = the finding describes the matched defect correctly. "
+        + "False alarm? = it claims that correct code behaves wrongly; a style or design hint is no false alarm. "
+        + "Do not change the generated parts above._", "")
+    for (const r of runs) {
+        out.push(`#### ${r.label} (${configLabel([ r ])})`, "")
+        const parsed = r.review === null ? null : parseReview(r.review)
+        if (parsed === null || parsed.status !== "ok") {
+            out.push("No parseable review.", "")
+            continue
+        }
+        out.push("| Severity | Location | Finding | Matched | Correct? | False alarm? |", "|---|---|---|---|---|---|")
+        for (const f of assignAll(parsed.findings, expected).filter((f) => f.severity !== "ACCEPTED")) {
+            const raw = /^[`▢\s]*([^\s`:]+:\d[\d,\-–]*)/.exec(f.text.trim())?.[1]
+            out.push(`| ${f.severity} | \`${raw ?? loc(f.location)}\` | ${clip(f.text).replace(/\|/g, "\\|")} | ${f.assigned?.id ?? "–"} |  |  |`)
+        }
+        out.push("")
+    }
+    out.push("**Summary.** Defects described correctly: … of …; false alarms on decoys: … of …; notable unassignable findings: …", "")
+    return out
 }
 
 /*  render the generated section of one series  */
@@ -215,7 +253,7 @@ export function renderSection ({ title, dirs, report, expected, c }) {
     out.push("")
 
     out.push("### Manual reading", "")
-    out.push("_Not recorded yet. Write it here by hand; do not change the generated parts above._", "")
+    out.push(...readingTemplate(runs, expected))
 
     const rows = groups.map((g) => `| ${title.replace(/\|/g, "\\|")} | ${configLabel(g.runs)} | ${uniq(g.runs.map((r) => r.meta.endpoint)).join(", ")} | `
         + `${g.m.runs.evaluated} / ${g.m.runs.total} | ${fmt(g.m.recall.overall.mean)} | ${fmt(g.m.recall.obvious.mean)} | `
