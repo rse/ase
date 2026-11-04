@@ -2,6 +2,14 @@
 ChangeLog
 =========
 
+2.0.8 (2026-11-XX)
+------------------
+
+-   BUGFIX [code]: Server Probe with Foreign Dispatcher
+    The server probe of `ase agent relay|task store start|status|stop` and the insecure relay and
+    task store clients now send requests with an `undici` dispatcher through the `fetch` of the npm
+    `undici` instead of the built-in one of Node, whose bundled `undici` rejected it (issue #116).
+
 2.0.7 (2026-11-04)
 ------------------
 

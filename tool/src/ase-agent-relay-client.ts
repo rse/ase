@@ -6,8 +6,7 @@
 
 import os                       from "node:os"
 
-import { ofetch }               from "ofetch"
-import { Agent }                from "undici"
+import type { Agent }           from "undici"
 import * as v                   from "valibot"
 import { WebSocket }            from "ws"
 import { isScalar }             from "yaml"
@@ -18,6 +17,7 @@ import { configSchema }         from "./ase-config-schema.js"
 import { parseScope }           from "./ase-config-scope.js"
 import * as TaskFormat          from "./ase-task-format.js"
 import { urlHost, isLoopback }  from "./ase-lib-server-bind.js"
+import { dispatchFetch, insecureAgent } from "./ase-lib-fetch.js"
 import { storeSchema }          from "./ase-task-store-server-cli.js"
 import { relaySchema }          from "./ase-agent-relay-server-cli.js"
 import * as Relay               from "./ase-agent-relay-core.js"
@@ -200,7 +200,7 @@ const RECONNECT_MAX_MS = 60 * 1000
 export class AgentRelayClient {
     private dispatcher: Agent | undefined
     constructor (private log: Log, private spec: RelaySpec) {
-        this.dispatcher = spec.insecure ? new Agent({ connect: { rejectUnauthorized: false } }) : undefined
+        this.dispatcher = spec.insecure ? insecureAgent() : undefined
     }
 
     /*  the base URL of the agent relay  */
@@ -210,7 +210,7 @@ export class AgentRelayClient {
 
     /*  perform a request, raising an error response or a failed connection  */
     private async request<T> (method: string, url: string, body?: unknown): Promise<T> {
-        const r = await ofetch.raw(`${this.spec.base}/projects/${this.spec.prjId}/agents${url}`, {
+        const r = await dispatchFetch.raw(`${this.spec.base}/projects/${this.spec.prjId}/agents${url}`, {
             method,
             headers: {
                 Authorization: `Bearer ${this.spec.token}`,
