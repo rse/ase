@@ -22,8 +22,11 @@ const here     = path.dirname(url.fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(here, "..", "..")
 const aseBin   = path.join(repoRoot, "tool", "bin", "ase")
 
-/*  the task id of the task fixture of every case  */
-const taskId = "wordcount"
+/*  the configuration of a case ("case.json"): the id of its task fixture, the program
+    the agents have to produce, and how the agents run ("pipeline": one agent after the
+    other in the foreground, "fleet": all agents together via "ase agent fleet")  */
+interface CaseConfig { task: string, program: string, runner: "pipeline" | "fleet" }
+let caseCfg: CaseConfig = { task: "", program: "", runner: "pipeline" }
 
 /*  the pipeline of the agents, each with the status it has to leave the task in  */
 const pipeline = [
@@ -136,8 +139,22 @@ const preflight = async (): Promise<string[]> => {
     const [ major, minor ] = process.versions.node.split(".").map(Number)
     if (major < 22 || (major === 22 && minor < 22))
         throw new InfraError(`Node >= 22.22 required, found ${process.versions.node}`)
-    if (!fs.existsSync(path.join(caseDir, "task.md")) || !fs.existsSync(path.join(caseDir, "suite")))
-        throw new InfraError(`case "${opts.case}" not found or incomplete (needs "task.md" and "suite/")`)
+    if (!fs.existsSync(path.join(caseDir, "task.md")) || !fs.existsSync(path.join(caseDir, "suite"))
+        || !fs.existsSync(path.join(caseDir, "case.json")))
+        throw new InfraError(`case "${opts.case}" not found or incomplete (needs "case.json", "task.md", and "suite/")`)
+    let cfg: Partial<CaseConfig>
+    try {
+        cfg = JSON.parse(await fs.promises.readFile(path.join(caseDir, "case.json"), "utf8")) as Partial<CaseConfig>
+    }
+    catch (err) {
+        throw new InfraError(`case "${opts.case}": invalid "case.json": ${err instanceof Error ? err.message : String(err)}`)
+    }
+    if (typeof cfg.task !== "string" || !/^[a-z][a-z0-9-]*$/.test(cfg.task)
+        || typeof cfg.program !== "string" || cfg.program === ""
+        || (cfg.runner !== "pipeline" && cfg.runner !== "fleet"))
+        throw new InfraError(`case "${opts.case}": "case.json" needs "task" (id), "program" (file), ` +
+            "and \"runner\" (\"pipeline\" or \"fleet\")")
+    caseCfg = { task: cfg.task, program: cfg.program, runner: cfg.runner }
     if (!fs.existsSync(path.join(repoRoot, "tool", "dst", "ase.js")))
         throw new InfraError("ASE tool not built: run \"cd tool && npm start build\" first")
     if ((await exec("git", [ "--version" ], { timeout: 10 * 1000 })).code !== 0)
@@ -220,8 +237,8 @@ const git = (sb: Sandbox, args: string[]) =>
 
 /*  the current status and tags of the task  */
 const taskState = async (sb: Sandbox): Promise<{ status: string, tags: string }> => {
-    const status = (await ase(sb, [ "task", "status", `${taskId}:` ])).stdout.trim()
-    const plan   = (await ase(sb, [ "task", "load", taskId ])).stdout
+    const status = (await ase(sb, [ "task", "status", `${caseCfg.task}:` ])).stdout.trim()
+    const plan   = (await ase(sb, [ "task", "load", caseCfg.task ])).stdout
     const tags   = /^Tags:\s*(.*)$/m.exec(plan)?.[1]?.trim() ?? ""
     return { status, tags }
 }
@@ -254,7 +271,7 @@ const suiteRun = async (python: string[], expected: number, project: string,
     env: Record<string, string>, logFile: string): Promise<Suite> => {
     const s = await exec(python[0], [ ...python.slice(1), "-m", "unittest", "discover",
         "-s", path.join(caseDir, "suite"), "-v" ], {
-        cwd: project, env: { ...env, WORDCOUNT_PROJECT: project, PYTHONDONTWRITEBYTECODE: "1" }, timeout: 5 * 60 * 1000 })
+        cwd: project, env: { ...env, AGENT_TEST_PROJECT: project, PYTHONDONTWRITEBYTECODE: "1" }, timeout: 5 * 60 * 1000 })
     const text = (s.stdout + s.stderr).replace(/\r\n/g, "\n")
     await fs.promises.writeFile(logFile, text, "utf8")
     const tests = [ ...text.matchAll(/^(test\w*) \(.*?\)(?:\n.*?)? \.\.\. (ok|FAIL|ERROR|skipped|expected failure|unexpected success)\b/gm) ]
@@ -281,6 +298,211 @@ interface Result {
     case: string, tool: string, verdict: "PASS" | "FAIL" | "ERROR", failure: string,
     steps: Step[], suite: Suite | null, checks: { name: string, pass: boolean, detail: string }[],
     costUsd: number, durationMs: number, results: string, sandbox: string
+}
+
+/*  sum the costs of the agent tool sessions of an agent output line, counting each
+    session once, by its usage line (its "result:" line repeats the same cost)  */
+const lineCost = (line: string): number => {
+    let cost = 0
+    for (const m of line.matchAll(/ usage: .*cost: \$(\d+(?:\.\d+)?)/g))
+        cost += Number(m[1])
+    return cost
+}
+
+/*  run the agents one after the other in the foreground, each until no work is left  */
+const runPipeline = async (sb: Sandbox, result: Result, agentsLog: fs.WriteStream): Promise<void> => {
+    for (const stage of pipeline) {
+        log(`running agent "${stage.kind}"`)
+        const t0 = Date.now()
+        let costUsd = 0
+        const r = await ase(sb, [ "agent", stage.kind, "start", "--foreground", "--one-shot",
+            "--tool", opts.tool, "--timeout", opts.timeout, ...stage.args ], {
+            timeout: timeoutMs + 5 * 60 * 1000,
+            onLine: (line) => {
+                const entry = `${stage.kind.padEnd(11)} | ${line}`
+                agentsLog.write(`${entry}\n`)
+                process.stdout.write(`  ${entry}\n`)
+                costUsd += lineCost(line)
+            }
+        })
+        const state = await taskState(sb)
+        const step: Step = {
+            agent: stage.kind, exit: r.code, timedOut: r.timedOut, durationMs: Date.now() - t0,
+            costUsd, status: state.status, tags: state.tags, expect: stage.expect,
+            pass: r.code === 0 && !r.timedOut && state.status === stage.expect && !/:failed\b/.test(state.tags)
+        }
+        result.steps.push(step)
+        result.costUsd += costUsd
+        log(`agent "${stage.kind}": exit ${r.code}${r.timedOut ? " (timed out)" : ""}, ` +
+            `task ${state.status}${state.tags !== "" ? ` [${state.tags}]` : ""}, $${costUsd.toFixed(2)}`)
+        if (!step.pass) {
+            result.failure = `agent "${stage.kind}" left the task in ${state.status} ` +
+                `(expected ${stage.expect})${r.code !== 0 ? `, exit ${r.code}` : ""}`
+            break
+        }
+        if (result.costUsd > maxCostUsd) {
+            result.failure = `cost ceiling of $${maxCostUsd} exceeded ($${result.costUsd.toFixed(2)})`
+            break
+        }
+    }
+}
+
+/*  the fleet configuration: the agents of the pipeline, plus the agent relay owned by
+    the fleet (per-user, i.e., isolated by the sandbox HOME, on a free port it allocates)  */
+const fleetConfig = (): string => [
+    "relay:",
+    "default:",
+    `    tool:     ${opts.tool}`,
+    `    timeout:  ${opts.timeout}`,
+    "    parallel: 1",
+    "implementer:",
+    "    params:",
+    "        effort-wait: false",
+    "qualifier:",
+    "    mode:     qualify",
+    "integrator:",
+    "    mode:     squash",
+    ""
+].join("\n")
+
+/*  the kinds of the agents present on the agent relay of the fleet (per its per-user
+    "relay.yaml"), or null if it is not reachable (queried directly, as the host-local
+    probe of "ase agent relay status" fails with undici 8 under Node 24)  */
+const relayAgents = async (sb: Sandbox): Promise<string[] | null> => {
+    const file = path.join(sb.env.XDG_CONFIG_HOME, "ase", "relay.yaml")
+    if (!fs.existsSync(file))
+        return null
+    const text  = await fs.promises.readFile(file, "utf8")
+    const value = (key: string) => new RegExp(`^${key}:\\s*["']?([^"'\\s]+)`, "m").exec(text)?.[1] ?? ""
+    try {
+        const r = await fetch(`http://${value("address") || "127.0.0.1"}:${value("port")}/projects/ase-agent-test/agents`,
+            { headers: { Authorization: `Bearer ${value("token")}` }, signal: AbortSignal.timeout(5 * 1000) })
+        if (r.status !== 200)
+            return null
+        const data = await r.json() as { agents?: { kind?: string }[] }
+        return (data.agents ?? []).map((agent) => String(agent.kind ?? "?"))
+    }
+    catch {
+        return null
+    }
+}
+
+/*  the order of the "enterprise" statuses along the happy path (to detect that a status
+    was passed, even if a poll missed it), and the statuses ending the happy path  */
+const statusRank = [ "PLANNED", "IMPLEMENTING", "IMPLEMENTED", "QUALIFYING", "QUALIFIED", "INTEGRATING", "INTEGRATED" ]
+const statusDead = /^(STALLED|DECLINED|DEFERRED|CANCELLED)$/
+
+/*  run all agents together as a fleet in the background, following its log and the
+    task until the task is integrated, failed, too expensive, or timed out, then stop it  */
+const runFleet = async (sb: Sandbox, result: Result, agentsLog: fs.WriteStream): Promise<void> => {
+    const t0      = Date.now()
+    const members = [ "relay", ...pipeline.map((stage) => stage.kind) ]
+
+    /*  start the fleet in the background and check it runs with all its members  */
+    log("starting agent fleet")
+    const start = await ase(sb, [ "agent", "fleet", "start" ], { timeout: 3 * 60 * 1000 })
+    result.checks.push({ name: "fleet started", pass: start.code === 0,
+        detail: `exit ${start.code}${start.code !== 0 ? `: ${(start.stderr || start.stdout).trim().split("\n").slice(-3).join(" | ")}` : ""}` })
+    if (start.code !== 0) {
+        result.failure = "fleet failed to start"
+        return
+    }
+    const status  = await ase(sb, [ "agent", "fleet", "status" ])
+    const missing = members.filter((name) => !new RegExp(`^\\s+${name} \\(.*\\): running`, "m").test(status.stdout))
+    result.checks.push({ name: "fleet running with all members", pass: status.code === 0 && missing.length === 0,
+        detail: missing.length > 0 ? `not running: ${missing.join(", ")}` : members.join(", ") })
+    let present: string[] | null = null
+    for (let i = 0; i < 15 && !pipeline.every((stage) => present?.includes(stage.kind)); i++) {
+        if (i > 0)
+            await new Promise((resolve) => setTimeout(resolve, 2 * 1000))
+        present = await relayAgents(sb)
+    }
+    result.checks.push({ name: "agents present on the agent relay",
+        pass: present !== null && pipeline.every((stage) => present?.includes(stage.kind)),
+        detail: present === null ? "agent relay not reachable" : `present: ${present.join(", ") || "(none)"}` })
+
+    /*  follow the shared fleet log (each line prefixed by the member name) and the task  */
+    const logFile = path.join(sb.project, ".ase", "agent", "fleet.log")
+    const costs   = new Map<string, number>()
+    let offset    = 0
+    let rest      = ""
+    const drain   = async () => {
+        if (!fs.existsSync(logFile))
+            return
+        const data = await fs.promises.readFile(logFile)
+        if (data.length <= offset)
+            return
+        const parts = (rest + data.subarray(offset).toString("utf8")).split(/\r?\n/)
+        offset = data.length
+        rest   = parts.pop() ?? ""
+        for (const line of parts) {
+            agentsLog.write(`${line}\n`)
+            process.stdout.write(`  ${line}\n`)
+            const member = /^(\S+)\s*\| /.exec(line)?.[1] ?? "fleet"
+            costs.set(member, (costs.get(member) ?? 0) + lineCost(line))
+        }
+    }
+    const reached  = new Map<string, number>()
+    const deadline = t0 + 3 * timeoutMs
+    let last       = ""
+    let state: { status: string, tags: string }
+    for (;;) {
+        await drain()
+        state = await taskState(sb)
+        if (`${state.status} ${state.tags}` !== last) {
+            last = `${state.status} ${state.tags}`
+            log(`task "${caseCfg.task}": ${state.status}${state.tags !== "" ? ` [${state.tags}]` : ""}`)
+        }
+        const rank = statusRank.indexOf(state.status)
+        for (const stage of pipeline)
+            if (!reached.has(stage.expect) && rank >= statusRank.indexOf(stage.expect))
+                reached.set(stage.expect, Date.now() - t0)
+        result.costUsd = [ ...costs.values() ].reduce((sum, cost) => sum + cost, 0)
+
+        /*  the integrator settles its tags (and attachments) after the final status  */
+        if (state.status === "INTEGRATED" && !/:active\b/.test(state.tags))
+            break
+        if (statusDead.test(state.status) || /:failed\b/.test(state.tags)) {
+            result.failure = `task left the happy path: ${state.status}${state.tags !== "" ? ` [${state.tags}]` : ""}`
+            break
+        }
+        if (result.costUsd > maxCostUsd) {
+            result.failure = `cost ceiling of $${maxCostUsd} exceeded ($${result.costUsd.toFixed(2)})`
+            break
+        }
+        if (Date.now() > deadline) {
+            result.failure = `fleet timed out after ${((Date.now() - t0) / 60000).toFixed(1)}m in ${state.status}`
+            break
+        }
+        await new Promise((resolve) => setTimeout(resolve, 5 * 1000))
+    }
+
+    /*  stop the fleet and check that it and its agent relay are gone  */
+    log("stopping agent fleet")
+    const stop = await ase(sb, [ "agent", "fleet", "stop" ], { timeout: 6 * 60 * 1000 })
+    await drain()
+    if (rest !== "") {
+        agentsLog.write(`${rest}\n`)
+        process.stdout.write(`  ${rest}\n`)
+    }
+    result.costUsd = [ ...costs.values() ].reduce((sum, cost) => sum + cost, 0)
+    const after      = await ase(sb, [ "agent", "fleet", "status" ])
+    const relayAfter = await relayAgents(sb)
+    result.checks.push({ name: "fleet stopped with its agent relay",
+        pass: stop.code === 0 && after.code !== 0 && relayAfter === null,
+        detail: `stop exit ${stop.code}, fleet ${after.code !== 0 ? "gone" : "still running"}, ` +
+            `relay ${relayAfter === null ? "gone" : "still running"}` })
+
+    /*  one step per agent: whether (and after how long) the task passed its expected status  */
+    for (const stage of pipeline) {
+        const at = reached.get(stage.expect)
+        result.steps.push({
+            agent: stage.kind, exit: 0, timedOut: false, durationMs: at ?? Date.now() - t0,
+            costUsd: costs.get(stage.kind) ?? 0, status: at !== undefined ? stage.expect : state.status,
+            tags: at !== undefined ? "" : state.tags, expect: stage.expect, pass: at !== undefined
+        })
+    }
+    log(`fleet: ${((Date.now() - t0) / 60000).toFixed(1)}m, $${result.costUsd.toFixed(2)}`)
 }
 
 /*  main procedure  */
@@ -341,8 +563,12 @@ const main = async (): Promise<number> => {
         await must("ase config set",     ase(sb, [ "config", "set", "project.task.default.source",    "branch:master" ]))
         await must("ase config set",     ase(sb, [ "config", "set", "project.task.default.changeset", "branch:cs-{id}" ]))
         await must("ase config set",     ase(sb, [ "config", "set", "project.task.default.target",    "branch:master" ]))
-        await must("ase task save",      ase(sb, [ "task", "save", "--create", taskId ],
+        await must("ase task save",      ase(sb, [ "task", "save", "--create", caseCfg.task ],
             { input: await fs.promises.readFile(path.join(caseDir, "task.md"), "utf8") }))
+
+        /*  configure the fleet (versioned, like intended for real projects)  */
+        if (caseCfg.runner === "fleet")
+            await fs.promises.writeFile(path.join(sb.project, ".ase", "fleet.yaml"), fleetConfig(), "utf8")
 
         /*  commit the ASE project files, as any untracked file in the working copy of
             "master" (e.g. ".ase/config.yaml") lets the merge of the integrator fail  */
@@ -352,58 +578,24 @@ const main = async (): Promise<number> => {
         if (untracked !== "")
             throw new InfraError(`working copy not clean after project setup: ${untracked.split("\n").join("; ")}`)
         const initial = await taskState(sb)
-        log(`task "${taskId}": ${initial.status}`)
+        log(`task "${caseCfg.task}": ${initial.status}`)
 
-        /*  (4) drive the task through the agent pipeline, one agent after the other
+        /*  (4) drive the task through the agents, one after the other resp. as a fleet
             (skipped on a dry-run, which only checks the setup without spending tokens)  */
         if (opts["dry-run"]) {
-            log("dry-run: skipping the agent pipeline")
+            log("dry-run: skipping the agents")
             result.failure = "dry-run"
         }
-        for (const stage of opts["dry-run"] ? [] : pipeline) {
-            log(`running agent "${stage.kind}"`)
-            const t0 = Date.now()
-            let costUsd = 0
-            const r = await ase(sb, [ "agent", stage.kind, "start", "--foreground", "--one-shot",
-                "--tool", opts.tool, "--timeout", opts.timeout, ...stage.args ], {
-                timeout: timeoutMs + 5 * 60 * 1000,
-                onLine: (line) => {
-                    const entry = `${stage.kind.padEnd(11)} | ${line}`
-                    agentsLog.write(`${entry}\n`)
-                    process.stdout.write(`  ${entry}\n`)
-
-                    /*  count each agent tool session once, by its usage line
-                        (its "result:" line repeats the same cost)  */
-                    for (const m of line.matchAll(/ usage: .*cost: \$(\d+(?:\.\d+)?)/g))
-                        costUsd += Number(m[1])
-                }
-            })
-            const state = await taskState(sb)
-            const step: Step = {
-                agent: stage.kind, exit: r.code, timedOut: r.timedOut, durationMs: Date.now() - t0,
-                costUsd, status: state.status, tags: state.tags, expect: stage.expect,
-                pass: r.code === 0 && !r.timedOut && state.status === stage.expect && !/:failed\b/.test(state.tags)
-            }
-            result.steps.push(step)
-            result.costUsd += costUsd
-            log(`agent "${stage.kind}": exit ${r.code}${r.timedOut ? " (timed out)" : ""}, ` +
-                `task ${state.status}${state.tags !== "" ? ` [${state.tags}]` : ""}, $${costUsd.toFixed(2)}`)
-            if (!step.pass) {
-                result.failure = `agent "${stage.kind}" left the task in ${state.status} ` +
-                    `(expected ${stage.expect})${r.code !== 0 ? `, exit ${r.code}` : ""}`
-                break
-            }
-            if (result.costUsd > maxCostUsd) {
-                result.failure = `cost ceiling of $${maxCostUsd} exceeded ($${result.costUsd.toFixed(2)})`
-                break
-            }
-        }
+        else if (caseCfg.runner === "fleet")
+            await runFleet(sb, result, agentsLog)
+        else
+            await runPipeline(sb, result, agentsLog)
 
         /*  (5) verify the result: integrated task, program on "master", clean working copy  */
         const final = await taskState(sb)
         result.checks.push({ name: "task integrated", pass: final.status === "INTEGRATED", detail: final.status })
         const tree = (await git(sb, [ "ls-tree", "--name-only", "master" ])).stdout.split("\n")
-        result.checks.push({ name: "wordcount.py on master", pass: tree.includes("wordcount.py"),
+        result.checks.push({ name: `${caseCfg.program} on master`, pass: tree.includes(caseCfg.program),
             detail: tree.filter((name) => name !== "").join(", ") })
         const branch = (await git(sb, [ "rev-parse", "--abbrev-ref", "HEAD" ])).stdout.trim()
         const dirty  = (await git(sb, [ "status", "--porcelain" ])).stdout.trim()
@@ -411,22 +603,22 @@ const main = async (): Promise<number> => {
             detail: `branch ${branch}${dirty !== "" ? `, changes: ${dirty.split("\n").join("; ")}` : ""}` })
 
         /*  (6) run the fixture test suite against the program on "master"  */
-        if (fs.existsSync(path.join(sb.project, "wordcount.py"))) {
+        if (fs.existsSync(path.join(sb.project, caseCfg.program))) {
             log("running test suite")
             result.suite = await suiteRun(python, expected, sb.project, sb.env, path.join(resultsDir, "suite.log"))
             log(`test suite: ${suiteDetail(result.suite)}`)
         }
         result.checks.push({ name: "all suite tests passed", pass: result.suite?.ok ?? false,
-            detail: result.suite === null ? "not run (no wordcount.py)" : suiteDetail(result.suite) })
+            detail: result.suite === null ? `not run (no ${caseCfg.program})` : suiteDetail(result.suite) })
 
         /*  collect the final artifacts  */
         await fs.promises.writeFile(path.join(resultsDir, "task.md"),
-            (await ase(sb, [ "task", "load", taskId ])).stdout, "utf8")
+            (await ase(sb, [ "task", "load", caseCfg.task ])).stdout, "utf8")
         await fs.promises.writeFile(path.join(resultsDir, "git.log"),
             (await git(sb, [ "log", "--all", "--graph", "--stat", "--format=%h %d %s" ])).stdout, "utf8")
-        const program = path.join(sb.project, "wordcount.py")
+        const program = path.join(sb.project, caseCfg.program)
         if (fs.existsSync(program))
-            await fs.promises.copyFile(program, path.join(resultsDir, "wordcount.py"))
+            await fs.promises.copyFile(program, path.join(resultsDir, caseCfg.program))
 
         result.verdict = result.checks.every((check) => check.pass) ? "PASS" : "FAIL"
         if (opts["dry-run"])
@@ -443,8 +635,15 @@ const main = async (): Promise<number> => {
     finally {
         agentsLog.end()
 
-        /*  (7) tear down the sandbox: stop the on-demand spawned ASE service  */
+        /*  (7) tear down the sandbox: stop a still running fleet (e.g. after an error)
+            and the on-demand spawned ASE service, and keep the log of the fleet  */
         if (sb !== null) {
+            if (caseCfg.runner === "fleet") {
+                await ase(sb, [ "agent", "fleet", "stop" ], { timeout: 6 * 60 * 1000 })
+                const fleetLog = path.join(sb.project, ".ase", "agent", "fleet.log")
+                if (fs.existsSync(fleetLog))
+                    await fs.promises.copyFile(fleetLog, path.join(resultsDir, "fleet.log"))
+            }
             await ase(sb, [ "service", "stop" ], { timeout: 30 * 1000 })
             const keep = opts.keep || (opts["keep-failed"] && result.verdict !== "PASS")
             if (keep)
@@ -504,7 +703,8 @@ const report = (r: Result): string => {
         ...tests,
         "## Artifacts",
         "",
-        `-   results: \`${r.results}\` (\`agents.log\`, \`suite.log\`, \`task.md\`, \`git.log\`, \`wordcount.py\`, \`result.json\`)`,
+        `-   results: \`${r.results}\` (\`agents.log\`, ${caseCfg.runner === "fleet" ? "`fleet.log`, " : ""}` +
+            `\`suite.log\`, \`task.md\`, \`git.log\`, \`${caseCfg.program}\`, \`result.json\`)`,
         ...(r.sandbox !== "" ? [ `-   sandbox: \`${r.sandbox}\`` ] : []),
         ""
     ].join("\n")

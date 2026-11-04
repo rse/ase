@@ -1,0 +1,1 @@
+{ "task": "wordcount", "program": "wordcount.py", "runner": "pipeline" }

@@ -6,7 +6,7 @@
 
 ##  the fixture test suite of the "wordcount-python" agent test case: it
 ##  black-box tests the agent-produced "wordcount.py" in the directory of
-##  $WORDCOUNT_PROJECT against the specification of the task fixture "task.md"
+##  $AGENT_TEST_PROJECT against the specification of the task fixture "task.md"
 ##  (standard library only, platform-independent)
 
 import os
@@ -16,7 +16,7 @@ import sys
 import tempfile
 import unittest
 
-PROJECT = os.environ.get("WORDCOUNT_PROJECT", os.getcwd())
+PROJECT = os.environ.get("AGENT_TEST_PROJECT", os.environ.get("WORDCOUNT_PROJECT", os.getcwd()))
 PROGRAM = os.path.join(PROJECT, "wordcount.py")
 
 

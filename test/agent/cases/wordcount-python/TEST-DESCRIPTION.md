@@ -18,6 +18,7 @@ pipeline stopped.
 | File                      | Role                                                          |
 |---------------------------|---------------------------------------------------------------|
 | `task.md`                 | the task fixture (ASE task format, id `wordcount`, `PLANNED`) |
+| `case.json`               | the case configuration (task `wordcount`, runner `pipeline`)  |
 | `suite/test_wordcount.py` | the test suite (Python `unittest`, standard library only)     |
 | `TEST-DESCRIPTION.md`     | this description                                              |
 
@@ -140,7 +141,7 @@ git rev-parse --abbrev-ref HEAD         # must be master
 git status --porcelain                  # must be empty
 
 # must pass all tests counted in the preflight
-WORDCOUNT_PROJECT=$SB/project PYTHONDONTWRITEBYTECODE=1 \
+AGENT_TEST_PROJECT=$SB/project PYTHONDONTWRITEBYTECODE=1 \
     python3 -m unittest discover -s $CASE/suite -v      # output saved as suite.log
 ```
 
@@ -210,7 +211,7 @@ Along the way, the agents:
 | skills `ase-task-implement`, `ase-repo-review`, `ase-task-integrate` | yes     | headless, via the agents                         |
 | ASE MCP service (on-demand start, stop)                              | yes     |                                                  |
 | agent tools `copilot` / `codex`                                      | opt-in  | only with `--tool copilot` resp. `--tool codex`  |
-| `ase agent fleet`, `ase agent relay`                                 | no      |                                                  |
+| `ase agent fleet`, `ase agent relay`                                 | no      | see case `fibonacci-fleet`                       |
 | background agents (`start`/`status`/`log`/`stop`)                    | no      |                                                  |
 | `estimator`, `editor`, `researcher`, `rebooter`, `condenser`         | no      | `estimator` replaced by `effort-wait=false`      |
 | `adhoc` agents and definition kinds                                  | no      |                                                  |
