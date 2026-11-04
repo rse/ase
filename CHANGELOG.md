@@ -2,25 +2,74 @@
 ChangeLog
 =========
 
-2.0.6 (2026-10-26)
+2.0.7 (2026-11-02)
+------------------
+
+-   FEATURE [code, docs]: Model Selection of Agents
+    The new definition option `-M`|`--model` of all agents (also `model` of the definition files and
+    of the sections `default` and per agent of a fleet) selects the model of the agent tool, either
+    for all tasks, or as `<size>=<model>` pairs per `Effort:` size of the task (like
+    `XS=haiku,*=sonnet`), while the new hook `model` of a definition can override it per task.
+
+-   FEATURE [code, docs]: Partial Staging Skill
+    The new skill `ase-repo-stage` stages only the working copy changes belonging to a topic, the
+    last `CHANGELOG.md` entry (`--entry`), the last turn (`--turn`), or the session (`--session`),
+    splitting mixed hunks, checks that the staged state builds on its own (optionally in a temporary
+    worktree), and optionally chains into `ase-repo-changelog` and `ase-repo-commit`.
+
+-   IMPROVEMENT [code, docs]: Verification Levels for Edit Skills
+    The boolean option `--verify`|`-v` of `ase-code-edit` and `ase-spec-edit` now takes a level:
+    `none` (former default), `light` (new default: lint, build, and regression tests resp. SpecBook
+    lint), or `full` (additionally ad-hoc manual tests), also steering the grilling questions. Both
+    skills now fix and re-verify for at most ten rounds and list the remaining failures.
+
+-   IMPROVEMENT [code, docs]: ChangeLog Entries in File Style
+    The skill `ase-repo-changelog` now follows the style of the existing entries instead of a fixed
+    60-80 character summary, keeps each entry within about 5 lines, writes the section via `Edit`
+    (so its changes show up as a diff), and triggers on prompts like "add a changelog entry".
+
+-   IMPROVEMENT [code]: Free-Text Replies in Next-Step Dialogs
+    The next-step dialogs of `ase-task-implement`, `ase-task-integrate`, `ase-task-grill`,
+    `ase-task-reboot`, and `ase-task-condense` now accept a free-text reply as an implicit `DONE`:
+    the skill finishes, and the text is then handled as a regular request, instead of the dialog
+    being re-opened with an "Invalid option selected!" error.
+
+-   IMPROVEMENT [code]: Commit Message Skill Activation
+    The frontmatter description of `ase-repo-commit` now lists trigger phrases (like "write" or
+    "propose" a "commit message"), so the skill is activated under more circumstances.
+
+-   IMPROVEMENT [code]: find(1) Fallback for Source Resolution
+    `ase-code-lint` now resolves directory and wildcard source references with `find` via `Bash`
+    (newly allowed) if the `Glob` tool is not available, to support foreign LLMs.
+
+-   BUGFIX [code]: Silent parallel sub-agents
+    Forbid any output while concurrently dispatched sub-agents report back one by one, as Claude
+    Code runs them in the background despite `run_in_background: false`, so skills like
+    `ase-code-lint` and `ase-docs-proofread` no longer print progress messages per returned batch
+    (`ase-control.md`).
+
+-   BUGFIX [code]: Skill Started Message First
+    `ase-skill.md` now requires the "skill started" message as the very first output, before any
+    tool call (including `ase_getopt`) and also for skills invoked via the `Skill` tool, so that
+    "do not output anything" instructions of later steps no longer suppress or defer it.
+
+-   UPDATE [infr]: NPM dependencies
+    Updated NPM dependencies.
+
+2.0.6 (2026-11-02)
 ------------------
 
 -   FEATURE [code]: Sortable Decision Matrix
     The Claude Code function hooks module (new `plugin/mods/ase-mods-evaluate.ts`) now redraws the
-    weighted decision matrix of `ase-meta-evaluate` as a grid, rendering the column of the best
-    alternative (resp. of all tied best ones) in blue and bold. Its header cells reveal clickable
-    buttons on hover, sorting the criteria rows by their column (cycling the primary, the reverse,
-    and the original order), while the rating row stays the last one. The Markdown table row
-    parsing is now shared with the grilling table via `ase-mods-common.ts`.
-    Needs `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1`.
+    decision matrix of `ase-meta-evaluate` as a grid, with the best alternatives in blue and bold,
+    and with header cell buttons sorting the criteria rows by their column. The Markdown table row
+    parsing is shared with the grilling table. Needs `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1`.
 
 -   IMPROVEMENT [code]: SPACE Switches from Find and Browse to Compose
-    In the intent help ("Find Skill Command") and the manpage browser ("Browse Skill Manpages")
-    of the Claude Code function hooks module, SPACE now takes over the command of the selected
-    skill into the prompt and immediately switches over to the synopsis form ("Compose Skill
-    Command"), as if RETURN and then `!!` were pressed. Hence, SPACE no longer scrolls the details
-    of the intent help (`b`/`f` still do), and no longer extends the filter of the manpage browser
-    (multi-keyword filters can still be given by the free text before the `//` trigger).
+    In the intent help and the manpage browser of the Claude Code function hooks module, SPACE now
+    takes over the command of the selected skill and switches over to the synopsis form, as if
+    RETURN and `!!` were pressed. Hence, SPACE no longer scrolls the intent help details (`b`/`f`
+    still do) and no longer extends the filter of the manpage browser.
 
 -   IMPROVEMENT [code, docs]: Function Hooks Enabled by `ase setup`
     For `--tool claude`, `ase setup install` and `ase setup update` now enable the function hooks
@@ -35,17 +84,39 @@ ChangeLog
 
 -   IMPROVEMENT [docs]: Per-Feature Agent Tool Support Matrix on Compat Page
     The compatibility section of the GitHub Pages site (`pages/src/components/Section-Compat.astro`)
-    now carries a detail table with the effective support score (-2 to +2) of each ASE feature
-    (plugin installation, hooks, skills, sub-agents, output style, statusline, mod API, MCP
-    service, telemetry, and headless agents) on each of the nine surfaces (CLI, IDE, and App) of
-    Anthropic Claude Code, GitHub Copilot, and OpenAI Codex, plus the per-surface score sums.
+    now carries a detail table with the support score (-2 to +2) of each ASE feature on each of the
+    nine surfaces (CLI, IDE, and App) of Anthropic Claude Code, GitHub Copilot, and OpenAI Codex,
+    plus the per-surface score sums.
 
 -   IMPROVEMENT [infr]: Faster Plugin Mirroring in `tool` Build
     The `build-plugin` target of `tool/etc/stx.conf` now mirrors `plugin/` and `.claude-plugin/`
-    via `syncdir` of the new development dependency `sync-directory`, which excludes
-    `node_modules`, `package.json`, `etc/`, and `.gitignore` already during the traversal and
-    deletes orphaned target files, instead of copying everything (including the 465 MB of
-    `plugin/node_modules`) and then removing the excluded parts again (7.9s down to 0.6s).
+    via `syncdir` of the new development dependency `sync-directory`, excluding `node_modules` and
+    the other unwanted parts already during the traversal, instead of copying everything and then
+    removing the excluded parts again (7.9s down to 0.6s).
+
+-   IMPROVEMENT [code]: Flicker-Free Terminal Task Board in tmux Popups
+    The terminal UI of `ase task board` (`tool/src/ase-task-board-tui.ts`) now renders
+    incrementally, rewriting only the changed lines of a frame, which no longer flickers in
+    terminals without synchronized output (DEC mode 2026), like tmux popups, and erases the tail
+    of each changed line only after its text (via the new dependency `string-width`).
+
+-   BUGFIX [code]: Clamp Task Board Graph Viewport to Shown Graph
+    The scroll position of the graph and flow views of the terminal task board
+    (`tool/src/ase-task-board-tui-model.ts`) is shared by both graphs, so a position carried over
+    from the other graph could show only the tail of the current one. The viewport is now kept
+    within the bounds of the shown graph.
+
+-   FEATURE [code, docs]: Specification Query via SpecBook 1.6.1
+    The new CLI command `ase spec query` and MCP tool `ase_specbook_query` (`tool/src/ase-spec.ts`)
+    query the validated specification (or the effective schema configuration) via the new `load()`
+    API of SpecBook with an XPath-like ASTq selector, writing JSON, JSON5, YAML, or TOON. The meta
+    file `ase-format-spec.md` and the skill `ase-spec-activate` point the agents onto it.
+
+-   IMPROVEMENT [code, docs]: SpecBook 1.6 Alignment
+    For SpecBook 1.6.1, `project.artifact.spec.schema` passes bundled and remote entries through to
+    SpecBook, `ase spec init` got `-s`/`--sample`, `ase spec export`/`preview` and
+    `ase_specbook_export` got `-S`/`--schema`, and the exports re-base Markdown image references.
+    The default of `project.artifact.spec.files` changed to `**/*.{md,txt,svg,png,jpg}`.
 
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
@@ -54,40 +125,28 @@ ChangeLog
 ------------------
 
 -   FEATURE [code]: Intent Help in the Prompt via `!!` Suffix
-    The Claude Code function hooks module (`plugin/mods/`, early access) now matches the still
-    unsubmitted prompt, once suffixed with a blank and `!!`, as an intent
-    against the help of all ASE skills (like `ase-help-intent`, but over the session context), and
-    shows the proposed skill commands in a master/detail view in the band above the prompt, where
-    LEFT/RIGHT selects a skill, UP/DOWN and `b`/`f`/SPACE scroll its details, RETURN picks its
-    command into the prompt, `//` switches over to the manpage browser for the intent, and `!!`,
-    BACKSPACE, or any other key restores the prompt as typed without the trigger.
+    The Claude Code function hooks module (`plugin/mods/`, early access) now matches a prompt
+    suffixed with a blank and `!!` as an intent against the help of all ASE skills and shows the
+    proposed skill commands in a master/detail view in the band above the prompt, where RETURN
+    picks a command, `//` switches over to the manpage browser, and `!!` restores the prompt.
 
 -   FEATURE [code]: Synopsis Form in the Prompt via `!!` Suffix
-    The Claude Code function hooks module now shows, for a skill command suffixed with `!!`,
-    the SYNOPSIS of its manual page as a form in the band above the prompt, prefilled with the
-    options and arguments already typed (so a typed command can be edited, too, with long options
-    also recognized by an unambiguous prefix and unrecognized words kept verbatim in the last
-    argument field), where LEFT/RIGHT steps
-    through its options and arguments (with their descriptions), SPACE toggles them, RETURN edits
-    their values (with a drop-down box for fixed values), RETURN at the end (or `!!` outside a
-    value) takes over the composed command into the prompt, and BACKSPACE cancels.
+    The Claude Code function hooks module now shows, for a skill command suffixed with `!!`, the
+    SYNOPSIS of its manual page as a form in the band above the prompt, prefilled with the already
+    typed options and arguments. LEFT/RIGHT steps through them, SPACE toggles and RETURN edits them,
+    `!!` takes over the composed command into the prompt, and BACKSPACE cancels.
 
 -   FEATURE [code]: Manual Band in the Prompt via `//` Suffix
-    The Claude Code function hooks module now toggles, for a skill command (bare or with its
-    options and arguments already typed) suffixed with a blank and `//`, the entire manual page
-    of the skill in the band above the prompt, while the command can be typed on. The band is
-    scrolled by the wheel (in fullscreen) and closes once the prompt no longer starts with the
-    skill command, the synopsis form opens, or the prompt is submitted.
+    The Claude Code function hooks module now toggles, for a skill command suffixed with a blank
+    and `//`, the entire manual page of the skill in the band above the prompt, while the command
+    can be typed on. The band closes once the prompt no longer starts with the skill command, the
+    synopsis form opens, or the prompt is submitted.
 
 -   FEATURE [code]: Manpage Browser in the Prompt via `//` Suffix
     The Claude Code function hooks module now shows, for a prompt of just `//` (or of a free text
     suffixed with a blank and `//`), a browser of the manual pages of all skills in the band above
-    the prompt, with a filter field (initially the free text) narrowing the listed skills by a
-    fuzzy search (like `ase man`), the manual page of the selected skill with the matches marked,
-    LEFT/RIGHT selecting a skill, UP/DOWN (and the wheel) scrolling its manual page, RETURN taking
-    over its command into the prompt, `!!` (for a non-empty filter) switching over to the intent
-    help for the filter, and `//` again leaving the filter in the prompt (which mirrors the filter
-    while the browser is shown).
+    the prompt, filtered by a fuzzy search (like `ase man`), where RETURN takes over the command of
+    the selected skill, `!!` switches over to the intent help, and `//` closes the browser.
 
 -   FEATURE [code]: Hint Band in the Prompt for Skill Commands
     The Claude Code function hooks module (`ase-mods-help-hint.ts`) now shows, for a prompt
@@ -123,52 +182,36 @@ ChangeLog
 
 -   REFACTOR [code,infr]: Split of the Claude Code Function Hooks Module
     The single module `plugin/mods/ase-mods.ts` is now split into the hooking infrastructure
-    `ase-mods.ts` (the only module loaded by the engine, dispatching the hooks), the shared parts
-    `ase-mods-common.ts`, the grill table `ase-mods-grill.ts`, the intent help
-    `ase-mods-help-find.ts`, and the synopsis form `ase-mods-help-compose.ts`. `AGENTS.md`
-    reflects the new module layout.
+    `ase-mods.ts` (the only module loaded by the engine), the shared parts `ase-mods-common.ts`,
+    the grill table `ase-mods-grill.ts`, the intent help `ase-mods-help-find.ts`, and the synopsis
+    form `ase-mods-help-compose.ts`. `AGENTS.md` reflects the new module layout.
 
 2.0.4 (2026-10-21)
 ------------------
 
 -   FEATURE [code,docs]: Specification Linting via `ase-spec-lint`
     The new skill `ase-spec-lint` lints the SpecBook-based specification like `ase-code-lint` lints
-    the source code, through investigation sub-agents (`ase:ase-spec-lint`) and with the same options
-    `--auto`, `--severity`, `--include`/`--exclude`, and `--staged`/`--unstaged`, but linting the
-    entire specification by default. It checks the ten aspects `S01 SYNTAX` (the SpecBook and
-    markdownlint diagnostics), `S02 FORMAT`, `S03 RATIONALE`, `S04 AMBIGUITY`, `S05 ATOMICITY`,
-    `S06 REALIZATION`, and the model-wide `S07 REDUNDANCY`, `S08 CONSISTENCY`, `S09 LOGIC` (logical
-    gaps of the specification model), and `S10 COMPLETENESS` (sufficiency for an implementation),
-    where the best-guess corrections of the latter two are never applied under `--auto`. For this,
-    `ase spec lint` and the MCP tool `ase_specbook_lint` can now additionally lint the generic Markdown
-    formatting of the specification via markdownlint (option `--markdown`|`-m` resp. input `markdown`).
+    the source code (same sub-agent approach and options), checking the ten aspects `S01 SYNTAX`
+    to `S10 COMPLETENESS`, from formatting to logical gaps and sufficiency for an implementation.
+    `ase spec lint` and `ase_specbook_lint` can now additionally lint the Markdown (`--markdown`).
 
 -   FEATURE [code,docs]: Interactive Manual Page Browser
-    `ase man` without any page now opens an interactive, Ink-based manual page browser in the
-    terminal, resembling the skill and command deep-dive of the website: a start page with a
-    search field and the grouped catalog of all skills and CLI commands, and a browser page with
-    the grouped master (filtered live by the search) and the rendered, syntax-highlighted
-    manual page as the detail, whose references to other manual pages can be followed by
-    keyboard and mouse. `ase man <page>` opens the browser, too, with the manual page fitting
-    exactly onto `<page>` selected, else with `<page>` as the search. Without a terminal,
-    `ase man [<page>]` prints the manual page (or `ase`(1)) as plain text. As `man`(1) is no
-    longer used, the manual pages are no longer rendered into the roff format via *remark-man*
-    (dropping `directories.man` of the package and the option `--path` of `ase man`), but are
-    shipped as Markdown in `dst/man/` only.
+    `ase man` now opens an interactive, Ink-based manual page browser in the terminal, with a
+    search, the grouped catalog of all skills and CLI commands, and the rendered, syntax-highlighted
+    manual pages with followable references (plain text output without a terminal). The manual
+    pages are now shipped as Markdown in `dst/man/` only, no longer rendered into roff format.
 
 -   FEATURE [code,docs]: Specification Initialization via `ase spec init`
-    The new command `ase spec init` resembles `specbook init` through the embedded *SpecBook* API,
-    like the other `ase spec` commands: it creates the absent specification Markdown files of the
-    schema configuration `project.artifact.spec.schema` below `project.artifact.spec.basedir`, each
-    with its frontmatter and artifact headings. Unlike `specbook init`, it creates no
+    The new command `ase spec init` resembles `specbook init` through the embedded *SpecBook* API:
+    it creates the absent specification Markdown files of `project.artifact.spec.schema` below
+    `project.artifact.spec.basedir`, each with its frontmatter and artifact headings, but no
     `.specbook.yaml`, as ASE keeps these options in its own configuration.
 
 -   IMPROVEMENT [code]: Branch Changeset Worktree Cleanup after Implementation
     `ase-task-implement` now removes the worktree `.ase/worktree/<name>` it newly created for a
-    `branch:` changeset again after the commit, as the change set lives on the branch alone, so
-    the branch can be checked out elsewhere. A pre-existing worktree of the branch and a worktree
-    with uncommitted changes are always kept, and the new option `--no-cleanup`|`-K` keeps the
-    worktree, like the same option of `ase-task-integrate`.
+    `branch:` changeset after the commit, so the branch can be checked out elsewhere. Pre-existing
+    worktrees and worktrees with uncommitted changes are kept, and the new option
+    `--no-cleanup`|`-K` keeps the worktree, like the same option of `ase-task-integrate`.
 
 -   IMPROVEMENT [code]: No Co-Authored-By Trailers in Commit Messages
     `ase-repo-merge` and `ase-task-implement` now explicitly instruct the agent to never add the
@@ -183,10 +226,9 @@ ChangeLog
 
 -   BUGFIX [code]: Direct NPM Registry Version Check of `ase setup update`
     `ase setup update` now queries the NPM registry directly for the latest ASE version, instead
-    of relying on the cached, at most hourly background check of *update-notifier*, which, up to
-    ASE 1.0.7, was consumed by the session start hook and hence let `ase setup update` regularly
+    of relying on the cached, at most hourly check of *update-notifier*, which let it regularly
     report the current version as the latest one. Only if the registry query fails, it falls back
-    to the cached check, and a newer version found is persisted for the session start hook.
+    to the cached check.
 
 -   BUGFIX [docs]: Website Menu Item Overlap in Narrow Renderings
     The website header (`Section-Header.astro`) and its navigation entries (`Widget-Nav-Entry.astro`)
@@ -194,10 +236,9 @@ ChangeLog
 
 -   BUGFIX [code,docs]: Full SpecBook Standard Schema for `ase spec`
     The schema configuration entry `std` of `project.artifact.spec.schema` now names the full
-    standard schema bundled with *SpecBook*, instead of the plugin meta file `ase-format-specbook.yaml`,
-    which is compressed for the agents and hence lacks the `refs`, `diagram`, and `format` fields.
-    This lets `ase spec export`/`preview` again render the graph, grid, and hub diagrams, and lets
-    `ase spec lint` and the MCP tool `ase_specbook_lint` again check the references and value formats.
+    standard schema bundled with *SpecBook* instead of the agent-compressed meta file
+    `ase-format-specbook.yaml`, so `ase spec export`/`preview` again render the diagrams, and
+    `ase spec lint` and `ase_specbook_lint` again check the references and value formats.
 
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
@@ -730,12 +771,10 @@ ChangeLog
     instructions and the ASE persona communication style in effect.
 
 -   FEATURE [tool]: Output style integration for all agent tools
-    Under Anthropic Claude Code CLI, `ase setup install` and `ase setup update` now
-    select the plugin output style `ase:ase-terse` via `outputStyle` in the scope's `settings.json`
-    (preserving a foreign selection), `ase setup uninstall` deselects it again, and
-    `ase setup status` reports it as `OUTPUTSTYLE` rows. Under GitHub Copilot CLI and
-    OpenAI Codex CLI, which have no output style concept, the session-start hook injects
-    the identical style instructions (frontmatter stripped) into the session context.
+    Under Claude Code CLI, `ase setup install` and `ase setup update` now select the plugin output
+    style `ase:ase-terse` via `outputStyle` in `settings.json`, `ase setup uninstall` deselects it,
+    and `ase setup status` reports it. Under GitHub Copilot CLI and OpenAI Codex CLI, the
+    session-start hook injects the identical style instructions into the session context.
 
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies: SpecBook 1.2.13, etc.
@@ -781,11 +820,10 @@ ChangeLog
 ------------------
 
 -   FEATURE [plugin]: Reconciliation operations and dry run
-    Added the `--operation` option to the `ase-sync-reconcile` skill, which
-    restricts the target-side changes to a subset of the operations `add`,
-    `update`, and `remove` (default: `all`), and the `--dry` option, which
-    performs the reconciliation without modifying any target artifact and
-    shows the intended changes as a unified diff instead.
+    Added the `--operation` option to the `ase-sync-reconcile` skill, which restricts the
+    target-side changes to a subset of `add`, `update`, and `remove` (default: `all`), and the
+    `--dry` option, which shows the intended changes as a unified diff without modifying any
+    target artifact.
 
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies: SpecBook 1.2.9
@@ -883,32 +921,16 @@ ChangeLog
 -------------------
 
 -   FEATURE [docs]: Use-case pages on the website
-    Added the new "Use Cases" part of the website: the new single source of
-    truth `pages/src/data/usecases.ts` carries eleven use cases (Exploration,
-    Research, Discovery, Skeleton, Specification, Coding, Bugfixing, Linting,
-    Versioning, Writing, and Automation), each walking one running example
-    step by step through the *ASE* skills carrying it, the new
-    `Section-Usecase.astro` renders them as a numbered process, the new
-    dynamic route `pages/src/pages/usecases/[usecase].astro` emits one page per
-    use case, and the "Use Cases" pull-down of `nav.ts` is derived from the
-    very same data, so the previously parked "Technology Stack" and "Crafting
-    Feature" prototype pages and the "Engineering Session" part of the
-    "Workflows" page were dropped in favor of them. Along the way,
-    `Widget-Terminal.astro` keeps command options together on one line and
-    accepts digits in skill names.
+    Added the "Use Cases" part of the website: `pages/src/data/usecases.ts` carries eleven use
+    cases, each walking one running example step by step through the *ASE* skills, rendered by
+    `Section-Usecase.astro` via the dynamic route `pages/src/pages/usecases/[usecase].astro` and
+    replacing the former "Technology Stack" and "Crafting Feature" prototype pages.
 
 -   FEATURE [docs]: Pull-down menus in the website navigation
-    Turned the flat header navigation into groups with pull-down menus: the new
-    `NavGroup` and `NavSection` types of `pages/src/data/nav.ts` let a header
-    label open a panel listing the sections of its page (or external targets),
-    rendered by the new `Widget-Nav-Entry.astro` for both header groups. The
-    "Philosophy", "Architecture", and "Compatibility" pages were folded into
-    the "Design" and "Setup" pages as addressable sections, the new "Project"
-    group leads to the repository and the new "Sibling Projects" page (with
-    `Section-Siblings.astro` extracted from `Section-Thanks.astro`), the
-    "Author" page became a group of its own, the "Home" entry is shown as the
-    leading *ASE* logo, and `Section-Highlights.astro`/`highlights.ts` were
-    renamed to `Section-Previews.astro`/`previews.ts`.
+    Turned the flat header navigation into groups with pull-down menus (`pages/src/data/nav.ts`,
+    `Widget-Nav-Entry.astro`), folded the "Philosophy", "Architecture", and "Compatibility" pages
+    into the "Design" and "Setup" pages, added the "Project" group with the new "Sibling Projects"
+    page, and made the "Author" page a group of its own.
 
 -   IMPROVEMENT [docs]: Install call-to-action in the website footer
     Added a stacked "block" variant to `Widget-Sticky-CTA.astro` and placed it
@@ -931,42 +953,30 @@ ChangeLog
 -------------------
 
 -   REFACTOR [docs]: Website navigation turned into distinct pages
-    Turned every navigation bar entry of the website into its own *Astro* page
-    route under `pages/src/pages/` (`highlights`, `setup`, `usage`, `workflows`,
-    `architecture`, `design`, `philosophy`, `compat`, `author`), driven by the
-    new single-source-of-truth `pages/src/data/nav.ts` which carries route path,
-    nav label, browser title, and meta description per entry, extracted the
-    comparison table into the new `Section-Productivity.astro` component,
-    replaced the single-page scroll-spy (`Feature-Scroll-Spy.astro`) with
-    per-page navigation plus the new `Feature-Scroll-Reveal.astro`, and adjusted
-    `BaseLayout.astro`, `Section-Header.astro`, and the affected sections and
-    widgets accordingly, so the site no longer is one long scrolling page.
+    Turned every navigation bar entry of the website into its own *Astro* page route under
+    `pages/src/pages/`, driven by the new single source of truth `pages/src/data/nav.ts`, and
+    replaced the single-page scroll-spy with per-page navigation plus the new
+    `Feature-Scroll-Reveal.astro`, so the site no longer is one long scrolling page.
 
 0.9.67 (2026-09-06)
 -------------------
 
 -   FEATURE [code]: Registration status reporting
-    Added the `ase setup status` command (`ase-setup.ts`), which reports across
-    *all* scopes at once the registration scope and enabled/disabled state of the
-    *ASE* plugin, the registration scope of every currently registered MCP server
-    of the `mcpServers` registry, and the settings files carrying an `activated`
-    or `foreign` `statusLine` entry, so an unintentionally leaked registration
-    becomes visible without probing `claude mcp get` per server by hand.
+    Added the `ase setup status` command (`ase-setup.ts`), which reports across *all* scopes the
+    registration of the *ASE* plugin, of every MCP server, and of the `statusLine` entries, so an
+    unintentionally leaked registration becomes visible without probing `claude mcp get` per
+    server by hand.
 
 -   FEATURE [docs]: Sibling projects on the website
-    Added a new "See Also the Sibling Projects" section to
-    `pages/src/components/Section-Thanks.astro`, listing *SpecBook*,
-    *MCP-to-OpenAI*, *MCP-to-Harness*, *claudeX*, and *Bash-Authorize* together
-    with their relation to *ASE*, and rendering the lightweight inline markup of
-    their notes, so the ecosystem around *ASE* becomes visible on the website.
+    Added a new "See Also the Sibling Projects" section to `Section-Thanks.astro`, listing
+    *SpecBook*, *MCP-to-OpenAI*, *MCP-to-Harness*, *claudeX*, and *Bash-Authorize* together with
+    their relation to *ASE*, so the ecosystem around *ASE* becomes visible on the website.
 
 -   IMPROVEMENT [docs]: Split article work-steps in the comparison table
-    Split the single "Writing Articles" row of `pages/src/data/comparison.ts`
-    into a "Writing Articles" row (brainstorming plus challenging and
-    strengthening arguments) and a "Correcting Articles" row (shortening,
-    refining, and proofreading), and switched the "Crafting Code" row over to
-    `/ase-code-edit` and `/ase-code-craft`, so each row again covers exactly one
-    work-step.
+    Split the "Writing Articles" row of `pages/src/data/comparison.ts` into "Writing Articles"
+    (brainstorming, challenging, and strengthening) and "Correcting Articles" (shortening,
+    refining, and proofreading), and switched the "Crafting Code" row over to `/ase-code-edit`
+    and `/ase-code-craft`, so each row again covers exactly one work-step.
 
 -   UPDATE [docs]: SpecBook project domain
     Switched the *SpecBook* references in `README.md` and on the website from the
@@ -981,35 +991,27 @@ ChangeLog
 -------------------
 
 -   FEATURE [code]: Boxing transparency in the statusline
-    Added the `%B` placeholder to `ase statusline`, rendering the project boxing
-    transparency (`white`, `grey`, `black`) resolved from the *ASE* configuration
-    cascade with an `ASE_PROJECT_BOXING` environment variable fallback, and added
-    it to the default statusline format line, so the boxing is permanently
-    observable instead of only in the session-start banner.
+    Added the `%B` placeholder to `ase statusline`, rendering the project boxing transparency
+    (`white`, `grey`, `black`) from the *ASE* configuration (with `ASE_PROJECT_BOXING` fallback),
+    and added it to the default statusline format, so the boxing is permanently observable.
 
 -   FEATURE [code]: Text length metrics
-    Added the `ase_text_metric` MCP tool and the `ase metric` CLI command in
-    `tool/src/ase-metric.ts`, measuring the `words`, `lines`, `chars` (Unicode
-    characters), and `bytes` (octets) of either a `file` or a literal `text`, and
-    switched the `ase-docs-shorten` skill and sub-agent, the `ase-meta-workflow`
-    skill, and the `ase-task-condense` skill over to it, so text lengths are
-    measured instead of estimated.
+    Added the `ase_text_metric` MCP tool and the `ase metric` CLI command, measuring the `words`,
+    `lines`, `chars`, and `bytes` of a `file` or a literal `text`, and switched the skills
+    `ase-docs-shorten`, `ase-meta-workflow`, and `ase-task-condense` over to it, so text lengths
+    are measured instead of estimated.
 
 -   FEATURE [docs]: Document shortening skill
-    Added the `ase-docs-shorten` skill and its sub-agent for reducing a single
-    document to a target length, given by the mutually exclusive and mandatory
-    `--chars <N>` or `--words <N>` option, through a three-stage cascade --
-    tighten the sentences, drop low-value content, compress the remaining content
-    into shorter expressions -- entering each stage only while the target is still
-    not met, and cutting every proposed change as a whole block which is
-    reviewed as a unified diff.
+    Added the `ase-docs-shorten` skill and its sub-agent for reducing a document to a target
+    length (`--chars <N>` or `--words <N>`) through a three-stage cascade -- tighten sentences,
+    drop low-value content, compress the remaining content -- entering each stage only while the
+    target is still not met, with every change reviewed as a unified diff.
 
 -   FEATURE [docs]: Document refinement skill
-    Added the `ase-docs-refine` skill and its sub-agent for a light rewriting of
-    awkward or unclear sentences -- restructuring sentences for rhythm and clarity,
-    replacing nominal constructions with verbs, making enumerations parallel,
-    cutting filler and redundancy, fixing awkward transitions, and adjusting
-    voice -- while content, numbers, and technical terms stay exactly as they are.
+    Added the `ase-docs-refine` skill and its sub-agent for a light rewriting of awkward or
+    unclear sentences -- restructuring, replacing nominal constructions with verbs, making
+    enumerations parallel, cutting filler, fixing transitions, and adjusting voice -- while
+    content, numbers, and technical terms stay exactly as they are.
 
 -   FEATURE [code]: Identifier and name minting
     Added the `ase-meta-mint` skill for minting identifiers and names out of a

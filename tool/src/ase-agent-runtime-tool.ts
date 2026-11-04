@@ -21,20 +21,23 @@ type ToolEntry = { level: LineLevel, msg: string, text?: boolean, quiet?: boolea
     which would otherwise be fed back into the next rendering of the task plan)  */
 const TEXT_MAX = 20
 
+/*  the "--model" option of all tools for the model <model> (none for the default model)  */
+const modelArgs = (model: string): string[] => model !== "" ? [ "--model", model ] : []
+
 /*  the per-tool headless invocation of the rendered prompt <prompt> with access to the
-    additional directories <add> (the "--add-dir" options), streaming JSONL events,
-    where risky actions are denied or automatically reviewed instead of being prompted for
+    additional directories <add> (the "--add-dir" options) and the model <model>, streaming JSONL
+    events, where risky actions are denied or automatically reviewed instead of being prompted for
     (the variadic "--add-dir" of Claude has to precede the other options to not consume the prompt)  */
-export const toolArgs: Record<Tool, (prompt: string, add: string[]) => string[]> = {
-    "claude":  (prompt, add) => [
-        ...add, "-p", "--output-format", "stream-json", "--verbose", "--disallowedTools", "AskUserQuestion",
+export const toolArgs: Record<Tool, (prompt: string, add: string[], model: string) => string[]> = {
+    "claude":  (prompt, add, model) => [
+        ...add, ...modelArgs(model), "-p", "--output-format", "stream-json", "--verbose", "--disallowedTools", "AskUserQuestion",
         "--permission-mode", "auto", "--permission-prompts", "none", prompt
     ],
-    "copilot": (prompt, add) => [
-        ...add, "--allow-all-tools", "--no-ask-user", "--no-color", "--output-format", "json", "-p", prompt
+    "copilot": (prompt, add, model) => [
+        ...add, ...modelArgs(model), "--allow-all-tools", "--no-ask-user", "--no-color", "--output-format", "json", "-p", prompt
     ],
-    "codex":   (prompt, add) => [
-        "exec", ...add, "--json", "--approve-for-me", "--color", "never", prompt
+    "codex":   (prompt, add, model) => [
+        "exec", ...add, ...modelArgs(model), "--json", "--approve-for-me", "--color", "never", prompt
     ]
 }
 

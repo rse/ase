@@ -136,7 +136,7 @@ const configParams: Array<{ name: string, value: string, scopes: string, desc: s
       scopes: "user, project",
       desc: "Anchor directory of the SpecBook-based specification files, relative to the project root." },
     { name: "project.artifact.spec.files",
-      value: "*.{md,txt,svg,png,jpg}",
+      value: "**/*.{md,txt,svg,png,jpg}",
       scopes: "user, project",
       desc: "Glob spec matching the specification files, relative to the anchor directory." },
     { name: "project.artifact.spec.schema",
@@ -144,7 +144,9 @@ const configParams: Array<{ name: string, value: string, scopes: string, desc: s
       scopes: "user, project",
       desc: "Whitespace-separated list of SpecBook YAML schema configuration files governing the " +
             "specification, merged in order, where \"std\" names the standard schema bundled with " +
-            "the ASE plugin and every other entry is relative to the project root. If empty, \"std\" is used." },
+            "the ASE plugin, \"meta\", \"pm\", \"npm:\", \"github:\", and \"http[s]://\" name the ones " +
+            "SpecBook bundles or fetches, and every other entry is relative to the project root. " +
+            "If empty, \"std\" is used." },
     { name: "project.artifact.code.basedir",
       value: "src",
       scopes: "user, project",

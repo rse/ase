@@ -4,6 +4,7 @@
 
 `ase spec init`
 \[`-h`|`--help`\]
+\[`-s`|`--sample`\]
 
 ## DESCRIPTION
 
@@ -31,6 +32,11 @@ configuration are taken from the *ASE* configuration (see
 - \[`-h`|`--help`\]:
   Show usage information and exit.
 
+- \[`-s`|`--sample`\]:
+  Additionally scaffold one lint-clean sample object per allowed object
+  kind into the created files, with placeholder values satisfying the
+  schema configuration, so the format is learnable from them.
+
 ## EXIT STATUS
 
 Exits with status `0` on success, and with status `1` if the
@@ -44,12 +50,15 @@ $ ase spec init
 
 # initialize and then lint the specification
 $ ase spec init && ase spec lint
+
+# initialize the specification with sample objects
+$ ase spec init -s
 ```
 
 ## SEE ALSO
 
 `ase`(1), `ase-spec`(1), `ase-spec-lint`(1), `ase-spec-export`(1),
-`ase-spec-preview`(1), `ase-config`(1).
+`ase-spec-query`(1), `ase-spec-preview`(1), `ase-config`(1).
 
 ## AUTHOR
 

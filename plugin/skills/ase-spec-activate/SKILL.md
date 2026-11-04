@@ -118,7 +118,10 @@ an ad-hoc change, and it *never* touches the artifact kinds `CODE`,
 
     Serve <query/> *ad-hoc* under the **Activated Behavior** below:
     read the `SPEC` artifacts of <artifact-files/> which are related to
-    <query/>, resolve their `[[xxx]]` references across artifacts, and
+    <query/> (or, for a question spanning entire object kinds, property
+    values, or reference relations, query them structurally via the
+    `ase_specbook_query(selector: "<selector/>")` tool of the `ase` MCP
+    server), resolve their `[[xxx]]` references across artifacts, and
     answer the query grounded in the specification content, citing the
     artifact file and object id of every statement you rely on. If
     <query/> asks for a change, apply it as an *ad-hoc modification*

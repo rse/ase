@@ -85,6 +85,16 @@ const promptOf = (value: unknown, configured: AgentHookPrompt): AgentHookPrompt 
     throw new Error("invalid prompt (expected a string, \"{ text }\", or \"{ skill, args }\")")
 }
 
+/*  the model returned by the hook "model", validated, where undefined
+    keeps the configured model <configured>  */
+const modelOf = (value: unknown, configured: string): string => {
+    if (value === undefined)
+        return configured
+    else if (typeof value !== "string")
+        throw new Error("invalid model (expected a string)")
+    return value.trim()
+}
+
 /*  the settling of a processed task decided by the hook "settle" (see "AgentHookSettlement"),
     where an undefined field keeps the configured settling, and where <tagged> tells whether
     the value of the tag is decided (as null untags the task)  */
@@ -413,7 +423,7 @@ class DefinedCore {
 
     /*  prepare the job of a task in its work <work>: render the prompt (with the request
         prompt <prompt> of a request agent), run the preparing commands, and run the hooks
-        "prepare" and "prompt", where the work is cleaned up again on a failure, and where
+        "prepare", "prompt", and "model", where the work is cleaned up again on a failure, and where
         <changed> decides preliminarily whether the plan content of a request agent changed  */
     async prepare (task: AgentTask, log: AgentLog, work: AgentWork, prompt: string,
         changed?: () => Promise<boolean>): Promise<AgentJob> {
@@ -459,7 +469,7 @@ class DefinedCore {
                 }
             }
 
-            /*  run the hooks "prepare" and "prompt", where a failed hook fails the processing  */
+            /*  run the hooks "prepare", "prompt", and "model", where a failed hook fails the processing  */
             const job: AgentHookJob = Object.freeze({
                 dir:               work.cwd,
                 dirs:              Object.freeze([ ...work.dirs ]),
@@ -477,7 +487,7 @@ class DefinedCore {
                     throw new Error(`agent: hook "${name}" failed: ${reason(err)}`, { cause: err })
                 }
             }
-            const { prepare: prepareHook, prompt: promptHook } = this.def.hooks
+            const { prepare: prepareHook, prompt: promptHook, model: modelHook } = this.def.hooks
             if (prepareHook !== undefined)
                 await hooked("prepare", async () => prepareHook(this.task(task), job, ctx))
             let spec: AgentHookPrompt = this.def.prompt.skill !== "" ?
@@ -486,10 +496,17 @@ class DefinedCore {
                 const configured = Object.freeze(spec)
                 spec = await hooked("prompt", async () => promptOf(await promptHook(this.task(task), configured, job, ctx), configured))
             }
+            const { sizes } = this.def.model
+            let model = sizes[TaskFormat.parseEffort(task.keys.get("Effort") ?? "")?.size ?? "*"] ?? sizes["*"] ?? ""
+            if (modelHook !== undefined) {
+                const configured = model
+                model = await hooked("model", async () => modelOf(await modelHook(this.task(task), configured, job, ctx), configured))
+            }
             return {
                 ...("skill" in spec ?
                     { cmd: `${spec.skill}${spec.args !== "" ? ` ${spec.args}` : ""}` } :
                     { prompt: spec.text }),
+                model,
                 cwd:     work.cwd,
                 dirs:    work.dirs,
                 finish:  (log: AgentLog, result: AgentResult) => this.finish(task, log, result, work, job, env, before, changed),
@@ -818,6 +835,7 @@ class DefinedPhaseAgent extends PhaseAgent {
         }
         this.presenceTitle = def.title
         this.presenceDesc  = def.description
+        this.modelSpec     = def.model.spec
         this.assigned      = def.assign.required
         this.finishing     = def.finish.commit || def.finish.success !== "" || def.workdir === "target"
             || def.hooks.finish !== undefined
@@ -974,6 +992,7 @@ class DefinedRequestAgent extends RequestAgent {
         this.presencePrompt  = def.request.prompt
         this.presenceTitle   = def.title
         this.presenceDesc    = def.description
+        this.modelSpec       = def.model.spec
         this.serial          = def.serial
         this.worktree        = def.workdir !== "project"
         this.lifecycles      = def.lifecycles
@@ -1081,7 +1100,7 @@ export abstract class DefinedAgent extends Agent {
         for (const option of definitionOptions) {
             if (option.key === "definition" && !definition)
                 continue
-            const flags = (option.key === "definition" ? "-D, " : "") + `--${option.key}` +
+            const flags = (option.key === "definition" ? "-D, " : option.key === "model" ? "-M, " : "") + `--${option.key}` +
                 (option.kind !== "flag" ? ` <${option.arg}>` : "")
             if (option.kind === "list")
                 cmd.option(flags, option.desc, (value: string, prev?: string[]) => [ ...(prev ?? []), value ])

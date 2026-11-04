@@ -13,7 +13,7 @@
     [`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`]
     [`--grill-perspective`|`-p` *perspective*]
     [`--grill-ground`|`-G`]
-    [`--verify`|`-v`]
+    [`--verify`|`-v` `light`|`none`|`full`]
     [`--worktree`|`-w` *name*[`:`*branch*]]
     [`--loop`|`-l`]
     [*query*]
@@ -37,8 +37,8 @@ project, and read the specification artifacts related to the query),
 *grilling* (optionally stress-test the query with rounds of questions),
 *implementing* (optionally select an approach, then apply the change set
 in place, honoring the GENERIC and SPECIFYING tenets and the `SPEC`
-format contract), and *verifying* (optionally validate the specification
-until it passes). The *querying* state, every *grilling* round, and the
+format contract), and *verifying* (validate the specification until it
+passes, unless disabled via `--verify none`). The *querying* state, every *grilling* round, and the
 approach selection close with an `EDIT TODO` box showing the established
 `WHAT` and `HOW` information.
 
@@ -74,8 +74,9 @@ timestamp refreshed.
     of a round are sorted by descending focus area importance
     (`DOMAIN`, `INTERFACE`, `ARCHITECTURE`, `IMPLEMENTATION`,
     `REGRESSION`, `CONFIRMATION`). Questions of focus area
-    `REGRESSION` and `CONFIRMATION` are raised only together with
-    `--verify`, as only then a verification honors their decisions.
+    `REGRESSION` are raised only under `--verify light` or `full`, and
+    those of focus area `CONFIRMATION` only under `--verify full`, as
+    only then a verification honors their decisions.
     All questions of a round are announced together below a `GRILLING ROUND K/L` line (the round numbering is
     omitted when only a single round is performed) as a
     `QUESTION`/`ANSWERS` table with one row per question, each row
@@ -134,12 +135,13 @@ timestamp refreshed.
     no usable facts are found, a warning is shown and the grilling falls
     back to model knowledge. Only effective together with `--grill`.
 
--   `--verify`|`-v`:
+-   `--verify`|`-v` `light`|`none`|`full`:
     Verify the edited specification by validating it via *SpecBook*
     linting and fixing the reported diagnostics in the affected `SPEC`
-    artifacts, for at most three rounds. Any diagnostics remaining after
-    the last round are listed as `REMAINING DIAGNOSTICS`. Without
-    `--verify`, strictly no validation is performed at all.
+    artifacts, for at most ten rounds. Any diagnostics remaining after
+    the last round are listed as `REMAINING DIAGNOSTICS`. The default
+    `light` and the level `full` perform the same validation. The level
+    `none` strictly performs no validation at all.
 
 -   `--worktree`|`-w` *name*[`:`*branch*]:
     Apply the change sets inside the dedicated Git worktree
@@ -151,8 +153,8 @@ timestamp refreshed.
     single worktree serves the whole skill run: it is prepared before
     the first discovery, so discovering, grilling, and implementing all
     operate on it, all `--loop` iterations land in it, and it is left
-    uncommitted for review. Under
-    `--verify`, the validation then runs as the `ase spec lint` command
+    uncommitted for review. Unless
+    `--verify none` is given, the validation then runs as the `ase spec lint` command
     inside the worktree. If *name* is a bare lower-case word naming no
     existing worktree and a *query* follows (like `-w fix the crash`, a
     former boolean `-w` usage), the skill asks whether *name* is the
@@ -181,16 +183,22 @@ timestamp refreshed.
 
 ##  EXAMPLES
 
-Edit in one shot, without any questions or validation:
+Edit in one shot, without any questions, but with validation:
 
 ```text
 ❯ /ase-spec-edit add a Reviewer persona to the persona model
 ```
 
-Grill the query with two rounds first, then edit and validate:
+Edit in one shot, without any questions or validation:
 
 ```text
-❯ /ase-spec-edit -g -r 2 -v split the Event entity into Event and EventSeries
+❯ /ase-spec-edit -v none add a Reviewer persona to the persona model
+```
+
+Grill the query with two rounds first, then edit and fully validate:
+
+```text
+❯ /ase-spec-edit -g -r 2 -v full split the Event entity into Event and EventSeries
 ```
 
 Let the user pick one of several specification approaches first, then

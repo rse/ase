@@ -259,12 +259,14 @@ glob). See `ase-artifact`(1):
 
 - `project.artifact.spec.basedir`, `project.artifact.spec.files`:
   The specification files (default: `docs/specbook` and
-  `*.{md,txt,svg,png,jpg}`).
+  `**/*.{md,txt,svg,png,jpg}`).
 
 - `project.artifact.spec.schema` (*string*):
   The whitespace-separated list of *SpecBook* schema configuration
-  files, where `std` names the bundled standard one and every other
-  entry is a file relative to the project root (default: empty, i.e.,
+  files, where `std`, `meta`, and `pm` name the bundled standard, meta,
+  and project management ones, `npm:`, `github:`, `http:`, and
+  `https:` references name remote ones, and every other entry is a file
+  or glob pattern relative to the project root (default: empty, i.e.,
   `std`). See `ase-spec`(1).
 
 - `project.artifact.code.basedir`, `project.artifact.code.files`:

@@ -123,4 +123,5 @@ Dissect the changes along an explicitly given axis:
 ##  SEE ALSO
 
 [`ase-task-dissect`](../ase-task-dissect/help.md), [`ase-repo-diff`](../ase-repo-diff/help.md), [`ase-repo-review`](../ase-repo-review/help.md),
-[`ase-repo-changelog`](../ase-repo-changelog/help.md), [`ase-repo-commit`](../ase-repo-commit/help.md).
+[`ase-repo-changelog`](../ase-repo-changelog/help.md), [`ase-repo-commit`](../ase-repo-commit/help.md),
+[`ase-repo-stage`](../ase-repo-stage/help.md).

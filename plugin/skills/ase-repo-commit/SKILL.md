@@ -2,7 +2,10 @@
 name: ase-repo-commit
 argument-hint: "[--help|-h]"
 description: >
-    Determine commit message for staged Git changes.
+    Determine commit message for staged Git changes. Use when the user
+    asks to "give", "write", "craft", "suggest", or "propose" a "commit
+    message", or wants to know how to "describe" or "phrase" the staged
+    changes for a commit.
 user-invocable: true
 disable-model-invocation: false
 effort: medium

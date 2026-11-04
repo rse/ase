@@ -1,6 +1,6 @@
 ---
 name: ase-spec-edit
-argument-hint: "[--help|-h] [--approach|-a] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--grill-ground|-G] [--verify|-v] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>]"
+argument-hint: "[--help|-h] [--approach|-a] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--grill-ground|-G] [--verify|-v light|none|full] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>]"
 description: >
     Edit Specification: Use when the user wants to "edit" the
     SpecBook-based specification (SPEC) in one shot from a query, with
@@ -22,7 +22,7 @@ Edit Specification
 
 <expand name="getopt"
     arg1="ase-spec-edit"
-    arg2="--approach|-a --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --grill-ground|-G --verify|-v --worktree|-w= --loop|-l">
+    arg2="--approach|-a --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --grill-ground|-G --verify|-v=(light|none|full) --worktree|-w= --loop|-l">
     $ARGUMENTS
 </expand>
 
@@ -239,11 +239,18 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 arg3="file paths, artifact ids, object kinds, object ids, property keys, references, and literal values"
                 arg4="the specification"
                 arg5="">
-                <if condition="<getopt-option-verify/> is not equal `true`">
+                <if condition="<getopt-option-verify/> is equal `none`">
                 Raise *no* questions at all of focus area `REGRESSION`
-                or `CONFIRMATION`, as without `--verify` no verification
-                takes place which could honor their decisions.
-                </if></expand>
+                or `CONFIRMATION`, as under `--verify none` no
+                verification takes place which could honor their
+                decisions.
+                </if>
+                <elseif condition="<getopt-option-verify/> is equal `light`">
+                Raise *no* questions at all of focus area
+                `CONFIRMATION`, as under `--verify light` no
+                change-specific checks take place which could honor
+                their decisions.
+                </elseif></expand>
 
             If <grill-stop/> is `true`, skip the remaining items of
             this round and all remaining rounds, and continue with
@@ -383,10 +390,11 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
 7.  **State: verifying:**
 
-    Enter this state only if <getopt-option-verify/> is equal `true`.
-    Otherwise you *MUST* *strictly skip* the entire state and *any*
-    verification: do *NOT* validate the specification at all and do
-    *NOT* run any build, tests, linter, or type-checker.
+    Enter this state only if <getopt-option-verify/> is equal `light` or
+    `full` (both perform the same validation). Otherwise (`none`) you
+    *MUST* *strictly skip* the entire state and *any* verification: do
+    *NOT* validate the specification at all and do *NOT* run any build,
+    tests, linter, or type-checker.
 
     1.  Validate the specification and capture its <diagnostics/> array
         of `{ file, line, column, severity, message }` objects:
@@ -405,7 +413,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
     2.  If <diagnostics/> is not empty, fix the reported problems in the
         affected `SPEC` artifacts via the `Edit`/`Write` tools and
-        re-validate as in item 7.1 -- for at most *three* rounds in
+        re-validate as in item 7.1 -- for at most *ten* rounds in
         total.
 
     3.  <if condition="<diagnostics/> is not empty after the last round">
@@ -450,6 +458,6 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
     </ase-tpl-hint>
 
     <ase-tpl-hint level="verbose">
-    Use `/ase-spec-edit --grill` to stress-test the query first, `--verify` to validate the specification afterwards, and `--loop` to chain several edits.
+    Use `/ase-spec-edit --grill` to stress-test the query first, `--verify none` to skip the validation of the specification afterwards, and `--loop` to chain several edits.
     </ase-tpl-hint>
     </else>

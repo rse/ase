@@ -1085,7 +1085,8 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
     const viewW  = innerW - 4
     let   { x, y } = scroll
     const box    = view === "graph" ? places.get(sel.id) : view === "flow" ? flowPlaces.get(flowSel) : undefined
-    const height = view === "graph" ? layout?.graph.height : flowLayout?.graph.height
+    const graph  = view === "graph" ? layout?.graph : view === "flow" ? flowLayout?.graph : undefined
+    const height = graph?.height
     const follow = `${view}:${flowSel}`
     if (box !== undefined && height !== undefined && (view !== "flow" || followed.current !== follow)) {
         const top    = Math.max(0, box.top - 2)
@@ -1099,6 +1100,13 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
     }
     if (view !== "flow")
         followed.current = ""
+
+    /*  keep the viewport within the bounds of the shown graph, as the scroll position is shared
+        by both graphs (and else, a position carried over from the other one may show only its tail)  */
+    if (graph !== undefined) {
+        x = Math.max(0, Math.min(Math.max(0, graph.width  + 2 - viewW), x))
+        y = Math.max(0, Math.min(Math.max(0, graph.height + 1 - viewH), y))
+    }
     if (x !== scroll.x || y !== scroll.y)
         setScroll({ x, y })
 

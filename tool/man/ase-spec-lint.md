@@ -67,7 +67,8 @@ $ ase spec lint -m
 
 ## SEE ALSO
 
-`ase`(1), `ase-spec`(1), `ase-spec-export`(1), `ase-spec-preview`(1).
+`ase`(1), `ase-spec`(1), `ase-spec-export`(1), `ase-spec-query`(1),
+`ase-spec-preview`(1).
 
 ## AUTHOR
 

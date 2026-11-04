@@ -232,6 +232,13 @@ Skill Identification
     ⧉ **ASE**: ✪ skill: **<skill-name/>**, ✦ purpose: **<purpose/>**, ▶ status: **skill started**
     </template>
 
+    You *MUST* output this <template/> *immediately* as the *very first*
+    output of the skill, *before* any tool call (including the
+    `ase_getopt` call) and *before* any work of the skill, and also when
+    the skill was invoked via the `Skill` tool from another skill. Any
+    "Do not output anything" instruction of the subsequent steps does
+    *NOT* suppress or defer it.
+
     Later (but only if ((`$1` is *NOT* equal to `-h` or `--help`) *AND*
     (<ase-guidance-level/> is equal to `normal` or `verbose`))), once
     this skill finally will stop processing, you *MUST* once output the

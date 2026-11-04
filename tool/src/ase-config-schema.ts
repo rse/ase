@@ -69,7 +69,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "project.task.effort.line":       "0.025",
         "project.task.effort.iteration":  "2.5",
         "project.artifact.spec.basedir":  "docs/specbook",
-        "project.artifact.spec.files":    "*.{md,txt,svg,png,jpg}",
+        "project.artifact.spec.files":    "**/*.{md,txt,svg,png,jpg}",
         "project.artifact.spec.schema":   "",
         "project.artifact.code.basedir":  "src",
         "project.artifact.code.files":    "** !**/etc/** !**/{.gitignore,.npmignore,package.json}",

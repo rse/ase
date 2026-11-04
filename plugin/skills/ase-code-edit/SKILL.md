@@ -1,6 +1,6 @@
 ---
 name: ase-code-edit
-argument-hint: "[--help|-h] [--mode|-m auto|craft|refactor|resolve] [--approach|-a] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--grill-ground|-G] [--verify|-v] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>|<issue-id>]"
+argument-hint: "[--help|-h] [--mode|-m auto|craft|refactor|resolve] [--approach|-a] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--grill-ground|-G] [--verify|-v light|none|full] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>|<issue-id>]"
 description: >
     Edit Source Code: Use when the user wants to "edit" the code base in
     one shot from a query or a bare analyzer issue id like "P1", fusing
@@ -22,7 +22,7 @@ Edit Source Code
 
 <expand name="getopt"
     arg1="ase-code-edit"
-    arg2="--mode|-m=(auto|craft|refactor|resolve) --approach|-a --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --grill-ground|-G --verify|-v --worktree|-w= --loop|-l">
+    arg2="--mode|-m=(auto|craft|refactor|resolve) --approach|-a --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --grill-ground|-G --verify|-v=(light|none|full) --worktree|-w= --loop|-l">
     $ARGUMENTS
 </expand>
 
@@ -238,11 +238,18 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 arg3="file and directory paths, identifiers, symbols, types, commands, options, configuration keys, and literal values"
                 arg4="the code base"
                 arg5="">
-                <if condition="<getopt-option-verify/> is not equal `true`">
+                <if condition="<getopt-option-verify/> is equal `none`">
                 Raise *no* questions at all of focus area `REGRESSION`
-                or `CONFIRMATION`, as without `--verify` no verification
-                takes place which could honor their decisions.
-                </if></expand>
+                or `CONFIRMATION`, as under `--verify none` no
+                verification takes place which could honor their
+                decisions.
+                </if>
+                <elseif condition="<getopt-option-verify/> is equal `light`">
+                Raise *no* questions at all of focus area
+                `CONFIRMATION`, as under `--verify light` no
+                change-specific tests take place which could honor
+                their decisions.
+                </elseif></expand>
 
             If <grill-stop/> is `true`, skip the remaining items of
             this round and all remaining rounds, and continue with
@@ -388,26 +395,56 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
 7.  **State: verifying:**
 
-    Enter this state only if <getopt-option-verify/> is equal `true`.
-    Otherwise you *MUST* *strictly skip* the entire state and *any*
-    verification: do *NOT* run any build, tests, linter, or
-    type-checker, and do *NOT* execute the modified program.
+    Enter this state only if <getopt-option-verify/> is equal `light` or
+    `full`. Otherwise (`none`) you *MUST* *strictly skip* the entire
+    state and *any* verification: do *NOT* run any build, tests, linter,
+    or type-checker, and do *NOT* execute the modified program.
 
     1.  Verify whether the implementation fulfills <todo-what/> and
-        <todo-how/> by running available verification commands
-        (build, tests, linter, type-checker)
+        <todo-how/>
         <if condition="<worktree-dir/> is not empty">
-        , each with <worktree-dir/> as its working directory
-        </if>.
+        , running every command with <worktree-dir/> as its working
+        directory
+        </if>:
+
+        -   Under `light` and `full`: run the available lint and build
+            commands (including the type-checker) and the already
+            existing regression test suite, if any.
+
+        -   Under `full` only: additionally perform *individual*,
+            *change-specific* manual tests, which exercise the changed
+            behavior through ad-hoc scratch tests and program runs.
+            Clean up all scratch test files afterwards, so they never
+            become part of the change set.
 
         If the verification fails, you *MUST* *adjust* the failing parts
-        of the change set and *RE-VERIFY* until the verification passes!
+        of the change set and *RE-VERIFY* -- for at most *ten* rounds
+        in total.
 
-    2.  Only output the following <template/>:
+    2.  <if condition="the verification still fails after the last round">
+
+        Only output the following <template/>, listing one bullet line
+        per remaining failure:
+
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ status: **verification failed**
+
+        <ase-tpl-bullet-signal/> **REMAINING FAILURES**:
+
+        -   <failure/>
+        [...]
+        </template>
+
+        </if>
+        <else>
+
+        Only output the following <template/>:
 
         <template>
         ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ status: **verification passed**
         </template>
+
+        </else>
 
 8.  **Loop or Finish:**
 

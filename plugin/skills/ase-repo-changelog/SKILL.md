@@ -2,7 +2,9 @@
 name: ase-repo-changelog
 argument-hint: "[--help|-h]"
 description: >
-    Update ChangeLog entries in CHANGELOG.md files
+    Update ChangeLog entries in CHANGELOG.md files. Use when the user wants to
+    "add a changelog entry", or to "update", "complete", or "consolidate" the
+    "changelog", "ChangeLog", or "CHANGELOG.md", e.g. before committing or releasing.
 user-invocable: true
 disable-model-invocation: false
 model: sonnet
@@ -41,7 +43,7 @@ Format
 The *ChangeLog* file is a Markdown formatted file named `CHANGELOG.md`,
 and contains sections with headers in the style `N.M.K (YYYY-MM-DD)`.
 
-Each *ChangeLog* entry is always formatted as...
+Each *ChangeLog* entry always starts with a line formatted as...
 
     `<change-type/> [<artifact-kind/>]: <summary/>`
 
@@ -66,9 +68,19 @@ multiple artifact kinds apply, comma-separate them
     -   `infr`:  infrastructure/build/tooling artifacts
     -   `othr`:  any other artifacts
 
-The <summary/> is not longer than about 60-80 characters. The
-*ChangeLog* entries for a single product release version are also always
-grouped and sorted according to the above <change-type/> list.
+The *layout* of the entries *MUST* follow the *style* of the existing
+entries of the *ChangeLog* file, especially its list item marker and
+indentation, its blank lines between entries, its line width, and its
+entry shape, e.g. a single-line <summary/>, a short <summary/> title
+line followed by an indented body of explaining sentences, or a
+<summary/> sentence wrapped over multiple indented lines. Only if the
+file contains no entries yet, use a single-line <summary/> of about
+60-80 characters.
+
+Each entry, including all its title and body lines, *MUST* be kept
+within about *5 lines* in total. The *ChangeLog* entries for a single
+product release version are also always grouped and sorted according
+to the above <change-type/> list.
 
 Processing
 ----------
@@ -144,8 +156,9 @@ Processing
     the entries in the first (most recent) section only, by adding the
     corresponding (most recent) Git *commits* and *staged* changes only.
 
-    For each Git commit, reduce the Git commit messages to a single
-    short <summary/> sentence, not longer than 60-80 characters.
+    For each Git commit, reduce the Git commit messages to an entry in
+    the *style* of the existing entries, kept within about *5 lines*
+    (see section *Format* above).
 
     For each entry, also determine the <artifact-kind/> *artifact kind*
     tag(s) from the paths of the changed files. To classify a changed
@@ -178,7 +191,8 @@ Processing
     Without immediately modifying the `CHANGELOG.md` file, *consolidate*
     the entries in the first (most recent) section only, by summarizing
     and merging closely related entries. Perform the entry consolidation
-    per <change-type/> group only.
+    per <change-type/> group only. Also condense any entry of this
+    section, which exceeds about *5 lines*, by compressing its wording.
 
     Without immediately modifying the `CHANGELOG.md` file, *sort* the
     entries in the first (most recent) section only. Instead of the
@@ -200,8 +214,13 @@ Processing
     `YYYY-MM-DD` in the `N.M.K (YYYY-MM-DD)` header of the *first* (most
     recent) section.
 
-    You *MUST* *NOT* output any further summary or give any further
-    explanations.
+    For this, you *MUST* use the `Edit` tool, replacing just the *first*
+    (most recent) section, instead of re-writing the entire file with
+    the `Write` tool, so that the resulting changes are shown to the
+    user as a diff by the agent tool itself.
+
+    You *MUST* *NOT* output the resulting entries a second time, any
+    further summary, or any further explanations.
 
     </step>
 

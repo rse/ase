@@ -79,7 +79,7 @@ members) or `ase agent fleet stop`.
   (with all its options commented out, so they fall back to
   `project.relay.url`, `project.relay.crt`, and `project.relay.key`),
   the section `default` (with `tool`, `parallel: 1`, and `timeout: 60m`,
-  plus `repo` and `tempdir` commented out), the edit request agent
+  plus `model`, `repo`, and `tempdir` commented out), the edit request agent
   `editor`, the effort estimation agent `estimator` (mode `phase`,
   estimating the planned tasks, i.e., the `OPEN` tasks for `solo`, the
   `PLANNING` tasks for `team`, and the `PLANNED` tasks for `enterprise`,
@@ -201,8 +201,9 @@ value omits an option, and a list repeats an option:
   `project.relay.url` selecting HTTPS requires both.
 
 - `default`:
-  (optional) The default options of all agents: `tool`, `parallel`,
-  `timeout`, `repo`, `tempdir`, and `agent-relay` (see `ase-agent`(1)),
+  (optional) The default options of all agents: `tool`, `model`,
+  `parallel`, `timeout`, `repo`, `tempdir`, and `agent-relay` (see
+  `ase-agent`(1) and `ase-agent-adhoc`(1)),
   each one applied only to the agents supporting it (e.g., `repo` not to
   `rebooter`), and overridden by the section of an agent. The option
   `agent-relay` is not allowed together with the section `relay`.
@@ -315,7 +316,8 @@ $ ase agent fleet stop
 ```
 
 A configuration `.ase/fleet.yaml` with the agent relay, the built-in
-agents, two editors of different agent tools, an agent of the
+agents (with an implementer using cheaper models for smaller tasks),
+two editors of different agent tools, an agent of the
 definition file `.ase/agents/reviewer.mts`, and an ad-hoc request
 agent:
 
@@ -329,6 +331,7 @@ default:
 rebooter:
 implementer:
     parallel: 2
+    model:    XS=haiku,S=haiku,*=sonnet
 editor-claude:
     kind:     editor
 editor-codex:

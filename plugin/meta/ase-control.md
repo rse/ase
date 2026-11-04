@@ -187,3 +187,17 @@ Control Flow Constructs
     the order of their occurrence in <parallel-body/>. This construct is
     expanded to its <parallel-body/>. Do not output anything else.
 
+-   *IMPORTANT*: You *MUST* honor the following rule for *all*
+    concurrently dispatched sub-agents -- whether invoked through
+    <parallel/> or through multiple `Agent` tool invocations emitted in
+    one single message:
+
+    The agent tool may run sub-agents in the *background* (e.g.
+    *Anthropic Claude Code CLI* ignores `run_in_background: false`) and
+    then notifies you of each returned sub-agent individually. While
+    these notifications arrive, you *MUST* *NOT* output anything -- no
+    progress messages (like `Batch 3 of 8 is back, 5 still running`),
+    no intermediate results, and no waiting notices -- but silently wait
+    for the remaining sub-agents. Only once *all* of them have returned,
+    continue with the processing which consumes their results.
+

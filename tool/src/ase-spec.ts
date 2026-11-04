@@ -15,7 +15,7 @@ import sourceCodeError          from "source-code-error"
 import type { McpServer }       from "@modelcontextprotocol/sdk/server/mcp.js"
 import { renderDiagnostic }     from "@rse/specbook/dst/specbook-diagnostic.js"
 import { renderVerbose }        from "@rse/specbook/dst/specbook-verbose.js"
-import type { SpecBook, Diagnostic, ExportFormat, VerboseLevel } from "@rse/specbook"
+import type { SpecBook, Diagnostic, ExportFormat, QueryFormat, VerboseLevel } from "@rse/specbook"
 
 import type Log                 from "./ase-lib-log.js"
 import type { LogLevel }        from "./ase-lib-log.js"
@@ -25,23 +25,45 @@ import { Task }                 from "./ase-task.js"
 import { Artifact }             from "./ase-artifact.js"
 import { writeStdout }          from "./ase-lib-stdio.js"
 
-/*  reusable functionality: initialize, lint, export, and preview the
+/*  the options of exporting the specification: the collector of the emitted
+    environment notices, the export of the effective schema configuration
+    instead, and the per-format directories the image references of the
+    normalized Markdown are re-based onto (refusing one below the base directory)  */
+interface SpecExportOptions {
+    notices?: string[]
+    schema?:  boolean
+    rebase?:  (string | undefined)[]
+}
+
+/*  reusable functionality: initialize, lint, export, query, and preview the
     SpecBook-based project specification, located via the
     "project.artifact.spec.basedir" and "project.artifact.spec.schema"
     configuration  */
 export class Spec {
-    /*  the SpecBook export formats, mirrored here (and checked for completeness
+    /*  the SpecBook export and query formats, mirrored here (and checked for completeness
         against SpecBook at compile-time) to not load SpecBook for the MCP schema  */
     static readonly formats = Object.keys({
         json: true, json5: true, yaml: true, toon: true, html: true, pdf: true, md: true
     } satisfies Record<ExportFormat, true>) as [ ExportFormat, ...ExportFormat[] ]
+    static readonly queryFormats = Object.keys({
+        json: true, json5: true, yaml: true, toon: true
+    } satisfies Record<QueryFormat, true>) as [ QueryFormat, ...QueryFormat[] ]
+
+    /*  whether a schema configuration entry is a reference SpecBook resolves
+        itself (mirroring its internal check): the bundled "std", "meta", and
+        "pm" ones, or a remote "npm:", "github:", or "http[s]://" one  */
+    private static isRemote (entry: string): boolean {
+        return entry === "std" || entry === "meta" || entry === "pm"
+            || (/^(?:npm|github):|^https?:\/\//).test(entry)
+    }
 
     /*  resolve the YAML schema configuration files: the whitespace-separated
         entries of the configured "project.artifact.spec.schema", merged in
-        the given order, where each entry is either the literal "std" for the
-        full SpecBook standard schema (not the agent-compressed plugin meta file
-        "ase-format-specbook.yaml") or a file path relative to the project
-        root, and an unset or empty value means "std"  */
+        the given order, where each entry is either a reference SpecBook resolves
+        itself (like "std" for the full SpecBook standard schema, not the
+        agent-compressed plugin meta file "ase-format-specbook.yaml") or a file
+        path or glob pattern relative to the project root, and an unset or
+        empty value means "std"  */
     static configFiles (log: Log): string[] {
         const cfg = new Config("config", configSchema, log)
         cfg.read()
@@ -50,9 +72,21 @@ export class Spec {
         const entries = list.split(/\s+/).filter((entry) => entry !== "")
         if (entries.length === 0)
             entries.push("std")
-        return entries.map((entry) => entry === "std" ?
-            "std" :
+        return entries.map((entry) => Spec.isRemote(entry) ?
+            entry :
             path.resolve(Task.projectRoot(), entry))
+    }
+
+    /*  the source options of the reading commands: the specification below
+        the "spec" artifact base directory, or, under "schema", the effective
+        schema configuration itself (to which no base directory applies)  */
+    private static source (log: Log, schema: boolean) {
+        return {
+            config:    Spec.configFiles(log),
+            basedir:   schema ? undefined : Artifact.basedir(log, "spec"),
+            gitignore: Spec.gitignore,
+            schema
+        }
     }
 
     /*  the ASE log level each SpecBook verbosity level maps onto: the
@@ -120,15 +154,17 @@ export class Spec {
     /*  initialize the absent artifact files of the schema configuration below
         the "spec" artifact base directory, letting SpecBook persist its project
         options file ".specbook.yaml" into a throw-away working directory, as
-        ASE keeps these options in its own configuration  */
-    static async init (log: Log): Promise<string[]> {
+        ASE keeps these options in its own configuration, where "sample"
+        scaffolds one sample object per allowed object kind into the files  */
+    static async init (log: Log, sample = false): Promise<string[]> {
         const basedir = Artifact.basedir(log, "spec")
         const cwd     = await fs.promises.mkdtemp(path.join(os.tmpdir(), "ase-spec-"))
         try {
             const result = await Spec.unmarked(Spec.api(log).then((api) => api.init({
                 config: Spec.configFiles(log),
                 basedir,
-                cwd
+                cwd,
+                sample
             })))
             return result.files.map((file) => Spec.relativize(path.join(basedir, file)))
         }
@@ -218,14 +254,12 @@ export class Spec {
     }
 
     /*  export the specification Markdown files below the "spec" artifact
-        base directory into the requested formats, one buffer per format,
-        collecting the emitted environment notices if requested  */
-    static export (log: Log, formats: ExportFormat[], notices?: string[]): Promise<Buffer[]> {
-        return Spec.unmarked(Spec.api(log, notices).then((api) => api.export({
-            config:    Spec.configFiles(log),
-            basedir:   Artifact.basedir(log, "spec"),
-            gitignore: Spec.gitignore,
-            formats
+        base directory into the requested formats, one buffer per format  */
+    static export (log: Log, formats: ExportFormat[], options: SpecExportOptions = {}): Promise<Buffer[]> {
+        return Spec.unmarked(Spec.api(log, options.notices).then((api) => api.export({
+            ...Spec.source(log, options.schema ?? false),
+            formats,
+            rebase: options.rebase
         })))
     }
 
@@ -237,26 +271,45 @@ export class Spec {
         log:      Log,
         formats:  ExportFormat[],
         outputs:  string[],
-        onExport: (buffers: Buffer[]) => Promise<void>
+        onExport: (buffers: Buffer[]) => Promise<void>,
+        options:  SpecExportOptions = {}
     ): Promise<void> {
-        return Spec.unmarked(Spec.api(log).then((api) => api.watch({
-            config:    Spec.configFiles(log),
-            basedir:   Artifact.basedir(log, "spec"),
-            gitignore: Spec.gitignore,
+        return Spec.unmarked(Spec.api(log, options.notices).then((api) => api.watch({
+            ...Spec.source(log, options.schema ?? false),
             formats,
+            rebase: options.rebase,
             outputs,
             onExport
         })))
     }
 
-    /*  serve the HTML export of the specification as a live preview,
-        kept in sync with its sources and pushed into the connected
-        browsers as an in-place document update  */
-    static preview (log: Log, addr: string, port: number): Promise<void> {
+    /*  query the specification Markdown files below the "spec" artifact
+        base directory (or, under "schema", the effective schema configuration)
+        with an ASTq selector and its "{name}" parameters, rendering the matched
+        nodes in a serialization format and collecting the emitted notices
+        (like the lint warnings) if requested  */
+    static query (
+        log:      Log,
+        selector: string,
+        params:   Record<string, string>,
+        format:   QueryFormat,
+        notices?: string[],
+        schema    = false
+    ): Promise<string> {
+        return Spec.unmarked(Spec.api(log, notices).then(async (api) => {
+            const { renderNodes } = await import("@rse/specbook")
+            const document = await api.load(Spec.source(log, schema))
+            return renderNodes(document.query(selector, params), format)
+        }))
+    }
+
+    /*  serve the HTML export of the specification (or, under "schema", of
+        the effective schema configuration) as a live preview, kept in sync
+        with its sources and pushed into the connected browsers as an
+        in-place document update  */
+    static preview (log: Log, addr: string, port: number, schema = false): Promise<void> {
         return Spec.unmarked(Spec.api(log).then((api) => api.preview({
-            config:    Spec.configFiles(log),
-            basedir:   Artifact.basedir(log, "spec"),
-            gitignore: Spec.gitignore,
+            ...Spec.source(log, schema),
             addr,
             port
         })))
@@ -272,7 +325,7 @@ export default class SpecCommand {
         /*  register CLI top-level command "ase spec"  */
         const spec = program
             .command("spec")
-            .description("Initialize, lint, export, and preview the SpecBook-based project specification")
+            .description("Initialize, lint, export, query, and preview the SpecBook-based project specification")
             .action(() => {
                 spec.outputHelp()
                 process.exit(1)
@@ -282,8 +335,9 @@ export default class SpecCommand {
         spec
             .command("init")
             .description("Initialize the absent specification Markdown files of the SpecBook schema configuration")
-            .action(async () => {
-                const files = await Spec.init(this.log)
+            .option("-s, --sample", "scaffold one sample object per allowed object kind into the created files")
+            .action(async (opts: { sample?: boolean }) => {
+                const files = await Spec.init(this.log, opts.sample === true)
                 await writeStdout(files.length > 0 ?
                     `initialized artifact file(s): ${files.join(", ")}\n` :
                     "no artifact files were created\n")
@@ -318,13 +372,17 @@ export default class SpecCommand {
             .option("-o, --output <[format:]file>",
                 "output file (\"-\" for stdout, repeatable), with the format inferred " +
                 "from the filename extension unless explicitly prefixed " +
-                "(default: \"index.html\" inside the specification base directory)",
+                "(default: \"index.html\", resp. \"schema.html\" under \"--schema\", " +
+                "inside the specification base directory)",
                 (value: string, previous: string[]) => previous.concat(value), new Array<string>())
             .option("-w, --watch", "keep the outputs in sync by re-exporting on every source change")
-            .action(async (opts: { output: string[], watch?: boolean }) => {
+            .option("-S, --schema", "export the effective schema configuration itself instead of the specification")
+            .action(async (opts: { output: string[], watch?: boolean, schema?: boolean }) => {
                 const { parseOutputSpec } = await import("@rse/specbook")
+                const schema   = opts.schema === true
                 const outputs  = (opts.output.length > 0 ? opts.output :
-                    [ path.join(Artifact.basedir(this.log, "spec"), "index.html") ]).map(parseOutputSpec)
+                    [ path.join(Artifact.basedir(this.log, "spec"), schema ? "schema.html" : "index.html") ])
+                    .map(parseOutputSpec)
 
                 /*  a re-export has to land somewhere it can be picked up again,
                     which a one-shot stdout stream cannot provide  */
@@ -332,25 +390,65 @@ export default class SpecCommand {
                     throw new Error("the watch mode requires regular output files " +
                         "(\"-\" for stdout is not supported)")
 
-                /*  parse the input once and export each distinct format once  */
-                const distinct = Array.from(new Set(outputs.map(({ format }) => format)))
-                const write = async (buffers: Buffer[]) => {
-                    for (const { format, output } of outputs) {
-                        const data = buffers[distinct.indexOf(format)]
-                        if (output === "-")
+                /*  parse the input once and export each distinct format once, the
+                    normalized Markdown once per output directory, as its image
+                    references are re-based onto it (but never for stdout)  */
+                const rebaseOf = ({ format, output }: { format: string, output: string }) =>
+                    format === "md" && output !== "-" ? path.dirname(path.resolve(output)) : undefined
+                const keyOf    = (spec: { format: string, output: string }) =>
+                    `${spec.format}:${rebaseOf(spec) ?? ""}`
+                const distinct = outputs.filter((spec, i) =>
+                    outputs.findIndex((other) => keyOf(other) === keyOf(spec)) === i)
+                const write    = async (buffers: Buffer[]) => {
+                    for (const spec of outputs) {
+                        const data = buffers[distinct.findIndex((other) => keyOf(other) === keyOf(spec))]
+                        if (spec.output === "-")
                             await writeStdout(data)
                         else {
-                            await fs.promises.writeFile(output, data)
-                            this.log.write("info", `spec: exported specification into "${output}" (${data.length} bytes)`)
+                            await fs.promises.writeFile(spec.output, data)
+                            this.log.write("info", `spec: exported specification into "${spec.output}" (${data.length} bytes)`)
                         }
                     }
                 }
+                const formats  = distinct.map(({ format }) => format)
+                const rebase   = distinct.map(rebaseOf)
                 if (opts.watch === true) {
-                    await Spec.watch(this.log, distinct, outputs.map(({ output }) => output), write)
+                    await Spec.watch(this.log, formats, outputs.map(({ output }) => output), write, { schema, rebase })
                     await new Promise<void>(() => { /*  never resolves  */ })
                 }
                 else
-                    await write(await Spec.export(this.log, distinct))
+                    await write(await Spec.export(this.log, formats, { schema, rebase }))
+            })
+
+        /*  register CLI sub-command "ase spec query"  */
+        spec
+            .command("query")
+            .description("Query the specification Markdown files with an ASTq selector, " +
+                "writing the matched nodes as JSON, JSON5, YAML, or TOON")
+            .argument("<selector>", "ASTq selector of the nodes to write")
+            .option("-P, --param <name=value>", "value of a \"{name}\" parameter of the selector (repeatable)",
+                (value: string, previous: string[]) => previous.concat(value), new Array<string>())
+            .option("-f, --format <format>", `output format (${Spec.queryFormats.join(", ")}; ` +
+                "default: inferred from the output file like for \"export\", else json)")
+            .option("-o, --output <[format:]file>", "output file (\"-\" for stdout)", "-")
+            .option("-S, --schema", "query the effective schema configuration itself instead of the specification")
+            .action(async (selector: string, opts: { param: string[], format?: string, output: string, schema?: boolean }) => {
+                const { parseQueryOutput } = await import("@rse/specbook")
+                const output = parseQueryOutput(opts.output, opts.format)
+                const params: Record<string, string> = {}
+                for (const param of opts.param) {
+                    const m = (/^([^=]+)=(.*)$/s).exec(param)
+                    if (m === null)
+                        throw new Error(`invalid query parameter "${param}" (expected "<name>=<value>")`)
+                    params[m[1]] = m[2]
+                }
+                const text = await Spec.query(this.log, selector, params, output.format, undefined, opts.schema === true)
+                if (output.output === "-")
+                    await writeStdout(text)
+                else {
+                    await fs.promises.writeFile(output.output, text)
+                    this.log.write("info", `spec: queried specification into "${output.output}" (${Buffer.byteLength(text)} bytes)`)
+                }
             })
 
         /*  register CLI sub-command "ase spec preview"  */
@@ -359,12 +457,13 @@ export default class SpecCommand {
             .description("Serve the HTML export of the specification Markdown files as a live preview")
             .option("-a, --addr <ip-addr>", "IP address to listen on (default: SpecBook preview address)")
             .option("-p, --port <tcp-port>", "TCP port to listen on (default: SpecBook preview port)")
-            .action(async (opts: { addr?: string, port?: string }) => {
+            .option("-S, --schema", "preview the effective schema configuration itself instead of the specification")
+            .action(async (opts: { addr?: string, port?: string, schema?: boolean }) => {
                 const { previewAddr, previewPort } = await import("@rse/specbook")
                 const port = Number(opts.port ?? previewPort)
                 if (!Number.isInteger(port) || port < 1 || port > 65535)
                     throw new Error(`invalid TCP port "${opts.port}"`)
-                await Spec.preview(this.log, opts.addr ?? previewAddr, port)
+                await Spec.preview(this.log, opts.addr ?? previewAddr, port, opts.schema === true)
                 await new Promise<void>(() => { /*  never resolves  */ })
             })
     }
@@ -445,12 +544,15 @@ export class SpecMCP {
                 "(PDF as a base64-encoded resource). The export fails on any lint diagnostic. " +
                 "The `notices` array carries the environment notices emitted during the export " +
                 "(like a PDF rendering falling back onto a system-installed browser), which are " +
-                "worth reporting to the user verbatim.",
+                "worth reporting to the user verbatim. With `schema`, the effective SpecBook YAML " +
+                "schema configuration itself is exported instead, as a SpecBook document.",
             inputSchema: {
                 format: z.enum(Spec.formats).optional()
                     .describe("output format (default: inferred from the `output` file extension, else `json`)"),
                 output: z.string().optional()
-                    .describe("output file path (\"-\" or omitted returns the result directly)")
+                    .describe("output file path (\"-\" or omitted returns the result directly)"),
+                schema: z.boolean().optional()
+                    .describe("if true, export the effective schema configuration instead of the specification (default: false)")
             },
             outputSchema: {
                 notices: z.array(z.string())
@@ -466,7 +568,12 @@ export class SpecMCP {
                 const spec = args.format !== undefined || args.output === undefined ?
                     { format: args.format ?? "json", output: args.output } :
                     parseOutputSpec(args.output)
-                const [ data ] = await Spec.export(this.log, [ spec.format ], notices)
+                /*  the image references of the normalized Markdown are re-based
+                    onto the directory of the output file  */
+                const rebase = spec.format === "md" && spec.output !== undefined && spec.output !== "-" ?
+                    path.dirname(path.resolve(Task.projectRoot(), spec.output)) : undefined
+                const [ data ] = await Spec.export(this.log, [ spec.format ],
+                    { notices, schema: args.schema ?? false, rebase: [ rebase ] })
                 if (spec.output !== undefined && spec.output !== "-") {
                     await fs.promises.writeFile(path.resolve(Task.projectRoot(), spec.output), data)
                     return {
@@ -487,6 +594,64 @@ export class SpecMCP {
                         structuredContent: { notices },
                         content: [ { type: "text", text: data.toString("utf8") } ]
                     }
+            }
+            catch (err: unknown) {
+                return mcpToolError(err)
+            }
+        })
+
+        mcp.registerTool("ase_specbook_query", {
+            title: "ASE SpecBook query",
+            description:
+                "Query the SpecBook specification Markdown files of the project (located via the " +
+                "`project.artifact.spec.basedir` configuration), strictly validated like for the export, " +
+                "with an XPath-like ASTq `selector` (like `// USE-CASE [ @STATUS == 'Done' ]`). " +
+                "The root node is of type `specification`, its children are of type `artifact` (attributes " +
+                "`created`, `modified`, and `file`), and the objects below are typed by their kind, with " +
+                "whitespace dashed (attributes `kind`, `id`, `anchor`, `paren`, `name`, `primary`, " +
+                "`description`, `rationale`, `elaboration`, and one per property key), where the query " +
+                "function `refs()` yields the objects the references of an object resolve to. A `{name}` " +
+                "in the selector is substituted by the corresponding entry of `params`. The matched nodes " +
+                "are rendered as a JSON (or JSON5, YAML, or TOON) array (their subtrees included, the " +
+                "embedded file contents dropped), written to the `output` file (a relative path resolves " +
+                "against the project root) if given, else returned directly. With `schema`, the effective " +
+                "SpecBook YAML schema configuration itself is queried instead, as a SpecBook document of " +
+                "the bundled meta schema configuration. The `notices` array carries the messages emitted " +
+                "during the loading (like the warning diagnostics of the specification).",
+            inputSchema: {
+                selector: z.string()
+                    .describe("ASTq selector of the nodes to return"),
+                params: z.record(z.string(), z.string()).optional()
+                    .describe("values of the `{name}` parameters of the selector (default: none)"),
+                format: z.enum(Spec.queryFormats).optional()
+                    .describe("output format (default: inferred from the `output` file extension, else `json`)"),
+                output: z.string().optional()
+                    .describe("output file path (\"-\" or omitted returns the result directly)"),
+                schema: z.boolean().optional()
+                    .describe("if true, query the effective schema configuration instead of the specification (default: false)")
+            },
+            outputSchema: {
+                notices: z.array(z.string())
+                    .describe("messages emitted during the loading, empty if there were none")
+            }
+        }, async (args) => {
+            const notices = new Array<string>()
+            try {
+                const { parseQueryOutput } = await import("@rse/specbook")
+                const spec = parseQueryOutput(args.output ?? "-", args.format)
+                const text = await Spec.query(this.log, args.selector, args.params ?? {},
+                    spec.format, notices, args.schema ?? false)
+                if (spec.output !== "-") {
+                    await fs.promises.writeFile(path.resolve(Task.projectRoot(), spec.output), text)
+                    return {
+                        structuredContent: { notices },
+                        content: [ { type: "text", text: `queried specification into "${spec.output}" (${Buffer.byteLength(text)} bytes)` } ]
+                    }
+                }
+                return {
+                    structuredContent: { notices },
+                    content: [ { type: "text", text } ]
+                }
             }
             catch (err: unknown) {
                 return mcpToolError(err)
