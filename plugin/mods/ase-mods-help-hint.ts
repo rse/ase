@@ -29,7 +29,7 @@ const GROUP  = /\[(?:[^[\]]|\[[^\]]*\])*\]|\((?:[^()]|\([^)]*\))*\)|\S+/g
 const NBSP   = String.fromCodePoint(0xA0)
 const SYNTAX = "gray"
 const REFER  = "red"
-const INDENT = 4
+const INDENT = 2
 const TITLE  = "[ ⧉ ASE: Show Skill Synopsis ]"
 
 /*  a hint band: the scroll state of its frame, the skill command as typed,

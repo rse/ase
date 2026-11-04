@@ -53,6 +53,10 @@ ChangeLog
     tool call (including `ase_getopt`) and also for skills invoked via the `Skill` tool, so that
     "do not output anything" instructions of later steps no longer suppress or defer it.
 
+-   BUGFIX [code]: Synopsis Band Continuation Indentation
+    The continuation lines of the skill synopsis in the hint band are now indented by 2 instead of
+    4 spaces, so they align with the command after the prompt marker.
+
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
 
