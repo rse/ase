@@ -1,0 +1,3 @@
+fixture/** text eol=lf
+testdata/** text eol=lf
+solution/** text eol=lf
