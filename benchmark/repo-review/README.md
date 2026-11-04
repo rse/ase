@@ -2,19 +2,26 @@
 
 # Does the review find the bugs? An effectiveness test for `ase-repo-review`
 
-[ASE](https://ase.tools) ships a skill called `ase-repo-review`. You point it at a
-commit, and an AI model reads the change and writes a code review: a verdict plus
-a table of findings, each with a severity and a file location. Such a review can
-look convincing even when it misses defects. This benchmark asks a plainer
-question: if we know exactly what is wrong with a change, how much of it does the
-review catch, and how often does it complain about code that is fine?
+[ASE](https://ase.tools) ships a skill called `ase-repo-review`: a packaged
+prompt and workflow that the Claude Code CLI runs as a command. You point it at
+a commit, and an AI model reads the change and writes a code review: a verdict
+plus a table of findings, each with a severity and a file location. Such a
+review can look convincing even when it misses defects. This benchmark asks a
+plainer question: if we know exactly what is wrong with a change, how much of it
+does the review catch, and how often does it complain about code that is fine?
+
+This is a pilot: two small test cases, measured on 2026-11-03 three times each
+with Claude Opus 5.5 and Claude Sonnet 5.5. Both cases turned out too easy for
+Opus, and both measurements showed limitations in the test cases and the scorer
+that need addressing before broader conclusions about model performance. The
+numbers show tendencies and the limits of the test itself, not a ranking.
 
 ## Purpose and scope
 
 What is tested here is not a model on its own but a whole review setup: the
-model, the ASE skill and its sub-agent, the Claude Code CLI that runs them, the
-tools they may use, the fixed prompt, and the limits of a run. The benchmark
-therefore answers one question:
+model, the ASE skill and the helper agent it delegates the reading to, the
+Claude Code CLI that runs them, the tools they may use, the fixed prompt, and
+the limits of a run. The benchmark therefore answers one question:
 
 > How does this ASE review setup behave with different models under the same
 > test conditions?
@@ -24,42 +31,35 @@ That would need a second condition: the same model with an ordinary review
 prompt, comparable context, tools, and budget. Such a baseline is not part of
 this benchmark.
 
-## Current status: pilot
-
-Two TypeScript test cases on the same small shop project, each with seven seeded
-defects and four decoys: `shop-core` (correctness defects) and `security`
-(defects an attacker could exploit, with a minimum severity per defect), each
-measured three times per model with Claude Opus 5.5 and Sonnet 5.5. Automated
-scores rely on file and line matching and can disagree with manual inspection.
-Both cases turned out too easy for Opus, and both measurements identified
-limitations in the test cases and the scorer that need addressing before broader
-conclusions about model performance.
-
 ## How the test works
 
 The approach is old and simple. We wrote a small project, introduced a change to
 it, and deliberately seeded defects into that change. Since we put the defects
 there, we know where they are, so we can check whether the review reports them.
 
-Finding defects is only half of a good review, though. A reviewer that flags
-every second line would score perfectly on seeded defects and still be useless.
-So the change also contains **decoys**: code that looks suspicious at first
-glance but is correct, such as a deliberate fall-through in a `switch` that
-carries a comment saying so, or a loose `== null` that deliberately covers both
-`null` and `undefined`. A review that reports a decoy may be raising a false
-alarm.
+### Defects and decoys
+
+Finding defects is only half of a good review. A reviewer that flags every
+second line would score perfectly on seeded defects and still be useless. So
+the change also contains **decoys**: code that looks suspicious at first glance
+but is correct, such as a deliberate fall-through in a `switch` that carries a
+comment saying so, or a loose `== null` that deliberately covers both `null`
+and `undefined`. A review that reports a decoy may be raising a false alarm.
 
 The list of defects and decoys, the **expected-results list**, lives in
-`solution/expected.json` and never travels with the code under review. The model
-sees a plain Git repository with two commits and nothing else; no file name,
-commit message, or comment hints at what we expect to be found.
+`solution/expected.json` and never travels with the code under review. The
+model sees a plain Git repository with two commits and nothing else; no file
+name, commit message, or comment hints at what we expect to be found.
+
+### Case `shop-core`
 
 The project under review is "shop-core", a little TypeScript shop with a cart,
-discount codes, orders, refunds, notifications, and an API layer. The base commit
-(`fixture/base/`) contains no intentionally seeded defects. The change
+discount codes, orders, refunds, notifications, and an API layer. The base
+commit (`fixture/base/`) contains no intentionally seeded defects. The change
 (`fixture/change/`) looks like a plausible piece of everyday work: it switches
 money amounts to integer cents, adds discount kinds, order options with a
-currency, and some validation. The seven seeded defects come in three tiers:
+currency, and some validation. It carries seven seeded defects in three
+**tiers** and four decoys:
 
 - **obvious** defects are visible in a single line, for example a loop that runs
   one position past the end of an array;
@@ -69,52 +69,71 @@ currency, and some validation. The seven seeded defects come in three tiers:
   example a function that now returns cents while its caller in another module
   still formats the value as euros, so the API shows a hundred times the amount.
 
-The second case, `security`, starts from the same shop with those defects fixed
-and adds an admin refund endpoint, a customer order lookup, a payment webhook,
-and HTML confirmation mails. Its seven defects are the kind an attacker would
-look for: a refund amount taken from the request, a role check that lets callers
-without a role through, an order lookup that never asks who is asking, a webhook
-that only verifies the signature when one is sent, a discount code pasted into
-HTML unescaped, a refund of the amount before the discount, and a failed payment
-that keeps the stock reserved. Its four decoys look like security smells but are
-fine: a constant-time signature comparison, a `Number()` conversion followed by
-strict validation, a `catch` that deliberately swallows mail errors, and
-`Math.random` used only to shuffle recommendations. Each defect also records the
-**minimum severity** a review should assign (`HIGH` for money, other people's
-data, and payment events, `MEDIUM` for injection into mails and blocked stock).
-The lists live in `solution/expected.json` and `cases/security/solution/expected.json`.
+### Case `security`
+
+The second case starts from the same shop with those defects fixed and adds an
+admin refund endpoint, a customer order lookup, a payment webhook, and HTML
+confirmation mails. Its seven defects are the kind an attacker would look for:
+
+- a refund amount taken from the request;
+- a role check that lets callers without a role through;
+- an order lookup that never asks who is asking;
+- a webhook that only verifies the signature when one is sent;
+- a discount code pasted into HTML unescaped;
+- a refund of the amount before the discount;
+- a failed payment that keeps the stock reserved.
+
+Its four decoys look like security smells but are fine: a constant-time
+signature comparison, a `Number()` conversion followed by strict validation, a
+`catch` that deliberately swallows mail errors, and `Math.random` used only to
+shuffle recommendations. Each defect of this case also records a **minimum
+severity** the review should assign: `HIGH` for money, other people's data, and
+payment events, `MEDIUM` for injection into mails and blocked stock. A security
+hole reported as `LOW` is half missed. The list lives in `cases/security/solution/expected.json`.
 
 ## Results so far
 
 Every measurement series is kept in the log [MEASUREMENTS.md](MEASUREMENTS.md)
 with the values computed at the time, a defect-by-run matrix in plain words, the
 findings the scorer could not assign, and the manual reading. Entries are only
-ever added, never rewritten, so the original values stay available when the case
-or the scorer changes. The summary below is the latest series.
+ever added, never rewritten, so the original values stay available when the
+case or the scorer changes. The summary below is the latest series of each case.
 
-On 2026-11-03 the setup ran three times each with Claude Opus 5.5 and Claude
-Sonnet 5.5. The whole measurement cost 3.59 USD, including two earlier plumbing
-runs; a run took between one and a half and two minutes.
+### Reading the figures
 
-### Automated scores
+The automated figures come from a deterministic scorer that assigns each
+finding to an expected entry **only by file name and line overlap** (the rule
+is in [Scoring and limitations](#scoring-and-limitations)); a correct finding
+placed at a different line, say at the caller, does not count. All values are
+means over three runs.
 
-The figures below come from the deterministic scorer. It assigns each finding of
-a review to an expected entry **only by file name and line overlap** (details in
-[Scoring and limitations](#scoring-and-limitations)). A correct finding placed
-at a different line, say at the caller instead of the faulty function, does not
-count. All values are means over three runs, scored with the current scorer
-(entry "Re-scoring … with the fixed location parser" in the log; the original
-figures of the first scoring are kept there as well).
+- **Location-matched recall**: the share of the seven defects with a finding at
+  a matching location, overall and per tier.
+- **Decoy match rate**: the share of the four decoys with a finding at a
+  matching location, whatever that finding says. The generated reports call the
+  same number "decoy false-alarm rate".
+- **Unassignable findings**: findings per run that match neither a defect nor a
+  decoy; they may be real extra defects, fair remarks, or unfounded complaints.
+- **Recall with adequate severity** (case `security` only): the share of
+  defects matched *and* reported with at least their minimum severity.
+- **Pilot thresholds**: provisional pass marks fixed before the first paid run
+  (overall recall ≥ 0.6, obvious tier ≥ 0.8, decoy match rate ≤ 0.25; the case
+  `security` adds recall with adequate severity ≥ 0.5).
+
+### Case `shop-core`
+
+The whole measurement cost 3.59 USD, including two earlier plumbing runs; a run
+took between one and a half and two minutes. The table shows the re-scoring
+with the fixed location parser (log entry "Re-scoring … with the fixed location
+parser"); the original figures of the first scoring are kept in the log as well.
 
 | Configuration | Location-matched recall, overall | Location-matched recall, obvious | Decoy match rate | Unassignable findings per run | Pilot thresholds |
 |---|---|---|---|---|---|
 | Opus 5.5 | 0.95 | 0.83 | 0.17 | 0.3 | met |
 | Sonnet 5.5 | 0.90 | 0.67 | 0.50 | 2.0 | not met |
 
-### Manual reading
-
-The raw reviews were also read against the expected-results list (one reader, not
-independently verified). The reading changes the picture considerably:
+The raw reviews were also read against the expected-results list (one reader,
+not independently verified). The reading changes the picture considerably:
 
 | Configuration | Defects described correctly | Obvious defects described correctly | Decoys claimed to be defects |
 |---|---|---|---|
@@ -130,21 +149,18 @@ independently verified). The reading changes the picture considerably:
   to overlap a decoy, or a misplaced real defect.
 - Two Sonnet findings claim that the non-null assertion on the optional customer
   can crash, which the code rules out; one of them sits at the type declaration,
-  so the scorer did not even see it. Several other findings of both models
-  criticize the optional customer as weak typing without claiming wrong
-  behavior, and one Sonnet finding suggests making the documented fall-through
-  more explicit. These are design or readability hints and are not counted
-  above.
+  so the scorer did not even see it. Other findings of both models criticize the
+  optional customer as weak typing without claiming wrong behavior, and one
+  suggests making the documented fall-through more explicit; such design or
+  readability hints are not counted above.
 - The unassignable findings were not classified. They include remarks on dead
   code and on the commit message, but they may also contain wrong claims.
 
 By the automated scores, Opus misses defects; by the reading, it found all of
 them in every run. The case is therefore too easy for Opus, and the scorer, not
-the model, accounts for most of the gap. The log entry lists every case, together
-with the models, ASE and CLI versions, digests of the test case, and the version
-of the scorer that produced the figures.
+the model, accounts for most of the gap.
 
-### The second case
+### Case `security`
 
 On the same day the setup ran three times per model on the case `security`
 (3.38 USD including a plumbing run; one and a half to two minutes per run).
@@ -154,16 +170,18 @@ On the same day the setup ran three times per model on the case `security`
 | Opus 5.5 | 1.00 | 1.00 | 0.50 | 2.3 | not met |
 | Sonnet 5.5 | 0.90 | 0.81 | 0.50 | 3.7 | not met |
 
-Opus found every defect in every run with adequate severity; the case is too easy
-for it. Sonnet, on reading, found 19 of 21 and reported the refund-amount defect
-as `MEDIUM` twice, which the new figure records. Both fail the thresholds only on
-the decoy rate, and on reading that rate holds **no false alarm at all**: the
-decoys drew intent remarks (`recommendations` is scope creep), design hints (use
-`crypto.timingSafeEqual`), a fair clarity remark (the `catch` cannot fail), and one
-correct observation that `Number("")` passes the amount check, which means that
-decoy is flawed. The reviews also found two real weaknesses the list does not
-record: an empty-secret fallback and missing state-transition guards. The log
-entry lists every case and what to change before the next series.
+Opus found every defect in every run with adequate severity; the case is too
+easy for it. Sonnet, on reading, found 19 of 21 and reported the refund-amount
+defect as `MEDIUM` twice, which the severity figure records.
+
+Both fail the thresholds only on the decoy match rate, and on reading that rate
+holds **no false alarm at all**. The decoys drew intent remarks
+(`recommendations` is scope creep), design hints (use
+`crypto.timingSafeEqual`), a fair clarity remark (the `catch` cannot fail), and
+one correct observation that `Number("")` passes the amount check, which means
+that decoy is flawed. The reviews also found two real weaknesses the list does
+not record: an empty-secret fallback and missing state-transition guards. The
+log entry lists every case and what to change before the next series.
 
 ## Quick start
 
@@ -219,44 +237,32 @@ If several entries qualify, the largest overlap wins, then the smallest distance
 then the smallest id. Findings the skill marks as `ACCEPTED` are ignored. No
 language model judges anything; the same reviews always give the same scores.
 
-From that assignment come three figures:
-
-- **Location-matched recall**: the share of the seven defects with a finding at
-  a matching location, overall and per tier.
-- **Decoy match rate** (in the reports: decoy false-alarm rate): the share of the
-  four predefined decoys with a finding at a matching location. It counts any
-  such finding, whatever it says, so it can include unrelated remarks.
-- **Unassignable findings**: findings that match neither a defect nor a decoy.
-- **Recall with adequate severity** (case `security` only): the share of defects
-  that were not only matched but reported with at least their minimum severity;
-  the highest severity among the findings matched to a defect counts. A security
-  hole reported as `LOW` is half missed, and this figure says so.
+From that assignment come the figures of [Reading the figures](#reading-the-figures).
+For recall with adequate severity, the highest severity among the findings
+matched to a defect counts.
 
 On manual reading, a finding on a decoy counts as a false alarm only if it claims
 the code behaves wrongly. A hint on readability or maintainability is not a false
 alarm.
 
-### What the decoy rate does not cover
+### What the decoy match rate does not cover
 
-The decoy rate measures false alarms on four predefined spots only. Unassignable
-findings count neither as hits nor as false alarms. Take a review that finds all
-seven defects, leaves the four decoys alone, and adds twenty unfounded
-complaints elsewhere: it scores a recall of 1.0 and a decoy rate of 0, although
-only seven of its 27 findings are right. That is why the number of unassignable
-findings belongs next to the other figures. Counting them all as false alarms
-would be wrong as well: they can be real additional defects, fair suggestions,
-or unfounded complaints, and only a manual review can tell.
+The decoy match rate measures false alarms on four predefined spots only. Take
+a review that finds all seven defects, leaves the four decoys alone, and adds
+twenty unfounded complaints elsewhere: it scores a recall of 1.0 and a decoy
+match rate of 0, although only seven of its 27 findings are right. That is why
+the number of unassignable findings belongs next to the other figures. Counting
+them all as false alarms would be wrong as well: only a manual review can tell
+real additional defects and fair suggestions from unfounded complaints.
 
 ### Pilot thresholds
 
-A configuration meets the predefined pilot thresholds if, on average, overall
-recall is at least 0.6, recall on the obvious tier is at least 0.8, and the
-decoy match rate is at most 0.25; the case `security` adds a fourth: recall with
-adequate severity of at least 0.5. These are provisional criteria chosen for the
-pilot cases, not requirements derived from a concrete use. Their strength is that
-they are committed in the `thresholds.json` of the case *before* its first paid
-run, so nobody can tune them to the results; the runner refuses paid runs if that
-file is uncommitted or modified.
+The thresholds listed under [Reading the figures](#reading-the-figures) are
+provisional criteria chosen for the pilot cases, not requirements derived from
+a concrete use. Their strength is that they are committed in the
+`thresholds.json` of the case *before* its first paid run, so nobody can tune
+them to the results; the runner refuses paid runs if that file is uncommitted
+or modified.
 
 ### Ceiling-effect check
 
@@ -268,17 +274,18 @@ below 1.0 while the manual reading found every defect.
 
 ### Known limitations
 
-- **One small case.** Seven defects in one change cannot rank strong models, and
-  this case is too easy for Opus. More runs of the same case show its variance
+- **Two small cases.** Seven defects per change cannot rank strong models, and
+  both cases are too easy for Opus. More runs of the same case show its variance
   but fix neither the matching errors nor the lack of variety.
 - **Location matching is blunt.** It misses correct findings placed one hop away
   and credits unrelated findings with wide ranges. Recording alternative
-  locations per defect and keeping decoys away from genuine weaknesses of the code
-  would help (see the log entry in `MEASUREMENTS.md`).
-- **The decoy rate measures locations, not claims.** In the case `security` it
-  reached 0.50 for both models without a single false alarm on reading. Decoys
-  that invite intent or style remarks inflate it, and one decoy of that case is
-  flawed. Decoy quality and a severity-aware decoy rate come before more models.
+  locations per defect and keeping decoys away from genuine weaknesses of the
+  code would help (see the log entry in `MEASUREMENTS.md`).
+- **The decoy match rate measures locations, not claims.** In the case
+  `security` it reached 0.50 for both models without a single false alarm on
+  reading. Decoys that invite intent or style remarks inflate it, and one decoy
+  of that case is flawed. Decoy quality and a severity-aware decoy match rate
+  come before more models.
 - **Three runs per model** show tendencies, not significant differences.
 - **Cost figures assume Anthropic prices.** For other endpoints the number means
   little.
@@ -302,7 +309,8 @@ prompt `/ase:ase-repo-review -c HEAD -S LOW`, that is, review the last commit an
 report everything down to severity LOW. The CLI is fenced in:
 
 - only the ASE plugin of this working copy is loaded, and only the `ase` MCP
-  server is reachable, so personal plugins and account connectors stay out;
+  server (the tool server that ASE provides to the model) is reachable, so
+  personal plugins and account connectors stay out;
 - the model may read and search files and run `git`, but it may not edit or write
   anything and may not go to the web;
 - inherited `CLAUDE*` and `ANTHROPIC_*` environment variables are removed;
@@ -332,8 +340,8 @@ throw-away copy for inspection; `--out` sets the location of the result folders.
 plugins (`@builtin`) are only logged, not treated as an isolation breach.
 
 `compare.mjs` reports per model recall per tier and overall (mean, minimum,
-maximum), the decoy rate, the unassignable findings, the skill verdict per run,
-duration and cost, the threshold verdict, and the ceiling-effect statement.
+maximum), the decoy match rate, the unassignable findings, the skill verdict per
+run, duration and cost, the threshold verdict, and the ceiling-effect statement.
 Applied twice to the same folders, `report.json` is byte-identical.
 
 ### Other endpoints (open-weight models)
@@ -396,5 +404,6 @@ rule, or the isolation of the runner.
 
 ## Origin
 
-Approach and matching rule follow the effectiveness test of MERIT
-(`tests/effectiveness/`); the code is written from scratch.
+Approach and matching rule follow the effectiveness test of MERIT, a separate
+project with its own test of an AI reviewer (`tests/effectiveness/`); the code
+here is written from scratch.
