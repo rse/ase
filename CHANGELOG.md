@@ -5,6 +5,12 @@ ChangeLog
 2.0.7 (2026-11-02)
 ------------------
 
+-   FEATURE [code, docs]: Model Selection of Agents
+    The new definition option `-M`|`--model` of all agents (also `model` of the definition files and
+    of the sections `default` and per agent of a fleet) selects the model of the agent tool, either
+    for all tasks, or as `<size>=<model>` pairs per `Effort:` size of the task (like
+    `XS=haiku,*=sonnet`), while the new hook `model` of a definition can override it per task.
+
 -   FEATURE [code, docs]: Partial Staging Skill
     The new skill `ase-repo-stage` stages only the working copy changes belonging to a topic, the
     last `CHANGELOG.md` entry (`--entry`), the last turn (`--turn`), or the session (`--session`),

@@ -12,6 +12,7 @@
 \[`-r`|`--repo` *url*\]
 \[`-d`|`--tempdir` *dir*\]
 \[`-m`|`--mode` `phase`|`request`\]
+\[`-M`|`--model` *model*\]
 \[`--`*group*`-`*item* *value* \[...\]\]
 \[`-f`|`--foreground`\]
 
@@ -245,6 +246,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
 
     - \[`--unclaimed`\]: Process the tasks of the incoming states
       without claiming them (`phase` only). Built-in: not set.
+
+    - \[`-M`|`--model` *model*\]: The model of the agent tool: a model
+      for all tasks, or comma-separated *size*`=`*model* pairs per
+      `Effort:` size (`XS`, `S`, `M`, `L`, `XL`, or `*` for all other
+      tasks), see `ase-agent-adhoc`(1). Generic default: the default
+      model of the agent tool. Built-in: none.
 
     - \[`--params` *name*`=`*value*\]: The value of a parameter
       declared by the definition (repeatable). Built-in: none declared.

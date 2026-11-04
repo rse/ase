@@ -19,6 +19,7 @@
 \[`--lifecycle` *model*\]
 \[`--serial`\]
 \[`--unclaimed`\]
+\[`-M`|`--model` *model*\]
 \[`--params` *name*`=`*value*\]
 \[`--state-`*item* *state*\]
 \[`--tag-`*item* *tag*\]
@@ -169,12 +170,12 @@ tags (except the request state tag) and, by default, gets its previous
 assignee back. An agent consumes the request prompts if its prompt
 template references `{prompt}` (except within the conditional
 `{?prompt:`*text*`}` only, which makes the prompt *optional*) or it
-has a hook `prepare`, `prompt`, or `finish` (which receive the request
-prompt in their *job*), where it then refuses a request with an empty
-prompt as failed, else it accepts requests with an empty prompt (which
-an agent with an optional prompt still passes on if non-empty), and
-announces this to the agent relay, so the task boards accept an empty
-prompt for its requests, too.
+has a hook `prepare`, `prompt`, `model`, or `finish` (which receive
+the request prompt in their *job*), where it then refuses a request
+with an empty prompt as failed, else it accepts requests with an empty
+prompt (which an agent with an optional prompt still passes on if
+non-empty), and announces this to the agent relay, so the task boards
+accept an empty prompt for its requests, too.
 
 Only the prompt (and `--state-incoming` for `--type phase`) is
 mandatory, while all other options default to the safe *annotate*
@@ -430,6 +431,16 @@ and `--prompt-skill` with `--prompt-args`, and `--tag-retry` and
   `--assign-failure`, the success criterion `status`, the hook
   `passes`, and `--workdir changeset` resp. `target` (as the task can
   be claimed by another agent meanwhile).
+
+- \[`-M`|`--model` *model*\]:
+  The model of the agent tool, passed to it as `--model` *model*
+  verbatim (e.g., an alias like `sonnet` or a full model name), either a
+  *model* for all tasks, or comma-separated *size*`=`*model* pairs per
+  `Effort:` size of the task (`XS`, `S`, `M`, `L`, `XL`, or `*` for all
+  other tasks, e.g., `XS=haiku,S=haiku,M=sonnet,*=opus`), where a task
+  without a matching pair gets the default model of the agent tool (the
+  default for all tasks). The hook `model` can override it per task (see
+  **HOOKS**).
 
 - \[`--params` *name*`=`*value*\]:
   (repeatable) The value of the parameter *name* declared by the
@@ -985,6 +996,14 @@ invocation:
   its template (`{ skill, args }` or `{ text }`): `{ skill, args }`,
   `{ text }`, a plain prompt text, or `undefined` to keep the
   configured one, where a thrown error fails the processing.
+
+- `model(task, model, job, ctx)`:
+  The model of the agent tool for the job, given the configured *model*
+  of `--model` for the `Effort:` size of the task (empty for the default
+  model of the agent tool): a model (empty for the default one), or
+  `undefined` to keep the configured one, where a thrown error fails the
+  processing. This allows choosing the model per task by any means,
+  e.g., by asking a cheap model via `ctx.exec`.
 
 - `verdict(task, result, ctx)`:
   (after a successful agent tool only) The verdict of the result (an

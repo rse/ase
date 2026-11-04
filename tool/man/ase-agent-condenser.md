@@ -9,6 +9,7 @@
 \[`-T`|`--timeout` *duration*\]
 \[`-o`|`--one-shot`\]
 \[`--agent-relay` *url*\]
+\[`-M`|`--model` *model*\]
 \[`--`*group*`-`*item* *value* \[...\]\]
 \[`-f`|`--foreground`\]
 
@@ -144,6 +145,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
       predecessors, and without ever changing their status and assignee
       (`phase` only). Built-in: not set. Not allowed, as the condenser
       claims the tasks into its activity state.
+
+    - \[`-M`|`--model` *model*\]: The model of the agent tool: a model
+      for all tasks, or comma-separated *size*`=`*model* pairs per
+      `Effort:` size (`XS`, `S`, `M`, `L`, `XL`, or `*` for all other
+      tasks), see `ase-agent-adhoc`(1). Generic default: the default
+      model of the agent tool. Built-in: none.
 
     - \[`--params` *name*`=`*value*\]: The value of a parameter
       declared by the definition (repeatable). Built-in: none declared.

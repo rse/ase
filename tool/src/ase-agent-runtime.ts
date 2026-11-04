@@ -75,13 +75,15 @@ export type AgentResult = { ok: boolean, output: string[] }
 
 /*  the invocation of a skill command "<skill> <args>" (rendered per agent tool, see
     "skillPrompt"), or alternatively of an already rendered raw prompt, in a working
-    directory, optionally granting access to additional directories, optionally
+    directory, optionally with a model of the agent tool (else its default model),
+    optionally granting access to additional directories, optionally
     finished after the invocation (e.g. by committing its result), and
     optionally cleaned up afterwards in any case, even after a failed
     finishing or a timed out preparing (e.g. by removing its temporary worktree)  */
 export type AgentJob = {
     cmd?:     string
     prompt?:  string
+    model?:   string
     cwd:      string
     dirs?:    string[]
     finish?:  (log: AgentLog, result: AgentResult) => Promise<void>
@@ -268,6 +270,9 @@ export abstract class Agent {
     /*  the title and the description of the operation of the agent, as announced in its presence (default: none)  */
     protected presenceTitle = ""
     protected presenceDesc  = ""
+
+    /*  the configured model of the agent tool, as shown in the start log line (default: none)  */
+    protected modelSpec = ""
 
     /*  whether tasks are processed serially only (clamping "--parallel" to 1, and
         refusing multiple agents of the kind in a fleet, see "ase agent fleet")  */
@@ -1047,11 +1052,12 @@ export abstract class Agent {
     private async invoke (taskId: string, job: AgentJob, abort: AbortSignal, log: AgentLog, echo: AgentLog, output: string[]): Promise<boolean> {
         const { tool, timeout, timeoutSpec } = this
         const { cwd } = job
-        const cli  = toolSpecs[tool].cli
-        const cmd  = job.cmd ?? ""
-        const i    = cmd.indexOf(" ")
-        const args = toolArgs[tool](job.prompt ?? skillPrompt(tool, i < 0 ? cmd : cmd.slice(0, i), i < 0 ? "" : cmd.slice(i + 1)),
-            [ ...new Set(job.dirs ?? []) ].filter((dir) => dir !== cwd).flatMap((dir) => [ "--add-dir", dir ]))
+        const cli   = toolSpecs[tool].cli
+        const cmd   = job.cmd ?? ""
+        const i     = cmd.indexOf(" ")
+        const model = job.model ?? ""
+        const args  = toolArgs[tool](job.prompt ?? skillPrompt(tool, i < 0 ? cmd : cmd.slice(0, i), i < 0 ? "" : cmd.slice(i + 1)),
+            [ ...new Set(job.dirs ?? []) ].filter((dir) => dir !== cwd).flatMap((dir) => [ "--add-dir", dir ]), model)
         await log("info", `running: ${cli} ${args.map((arg) => arg.includes(" ") ? `"${arg}"` : arg).join(" ")}`)
         const started = Date.now()
         const costs: ToolCosts = { costToken: null, costUSD: null, cread: 0, cwrite: 0, input: 0, apiMs: null }
@@ -1095,7 +1101,7 @@ export abstract class Agent {
 
         /*  book the usage onto the task, if the AI usage accounting is enabled ("telemetry.enabled"),
             (the AI request time falling back to the wall time and an unreported cost to the price
-            table entry of the tool, as its model is unknown), without any human time and costs,
+            table entry of the given model, else of the tool), without any human time and costs,
             as the headless agent tool runs unattended; the times are booked in rounded minutes,
             with the (signed) rounding remainder carried over to the next booking onto the task,
             where a failed booking is only reported  */
@@ -1108,7 +1114,8 @@ export abstract class Agent {
             if (cost === null) {
                 const cfg = new Config("config", configSchema, this.log)
                 cfg.read()
-                cost = tokenCost(modelPrice(parsePrices(String(cfg.get("telemetry.prices.ai") ?? "")), tool), tokens)
+                const prices = parsePrices(String(cfg.get("telemetry.prices.ai") ?? ""))
+                cost = tokenCost(modelPrice(prices, model !== "" && prices.has(model) ? model : tool), tokens)
             }
             const carry    = this.unbooked.get(taskId) ?? { aiMs: 0, realMs: 0 }
             const aiMs     = carry.aiMs   + (costs.apiMs ?? walltimeMs)
@@ -1490,7 +1497,7 @@ export abstract class Agent {
                 await this.cloneRepo()
 
             await this.write("info", this.name, `observing ${this.observing()} ` +
-                `(tool: ${tool}, parallel: ${parallel}, timeout: ${this.timeoutSpec}${this.oneShot ? ", one-shot" : ""})`)
+                `(tool: ${tool}${this.modelSpec !== "" ? `, model: ${this.modelSpec}` : ""}, parallel: ${parallel}, timeout: ${this.timeoutSpec}${this.oneShot ? ", one-shot" : ""})`)
             let finished = false
             let failure: unknown = null
             while (!abort.signal.aborted && !finished) {

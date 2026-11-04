@@ -129,6 +129,9 @@ export const definitionOptions: DefinitionOption[] = [
     opt("unclaimed",         "flag",  "",              "process the tasks of the incoming states (each adapted onto the " +
         "task lifecycle model) without claiming them, independent of their assignee and predecessors, " +
         "and without ever changing their status and assignee (for \"phase\" only)"),
+    opt("model",             "value", "model",         "model of the agent tool: a model for all tasks, or comma-separated " +
+        "\"<size>=<model>\" pairs per \"Effort:\" size (\"XS\", \"S\", \"M\", \"L\", \"XL\", or \"*\" for all other tasks) " +
+        "(default: the default model of the agent tool)"),
     opt("params",            "list",  "name=value",    "value of a parameter declared by the definition (repeatable)"),
     opt("state-incoming",    "list",  "state",         "state of the tasks to claim (mandatory for \"phase\", " +
         "repeatable with \"--unclaimed\" or \"--state-activity\" only)"),
@@ -318,6 +321,7 @@ export type ResolvedDefinition = {
     lifecycles:  string[]
     serial:      boolean
     unclaimed:   boolean
+    model:       { spec: string, sizes: Record<string, string> }
     state: {
         incoming: string[], activity: string, success: string, failure: string,
         phase: string, passed: string, verdict: Record<string, string>
@@ -363,7 +367,7 @@ export const flattenDefinition = (data: Record<string, unknown>, where: string):
 }
 
 /*  the names of the hooks of a definition (see "AgentHooks")  */
-const hookNames = [ "start", "order", "passes", "ready", "prepare", "prompt", "verdict", "success", "settle", "finish", "stop" ]
+const hookNames = [ "start", "order", "passes", "ready", "prepare", "prompt", "model", "verdict", "success", "settle", "finish", "stop" ]
 
 /*  a normalized parameter declaration of a definition (see "AgentParam"),
     with only the fields given by the definition (to extend those of its base)  */
@@ -891,6 +895,25 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
             fail("definition", "hook \"passes\" is not for \"--unclaimed\" (as an unclaimed task never waits for its predecessors)")
     }
 
+    /*  the model of the agent tool: a plain model (for all tasks, as size "*"),
+        or the models per "Effort:" size, where none means the default of the tool  */
+    const modelSpec = str("model").trim()
+    const sizes: Record<string, string> = {}
+    if (modelSpec !== "" && !modelSpec.includes("="))
+        sizes["*"] = modelSpec
+    else if (modelSpec !== "") {
+        for (const pair of modelSpec.split(",").map((item) => item.trim())) {
+            const m = /^(XS|S|M|L|XL|\*)=(\S+)$/.exec(pair)
+            if (m === null)
+                fail("model", `invalid pair "${pair}" (expected "<size>=<model>" with size "XS", "S", "M", "L", "XL", or "*")`)
+            else if (Object.hasOwn(sizes, m[1]))
+                fail("model", `size "${m[1]}" given twice`)
+            else
+                sizes[m[1]] = m[2]
+        }
+    }
+    const model = { spec: modelSpec, sizes }
+
     /*  whether a verdict is determined (by "--verdict-label" or the hook "verdict")  */
     const verdicting = has("verdict-label") || loaded.hooks.verdict !== undefined
 
@@ -979,11 +1002,11 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
         hence the prompt of the request), resp. uses them optionally by "{prompt}" used only
         within the conditional "{?prompt:...}", else ignores them  */
     const consumes: AgentPrompt = type === "request" && (template.required.has("prompt")
-        || ([ "prepare", "prompt", "finish" ] as const).some((hook) => loaded.hooks[hook] !== undefined)) ? "required" :
+        || ([ "prepare", "prompt", "model", "finish" ] as const).some((hook) => loaded.hooks[hook] !== undefined)) ? "required" :
         type === "request" && template.names.has("prompt") ? "optional" : "ignored"
 
     return {
-        name, title, description, type, workdir, lifecycles, unclaimed,
+        name, title, description, type, workdir, lifecycles, unclaimed, model,
         serial:  flag("serial"),
         state:   { incoming, activity, success, failure, phase, passed, verdict: verdicts },
         tag:     {

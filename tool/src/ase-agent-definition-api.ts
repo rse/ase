@@ -53,6 +53,7 @@ export interface AgentDefinition {
     lifecycle?:   Many<string>
     serial?:      boolean
     unclaimed?:   boolean
+    model?:       string
     state?: {
         incoming?: Many<string>
         activity?: string
@@ -278,6 +279,9 @@ type Async<T> = T | Promise<T>
     - "prompt": the prompt of the job, given the configured one <prompt> (rendered from its
       template): a skill with its arguments, a prompt text (also as a plain string), or
       undefined to keep the configured one, where a thrown error fails the processing
+    - "model": the model of the agent tool for the job, given the configured one <model> (of
+      "model", by the "Effort:" size of the task, where empty means the default of the agent
+      tool): a model, or undefined to keep the configured one, where a thrown error fails the processing
     - "verdict" (after a successful agent tool only): the verdict of the result (an upper-case
       word, accepted only if listed by "verdict.allow", if given), an empty string for none,
       or undefined to keep the one found after "verdict.label" (if any)
@@ -296,6 +300,7 @@ export interface AgentHooks {
     ready?:   (task: AgentHookTask, ctx: AgentHookContext) => Async<boolean | string>
     prepare?: (task: AgentHookTask, job: AgentHookJob, ctx: AgentHookContext) => Async<void>
     prompt?:  (task: AgentHookTask, prompt: AgentHookPrompt, job: AgentHookJob, ctx: AgentHookContext) => Async<AgentHookPrompt | string | undefined>
+    model?:   (task: AgentHookTask, model: string, job: AgentHookJob, ctx: AgentHookContext) => Async<string | undefined>
     verdict?: (task: AgentHookTask, result: AgentHookResult, ctx: AgentHookContext) => Async<string | undefined>
     success?: (task: AgentHookTask, result: AgentHookResult, ctx: AgentHookContext) => Async<boolean | string>
     settle?:  (task: AgentHookTask, outcome: AgentHookOutcome, ctx: AgentHookContext) => Async<AgentHookSettlement | undefined>
