@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.0.7 (2026-11-02)
+2.0.7 (2026-11-04)
 ------------------
 
 -   FEATURE [code, docs]: Model Selection of Agents
@@ -41,6 +41,11 @@ ChangeLog
 -   IMPROVEMENT [code]: find(1) Fallback for Source Resolution
     `ase-code-lint` now resolves directory and wildcard source references with `find` via `Bash`
     (newly allowed) if the `Glob` tool is not available, to support foreign LLMs.
+
+-   BUGFIX [code]: Gitea Issue Dependencies Content-Type
+    The Gitea task store plugin (`ase-task-store-plugin-gitea.ts`) now sends the issue dependency
+    create and remove requests with `Content-Type: application/json`, fixing the HTTP 422 errors
+    against Forgejo/Gitea.
 
 -   BUGFIX [code]: Silent parallel sub-agents
     Forbid any output while concurrently dispatched sub-agents report back one by one, as Claude
