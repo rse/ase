@@ -20,7 +20,7 @@
         "markdownlint-cli2":                "0.24.0",
         "eslint":                           "10.14.0",
         "@eslint/markdown":                 "8.0.3",
-        "eslint-markdown":                  "0.20.0",
+        "eslint-markdown":                  "0.21.0",
         "typescript":                       "6.0.3"
     },
     "engines": {
