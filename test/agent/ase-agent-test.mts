@@ -94,6 +94,7 @@ const exec = (cmd: string, args: string[], options: {
                 options.onLine(line, stream)
         }
     }
+    child.stdin.on("error", () => {})  /*  ignore EPIPE: the child may exit without reading stdin  */
     child.stdout.on("data", collect("stdout"))
     child.stderr.on("data", collect("stderr"))
     let timedOut = false
