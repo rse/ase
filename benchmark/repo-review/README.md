@@ -116,9 +116,10 @@ means over three runs.
   decoy; they may be real extra defects, fair remarks, or unfounded complaints.
 - **Recall with adequate severity** (case `security` only): the share of
   defects matched *and* reported with at least their minimum severity.
-- **Pilot thresholds**: provisional pass marks fixed before the first paid run
-  (overall recall ≥ 0.6, obvious tier ≥ 0.8, decoy match rate ≤ 0.25; the case
-  `security` adds recall with adequate severity ≥ 0.5).
+- **Automated thresholds**: the pilot's provisional pass marks, fixed before
+  the first paid run (overall recall ≥ 0.6, obvious tier ≥ 0.8, decoy match
+  rate ≤ 0.25; the case `security` adds recall with adequate severity ≥ 0.5).
+  "Met" or "not met" judges the automated figures only, never the reading.
 
 ### Case `shop-core`
 
@@ -127,7 +128,7 @@ took between one and a half and two minutes. The table shows the re-scoring
 with the fixed location parser (log entry "Re-scoring … with the fixed location
 parser"); the original figures of the first scoring are kept in the log as well.
 
-| Configuration | Location-matched recall, overall | Location-matched recall, obvious | Decoy match rate | Unassignable findings per run | Pilot thresholds |
+| Configuration | Location-matched recall, overall | Location-matched recall, obvious | Decoy match rate | Unassignable findings per run | Automated thresholds |
 |---|---|---|---|---|---|
 | Opus 5.5 | 0.95 | 0.83 | 0.17 | 0.3 | met |
 | Sonnet 5.5 | 0.90 | 0.67 | 0.50 | 2.0 | not met |
@@ -165,18 +166,22 @@ the model, accounts for most of the gap.
 On the same day the setup ran three times per model on the case `security`
 (3.38 USD including a plumbing run; one and a half to two minutes per run).
 
-| Configuration | Location-matched recall | Recall with adequate severity | Decoy match rate | Unassignable per run | Pilot thresholds |
+| Configuration | Location-matched recall, overall | Recall with adequate severity | Decoy match rate | Unassignable findings per run | Automated thresholds |
 |---|---|---|---|---|---|
 | Opus 5.5 | 1.00 | 1.00 | 0.50 | 2.3 | not met |
 | Sonnet 5.5 | 0.90 | 0.81 | 0.50 | 3.7 | not met |
 
-Opus found every defect in every run with adequate severity; the case is too
-easy for it. Sonnet, on reading, found 19 of 21 and reported the refund-amount
-defect as `MEDIUM` twice, which the severity figure records.
+The raw reviews were read the same way as for `shop-core`:
 
-Both fail the thresholds only on the decoy match rate, and on reading that rate
-holds **no false alarm at all**. The decoys drew intent remarks
-(`recommendations` is scope creep), design hints (use
+| Configuration | Defects described correctly | Defects reported with adequate severity | Decoys claimed to be defects |
+|---|---|---|---|
+| Opus 5.5 | 21 of 21 (all 7 in every run) | 21 of 21 | 0 of 12 |
+| Sonnet 5.5 | 19 of 21 (missed the stock-reservation defect twice) | 17 of 21 (refund amount as `MEDIUM` twice) | 0 of 12 |
+
+Opus found every defect in every run with adequate severity; the case is too
+easy for it. Both miss the automated thresholds only on the decoy match rate,
+and on reading that rate holds **no false alarm at all**. The decoys drew
+intent remarks (`recommendations` is scope creep), design hints (use
 `crypto.timingSafeEqual`), a fair clarity remark (the `catch` cannot fail), and
 one correct observation that `Number("")` passes the amount check, which means
 that decoy is flawed. The reviews also found two real weaknesses the list does
