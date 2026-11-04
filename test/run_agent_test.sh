@@ -9,6 +9,12 @@
 ##
 ##  With "--case <name>", only this single case runs.
 ##
+##  Environment:
+##  -   ASE_TEST_JOBS=1:          run the cases one after the other instead of
+##                                in parallel (e.g. for a single local model)
+##  -   ASE_AGENT_TEST_CONFIRM=0: skip the cost confirmation (e.g. for a local
+##                                model, see run_agent_test_local.sh)
+##
 
 set -euo pipefail
 
@@ -41,7 +47,7 @@ set -- ${args[@]+"${args[@]}"}
 
 #   warn about the costs and ask for confirmation
 #   (runs without any agent spend no tokens, so need no confirmation)
-if [[ $nocost -eq 0 ]]; then
+if [[ $nocost -eq 0 && "${ASE_AGENT_TEST_CONFIRM:-1}" != "0" ]]; then
     cat <<'EOF'
 This runs the "ase agent" end-to-end system tests.
 
@@ -67,15 +73,24 @@ if [[ $single -eq 1 ]]; then
     exec node agent/ase-agent-test.mts "$@"
 fi
 
-#   run the tests of all cases in parallel, each with its output prefixed by its
-#   case name, and captured for the summary
+#   run the tests of all cases in parallel (resp. one after the other with
+#   ASE_TEST_JOBS=1), each with its output prefixed by its case name, and
+#   captured for the summary
 set -o pipefail
 logdir=$(mktemp -d "${TMPDIR:-/tmp}/run-agent-test-XXXXXX")
 trap 'rm -rf "$logdir"' EXIT
-pids=()
+serial=0
+[[ "${ASE_TEST_JOBS:-}" == "1" ]] && serial=1
+rcs=()
 for c in "${cases[@]}"; do
     node agent/ase-agent-test.mts --case "$c" "$@" 2>&1 | tee "$logdir/$c.log" | sed -u "s/^/[$c] /" &
-    pids+=($!)
+    if [[ $serial -eq 1 ]]; then
+        rc=0
+        wait $! || rc=$?
+        rcs+=("$rc")
+    else
+        rcs+=("pid:$!")
+    fi
 done
 
 #   await all tests, collecting per case its name, exit code, captured log,
@@ -83,8 +98,12 @@ done
 worst=0
 summary=()
 for i in "${!cases[@]}"; do
-    rc=0
-    wait "${pids[$i]}" || rc=$?
+    rc="${rcs[$i]}"
+    if [[ "$rc" == pid:* ]]; then
+        pid="${rc#pid:}"
+        rc=0
+        wait "$pid" || rc=$?
+    fi
     [[ $rc -gt $worst ]] && worst=$rc
     log="$logdir/${cases[$i]}.log"
     dir=$(grep -o 'results: `[^`]*`' "$log" | tail -1 | sed 's/^results: `//; s/`$//' || true)

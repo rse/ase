@@ -68,13 +68,20 @@ node agent/ase-agent-test.mts --tool codex --timeout 20m --max-cost-usd 3
 npm start test-agent                             # the same via stx (inside test/)
 ./run_agent_test.sh                              # all cases in parallel, after a cost confirmation (inside test/)
 ./run_agent_test.sh --case fibonacci-fleet       # a single case, after a cost confirmation
+./run_agent_test_local.sh [<profile>]            # all cases against a local model gateway (no confirmation)
 ```
 
 `run_agent_test.sh` runs the cases `wordcount-python` and
 `fibonacci-fleet` in parallel (each in its own sandbox, with its output
 prefixed by `[<case>]`), passes all further options to both, prints one
 verdict line per case, and exits with the worst exit code. With
-`--case` or `--suite-only`, it runs only a single test.
+`--case` or `--suite-only`, it runs only a single test. With
+`ASE_TEST_JOBS=1`, the cases run one after the other, and
+`ASE_AGENT_TEST_CONFIRM=0` skips the cost confirmation.
+`run_agent_test_local.sh` exports an LLM gateway profile (see
+`etc/llm-local.env.sample`, which sets `ASE_TEST_JOBS=1`, as a single local
+model handles concurrent generation poorly) and then runs
+`run_agent_test.sh` without the confirmation.
 
 Options:
 

@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 ##
-##  run_agent_test_local.sh -- run the "ase agent" end-to-end system test
-##  (agent/ase-agent-test.mts) against a locally served model behind an
-##  Anthropic-compatible gateway (e.g. a LiteLLM proxy), configured through
-##  an LLM gateway profile (same format as for run_all_tests_local.sh)
+##  run_agent_test_local.sh -- run the "ase agent" end-to-end system tests
+##  of all cases (via run_agent_test.sh, incl. its summary) against a locally
+##  served model behind an Anthropic-compatible gateway (e.g. a LiteLLM
+##  proxy), configured through an LLM gateway profile (same format as for
+##  run_all_tests_local.sh)
 ##
-##  Usage: ./run_agent_test_local.sh [<profile>] [agent test options, e.g. --dry-run]
+##  Usage: ./run_agent_test_local.sh [<profile>] [agent test options, e.g. --dry-run, --case <name>]
 ##
 ##  The profile is taken from the first argument, else from $ASE_TEST_LLM,
-##  else from "etc/llm-local.env".
+##  else from "etc/llm-local.env". With ASE_TEST_JOBS=1 (as set by the sample
+##  profile), the cases run one after the other instead of in parallel.
 ##
 
 set -euo pipefail
@@ -47,6 +49,11 @@ for tier in OPUS SONNET HAIKU; do
 done
 unset ANTHROPIC_AUTH_TOKEN
 
-echo "Running the \"ase agent\" system test against the gateway $ANTHROPIC_BASE_URL (model \"$ANTHROPIC_MODEL\")."
+echo "Running the \"ase agent\" system tests against the gateway $ANTHROPIC_BASE_URL (model \"$ANTHROPIC_MODEL\")"
+if [[ "${ASE_TEST_JOBS:-}" == "1" ]]; then
+    echo "one case after the other (ASE_TEST_JOBS=1)."
+else
+    echo "with the cases in parallel (set ASE_TEST_JOBS=1 to serialize them)."
+fi
 echo "Note: local runs can take VERY long, and the reported costs are meaningless."
-exec node agent/ase-agent-test.mts "$@"
+ASE_AGENT_TEST_CONFIRM=0 exec ./run_agent_test.sh "$@"
