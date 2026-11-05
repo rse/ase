@@ -13,6 +13,7 @@
     [`--ground`|`-G`]
     [`--focus`|`-f` *section*[,...]]
     [`--force`|`-F`]
+    [`--quiet`|`-q`]
     [`--next`|`-n` *option*[,...]]
     [*id*]
 
@@ -61,7 +62,7 @@ persisted, its `Tags:` frontmatter key records each grilled section as
 its own tag `grilled:`*section* (lower-case, kept alongside the tags of
 previously grilled sections, e.g. `grilled:specification,
 grilled:design`), and a `PLAN CHANGES` box shows the bullet-points
-changed by the round. Finally, the user is offered a complete
+changed by the round (unless `--quiet` is given). Finally, the user is offered a complete
 re-grilling (with the same grilling options), or a hand-off to editing,
 implementation, or draft.
 
@@ -135,6 +136,11 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
     Re-grill already grilled sections completely, i.e., ignore their
     `grilled:`*section* tags instead of skipping them resp. re-asking
     only their `[?]` bullet-points.
+
+-   `--quiet`|`-q`:
+    Do not print the `PLAN CHANGES` box of the bullet-points changed by
+    a round. The status lines and the dialogs stay. It is forwarded on a
+    re-grilling, but not on a hand-off to another skill.
 
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end

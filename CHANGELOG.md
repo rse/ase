@@ -5,6 +5,10 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Quiet Option for Task Grilling
+    The new option `--quiet`|`-q` of `ase-task-grill` suppresses the printing of the `PLAN CHANGES`
+    box at the end of a grilling round, while status lines and dialogs stay.
+
 -   IMPROVEMENT [code, docs]: Quiet Option for Task Editing
     The new option `--quiet`|`-q` of `ase-task-edit` suppresses the printing of the resulting plan
     at the end of a planning round, while status lines, dialogs, and stale draft warnings stay.

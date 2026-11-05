@@ -1,6 +1,6 @@
 ---
 name: ase-task-grill
-argument-hint: "[--help|-h] [--rounds|-r <n>] [--until|-u MUST|SHOULD|MAY] [--perspective|-p <perspective>] [--ground|-G] [--focus|-f <section>[,...]] [--force|-F] [--next|-n <option>[,...]] [<id>]"
+argument-hint: "[--help|-h] [--rounds|-r <n>] [--until|-u MUST|SHOULD|MAY] [--perspective|-p <perspective>] [--ground|-G] [--focus|-f <section>[,...]] [--force|-F] [--quiet|-q] [--next|-n <option>[,...]] [<id>]"
 description: >
     Interview the user relentlessly about the task plan until reaching a
     shared understanding, resolving each branch of the question decision
@@ -22,7 +22,7 @@ Iteratively Grill a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-grill"
-    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --focus|-f=(all|SPECIFICATION|SPEC|DESIGN|DES|VERIFICATION|VER)... --force|-F --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task">
+    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --focus|-f=(all|SPECIFICATION|SPEC|DESIGN|DES|VERIFICATION|VER)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -298,6 +298,7 @@ Set <args>--int-reuse-task</args>.
 
         6.  SHOW PLAN CHANGES:
 
+            <if condition="<getopt-option-quiet/> is not equal `true`">
             Set <round-suffix/> to
             ` round <m/>/<getopt-option-rounds/>` if
             <getopt-option-rounds/> is greater than 1, or to empty
@@ -316,6 +317,7 @@ Set <args>--int-reuse-task</args>.
 
             <ase-tpl-foot title="PLAN CHANGES" subtitle="after grilling<round-suffix/>"/>
             </template>
+            </if>
 
 4.  **Decide Next Step:**
 
@@ -351,6 +353,9 @@ Set <args>--int-reuse-task</args>.
             </if>
             <if condition="<getopt-option-ground/> is `true`">
                 Set <args><args/> --ground</args>.
+            </if>
+            <if condition="<getopt-option-quiet/> is `true`">
+                Set <args><args/> --quiet</args>.
             </if>
             Only output the following <template/> and then call the
             tool `Skill(skill: "ase:ase-task-grill", args: "<args/>")`
