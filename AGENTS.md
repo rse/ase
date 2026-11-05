@@ -16,7 +16,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 **ASE** ships three deliverables from one repository:
 
 -   `plugin/`: the agent tool plugin
-    -   `plugin/skills/ase-xxx-xxx/`: the 58 skills, each with a `SKILL.md`
+    -   `plugin/skills/ase-xxx-xxx/`: the 59 skills, each with a `SKILL.md`
         (agent instructions) and a `help.md` (Unix-style manual page), plus
         optional skill-specific files (like `ase-help-intent/data.md`, the
         concatenation of all `help.md` files, generated at build-time, or

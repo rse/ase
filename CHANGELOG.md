@@ -5,6 +5,13 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   FEATURE [code, docs]: Comprehension-Scored Commit Skill
+    The new skill `ase-repo-qa-commit` stages the files changed in the current session, quizzes the
+    user with up to five multiple-choice questions on the architecture and a deep technical detail
+    of the staged changes, and then commits them with
+    the score and a traffic light prefixed to the commit message (like `🟢 [5/5] FEATURE: ...`),
+    where a red score of below 40% additionally flags the commit with `-- NEEDS REVIEW`.
+
 -   BUGFIX [code]: Server Probe with Foreign Dispatcher
     The server probe of `ase agent relay|task store start|status|stop` and the insecure relay and
     task store clients now send requests with an `undici` dispatcher through the `fetch` of the npm

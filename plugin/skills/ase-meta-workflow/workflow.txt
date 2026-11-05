@@ -31,6 +31,7 @@ START               -> ase-repo-dissect
 START               -> ase-repo-stage
 START               -> ase-repo-merge
 START               -> ase-repo-resolve
+START               -> ase-repo-qa-commit
 ase-help-skill      -> END
 ase-meta-config     -> END
 ase-meta-why        -> END
@@ -64,6 +65,7 @@ ase-repo-dissect    -> END
 ase-repo-stage      -> END
 ase-repo-merge      -> END
 ase-repo-resolve    -> END
+ase-repo-qa-commit  -> END
 START               -> SKETCH
 START               -> TASK
 START               -> ase-sync-import
