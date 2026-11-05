@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--quiet|-q] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--focus|-f <section>[,...]] [--quiet|-q] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. A new plan is optionally composed along the
@@ -27,7 +27,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --quiet|-q --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --quiet|-q --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
     $ARGUMENTS
 </expand>
 
@@ -80,6 +80,19 @@ requested <instruction/> to the *plan*.
 When refining the plan this way, preserve the overall structure of the
 plan and only modify what the user actually requested. Do *not* rewrite
 unrelated sections of the plan.
+
+<if condition="<getopt-option-focus/> is not equal `all`">
+Restrict the refinement to the sections in <sections/>: all other
+sections and the "backmatter" stay *unchanged* and serve as read-only
+context. Only if the <instruction/> inevitably requires a *foreign
+change* outside of these sections, apply it nevertheless, set <foreign/>
+to the comma-separated names of the changed sections (resp.
+`backmatter`), and only output the following <template/>:
+
+<template>
+⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ WARNING: changed sections outside of focus: **<foreign/>**
+</template>
+</if>
 
 <if condition="<getopt-option-int-source-dir/> is not empty">
 The *code basis* of the task is the separate working copy
@@ -212,6 +225,17 @@ then immediately *STOP* processing the entire current skill:
 Set <chosen-approach></chosen-approach> (empty). Do not output anything.
 </else>
 
+<if condition="<getopt-option-focus/> is not equal `all` and <task-content/> is not empty">
+This is the `OVERWRITE` of an existing plan under a focus, so re-generate
+*only* the sections in <sections/> of <task-content/> in-place, by
+closely following the defined plan format <format/> and injecting into
+them all the information from the <instruction/>, the <chosen-approach/>
+(if not empty), all decisions you derived from the <instruction/> and the
+<chosen-approach/>, and the grounding in the project. All other sections,
+the "backmatter", and all other frontmatter keys stay *unchanged*. Set the
+`Kind:` frontmatter key to <task-kind/>.
+</if>
+<else>
 Create a new plan from scratch and store the result as
 <task-content/> by closely following the defined plan format
 <format/> and injecting into it all the information from
@@ -219,6 +243,14 @@ the <instruction/>, the <chosen-approach/> (if not empty), all
 decisions you derived from the <instruction/> and the <chosen-approach/>, and
 the grounding in the project. Set the `Kind:` frontmatter key to
 <task-kind/>.
+
+<if condition="<getopt-option-focus/> is not equal `all`">
+Populate *only* the sections in <sections/> and keep all other sections
+*empty*, i.e., as bare `##` headings without any bullet-points, until a
+later round focuses them. Hence, the `CHANGELOG.md` bullet-point of the
+grounding above is due only if `DESIGN` is in <sections/>.
+</if>
+</else>
 
 <if condition="<task-kind/> is equal `RESOLVING`">
 The plan *MUST* carry code references, a precise description of the
@@ -238,7 +270,8 @@ Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
 `ase` MCP server and use the `text` field of its response
 for fresh <timestamp-created/> and <timestamp-modified/>
 information. Then insert the current <ase-task-id/>,
-<timestamp-created/>, and <timestamp-modified/> information.
+<timestamp-created/>, and <timestamp-modified/> information -- except
+for the `OVERWRITE` under a focus above, which keeps the `Created:` key.
 Set <task-content-dirty>true</task-content-dirty>.
 </define>
 
@@ -261,6 +294,8 @@ Set <args></args> (set args to empty).
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
+
+        <expand name="task-focus" arg1="ase-task-edit"></expand>
 
     2.  Resolve a potential analyzer issue:
 
@@ -685,15 +720,26 @@ Set <args></args> (set args to empty).
         ⇥   **Target:**    <task-target/>
         </format>
 
+        Set <focus-label></focus-label> (empty).
+        <if condition="<getopt-option-focus/> is not equal `all`">
+        For the *rendering only*, overriding the above, additionally drop
+        the glyph lines, the `#   TASK: <title/>` heading, every `##`
+        section whose name is *not* in <sections/>, and the entire
+        "backmatter", keeping the remaining sections, including their
+        `##` headings, in their plan order, and set <focus-label/> to
+        ` (<names/>)`, with <names/> being the comma-separated names of
+        these remaining sections.
+        </if>
+
         Only output the following <template/>, so the user
         can read the plan and react to it. Do *not* truncate,
-        summarize, or partially show the plan. Use the
-        following <template/>:
+        summarize, or partially show the plan, beyond the focus
+        above. Use the following <template/>:
 
         <template>
-        <ase-tpl-head title="TASK" subtitle="<task-id/>"/>
+        <ase-tpl-head title="TASK" subtitle="<task-id/><focus-label/>"/>
         <task-render/>
-        <ase-tpl-foot title="TASK" subtitle="<task-id/>"/>
+        <ase-tpl-foot title="TASK" subtitle="<task-id/><focus-label/>"/>
         </template>
         </if>
 
@@ -776,6 +822,9 @@ Set <args></args> (set args to empty).
             <expand name="handoff-args"/>
             <if condition="<getopt-option-quiet/> is `true`">
                 Set <args><args/> --quiet</args>.
+            </if>
+            <if condition="<getopt-option-focus/> is not equal `all`">
+                Set <args><args/> --focus <getopt-option-focus/></args>.
             </if>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-grill", args: "<args/>")` tool

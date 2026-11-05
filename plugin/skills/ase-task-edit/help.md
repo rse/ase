@@ -11,6 +11,7 @@
     [`--mode`|`-m` `auto`|`craft`|`refactor`|`resolve`|`specify`]
     [`--approach`|`-a`]
     [`--unverified`|`-u`]
+    [`--focus`|`-f` *section*[,...]]
     [`--quiet`|`-q`]
     [`--next`|`-n` *option*[,...]]
     [*id* | *id*: *instruction* | *instruction* | *issue-id*]
@@ -96,6 +97,22 @@ stale draft.
     build, tests, linter, type-checker, or program execution) once
     the source files have been modified.
 
+-   `--focus`|`-f` *section*[,...]:
+    Edit and show only the given plan *section*(s). Each *section* is
+    one of `SPECIFICATION` (also `SPEC` or `WHAT`), `DESIGN` (also `DES`
+    or `HOW`), or `VERIFICATION` (also `VERIFY`, `VER`, or `WHEN`),
+    matched case-sensitively, or the sentinel `all` (default). The shown
+    plan consists only of these sections, including their headings, but
+    without the frontmatter and the title.
+
+    The rest of the plan stays the context, and an *instruction* requiring a
+    change outside of the focus is applied nevertheless and reported by
+    a warning. A new plan gets all section headings, but only the focused
+    sections are populated, and `OVERWRITE` re-generates only them. An
+    unknown, empty, or duplicate *section* token aborts the skill. It is
+    forwarded on a hand-off to `ase-task-grill`, but not on a hand-off
+    to another skill.
+
 -   `--quiet`|`-q`:
     Do not print the resulting plan at the end of a planning round. The
     status lines, the dialogs, and the warning on a stale implementation
@@ -171,6 +188,12 @@ Plan a refactoring under the id `cleanup`:
 
 ```text
 ❯ /ase-task-edit -m refactor cleanup: extract HTTP client into its own class
+```
+
+Refine and show only the `DESIGN` section of the task under id `hello`:
+
+```text
+❯ /ase-task-edit --focus HOW hello: print the text via a dedicated logger.
 ```
 
 ##  SEE ALSO

@@ -5,6 +5,12 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Section Focus for Task Editing and Grilling
+    The new option `--focus`|`-f` of `ase-task-edit` edits and shows only the given plan sections
+    (without frontmatter and title), and is forwarded on the hand-offs to `ase-task-grill` and back.
+    The same option of `ase-task-grill` additionally accepts the synonyms `WHAT`, `HOW`, `VERIFY`,
+    and `WHEN`, matches upper-case only, and warns on answers changing sections outside the focus.
+
 -   IMPROVEMENT [code, docs]: Quiet Option Preserved across Task Edit and Grill
     The option `--quiet`|`-q` is now forwarded on the hand-offs from `ase-task-edit` to
     `ase-task-grill` and back, so a quiet refinement stays quiet when switching between both skills.

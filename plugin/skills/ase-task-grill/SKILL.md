@@ -22,7 +22,7 @@ Iteratively Grill a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-grill"
-    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --focus|-f=(all|SPECIFICATION|SPEC|DESIGN|DES|VERIFICATION|VER)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task">
+    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -61,23 +61,9 @@ Set <args>--int-reuse-task</args>.
         ⧉ **ASE**: ☻ skill: **ase-task-grill**, ▶ ERROR: invalid `--rounds` value: **<getopt-option-rounds/>**
         </template>
 
-    3.  Treat <getopt-option-focus/> as a comma-separated list of
-        *section tokens*. Trim and upper-case every token, then expand
-        the abbreviations `SPEC`, `DES`, and `VER` to `SPECIFICATION`,
-        `DESIGN`, and `VERIFICATION`, and expand the sentinel `ALL`
-        (the default) to `SPECIFICATION,DESIGN,VERIFICATION`. Set
-        <sections/> to the resulting list, *keeping the given order*.
-        The getopt parser validates only the *first* token, so you
-        *MUST* validate each token yourself: if any token is *empty*,
-        *not* one of the recognized sections or abbreviations, or
-        results in a section already present in <sections/>, bind
-        <token/> to that offending token, then only output the
-        following <template/> and immediately *STOP* processing the
-        entire current skill:
+    3.  Resolve the plan sections under focus:
 
-        <template>
-        ⧉ **ASE**: ☻ skill: **ase-task-grill**, ▶ ERROR: invalid `--focus` token: **<token/>**
-        </template>
+        <expand name="task-focus" arg1="ase-task-grill"></expand>
 
         Each section in <sections/> selects its *focus areas* of the
         grilling: `SPECIFICATION` selects `DOMAIN` and `INTERFACE`,
@@ -277,7 +263,19 @@ Set <args>--int-reuse-task</args>.
                 can re-ask it.
 
             Set <changes/> to all bullet-points of <task-content/> which
-            were changed or added in this round. Do not output anything.
+            were changed or added in this round. Do not output anything,
+            except for the following warning:
+
+            <if condition="<getopt-option-focus/> is not equal `all` and <changes/> contains a bullet-point of a section *not* in <sections/>">
+            An answer required a *foreign change* outside of the focus,
+            which is applied nevertheless. Set <foreign/> to the
+            comma-separated names of these sections and only output the
+            following <template/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ WARNING: changed sections outside of focus: **<foreign/>**
+            </template>
+            </if>
 
         5.  SAVE PLAN:
 
@@ -328,7 +326,7 @@ Set <args>--int-reuse-task</args>.
             arg2="DONE|GRILL|EDIT|IMPLEMENT|DRAFT">
             Next Step: How would you like to proceed with the plan?
             DONE: Stop processing.
-            GRILL: Re-grill the entire plan again.
+            GRILL: Re-grill the plan again.
             EDIT: Hand off plan to editing.
             DRAFT: Hand off plan to implementation drafting.
             IMPLEMENT: Hand off plan to implementation.
@@ -372,6 +370,9 @@ Set <args>--int-reuse-task</args>.
             <expand name="handoff-args"/>
             <if condition="<getopt-option-quiet/> is `true`">
                 Set <args><args/> --quiet</args>.
+            </if>
+            <if condition="<getopt-option-focus/> is not equal `all`">
+                Set <args><args/> --focus <getopt-option-focus/></args>.
             </if>
             Only output the following <template/> and then call the
             tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`
