@@ -11,8 +11,6 @@ import os                         from "node:os"
 import type { ChildProcess }      from "node:child_process"
 
 import type { Command }           from "commander"
-import { ofetch }                 from "ofetch"
-import { Agent }                  from "undici"
 import { isSeq, isScalar }        from "yaml"
 import type * as v                from "valibot"
 
@@ -20,6 +18,7 @@ import { Config }                 from "./ase-config-core.js"
 import { parseScope }             from "./ase-config-scope.js"
 import { isLogLevel }             from "./ase-lib-log.js"
 import { writeStdout }            from "./ase-lib-stdio.js"
+import { dispatchFetch, insecureAgent } from "./ase-lib-fetch.js"
 import { Daemon, DaemonCommand }  from "./ase-lib-daemon-cli.js"
 import { urlHost, isLoopback, serverHeader } from "./ase-lib-server-bind.js"
 import type { ServerConfig }      from "./ase-lib-server-bind.js"
@@ -29,7 +28,7 @@ export const DEFAULT_ADDRESS = "127.0.0.1"
 
 /*  the dispatcher of the host-local probe, skipping the certificate verification,
     as a certificate rarely covers a loopback or local interface address  */
-const probeAgent = new Agent({ connect: { rejectUnauthorized: false } })
+const probeAgent = insecureAgent()
 
 /*  whether an address belongs to this host (loopback or a local network interface)  */
 export const isLocal = (address: string): boolean =>
@@ -223,7 +222,7 @@ export abstract class ServerCommand<C extends ServerContext, O extends ServerSta
         /*  skip the certificate verification for host-local addresses only,
             as elsewhere a man-in-the-middle could capture the token  */
         const lax     = isLocal(host.replace(/^\[|\]$/g, ""))
-        const request = (auth: string | null) => ofetch.raw(url, {
+        const request = (auth: string | null) => dispatchFetch.raw(url, {
             method:              "GET",
             headers:             auth !== null ? { Authorization: `Bearer ${auth}` } : {},
             dispatcher:          lax ? probeAgent : undefined,
@@ -247,8 +246,12 @@ export abstract class ServerCommand<C extends ServerContext, O extends ServerSta
                 return "running"
             return "foreign"
         }
-        catch {
+        catch (err: unknown) {
             /*  treat an unreachable or unresponsive server as not running  */
+            let cause = err
+            while (cause instanceof Error && cause.cause instanceof Error)
+                cause = cause.cause
+            this.log.write("debug", `${this.label}: probe of ${url} failed: ${cause instanceof Error ? cause.message : String(cause)}`)
             return null
         }
     }

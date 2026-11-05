@@ -7,12 +7,12 @@
 import path                                               from "node:path"
 import fs                                                 from "node:fs"
 
-import { ofetch }                                         from "ofetch"
-import { Agent }                                          from "undici"
+import type { Agent }                                     from "undici"
 import { WebSocket }                                      from "ws"
 import { LRUCache }                                       from "lru-cache"
 
 import type Log                                           from "./ase-lib-log.js"
+import { dispatchFetch, insecureAgent }                   from "./ase-lib-fetch.js"
 import { Config }                                         from "./ase-config-core.js"
 import { configSchema }                                   from "./ase-config-schema.js"
 import { parseScope, userStateDir }                       from "./ase-config-scope.js"
@@ -244,7 +244,7 @@ export class RemoteTaskStoreClient implements TaskStoreClient {
         private log: Log, private base: string, private token: string, private insecure: boolean) {
         this.lifecycle  = configured
         this.idscheme   = configuredIdScheme
-        this.dispatcher = insecure ? new Agent({ connect: { rejectUnauthorized: false } }) : undefined
+        this.dispatcher = insecure ? insecureAgent() : undefined
     }
     /*  raise a failed connection as an unreachable store error,
         reporting the innermost cause (like "connect ECONNREFUSED")  */
@@ -260,7 +260,7 @@ export class RemoteTaskStoreClient implements TaskStoreClient {
         its status, and a failed connection is raised as an unreachable store error  */
     private async request<T> (method: string, url: string, body?: unknown,
         headers: Record<string, string> = {}, tolerated: number[] = []): Promise<T | null> {
-        const r = await ofetch.raw(`${this.base}${url}`, {
+        const r = await dispatchFetch.raw(`${this.base}${url}`, {
             method,
             headers: {
                 Authorization: `Bearer ${this.token}`,
@@ -442,7 +442,7 @@ export class RemoteTaskStoreClient implements TaskStoreClient {
             `${this.tasks}/${encodeURIComponent(id)}/attachment${append ? "?append=true" : ""}`, attachment)) !== null
     }
     async content (id: string, index: number): Promise<{ type: string, content: Buffer } | null> {
-        const r = await ofetch.raw<ArrayBuffer, "arrayBuffer">(`${this.base}${this.tasks}/${encodeURIComponent(id)}/attachment/${index}/content`, {
+        const r = await dispatchFetch.raw<ArrayBuffer, "arrayBuffer">(`${this.base}${this.tasks}/${encodeURIComponent(id)}/attachment/${index}/content`, {
             headers:             { Authorization: `Bearer ${this.token}` },
             responseType:        "arrayBuffer",
             dispatcher:          this.dispatcher,

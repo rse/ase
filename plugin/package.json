@@ -6,7 +6,7 @@
     "homepage":                             "https://ase.tools",
     "repository":                           { "url": "git+https://github.com/rse/ase.git", "type": "git" },
     "bugs":                                 { "url": "https://github.com/rse/ase/issues" },
-    "version":                              "2.0.6",
+    "version":                              "2.0.7",
     "license":                              "Apache-2.0",
     "author": {
         "name":                             "Dr. Ralf S. Engelschall",
@@ -20,7 +20,7 @@
         "markdownlint-cli2":                "0.24.0",
         "eslint":                           "10.14.0",
         "@eslint/markdown":                 "8.0.3",
-        "eslint-markdown":                  "0.20.0",
+        "eslint-markdown":                  "0.21.0",
         "typescript":                       "6.0.3"
     },
     "engines": {

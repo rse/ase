@@ -2,7 +2,15 @@
 ChangeLog
 =========
 
-2.0.7 (2026-11-02)
+2.0.8 (2026-11-XX)
+------------------
+
+-   BUGFIX [code]: Server Probe with Foreign Dispatcher
+    The server probe of `ase agent relay|task store start|status|stop` and the insecure relay and
+    task store clients now send requests with an `undici` dispatcher through the `fetch` of the npm
+    `undici` instead of the built-in one of Node, whose bundled `undici` rejected it (issue #116).
+
+2.0.7 (2026-11-04)
 ------------------
 
 -   FEATURE [code, docs]: Model Selection of Agents
@@ -42,6 +50,11 @@ ChangeLog
     `ase-code-lint` now resolves directory and wildcard source references with `find` via `Bash`
     (newly allowed) if the `Glob` tool is not available, to support foreign LLMs.
 
+-   BUGFIX [code]: Gitea Issue Dependencies Content-Type
+    The Gitea task store plugin (`ase-task-store-plugin-gitea.ts`) now sends the issue dependency
+    create and remove requests with `Content-Type: application/json`, fixing the HTTP 422 errors
+    against Forgejo/Gitea.
+
 -   BUGFIX [code]: Silent parallel sub-agents
     Forbid any output while concurrently dispatched sub-agents report back one by one, as Claude
     Code runs them in the background despite `run_in_background: false`, so skills like
@@ -52,6 +65,10 @@ ChangeLog
     `ase-skill.md` now requires the "skill started" message as the very first output, before any
     tool call (including `ase_getopt`) and also for skills invoked via the `Skill` tool, so that
     "do not output anything" instructions of later steps no longer suppress or defer it.
+
+-   BUGFIX [code]: Synopsis Band Continuation Indentation
+    The continuation lines of the skill synopsis in the hint band are now indented by 2 instead of
+    4 spaces, so they align with the command after the prompt marker.
 
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
