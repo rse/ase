@@ -774,6 +774,9 @@ Set <args></args> (set args to empty).
 
             *Break* out of the *loop*.
             <expand name="handoff-args"/>
+            <if condition="<getopt-option-quiet/> is `true`">
+                Set <args><args/> --quiet</args>.
+            </if>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-grill", args: "<args/>")` tool
             to *grill* the finalized plan.

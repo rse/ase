@@ -140,7 +140,8 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
 -   `--quiet`|`-q`:
     Do not print the `PLAN CHANGES` box of the bullet-points changed by
     a round. The status lines and the dialogs stay. It is forwarded on a
-    re-grilling, but not on a hand-off to another skill.
+    re-grilling and on a hand-off to `ase-task-edit`, but not on a
+    hand-off to another skill.
 
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end

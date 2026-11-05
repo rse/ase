@@ -99,7 +99,8 @@ stale draft.
 -   `--quiet`|`-q`:
     Do not print the resulting plan at the end of a planning round. The
     status lines, the dialogs, and the warning on a stale implementation
-    draft stay. It is not forwarded on a hand-off to another skill.
+    draft stay. It is forwarded on a hand-off to `ase-task-grill`, but
+    not on a hand-off to another skill.
 
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end

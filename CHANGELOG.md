@@ -5,6 +5,10 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Quiet Option Preserved across Task Edit and Grill
+    The option `--quiet`|`-q` is now forwarded on the hand-offs from `ase-task-edit` to
+    `ase-task-grill` and back, so a quiet refinement stays quiet when switching between both skills.
+
 -   IMPROVEMENT [code, docs]: Quiet Option for Task Grilling
     The new option `--quiet`|`-q` of `ase-task-grill` suppresses the printing of the `PLAN CHANGES`
     box at the end of a grilling round, while status lines and dialogs stay.

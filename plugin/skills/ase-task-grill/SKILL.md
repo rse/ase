@@ -370,6 +370,9 @@ Set <args>--int-reuse-task</args>.
 
         -   If <result/> is `EDIT`:
             <expand name="handoff-args"/>
+            <if condition="<getopt-option-quiet/> is `true`">
+                Set <args><args/> --quiet</args>.
+            </if>
             Only output the following <template/> and then call the
             tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`
             to invoke the `ase:ase-task-edit` skill in order to *edit*
