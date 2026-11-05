@@ -23,7 +23,7 @@ Code](https://claude.com/product/claude-code) — and with reduced support also 
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
 [OpenAI Codex CLI](https://github.com/openai/codex).
 
-**ASE** ships with 58 agent skills, agent hooks, agent sub-agents, an
+**ASE** ships with 59 agent skills, agent hooks, agent sub-agents, an
 underlying Model-Context-Protocol (MCP) service and a Command-Line Interface
 (CLI) with a task store, task boards, and autonomous agents, incorporating
 reasonable methodology and automation aspects, to support the recurring
@@ -432,6 +432,12 @@ see whether **ASE** is right for you:
   You want a concise commit message crafted from the currently staged
   Git changes instead of writing it by hand?
   &rarr; [`/ase-repo-commit`](plugin/skills/ase-repo-commit/help.md)
+
+- **Comprehension-Scored Commit**:
+  You want to prove your understanding of the staged Git changes in a
+  multiple-choice quiz before committing them, with the score recorded
+  in the commit message and poorly understood changes flagged for review?
+  &rarr; [`/ase-repo-qa-commit`](plugin/skills/ase-repo-qa-commit/help.md)
 
 - **Conceptual Topic Neighborhood**:
   You want to explore the parent, sibling, and child topics of a concept,

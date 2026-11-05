@@ -44,6 +44,7 @@
 ⎈   **VERSION CONTROL**
 ○   `ase-repo-changelog`:  Update ChangeLog Entries
 ○   `ase-repo-commit`:     Git Commit Message
+○   `ase-repo-qa-commit`:  Git Commit with Comprehension Quiz
 ○   `ase-repo-diff`:       Summarize Diff
 ○   `ase-repo-review`:     Review Changes
 ○   `ase-repo-dissect`:    Dissect a Change Set

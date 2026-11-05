@@ -180,4 +180,4 @@ Review the last commit:
 ##  SEE ALSO
 
 [`ase-repo-diff`](../ase-repo-diff/help.md), [`ase-repo-commit`](../ase-repo-commit/help.md), [`ase-code-lint`](../ase-code-lint/help.md), [`ase-code-analyze`](../ase-code-analyze/help.md),
-[`ase-meta-diaboli`](../ase-meta-diaboli/help.md).
+[`ase-meta-diaboli`](../ase-meta-diaboli/help.md), [`ase-repo-qa-commit`](../ase-repo-qa-commit/help.md).

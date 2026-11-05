@@ -34,4 +34,4 @@ Craft a commit message for the currently staged changes:
 
 ##  SEE ALSO
 
-[`ase-repo-changelog`](../ase-repo-changelog/help.md).
+[`ase-repo-changelog`](../ase-repo-changelog/help.md), [`ase-repo-qa-commit`](../ase-repo-qa-commit/help.md).
