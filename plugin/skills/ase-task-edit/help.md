@@ -11,6 +11,7 @@
     [`--mode`|`-m` `auto`|`craft`|`refactor`|`resolve`|`specify`]
     [`--approach`|`-a`]
     [`--unverified`|`-u`]
+    [`--quiet`|`-q`]
     [`--next`|`-n` *option*[,...]]
     [*id* | *id*: *instruction* | *instruction* | *issue-id*]
 
@@ -94,6 +95,11 @@ stale draft.
     a plan, it strictly skips the entire verification phase (no
     build, tests, linter, type-checker, or program execution) once
     the source files have been modified.
+
+-   `--quiet`|`-q`:
+    Do not print the resulting plan at the end of a planning round. The
+    status lines, the dialogs, and the warning on a stale implementation
+    draft stay. It is not forwarded on a hand-off to another skill.
 
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end

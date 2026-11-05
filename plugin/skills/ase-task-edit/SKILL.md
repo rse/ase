@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--quiet|-q] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. A new plan is optionally composed along the
@@ -27,7 +27,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --quiet|-q --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
     $ARGUMENTS
 </expand>
 
@@ -647,6 +647,7 @@ Set <args></args> (set args to empty).
         silently *skip* this entire step 3.3 (no MCP tool call and no
         output at all) and continue with step 3.4.
 
+        <if condition="<getopt-option-quiet/> is not equal `true`">
         <if condition="<task-render/> is empty">
         Call the `ase_markdown_prepare(text: "<task-content/>")` tool of
         the `ase` MCP server and set <task-render/> to the `text` output
@@ -694,12 +695,13 @@ Set <args></args> (set args to empty).
         <task-render/>
         <ase-tpl-foot title="TASK" subtitle="<task-id/>"/>
         </template>
+        </if>
 
         <if condition="the backmatter of <task-content/> contains an attachment
             block with the `Type` key value `text/x-diff; charset=utf-8; kind="draft"`
             which is *stale* according to the plan <format/> (its `Modified` key
             is absent or older than the `Modified` key of the frontmatter)">
-        Directly *after* this <template/>, only output the following
+        Directly *after* any rendering, only output the following
         <template/> and then give the corrective hint by expanding the
         subsequent construct (which, depending on the configured
         <ase-guidance-level/>, may expand into nothing and hence emit

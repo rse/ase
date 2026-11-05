@@ -5,6 +5,10 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Quiet Option for Task Editing
+    The new option `--quiet`|`-q` of `ase-task-edit` suppresses the printing of the resulting plan
+    at the end of a planning round, while status lines, dialogs, and stale draft warnings stay.
+
 -   BUGFIX [code]: Server Probe with Foreign Dispatcher
     The server probe of `ase agent relay|task store start|status|stop` and the insecure relay and
     task store clients now send requests with an `undici` dispatcher through the `fetch` of the npm
