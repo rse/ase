@@ -10,10 +10,11 @@
     task in the band above the prompt, rendered like the read dialog of the task
     board TUI, following all changes of the task (keeping the scroll position and
     showing the last change as a unified diff with line numbers) and scrolled by the
-    wheel, while the prompt stays free for typing. The band closes once a next step
-    of the skill (like "DONE") is submitted at the prompt.  */
+    wheel, while the prompt stays free for typing. A "##" typed at the end of the
+    prompt drops the diff, showing just the latest state of the task. The band closes
+    once a next step of the skill (like "DONE") is submitted at the prompt.  */
 
-import type { Elements, RenderElement, Timer } from "claude-code"
+import type { Elements, PromptBox, RenderElement, Timer } from "claude-code"
 import { type Engine, type Char, type BandRender, type BandScroll, type View, PICKED,
     uniform, width, wrap, layout, wheel, panel } from "./ase-mods-common.ts"
 
@@ -371,6 +372,18 @@ export const modTaskEdit = () => {
             reset()
     }
 
+    /*  drop the diff of the last change from the task band, so just the latest state
+        remains, once "##" is typed (not pasted with other text) at the end of the
+        prompt, and remove it from there again  */
+    const edit = (box: PromptBox, input: string): PromptBox => {
+        if (shown === undefined || !/^#{1,2}$/.test(input) || box.cursor !== box.text.length || !box.text.endsWith("##"))
+            return box
+        shown.before  = undefined
+        shown.columns = 0
+        const text = box.text.slice(0, -2)
+        return { ...box, text, cursor: text.length }
+    }
+
     /*  scroll the task in the band by the wheel
         (and tell whether the band took the scrolling)  */
     const scroll = (e: BandScroll): boolean => {
@@ -402,12 +415,12 @@ export const modTaskEdit = () => {
             panel(ui, geometry, shown, {
                 title: `[ ⧉ ASE: Edit Task: ${shown.id}${shown.sections.length > 0 ? ` (${shown.sections.join(", ")})` : ""} ]`,
                 hints: (geometry.overflow ? "wheel or CTRL+x + TAB + ↑/↓/PgUp/PgDn: scroll · " : "") +
-                    "DONE · GRILL · DRAFT · IMPLEMENT · CANCEL · (type for refining)",
+                    "##: clear diff · DONE · GRILL · DRAFT · IMPLEMENT · CANCEL · (type for refining)",
                 lines: shown.lines,
                 gutter: shown.digits
             })
         ] })
     }
 
-    return { active, reset, open, submit, scroll, render }
+    return { active, reset, open, submit, edit, scroll, render }
 }

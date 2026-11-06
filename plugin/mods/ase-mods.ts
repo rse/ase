@@ -88,7 +88,8 @@ export const register: Register = (on, options) => {
         (toggling the manual band for a skill command with "//", resp. showing the
         synopsis form for a skill command with a manual page with "!!", else arming
         the matching of the prompt as an intent with "!!", resp. showing the manpage
-        browser for any other prompt with "//"), close the manual band once the
+        browser for any other prompt with "//", resp. dropping the diff of the task
+        band with "##"), close the manual band once the
         prompt left its skill command or another band opened, track the skill
         command of the hint band, and track the picks of the grill table inside
         the edited prompt while no band is shown  */
@@ -118,6 +119,11 @@ export const register: Register = (on, options) => {
         }
         else {
             box = await next(e)
+            const stripped = task.edit(box, e.inputText)
+            if (stripped !== box) {
+                box = stripped
+                $.ui.invalidate("ui.render")
+            }
             if (/[!/]$/.test(e.inputText) && box.cursor === box.text.length && TRIGGER.test(box.text))
                 box = await open(box)
         }

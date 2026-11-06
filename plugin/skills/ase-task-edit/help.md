@@ -139,6 +139,10 @@ stale draft.
     `GRILL`, `DRAFT`, `IMPLEMENT`, or `CANCEL` (in any case), which closes the
     band. After a hand-off to `ase-task-grill`, a hand-off back reopens it.
 
+    Type `##` at the end of the prompt (which removes it again) to remove the
+    unified diff and show just the latest state of the plan, until its next
+    change. The band stays open and the input does not reach the agent.
+
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end
     of this skill). *option* is a single token or a *comma-separated

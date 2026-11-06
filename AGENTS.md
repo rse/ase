@@ -82,7 +82,8 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `ase-task-edit --interactive`, signaled through a tool registered by
         the module, rendered in the band above the prompt and following
         all changes of the task, with the last change shown as a unified diff
-        with line numbers, until a next step of the skill is submitted)
+        with line numbers (removed by a `##` at the prompt), until a next
+        step of the skill is submitted)
     -   `plugin/.claude-plugin/`, `plugin/.codex-plugin/`,
         `plugin/.github/plugin/`: the per-agent-tool plugin manifests
 -   `tool/`: the `@rse/ase` CLI

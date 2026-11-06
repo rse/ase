@@ -8,8 +8,8 @@ ChangeLog
 -   IMPROVEMENT [code, docs]: Interactive Band for Task Editing
     The new option `--interactive`|`-i` of `ase-task-edit` shows the plan in a band above the prompt,
     instead of printing it and showing a dialog, which follows all changes of the plan, keeps its
-    scroll position, shows the last change as a unified diff with line numbers, and closes on
-    `DONE`, `GRILL`, `DRAFT`, `IMPLEMENT`, or `CANCEL` at the prompt.
+    scroll position, shows the last change as a unified diff with line numbers (until `##` at the
+    prompt), and closes on `DONE`, `GRILL`, `DRAFT`, `IMPLEMENT`, or `CANCEL` at the prompt.
 
 -   IMPROVEMENT [code, docs]: Section Focus for Task Editing and Grilling
     The new option `--focus`|`-f` of `ase-task-edit` edits and shows only the given plan sections
