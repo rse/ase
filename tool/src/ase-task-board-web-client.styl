@@ -1743,6 +1743,22 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
     to
         left: 75%
 
+/*  the task viewer: its task dialog spans the entire window, resp. the
+    notice why it cannot show its task is centered in the empty window  */
+#dlg.full
+    left: 0
+    top: 0
+    transform: none
+    width: 100vw
+    height: 100vh
+    border: none
+    border-radius: 0
+    box-shadow: none
+#watch-note
+    margin: auto
+    padding: 16px
+    color: var(--c-signal)
+
 /*  the task dialog: horizontally centered, of a fixed height, with its rows stacked  */
 #dlg
     position: absolute

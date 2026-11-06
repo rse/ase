@@ -24,14 +24,50 @@ import { sanitize, renderDialog, renderConfirm, renderTransfer, renderAssign, re
 const renderScreen = (ctx: BoardCtx, project: string) => {
     const {
         columns, rows, all, board, surface, view, filter, typing, dialog, notice, carry, confirm, transfer, assign, prompt,
-        headRef, tabLabels, dialogSel, dialogLines, transferCard, transferList, dim, store, busy, busyTick,
-        agents
+        headRef, tabLabels, dialogW, dialogSel, dialogLines, transferCard, transferList, dim, store, busy, busyTick,
+        agents, watched
     } = ctx
 
     /*  refuse to draw into a too small window  */
     if (columns < 40 || rows < 16)
         return h(Box, { width: columns, height: rows, justifyContent: "center", alignItems: "center" },
             h(Text, cx("signal"), `window too small (${columns}×${rows}) — needs at least 40×16`))
+
+    /*  the dialog and popups on top of the screen  */
+    const overlays = [
+        dialog !== null ? renderDialog({
+            card:    all.cards.get(dialog.id),
+            group:   all.groups.find((g) => g.lanes.some((l) => l.status === all.cards.get(dialog.id)?.status))?.title,
+            id:      dialog.id,
+            pred:    all.pred.get(dialog.id) ?? [],
+            succ:    all.succ.get(dialog.id) ?? [],
+            tint:    (ref) => {
+                const c    = all.cards.get(ref)
+                const tone = c !== undefined ? toneOf(all, c) : "idle"
+                return tone === "active" ? palette.accent : tone === "done" ? palette.dim : palette.normal
+            },
+            tabs:    tabLabels,
+            tab:     dialogSel,
+            first:   dialog.first,
+            scroll:  dialog.scrolls[dialogSel] ?? 0,
+            lines:   dialogLines,
+            width:   dialogW,
+            columns,
+            rows,
+            notice,
+            viewer:  watched !== undefined
+        }) : null,
+        confirm !== null ? renderConfirm(confirm.id, confirm.yes, columns, rows) : null,
+        transfer !== null && transferCard !== undefined ?
+            renderTransfer(transfer.id, transferCard.status, transferList, transfer.at, columns, rows) : null,
+        assign !== null ? renderAssign(assign, assignChoices(assign), assignUnknown(assign), columns, rows) : null,
+        prompt !== null ? renderPrompt(prompt, columns, rows, prompt.request !== null ? requestChoices(prompt.request) : []) : null,
+        busy !== null ? renderBusy(busy.label, busy.since, busyTick, columns, rows) : null
+    ]
+
+    /*  the task viewer shows only the dialog and popups, without the board  */
+    if (watched !== undefined)
+        return h(Box, { width: columns, height: rows, flexDirection: "column" }, ...overlays)
 
     /*  the status line in the last line of the screen, below the key hints, enclosed
         on its left and right side by the downward lines of the rule above it,
@@ -111,32 +147,7 @@ const renderScreen = (ctx: BoardCtx, project: string) => {
         /*  the horizontal rule between the key hints and the status line, turning downward with rounded corners at both ends  */
         h(Text, cx("dim", dim && "dimmed"), " ╭" + "─".repeat(Math.max(0, columns - 4)) + "╮ "),
         status,
-        dialog !== null ? renderDialog({
-            card:    all.cards.get(dialog.id),
-            group:   all.groups.find((g) => g.lanes.some((l) => l.status === all.cards.get(dialog.id)?.status))?.title,
-            id:      dialog.id,
-            pred:    all.pred.get(dialog.id) ?? [],
-            succ:    all.succ.get(dialog.id) ?? [],
-            tint:    (ref) => {
-                const c    = all.cards.get(ref)
-                const tone = c !== undefined ? toneOf(all, c) : "idle"
-                return tone === "active" ? palette.accent : tone === "done" ? palette.dim : palette.normal
-            },
-            tabs:    tabLabels,
-            tab:     dialogSel,
-            first:   dialog.first,
-            scroll:  dialog.scrolls[dialogSel] ?? 0,
-            lines:   dialogLines,
-            columns,
-            rows,
-            notice
-        }) : null,
-        confirm !== null ? renderConfirm(confirm.id, confirm.yes, columns, rows) : null,
-        transfer !== null && transferCard !== undefined ?
-            renderTransfer(transfer.id, transferCard.status, transferList, transfer.at, columns, rows) : null,
-        assign !== null ? renderAssign(assign, assignChoices(assign), assignUnknown(assign), columns, rows) : null,
-        prompt !== null ? renderPrompt(prompt, columns, rows, prompt.request !== null ? requestChoices(prompt.request) : []) : null,
-        busy !== null ? renderBusy(busy.label, busy.since, busyTick, columns, rows) : null)
+        ...overlays)
 }
 
 /*  pass each pressed SGR mouse report ("ESC[<b;x;y" plus "M"/"m" for press/release, 1-based)
@@ -198,8 +209,8 @@ export const useMouseReports = (onPress: (button: number, col: number, row: numb
 }
 
 /*  the root component of the terminal board  */
-const App = ({ log, initial, project, relay }: { log: Log, initial: Board, project: string, relay?: string }) => {
-    const ctx = useBoardState(log, initial, relay)
+const App = ({ log, initial, project, relay, watched }: { log: Log, initial: Board, project: string, relay?: string, watched?: string }) => {
+    const ctx = useBoardState(log, initial, relay, watched)
 
     /*  handle the mouse, but ignore it while the modal busy popup is shown  */
     useMouseReports((button, col, row) => {
@@ -248,8 +259,8 @@ const lateErasing = (stream: NodeJS.WriteStream): NodeJS.WriteStream => {
     })
 }
 
-/*  run the terminal board until the user quits  */
-export const runTUI = async (log: Log, relay?: string): Promise<void> => {
+/*  run the terminal board (resp. with a task id, the task viewer) until the user quits  */
+export const runTUI = async (log: Log, relay?: string, watched?: string): Promise<void> => {
     const initial = await buildBoard(log)
     const project = Task.projectIdOf(Task.projectRoot())
     loadPalette(log)
@@ -269,7 +280,7 @@ export const runTUI = async (log: Log, relay?: string): Promise<void> => {
             rewrite only the changed lines of a frame, as otherwise every frame
             is erased and redrawn entirely, which flickers in terminals not
             honoring synchronized output (DEC mode 2026), like tmux popups  */
-        const app = render(h(App, { log, initial, project, relay }), {
+        const app = render(h(App, { log, initial, project, relay, watched }), {
             alternateScreen: true, exitOnCtrlC: true, patchConsole: true, kittyKeyboard: { mode: "auto" },
             incrementalRendering: true, stdout: lateErasing(process.stdout)
         })

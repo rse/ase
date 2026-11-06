@@ -23,7 +23,7 @@ const handlePopupMouse = (ctx: BoardCtx, btn: number, mx: number, my: number): b
     const {
         columns, rows, all, dialog, setDialog, setNotice, confirm, setConfirm, transfer, setTransfer,
         assign, setAssign, assignTo, prompt, setPrompt, cancelPrompt, submitPrompt,
-        dialogW, tabLabels, dialogSel, dialogScroll, transferList, remove, transferTo
+        dialogW, tabLabels, dialogSel, dialogScroll, transferList, remove, transferTo, watched
     } = ctx
 
     if (prompt !== null) {
@@ -98,10 +98,11 @@ const handlePopupMouse = (ctx: BoardCtx, btn: number, mx: number, my: number): b
         return true
     }
     if (dialog !== null) {
-        /*  a click onto the " X " of the header (the second dialog row) closes  */
+        /*  a click onto the " X " of the header (the second dialog row) closes
+            (the task viewer has no " X " at all, as only "q" quits it)  */
         const barX   = Math.floor((columns - dialogW) / 2) + 1
         const closeX = barX - 1 + dialogW - DIALOG_CLOSE
-        if (btn === 0 && my === 1 && mx >= closeX && mx < closeX + 3)
+        if (btn === 0 && my === 1 && mx >= closeX && mx < closeX + 3 && watched === undefined)
             setDialog(null)
         else if (btn === 0 && my === 3 && mx >= barX && mx < barX + dialogW - 2) {
             /*  a click onto a predecessor or successor id (in the fourth dialog row) jumps to its task view  */
@@ -497,9 +498,9 @@ const handlePopupKey = (ctx: BoardCtx, input: string, key: Key): void => {
 
 /*  handle a key press within the read dialog  */
 const handleDialogKey = (ctx: BoardCtx, dialog: NonNullable<BoardCtx["dialog"]>, input: string, key: Key): void => {
-    const { rows, setDialog, dialogW, tabLabels, dialogSel, dialogScroll, startEdit } = ctx
+    const { rows, setDialog, dialogW, tabLabels, dialogSel, dialogScroll, startEdit, watched } = ctx
     const page = Math.max(1, rows - DIALOG_CHROME - 2)
-    if (key.escape || key.return)
+    if (watched !== undefined ? input === "q" : key.escape || key.return)
         setDialog(null)
     else if (input === "e")
         startEdit(dialog.id)

@@ -5,7 +5,9 @@
 -->
 
 <template>
-    <header>
+    <!--  the task viewer shows only the task dialog (resp. why it cannot show it), without the board  -->
+    <div v-if="watchError !== null" id="watch-note">{{ watchError }}</div>
+    <header v-if="watched === null">
         <span>
             ⧉ ASE: <span class="emph">Task Board</span>
             <span class="sep">·</span>project: <span class="emph">{{ board?.project }}</span>
@@ -21,7 +23,7 @@
             </span>
         </span>
     </header>
-    <div id="view">
+    <div v-if="watched === null" id="view">
         <BoardLanes />
         <BoardGraph />
         <BoardAgents />
@@ -33,7 +35,7 @@
           view with the selected agent, of the agent graph view with the selected agent card
           and its states, and of the stats view with its number of tasks, followed by the
           hint how to show the hidden key hints again  -->
-    <div id="hscroll">
+    <div v-if="watched === null" id="hscroll">
         <button :style="{ visibility: view === 'lanes' && !scroll.all && !grown ? 'visible' : 'hidden' }" @click="scrollBy(-240)">◀</button>
         <span v-if="grown">lane <b>{{ board?.groups[sel.g]?.lanes[sel.l]?.status }}</b> of group <b>{{ board?.groups[sel.g]?.title }}</b> grown<span class="sep">·</span>g shrinks</span>
         <span v-else-if="view === 'lanes' && scroll.info !== ''">{{ scroll.info }}<span class="sep">·</span>{{ scroll.all ? "all visible" : "scroll or ◀/▶" }}</span>
@@ -45,7 +47,7 @@
         <span v-if="!surface.keys" class="keys"><span class="sep">·</span><kbd>?</kbd> show key hints</span>
         <button :style="{ visibility: view === 'lanes' && !scroll.all && !grown ? 'visible' : 'hidden' }" @click="scrollBy(240)">▶</button>
     </div>
-    <footer>
+    <footer v-if="watched === null">
         <div v-for="(line, k) in (surface.keys ? hints : [])" :key="k" class="hints">
             <template v-for="(hint, i) in line" :key="hint.key">
                 <span v-if="i > 0" class="sep">·</span><template v-for="(key, j) in (hint.key === '/' ? [ '/' ] : hint.key.split('/'))" :key="j"><template v-if="j > 0">/</template><kbd>{{ key }}</kbd></template><span class="action">{{ hint.action }}</span>
@@ -70,7 +72,7 @@ import BoardPopup                               from "./ase-task-board-web-clien
 import {
     board, actionError, actionNote, view, sel, drag, scroll, filter, filterEl, agents, agentSel, online, store, stats, statsRanges,
     surface, titles, grown, agentLabel, cycleView, clearFilter, scrollBy, updateScroll, updateTabScroll,
-    rowLanes, reload, startService, stopService, flowSel, flowAgents, viewLabels, viewCycleHint, type AgentFlow, type View
+    rowLanes, reload, startService, stopService, flowSel, flowAgents, viewLabels, viewCycleHint, watched, watchError, type AgentFlow, type View
 } from "./ase-task-board-web-client-model"
 import { stopEdit }                  from "./ase-task-board-web-client-editor"
 import { controlStart, controlStop } from "./ase-task-board-web-client-control"

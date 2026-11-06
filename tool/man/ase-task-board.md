@@ -7,6 +7,7 @@
 \[`-w`|`--web`\]
 \[`-t`|`--text`\]
 \[`--agent-relay` *url*\]
+\[`-T`|`--task` *id*\]
 
 ## DESCRIPTION
 
@@ -214,6 +215,26 @@ waiting) with their status and their last processing log line, and
 finally all warnings of the board (behind `⚠`, e.g. on dependency
 cycles).
 
+### Task Viewer
+
+With `--task`, the terminal and the web board act as a *task viewer*:
+instead of the board, they show only the task dialog of the given task,
+spanning the entire window and following all changes of the task live.
+All actions of the task dialog stay available, and a click onto a
+predecessor or successor shows that task instead. The shown view of the
+board stays untouched. An unknown task is refused with an error.
+
+The terminal board quits on `q` or `Ctrl`+`C` only, and with a warning
+once the shown task no longer exists (e.g. as it was deleted or renamed
+elsewhere).
+
+The web board has no closing keys, as a page cannot close its browser
+tab. Once the shown task no longer exists, it shows only a notice, and
+shows the task again as soon as it exists again.
+
+With `--text`, and also without an interactive terminal, the plan of the
+task is printed as plain text and the command exits.
+
 ### Statistics View
 
 The third view *statistics* shows the statistics of the tasks matching the
@@ -409,6 +430,10 @@ relay, the agent graph view is skipped.
   Honored by the terminal board and the text overview only, as the web
   board always follows the configured `project.relay.url` (and hence
   warns about the option).
+
+- \[`-T`|`--task` *id*\]:
+  Show only the task dialog of the task *id* instead of the board, as a
+  viewer and watcher of the task (see **Task Viewer**).
 
 ## KEYS
 
@@ -625,7 +650,7 @@ The following configuration keys (on scope `user` or `project`, see
 The command exits with status `0` once the terminal board is quit, the
 text overview is printed, resp. the web board is opened, and with
 status `1` on any error (e.g. an *ASE* service without web board on
-`--web`).
+`--web`, or an unknown task on `--task`).
 
 ## EXAMPLES
 
@@ -635,6 +660,9 @@ $ ase task board
 
 # show the web board in the browser
 $ ase task board --web
+
+# view and watch a single task in the terminal
+$ ase task board --task T1
 
 # print the lane overview, including the agents of a remote agent relay
 $ ase task board --text --agent-relay ase://relay.example.com:42043

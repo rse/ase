@@ -235,8 +235,12 @@ export const tabDocs     = ref<Record<number, string>>({})
 export const tabScroll   = reactive({ less: false, more: false })
 export const tabScrolls  = new Map<number, number>()
 export const filter      = ref("")
+
+/*  the task of the task viewer (if any), and why it is currently not shown  */
+export const watched     = new URLSearchParams(window.location.search).get("task")
+export const watchError  = ref<string | null>(null)
 let   query       = ""
-let   openId      = null as string | null
+let   openId      = watched
 let   openSeq     = 0
 let   reloadSeq   = 0
 let   graphSeq    = 0
@@ -531,12 +535,18 @@ export const openTask = async (id: string, background = false) => {
     if (seq !== openSeq)
         return
     if (t.error !== undefined) {
-        if (editing.value === null)
-            closeTask()
-        else
+        if (editing.value !== null)
             notice.value = { kind: "error", message: t.error }
+        else if (watched !== null) {
+            /*  the task viewer stays open, and shows the task again once it re-appears  */
+            task.value       = null
+            watchError.value = t.error
+        }
+        else
+            closeTask()
         return
     }
+    watchError.value = null
 
     /*  replace the cached attachment documents only once the selected one is re-fetched  */
     const n   = Math.min(tab.value, t.tabs.length - 1)
@@ -614,8 +624,8 @@ export const reload = async (background = false) => {
     }
     boardError.value = null
 
-    /*  start in the persisted view on the first load  */
-    if (board.value === null)
+    /*  start in the persisted view on the first load (the task viewer shows no view at all)  */
+    if (board.value === null && watched === null)
         view.value = data.surface.view
     board.value = data
     if (view.value === "graph")

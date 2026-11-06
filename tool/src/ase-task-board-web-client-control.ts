@@ -11,18 +11,19 @@ import Mousetrap                          from "mousetrap"
 import {
     type Board, type Card, type Group, type Sel, type Surface,
     api, groupItems, rowLanes, relocate,
-    board, actionError, actionNote, view, graph, task, sel, grow, editing, confirmDel, transfer, assign, prompt,
+    board, actionError, actionNote, view, graph, task, sel, grow, editing, confirmDel, transfer, assign, prompt, watched,
     tab, drag, busy, boardEl, graphEl, flowEl, flowSel, planEl, filterEl, agentList, agentSel, logEl, showFlowAgent,
     surface, growable, grown, openTask, closeTask, selectTab, selectAgent, toggle, cycleView, stepStatsRange
 } from "./ase-task-board-web-client-model"
 import { startEdit, startNew, onEditorKey } from "./ase-task-board-web-client-editor"
 
-/*  delete a task (after its confirmation), closing its task dialog  */
+/*  delete a task (after its confirmation), closing its task dialog
+    (the task viewer stays open and notices the vanished task on its reload)  */
 export const deleteTask = async (id: string) => {
     confirmDel.value = null
     const res = await api<{ ok: boolean }>(`/task-board/api/task/${encodeURIComponent(id)}`, { method: "DELETE" })
     actionError.value = res.error ?? null
-    if (res.error === undefined && task.value?.id === id)
+    if (res.error === undefined && task.value?.id === id && watched === null)
         closeTask()
 }
 
@@ -376,13 +377,16 @@ const dialogKeys: Record<string, (id: string) => void> = {
     D: (id) => { confirmDel.value = id }
 }
 
-/*  in the task dialog, RETURN and ESC close it, "e" edits its plan, "E" edits it by a prompt,
+/*  in the task dialog, RETURN and ESC close it (except in the task viewer, as a browser tab
+    cannot be closed by its page), "e" edits its plan, "E" edits it by a prompt,
     "R" requests it by a prompt, "D" deletes, "T" transitions, and "A" assigns its task, the left/right arrows (also Tab/Shift+Tab) switch
     its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
 const onDialogKey = (ev: KeyboardEvent) => {
     const win = planEl.value?.contentWindow ?? null
-    if (ev.key === "Escape" || ev.key === "Enter")
-        closeTask()
+    if (ev.key === "Escape" || ev.key === "Enter") {
+        if (watched === null)
+            closeTask()
+    }
     else if (ev.key === "e" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
         ev.preventDefault()
         startEdit()
@@ -818,7 +822,7 @@ const onKey = (ev: KeyboardEvent) => {
         onEditorKey(ev, editing.value.keymap)
     else if (task.value !== null)
         onDialogKey(ev)
-    else
+    else if (watched === null)
         onBoardKey(ev)
 }
 
@@ -831,20 +835,22 @@ const onBusyKey = (ev: KeyboardEvent) => {
     ev.stopImmediatePropagation()
 }
 
-/*  start the key handling: the single-key bindings (the graph view binds its zoom keys
-    itself), the dispatching of all other keys, and the swallowing of keys while busy  */
+/*  start the key handling: the single-key bindings of the board (the graph view binds its zoom
+    keys itself), the dispatching of all other keys, and the swallowing of keys while busy  */
 export const controlStart = () => {
-    Mousetrap.bind("t", () => { if (board.value !== null && (view.value === "lanes" || view.value === "graph")) toggle("titles", "") })
-    Mousetrap.bind("s", () => { if (board.value !== null && view.value === "graph" && task.value === null) toggle("standalone", "") })
-    Mousetrap.bind("v", () => { if (task.value === null) cycleView() })
-    Mousetrap.bind("V", () => { if (task.value === null) cycleView(true) })
-    Mousetrap.bind("?", () => { if (board.value !== null) toggle("keys", "") })
-    Mousetrap.bind("/", (ev) => {
-        if (task.value !== null || view.value === "agents" || view.value === "flow")
-            return
-        ev.preventDefault()
-        filterEl.value?.focus()
-    })
+    if (watched === null) {
+        Mousetrap.bind("t", () => { if (board.value !== null && (view.value === "lanes" || view.value === "graph")) toggle("titles", "") })
+        Mousetrap.bind("s", () => { if (board.value !== null && view.value === "graph" && task.value === null) toggle("standalone", "") })
+        Mousetrap.bind("v", () => { if (task.value === null) cycleView() })
+        Mousetrap.bind("V", () => { if (task.value === null) cycleView(true) })
+        Mousetrap.bind("?", () => { if (board.value !== null) toggle("keys", "") })
+        Mousetrap.bind("/", (ev) => {
+            if (task.value !== null || view.value === "agents" || view.value === "flow")
+                return
+            ev.preventDefault()
+            filterEl.value?.focus()
+        })
+    }
     window.addEventListener("keydown", onBusyKey, true)
     document.addEventListener("keydown", onKey)
 }

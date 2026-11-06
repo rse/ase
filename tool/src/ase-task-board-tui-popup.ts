@@ -297,7 +297,7 @@ export const DIALOG_WIDTH  = 110
 type DialogArgs = {
     card: Card | undefined, group: string | undefined, id: string, pred: string[], succ: string[],
     tint: (id: string) => string | undefined, tabs: string[], tab: number, first: number, scroll: number,
-    lines: DialogLine[], columns: number, rows: number, notice: string | null
+    lines: DialogLine[], width: number, columns: number, rows: number, notice: string | null, viewer: boolean
 }
 
 /*  the segments of the dependencies row of the read dialog within its inner width:
@@ -730,8 +730,7 @@ export const renderAssign = (assign: AssignState, choices: AssignChoice[], unkno
 
 /*  render the read dialog: full height, horizontally centered, with a
     vertical scroll bar in its right border  */
-export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, first, scroll, lines, columns, rows, notice }: DialogArgs) => {
-    const width  = Math.min(columns - 2, DIALOG_WIDTH)
+export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, first, scroll, lines, width, columns, rows, notice, viewer }: DialogArgs) => {
     const left   = Math.floor((columns - width) / 2)
     const bodyW  = width - 5
     const viewH  = rows - DIALOG_CHROME
@@ -789,7 +788,8 @@ export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, fir
     /*  the key hints, or instead the status notice of an edit, truncated to the free width  */
     const free   = Math.max(0, innerW - pos.length - 1)
     const keys   = (notice !== null ? " " + sanitize(notice) :
-        " ←/→/⇤/⇥: switch tab · ↑/↓/⇈/⇊: scroll · e: edit · E: edit by prompt · R: request by prompt · T: transition · A: assign · D: delete · M: toggle mouse · ⏎/ESC: close").slice(0, free)
+        " ←/→/⇤/⇥: switch tab · ↑/↓/⇈/⇊: scroll · e: edit · E: edit by prompt · R: request by prompt · T: transition · A: assign · D: delete · M: toggle mouse · " +
+        (viewer ? "q: quit" : "⏎/ESC: close")).slice(0, free)
 
     return h(Box, { key: "dialog", top: 0, left, width, height: rows, ...cx("popup", "border-dim") },
         h(Text, {},
@@ -800,7 +800,7 @@ export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, fir
             h(Text, cx("dim"), right.slice(0, right.length - lane.length)),
             h(Text, cx("dim", "bold"), lane),
             " ",
-            h(Text, cx("dim", "inverse"), " X "),
+            h(Text, cx("dim", !viewer && "inverse"), viewer ? "   " : " X "),
             " "),
         separator("sep-title"),
         h(Text, {}, ...segs.map((seg, k) => h(Text, { key: k, color: seg.color, inverse: seg.inverse }, seg.text))),

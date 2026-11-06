@@ -5,6 +5,11 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Standalone Task Viewer of Task Boards
+    The new option `--task`|`-T` of `ase task board` shows only the task dialog of the given task,
+    spanning the entire window and following all its changes, as a task viewer and watcher. The
+    terminal board quits on `q`, the web board stays open. `--text` prints the plan of the task.
+
 -   IMPROVEMENT [code, docs]: Interactive Band for Task Editing
     The new option `--interactive`|`-i` of `ase-task-edit` shows the plan in a band above the prompt,
     instead of printing it and showing a dialog, which follows all changes of the plan, keeps its

@@ -20,6 +20,7 @@ interface BoardOpts {
     web?:        boolean
     text?:       boolean
     agentRelay?: string
+    task?:       string
 }
 
 /*  render the lane overview (and the agents passed by the agent relay, if any)
@@ -124,21 +125,30 @@ export default class TaskBoardCommand {
             .option("--agent-relay <url>", "agent relay to receive the live presence of the agents from, " +
                 "as \"ase[s]://<addr>:<port>[/<token>]\" (default: the configured \"project.relay.url\", else none; " +
                 "the web board always follows the configured one)")
+            .option("-T, --task <id>", "show only the task dialog of the given task as a task viewer, " +
+                "following all its changes live (with --text or without a terminal: print its plan and exit)")
             .action(async (opts: BoardOpts) => {
+                /*  refuse the task viewer on an unknown task  */
+                const plan = opts.task !== undefined ? await Task.load(this.log, opts.task) : ""
+                if (opts.task !== undefined && plan === "")
+                    throw new Error(`board: no task "${opts.task}"`)
+
                 /*  serve and open the web board  */
                 if (opts.web === true) {
                     if (opts.agentRelay !== undefined)
                         this.log.write("warning", "board: \"--agent-relay\" is ignored by the web board, " +
                             "which follows the configured \"project.relay.url\"")
-                    const url = `http://${SERVICE_HOST}:${await this.servicePort()}/task-board`
+                    const url = `http://${SERVICE_HOST}:${await this.servicePort()}/task-board` +
+                        (opts.task !== undefined ? `?task=${encodeURIComponent(opts.task)}` : "")
                     await writeStdout(`${url}\n`)
                     await this.openBrowser(url)
                     return
                 }
 
-                /*  print the plain text overview if requested or without a terminal  */
+                /*  print the plain text overview (resp. the plan of the task
+                    of the task viewer) if requested or without a terminal  */
                 if (opts.text === true || !process.stdout.isTTY || !process.stdin.isTTY) {
-                    await writeStdout(await textOverview(this.log, opts.agentRelay))
+                    await writeStdout(opts.task !== undefined ? plan : await textOverview(this.log, opts.agentRelay))
                     return
                 }
 
@@ -146,7 +156,7 @@ export default class TaskBoardCommand {
                     (its development build records a never cleared performance measure per render)  */
                 process.env.NODE_ENV ??= "production"
                 const { runTUI } = await import("./ase-task-board-tui.js")
-                await runTUI(this.log, opts.agentRelay)
+                await runTUI(this.log, opts.agentRelay, opts.task)
             })
     }
 }
