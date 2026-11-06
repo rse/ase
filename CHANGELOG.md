@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.0.8 (2026-11-XX)
+2.0.8 (2026-11-07)
 ------------------
 
 -   IMPROVEMENT [code, docs]: Dark Mode of Web Task Board
@@ -33,22 +33,20 @@ ChangeLog
     The same option of `ase-task-grill` additionally accepts the synonyms `WHAT`, `HOW`, `VERIFY`,
     and `WHEN`, matches upper-case only, and warns on answers changing sections outside the focus.
 
--   IMPROVEMENT [code, docs]: Quiet Option Preserved across Task Edit and Grill
-    The option `--quiet`|`-q` is now forwarded on the hand-offs from `ase-task-edit` to
-    `ase-task-grill` and back, so a quiet refinement stays quiet when switching between both skills.
-
--   IMPROVEMENT [code, docs]: Quiet Option for Task Grilling
-    The new option `--quiet`|`-q` of `ase-task-grill` suppresses the printing of the `PLAN CHANGES`
-    box at the end of a grilling round, while status lines and dialogs stay.
-
--   IMPROVEMENT [code, docs]: Quiet Option for Task Editing
+-   IMPROVEMENT [code, docs]: Quiet Option for Task Editing and Grilling
     The new option `--quiet`|`-q` of `ase-task-edit` suppresses the printing of the resulting plan
-    at the end of a planning round, while status lines, dialogs, and stale draft warnings stay.
+    and of `ase-task-grill` the `PLAN CHANGES` box at the end of a round, while status lines and
+    dialogs stay. It is forwarded on the hand-offs between both skills, so a quiet refinement
+    stays quiet when switching between them.
 
 -   BUGFIX [code]: Server Probe with Foreign Dispatcher
     The server probe of `ase agent relay|task store start|status|stop` and the insecure relay and
     task store clients now send requests with an `undici` dispatcher through the `fetch` of the npm
     `undici` instead of the built-in one of Node, whose bundled `undici` rejected it (issue #116).
+
+-   REFACTOR [code, infr]: Unified Mods Filenames
+    The modules `ase-mods-evaluate.ts` and `ase-mods-grill.ts` of `plugin/mods/` are renamed to
+    `ase-mods-meta-evaluate.ts` resp. `ase-mods-task-grill.ts`, matching the naming of the other mods.
 
 -   UPDATE [infr]: NPM dependencies
     Updated NPM dependencies.
