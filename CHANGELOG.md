@@ -5,6 +5,12 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Dark Mode of Web Task Board
+    The new configuration `board.web.theme` selects the color theme `light`, `dark`, or `auto`
+    (default, following the operating system or browser) of the web board, including its task
+    dialog and task viewer. The key `L` cycles the three themes, remembered in the current browser
+    until cycled back to the configured one.
+
 -   IMPROVEMENT [code, docs]: Diff of Task Changes in Task Boards
     The task dialog of `ase task board` now shows the last change of the plan as a diff in its
     plan tab, in the rendered look, with colored lines and inverse changed words, until `#`

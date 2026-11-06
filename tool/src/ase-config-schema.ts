@@ -86,6 +86,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "board.web.color.accent":         webColorDefaults.accent,
         "board.web.color.signal":         webColorDefaults.signal,
         "board.web.editor.keymap":        "default",
+        "board.web.theme":                "auto",
         "telemetry.enabled":              "false",
         "telemetry.implicit":             "true",
         "telemetry.prices.ai":            "*=4.00/20.00/0.20/5.00",
@@ -140,6 +141,7 @@ export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"
     "board.web.color.accent":         [ "user", "project" ],
     "board.web.color.signal":         [ "user", "project" ],
     "board.web.editor.keymap":        [ "user", "project" ],
+    "board.web.theme":                [ "user", "project" ],
     "telemetry.enabled":              [ "user", "project" ],
     "telemetry.implicit":             [ "user", "project" ],
     "telemetry.service.port":         [ "user" ],
@@ -388,7 +390,8 @@ export const configSchema = v.nullish(v.strictObject({
             })),
             editor: v.optional(v.strictObject({
                 keymap: v.optional(v.picklist([ "default", "vim", "emacs" ]))
-            }))
+            })),
+            theme: v.optional(v.picklist([ "auto", "light", "dark" ]))
         }))
     }))
 }))

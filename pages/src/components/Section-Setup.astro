@@ -221,7 +221,11 @@ const configParams: Array<{ name: string, value: string, scopes: string, desc: s
     { name: "board.web.editor.keymap",
       value: "default",
       scopes: "user, project",
-      desc: "Key bindings of the task plan editor of the web task board: default, vim, or emacs." }
+      desc: "Key bindings of the task plan editor of the web task board: default, vim, or emacs." },
+    { name: "board.web.theme",
+      value: "auto",
+      scopes: "user, project",
+      desc: "Color theme of the web task board: light, dark, or auto (following the operating system or browser)." }
 ]
 
 /*  the per-tool tabs of an "ase" setup command, optionally preceded by common commands  */

@@ -9,6 +9,22 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>ASE Task Board</title>
+        <script>
+            /*  apply the color theme remembered in this browser (see "cycleTheme") before the
+                first paint, to not flash the configured theme, which is kept for "cycleTheme"  */
+            (() => {
+                const root = document.documentElement
+                root.dataset.themeConfigured = root.dataset.theme ?? "auto"
+                try {
+                    const theme = localStorage.getItem("ase-task-board:theme")
+                    if (theme === "auto" || theme === "light" || theme === "dark")
+                        root.dataset.theme = theme
+                }
+                catch (_err) {
+                    /*  the configured theme applies  */
+                }
+            })()
+        </script>
         <link rel="stylesheet" href="/task-board/colors.css" vite-ignore>
     </head>
     <body>

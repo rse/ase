@@ -62,33 +62,39 @@
                 <template v-else>{{ notice.message }}</template>
             </div>
 
-            <!--  the status of the task actions of the task viewer, which has no status line of its own  -->
-            <div v-if="watched !== null && (actionError !== null || actionNote !== null)" class="dnote">{{ actionError ?? actionNote }}</div>
+            <!--  the notices of the task actions, as the status line is behind the backdrop, and for
+                  the task viewer, which has no status line, also their errors (stale ones of the board stay out)  -->
+            <div v-if="actionNote !== null || (watched !== null && actionError !== null)" class="dnote">{{ actionNote ?? actionError }}</div>
 
             <!--  the content: the rendered task plan or attachment of the selected tab, or the task plan editor  -->
             <iframe v-show="editing === null" id="plan" ref="planEl" title="task plan"
                 sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-                :srcdoc="tab === 0 ? (taskDiff ?? task.doc) : (tabDocs[tab] ?? '')" @load="restorePlanScroll"></iframe>
+                :srcdoc="planDoc" @load="restorePlanScroll"></iframe>
             <div v-show="editing !== null" id="editor" ref="editorEl"></div>
 
             <!--  the footer: the key hints  -->
             <div v-if="editing?.keymap === 'vim'" class="dfoot"><kbd>:w</kbd><span class="action">saves</span><span class="sep">·</span><kbd>:q</kbd><span class="action">cancels</span><span class="sep">·</span><kbd>:q!</kbd><span class="action">discards</span></div>
             <div v-else-if="editing?.keymap === 'emacs'" class="dfoot"><kbd>C-x C-s</kbd><span class="action">saves</span><span class="sep">·</span><kbd>C-x C-c</kbd><span class="action">cancels</span></div>
             <div v-else-if="editing !== null" class="dfoot"><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>S</kbd><span class="action">saves</span><span class="sep">·</span><kbd>ESC</kbd><span class="action">cancels</span></div>
-            <div v-else class="dfoot"><template v-if="tab === 0 && taskDiff !== null"><kbd>#</kbd><span class="action">clears diff</span><span class="sep">·</span></template><kbd>←</kbd>/<kbd>→</kbd>/<kbd>⇤</kbd>/<kbd>⇥</kbd><span class="action">switches tab</span><span class="sep">·</span><kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>⇈</kbd>/<kbd>⇊</kbd><span class="action">scrolls</span><span class="sep">·</span><kbd>e</kbd><span class="action">edits</span><span class="sep">·</span><kbd>E</kbd><span class="action">edits by prompt</span><span class="sep">·</span><kbd>R</kbd><span class="action">requests by prompt</span><span class="sep">·</span><kbd>T</kbd><span class="action">transitions</span><span class="sep">·</span><kbd>A</kbd><span class="action">assigns</span><span class="sep">·</span><kbd>D</kbd><span class="action">deletes</span><template v-if="watched === null"><span class="sep">·</span><kbd>⏎</kbd>/<kbd>ESC</kbd><span class="action">closes</span></template></div>
+            <div v-else class="dfoot"><template v-if="tab === 0 && taskDiff !== null"><kbd>#</kbd><span class="action">clears diff</span><span class="sep">·</span></template><kbd>←</kbd>/<kbd>→</kbd>/<kbd>⇤</kbd>/<kbd>⇥</kbd><span class="action">switches tab</span><span class="sep">·</span><kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>⇈</kbd>/<kbd>⇊</kbd><span class="action">scrolls</span><span class="sep">·</span><kbd>e</kbd><span class="action">edits</span><span class="sep">·</span><kbd>E</kbd><span class="action">edits by prompt</span><span class="sep">·</span><kbd>R</kbd><span class="action">requests by prompt</span><span class="sep">·</span><kbd>T</kbd><span class="action">transitions</span><span class="sep">·</span><kbd>A</kbd><span class="action">assigns</span><span class="sep">·</span><kbd>D</kbd><span class="action">deletes</span><span class="sep">·</span><kbd>L</kbd><span class="action">cycles theme</span><template v-if="watched === null"><span class="sep">·</span><kbd>⏎</kbd>/<kbd>ESC</kbd><span class="action">closes</span></template></div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue"
 import TaskTitle from "./ase-task-board-web-client-title.vue"
 import {
     task, editing, notice, tab, tabDocs, taskDiff, tabScroll, tabScrolls, planEl, tabsEl, actionError, actionNote, watched,
-    openTask, closeTask, selectTab, updateTabScroll
+    openTask, closeTask, selectTab, updateTabScroll, themed
 } from "./ase-task-board-web-client-model"
 import {
     editorEl, startEdit, saveEdit, stopEdit, leaveEdit, restoreDraft, dropDraft
 } from "./ase-task-board-web-client-editor"
+
+/*  the document of the selected tab, themed only when it changes, as a theme
+    change adjusts the root element of the shown one and must not reload it  */
+const planDoc = computed(() => themed(tab.value === 0 ? (taskDiff.value ?? task.value?.doc ?? "") : (tabDocs.value[tab.value] ?? "")))
 
 /*  restore the scroll position of the document of the selected tab once it is loaded  */
 const restorePlanScroll = () => {

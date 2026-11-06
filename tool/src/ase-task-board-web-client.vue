@@ -165,6 +165,7 @@ const hints     = computed(() => {
     ], [
         { key: "Left-Click",    action: "select task" },
         { key: "Double-Click",  action: "view task / shrink lane" },
+        { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "lanes" ? [ [
         { key: "↑/↓/←/→",       action: "select task" },
@@ -191,6 +192,7 @@ const hints     = computed(() => {
         { key: "Left-Click",    action: "select task/lane/phase" },
         { key: "Double-Click",  action: "view task, collapse/expand lane/phase" },
         { key: "Drag & Drop",   action: "directly transition task" },
+        { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "agents" ? [ [
         { key: "↑/↓/Left-Click", action: "select agent" },
@@ -198,6 +200,7 @@ const hints     = computed(() => {
         { key: "Wheel",         action: "scroll agent log" }
     ], [
         { key: "v/V",           action: cycleHint("agents") },
+        { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "flow" ? [ [
         { key: "↑/↓/←/→/Left-Click", action: "select agent/state" },
@@ -206,12 +209,14 @@ const hints     = computed(() => {
         { key: "Left-Drag",     action: "scroll canvas" }
     ], [
         { key: "v/V",           action: cycleHint("flow") },
+        { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "stats" ? [ [
         { key: "←/→",           action: "select time range" },
         { key: "/",             action: "filter tasks" },
         { key: "v/V",           action: cycleHint("stats") }
     ], [
+        { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : [ [
         { key: "↑/↓/←/→/Left-Click", action: "select task" },
@@ -231,6 +236,7 @@ const hints     = computed(() => {
         { key: "v/V",           action: cycleHint("graph") },
         { key: "+/-/0/Wheel",   action: "zoom in/out/reset" },
         { key: "Left-Drag",     action: "scroll canvas" },
+        { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ]
 })

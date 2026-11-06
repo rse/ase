@@ -303,6 +303,35 @@ const notify = (text: string) => {
     }, 5000)
 }
 
+/*  cycle the color theme (auto, light, dark) of the page and of the shown task document,
+    overriding the configured one in this browser until cycled back to it
+    (silently not remembered if the browser storage is unavailable), where
+    the page itself applies the remembered theme before its first paint  */
+const themes          = [ "auto", "light", "dark" ]
+const themeKey        = "ase-task-board:theme"
+const themeConfigured = document.documentElement.dataset.themeConfigured ?? "auto"
+const applyTheme = (theme: string) => {
+    document.documentElement.dataset.theme = theme
+    const root = planEl.value?.contentDocument?.documentElement
+    if (root !== undefined)
+        root.dataset.theme = theme
+}
+const cycleTheme = () => {
+    const current = document.documentElement.dataset.theme ?? "auto"
+    const theme   = themes[(themes.indexOf(current) + 1) % themes.length]
+    applyTheme(theme)
+    try {
+        if (theme === themeConfigured)
+            localStorage.removeItem(themeKey)
+        else
+            localStorage.setItem(themeKey, theme)
+    }
+    catch (_err: unknown) {
+        /*  not remembered  */
+    }
+    notify(`theme: ${theme}`)
+}
+
 /*  request the edit of a task by the prompt of its popup (processed by "ase agent editor"),
     dropping the draft of the task once sent, resp. keeping the prompt as its draft on failure  */
 export const submitPrompt = async () => {
@@ -378,8 +407,8 @@ const dialogKeys: Record<string, (id: string) => void> = {
 }
 
 /*  in the task dialog, RETURN and ESC close it (except in the task viewer, as a browser tab
-    cannot be closed by its page), "e" edits its plan, "E" edits it by a prompt,
-    "R" requests it by a prompt, "D" deletes, "T" transitions, and "A" assigns its task, "#" clears the diff of its plan,
+    cannot be closed by its page), "e" edits its plan, "E" edits it by a prompt, "R" requests it by a prompt,
+    "D" deletes, "T" transitions, and "A" assigns its task, "#" clears the diff of its plan, "L" cycles the color theme,
     the left/right arrows (also Tab/Shift+Tab) switch its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
 const onDialogKey = (ev: KeyboardEvent) => {
     const win = planEl.value?.contentWindow ?? null
@@ -398,6 +427,10 @@ const onDialogKey = (ev: KeyboardEvent) => {
     else if (ev.key === "#" && tab.value === 0 && taskDiff.value !== null) {
         ev.preventDefault()
         clearDiff()
+    }
+    else if (ev.key === "L" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+        ev.preventDefault()
+        cycleTheme()
     }
     else if (ev.key === "ArrowLeft" || ev.key === "ArrowRight" || ev.key === "Tab") {
         ev.preventDefault()
@@ -855,6 +888,9 @@ export const controlStart = () => {
             filterEl.value?.focus()
         })
     }
+
+    /*  (in the task dialog, "onDialogKey" handles it, as only keydown passes from its document)  */
+    Mousetrap.bind("L", () => { if (task.value === null) cycleTheme() })
     window.addEventListener("keydown", onBusyKey, true)
     document.addEventListener("keydown", onKey)
 }

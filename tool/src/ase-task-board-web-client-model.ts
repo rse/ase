@@ -206,6 +206,11 @@ export const api = async <T>(url: string, opts?: RequestInit, background = false
     }
 }
 
+/*  stamp the color theme of the page (see "board.web.theme") onto a
+    standalone document, so that it renders in the theme right away  */
+export const themed = (doc: string): string =>
+    doc.replace(/<html\b/, `<html data-theme="${document.documentElement.dataset.theme ?? "auto"}"`)
+
 /*  the state of the page  */
 export const board       = ref<Board | null>(null)
 export const boardError  = ref<string | null>(null)
