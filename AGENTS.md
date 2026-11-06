@@ -137,8 +137,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             resp. GitHub, GitLab, and Gitea Issues), and `task-store-issues`
             for the common parts of all issue tracker storage plugins
         -   the task board: `task-board` for the `ase task board` CLI
-            command, `task-board-{core,graph,flow,filter,stats}` for its
-            model (where `flow` is the agent graph along the lifecycle model),
+            command, `task-board-{core,graph,flow,filter,stats,diff}` for its
+            model (where `flow` is the agent graph along the lifecycle model,
+            and `diff` the diff of the last change of a task plan),
             `task-board-tui` (split into `task-board-tui-{model,control,view,popup,style}`)
             for the terminal UI, and `task-board-web-server` for the browser
             UI, served by the service, with its client in

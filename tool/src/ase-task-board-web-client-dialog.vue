@@ -68,14 +68,14 @@
             <!--  the content: the rendered task plan or attachment of the selected tab, or the task plan editor  -->
             <iframe v-show="editing === null" id="plan" ref="planEl" title="task plan"
                 sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-                :srcdoc="tab === 0 ? task.doc : (tabDocs[tab] ?? '')" @load="restorePlanScroll"></iframe>
+                :srcdoc="tab === 0 ? (taskDiff ?? task.doc) : (tabDocs[tab] ?? '')" @load="restorePlanScroll"></iframe>
             <div v-show="editing !== null" id="editor" ref="editorEl"></div>
 
             <!--  the footer: the key hints  -->
             <div v-if="editing?.keymap === 'vim'" class="dfoot"><kbd>:w</kbd><span class="action">saves</span><span class="sep">·</span><kbd>:q</kbd><span class="action">cancels</span><span class="sep">·</span><kbd>:q!</kbd><span class="action">discards</span></div>
             <div v-else-if="editing?.keymap === 'emacs'" class="dfoot"><kbd>C-x C-s</kbd><span class="action">saves</span><span class="sep">·</span><kbd>C-x C-c</kbd><span class="action">cancels</span></div>
             <div v-else-if="editing !== null" class="dfoot"><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>S</kbd><span class="action">saves</span><span class="sep">·</span><kbd>ESC</kbd><span class="action">cancels</span></div>
-            <div v-else class="dfoot"><kbd>←</kbd>/<kbd>→</kbd>/<kbd>⇤</kbd>/<kbd>⇥</kbd><span class="action">switches tab</span><span class="sep">·</span><kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>⇈</kbd>/<kbd>⇊</kbd><span class="action">scrolls</span><span class="sep">·</span><kbd>e</kbd><span class="action">edits</span><span class="sep">·</span><kbd>E</kbd><span class="action">edits by prompt</span><span class="sep">·</span><kbd>R</kbd><span class="action">requests by prompt</span><span class="sep">·</span><kbd>T</kbd><span class="action">transitions</span><span class="sep">·</span><kbd>A</kbd><span class="action">assigns</span><span class="sep">·</span><kbd>D</kbd><span class="action">deletes</span><template v-if="watched === null"><span class="sep">·</span><kbd>⏎</kbd>/<kbd>ESC</kbd><span class="action">closes</span></template></div>
+            <div v-else class="dfoot"><template v-if="tab === 0 && taskDiff !== null"><kbd>#</kbd><span class="action">clears diff</span><span class="sep">·</span></template><kbd>←</kbd>/<kbd>→</kbd>/<kbd>⇤</kbd>/<kbd>⇥</kbd><span class="action">switches tab</span><span class="sep">·</span><kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>⇈</kbd>/<kbd>⇊</kbd><span class="action">scrolls</span><span class="sep">·</span><kbd>e</kbd><span class="action">edits</span><span class="sep">·</span><kbd>E</kbd><span class="action">edits by prompt</span><span class="sep">·</span><kbd>R</kbd><span class="action">requests by prompt</span><span class="sep">·</span><kbd>T</kbd><span class="action">transitions</span><span class="sep">·</span><kbd>A</kbd><span class="action">assigns</span><span class="sep">·</span><kbd>D</kbd><span class="action">deletes</span><template v-if="watched === null"><span class="sep">·</span><kbd>⏎</kbd>/<kbd>ESC</kbd><span class="action">closes</span></template></div>
         </div>
     </div>
 </template>
@@ -83,7 +83,7 @@
 <script setup lang="ts">
 import TaskTitle from "./ase-task-board-web-client-title.vue"
 import {
-    task, editing, notice, tab, tabDocs, tabScroll, tabScrolls, planEl, tabsEl, actionError, actionNote, watched,
+    task, editing, notice, tab, tabDocs, taskDiff, tabScroll, tabScrolls, planEl, tabsEl, actionError, actionNote, watched,
     openTask, closeTask, selectTab, updateTabScroll
 } from "./ase-task-board-web-client-model"
 import {

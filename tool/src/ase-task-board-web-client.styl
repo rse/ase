@@ -2084,6 +2084,36 @@ body.plan
             font-size: 0.9rem
             padding: 0
 
+    /*  the diff of a changed task plan: added lines accented and removed lines signaled,
+        both on a light ground (each on its own row, except in code blocks, already
+        being broken into lines), and their changed words inverse  */
+    .chg
+        display: block
+        code
+            color: inherit
+        &.add
+            color: var(--c-accent)
+            background: var(--c-accent-ground)
+        &.del
+            color: var(--c-signal)
+            background: var(--c-signal-ground)
+        &.word
+            display: inline
+            color: var(--c-paper)
+        &.add.word
+            background: var(--c-accent)
+        &.del.word
+            background: var(--c-signal)
+    pre .chg
+        display: inline
+    table.fields tr
+        &.add td
+            color: var(--c-accent)
+            background: var(--c-accent-ground)
+        &.del td
+            color: var(--c-signal)
+            background: var(--c-signal-ground)
+
     /*  a draft diff: headers dimmed, inserted lines accented, removed lines signaled  */
     pre.diff code
         color: var(--c-text)

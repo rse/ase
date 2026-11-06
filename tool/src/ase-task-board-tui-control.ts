@@ -498,12 +498,14 @@ const handlePopupKey = (ctx: BoardCtx, input: string, key: Key): void => {
 
 /*  handle a key press within the read dialog  */
 const handleDialogKey = (ctx: BoardCtx, dialog: NonNullable<BoardCtx["dialog"]>, input: string, key: Key): void => {
-    const { rows, setDialog, dialogW, tabLabels, dialogSel, dialogScroll, startEdit, watched } = ctx
+    const { rows, setDialog, dialogW, tabLabels, dialogSel, dialogScroll, dialogDiff, clearDiff, startEdit, watched } = ctx
     const page = Math.max(1, rows - DIALOG_CHROME - 2)
     if (watched !== undefined ? input === "q" : key.escape || key.return)
         setDialog(null)
     else if (input === "e")
         startEdit(dialog.id)
+    else if (input === "#" && dialogDiff)
+        clearDiff()
     else if (key.leftArrow || key.rightArrow || key.tab) {
         const tab = Math.max(0, Math.min(tabLabels.length - 1, dialogSel + (key.leftArrow || (key.tab && key.shift) ? -1 : 1)))
         setDialog({ ...dialog, tab, first: tabFirst(tabLabels, dialog.first, tab, dialogW - 4) })

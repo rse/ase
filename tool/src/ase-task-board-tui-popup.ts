@@ -9,20 +9,23 @@ import { Box, Text }                          from "ink"
 import type { Task }                          from "./ase-task.js"
 import { cardLabel, groupLabel, attachmentTabs, isDiff, diffTones, dataLang, dataSpans, clampLines } from "./ase-task-board-core.js"
 import type { Card }                          from "./ase-task-board-core.js"
+import { diffHunks, changedWords }            from "./ase-task-board-diff.js"
+import type { DiffSpan }                      from "./ase-task-board-diff.js"
 import type { AgentPresence, AgentLine }      from "./ase-agent-relay-core.js"
 import { h }                                  from "./ase-task-board-tui-view.js"
 import { palette, cx, spinnerFrames, eighths } from "./ase-task-board-tui-style.js"
 import type { TransferEntry, BusyLabel, PromptState, PromptFocus, AssignState, AssignChoice } from "./ase-task-board-tui-model.js"
 
 /*  a text line with a per-character mask of its inline style
-    (bit 0: bold, bit 1: italic, bit 2: code, bit 3: accent, bit 4: signal, bit 5: dim)  */
+    (bit 0: bold, bit 1: italic, bit 2: code, bit 3: accent, bit 4: signal, bit 5: dim, bit 6: changed)  */
 type Line = { text: string, mask: number[] }
-const BOLD   = 1
-const ITALIC = 2
-const CODE   = 4
-const ACCENT = 8
-const SIGNAL = 16
-const DIM    = 32
+const BOLD    = 1
+const ITALIC  = 2
+const CODE    = 4
+const ACCENT  = 8
+const SIGNAL  = 16
+const DIM     = 32
+const CHANGED = 64
 
 /*  strip the Markdown inline markers of a line ("`" for code, "**" and
     "__" for bold, "*" for italic), recording the style of the marked text  */
@@ -92,7 +95,7 @@ type Attachment = Awaited<ReturnType<typeof Task.attachments>>[number]
 export type PlanParts  = { keys: Map<string, string>, body: string, atts: Attachment[] } | null | Error | undefined
 
 /*  a line of the read dialog  */
-type DialogLine = { text: string, color?: string, bold?: boolean, mask?: number[] }
+type DialogLine = { text: string, color?: string, bold?: boolean, mask?: number[], sign?: string, tint?: string }
 
 /*  the key/value header lines of the read dialog (each cut to the width with
     an ellipsis), separated from the content by a line, so that the content
@@ -135,6 +138,37 @@ export const planLines = (parts: PlanParts, id: string, width: number): DialogLi
         ...headerLines([ ...parts.keys ].filter(([ key ]) => key !== "Type"), width, true),
         ...markdownLines(parts.body, width)
     ]
+}
+
+/*  determine whether a task plan differs from its predecessor in what the read
+    dialog shows (and not, for instance, only in its attachments)  */
+export const planChanged = (before: PlanParts, after: PlanParts): boolean => {
+    const shown = (parts: PlanParts) => parts === undefined || parts === null || parts instanceof Error ? null :
+        JSON.stringify([ [ ...parts.keys ].filter(([ key ]) => key !== "Type"), parts.body ])
+    return shown(before) !== null && shown(after) !== null && shown(before) !== shown(after)
+}
+
+/*  the lines of the diff of two task plans for the read dialog: the rendered lines of
+    both, where removed lines are red and added lines blue, with their sign in the
+    otherwise empty first column and their changed words marked, and where only the
+    shown content of the lines decides about a change  */
+export const planDiffLines = (before: PlanParts, after: PlanParts, id: string, width: number): DialogLine[] => {
+    const changed = (line: DialogLine, sign: string, tint: string, spans: DiffSpan[]): DialogLine => {
+        const mask = [ ...(line.mask ?? new Array<number>(line.text.length).fill(0)) ]
+        for (const { from, to } of spans)
+            for (let k = from; k < to; k++)
+                mask[k] |= CHANGED
+        return { ...line, mask, sign, tint }
+    }
+    return diffHunks(planLines(before, id, width), planLines(after, id, width), (line) => JSON.stringify(line))
+        .flatMap(({ kept, removed, added }) => {
+            const [ del, add ] = changedWords(removed.map((line) => line.text), added.map((line) => line.text))
+            return [
+                ...kept,
+                ...removed.map((line, k) => changed(line, "-", "red",  del[k])),
+                ...added.map((line, k)   => changed(line, "+", "blue", add[k]))
+            ]
+        })
 }
 
 /*  the lines of a task plan attachment for the read dialog: its embedded
@@ -297,7 +331,7 @@ export const DIALOG_WIDTH  = 110
 type DialogArgs = {
     card: Card | undefined, group: string | undefined, id: string, pred: string[], succ: string[],
     tint: (id: string) => string | undefined, tabs: string[], tab: number, first: number, scroll: number,
-    lines: DialogLine[], width: number, columns: number, rows: number, notice: string | null, viewer: boolean
+    lines: DialogLine[], width: number, columns: number, rows: number, notice: string | null, viewer: boolean, diffed: boolean
 }
 
 /*  the segments of the dependencies row of the read dialog within its inner width:
@@ -730,7 +764,7 @@ export const renderAssign = (assign: AssignState, choices: AssignChoice[], unkno
 
 /*  render the read dialog: full height, horizontally centered, with a
     vertical scroll bar in its right border  */
-export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, first, scroll, lines, width, columns, rows, notice, viewer }: DialogArgs) => {
+export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, first, scroll, lines, width, columns, rows, notice, viewer, diffed }: DialogArgs) => {
     const left   = Math.floor((columns - width) / 2)
     const bodyW  = width - 5
     const viewH  = rows - DIALOG_CHROME
@@ -788,6 +822,7 @@ export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, fir
     /*  the key hints, or instead the status notice of an edit, truncated to the free width  */
     const free   = Math.max(0, innerW - pos.length - 1)
     const keys   = (notice !== null ? " " + sanitize(notice) :
+        (diffed ? " #: clear diff ·" : "") +
         " ←/→/⇤/⇥: switch tab · ↑/↓/⇈/⇊: scroll · e: edit · E: edit by prompt · R: request by prompt · T: transition · A: assign · D: delete · M: toggle mouse · " +
         (viewer ? "q: quit" : "⏎/ESC: close")).slice(0, free)
 
@@ -814,8 +849,8 @@ export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, fir
 
             /*  split the padded line into runs of equal inline style (cut to the body width,
                 as a wider line would wrap and push the rows of the dialog out of place)  */
-            const text = " " + (line?.text ?? "").slice(0, bodyW).padEnd(bodyW)
-            const mask = [ 0, ...(line?.mask ?? []) ]
+            const text = (line?.sign ?? " ") + (line?.text ?? "").slice(0, bodyW).padEnd(bodyW)
+            const mask = [ line?.sign !== undefined ? CHANGED : 0, ...(line?.mask ?? []) ]
             const runs = [] as { text: string, style: number }[]
             for (let k = 0; k < text.length; k++) {
                 const style = mask[k] ?? 0
@@ -827,8 +862,9 @@ export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, fir
             return h(Box, { key: i },
                 ...runs.map((run, k) => h(Text, {
                     key: k, wrap: "truncate",
-                    color: (run.style & (CODE | ACCENT)) !== 0 ? palette.accent : (run.style & SIGNAL) !== 0 ? palette.signal :
-                        (run.style & DIM) !== 0 ? palette.dim : line?.color,
+                    color: line?.tint ?? ((run.style & (CODE | ACCENT)) !== 0 ? palette.accent : (run.style & SIGNAL) !== 0 ? palette.signal :
+                        (run.style & DIM) !== 0 ? palette.dim : line?.color),
+                    inverse: (run.style & CHANGED) !== 0,
                     bold: (line?.bold ?? false) || (run.style & BOLD) !== 0, italic: (run.style & ITALIC) !== 0
                 }, run.text)),
                 h(Text, cx("signal"), ` ${bar}`))

@@ -24,7 +24,7 @@ import { sanitize, renderDialog, renderConfirm, renderTransfer, renderAssign, re
 const renderScreen = (ctx: BoardCtx, project: string) => {
     const {
         columns, rows, all, board, surface, view, filter, typing, dialog, notice, carry, confirm, transfer, assign, prompt,
-        headRef, tabLabels, dialogW, dialogSel, dialogLines, transferCard, transferList, dim, store, busy, busyTick,
+        headRef, tabLabels, dialogW, dialogSel, dialogLines, dialogDiff, transferCard, transferList, dim, store, busy, busyTick,
         agents, watched
     } = ctx
 
@@ -55,7 +55,8 @@ const renderScreen = (ctx: BoardCtx, project: string) => {
             columns,
             rows,
             notice,
-            viewer:  watched !== undefined
+            viewer:  watched !== undefined,
+            diffed:  dialogDiff
         }) : null,
         confirm !== null ? renderConfirm(confirm.id, confirm.yes, columns, rows) : null,
         transfer !== null && transferCard !== undefined ?

@@ -90,6 +90,11 @@ set snapshot `kind="changeset"` of the `implementer` and `integrator`
 agents) is colored per line, YAML and JSON data are syntax-highlighted,
 and a change set snapshot older than the plan is marked `(stale)`.
 
+While the task dialog is open, the last change of the shown plan is displayed
+as a diff in the plan tab, with the removed and added lines colored (in the
+terminal board also signed) and their changed words shown inverse, until `#` clears it or a next change
+replaces it. Closing the task dialog or switching to another task drops it.
+
 A task is moved into another state (changing its `Status:`) either by
 picking it up with `SPACE` and dropping it with a second `SPACE` onto
 the selected lane (only lanes whose state is reachable from the current
@@ -540,6 +545,7 @@ letter under the kitty keyboard protocol.
 - `↑`/`↓`: Scroll the content.
 - `PgUp`/`PgDn`: Scroll the content by one page.
 - `e`: Edit the task plan.
+- `#`: Clear the diff of the last change of the task plan.
 - `D`, `T`, `A`, `E`, `R`, `M`: As in every view.
 - `⏎`, `ESC`: Close the task dialog.
 

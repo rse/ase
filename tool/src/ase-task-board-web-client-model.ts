@@ -19,7 +19,7 @@ export type Surface = { view: View, minimized: string[], collapsed: string[], ti
 export type Board   = { mode: string, project: string, version: string, warnings: string[], users: string[], self: string, surface: Surface, moves: Record<string, string[]>, groups: Group[] }
 export type Tone    = "active" | "done" | "idle"
 export type Ref     = { id: string, tone: Tone }
-export type Task    = { id: string, title: string, tone: Tone, status: string, group: string, epic: string, doc: string, tabs: string[], pred: Ref[], succ: Ref[] }
+export type Task    = { id: string, title: string, tone: Tone, status: string, group: string, epic: string, doc: string, plan: { keys: [ string, string ][], body: string }, tabs: string[], pred: Ref[], succ: Ref[] }
 export type View    = "lanes" | "graph" | "stats" | "agents" | "flow"
 
 /*  the displayed names of the views (the persisted view ids being kept short)  */
@@ -232,6 +232,7 @@ export const prompt      = ref<{ id: string, text: string, name: string | null }
 export const scroll      = reactive({ all: true, info: "" })
 export const tab         = ref(0)
 export const tabDocs     = ref<Record<number, string>>({})
+export const taskDiff    = ref<string | null>(null)
 export const tabScroll   = reactive({ less: false, more: false })
 export const tabScrolls  = new Map<number, number>()
 export const filter      = ref("")
@@ -548,15 +549,37 @@ export const openTask = async (id: string, background = false) => {
     }
     watchError.value = null
 
+    /*  a change of the shown plan of the still open task replaces its diff (always
+        in the background), any other task starts without a diff  */
+    const prev = task.value?.id === id ? task.value : null
+    let   diff = prev !== null ? taskDiff.value : null
+    if (prev !== null && JSON.stringify(prev.plan) !== JSON.stringify(t.plan)) {
+        const d = await api<{ doc: string }>("/task-board/api/diff", {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({ before: prev.plan, after: t.plan })
+        }, true)
+        if (seq !== openSeq)
+            return
+        diff = d.error !== undefined ? null : d.doc
+    }
+
     /*  replace the cached attachment documents only once the selected one is re-fetched  */
     const n   = Math.min(tab.value, t.tabs.length - 1)
     const doc = n > 0 ? await fetchTabDoc(id, n, background) : ""
     if (seq !== openSeq)
         return
-    tabDocs.value = n > 0 ? { [n]: doc } : {}
-    task.value    = t
-    tab.value     = n
+    tabDocs.value  = n > 0 ? { [n]: doc } : {}
+    taskDiff.value = diff
+    task.value     = t
+    tab.value      = n
     nextTick(updateTabScroll)
+}
+
+/*  drop the diff of the last change, so just the latest state of the task remains  */
+export const clearDiff = () => {
+    keepTabScroll()
+    taskDiff.value = null
 }
 
 /*  re-open the dialog under another task id (or none) with the next board reload  */
@@ -574,8 +597,9 @@ export const closeTask = () => {
     for (const hook of closeHooks)
         hook()
     openSeq++
-    openId     = null
-    task.value = null
+    openId         = null
+    task.value     = null
+    taskDiff.value = null
 }
 
 /*  fetch the document of an attachment tab, or load it into the cache

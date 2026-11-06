@@ -5,6 +5,11 @@ ChangeLog
 2.0.8 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Diff of Task Changes in Task Boards
+    The task dialog of `ase task board` now shows the last change of the plan as a diff in its
+    plan tab, in the rendered look, with colored lines and inverse changed words, until `#`
+    clears it or a next change replaces it. Closing the dialog or switching the task drops it.
+
 -   IMPROVEMENT [code, docs]: Standalone Task Viewer of Task Boards
     The new option `--task`|`-T` of `ase task board` shows only the task dialog of the given task,
     spanning the entire window and following all its changes, as a task viewer and watcher. The

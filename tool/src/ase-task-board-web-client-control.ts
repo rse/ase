@@ -12,8 +12,8 @@ import {
     type Board, type Card, type Group, type Sel, type Surface,
     api, groupItems, rowLanes, relocate,
     board, actionError, actionNote, view, graph, task, sel, grow, editing, confirmDel, transfer, assign, prompt, watched,
-    tab, drag, busy, boardEl, graphEl, flowEl, flowSel, planEl, filterEl, agentList, agentSel, logEl, showFlowAgent,
-    surface, growable, grown, openTask, closeTask, selectTab, selectAgent, toggle, cycleView, stepStatsRange
+    tab, taskDiff, drag, busy, boardEl, graphEl, flowEl, flowSel, planEl, filterEl, agentList, agentSel, logEl, showFlowAgent,
+    surface, growable, grown, openTask, closeTask, clearDiff, selectTab, selectAgent, toggle, cycleView, stepStatsRange
 } from "./ase-task-board-web-client-model"
 import { startEdit, startNew, onEditorKey } from "./ase-task-board-web-client-editor"
 
@@ -379,8 +379,8 @@ const dialogKeys: Record<string, (id: string) => void> = {
 
 /*  in the task dialog, RETURN and ESC close it (except in the task viewer, as a browser tab
     cannot be closed by its page), "e" edits its plan, "E" edits it by a prompt,
-    "R" requests it by a prompt, "D" deletes, "T" transitions, and "A" assigns its task, the left/right arrows (also Tab/Shift+Tab) switch
-    its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
+    "R" requests it by a prompt, "D" deletes, "T" transitions, and "A" assigns its task, "#" clears the diff of its plan,
+    the left/right arrows (also Tab/Shift+Tab) switch its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
 const onDialogKey = (ev: KeyboardEvent) => {
     const win = planEl.value?.contentWindow ?? null
     if (ev.key === "Escape" || ev.key === "Enter") {
@@ -394,6 +394,10 @@ const onDialogKey = (ev: KeyboardEvent) => {
     else if (Object.hasOwn(dialogKeys, ev.key) && !ev.ctrlKey && !ev.metaKey && !ev.altKey && task.value !== null) {
         ev.preventDefault()
         dialogKeys[ev.key](task.value.id)
+    }
+    else if (ev.key === "#" && tab.value === 0 && taskDiff.value !== null) {
+        ev.preventDefault()
+        clearDiff()
     }
     else if (ev.key === "ArrowLeft" || ev.key === "ArrowRight" || ev.key === "Tab") {
         ev.preventDefault()

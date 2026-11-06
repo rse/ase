@@ -32,7 +32,7 @@ import type { GraphLayout, Place }            from "./ase-task-board-graph.js"
 import { flowOf, layoutFlow, flowState }      from "./ase-task-board-flow.js"
 import type { Flow }                          from "./ase-task-board-flow.js"
 import { fitGroups, agentLogWidth, agentOpLines, agentOpHeight, AGENT_INFO_H } from "./ase-task-board-tui-view.js"
-import { dialogTabs, planLines, attachmentLines, agentLogLines, agentLogKey, DIALOG_CHROME, DIALOG_WIDTH } from "./ase-task-board-tui-popup.js"
+import { dialogTabs, planLines, planChanged, planDiffLines, attachmentLines, agentLogLines, agentLogKey, DIALOG_CHROME, DIALOG_WIDTH } from "./ase-task-board-tui-popup.js"
 import type { PlanParts }                     from "./ase-task-board-tui-popup.js"
 import { pulseFrames }                        from "./ase-task-board-tui-style.js"
 
@@ -511,7 +511,7 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
     const [ sel,     setSel     ] = React.useState<Sel>(() => relocate(board, { g: 0, l: 0, id: "" }, surface))
     const [ dialog,  setDialog  ] = React.useState<{ id: string, tab: number, first: number, scrolls: Record<number, number> } | null>(
         watched !== undefined ? { id: watched, tab: 0, first: 0, scrolls: {} } : null)
-    const [ plan,    setPlan    ] = React.useState<{ id: string, parts: PlanParts } | null>(null)
+    const [ plan,    setPlan    ] = React.useState<{ id: string, parts: PlanParts, before?: PlanParts } | null>(null)
     const [ files,   setFiles   ] = React.useState<Map<string, Buffer | Error>>(new Map())
     const [ first,   setFirst   ] = React.useState(0)
     const [ scroll,  setScroll  ] = React.useState({ x: 0, y: 0 })
@@ -749,18 +749,26 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
 
     /*  fetch the plan (with its attachments) of the read dialog whenever it is opened or the board changes
         (the latter in the background, i.e. without the busy popup), together with loading the
-        syntax highlighter of YAML or JSON attachments (on the first opening only)  */
+        syntax highlighter of YAML or JSON attachments (on the first opening only), where a
+        change with a shown effect remembers its predecessor for the diff of the read dialog,
+        and where closing the dialog forgets the plan, as its changes are followed only while open  */
     const dialogId  = dialog?.id
     const dialogTab = dialog?.tab ?? 0
     React.useEffect(() => {
-        if (dialogId === undefined)
+        if (dialogId === undefined) {
+            setPlan(null)
             return
+        }
         let live = true
         const load = Promise.all([ Task.parts(log, dialogId), Task.attachments(log, dialogId), dataLoad() ])
         const run  = plan?.id === dialogId ? load : track({ text: "loading task", id: dialogId }, load)
         run.then(([ parts, atts ]) => {
             if (live)
-                setPlan({ id: dialogId, parts: parts === null ? null : { ...parts, atts } })
+                setPlan((prev) => {
+                    const next = parts === null ? null : { ...parts, atts }
+                    const same = prev?.id === dialogId && next !== null
+                    return { id: dialogId, parts: next, before: !same ? undefined : planChanged(prev.parts, next) ? prev.parts : prev.before }
+                })
         }).catch((err: unknown) => {
             log.write("warning", `board: loading plan failed: ${err instanceof Error ? err.message : String(err)}`)
             if (live)
@@ -1078,10 +1086,18 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
     const dialogSel   = Math.min(dialogTab, tabLabels.length - 1)
     const dialogAtt   = dialogSel > 0 && dialogParts !== undefined && dialogParts !== null && !(dialogParts instanceof Error) ?
         dialogParts.atts[dialogSel - 1] : undefined
+    const planDiff    = React.useMemo(() => plan?.before !== undefined ?
+        planDiffLines(plan.before, plan.parts, plan.id, Math.max(1, dialogW - 5)) : null, [ plan, dialogW ])
+    const dialogDiff  = planDiff !== null && dialogSel === 0 && plan?.id === dialog?.id
     const dialogLines = dialog === null ? [] : dialogAtt !== undefined ?
         attachmentLines(dialogAtt, files.get(`${dialog.id}:${dialogSel}`), Math.max(1, dialogW - 5)) :
-        planLines(dialogParts, dialog.id, Math.max(1, dialogW - 5))
+        dialogDiff ? planDiff : planLines(dialogParts, dialog.id, Math.max(1, dialogW - 5))
     const dialogMax   = Math.max(0, dialogLines.length - (rows - DIALOG_CHROME))
+
+    /*  drop the diff of the last change from the read dialog, so just the latest state remains  */
+    const clearDiff = () => {
+        setPlan((prev) => prev !== null ? { ...prev, before: undefined } : prev)
+    }
 
     /*  the entries of the transfer popup of its (still existing) task  */
     const transferCard = transfer !== null ? all.cards.get(transfer.id) : undefined
@@ -1189,7 +1205,7 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         sel, setSel, dialog, setDialog, scroll, layout, notice, setNotice, carry, setCarry, cycle,
         confirm, setConfirm, transfer, setTransfer, assign, setAssign, prompt, setPrompt, mouse, setMouse, lastClick, grown, setGrow,
         cardBoxes, laneBoxes, groupBoxes, headBoxes, agentBoxes, rangeBoxes, cardRef, laneRef, groupRef, headRef, agentRef, rangeRef, boxAt, graphView,
-        places, graphTitles, boardH, dialogW, tabLabels, dialogSel, dialogLines, dialogScroll,
+        places, graphTitles, boardH, dialogW, tabLabels, dialogSel, dialogLines, dialogScroll, dialogDiff, clearDiff,
         transferCard, transferList, fit, viewH, viewW, x, y, nodes, dim, pulse, now, beatOf, store, busy, busyTick,
         agents, working, cycleView, agentList, agentIdx, agent, agentOp, logLines, logH, logFirst, logMax, selectAgent, scrollLog, stats, usage, range, setRange, stepRange,
         flow, flowLayout, flowSel, setFlowSel, flowPlaces, focusAgent, scrollFlow,
