@@ -302,6 +302,29 @@ const notify = (text: string) => {
     }, 5000)
 }
 
+/*  cycle the color theme (auto, light, and dark) of the page and of the
+    shown task document, overriding the configured one in this browser
+    (silently not remembered if the browser storage is unavailable)  */
+const themes   = [ "auto", "light", "dark" ]
+const themeKey = "ase-task-board:theme"
+const applyTheme = (theme: string) => {
+    document.documentElement.dataset.theme = theme
+    const root = planEl.value?.contentDocument?.documentElement
+    if (root !== undefined)
+        root.dataset.theme = theme
+}
+const cycleTheme = () => {
+    const theme = themes[(themes.indexOf(document.documentElement.dataset.theme ?? "auto") + 1) % themes.length]
+    applyTheme(theme)
+    try {
+        localStorage.setItem(themeKey, theme)
+    }
+    catch (_err: unknown) {
+        /*  not remembered  */
+    }
+    notify(`theme: ${theme}`)
+}
+
 /*  request the edit of a task by the prompt of its popup (processed by "ase agent editor"),
     dropping the draft of the task once sent, resp. keeping the prompt as its draft on failure  */
 export const submitPrompt = async () => {
@@ -834,11 +857,20 @@ const onBusyKey = (ev: KeyboardEvent) => {
 /*  start the key handling: the single-key bindings (the graph view binds its zoom keys
     itself), the dispatching of all other keys, and the swallowing of keys while busy  */
 export const controlStart = () => {
+    try {
+        const theme = localStorage.getItem(themeKey)
+        if (theme !== null && themes.includes(theme))
+            applyTheme(theme)
+    }
+    catch (_err: unknown) {
+        /*  the configured theme applies  */
+    }
     Mousetrap.bind("t", () => { if (board.value !== null && (view.value === "lanes" || view.value === "graph")) toggle("titles", "") })
     Mousetrap.bind("s", () => { if (board.value !== null && view.value === "graph" && task.value === null) toggle("standalone", "") })
     Mousetrap.bind("v", () => { if (task.value === null) cycleView() })
     Mousetrap.bind("V", () => { if (task.value === null) cycleView(true) })
     Mousetrap.bind("?", () => { if (board.value !== null) toggle("keys", "") })
+    Mousetrap.bind("L", () => { cycleTheme() })
     Mousetrap.bind("/", (ev) => {
         if (task.value !== null || view.value === "agents" || view.value === "flow")
             return

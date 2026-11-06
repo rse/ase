@@ -65,7 +65,7 @@
             <!--  the content: the rendered task plan or attachment of the selected tab, or the task plan editor  -->
             <iframe v-show="editing === null" id="plan" ref="planEl" title="task plan"
                 sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-                :srcdoc="tab === 0 ? task.doc : (tabDocs[tab] ?? '')" @load="restorePlanScroll"></iframe>
+                :srcdoc="themed(tab === 0 ? task.doc : (tabDocs[tab] ?? ''))" @load="restorePlanScroll"></iframe>
             <div v-show="editing !== null" id="editor" ref="editorEl"></div>
 
             <!--  the footer: the key hints  -->
@@ -81,7 +81,7 @@
 import TaskTitle from "./ase-task-board-web-client-title.vue"
 import {
     task, editing, notice, tab, tabDocs, tabScroll, tabScrolls, planEl, tabsEl,
-    openTask, closeTask, selectTab, updateTabScroll
+    openTask, closeTask, selectTab, updateTabScroll, themed
 } from "./ase-task-board-web-client-model"
 import {
     editorEl, startEdit, saveEdit, stopEdit, leaveEdit, restoreDraft, dropDraft

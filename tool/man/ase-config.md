@@ -361,6 +361,11 @@ Task board (all writable on the `user` and `project` scopes only, see
   The key bindings of the task plan editor of the web board (default:
   `default`).
 
+- `board.web.theme` (`auto`, `light`, or `dark`):
+  The color theme of the web board, where `auto` follows the light or
+  dark preference of the operating system resp. browser (default:
+  `auto`).
+
 ## ENVIRONMENT
 
 - `EDITOR`, `VISUAL`:

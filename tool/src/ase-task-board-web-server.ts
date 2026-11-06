@@ -184,6 +184,15 @@ const editorKeymap = (log: Log): "default" | "vim" | "emacs" => {
     return value === "vim" || value === "emacs" ? value : "default"
 }
 
+/*  the color theme of the web board, resolved from the
+    "board.web.theme" configuration (on each page load)  */
+const boardTheme = (log: Log): "auto" | "light" | "dark" => {
+    const cfg = new Config("config", configSchema, log)
+    cfg.read()
+    const value = cfg.get("board.web.theme")
+    return value === "light" || value === "dark" ? value : "auto"
+}
+
 /*  render a standalone document (styled by the client stylesheet) out of
     key/value fields, separated by a line from the content  */
 const fieldsDocument = (fields: [ string, string ][], content: string): string => {
@@ -402,11 +411,13 @@ const guarded = (handler: Handler): Handler =>
 
 /*  register the page routes of the web board: its client assets and its colors  */
 const registerPageRoutes = (server: Hapi.Server, log: Log): void => {
-    /*  the single page of the web board, with its stylesheet and browser-side code  */
+    /*  the single page of the web board, with its stylesheet and browser-side code,
+        and with its color theme (resolved on each page load) on its root element  */
     server.route({
         method:  "GET",
         path:    "/task-board",
-        handler: (_request, h) => h.response(clientAsset("html")).type("text/html; charset=utf-8")
+        handler: (_request, h) => h.response(clientAsset("html")
+            .replace(/<html\b/, `<html data-theme="${boardTheme(log)}"`)).type("text/html; charset=utf-8")
     })
     server.route({
         method:  "GET",

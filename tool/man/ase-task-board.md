@@ -426,6 +426,8 @@ letter under the kitty keyboard protocol.
   views).
 - `?`: Hide or show the key hint lines (persisted); while hidden, the
   information line ends with `?: show key hints`.
+- `L`: Cycle the color theme through `auto`, `light`, and `dark`,
+  overriding `board.web.theme` in the current browser (web board only).
 - `D`: Delete the selected task, after a confirmation (not in the
   agent logs and statistics views).
 - `T`: Transfer the selected task to another state via the transfer
@@ -593,6 +595,11 @@ The following configuration keys (on scope `user` or `project`, see
 - `board.web.editor.keymap`:
   The key bindings of the task plan editor of the web board: `default`,
   `vim`, or `emacs` (default: `default`).
+
+- `board.web.theme`:
+  The color theme of the web board: `light`, `dark`, or `auto`, which
+  follows the light or dark preference of the operating system resp.
+  browser (default: `auto`).
 
 - `project.relay.url`:
   The default agent relay of the boards (see `--agent-relay`).

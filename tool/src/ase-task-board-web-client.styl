@@ -71,6 +71,44 @@ vendors = official
     --c-signal:        var(--color-signal-42)
     --c-signal-ground: var(--color-signal-62)
 
+/*  the semantic colors of the dark theme: light texts on dark grounds, with the
+    steps picked by their lightness (the lowest steps of a spread are all nearly
+    black), except for the shade (still black for the shadows and backdrops)  */
+dark-theme()
+    --c-text:          var(--color-normal-56)
+    --c-text-strong:   var(--color-normal-44)
+    --c-text-soft:     var(--color-normal-48)
+    --c-paper:         var(--color-normal-19)
+    --c-shade:         var(--color-normal-1)
+    --c-mute:          var(--color-dim-42)
+    --c-line:          var(--color-dim-34)
+    --c-border-strong: var(--color-dim-28)
+    --c-border:        var(--color-dim-25)
+    --c-border-soft:   var(--color-dim-23)
+    --c-fill:          var(--color-dim-21)
+    --c-ground:        var(--color-dim-15)
+    --c-ground-light:  var(--color-dim-17)
+    --c-accent-strong: var(--color-accent-48)
+    --c-accent:        var(--color-accent-42)
+    --c-accent-light:  var(--color-accent-33)
+    --c-accent-line:   var(--color-accent-28)
+    --c-accent-border: var(--color-accent-25)
+    --c-accent-fill:   var(--color-accent-21)
+    --c-accent-ground: var(--color-accent-16)
+    --c-accent-paper:  var(--color-accent-18)
+    --c-signal-strong: var(--color-signal-50)
+    --c-signal:        var(--color-signal-44)
+    --c-signal-ground: var(--color-signal-17)
+    color-scheme: dark
+
+/*  the color theme (see "board.web.theme"): "dark" always, "auto"
+    whenever the operating system or browser prefers a dark one  */
+:root[data-theme="dark"]
+    dark-theme()
+@media (prefers-color-scheme: dark)
+    :root:not([data-theme="light"])
+        dark-theme()
+
 /*  the base settings  */
 *
     box-sizing: border-box
@@ -1898,16 +1936,16 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
         .cm-line
             padding: 0 20px
 
-        /*  the cursor as a filled block in the signal color with a white character
+        /*  the cursor as a filled block in the signal color with a paper-colored character
             (also the block cursor of the Vim key bindings), outlined only while unfocused,
             replacing the regular line cursor  */
         .cm-cursor
             display: none
         .cm-block-cursor, .cm-fat-cursor
             background: var(--c-signal)
-            color: #ffffff !important
+            color: var(--c-paper) !important
             *
-                color: #ffffff !important
+                color: var(--c-paper) !important
         .cm-editor:not(.cm-focused)
             .cm-block-cursor, .cm-fat-cursor
                 background: none
