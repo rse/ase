@@ -13,6 +13,7 @@
     [`--unverified`|`-u`]
     [`--focus`|`-f` *section*[,...]]
     [`--quiet`|`-q`]
+    [`--interactive`|`-i`]
     [`--next`|`-n` *option*[,...]]
     [*id* | *id*: *instruction* | *instruction* | *issue-id*]
 
@@ -119,6 +120,25 @@ stale draft.
     draft stay. It is forwarded on a hand-off to `ase-task-grill`, but
     not on a hand-off to another skill.
 
+-   `--interactive`|`-i`:
+    Show the plan in a band above the prompt (*Anthropic Claude Code CLI* with
+    active ASE function hooks in an interactive terminal only, else the skill
+    aborts), instead of printing it, and ask for the next step without any
+    dialog. The band takes 75% of the terminal height, in the fullscreen mode
+    all the rows the terminal UI leaves it. Under `--focus`, it shows only the
+    focused sections.
+
+    The band follows every change of the plan, also by others, and keeps its
+    scroll position. Its line numbers are those of the plan text in `ase task
+    edit`. It shows the last change as a unified diff with colored backgrounds and
+    line numbers, red for removed and blue for added lines. In the fullscreen
+    mode, scroll it with the mouse wheel, or with *CTRL+x* *TAB* and then
+    *PageUp*/*PageDown*.
+
+    At the prompt, type either a refinement instruction, or one of `DONE`,
+    `GRILL`, `DRAFT`, `IMPLEMENT`, or `CANCEL` (in any case), which closes the
+    band. After a hand-off to `ase-task-grill`, a hand-off back reopens it.
+
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end
     of this skill). *option* is a single token or a *comma-separated
@@ -194,6 +214,12 @@ Refine and show only the `DESIGN` section of the task under id `hello`:
 
 ```text
 ❯ /ase-task-edit --focus HOW hello: print the text via a dedicated logger.
+```
+
+Refine the task under id `hello` with its plan shown in a band above the prompt:
+
+```text
+❯ /ase-task-edit --interactive hello
 ```
 
 ##  SEE ALSO

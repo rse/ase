@@ -1,3 +1,4 @@
+
 ## About
 
 **Agentic Software Engineering (ASE)** is the opinionated companion
@@ -76,7 +77,12 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         (a prompt starting with a skill command showing the entire argument
         hint of the skill, wrapped over multiple lines, in the band above
         the prompt, instead of the truncated one-line argument hint of
-        Claude Code, which is dropped for the skills)
+        Claude Code, which is dropped for the skills), and
+        `ase-mods-task-edit.ts` for the task band (the task of
+        `ase-task-edit --interactive`, signaled through a tool registered by
+        the module, rendered in the band above the prompt and following
+        all changes of the task, with the last change shown as a unified diff
+        with line numbers, until a next step of the skill is submitted)
     -   `plugin/.claude-plugin/`, `plugin/.codex-plugin/`,
         `plugin/.github/plugin/`: the per-agent-tool plugin manifests
 -   `tool/`: the `@rse/ase` CLI

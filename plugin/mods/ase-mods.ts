@@ -10,7 +10,8 @@
     ("ase-mods-evaluate.ts"), the intent help ("ase-mods-help-find.ts"),
     the synopsis form ("ase-mods-help-compose.ts"),
     the manual band ("ase-mods-help-show.ts"), the manpage browser
-    ("ase-mods-help-browse.ts"), and the hint band ("ase-mods-help-hint.ts").
+    ("ase-mods-help-browse.ts"), the hint band ("ase-mods-help-hint.ts"),
+    and the task band ("ase-mods-task-edit.ts").
     As the engine loads only a module spelling "on", "$", and "next" literally,
     this is the only module touching the engine, and it binds the engine
     services needed by the other modules as plain functions.  */
@@ -24,6 +25,7 @@ import { modHelpCompose }     from "./ase-mods-help-compose.ts"
 import { modHelpShow }        from "./ase-mods-help-show.ts"
 import { modHelpBrowse }      from "./ase-mods-help-browse.ts"
 import { modHelpHint }        from "./ase-mods-help-hint.ts"
+import { modTaskEdit, TOOL }  from "./ase-mods-task-edit.ts"
 
 /*  function hook registration entry point  */
 export const register: Register = (on, options) => {
@@ -32,7 +34,7 @@ export const register: Register = (on, options) => {
         return
 
     /*  the grill table, the decision matrix, the intent help, the synopsis form,
-        the manual band, the manpage browser, and the hint band  */
+        the manual band, the manpage browser, the hint band, and the task band  */
     const grill    = modGrill()
     const evaluate = modEvaluate()
     const intent   = modHelpFind()
@@ -40,6 +42,27 @@ export const register: Register = (on, options) => {
     const manual   = modHelpShow()
     const browse   = modHelpBrowse()
     const hint     = modHelpHint()
+    const task     = modTaskEdit()
+
+    /*  provide the tool of the task band where a person sees the band only, so
+        its absence tells "ase-task-edit --interactive" that no band exists  */
+    on("session.start", async ($, e, next) => {
+        if (e.isInteractive && e.surface === "terminal")
+            await $.tool.register(TOOL)
+        return next(e)
+    })
+
+    /*  serve the tool of the task band, which needs no permission, as it just
+        shows a task, and whose loading of the task is as harmless  */
+    on("tool.check", { tool: "mcp__ase__ase_task_band" }, () => ({ decision: "allow" }))
+    on("tool.call", { tool: "mcp__ase__ase_task_band" }, async ($, e) => ({
+        result: await task.open(String(e.id), String(e.sections ?? ""), {
+            invalidate: () => $.ui.invalidate("ui.render"),
+            every:      (ms, fn) => $.clock.every(ms, fn),
+            load:       async (id) => (await $.tool.call({ tool: "mcp__plugin_ase_ase__ase_task_load",
+                id, variant: "source", tag: true })).text ?? ""
+        })
+    }))
 
     /*  the bands above the prompt (the synopsis form, the intent band, and the
         manpage browser, opened in this order), the shown one (as at most one is
@@ -130,10 +153,10 @@ export const register: Register = (on, options) => {
     })
 
     /*  operate the synopsis form resp. the intent band, else scroll the manual
-        page in the band, by the wheel, and never let the engine move the window
-        over our (overflowing) band, even while it takes no scrolling  */
+        page, else the task, in the band, by the wheel, and never let the engine
+        move the window over our (overflowing) band, even while it takes no scrolling  */
     on("ui.scroll", { component: "AbovePrompt" }, ($, e, next) => {
-        if (!bands.some((band) => band.scroll(e)) && !manual.scroll(e))
+        if (!bands.some((band) => band.scroll(e)) && !manual.scroll(e) && !task.scroll(e))
             return shown() === undefined && !manual.active() ? next(e) : {}
         $.ui.invalidate("ui.render")
         return {}
@@ -194,6 +217,7 @@ export const register: Register = (on, options) => {
         reset()
         manual.reset()
         hint.reset()
+        task.submit(e.text)
         $.ui.invalidate("ui.render")
         return next(e)
     }).catch(($, e, next) =>
@@ -216,19 +240,20 @@ export const register: Register = (on, options) => {
         }) ?? evaluate.render(e, ui, { invalidate }) ?? drawn
     })
 
-    /*  draw the intent band resp. the synopsis form, else the manual page,
-        else the argument hint, into the band above the prompt (terminal only)  */
+    /*  draw the intent band resp. the synopsis form, else the manual page, else
+        the task, else the argument hint, into the band above the prompt (terminal only)  */
     on("ui.render", { component: "AbovePrompt", surface: "terminal" }, async ($, e, next) => {
         const drawn = await next(e)
         const ui    = $.ui.resolve(e)
-        return shown()?.render(e, ui) ?? manual.render(e, ui) ?? hint.render(e, ui) ?? drawn
+        return shown()?.render(e, ui) ?? manual.render(e, ui) ?? task.render(e, ui) ?? hint.render(e, ui) ?? drawn
     }).catch(($, e, next) => {
         /*  close a failed intent band resp. synopsis form, restore the prompt
             resp. the command as typed (instead of the held prompt), resp. close
-            a failed manual band and hint band, and keep the drawing beneath  */
+            a failed manual band, task band, and hint band, and keep the drawing beneath  */
         const text = cancel()
         if (text === undefined) {
             manual.reset()
+            task.reset()
             hint.reset()
         }
         if (text !== undefined)

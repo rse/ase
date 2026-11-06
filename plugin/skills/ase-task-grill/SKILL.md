@@ -22,7 +22,7 @@ Iteratively Grill a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-grill"
-    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task">
+    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task --int-interactive">
     $ARGUMENTS
 </expand>
 
@@ -355,6 +355,9 @@ Set <args>--int-reuse-task</args>.
             <if condition="<getopt-option-quiet/> is `true`">
                 Set <args><args/> --quiet</args>.
             </if>
+            <if condition="<getopt-option-int-interactive/> is `true`">
+                Set <args><args/> --int-interactive</args>.
+            </if>
             Only output the following <template/> and then call the
             tool `Skill(skill: "ase:ase-task-grill", args: "<args/>")`
             to invoke the `ase:ase-task-grill` skill again in order to
@@ -370,6 +373,9 @@ Set <args>--int-reuse-task</args>.
             <expand name="handoff-args"/>
             <if condition="<getopt-option-quiet/> is `true`">
                 Set <args><args/> --quiet</args>.
+            </if>
+            <if condition="<getopt-option-int-interactive/> is `true`">
+                Set <args><args/> --interactive</args>.
             </if>
             <if condition="<getopt-option-focus/> is not equal `all`">
                 Set <args><args/> --focus <getopt-option-focus/></args>.

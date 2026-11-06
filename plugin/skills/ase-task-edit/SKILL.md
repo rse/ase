@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--focus|-f <section>[,...]] [--quiet|-q] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--focus|-f <section>[,...]] [--quiet|-q] [--interactive|-i] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. A new plan is optionally composed along the
@@ -27,7 +27,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --quiet|-q --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
     $ARGUMENTS
 </expand>
 
@@ -296,6 +296,21 @@ Set <args></args> (set args to empty).
         Do not output anything.
 
         <expand name="task-focus" arg1="ase-task-edit"></expand>
+
+        Set <band-open>false</band-open>.
+        <if condition="<getopt-option-interactive/> is `true`">
+        The band of `--interactive` is drawn by the function hooks module
+        of the plugin, which provides the `mcp__ase__ase_task_band` tool
+        in an interactive terminal only. Load the schema of this tool (if
+        deferred, via `ToolSearch` with the query
+        `select:mcp__ase__ase_task_band`). If this tool does not exist,
+        only output the following <template/> and then immediately *STOP*
+        processing the entire current skill:
+
+        <template>
+        ⧉ **ASE**: ☻ skill: **ase-task-edit**, ▶ ERROR: `--interactive` requires the active ASE function hooks in an interactive terminal
+        </template>
+        </if>
 
     2.  Resolve a potential analyzer issue:
 
@@ -682,7 +697,7 @@ Set <args></args> (set args to empty).
         silently *skip* this entire step 3.3 (no MCP tool call and no
         output at all) and continue with step 3.4.
 
-        <if condition="<getopt-option-quiet/> is not equal `true`">
+        <if condition="<getopt-option-quiet/> is not equal `true` and <getopt-option-interactive/> is not equal `true`">
         <if condition="<task-render/> is empty">
         Call the `ase_markdown_prepare(text: "<task-content/>")` tool of
         the `ase` MCP server and set <task-render/> to the `text` output
@@ -790,7 +805,40 @@ Set <args></args> (set args to empty).
                 ⧉ **ASE**: ☻ skill: **ase-task-edit**, ▶ ERROR: invalid `--next` token: **<head/>**
                 </template>
 
-        -   If <getopt-option-next/> is equal to `none`:
+        -   If <getopt-option-next/> is equal to `none` and <getopt-option-interactive/> is `true`:
+
+            <if condition="<band-open/> is `false`">
+            Call the `mcp__ase__ase_task_band(id: "<ase-task-id/>")` tool --
+            if <getopt-option-focus/> is not equal `all`, additionally with
+            the argument `sections: "<sections/>"` -- to show the plan in the
+            band above the prompt, which from now on follows every change of
+            the plan on its own, and set <band-open>true</band-open>. If its
+            `text` output field starts with `ERROR: <info/>`, only output the
+            following <template/> and then immediately *STOP* processing the
+            entire current skill:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ ERROR: **<info/>**
+            </template>
+            </if>
+
+            Do *not* show any dialog. Only output the following <template/>,
+            end the current turn, wait for the user input, and store the
+            user input in <result/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **awaiting instruction**
+            </template>
+
+            If <result/>, with any leading and trailing whitespace stripped,
+            case-insensitively equals `DONE`, `GRILL`, `DRAFT`, `IMPLEMENT`,
+            or `CANCEL` -- exactly the inputs on which the band closes on its
+            own -- set <result/> to this upper-case token. Otherwise, set
+            <result>OTHER: <result/></result>, also for an input which merely
+            indicates that the user does not want to proceed, as the band
+            stays open on it.
+
+        -   If <getopt-option-next/> is equal to `none` and <getopt-option-interactive/> is not `true`:
 
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
@@ -822,6 +870,9 @@ Set <args></args> (set args to empty).
             <expand name="handoff-args"/>
             <if condition="<getopt-option-quiet/> is `true`">
                 Set <args><args/> --quiet</args>.
+            </if>
+            <if condition="<getopt-option-interactive/> is `true`">
+                Set <args><args/> --int-interactive</args>.
             </if>
             <if condition="<getopt-option-focus/> is not equal `all`">
                 Set <args><args/> --focus <getopt-option-focus/></args>.
