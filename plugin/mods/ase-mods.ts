@@ -6,8 +6,8 @@
 
 /*  Claude Code function hooks module ("mod", EARLY ACCESS):
     Hooking infrastructure, registering the function hooks and dispatching
-    them into the grill table ("ase-mods-grill.ts"), the decision matrix
-    ("ase-mods-evaluate.ts"), the intent help ("ase-mods-help-find.ts"),
+    them into the grill table ("ase-mods-task-grill.ts"), the decision matrix
+    ("ase-mods-meta-evaluate.ts"), the intent help ("ase-mods-help-find.ts"),
     the synopsis form ("ase-mods-help-compose.ts"),
     the manual band ("ase-mods-help-show.ts"), the manpage browser
     ("ase-mods-help-browse.ts"), the hint band ("ase-mods-help-hint.ts"),
@@ -18,8 +18,8 @@
 
 import type { Register, PromptBox, Timer } from "claude-code"
 import { type Band, TRIGGER } from "./ase-mods-common.ts"
-import { modGrill }           from "./ase-mods-grill.ts"
-import { modEvaluate }        from "./ase-mods-evaluate.ts"
+import { modGrill }           from "./ase-mods-task-grill.ts"
+import { modEvaluate }        from "./ase-mods-meta-evaluate.ts"
 import { modHelpFind }        from "./ase-mods-help-find.ts"
 import { modHelpCompose }     from "./ase-mods-help-compose.ts"
 import { modHelpShow }        from "./ase-mods-help-show.ts"

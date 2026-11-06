@@ -51,8 +51,8 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         them), `ase-mods-common.ts` for the shared parts (Markdown table
         rows, styled characters, Markdown conversion, wrapping, framing,
         and the contract, keys, geometry, and drawing of the master/detail
-        view in the band above the prompt), `ase-mods-grill.ts` for
-        re-rendering the grilling tables of ASE, `ase-mods-evaluate.ts`
+        view in the band above the prompt), `ase-mods-task-grill.ts` for
+        re-rendering the grilling tables of ASE, `ase-mods-meta-evaluate.ts`
         for re-rendering the decision matrices of `ase-meta-evaluate`
         (with the best alternative in blue and the criteria rows sortable
         by clicking the header cells), `ase-mods-help-find.ts`
