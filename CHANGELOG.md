@@ -50,6 +50,9 @@ ChangeLog
     task store clients now send requests with an `undici` dispatcher through the `fetch` of the npm
     `undici` instead of the built-in one of Node, whose bundled `undici` rejected it (issue #116).
 
+-   UPDATE [infr]: NPM dependencies
+    Updated NPM dependencies.
+
 2.0.7 (2026-11-04)
 ------------------
 
