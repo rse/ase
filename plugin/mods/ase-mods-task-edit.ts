@@ -415,7 +415,8 @@ export const modTaskEdit = () => {
             panel(ui, geometry, shown, {
                 title: `[ ⧉ ASE: Edit Task: ${shown.id}${shown.sections.length > 0 ? ` (${shown.sections.join(", ")})` : ""} ]`,
                 hints: (geometry.overflow ? "wheel or CTRL+x + TAB + ↑/↓/PgUp/PgDn: scroll · " : "") +
-                    "##: clear diff · DONE · GRILL · DRAFT · IMPLEMENT · CANCEL · (type for refining)",
+                    (shown.before !== undefined ? "##: clear diff · " : "") +
+                    "DONE · GRILL · DRAFT · IMPLEMENT · CANCEL · (type for refining)",
                 lines: shown.lines,
                 gutter: shown.digits
             })
