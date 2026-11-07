@@ -25,6 +25,10 @@ ChangeLog
     response, e.g. as the service vanished during a tool call, instead of letting the agent tool
     hang until its idle timeout. The request is not re-sent, as its outcome is unknown.
 
+-   BUGFIX [code]: Reliable Stop of Service
+    `ase service stop` now waits for the stopping service to clear its persisted port, instead of
+    also clearing it, which let the command frequently fail with `Lock file is already being held`.
+
 2.0.8 (2026-11-07)
 ------------------
 

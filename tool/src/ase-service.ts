@@ -98,6 +98,7 @@ const PORT_ENV   = "ASE_SERVICE_PORT"
 const LEVEL_ENV  = "ASE_SERVICE_LOG_LEVEL"
 const IDLE_MS    = 30 * 60 * 1000
 const TICK_MS    = 60 * 1000
+const STOP_MS    = 5 * 1000
 
 /*  maximum length of the MCP tool call arguments logged per request  */
 const LOG_ARGS_MAX = 200
@@ -719,7 +720,14 @@ export default class ServiceCommand {
         }
         const r = await ofetch.raw(`http://${HOST}:${ctx.port}/stop`, this.postRequest({}, 5000))
         const ok = r.status >= 200 && r.status < 300
-        Service.clearPort(ctx.svc)
+
+        /*  the stopping service clears its port itself, so wait for it and clear the
+            port here only as a fallback, as clearing on both sides collides on the lock  */
+        const deadline = ok ? Date.now() + STOP_MS : 0
+        while (Date.now() < deadline && fs.existsSync(ctx.svc.filename))
+            await new Promise<void>((resolve) => setTimeout(resolve, 50))
+        if (fs.existsSync(ctx.svc.filename))
+            Service.clearPort(ctx.svc)
         return ok ? 0 : 1
     }
 
