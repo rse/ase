@@ -29,6 +29,10 @@ ChangeLog
     `ase service stop` now waits for the stopping service to clear its persisted port, instead of
     also clearing it, which let the command frequently fail with `Lock file is already being held`.
 
+-   BUGFIX [code]: Unclipped Border of Selected Lane in Web Task Board
+    The lanes view now leaves room within its scroll container for the bold border of the selected
+    lane, which was clipped by one pixel at the outer edges, also when scrolling horizontally.
+
 2.0.8 (2026-11-07)
 ------------------
 

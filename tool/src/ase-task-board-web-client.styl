@@ -262,6 +262,12 @@ header
     min-height: 0
     overflow-x: auto
 
+    /*  room within the clipping edges for the bold border of the selected lane, also
+        when scrolling a selected task box (nested 11px within its lane) into view  */
+    padding: 1px
+    margin: -1px
+    scroll-padding-inline: 12px
+
     /*  a double click opens or toggles, so it must not select text  */
     user-select: none
 .group
