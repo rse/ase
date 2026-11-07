@@ -1,0 +1,21 @@
+skill: ase-task-list
+args: ""
+runs: 1
+timeoutSec: 240
+budget: { maxUsd: 1.00 }
+fixture:
+  lifecycle: solo
+  tasks:
+    - fixture/TASK-alpha.md
+    - fixture/TASK-beta.md
+    - fixture/TASK-gamma.md
+oracles:
+  - notErrored: true
+  - regex:
+      in: output
+      match:
+        - "alpha"
+        - "beta"
+      not:
+        - "gamma"
+  - taskStore: { count: 3 }

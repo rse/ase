@@ -1,0 +1,5 @@
+end: "skill finished"
+rules:
+  - when: "GRILLING|QUESTION"
+    answer: "Choose alternative A for every question."
+default: "Proceed as you see fit, no further input from my side."

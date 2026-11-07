@@ -1,0 +1,16 @@
+skill: ase-meta-brainstorm
+args: "--max-clarify 0 --min-ideas 8 --max-shortlist 3 a command-line tool which reminds developers of stale local Git branches"
+runs: 3
+minPass: 2
+timeoutSec: 600
+budget: { maxUsd: 2.50 }
+oracles:
+  - notErrored: true
+  - regex:
+      in: output
+      match:
+        - "RECOMMENDED IDEA|RECOMMENDATION"
+  - rubric:
+      file: rubric.md
+      threshold: 0.7
+      votes: 3
