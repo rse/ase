@@ -118,6 +118,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         and its AI usage accounting (`service-otel` for the OTLP ingress,
         the usage windows of the task assignments, and their bookings onto
         the usage attachments of the tasks)
+    -   `tool/src/ase-spec-worker.ts`: the worker thread entry point, running
+        the SpecBook lint and export of the MCP tools `ase_specbook_{lint,export}`
+        off the event loop of the service
     -   `tool/src/ase-task-*.ts`: the task functionality, where `ase-task.ts`
         itself only forwards the `ase task` CLI and `ase_task_*` MCP tools to
         the task store selected by `project.task.store.url`, through the

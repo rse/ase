@@ -10,6 +10,11 @@ ChangeLog
     introduction, an entry in the "Project" pull-down of the header, the footer of all pages, and
     the introduction of the "Get Started" section of the usage page.
 
+-   BUGFIX [code]: Responsive Service during SpecBook Lint and Export
+    The MCP tools `ase_specbook_lint` and `ase_specbook_export` now run the CPU-bound SpecBook
+    processing in a worker thread, so it no longer blocks parallel tool calls and the health
+    probes of the MCP bridge. The CLI commands `ase spec lint|export` stay in-process.
+
 2.0.8 (2026-11-07)
 ------------------
 
