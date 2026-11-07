@@ -20,6 +20,11 @@ ChangeLog
     answers a still failing request with a JSON-RPC error, instead of dropping it and letting the
     agent tool hang until its idle timeout. The service raises its keep-alive timeout to 65s.
 
+-   BUGFIX [code, docs]: Answer Requests on Lost Response Streams in MCP Bridge
+    `ase mcp` now answers a request with a JSON-RPC error if its response stream ends without its
+    response, e.g. as the service vanished during a tool call, instead of letting the agent tool
+    hang until its idle timeout. The request is not re-sent, as its outcome is unknown.
+
 2.0.8 (2026-11-07)
 ------------------
 

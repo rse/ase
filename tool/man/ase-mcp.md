@@ -31,6 +31,11 @@ service:
   once more, and a request still failing is answered with a JSON-RPC
   error (`ase service unreachable:` *reason*).
 
+- A request whose response stream ends without its response, e.g. as
+  the service vanished while processing it, is answered with a JSON-RPC
+  error as well (`ase service connection lost`), as its outcome is
+  unknown and hence it is not sent once more.
+
 - On a lost or refused connection, the service is auto-started again
   and the connection is re-established, with a delay growing from 0.5
   up to 10 seconds between the attempts.
