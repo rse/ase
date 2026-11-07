@@ -177,6 +177,8 @@ export const navProject: NavGroup = {
     items: [
         { path:  site.repo,
           label: "Repository" },
+        { path:  site.discussions,
+          label: "Discussions" },
         { path:        "/project/",
           label:       "Sibling Projects",
           title:       "Sibling Projects",

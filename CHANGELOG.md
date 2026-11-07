@@ -2,6 +2,14 @@
 ChangeLog
 =========
 
+2.0.9 (2026-11-XX)
+------------------
+
+-   IMPROVEMENT [docs]: GitHub Discussions on the Website
+    The website now links the GitHub Discussions of ASE through a hint in the landing page
+    introduction, an entry in the "Project" pull-down of the header, the footer of all pages, and
+    the introduction of the "Get Started" section of the usage page.
+
 2.0.8 (2026-11-07)
 ------------------
 
