@@ -15,6 +15,11 @@ ChangeLog
     processing in a worker thread, so it no longer blocks parallel tool calls and the health
     probes of the MCP bridge. The CLI commands `ase spec lint|export` stay in-process.
 
+-   BUGFIX [code, docs]: Fewer Lost Requests in MCP Bridge
+    On a failed HTTP send, `ase mcp` now re-sends a message once over a broken connection and
+    answers a still failing request with a JSON-RPC error, instead of dropping it and letting the
+    agent tool hang until its idle timeout. The service raises its keep-alive timeout to 65s.
+
 2.0.8 (2026-11-07)
 ------------------
 
