@@ -227,5 +227,5 @@ branch `feature-hello`:
 ##  SEE ALSO
 
 [`ase-task-edit`](../ase-task-edit/help.md), [`ase-task-integrate`](../ase-task-integrate/help.md),
-[`ase-task-view`](../ase-task-view/help.md), [`ase-task-delete`](../ase-task-delete/help.md).
+[`ase-task-view`](../ase-task-view/help.md), [`ase-task-delete`](../ase-task-delete/help.md), [`ase-task-prove`](../ase-task-prove/help.md).
 
