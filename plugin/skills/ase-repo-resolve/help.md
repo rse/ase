@@ -51,7 +51,8 @@ does *not* build or test the result, so the resolved conflicts still
 deserve a review.
 
 The same resolution procedure is used by `ase-repo-merge` for the
-conflicts of its merge.
+conflicts of its merge and by `ase-repo-import` for the conflicts of
+its import.
 
 ##  OPTIONS
 
@@ -98,5 +99,5 @@ interactively:
 
 ##  SEE ALSO
 
-[`ase-repo-merge`](../ase-repo-merge/help.md), [`ase-repo-review`](../ase-repo-review/help.md),
+[`ase-repo-merge`](../ase-repo-merge/help.md), [`ase-repo-import`](../ase-repo-import/help.md), [`ase-repo-review`](../ase-repo-review/help.md),
 [`ase-repo-commit`](../ase-repo-commit/help.md), [`ase-repo-diff`](../ase-repo-diff/help.md).

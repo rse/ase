@@ -50,6 +50,7 @@
 ○   `ase-repo-stage`:      Stage a Part of the Changes
 ○   `ase-repo-merge`:      Merge a Branch
 ○   `ase-repo-resolve`:    Resolve Merge Conflicts
+○   `ase-repo-import`:     Import a Change Set
 
 ⎈   **TASK MANAGEMENT**
 ○   `ase-task-id`:         Configure Task Id

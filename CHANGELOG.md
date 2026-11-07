@@ -5,6 +5,12 @@ ChangeLog
 2.0.9 (2026-11-XX)
 ------------------
 
+-   FEATURE [plugin, docs]: Change Set Import
+    The new `ase-repo-import` skill imports a pull/merge request or commit of GitHub, GitLab, or
+    Gitea (by URL or `#<number>`), or a patch file, into the working copy as unstaged and untracked
+    files, merged with local changes. Conflicts are resolved semantically (sharing
+    `ase-common-resolve.md`), and the remaining ones keep their markers and are reported as a TODO.
+
 -   IMPROVEMENT [docs]: GitHub Discussions on the Website
     The website now links the GitHub Discussions of ASE through a hint in the landing page
     introduction, an entry in the "Project" pull-down of the header, the footer of all pages, and
