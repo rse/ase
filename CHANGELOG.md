@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.0.9 (2026-11-XX)
+2.0.9 (2026-11-07)
 ------------------
 
 -   FEATURE [plugin, docs]: Change Set Import
@@ -15,6 +15,12 @@ ChangeLog
     The website now links the GitHub Discussions of ASE through a hint in the landing page
     introduction, an entry in the "Project" pull-down of the header, the footer of all pages, and
     the introduction of the "Get Started" section of the usage page.
+
+-   IMPROVEMENT [code]: Placement of Parts in Task Dissection
+    The skill `ase-task-dissect` now places the parts via `Group:` and `After:`: a task within an
+    epic is replaced by its parts (re-wiring its successors and deleting it), any other task becomes
+    the explicit epic of its parts. Each part lists its direct dependencies in `After:`, while the
+    root parts inherit the `After:` predecessors of the task.
 
 -   BUGFIX [code]: Responsive Service during SpecBook Lint and Export
     The MCP tools `ase_specbook_lint` and `ase_specbook_export` now run the CPU-bound SpecBook
