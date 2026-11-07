@@ -242,7 +242,9 @@ Procedure
         <renames/> to the mapping of the *source* to the *destination*
         path of its `rename` lines (expanding the compact form
         `dir/{old => new}/file`), as `--numstat -z` reports only the
-        destination. Do not output anything.
+        destination. Set <created/> to the paths of its `create mode`
+        lines plus the destinations of its `copy` lines, and <removed/>
+        to the paths of its `delete mode` lines. Do not output anything.
 
     2.  Determine the *local changes* of the affected files by running
         the command
@@ -366,20 +368,50 @@ Procedure
         any other path, as the staged state of the user stays as it is.
         </if>
 
-    2.  If <fetched-patch/> is not empty, remove it by running the
-        command `rm -rf "<fetched-patch/>"`. Do not output anything.
-
     </step>
 
 6.  <step id="STEP 6: Report Verdict">
 
-    1.  Set <import-todo/> to <import-escalations/> plus
+    1.  Set <import-summary/> to one to three sentences stating what the
+        change set does, derived from the actual changes in <patch/>
+        (for a large patch, at least from its significant hunks) and not
+        only from the claims of <import-intent/>. For every path of
+        <touched/>, which is relative to <repo-root/>, set <change/> to
+        `added` if it is in <created/>, `removed` if it is in <removed/>,
+        `renamed` if it is a destination of <renames/>, or `modified`
+        otherwise, followed by `, not applied` if <import-escalations/>
+        left the file untouched. Set <file/> to the path, for `renamed`
+        prefixed with its rename source and ` → `, and <file-summary/> to
+        a short phrase stating what the patch changes in this file. Do
+        not output anything.
+
+    2.  If <fetched-patch/> is not empty, remove it by running the
+        command `rm -rf "<fetched-patch/>"`. Do not output anything.
+
+    3.  Only output the following <template/>, with one table row per
+        path of <touched/>, grouped in the order `added`, `modified`,
+        `renamed`, and `removed`:
+
+        <template>
+        <ase-tpl-head title="IMPORT SUMMARY"/>
+
+        <import-summary/>
+
+        | Change    | File      | Summary         |
+        |-----------|-----------|-----------------|
+        | <change/> | `<file/>` | <file-summary/> |
+        | [...]     | [...]     | [...]           |
+
+        <ase-tpl-foot title="IMPORT SUMMARY"/>
+        </template>
+
+    4.  Set <import-todo/> to <import-escalations/> plus
         <resolve-escalations/>. Set <import-verdict>IMPORTED</import-verdict>
         if <import-todo/> is empty, or
         <import-verdict>CONFLICT</import-verdict> otherwise. Do not
         output anything.
 
-    2.  <if condition="<import-todo/> is not empty">
+    5.  <if condition="<import-todo/> is not empty">
         Set <backups/> to the text `⊚ backups:`, followed by a blank and
         <resolve-backup-dir/> rendered as a code span, if
         <resolve-backup-dir/> is not empty, or to empty otherwise. Then
@@ -400,13 +432,13 @@ Procedure
         </template>
         </if>
 
-    3.  Only output the following <template/>:
+    6.  Only output the following <template/>:
 
         <template>
         ⧉ **ASE**: ✪ skill: **ase-repo-import**, ⇌ source: **<source/>**, ▶ IMPORT VERDICT: **<import-verdict/>**
         </template>
 
-    4.  Give the closing hint by expanding the following (which,
+    7.  Give the closing hint by expanding the following (which,
         depending on the configured <ase-guidance-level/>, may expand
         into nothing and hence emit no output at all):
 

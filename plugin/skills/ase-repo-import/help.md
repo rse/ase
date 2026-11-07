@@ -37,6 +37,11 @@ verdict is then `CONFLICT`. On a `FAILED` verdict, the working copy is
 left untouched. The skill does *not* build or test the result, so the
 imported changes still deserve a review.
 
+Unless the verdict is `FAILED`, the skill finally summarizes briefly
+what the change set does and reports its files in a table with the type
+of change (added, modified, renamed, or removed), the file path relative
+to the root of the working copy, and a summary of the change.
+
 ##  OPTIONS
 
 -   `--safe`|`-s`:
