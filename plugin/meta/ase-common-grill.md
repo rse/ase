@@ -4,7 +4,8 @@ Grill Skill Common Steps
 
 <define name="grill-understanding">
 
-Set <grill-perspective><arg2/></grill-perspective> (with any leading
+Set <grill-subject><arg1/></grill-subject>, set
+<grill-perspective><arg2/></grill-perspective> (with any leading
 and trailing whitespace stripped), set <grill-ground><arg3/></grill-ground>,
 and set <grill-facts></grill-facts> (empty). Set <grill-label/> to
 ` (<grill-perspective/>, grounded)` if <grill-perspective/> is not empty
@@ -350,18 +351,44 @@ questions:
     current decision state of the grilled subject, append
     ` ⚑` to its <answer-N-K-label/>.
 
+    Then *weigh* the answer alternatives of every question against
+    each other and *recommend* exactly *one* of them -- the one you
+    judge to be the *right* decision for the grilled subject,
+    independent of whether it reflects the current decision state.
+    Append ` ★` to its <answer-N-K-label/> (after a possibly present
+    ` ⚑`), set <recommend-N-id/> to its <answer-N-K-id/>, and set
+    <recommend-N-reason/> to an ultra brief rationale of at most *15
+    words*, stating *why* it is the right decision *compared to* the
+    other alternatives -- naming the decisive advantage over them or
+    their decisive drawback, not merely restating the recommended
+    answer.
+
     Assemble an <answer-N/> out of `**<answer-N-1-id/>**
     ▶ **<answer-N-1-label/>**: <answer-N-1-description/>,
     **<answer-N-2-id/>** ▶ **<answer-N-2-label/>**:
-    <answer-N-2-description/>[, ...]`.
+    <answer-N-2-description/>[, ...]`, and a <recommend-N/> out
+    of `★ **<recommend-N-id/>**: <recommend-N-reason/>` -- with a
+    space after the `★` and the answer letter in bold. Every
+    <answer-N/> *MUST* carry exactly one ` ★` inside the bold label
+    of its recommended answer, e.g. `**A** ▶ **Keep Order ⚑ ★**:
+    ...` or `**B** ▶ **Split Class ★**: ...`.
 
     Keep every assembled <answer-N/> at most *240 characters*
-    long -- drop the least relevant alternative and compact the
-    descriptions until it fits -- as a longer answer overflows
-    its table cell and silently degrades the entire table into a
-    plain text rendering.
+    long -- drop the least relevant alternative (but *never* the
+    recommended one) and compact the descriptions until it fits
+    --, and every assembled <recommend-N/> at most *120
+    characters* long -- compact the rationale until it fits --,
+    as a longer cell overflows the table and silently degrades
+    the entire table into a plain text rendering.
 
 5.  SHOW QUESTIONS:
+
+    Set <grill-summary/> to a plain-language explanation of
+    <grill-subject/> in its current state, of at most *3 short
+    sentences* and *60 words*: what it is about, which problem it
+    solves, and what it changes -- in simple everyday words, as if
+    told to a newcomer to the project, avoiding jargon, internal
+    identifiers, and file paths wherever possible.
 
     Output only the following <template/> -- it lists *all*
     questions of the round up-front, one table row per
@@ -378,15 +405,17 @@ questions:
     <template>
     ⧉ **ASE**: <round-id/><grill-label/>: *Relentless Interviewing Until Clarity*
 
-    | QUESTION      | ANSWERS     |
-    | ------------- | ----------- |
-    | <question-1/> | <answer-1/> |
-    | <question-2/> | <answer-2/> |
-    | [...]         | [...]       |
+    **IN SHORT**: <grill-summary/>
+
+    | QUESTION      | ANSWERS     | RECOMMENDATION |
+    | ------------- | ----------- | -------------- |
+    | <question-1/> | <answer-1/> | <recommend-1/> |
+    | <question-2/> | <answer-2/> | <recommend-2/> |
+    | [...]         | [...]       | [...]          |
 
     Legend: **DOM**: Domain       (MUST)    **IFC**: Interface      (MUST)    **n**: round-local question number
             **ARC**: Architecture (SHOULD)  **IMP**: Implementation (MAY)     **X**: question-local answer letter
-            **REG**: Regression   (SHOULD)  **CON**: Confirmation   (SHOULD)  ⚑: current decision state
+            **REG**: Regression   (SHOULD)  **CON**: Confirmation   (SHOULD)  ⚑: as-is  ★: recommended
     </template>
 
 </define>
@@ -401,6 +430,16 @@ response*, which cherry-picks for the question with
 <answer-N-K-id/> equal to its letter (case-insensitive). A
 token referencing a non-existing question or answer is
 treated as plain free text.
+
+</define>
+
+<define name="grill-accept-recommendations">
+
+If <result/> is `ACCEPT RECOMMENDATIONS`, set <result/> to the short
+responses `<question-N-id/><recommend-N-id/>` of *all* questions of the
+round, separated by single spaces (like `1B 2A 3C`), so the
+recommended answer of every question is cherry-picked as if typed by
+the user, and treat it as the combined free-text reply.
 
 </define>
 
