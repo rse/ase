@@ -227,7 +227,7 @@ export default class ServiceCommand {
         new KVMCP().register(mcp)
         new TimestampMCP().register(mcp)
         new SleepMCP().register(mcp)
-        new GetoptMCP().register(mcp)
+        new GetoptMCP(log).register(mcp)
         new SkillsMCP().register(mcp)
         new WorktreeMCP().register(mcp)
         new MintMCP().register(mcp)

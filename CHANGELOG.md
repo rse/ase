@@ -11,6 +11,12 @@ ChangeLog
     files, merged with local changes. Conflicts are resolved semantically, remaining ones keep their
     markers and are reported as a TODO, and the change set is summarized with its changed files.
 
+-   FEATURE [plugin, code, docs]: Skill Command Aliases
+    The new `ase alias` command and `ase-meta-alias` skill manage per-user and per-project full
+    aliases (`/foo-bar` for any skill command line, provided as generated shim skills), option
+    aliases (`--custom` for several options), and option defaults of the skills, while the option
+    parser now accepts the negation `--no-x` of every option `--x` to drop an injected option.
+
 -   IMPROVEMENT [docs]: GitHub Discussions on the Website
     The website now links the GitHub Discussions of ASE through a hint in the landing page
     introduction, an entry in the "Project" pull-down of the header, the footer of all pages, and

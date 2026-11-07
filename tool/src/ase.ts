@@ -43,6 +43,7 @@ const attach = async (imported: Promise<{ default: CommandClass }>, parent: Comm
 const commands: Record<string, Registrar> = {
     setup:      async (p) => attach(import("./ase-setup.js"), p),
     config:     async (p) => attach(import("./ase-config.js"), p),
+    alias:      async (p) => attach(import("./ase-alias.js"), p),
     mcp:        async (p) => attach(import("./ase-mcp.js"), p),
     service:    async (p) => attach(import("./ase-service.js"), p),
     hook:       async (p) => attach(import("./ase-hook.js"), p),

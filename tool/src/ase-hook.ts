@@ -22,6 +22,7 @@ import { readStdin, writeStdout }                         from "./ase-lib-stdio.
 import { Task }                                           from "./ase-task.js"
 import * as TaskFormat                                    from "./ase-task-format.js"
 import { parseTool, type Tool }                           from "./ase-setup-common.js"
+import { Aliases, aliasScopes }                           from "./ase-alias-core.js"
 
 /*  per-tool dispatch table for the parts that actually differ between
     Anthropic Claude Code CLI, GitHub Copilot CLI, and OpenAI Codex CLI hook integrations.  */
@@ -111,7 +112,7 @@ const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
 /*  the ASE session information determined by the session-start hook  */
 type SessionInfo = Record<"version" | "versionHint" | "pluginRoot" | "persona" | "guidance" |
     "userId" | "projectId" | "boxing" | "lifecycle" | "defaultSource" | "defaultChangeset" |
-    "defaultTarget" | "specBasedir" | "specSchema" | "taskId" | "sessionId" | "headless", string>
+    "defaultTarget" | "specBasedir" | "specSchema" | "getoptTuned" | "taskId" | "sessionId" | "headless", string>
 
 /*  CLI command "ase hook"  */
 export default class HookCommand {
@@ -443,11 +444,27 @@ export default class HookCommand {
         const specBasedir = String(cfg.get("project.artifact.spec.basedir") ?? "")
         const specSchema  = String(cfg.get("project.artifact.spec.schema")  ?? "")
 
+        /*  synchronize the shim skills of the full aliases of both scopes for the agent
+            tool (e.g. after a pull of a changed project alias file), and determine the
+            skills with option aliases or option defaults, whose options always have to be
+            parsed by the option parser of the service, never locally by the agent itself  */
+        let getoptTuned = ""
+        try {
+            const aliases = Aliases.load()
+            for (const scope of aliasScopes)
+                for (const change of aliases.sync(scope, tool))
+                    this.log.write("debug", `hook: alias: ${change}`)
+            getoptTuned = aliases.tuned().join(" ")
+        }
+        catch (err: unknown) {
+            this.log.write("warning", `hook: ${err instanceof Error ? err.message : String(err)}`)
+        }
+
         /*  publish the ASE session information and emit it as the hook output payload  */
         const payload = this.publishSessionInfo(tool, {
             version: versionCurrentPlugin, versionHint, pluginRoot, persona, guidance, userId, projectId,
             boxing, lifecycle, defaultSource, defaultChangeset, defaultTarget,
-            specBasedir, specSchema, taskId, sessionId, headless
+            specBasedir, specSchema, getoptTuned, taskId, sessionId, headless
         }, md, path.dirname(fileMd), style)
         await writeStdout(JSON.stringify(payload))
         return 0
@@ -481,7 +498,7 @@ export default class HookCommand {
         const {
             version, versionHint, pluginRoot, persona, guidance, userId, projectId,
             boxing, lifecycle, defaultSource, defaultChangeset, defaultTarget,
-            specBasedir, specSchema, taskId, sessionId, headless
+            specBasedir, specSchema, getoptTuned, taskId, sessionId, headless
         } = info
 
         /*  provide ASE information to Anthropic Claude Code CLI shell commands
@@ -520,6 +537,7 @@ export default class HookCommand {
             `<ase-project-task-default-target>${defaultTarget}</ase-project-task-default-target>\n` +
             `<ase-spec-basedir>${specBasedir}</ase-spec-basedir>\n` +
             `<ase-spec-schema>${specSchema}</ase-spec-schema>\n` +
+            `<ase-getopt-tuned>${getoptTuned}</ase-getopt-tuned>\n` +
             `<ase-task-id>${taskId}</ase-task-id>\n` +
             `<ase-session-id>${sessionId}</ase-session-id>\n` +
             `<ase-headless>${headless}</ase-headless>\n` +

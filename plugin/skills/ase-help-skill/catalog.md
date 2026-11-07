@@ -74,5 +74,6 @@
 ○   `ase-meta-workflow`:   Generate a Workflow Skill
 ○   `ase-meta-mint`:       Mint an Identifier or Name
 ○   `ase-meta-config`:     Configuration Management
+○   `ase-meta-alias`:      Skill Command Alias Management
 ○   `ase-meta-compat`:     Self-Test ASE Compatibility
 

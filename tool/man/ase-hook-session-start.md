@@ -82,39 +82,46 @@ following steps:
    `CLAUDE_ENV_FILE` (if set), so they are available to all shell
    commands of the session.
 
-9. It writes the hook output payload to standard output: the session
-   information as XML-style tags (`<ase-version>`, `<ase-version-hint>`,
-   `<ase-plugin-root>`, `<ase-persona-style>`, `<ase-guidance-level>`,
-   `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
-   `<ase-project-task-lifecycle>`,
-   `<ase-project-task-default-source>`,
-   `<ase-project-task-default-changeset>`,
-   `<ase-project-task-default-target>`, `<ase-spec-basedir>`,
-   `<ase-spec-schema>`, `<ase-task-id>`, `<ase-session-id>`,
-   `<ase-headless>`, and `<ase-agent-tool>`), followed by the
-   constitution, with all `@`*file* references expanded recursively
-   (relative to the referencing file, `~/` denoting the home
-   directory).
+9. It synchronizes the shim skills of the full aliases of the user and
+   the project for the agent tool of the session (see `ase-alias`(1)),
+   e.g., after a pull of a changed project alias file, and determines the
+   skills with option aliases or option defaults. A failure is logged as
+   a warning only.
 
-   The persona rules are not part of this output, but are injected
-   separately by `ase hook session-persona`, as agent tools like
-   *Anthropic Claude Code CLI* show only a preview of a hook output
-   beyond 10,000 characters.
+10. It writes the hook output payload to standard output: the session
+    information as XML-style tags (`<ase-version>`, `<ase-version-hint>`,
+    `<ase-plugin-root>`, `<ase-persona-style>`, `<ase-guidance-level>`,
+    `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
+    `<ase-project-task-lifecycle>`,
+    `<ase-project-task-default-source>`,
+    `<ase-project-task-default-changeset>`,
+    `<ase-project-task-default-target>`, `<ase-spec-basedir>`,
+    `<ase-spec-schema>`, `<ase-getopt-tuned>` (the space-separated
+    skills with option aliases or option defaults), `<ase-task-id>`,
+    `<ase-session-id>`, `<ase-headless>`, and `<ase-agent-tool>`),
+    followed by the constitution, with all `@`*file* references expanded
+    recursively (relative to the referencing file, `~/` denoting the
+    home directory).
 
-   For `--tool copilot` and `--tool codex` only, the instructions of the
-   output style `ase-terse` (with its YAML frontmatter stripped) are
-   appended, as these agent tools have no output style concept, whereas
-   *Anthropic Claude Code CLI* applies the plugin output style natively.
-   The context is emitted as `hookSpecificOutput.additionalContext`
-   (`claude` and `codex`), resp. as the top-level field
-   `additionalContext` (`copilot`).
+    The persona rules are not part of this output, but are injected
+    separately by `ase hook session-persona`, as agent tools like
+    *Anthropic Claude Code CLI* show only a preview of a hook output
+    beyond 10,000 characters.
 
-   Additionally, for `claude` and `codex`, unless running headless
-   (`ASE_HEADLESS` is `true`) or with guidance level `none`, a
-   deterministic *ASE* banner (version, user, project, task, session,
-   persona, guidance, and boxing, plus usage hints for guidance level
-   `normal` and `verbose`) is emitted as the top-level field
-   `systemMessage`.
+    For `--tool copilot` and `--tool codex` only, the instructions of the
+    output style `ase-terse` (with its YAML frontmatter stripped) are
+    appended, as these agent tools have no output style concept, whereas
+    *Anthropic Claude Code CLI* applies the plugin output style natively.
+    The context is emitted as `hookSpecificOutput.additionalContext`
+    (`claude` and `codex`), resp. as the top-level field
+    `additionalContext` (`copilot`).
+
+    Additionally, for `claude` and `codex`, unless running headless
+    (`ASE_HEADLESS` is `true`) or with guidance level `none`, a
+    deterministic *ASE* banner (version, user, project, task, session,
+    persona, guidance, and boxing, plus usage hints for guidance level
+    `normal` and `verbose`) is emitted as the top-level field
+    `systemMessage`.
 
 ## OPTIONS
 

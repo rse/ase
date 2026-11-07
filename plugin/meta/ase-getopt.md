@@ -20,7 +20,7 @@ set placeholders into the context as a side-effect.
     3-6 are *structurally unreachable* and you *MUST NOT* call the
     `ase_getopt` MCP tool under any circumstances.
 
-    <if condition="<getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e. it does not contain an option)">
+    <if condition="<getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e. it does not contain an option) *AND* <getopt-skill/> is *NOT* one of the space-separated skill names of <ase-getopt-tuned/> (i.e. it has no option aliases or option defaults)">
         Parse the options *locally*, without any MCP call:
 
         For each option token in <getopt-spec/> of the form
@@ -61,6 +61,9 @@ set placeholders into the context as a side-effect.
     *first* token of a supplied list is validated by the parser against
     the choice set -- subsequent tokens are *not* validated, and skills
     validate each remaining token themselves as they consume it).
+    The tool additionally accepts the negation `--no-<long>` of every
+    option and applies the option aliases and option defaults configured
+    for <getopt-skill/> (see `ase alias`).
 
 4.  **Short-Circuit for Error**:
     This step is the *sole* and *authoritative* handler for an

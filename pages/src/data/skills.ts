@@ -22,6 +22,7 @@ export const skillGroups: SkillGroup[] = [
             "ase-help-skill",
             "ase-help-intent",
             "ase-meta-config",
+            "ase-meta-alias",
             "ase-meta-why",
             "ase-meta-eli5",
             "ase-meta-proximity",
@@ -129,7 +130,7 @@ for (const id of allSkills)
         prefixes.push(prefixOf(id))
 const subGroups: Record<string, SkillGroup[]> = {
     meta: [
-        { label: "META: CONFIG",   skills: [ "ase-meta-config", "ase-meta-compat" ] },
+        { label: "META: CONFIG",   skills: [ "ase-meta-config", "ase-meta-alias", "ase-meta-compat" ] },
         { label: "META: EXPLAIN",  skills: [ "ase-meta-why", "ase-meta-eli5" ] },
         { label: "META: JUDGE",    skills: [ "ase-meta-evaluate", "ase-meta-diaboli", "ase-meta-steelman" ] },
         { label: "META: RESEARCH", skills: [ "ase-meta-brainstorm", "ase-meta-search", "ase-meta-quorum",

@@ -17,7 +17,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 **ASE** ships three deliverables from one repository:
 
 -   `plugin/`: the agent tool plugin
-    -   `plugin/skills/ase-xxx-xxx/`: the 59 skills, each with a `SKILL.md`
+    -   `plugin/skills/ase-xxx-xxx/`: the 60 skills, each with a `SKILL.md`
         (agent instructions) and a `help.md` (Unix-style manual page), plus
         optional skill-specific files (like `ase-help-intent/data.md`, the
         concatenation of all `help.md` files, generated at build-time, or
@@ -89,9 +89,14 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 -   `tool/`: the `@rse/ase` CLI
     -   `tool/src/ase.ts`: the entry point, wiring all top-level commands
     -   `tool/src/ase-<command>.ts`: one module per CLI command resp.
-        command group: `setup`, `config`, `service`, `mcp`, `hook`,
+        command group: `setup`, `config`, `alias`, `service`, `mcp`, `hook`,
         `statusline`, `task`, `task-board`, `agent`, `artifact`, `spec`,
         `man`, `util`, and `util-{meta,diagram,worktree,mint,metric,compat}`
+    -   `tool/src/ase-alias-core.ts`: the skill command aliases of
+        `ase alias` (loading, merging, and modifying the alias files of
+        the user and the project, resolving the full aliases, and
+        synchronizing their shim skills), applied by the option parser
+        `service-getopt` and the session start hook
     -   `tool/src/ase-lib-*.ts`: the generic library modules (`lib-log`,
         `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`, `lib-hash`,
         `lib-fetch` for the HTTP requests through an `undici` dispatcher,
@@ -321,6 +326,10 @@ accepts `--force` to update even if already at the latest version.
 Beyond `ase setup`, the CLI provides:
 
 -   `ase config`: the layered `user` < `project` < `task` < `session` configuration
+-   `ase alias`: the skill command aliases of the user and the project:
+    full aliases (provided as generated shim skills), option aliases, and
+    option defaults of the skills, applied by the option parser `ase_getopt`
+    (which also accepts the negation `--no-x` of every option `--x`)
 -   `ase service`: the per-project background HTTP service
 -   `ase mcp`: the stdio-to-service MCP bridge
 -   `ase hook`: the agent tool hook handlers

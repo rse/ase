@@ -453,6 +453,13 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-meta-mint`](plugin/skills/ase-meta-mint/help.md)
   `-t name a background service bridged into the agent tool`
 
+- **Skill Command Aliases**:
+  You regularly run a skill with the same options and want a short
+  command, a short option, or default options for it, shared with your
+  team through the repository?
+  &rarr; [`/ase-meta-alias`](plugin/skills/ase-meta-alias/help.md)
+  `set lint-sec /ase-code-lint --include=A05,A06 -S HIGH`
+
 - **Harness Compatibility Self-Test**:
   You want to check how faithfully your current LLM and its agent harness
   execute the core interpreter primitives the **ASE** skills rely on?

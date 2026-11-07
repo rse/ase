@@ -25,8 +25,8 @@ import { sanitize }                           from "./ase-task-board-tui-popup.j
     it (bottom of the panel, two key hint lines, rule, and status line), the
     screen columns left of the content (margin, side, and padding of the panel),
     the left and right padding of the rendered page within the detail, the
-    minimum width, the maximum count, and the gap of the catalog columns, and
-    the minimum window size  */
+    minimum width, the maximum count, the gap, and the overload tolerance of
+    the catalog columns, and the minimum window size  */
 const TOP     = 7
 const BOTTOM  = 5
 const LEFT    = 3
@@ -34,6 +34,7 @@ const PAD     = 2
 const COL_MIN = 24
 const COL_MAX = 5
 const GAP     = 2
+const COL_TOL = 1.25
 const MIN_W   = 60
 const MIN_H   = 20
 
@@ -77,7 +78,8 @@ const filterGroups = (groups: ManGroup[], hits: Map<string, RegExp> | null): Man
 /*  lay out the catalog grid onto a width (with 1-5 columns, like the
     catalog of the website), reduced to the matching pages of a search (if any),
     where the groups of each section are distributed in their order onto the
-    columns, each filled up to the balanced height  */
+    columns, each filled up to the balanced height, resp., if this overloads a
+    column too much, up to the lowest height at which all groups fit  */
 const layoutGrid = (catalog: Catalog, hits: Map<string, RegExp> | null, width: number): Grid => {
     const n     = Math.max(1, Math.min(COL_MAX, Math.floor((width + GAP) / (COL_MIN + GAP))))
     const colW  = Math.floor((width - (n - 1) * GAP) / n)
@@ -90,16 +92,23 @@ const layoutGrid = (catalog: Catalog, hits: Map<string, RegExp> | null, width: n
             lines.push(empty())
         lines.push([ { kind: "section", text: title }, ...empty().slice(1) ], empty())
         const total  = groups.reduce((sum, group) => sum + group.pages.length + 2, -1)
-        const target = Math.ceil(total / n)
-        const cols   = Array.from({ length: n }, () => [] as Cell[])
-        let c = 0
-        for (const group of groups) {
-            if (cols[c].length > 0 && cols[c].length + group.pages.length + 2 > target && c < n - 1)
-                c++
-            if (cols[c].length > 0)
-                cols[c].push(null)
-            cols[c].push({ kind: "group", text: group.label }, ...group.pages.map((page) => ({ kind: "page" as const, page })))
+        const fill   = (target: number) => {
+            const cols = Array.from({ length: n }, () => [] as Cell[])
+            let c = 0
+            for (const group of groups) {
+                if (cols[c].length > 0 && cols[c].length + group.pages.length + 2 > target && c < n - 1)
+                    c++
+                if (cols[c].length > 0)
+                    cols[c].push(null)
+                cols[c].push({ kind: "group", text: group.label }, ...group.pages.map((page) => ({ kind: "page" as const, page })))
+            }
+            return cols
         }
+        let target = Math.ceil(total / n)
+        let cols   = fill(target)
+        if (cols.some((col) => col.length > target * COL_TOL))
+            while (cols.some((col) => col.length > target))
+                cols = fill(++target)
         const height = Math.max(...cols.map((col) => col.length))
         for (let l = 0; l < height; l++)
             lines.push(cols.map((col) => col[l] ?? null))
