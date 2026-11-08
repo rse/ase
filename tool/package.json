@@ -72,7 +72,7 @@
         "@types/mousetrap":                 "1.6.15"
     },
     "dependencies": {
-        "commander":                        "15.0.0",
+        "commander":                        "15.1.0",
         "@dotenvx/dotenvx":                 "2.38.2",
         "yaml":                             "2.9.1",
         "valibot":                          "1.5.0",
@@ -110,7 +110,7 @@
         "picomatch":                        "4.0.7",
         "lru-cache":                        "11.5.3",
         "@rse/specbook":                    "1.6.2",
-        "markdownlint":                     "0.42.0",
+        "markdownlint":                     "0.42.1",
         "tail":                             "2.2.6",
         "source-code-error":                "1.2.0",
         "pure-uuid":                        "2.0.0",
