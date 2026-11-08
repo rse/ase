@@ -63,12 +63,13 @@ const subCommands: Record<string, Record<string, Registrar>> = {
         board:    async (p) => attach(import("./ase-task-board.js"), p)
     },
     util: {
-        meta:     async (p) => attach(import("./ase-util-meta.js"), p),
-        compat:   async (p) => attach(import("./ase-util-compat.js"), p),
-        diagram:  async (p) => attach(import("./ase-util-diagram.js"), p),
-        worktree: async (p) => attach(import("./ase-util-worktree.js"), p),
-        mint:     async (p) => attach(import("./ase-util-mint.js"), p),
-        metric:   async (p) => attach(import("./ase-util-metric.js"), p)
+        meta:      async (p) => attach(import("./ase-util-meta.js"), p),
+        compat:    async (p) => attach(import("./ase-util-compat.js"), p),
+        diagram:   async (p) => attach(import("./ase-util-diagram.js"), p),
+        worktree:  async (p) => attach(import("./ase-util-worktree.js"), p),
+        mint:      async (p) => attach(import("./ase-util-mint.js"), p),
+        metric:    async (p) => attach(import("./ase-util-metric.js"), p),
+        rasterize: async (p) => attach(import("./ase-util-rasterize.js"), p)
     }
 }
 

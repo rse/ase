@@ -13,6 +13,12 @@ export const readStdin = (): Promise<string> => {
     return getStdin()
 }
 
+/*  read the entire stdin payload as raw octets (for binary input),
+    with the same terminal handling as "readStdin"  */
+export const readStdinBuffer = (): Promise<Uint8Array> => {
+    return getStdin.buffer()
+}
+
 /*  write a string to stdout, awaiting the write callback which only
     fires once the data has been flushed to the underlying pipe, so a
     subsequent "process.exit" cannot truncate the output  */

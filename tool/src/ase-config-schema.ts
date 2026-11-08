@@ -19,7 +19,8 @@ export const projectClassification = {
 /*  agent classification taxonomy  */
 export const agentClassification = {
     persona:  [ "writer", "engineer", "journalist", "telegrapher", "caveman" ],
-    guidance: [ "none", "minimal", "normal", "verbose" ]
+    guidance: [ "none", "minimal", "normal", "verbose" ],
+    diagram:  [ "image", "text" ]
 } as const
 
 /*  the default colors of the four color roles of the terminal board
@@ -54,6 +55,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
     default: {
         "agent.persona":   "engineer",
         "agent.guidance":  "normal",
+        "agent.diagram":   "image",
         "project.name":    "Example Project",
         "project.boxing":  "white",
         "project.users":   "",
@@ -352,7 +354,8 @@ export const configSchema = v.nullish(v.strictObject({
     })),
     agent: v.optional(v.strictObject({
         persona:  v.optional(v.picklist(agentClassification.persona)),
-        guidance: v.optional(v.picklist(agentClassification.guidance))
+        guidance: v.optional(v.picklist(agentClassification.guidance)),
+        diagram:  v.optional(v.picklist(agentClassification.diagram))
     })),
     telemetry: v.optional(v.strictObject({
         enabled:  v.optional(v.union([ v.boolean(), v.picklist([ "true", "false" ]) ])),

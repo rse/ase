@@ -27,7 +27,7 @@ board), the autonomous task lifecycle agents (plus their agent relay
 and fleet supervisor), the project artifact resolution, the
 *SpecBook*-based specification initializing, linting, exporting,
 querying, and previewing, and miscellaneous utilities like diagram rendering,
-identifier minting, and text measuring.
+identifier minting, text measuring, and SVG rasterizing.
 
 Most commands are sub-command groups. Each group and each command has
 its own manual page, named after the command path with dashes, e.g.,
@@ -109,7 +109,8 @@ The following top-level commands exist:
 
 - `ase util` *command* \[...\]:
   Utility commands (meta files, compatibility probes, diagram rendering,
-  worktree resolution, identifier minting, and text measuring). See
+  worktree resolution, identifier minting, text measuring, and SVG
+  rasterizing). See
   `ase-util`(1).
 
 - `ase agent` *agent* *command* \[...\]:

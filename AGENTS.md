@@ -77,13 +77,20 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         (a prompt starting with a skill command showing the entire argument
         hint of the skill, wrapped over multiple lines, in the band above
         the prompt, instead of the truncated one-line argument hint of
-        Claude Code, which is dropped for the skills), and
+        Claude Code, which is dropped for the skills),
         `ase-mods-task-edit.ts` for the task band (the task of
         `ase-task-edit --interactive`, signaled through a tool registered by
         the module, rendered in the band above the prompt and following
         all changes of the task, with the last change shown as a unified diff
         with line numbers (removed by a `##` at the prompt), until a next
-        step of the skill is submitted)
+        step of the skill is submitted), and `ase-mods-render-image.ts` for
+        the image and diagram rendering (an SVG/PNG/GIF/JPEG image of the
+        tool `ase_mods_render_image`, resp. a Mermaid or D2 diagram of the tool
+        `ase_mods_diagram`, rendered into SVG by the MCP tool `ase_diagram`
+        and used by the skills instead of the ASCII diagrams of the
+        `ase-meta-diagram` sub-agent, both tools registered by the module,
+        rasterized by the MCP tool `ase_rasterize`, fitted into the terminal
+        width, and shown below the row of the tool call)
     -   `plugin/.claude-plugin/`, `plugin/.codex-plugin/`,
         `plugin/.github/plugin/`: the per-agent-tool plugin manifests
 -   `tool/`: the `@rse/ase` CLI
@@ -91,7 +98,8 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
     -   `tool/src/ase-<command>.ts`: one module per CLI command resp.
         command group: `setup`, `config`, `alias`, `service`, `mcp`, `hook`,
         `statusline`, `task`, `task-board`, `agent`, `artifact`, `spec`,
-        `man`, `util`, and `util-{meta,diagram,worktree,mint,metric,compat}`
+        `man`, `util`, and
+        `util-{meta,diagram,worktree,mint,metric,rasterize,compat}`
     -   `tool/src/ase-alias-core.ts`: the skill command aliases of
         `ase alias` (loading, merging, and modifying the alias files of
         the user and the project, resolving the full aliases, and
@@ -125,6 +133,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         the usage attachments of the tasks)
     -   `tool/src/ase-spec-worker.ts`: the worker thread entry point, running
         the SpecBook lint and export of the MCP tools `ase_specbook_{lint,export}`
+        off the event loop of the service
+    -   `tool/src/ase-util-rasterize-worker.ts`: the persistent worker thread
+        entry point, running the rasterizing of the MCP tool `ase_rasterize`
         off the event loop of the service
     -   `tool/src/ase-task-*.ts`: the task functionality, where `ase-task.ts`
         itself only forwards the `ase task` CLI and `ase_task_*` MCP tools to
@@ -270,10 +281,11 @@ npm start fetch-types   # force re-download of mods/claude-code.d.ts
 
 cd tool
 npm start lint          # eslint over src/ + vue-tsc type-check of the web board client
-npm start build         # lint + build-cmd + build-man + build-plugin
+npm start build         # lint + build-cmd + build-man + build-font + build-plugin
 npm start build-cmd     # tsc of the program and its public types + vite build
                         # of the web board client (emits into dst/)
 npm start build-man     # copy of man/*.md into dst/man/*.md
+npm start build-font    # copy of the bundled rasterizer fonts into dst/font/*.ttf
 npm start build-plugin  # copy ../plugin and ../.claude-plugin into the package
 npm start build-container # build and push the multi-arch container image (etc/ase.dockerfile)
 npm start build-watch   # nodemon rebuild on src/**/*.{ts,vue,styl,html}
@@ -384,7 +396,9 @@ Beyond `ase setup`, the CLI provides:
 -   `ase util`: the utility commands `ase util meta` (plugin meta file
     output), `ase util diagram` (Mermaid rendering), `ase util worktree`
     (ASE worktree path resolution), `ase util mint` (hash-derived
-    identifier minting), `ase util metric` (text length metrics), and
+    identifier minting), `ase util metric` (text length metrics),
+    `ase util rasterize` (SVG/PNG/GIF/JPEG rasterizing into PNG, Kitty, iTerm2 IIP, or
+    SIXEL, with bundled fonts copied into `dst/font/` at build-time), and
     `ase util compat` (probe values for the `ase-meta-compat` self-test
     skill)
 

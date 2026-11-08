@@ -7,12 +7,12 @@
 /*  Claude Code function hooks module ("mod", EARLY ACCESS):
     Common parts, shared by the grill table, the decision matrix, the intent
     help, the synopsis form, the manual band, the manpage browser, the hint band,
-    and the task band: the rows of the Markdown tables, the styled characters of the terminal
+    the task band, and the image rendering: the rows of the Markdown tables, the styled characters of the terminal
     drawing, their Markdown conversion, wrapping, and framing, and the contract,
     keys, geometry, and drawing of the master/detail view in the band above the
     prompt.  */
 
-import type { Elements, Frozen, MatchedEvent, ModelCompleteRequest, ModelForkResult,
+import type { Elements, Frozen, MatchedEvent, McpToolResult, ModelCompleteRequest, ModelForkResult,
     PromptBox, PromptEditInput, PromptFilled, RenderElement, Timer } from "claude-code"
 
 /*  the services of the engine, bound by the hooking infrastructure for the
@@ -20,7 +20,9 @@ import type { Elements, Frozen, MatchedEvent, ModelCompleteRequest, ModelForkRes
     redrawing, the reading of a plugin file and of the names of the directories
     in a plugin directory, the forked and the plain model completion, the
     waiting, the reading and filling of the prompt, the loading of a task
-    (with its entity tag), and the running of a repeating timer  */
+    (with its entity tag), the running of a repeating timer, the rasterizing
+    of an image (by the MCP tool "ase_rasterize"), and the reading of a file
+    as bytes (base64)  */
 export type Engine = {
     invalidate: () => void,
     read:       (file: string) => Promise<string>,
@@ -31,7 +33,10 @@ export type Engine = {
     prompt:     () => Promise<PromptBox>,
     fill:       (text: string) => Promise<PromptFilled>,
     load:       (id: string) => Promise<string>,
-    every:      (ms: number, fn: () => void) => Timer
+    every:      (ms: number, fn: () => void) => Timer,
+    rasterize:  (args: Record<string, unknown>) => Promise<McpToolResult>,
+    diagram:    (args: Record<string, unknown>) => Promise<McpToolResult>,
+    bytes:      (file: string) => Promise<string>
 }
 
 /*  the colors of a picked (resp. selected or focused) item, of a code span,
@@ -363,7 +368,7 @@ export const paint = (Text: Text, chars: Char[]): (string | RenderElement)[] =>
 /*  draw a horizontal edge of the self-drawn frame (dimmed), with titles at its
     start and its end (with their brackets dimmed, an "ASE" prefix before a colon
     in bold, and the rest dimmed)  */
-const edge = (Text: Text, line: string, head = "", tail = "", lead = 2, trail = 2): RenderElement =>
+export const edge = (Text: Text, line: string, head = "", tail = "", lead = 2, trail = 2): RenderElement =>
     Text({ children: titled(line, head, tail, lead, trail).flatMap(([ text, label ]) => {
         const m = /^(\[ )?([^:]*)(:.*?)( \])?$/.exec(text)
         if (!label || m === null)

@@ -55,7 +55,8 @@ following steps:
    the project id (a valid configured `project.id`, else derived from
    the project directory), the user id (`$USER`, else `$LOGNAME`, else
    `unknown`), the persona style `agent.persona`, the guidance level
-   `agent.guidance`, the boxing transparency `project.boxing`, the task
+   `agent.guidance`, the diagram mode `agent.diagram`, the boxing
+   transparency `project.boxing`, the task
    lifecycle model `project.task.lifecycle`, the defaults
    `project.task.default.source`, `project.task.default.changeset`, and
    `project.task.default.target`, the specification base directory
@@ -64,12 +65,12 @@ following steps:
 
    A setting not explicitly configured in any scope falls back to the
    environment variables `ASE_PERSONA_STYLE`, `ASE_GUIDANCE_LEVEL`,
-   `ASE_PROJECT_BOXING`, `ASE_PROJECT_TASK_LIFECYCLE`,
+   `ASE_DIAGRAM_MODE`, `ASE_PROJECT_BOXING`, `ASE_PROJECT_TASK_LIFECYCLE`,
    `ASE_PROJECT_TASK_DEFAULT_SOURCE`,
    `ASE_PROJECT_TASK_DEFAULT_CHANGESET`, and
    `ASE_PROJECT_TASK_DEFAULT_TARGET`, and finally to the defaults
-   `engineer`, `normal`, `white`, `solo`, `worktree`, `worktree`, and
-   `source`.
+   `engineer`, `normal`, `image`, `white`, `solo`, `worktree`,
+   `worktree`, and `source`.
 
 8. For `--tool claude` only, it appends `export` statements of the
    variables `ASE_VERSION`, `ASE_PLUGIN_ROOT`, `ASE_USER_ID`,
@@ -91,7 +92,7 @@ following steps:
 10. It writes the hook output payload to standard output: the session
     information as XML-style tags (`<ase-version>`, `<ase-version-hint>`,
     `<ase-plugin-root>`, `<ase-persona-style>`, `<ase-guidance-level>`,
-    `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
+    `<ase-diagram-mode>`, `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
     `<ase-project-task-lifecycle>`,
     `<ase-project-task-default-source>`,
     `<ase-project-task-default-changeset>`,
@@ -156,8 +157,8 @@ following steps:
 - `ASE_SETUP_DEV`:
   If set, the version hint notes a development setup.
 
-- `ASE_PERSONA_STYLE`, `ASE_GUIDANCE_LEVEL`, `ASE_PROJECT_BOXING`,
-  `ASE_PROJECT_TASK_LIFECYCLE`, `ASE_PROJECT_TASK_DEFAULT_SOURCE`,
+- `ASE_PERSONA_STYLE`, `ASE_GUIDANCE_LEVEL`, `ASE_DIAGRAM_MODE`,
+  `ASE_PROJECT_BOXING`, `ASE_PROJECT_TASK_LIFECYCLE`, `ASE_PROJECT_TASK_DEFAULT_SOURCE`,
   `ASE_PROJECT_TASK_DEFAULT_CHANGESET`,
   `ASE_PROJECT_TASK_DEFAULT_TARGET`:
   The fallbacks of the settings not explicitly configured.

@@ -43,6 +43,7 @@ import { SkillsMCP }                     from "./ase-service-skills.js"
 import { WorktreeMCP }                   from "./ase-util-worktree.js"
 import { MintMCP }                       from "./ase-util-mint.js"
 import { MetricMCP }                     from "./ase-util-metric.js"
+import { RasterizeMCP }                  from "./ase-util-rasterize.js"
 import { UsageTracker }                  from "./ase-service-otel.js"
 import type { UsageRecord }              from "./ase-service-otel.js"
 import pkg                               from "../package.json" with { type: "json" }
@@ -232,6 +233,7 @@ export default class ServiceCommand {
         new WorktreeMCP().register(mcp)
         new MintMCP().register(mcp)
         new MetricMCP().register(mcp)
+        new RasterizeMCP().register(mcp)
         new ConfigMCP(log).register(mcp)
         new StateMCP(log).register(mcp)
         return mcp

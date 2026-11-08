@@ -110,13 +110,9 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
     Find all modules (or OOP classes) of <getopt-arguments/> and build a
     Mermaid specification <mermaid-spec/> for a `flowchart TB` diagram
     with all modules as boxes and the imports between modules as the
-    directed edges. Then
-    dispatch the rendering to the `ase-meta-diagram` sub-agent by
-    calling the tool `Agent(description: "Diagram Rendering",
-    subagent_type: "ase:ase-meta-diagram", prompt: <mermaid-spec/>,
-    run_in_background: false)` and reproduce its
-    returned fenced code block verbatim in the response text. Do not
-    display any further explanation except for this diagram.
+    directed edges. Then render <mermaid-spec/> according to the
+    *Diagrams* rule of the skill conventions. Do not display any
+    further explanation except for this diagram.
     </step>
 </flow>
 

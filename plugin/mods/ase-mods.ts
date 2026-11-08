@@ -11,7 +11,8 @@
     the synopsis form ("ase-mods-help-compose.ts"),
     the manual band ("ase-mods-help-show.ts"), the manpage browser
     ("ase-mods-help-browse.ts"), the hint band ("ase-mods-help-hint.ts"),
-    and the task band ("ase-mods-task-edit.ts").
+    the task band ("ase-mods-task-edit.ts"), and the image and diagram
+    rendering ("ase-mods-render-image.ts").
     As the engine loads only a module spelling "on", "$", and "next" literally,
     this is the only module touching the engine, and it binds the engine
     services needed by the other modules as plain functions.  */
@@ -26,6 +27,7 @@ import { modHelpShow }        from "./ase-mods-help-show.ts"
 import { modHelpBrowse }      from "./ase-mods-help-browse.ts"
 import { modHelpHint }        from "./ase-mods-help-hint.ts"
 import { modTaskEdit, TOOL }  from "./ase-mods-task-edit.ts"
+import { modRenderImage, TOOL as IMAGE, DIAGRAM } from "./ase-mods-render-image.ts"
 
 /*  function hook registration entry point  */
 export const register: Register = (on, options) => {
@@ -34,7 +36,8 @@ export const register: Register = (on, options) => {
         return
 
     /*  the grill table, the decision matrix, the intent help, the synopsis form,
-        the manual band, the manpage browser, the hint band, and the task band  */
+        the manual band, the manpage browser, the hint band, the task band, and
+        the image rendering  */
     const grill    = modGrill()
     const evaluate = modEvaluate()
     const intent   = modHelpFind()
@@ -43,12 +46,18 @@ export const register: Register = (on, options) => {
     const browse   = modHelpBrowse()
     const hint     = modHelpHint()
     const task     = modTaskEdit()
+    const image    = modRenderImage()
 
-    /*  provide the tool of the task band where a person sees the band only, so
-        its absence tells "ase-task-edit --interactive" that no band exists  */
+    /*  provide the tools of the task band and the image and diagram rendering
+        where a person sees the band resp. the image only, so the absence of the
+        former tells "ase-task-edit --interactive" that no band exists, resp. the
+        absence of the latter tells the skills to render ASCII diagrams instead  */
     on("session.start", async ($, e, next) => {
-        if (e.isInteractive && e.surface === "terminal")
+        if (e.isInteractive && e.surface === "terminal") {
             await $.tool.register(TOOL)
+            await $.tool.register(IMAGE)
+            await $.tool.register(DIAGRAM)
+        }
         return next(e)
     })
 
@@ -63,6 +72,37 @@ export const register: Register = (on, options) => {
                 id, variant: "source", tag: true })).text ?? ""
         })
     }))
+
+    /*  serve the tools of the image and diagram rendering, which need no
+        permission, as they just show an image, and whose rendering and
+        rasterizing of the image is as harmless  */
+    for (const tool of [ "mcp__ase__ase_mods_render_image", "mcp__ase__ase_mods_diagram" ] as const) {
+        on("tool.check", { tool }, () => ({ decision: "allow" }))
+        on("tool.call", { tool }, async ($, e) => ({
+            result: await image.call(tool, e.tool_use_id, e, {
+                rasterize: (args) => $.mcp.call("plugin_ase_ase", "ase_rasterize", args),
+                diagram:   (args) => $.mcp.call("plugin_ase_ase", "ase_diagram", args),
+                bytes:     async (file) => (await $.fs.read(file, { as: "bytes" })).base64
+            })
+        }))
+    }
+
+    /*  draw the image below the row of a call of the tools of the image and
+        diagram rendering (terminal only)  */
+    on("ui.render", { component: "ToolUse", surface: "terminal" }, async ($, e, next) => {
+        const drawn = await next(e)
+        return image.render(e, $.ui.resolve(e), drawn, {
+            rasterize:  (args) => $.mcp.call("plugin_ase_ase", "ase_rasterize", args),
+            diagram:    (args) => $.mcp.call("plugin_ase_ase", "ase_diagram", args),
+            bytes:      async (file) => (await $.fs.read(file, { as: "bytes" })).base64,
+            invalidate: () => $.ui.invalidate("ui.render")
+        }) ?? drawn
+    })
+
+    /*  draw the notice of a call of the tools of the image and diagram rendering
+        dimmed, or nothing while the border of the shown image carries it (terminal only)  */
+    on("ui.render", { component: "ToolResult", surface: "terminal" }, async ($, e, next) =>
+        image.result(e, $.ui.resolve(e)) ?? next(e))
 
     /*  the bands above the prompt (the synopsis form, the intent band, and the
         manpage browser, opened in this order), the shown one (as at most one is
@@ -251,6 +291,7 @@ export const register: Register = (on, options) => {
     on("ui.render", { component: "AbovePrompt", surface: "terminal" }, async ($, e, next) => {
         const drawn = await next(e)
         const ui    = $.ui.resolve(e)
+        image.track(e.viewport)
         return shown()?.render(e, ui) ?? manual.render(e, ui) ?? task.render(e, ui) ?? hint.render(e, ui) ?? drawn
     }).catch(($, e, next) => {
         /*  close a failed intent band resp. synopsis form, restore the prompt

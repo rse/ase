@@ -292,6 +292,11 @@ Agent:
   The amount of unsolicited help hints of the AI agent (default:
   `normal`).
 
+- `agent.diagram` (`image` or `text`):
+  The rendering of the diagrams of the skills: as an inline image
+  where the terminal supports it, else as text, resp. always as text
+  (default: `image`).
+
 AI usage accounting (see `ase-task-assign`(1) and
 `ase-setup-telemetry`(1)):
 

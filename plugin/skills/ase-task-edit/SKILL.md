@@ -197,13 +197,9 @@ Hints:
   visualize it with an optional diagram <optional-diagram/> by
   building a Mermaid specification <mermaid-spec/> (e.g. `flowchart
   TB`, `stateDiagram-v2`, `sequenceDiagram`, `classDiagram`, or
-  `erDiagram`, depending on intent) and dispatching the rendering
-  to the `ase-meta-diagram` sub-agent by calling the tool
-  `Agent(description: "Diagram Rendering", subagent_type:
-  "ase:ase-meta-diagram", prompt: <mermaid-spec/>,
-  run_in_background: false)`, reproducing its
-  returned fenced code block verbatim. Omit <optional-diagram/>
-  entirely for simple or purely local situations.
+  `erDiagram`, depending on intent) and rendering it according to
+  the *Diagrams* rule of the skill conventions. Omit
+  <optional-diagram/> entirely for simple or purely local situations.
 </if>
 
 <if condition="<getopt-option-approach/> is equal `true`">

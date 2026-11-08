@@ -47,12 +47,26 @@ Skill Output
 -   *IMPORTANT*: For *Diagrams*: whenever the response needs a
     diagram (structural, control-flow, state, sequence, class,
     entity-relationship, or metrics), you *MUST* build a Mermaid
-    specification and dispatch its rendering to the `ase-meta-diagram`
-    sub-agent via the `Agent` tool (`subagent_type: "ase:ase-meta-diagram"`),
-    then reproduce its returned fenced code block verbatim in the
-    response text. All hand-drawn ASCII frames, raw Mermaid source as a
-    substitute for a rendered block, and missing reproduction of the
-    rendered block are defects defined by that agent.
+    specification <mermaid-spec/> and render it at the position of
+    the diagram in the response as follows:
+
+    -   *Inline Image*: If <ase-diagram-mode/> is not equal `text` and
+        the tool `ase_mods_diagram` of the `ase` MCP server is available
+        (if deferred, first load it via `ToolSearch`), emit the response
+        text up to the diagram, call
+        this tool with `diagram: <mermaid-spec/>`, and continue with the
+        remaining response text. On `OK: ...` the user already sees the
+        diagram, so do *not* reproduce or describe it in the response text.
+
+    -   *Text Block*: Otherwise, or if the tool returns `ERROR: ...`,
+        dispatch the rendering to the `ase-meta-diagram` sub-agent via
+        the `Agent` tool (`subagent_type: "ase:ase-meta-diagram"`,
+        `prompt: <mermaid-spec/>`, `run_in_background: false`), then
+        reproduce its returned fenced code block verbatim in the
+        response text.
+
+    All hand-drawn ASCII frames, raw Mermaid source as a substitute for
+    a rendered diagram, and missing renderings of the diagram are defects.
 
 -   *IMPORTANT*: For Markdown *Tables*:
 

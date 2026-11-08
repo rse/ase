@@ -2,6 +2,28 @@
 ChangeLog
 =========
 
+2.0.10 (2026-11-XX)
+-------------------
+
+-   FEATURE [code, docs]: SVG Rasterizing
+    The new `ase util rasterize` command and MCP tool `ase_rasterize` rasterize an SVG document
+    or PNG/GIF/JPEG image (from file, or raw, `data:` URL, or base64 data) via resvg (WebAssembly,
+    with bundled fonts) into PNG or auto-detected Kitty, iTerm2, or SIXEL terminal graphics, with
+    scaling into the terminal (sized by `--width`/`--height`), background, and `--smart` CSS
+    variable resolving, where the MCP tool rasterizes off the event loop in a worker thread.
+
+-   FEATURE [plugin, docs]: Inline Image Rendering
+    The new mod `ase-mods-render-image.ts` provides the tool `ase_mods_render_image`, which shows
+    an SVG/PNG/GIF/JPEG image, rasterized via `ase_rasterize` and fitted into the terminal width
+    (or into requested cells), inline below its tool call row, rasterized again on each width
+    change, and rasterized again with fewer pixels when its PNG is above 2 MiB.
+
+-   FEATURE [plugin, docs]: Inline Diagram Rendering
+    The image rendering mod additionally provides the tool `ase_mods_diagram`, which renders a
+    Mermaid or D2 diagram via `ase_diagram` into SVG and shows it inline as an image. The skills
+    use it for their diagrams when available and `agent.diagram` is `image` (the default), else
+    the ASCII diagrams of `ase-meta-diagram`.
+
 2.0.9 (2026-11-08)
 ------------------
 
