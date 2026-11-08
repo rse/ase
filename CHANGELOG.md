@@ -17,6 +17,10 @@ ChangeLog
     aliases (`--custom` for several options), and option defaults of the skills, while the option
     parser now accepts the negation `--no-x` of every option `--x` to drop an injected option.
 
+-   IMPROVEMENT [docs]: VCS as Sibling Project on the Website
+    The "Sibling Projects" section of the website now also lists VCS, the worktree management
+    for Git repositories, used by RSE with ASE.
+
 -   IMPROVEMENT [docs]: GitHub Discussions on the Website
     The website now links the GitHub Discussions of ASE through a hint in the landing page
     introduction, an entry in the "Project" pull-down of the header, the footer of all pages, and
