@@ -38,6 +38,10 @@ author, [*Dr. Ralf S. Engelschall*](https://ase.tools/#author):
 > reasonable methodology and automation aspects while keeping the
 > developers in the driver's seat to ensure stable result quality."
 
+![ASE](docs/presentation-1.png)
+![ASE](docs/presentation-2.png)
+![ASE](docs/presentation-3.png)
+
 Notices
 -------
 
