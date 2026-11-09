@@ -7,6 +7,8 @@
 \[`-i`|`--input` *file*\]
 \[`-l`|`--lang` `mermaid`|`d2`\]
 \[`-f`|`--format` `ascii`|`svg`\]
+\[`-t`|`--theme` `light`|`dark`\]
+\[`-T`|`--tone` *tone*\]
 \[`-a`|`--ascii`\]
 \[`-c`|`--color-mode` `none`|`ansi16`|`ansi256`\]
 \[`--node-margin-x` *n*\]
@@ -26,6 +28,28 @@ as a self-contained SVG document. The *Mermaid* diagrams are rendered
 via *beautiful-mermaid* (supporting, e.g., flowcharts, UML state,
 sequence, and class diagrams, ER diagrams, and XY-charts), and the
 *D2* diagrams via the WebAssembly build of *D2*.
+
+For the `svg` format, the diagrams are drawn in the colors of a theme
+style (`light` or `dark`) and a theme color tone (one or two colors,
+where a missing second one is derived as the complement of the first
+one), from which a grey, an accent, and a signal color spread are
+derived. For *Mermaid*, the node boxes are drawn in a darker accent
+color with lighter labels on the `light` style, resp. vice versa on the
+`dark` style. A `classDef default` in the diagram overrides their
+`fill`, `stroke`, and `color`, while the nodes with their own class or
+`style` keep their explicit properties. For *D2*, the colors override
+the D2 themes "Neutral Default" (`light`) resp. "Dark Mauve" (`dark`),
+while a `theme-overrides` of the diagram itself still wins. On the
+`light` style, the *D2* shapes without own colors (except containers and
+text, code, image, class, and SQL table shapes) are drawn in a darker
+accent resp. signal color with lighter labels, too. The *D2*
+diagrams have a transparent background, unless the diagram sets its
+own via a top-level `style.fill`, and a padding of 20 instead of 100
+pixels, unless the diagram sets its own via the `pad` of `d2-config`.
+
+Any custom color of a diagram (like of a `classDef`, a `style`, or a
+`style.fill`) is replaced by its perceptually nearest color of the three
+color spreads, so the SVG document uses the theme colors only.
 
 For the `ascii` format, the rendering is optionally clipped to the
 terminal dimensions (reduced by the extra clipping amounts): lines
@@ -57,6 +81,15 @@ The MCP tool `ase_diagram` provides the same to the skills.
 - \[`-f`|`--format` `ascii`|`svg`\]:
   The output format: `ascii` for Unicode/ASCII art (default) or `svg`
   for an SVG document. The clipping options apply to `ascii` only.
+
+- \[`-t`|`--theme` `light`|`dark`\]:
+  The theme style of the SVG document (`svg` only).
+  Default: the configured `agent.diagram.theme`, else `light`.
+
+- \[`-T`|`--tone` *tone*\]:
+  The theme color tone of the SVG document as one or two colors
+  `#rgb` or `#rrggbb`, separated by whitespace (`svg` only). Default:
+  the configured `agent.diagram.tone`, else `#336699`.
 
 - \[`-a`|`--ascii`\]:
   Emit plain ASCII characters (`+`, `-`, `|`) instead of the Unicode
@@ -129,11 +162,14 @@ $ ase util diagram -l d2 -i arch.d2 -a -c none
 
 # render a Mermaid diagram as an SVG document
 $ ase util diagram -i flow.mmd -f svg >flow.svg
+
+# render a Mermaid diagram as an SVG document in a dark purple theme
+$ ase util diagram -i flow.mmd -f svg -t dark -T "#663399" >flow.svg
 ```
 
 ## SEE ALSO
 
-`ase`(1), `ase-util`(1).
+`ase`(1), `ase-util`(1), `ase-config`(1).
 
 ## AUTHOR
 

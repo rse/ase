@@ -50,6 +50,11 @@ export const DIAGRAM = {
     description: "Render a Mermaid or D2 diagram inline into the terminal of the user as an image, " +
         "fitted into the terminal width, or into at most `columns` x `rows` character cells. Pass the " +
         "diagram specification as `diagram` and its language as `lang` (\"mermaid\" by default, or \"d2\"). " +
+        "Do not style any colors, as the diagram uses the theme colors only. " +
+        "Prefer a narrow and tall layout, as a wide diagram is downscaled to the terminal width: " +
+        "top-to-bottom direction, at most 4 nodes side by side, short labels, and more sibling " +
+        "nodes grouped into a Mermaid `subgraph` with `direction LR` resp. a D2 container with " +
+        "`grid-columns: 3`. " +
         "The user will see the diagram, while you only get `OK: ...` or `ERROR: ...` as text. On `OK: ...`, " +
         "do NOT reproduce, describe, comment on, or confirm the shown diagram, and if showing it was the " +
         "entire request, end your turn without any further text.",

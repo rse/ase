@@ -30,7 +30,8 @@ The recognized keys are grouped under `project.*` (`project.id`,
 `project.name`, `project.boxing`, `project.task.lifecycle`,
 `project.task.idscheme`, `project.task.default.{source,changeset,target}`,
 and the `project.artifact.`*kind*`.{basedir,files}`
-globs) and `agent.*` (`agent.persona`, `agent.guidance`, and `agent.diagram`).
+globs) and `agent.*` (`agent.persona`, `agent.guidance`, and
+`agent.diagram.{format,theme,tone}`).
 Some keys are writable on selected scopes only; in particular
 the `project.artifact.*` globs are writable on the `user` and
 `project` scopes only. The internal session state, like the active
@@ -44,12 +45,12 @@ pyramid-structured `journalist`, the brief, factual, and abbreviating
 `telegrapher`, or the terse, rough, and stuttering `caveman`;
 `agent.guidance` selects the number of unsolicited hints and is one of
 `none`, `minimal`, `normal` (the default), or `verbose`;
-`agent.diagram` selects the rendering of the diagrams of the skills and is
+`agent.diagram.format` selects the rendering of the diagrams of the skills and is
 one of `image` (the default, an inline image where the terminal supports it,
 else text) or `text` (always text); and
 `project.boxing` selects the artifact transparency and is one of `white`,
 `grey`, or `black`. Setting `agent.persona`, `agent.guidance`,
-`agent.diagram`, or `project.boxing` takes effect immediately, i.e. still
+`agent.diagram.format`, or `project.boxing` takes effect immediately, i.e. still
 within the running session. Additionally, `project.task.lifecycle` selects the task plan
 lifecycle and is one of `solo` (the default), `team`, or `enterprise`; it is
 exported at session start as `<ase-project-task-lifecycle/>`. Finally,
@@ -66,6 +67,12 @@ a `branch:<name>` or `attachment:<name>` value can carry the placeholder
 `{id}` of the task id (e.g., `branch:cs-{id}` for a branch per task); they
 are exported at session start as
 `<ase-project-task-default-{source,changeset,target}/>`.
+
+The diagram images are styled by `agent.diagram.theme`, one of `light`
+(the default, dark node boxes with light labels) or `dark` (vice versa),
+and `agent.diagram.tone`, one or two theme colors `#rgb` or `#rrggbb`
+(default: `#336699`), where a missing second color is derived as the
+complement of the first one (a brown for the default blue).
 
 The following *operations* exist:
 

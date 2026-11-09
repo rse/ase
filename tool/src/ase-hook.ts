@@ -431,7 +431,7 @@ export default class HookCommand {
             mode, project boxing transparency, and project task lifecycle  */
         const persona   = setting("agent.persona",          "ASE_PERSONA_STYLE",          "engineer")
         const guidance  = setting("agent.guidance",         "ASE_GUIDANCE_LEVEL",         "normal")
-        const diagram   = setting("agent.diagram",          "ASE_DIAGRAM_MODE",           "image")
+        const diagram   = setting("agent.diagram.format",   "ASE_DIAGRAM_MODE",           "image")
         const boxing    = setting("project.boxing",         "ASE_PROJECT_BOXING",         "white")
         const lifecycle = setting("project.task.lifecycle", "ASE_PROJECT_TASK_LIFECYCLE", "solo")
 

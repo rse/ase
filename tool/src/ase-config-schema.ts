@@ -20,8 +20,12 @@ export const projectClassification = {
 export const agentClassification = {
     persona:  [ "writer", "engineer", "journalist", "telegrapher", "caveman" ],
     guidance: [ "none", "minimal", "normal", "verbose" ],
-    diagram:  [ "image", "text" ]
+    diagram:  [ "image", "text" ],
+    theme:    [ "light", "dark" ]
 } as const
+
+/*  the default theme color tone of the diagrams  */
+export const diagramToneDefault = "#336699"
 
 /*  the default colors of the four color roles of the terminal board
     ("default" is the foreground color of the terminal)  */
@@ -55,7 +59,9 @@ export const projectClassificationPresets: Record<string, Record<string, string>
     default: {
         "agent.persona":   "engineer",
         "agent.guidance":  "normal",
-        "agent.diagram":   "image",
+        "agent.diagram.format": "image",
+        "agent.diagram.theme":  "light",
+        "agent.diagram.tone":   diagramToneDefault,
         "project.name":    "Example Project",
         "project.boxing":  "white",
         "project.users":   "",
@@ -355,7 +361,12 @@ export const configSchema = v.nullish(v.strictObject({
     agent: v.optional(v.strictObject({
         persona:  v.optional(v.picklist(agentClassification.persona)),
         guidance: v.optional(v.picklist(agentClassification.guidance)),
-        diagram:  v.optional(v.picklist(agentClassification.diagram))
+        diagram:  v.optional(v.strictObject({
+            format:   v.optional(v.picklist(agentClassification.diagram)),
+            theme:    v.optional(v.picklist(agentClassification.theme)),
+            tone:     v.optional(v.pipe(v.string(), v.check((s) => /^#(?:[0-9a-fA-F]{3}){1,2}(?:\s+#(?:[0-9a-fA-F]{3}){1,2})?$/.test(s.trim()),
+                "expected \"#rgb\" or \"#rrggbb\", optionally followed by a second one")))
+        }))
     })),
     telemetry: v.optional(v.strictObject({
         enabled:  v.optional(v.union([ v.boolean(), v.picklist([ "true", "false" ]) ])),

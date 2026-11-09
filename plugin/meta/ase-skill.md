@@ -65,6 +65,13 @@ Skill Output
         reproduce its returned fenced code block verbatim in the
         response text.
 
+    Build <mermaid-spec/> for a *narrow and tall* layout, as wide
+    diagrams are downscaled to the terminal width and become hard to
+    read: use `flowchart TB`, keep at most 4 nodes side by side, keep
+    the labels short (or break them with `<br/>`), and group more sibling
+    nodes into a `subgraph` with `direction LR`, which wraps them into
+    rows. Do *not* style any colors, as the theme colors are used only.
+
     All hand-drawn ASCII frames, raw Mermaid source as a substitute for
     a rendered diagram, and missing renderings of the diagram are defects.
 

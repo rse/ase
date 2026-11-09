@@ -55,7 +55,7 @@ following steps:
    the project id (a valid configured `project.id`, else derived from
    the project directory), the user id (`$USER`, else `$LOGNAME`, else
    `unknown`), the persona style `agent.persona`, the guidance level
-   `agent.guidance`, the diagram mode `agent.diagram`, the boxing
+   `agent.guidance`, the diagram mode `agent.diagram.format`, the boxing
    transparency `project.boxing`, the task
    lifecycle model `project.task.lifecycle`, the defaults
    `project.task.default.source`, `project.task.default.changeset`, and

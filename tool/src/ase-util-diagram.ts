@@ -10,15 +10,23 @@ import { Command, InvalidArgumentError, Option } from "commander"
 import { z }                                     from "zod"
 
 import type { McpServer }                        from "@modelcontextprotocol/sdk/server/mcp.js"
-import type { D2 }                               from "@d2lang/d2"
+import type { D2, Diagram as D2Diagram }        from "@d2lang/d2"
 
 import type Log                                  from "./ase-lib-log.js"
 import { readStdin, writeStdout }                from "./ase-lib-stdio.js"
+import { confineColors }                         from "./ase-lib-color.js"
+import { Config }                               from "./ase-config-core.js"
+import { configSchema, diagramToneDefault }      from "./ase-config-schema.js"
+
+/*  the theme style of the SVG renderings  */
+export type DiagramTheme = "light" | "dark"
 
 /*  options accepted by the pure rendering helper  */
 export interface DiagramRenderOpts {
     lang:           "mermaid" | "d2"
     format:         "ascii" | "svg"
+    theme?:         DiagramTheme
+    tone?:          string
     ascii:          boolean
     colorMode:      "none" | "ansi16" | "ansi256"
     nodeMarginX:    number
@@ -48,16 +56,58 @@ const parseInteger = (name: string) => (value: string): number => {
     alive until the compiler is disposed)  */
 let d2: Promise<D2> | null = null
 
-/*  turn a D2 compile failure (a JSON-encoded list of errors) into a message  */
-const d2Error = (err: unknown): string => {
+/*  turn a D2 compile failure (a JSON-encoded list of errors, whose source
+    lines are shifted by the number of prepended lines) into a message  */
+const d2Error = (err: unknown, shift: number): string => {
     const message = err instanceof Error ? err.message : String(err)
     try {
         return (JSON.parse(message) as { errmsg: string }[])
-            .map((error) => error.errmsg.replace(/^index:/, "line "))
+            .map((error) => error.errmsg.replace(/^index:(\d+):/, (_, line: string) => `line ${Number(line) - shift}:`))
             .join("; ")
     }
     catch {
         return message
+    }
+}
+
+/*  draw the leaf shapes of a D2 diagram (and of its boards) still in theme colors
+    as boxes: those of the accent "B*" resp. the alternative accent "AA*"/"AB*"
+    colors, but not the containers, the text, code, image, class, and SQL table
+    shapes, nor the labels outside of the shapes  */
+type D2Box = { fill: string, stroke: string, color: string }
+const d2Boxes = (diagram: D2Diagram, boxes: { accent: D2Box, signal: D2Box }): void => {
+    const containers = new Set(diagram.shapes.map((shape) => shape.id.replace(/\.?[^.]*$/, "")))
+    for (const shape of diagram.shapes) {
+        const box = /^B[1-6]$/.test(shape.fill) ? boxes.accent : /^A[AB][245]$/.test(shape.fill) ? boxes.signal : null
+        if (box === null || containers.has(shape.id) || /^(?:text|code|image|class|sql_table)$/.test(shape.type))
+            continue
+        shape.fill = box.fill
+        if (/^B[1-6]$/.test(shape.stroke))
+            shape.stroke = box.stroke
+        if ("color" in shape && /^N[1-7]$/.test(shape.color) && !shape.labelPosition?.startsWith("OUTSIDE"))
+            shape.color = box.color
+    }
+    for (const board of [ ...diagram.layers ?? [], ...diagram.scenarios ?? [], ...diagram.steps ?? [] ])
+        if (board !== undefined)
+            d2Boxes(board, boxes)
+}
+
+/*  the theme color spreads of the SVG renderings (after the approach of
+    SpecBook): a grey base spread, an accent spread derived from the first
+    theme color tone, and a signal spread derived from the second one (if
+    given) or else from the complement-transposed first one (a brown for the
+    default blue), each of 32 colors from dark (index 0) to light (index 31)  */
+type DiagramColors = { base: string[], accent: string[], signal: string[] }
+const diagramColors = async (tone: string): Promise<DiagramColors> => {
+    const { parse, generate } = await import("@rse/mrcs")
+    const tones = tone.trim().split(/\s+/)
+    if (tones.length > 2 || !tones.every((t) => /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(t)))
+        throw new Error(`invalid theme color tone "${tone}" (expected "#rrggbb", optionally followed by a second one)`)
+    const [ accent, signal = `${accent}^` ] = tones.map((t) => t.replace(/^#(.)(.)(.)$/, "#$1$1$2$2$3$3").toLowerCase())
+    return {
+        base:   generate(parse("#000000/32")),
+        accent: generate(parse(`${accent}+40-5/32`)),
+        signal: generate(parse(`${signal}+40-5/32`))
     }
 }
 
@@ -177,6 +227,19 @@ export class Diagram {
         return depth >= 8 ? "ansi256" : depth >= 4 ? "ansi16" : "none"
     }
 
+    /*  determine the theme style and theme color tone of the SVG renderings
+        from the "agent.diagram.{theme,tone}" configuration  */
+    static configTheme (log: Log): { theme: DiagramTheme, tone: string } {
+        const cfg = new Config("config", configSchema, log)
+        cfg.read()
+        const theme = cfg.get("agent.diagram.theme")
+        const tone  = cfg.get("agent.diagram.tone")
+        return {
+            theme: theme === "dark" ? "dark" : "light",
+            tone:  typeof tone === "string" && tone.trim() !== "" ? tone : diagramToneDefault
+        }
+    }
+
     /*  dispose the D2 compiler (if any), so its worker thread no longer
         keeps the process alive (used by the short-lived CLI only)  */
     static async dispose (): Promise<void> {
@@ -196,16 +259,62 @@ export class Diagram {
             throw err
         })
         const compiler = await d2
+
+        /*  for the SVG document, determine the theme colors in the style of the
+            SpecBook diagrams, picked out of the theme color spreads after the shape
+            of the D2 themes "Neutral Default" (light) and "Dark Mauve" (dark): the
+            neutrals "N1" (text) to "N7" (background), the base colors "B1" (strokes)
+            to "B6" (fills), and the alternative accents "AA*"/"AB*" (from the signal
+            spread), prepended as one line of configuration on the theme of the style,
+            together with a transparent background and a padding of 20 instead of 100
+            pixels, so the configuration and the background of the diagram still win  */
+        let input   = src
+        let themeID = 0
+        let shift   = 0
+        let palette = [] as string[]
+        let boxes   = null as { accent: D2Box, signal: D2Box } | null
+        if (opts.format === "svg") {
+            const dark = opts.theme === "dark"
+            const { base: b, accent: a, signal: s } = await diagramColors(opts.tone ?? diagramToneDefault)
+            palette = [ ...b, ...a, ...s ]
+
+            /*  on the light theme style, draw the leaf shapes in darker colors with
+                lighter labels (like the node boxes of the Mermaid diagrams)  */
+            if (!dark)
+                boxes = {
+                    accent: { fill: a[5]!, stroke: a[3]!, color: b[31]! },
+                    signal: { fill: s[5]!, stroke: s[3]!, color: b[31]! }
+                }
+            const colors = dark ? {
+                N1: b[28], N2: b[25], N3: b[22], N4: b[13], N5: b[10], N6: b[8], N7: b[6],
+                B1: a[21], B2: a[21], B3: a[13], B4: b[9],  B5: a[0],  B6: a[5],
+                AA2: s[19], AA4: s[10], AA5: s[8], AB4: s[10], AB5: s[8]
+            } : {
+                N1: b[3],  N2: b[13], N3: b[19], N4: b[25], N5: b[27], N6: b[29], N7: b[31],
+                B1: a[7],  B2: a[11], B3: a[27], B4: a[31], B5: a[28], B6: a[24],
+                AA2: s[13], AA4: s[28], AA5: s[30], AB4: s[28], AB5: s[30]
+            }
+            const overrides = Object.entries(colors).map(([ key, color ]) => `${key}: "${color}"`).join("; ")
+            input   = `vars: { d2-config: { pad: 20; theme-overrides: { ${overrides} } } }; style.fill: transparent\n${src}`
+            themeID = dark ? 200 : 0
+            shift   = 1
+        }
+
+        /*  compile and render the diagram, with the custom colors of the
+            diagram confined to the theme color spreads (SVG only)  */
         try {
-            const result = await compiler.compile(src)
-            return await compiler.render(result.diagram, {
+            const result = await compiler.compile(input, { themeID })
+            if (boxes !== null)
+                d2Boxes(result.diagram, boxes)
+            const output = await compiler.render(result.diagram, {
                 ...result.renderOptions,
                 ascii:     opts.format === "ascii",
                 asciiMode: opts.ascii ? "standard" : "extended"
             })
+            return opts.format === "svg" ? confineColors(output, palette) : output
         }
         catch (err: unknown) {
-            throw new Error(d2Error(err), { cause: err })
+            throw new Error(d2Error(err, shift), { cause: err })
         }
     }
 
@@ -214,10 +323,63 @@ export class Diagram {
     static async renderMermaid (src: string, opts: DiagramRenderOpts): Promise<string> {
         const { renderMermaidASCII, renderMermaidSVG } = await import("beautiful-mermaid")
 
-        /*  render as a self-contained SVG document using the library's
-            themed defaults (the ANSI "colorMode" is meaningful only for ASCII art)  */
-        if (opts.format === "svg")
-            return renderMermaidSVG(src)
+        /*  render as a self-contained SVG document in the style of the SpecBook
+            diagrams (the colors picked out of the theme color spreads per theme style,
+            with its recoloring of the class boxes, and the arrow heads in the accent
+            color of the D2 strokes "B1"), but opaque, in the font bundled
+            for rasterizing, and without the web font import (the ANSI "colorMode" is
+            meaningful only for ASCII art)  */
+        if (opts.format === "svg") {
+            const dark = opts.theme === "dark"
+            const { base: b, accent: a, signal: s } = await diagramColors(opts.tone ?? diagramToneDefault)
+            const colors = dark ?
+                { bg: b[6]!,  fg: b[28]!, line: b[21]!, accent: a[21]!, muted: b[21]!, surface: a[7]!,  border: a[13]! } :
+                { bg: b[31]!, fg: b[5]!,  line: b[21]!, accent: a[7]!,  muted: b[21]!, surface: a[30]!, border: a[23]! }
+            const cls = dark ?
+                { header: a[3]!, title: b[31]!, body: b[9]!,                name: a[27]!, type: a[22]!, mark: a[16]! } :
+                { header: a[7]!, title: b[31]!, body: "var(--_node-fill)", name: a[5]!,  type: a[11]!, mark: a[17]! }
+
+            /*  determine the style of the node boxes: a darker accent color with lighter
+                labels on the light theme style and vice versa on the dark one, overridable
+                per property by a "classDef default" (as "beautiful-mermaid" does not apply
+                this class itself), escaped for the SVG attributes  */
+            const box: Record<string, string> = dark ?
+                { fill: a[23]!, stroke: a[26]!, color: b[6]!  } :
+                { fill: a[5]!,  stroke: a[3]!,  color: b[31]! }
+            for (const m of src.matchAll(/^\s*classDef\s+default\s+(.+?);?\s*$/gm)) {
+                for (const pair of m[1]!.split(",")) {
+                    const colon = pair.indexOf(":")
+                    const key   = pair.slice(0, colon).trim()
+                    const value = pair.slice(colon + 1).trim()
+                    if (colon > 0 && key in box && value !== "")
+                        box[key] = value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
+                }
+            }
+            const svg = renderMermaidSVG(src, { ...colors, font: "Source Sans 3", padding: 12 })
+                .replace(/^\s*@import url\([^)]*\);\s*$/m, "")
+                .replace(/<g class="class-node"[^>]*>[\s\S]*?<\/g>/g, (group) => group
+                    .replace("fill=\"var(--_node-fill)\"",                 `fill="${cls.body}"`)
+                    .replace("fill=\"var(--_group-hdr)\"",                 `fill="${cls.header}"`)
+                    .replace("fill=\"var(--_text-muted)\">&lt;&lt;",       `fill="${cls.title}">&lt;&lt;`)
+                    .replace("font-weight=\"700\" fill=\"var(--_text)\"",  `font-weight="700" fill="${cls.title}"`)
+                    .replaceAll("<tspan fill=\"var(--_text-sec)\">",       `<tspan fill="${cls.name}">`)
+                    .replaceAll("<tspan fill=\"var(--_text-muted)\">",     `<tspan fill="${cls.type}">`)
+                    .replaceAll("<tspan fill=\"var(--_text-faint)\">",     `<tspan fill="${cls.mark}">`))
+
+                /*  apply the style of the node boxes to the nodes without an explicit
+                    fill, stroke, or label color (but not to the dots of the states)  */
+                .replace(/<g class="node"[^>]*>[\s\S]*?<\/g>/g, (group) => group
+                    .replaceAll("fill=\"var(--_node-fill)\"",       () => `fill="${box.fill}"`)
+                    .replaceAll("stroke=\"var(--_node-stroke)\"",   () => `stroke="${box.stroke}"`)
+                    .replace(/(<text\b[^>]*?) fill="var\(--_text\)"/, (_, text: string) => `${text} fill="${box.color}"`))
+
+                /*  draw the frames of the subgraphs in a neutral grey instead of the accent border  */
+                .replace(/(fill="var\(--_group-(?:fill|hdr)\)") stroke="var\(--_node-stroke\)"/g,
+                    (_, fill: string) => `${fill} stroke="${dark ? b[13]! : b[25]!}"`)
+
+            /*  confine the custom colors of the diagram to the theme color spreads  */
+            return confineColors(svg, [ ...b, ...a, ...s ])
+        }
 
         /*  determine theme colors (gray shades once colors are enabled)  */
         const colored = opts.colorMode !== "none"
@@ -315,6 +477,10 @@ export default class DiagramCommand {
                 .choices([ "mermaid", "d2" ]).default("mermaid"))
             .addOption(new Option("-f, --format <format>", "output format")
                 .choices([ "ascii", "svg" ]).default("ascii"))
+            .addOption(new Option("-t, --theme <theme>", "theme style of SVG output (default: agent.diagram.theme)")
+                .choices([ "light", "dark" ]))
+            .option("-T, --tone <tone>",
+                "theme color tone(s) of SVG output as \"#rrggbb [#rrggbb]\" (default: agent.diagram.tone)")
             .option("-a, --ascii",
                 "emit plain ASCII (+-|) instead of Unicode box-drawing",
                 false)
@@ -361,10 +527,11 @@ export default class DiagramCommand {
                     process.exit(1)
                 }
 
-                /*  create diagram rendering  */
+                /*  create diagram rendering (in the configured theme by default)  */
                 let out: string
                 try {
-                    out = await Diagram.render(src, opts)
+                    const theme = Diagram.configTheme(this.log)
+                    out = await Diagram.render(src, { ...opts, theme: opts.theme ?? theme.theme, tone: opts.tone ?? theme.tone })
                 }
                 catch (err: unknown) {
                     const message = err instanceof Error ? err.message : String(err)
@@ -383,6 +550,8 @@ export default class DiagramCommand {
 
 /*  MCP registration entry point for diagram tools  */
 export class DiagramMCP {
+    constructor (private log: Log) {}
+
     register (mcp: McpServer): void {
         mcp.registerTool("ase_diagram", {
             title:       "ASE diagram render",
@@ -398,6 +567,10 @@ export class DiagramMCP {
                 "metrics/distributions/time-series as an XY-Chart. " +
                 "Pass the diagram specification as `diagram` and its language as `lang` " +
                 "(\"mermaid\" by default, or \"d2\"). " +
+                "Do not style any colors, as the SVG uses the theme colors only. " +
+                "Prefer a narrow and tall layout: top-to-bottom direction, at most 4 nodes " +
+                "side by side, short labels, and more sibling nodes grouped into a Mermaid " +
+                "`subgraph` with `direction LR` resp. a D2 container with `grid-columns: 3`. " +
                 "Returns the rendered art (or SVG document, for `format` \"svg\") as `text`.",
             inputSchema: {
                 diagram: z.string()
@@ -406,6 +579,10 @@ export class DiagramMCP {
                     .describe("diagram language: \"mermaid\" for Mermaid, \"d2\" for D2"),
                 format: z.enum([ "ascii", "svg" ]).default("ascii")
                     .describe("output format: \"ascii\" for Unicode/ASCII art, \"svg\" for an SVG document"),
+                theme: z.enum([ "light", "dark" ]).optional()
+                    .describe("theme style of the SVG document; defaults to the configured agent.diagram.theme"),
+                tone: z.string().optional()
+                    .describe("theme color tone(s) \"#rrggbb [#rrggbb]\" of the SVG document; defaults to the configured agent.diagram.tone"),
                 ascii: z.boolean().default(false)
                     .describe("emit plain ASCII (+-|) instead of Unicode box-drawing characters"),
                 colorMode: z.enum([ "none", "ansi16", "ansi256" ]).default("none")
@@ -427,7 +604,8 @@ export class DiagramMCP {
             }
         }, async (args) => {
             try {
-                const out = await Diagram.render(args.diagram, args)
+                const theme = Diagram.configTheme(this.log)
+                const out   = await Diagram.render(args.diagram, { ...args, theme: args.theme ?? theme.theme, tone: args.tone ?? theme.tone })
                 return {
                     content: [ { type: "text", text: out } ]
                 }

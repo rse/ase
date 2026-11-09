@@ -292,10 +292,20 @@ Agent:
   The amount of unsolicited help hints of the AI agent (default:
   `normal`).
 
-- `agent.diagram` (`image` or `text`):
+- `agent.diagram.format` (`image` or `text`):
   The rendering of the diagrams of the skills: as an inline image
   where the terminal supports it, else as text, resp. always as text
   (default: `image`).
+
+- `agent.diagram.theme` (`light` or `dark`):
+  The theme style of the diagram images: dark node boxes with light
+  labels on a light background, resp. vice versa (default: `light`).
+
+- `agent.diagram.tone` (`#`*rgb* \[`#`*rgb*\]):
+  The theme color tone of the diagram images, as one or two colors
+  (`#rgb` or `#rrggbb`), from which the color spreads are derived,
+  where a missing second one is derived as the complement of the
+  first one (default: `#336699`, a blue with a derived brown).
 
 AI usage accounting (see `ase-task-assign`(1) and
 `ase-setup-telemetry`(1)):

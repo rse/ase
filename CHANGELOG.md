@@ -21,8 +21,27 @@ ChangeLog
 -   FEATURE [plugin, docs]: Inline Diagram Rendering
     The image rendering mod additionally provides the tool `ase_mods_diagram`, which renders a
     Mermaid or D2 diagram via `ase_diagram` into SVG and shows it inline as an image. The skills
-    use it for their diagrams when available and `agent.diagram` is `image` (the default), else
-    the ASCII diagrams of `ase-meta-diagram`.
+    use it for their diagrams when available and `agent.diagram.format` is `image` (the
+    default), else the ASCII diagrams of `ase-meta-diagram`.
+
+-   IMPROVEMENT [code]: Mermaid SVG Styling
+    The SVG rendering of Mermaid diagrams by `ase_diagram` now uses the light style of the
+    SpecBook diagrams (colors and class box recoloring), opaque and in the bundled font.
+
+-   FEATURE [code, plugin, docs]: Diagram Theme Configuration
+    The new `agent.diagram.theme` (`light`/`dark`) and `agent.diagram.tone` (one or two colors,
+    default `#336699` plus its derived complement) style the Mermaid and D2 SVG renderings after
+    the approach of SpecBook (also via `--theme`/`--tone`), and `agent.diagram` became `.format`.
+
+-   IMPROVEMENT [code, plugin, docs]: Diagram Color Confinement
+    The SVG renderings of Mermaid and D2 diagrams now replace every custom color by its
+    perceptually nearest (OKLab) color of the theme color spreads of `agent.diagram.tone`, and
+    the diagram tools tell the model not to style any colors.
+
+-   IMPROVEMENT [code, plugin, docs]: Narrow Diagram Layouts
+    The skills and the diagram tools now ask for narrow and tall diagrams (at most 4 nodes side
+    by side, siblings wrapped via `subgraph` with `direction LR` resp. `grid-columns`), as wide
+    ones get downscaled to the terminal width, and D2 SVGs use a padding of 20 instead of 100.
 
 2.0.9 (2026-11-08)
 ------------------

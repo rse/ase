@@ -220,7 +220,7 @@ export default class ServiceCommand {
         const mcp = new McpServer({ name: "ase", version: pkg.version })
         new ServiceMCP({ projectId: ctx.projectId, port: ctx.port, startTime }).register(mcp)
         new CompatMCP().register(mcp)
-        new DiagramMCP().register(mcp)
+        new DiagramMCP(log).register(mcp)
         new TaskMCP(log, usage).register(mcp)
         new MarkdownMCP().register(mcp)
         new ArtifactMCP(log).register(mcp)

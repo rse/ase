@@ -107,6 +107,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `service-getopt` and the session start hook
     -   `tool/src/ase-lib-*.ts`: the generic library modules (`lib-log`,
         `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`, `lib-hash`,
+        `lib-color` for the confining of the SVG colors to a palette,
         `lib-fetch` for the HTTP requests through an `undici` dispatcher,
         `lib-daemon-cli` for the start/status/log/stop CLI commands of all
         background processes (servers, agents, and the agent fleet), and
