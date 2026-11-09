@@ -9,6 +9,11 @@ ChangeLog
     The `background` parameter of the tools `ase_mods_render_image` and `ase_mods_diagram` now
     tells the model to not pass it implicitly, but only on request or when the default fails.
 
+-   BUGFIX [plugin]: Sporadically Blank Inline Images
+    The mod now draws the image of `ase_mods_render_image` and `ase_mods_diagram` only for the
+    resolved call, and sends it again shortly after drawing, as the terminal sporadically
+    missed its transmission and showed a blank box instead.
+
 2.0.11 (2026-11-09)
 -------------------
 

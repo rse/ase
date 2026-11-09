@@ -83,8 +83,8 @@ export const DIAGRAM = {
     terminal shows a blank box), the largest PNG of an image (base64, as larger
     ones are rasterized again with fewer pixels, since a file is not shown by
     every terminal), the number of these rasterizings, the number of kept
-    images, and the viewport assumed before any was measured, and the titles of
-    the border  */
+    images, the viewport assumed before any was measured, the delays of sending
+    a drawn image again, and the titles of the border  */
 const NAME          = "mcp__ase__ase_mods_render_image"
 const NAME_DIAGRAM  = "mcp__ase__ase_mods_diagram"
 const MARGIN        = 2
@@ -96,6 +96,7 @@ const LIMIT         = 2 * 1024 * 1024 * 4 / 3
 const ATTEMPTS      = 4
 const KEEP          = 16
 const VIEWPORT      = { columns: 80, rows: 24 }
+const RESEND        = [ 250, 1000 ]
 const TITLE         = "[ ⧉ ASE: Inline Image Rendering ]"
 const TITLE_DIAGRAM = "[ ⧉ ASE: Inline Diagram Rendering ]"
 
@@ -147,12 +148,14 @@ export const modRenderImage = () => {
     /*  the last measured viewport, the rasterized images by their tool call,
         the viewport widths of the evicted images by their tool call (as they
         are not rasterized again for the same width, else the images beyond
-        the kept ones would evict each other in an endless loop), and the
-        still running rasterizings  */
+        the kept ones would evict each other in an endless loop), the still
+        running rasterizings, and the viewport widths the drawn images were
+        sent again for  */
     let viewport  = VIEWPORT
     const images  = new Map<string, Shown>()
     const evicted = new Map<string, number>()
     const pending = new Map<string, Promise<Shown>>()
+    const resent  = new Map<string, number>()
 
     /*  track the viewport of a drawing  */
     const track = (measured: RenderViewport | undefined): void => {
@@ -243,6 +246,7 @@ export const modRenderImage = () => {
                 if (images.size <= KEEP)
                     break
                 images.delete(old)
+                resent.delete(old)
                 evicted.set(old, width)
             }
             return shown
@@ -281,20 +285,44 @@ export const modRenderImage = () => {
         image meanwhile, but only for a resolved call, as before its input can
         still be partial  */
     const render = (e: ImageRender, ui: Elements["terminal"], row: RenderElement,
-        engine: Pick<Engine, "rasterize" | "diagram" | "bytes" | "invalidate">): RenderElement | undefined => {
+        engine: Pick<Engine, "rasterize" | "diagram" | "bytes" | "invalidate" | "sleep" | "blit">):
+        RenderElement | undefined => {
         if (e.props.tool !== NAME && e.props.tool !== NAME_DIAGRAM)
             return undefined
         track(e.viewport)
-        const id    = e.props.tool_use_id
-        const input = parse(e.props.tool, e.props.input)
-        const shown = images.get(id)
-        if (shown?.width !== viewport.columns && evicted.get(id) !== viewport.columns
-            && e.props.output !== undefined && !e.props.isErrored && !e.props.isInterrupted)
+        const id       = e.props.tool_use_id
+        const input    = parse(e.props.tool, e.props.input)
+        const shown    = images.get(id)
+        const resolved = e.props.output !== undefined && !e.props.isErrored && !e.props.isInterrupted
+        if (shown?.width !== viewport.columns && evicted.get(id) !== viewport.columns && resolved)
             load(id, input, engine).then(() => engine.invalidate()).catch(() => {
                 /*  ignore a failed rasterizing, as it is kept as an error  */
             })
-        if (shown === undefined || "error" in shown)
+
+        /*  draw the image only for a resolved call, as an image drawn for the
+            still running call is redrawn without being transmitted again  */
+        if (!resolved || shown === undefined || "error" in shown)
             return undefined
+
+        /*  send the drawn image again shortly after its first drawing at a
+            width (while still drawn), as the terminal sporadically misses its
+            transmission and then shows a blank box, while a blit always sends  */
+        if (resent.get(id) !== shown.width) {
+            resent.set(id, shown.width)
+            const requestId = e.requestId
+            const resend = async () => {
+                for (const ms of RESEND) {
+                    await engine.sleep(ms)
+                    if (images.get(id) !== shown)
+                        break
+                    await engine.blit({ requestId, key: "image", source: shown.source,
+                        columns: shown.columns, rows: shown.rows })
+                }
+            }
+            resend().catch(() => {
+                /*  ignore a failed sending, as the image is drawn already  */
+            })
+        }
         const rule = "─".repeat(shown.columns)
         const side = () => ui.Text({ dimColor: true, children: Array(shown.rows).fill("│").join("\n") })
         const size = `[ ${shown.pixels.width}x${shown.pixels.height}px, ${shown.columns}x${shown.rows}ch ]`

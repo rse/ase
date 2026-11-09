@@ -95,7 +95,9 @@ export const register: Register = (on, options) => {
             rasterize:  (args) => $.mcp.call("plugin_ase_ase", "ase_rasterize", args),
             diagram:    (args) => $.mcp.call("plugin_ase_ase", "ase_diagram", args),
             bytes:      async (file) => (await $.fs.read(file, { as: "bytes" })).base64,
-            invalidate: () => $.ui.invalidate("ui.render")
+            invalidate: () => $.ui.invalidate("ui.render"),
+            sleep:      (ms) => $.clock.sleep(ms),
+            blit:       (args) => $.ui.blit(args)
         }) ?? drawn
     })
 
