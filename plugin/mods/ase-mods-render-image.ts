@@ -34,7 +34,8 @@ export const TOOL = {
             data:       { type: "string",  description: "SVG document or PNG/GIF/JPEG image, as raw SVG text, " +
                 "as \"data:\" URL, or as base64 data" },
             background: { type: "string",  description: "CSS color to fill transparent areas with, " +
-                "or \"auto\" (default) to keep transparency" },
+                "or \"auto\" (default) to keep transparency; do NOT pass it implicitly, " +
+                "only when the user requests it or the default is known to not work" },
             smart:      { type: "boolean", description: "resolve CSS custom properties and color mixings first " +
                 "(needed for `ase_diagram` SVG output)" },
             columns:    { type: "number",  description: "maximum width in terminal columns (default: terminal width)" },
@@ -65,7 +66,8 @@ export const DIAGRAM = {
             lang:       { type: "string",  enum: [ "mermaid", "d2" ], description: "diagram language: " +
                 "\"mermaid\" (default) for Mermaid, \"d2\" for D2" },
             background: { type: "string",  description: "CSS color to fill transparent areas with, " +
-                "or \"auto\" (default) to keep transparency" },
+                "or \"auto\" (default) to keep transparency; do NOT pass it implicitly, " +
+                "only when the user requests it or the default is known to not work" },
             columns:    { type: "number",  description: "maximum width in terminal columns (default: terminal width)" },
             rows:       { type: "number",  description: "maximum height in terminal rows (default: unbounded, " +
                 "as the transcript scrolls vertically)" }

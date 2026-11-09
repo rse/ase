@@ -2,6 +2,13 @@
 ChangeLog
 =========
 
+2.0.12 (2026-11-XX)
+-------------------
+
+-   IMPROVEMENT [plugin]: Implicit Image Background
+    The `background` parameter of the tools `ase_mods_render_image` and `ase_mods_diagram` now
+    tells the model to not pass it implicitly, but only on request or when the default fails.
+
 2.0.11 (2026-11-09)
 -------------------
 
