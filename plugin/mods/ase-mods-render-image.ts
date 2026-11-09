@@ -99,7 +99,6 @@ const KEEP          = 16
 const VIEWPORT      = { columns: 80, rows: 24 }
 const RESEND        = [ 250, 1000 ]
 const TITLE         = "[ ⧉ ASE: Inline Image Rendering ]"
-const TITLE_DIAGRAM = "[ ⧉ ASE: Inline Diagram Rendering ]"
 
 /*  the event of drawing the row of a tool call  */
 export type ImageRender = Frozen<MatchedEvent<"ui.render", { component: "ToolUse", surface: "terminal" }>>
@@ -405,7 +404,7 @@ export const modRenderImage = () => {
         return ui.Box({ flexDirection: "column", children: [
             row,
             ui.Box({ flexDirection: "column", marginTop: 1, children: [
-                edge(ui.Text, `╭${rule}╮`, e.props.tool === NAME_DIAGRAM ? TITLE_DIAGRAM : TITLE),
+                edge(ui.Text, `╭${rule}╮`, TITLE),
                 ui.Box({ flexDirection: "row", children: [
                     side(),
                     ui.Box({ width: shown.columns, height: shown.rows, flexShrink: 0, flexDirection: "column",

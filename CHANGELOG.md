@@ -2,6 +2,13 @@
 ChangeLog
 =========
 
+2.0.13 (2026-11-XX)
+-------------------
+
+-   IMPROVEMENT [plugin]: Uniform Inline Image Title
+    The mod now titles the diagrams of `ase_mods_diagram` "Inline Image Rendering" as well,
+    instead of "Inline Diagram Rendering".
+
 2.0.12 (2026-11-09)
 -------------------
 
