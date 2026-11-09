@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.0.10 (2026-11-XX)
+2.0.10 (2026-11-09)
 -------------------
 
 -   FEATURE [code, docs]: SVG Rasterizing
