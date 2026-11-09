@@ -19,6 +19,7 @@ import { userId }                from "./ase-service-otel.js"
 import { Config }                from "./ase-config-core.js"
 import { configSchema, webColorDefaults, webColorNames } from "./ase-config-schema.js"
 import { buildBoard, watchTasks, toneOf, laneMoves, cardMoves, BoardState, attachmentTabs, isDiff, diffTones, dataLang, dataLoad, dataSpans, newTaskText, createTask, saveTask, TaskConflict, watchAgents } from "./ase-task-board-core.js"
+import { diffHunks, diffMarkdown, diffMarksToHTML } from "./ase-task-board-diff.js"
 import { layoutGraph, drawGraphSVG } from "./ase-task-board-graph.js"
 import { flowOf, layoutFlow, drawFlowSVG } from "./ase-task-board-flow.js"
 import { filterBoard, dropStandalone } from "./ase-task-board-filter.js"
@@ -111,9 +112,9 @@ const markedLoad = async (remote: boolean): Promise<Marked> => {
                     (title ? ` title="${escapeHTML(title)}"` : "") + ">" : escapeHTML(text)
             },
             code ({ text, lang }) {
-                if (lang === "mermaid") {
+                if (lang === "mermaid" && !text.includes("⟦chg:")) {
                     try {
-                        return `<div class="diagram">${renderMermaidSVG(text)}</div>`
+                        return `<div class="diagram">${renderMermaidSVG(text, { bg: "var(--c-paper)", fg: "var(--c-text)" })}</div>`
                     }
                     catch {
                         /*  fall through to the plain rendering of the source  */
@@ -137,13 +138,13 @@ const renderPlan = async (body: string, remote = false): Promise<string> => {
         const outside = fence === ""
         fence = TaskFormat.fenceTrack(fence, line)
         return !outside || fence !== "" ? line : line
-            .replace(/^(\s*(?:[-*]|\d+[.)])\s+)\[([ x/?\->])\]/, (_m, lead: string, box: string) => `${lead}⟦box:${boxes[box]}⟧`)
+            .replace(/^(\s*(?:[-*]|\d+[.)])\s+(?:⟦chg:[a-z-]+⟧)?)\[([ x/?\->])\]/, (_m, lead: string, box: string) => `${lead}⟦box:${boxes[box]}⟧`)
     }).join("\n")
     if (!marked.has(remote))
         marked.set(remote, markedLoad(remote))
     const html = (await marked.get(remote)!).parse(prepared, { async: false })
-    return html.replace(/⟦box:([a-z]+)⟧/g, (_m, state: string) =>
-        `<span class="box ${state}" title="[${escapeHTML(boxChars[state] ?? " ")}]"></span>`)
+    return diffMarksToHTML(html.replace(/⟦box:([a-z]+)⟧/g, (_m, state: string) =>
+        `<span class="box ${state}" title="[${escapeHTML(boxChars[state] ?? " ")}]"></span>`))
 }
 
 /*  the color roles of the web board, with their base colors resolved from the
@@ -184,10 +185,20 @@ const editorKeymap = (log: Log): "default" | "vim" | "emacs" => {
     return value === "vim" || value === "emacs" ? value : "default"
 }
 
-/*  render a standalone document (styled by the client stylesheet) out of
-    key/value fields, separated by a line from the content  */
-const fieldsDocument = (fields: [ string, string ][], content: string): string => {
-    const rows = fields.map(([ k, v ]) => `<tr><td class="k">${escapeHTML(k)}</td><td>${escapeHTML(v)}</td></tr>`).join("")
+/*  the color theme of the web board, resolved from the
+    "board.web.theme" configuration (on each page load)  */
+const boardTheme = (log: Log): "auto" | "light" | "dark" => {
+    const cfg = new Config("config", configSchema, log)
+    cfg.read()
+    const value = cfg.get("board.web.theme")
+    return value === "light" || value === "dark" ? value : "auto"
+}
+
+/*  render a standalone document (styled by the client stylesheet) out of key/value
+    fields (optionally marked as added or removed), separated by a line from the content  */
+const fieldsDocument = (fields: [ string, string, string? ][], content: string): string => {
+    const rows = fields.map(([ k, v, mark ]) =>
+        `<tr${mark !== undefined ? ` class="${mark}"` : ""}><td class="k">${escapeHTML(k)}</td><td>${escapeHTML(v)}</td></tr>`).join("")
     return "<!DOCTYPE html><html><head><meta charset=\"utf-8\">" +
         "<link rel=\"stylesheet\" href=\"/task-board/colors.css\">" +
         "<link rel=\"stylesheet\" href=\"/task-board/ase-task-board-web-client.css\"></head><body class=\"plan\"><article>" +
@@ -198,6 +209,22 @@ const fieldsDocument = (fields: [ string, string ][], content: string): string =
 /*  render a task plan as a standalone document: frontmatter fields and the numbered plan sections  */
 const taskDocument = async (keys: Map<string, string>, body: string): Promise<string> =>
     fieldsDocument([ ...keys ].filter(([ k ]) => k !== "Type"), await renderPlan(body))
+
+/*  the shown content of a task plan, kept by the client for requesting a diff  */
+type PlanText = { keys: [ string, string ][], body: string }
+const isPlanText = (value: unknown): value is PlanText => {
+    const plan = value as Partial<PlanText> | null | undefined
+    return typeof plan?.body === "string" && Array.isArray(plan.keys) && plan.keys.every((field) =>
+        Array.isArray(field) && field.length === 2 && field.every((text) => typeof text === "string"))
+}
+
+/*  render the diff of two task plans as a standalone document, in the look of a task plan  */
+const diffDocument = async (before: PlanText, after: PlanText): Promise<string> =>
+    fieldsDocument(diffHunks(before.keys, after.keys, (field) => JSON.stringify(field)).flatMap(({ kept, removed, added }) => [
+        ...kept,
+        ...removed.map(([ k, v ]): [ string, string, string ] => [ k, v, "del" ]),
+        ...added.map(([ k, v ]): [ string, string, string ] => [ k, v, "add" ])
+    ]), await renderPlan(diffMarkdown(before.body, after.body)))
 
 /*  render a task plan attachment as a standalone document: its fields and
     its content, with images embedded, Markdown rendered, YAML or JSON data syntax-highlighted, a diff
@@ -402,11 +429,13 @@ const guarded = (handler: Handler): Handler =>
 
 /*  register the page routes of the web board: its client assets and its colors  */
 const registerPageRoutes = (server: Hapi.Server, log: Log): void => {
-    /*  the single page of the web board, with its stylesheet and browser-side code  */
+    /*  the single page of the web board, with its stylesheet and browser-side code,
+        and with its color theme (resolved on each page load) on its root element  */
     server.route({
         method:  "GET",
         path:    "/task-board",
-        handler: (_request, h) => h.response(clientAsset("html")).type("text/html; charset=utf-8")
+        handler: (_request, h) => h.response(clientAsset("html")
+            .replace(/<html\b/, `<html data-theme="${boardTheme(log)}"`)).type("text/html; charset=utf-8")
     })
     server.route({
         method:  "GET",
@@ -516,10 +545,25 @@ const registerViewRoutes = (server: Hapi.Server, log: Log): void => {
                 group:  board.groups.find((g) => g.lanes.some((l) => l.status === card.status))?.title ?? "",
                 epic:   card.group,
                 doc:    await taskDocument(parts.keys, parts.body),
+                plan:   { keys: [ ...parts.keys ].filter(([ k ]) => k !== "Type"), body: parts.body },
                 tabs:   attachmentTabs(await Task.attachments(log, id), parts.keys.get("Modified") ?? ""),
                 pred:   ref(board.pred.get(id) ?? []),
                 succ:   ref(board.succ.get(id) ?? [])
             })
+        })
+    })
+
+    /*  the diff of two states of a task plan, rendered statelessly out of the states
+        kept by the client, as the changes are followed per task dialog  */
+    server.route({
+        method:  "POST",
+        path:    "/task-board/api/diff",
+        options: { payload: { parse: true, allow: "application/json" } },
+        handler: guarded(async (request, h) => {
+            const p = request.payload as { before?: unknown, after?: unknown } | null
+            if (!isPlanText(p?.before) || !isPlanText(p.after))
+                return h.response({ error: "invalid diff request" }).code(400)
+            return h.response({ doc: await diffDocument(p.before, p.after) })
         })
     })
 

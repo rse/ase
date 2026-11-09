@@ -103,7 +103,7 @@ for (const page of manPages) {
     (the manual page browser of "ase man"), so keep both in sync.  */
 export const manColumns: ManGroup[][] = [
     [ "Top-Level", "setup" ],
-    [ "config", "service" ],
+    [ "config", "alias", "service" ],
     [ "task" ],
     [ "spec", "util", "artifact" ],
     [ "agent", "hook" ]

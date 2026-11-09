@@ -23,7 +23,7 @@ Code](https://claude.com/product/claude-code) — and with reduced support also 
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
 [OpenAI Codex CLI](https://github.com/openai/codex).
 
-**ASE** ships with 58 agent skills, agent hooks, agent sub-agents, an
+**ASE** ships with 59 agent skills, agent hooks, agent sub-agents, an
 underlying Model-Context-Protocol (MCP) service and a Command-Line Interface
 (CLI) with a task store, task boards, and autonomous agents, incorporating
 reasonable methodology and automation aspects, to support the recurring
@@ -37,6 +37,10 @@ author, [*Dr. Ralf S. Engelschall*](https://ase.tools/#author):
 > skills to boost their daily productivity. Those skills incorporate
 > reasonable methodology and automation aspects while keeping the
 > developers in the driver's seat to ensure stable result quality."
+
+![ASE](docs/presentation-1.png)
+![ASE](docs/presentation-2.png)
+![ASE](docs/presentation-3.png)
 
 Notices
 -------
@@ -320,6 +324,13 @@ see whether **ASE** is right for you:
   &rarr; [`/ase-repo-resolve`](plugin/skills/ase-repo-resolve/help.md)
   `--interactive src/`
 
+- **Change Set Import**:
+  You want a pull request, merge request, commit, or patch file imported
+  into your working copy as unstaged and untracked files, with conflicts
+  resolved semantically and the remaining ones reported as a TODO?
+  &rarr; [`/ase-repo-import`](plugin/skills/ase-repo-import/help.md)
+  `#103`
+
 - **Guided Bug Fixing**:
   You want a problem or bug resolved through a structured, plan-driven
   funnel of candidate root causes and fix approaches instead of a direct,
@@ -445,6 +456,13 @@ see whether **ASE** is right for you:
   short description?
   &rarr; [`/ase-meta-mint`](plugin/skills/ase-meta-mint/help.md)
   `-t name a background service bridged into the agent tool`
+
+- **Skill Command Aliases**:
+  You regularly run a skill with the same options and want a short
+  command, a short option, or default options for it, shared with your
+  team through the repository?
+  &rarr; [`/ase-meta-alias`](plugin/skills/ase-meta-alias/help.md)
+  `set lint-sec /ase-code-lint --include=A05,A06 -S HIGH`
 
 - **Harness Compatibility Self-Test**:
   You want to check how faithfully your current LLM and its agent harness

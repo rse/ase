@@ -52,6 +52,7 @@ file lock and atomically.
     - `default`:
       The complete baseline of the built-in `default` scope:
       `agent.persona` `engineer`, `agent.guidance` `normal`,
+      `agent.diagram` `image`,
       `project.name` `Example Project`, `project.boxing` `white`,
       `project.task.lifecycle` `solo`, `project.task.idscheme` `slug`,
       `project.task.store.url` `ase:./.ase/task`,
@@ -63,7 +64,8 @@ file lock and atomically.
       `project.task.effort.line` `0.025`,
       `project.task.effort.iteration` `2.5`, the full set of
       `project.artifact.*` globs, the `board.tui.color.*`,
-      `board.web.color.*`, and `board.web.editor.keymap` defaults, and
+      `board.web.color.*`, `board.web.editor.keymap`, and
+      `board.web.theme` defaults, and
       `telemetry.enabled` `false`, `telemetry.prices.ai`
       `*=4.00/20.00/0.20/5.00`, and `telemetry.prices.hr` `*=110`.
     - `vibe`:

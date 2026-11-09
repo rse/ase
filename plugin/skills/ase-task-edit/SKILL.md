@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--focus|-f <section>[,...]] [--quiet|-q] [--interactive|-i] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. A new plan is optionally composed along the
@@ -27,7 +27,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
     $ARGUMENTS
 </expand>
 
@@ -80,6 +80,19 @@ requested <instruction/> to the *plan*.
 When refining the plan this way, preserve the overall structure of the
 plan and only modify what the user actually requested. Do *not* rewrite
 unrelated sections of the plan.
+
+<if condition="<getopt-option-focus/> is not equal `all`">
+Restrict the refinement to the sections in <sections/>: all other
+sections and the "backmatter" stay *unchanged* and serve as read-only
+context. Only if the <instruction/> inevitably requires a *foreign
+change* outside of these sections, apply it nevertheless, set <foreign/>
+to the comma-separated names of the changed sections (resp.
+`backmatter`), and only output the following <template/>:
+
+<template>
+⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ WARNING: changed sections outside of focus: **<foreign/>**
+</template>
+</if>
 
 <if condition="<getopt-option-int-source-dir/> is not empty">
 The *code basis* of the task is the separate working copy
@@ -184,13 +197,9 @@ Hints:
   visualize it with an optional diagram <optional-diagram/> by
   building a Mermaid specification <mermaid-spec/> (e.g. `flowchart
   TB`, `stateDiagram-v2`, `sequenceDiagram`, `classDiagram`, or
-  `erDiagram`, depending on intent) and dispatching the rendering
-  to the `ase-meta-diagram` sub-agent by calling the tool
-  `Agent(description: "Diagram Rendering", subagent_type:
-  "ase:ase-meta-diagram", prompt: <mermaid-spec/>,
-  run_in_background: false)`, reproducing its
-  returned fenced code block verbatim. Omit <optional-diagram/>
-  entirely for simple or purely local situations.
+  `erDiagram`, depending on intent) and rendering it according to
+  the *Diagrams* rule of the skill conventions. Omit
+  <optional-diagram/> entirely for simple or purely local situations.
 </if>
 
 <if condition="<getopt-option-approach/> is equal `true`">
@@ -212,6 +221,17 @@ then immediately *STOP* processing the entire current skill:
 Set <chosen-approach></chosen-approach> (empty). Do not output anything.
 </else>
 
+<if condition="<getopt-option-focus/> is not equal `all` and <task-content/> is not empty">
+This is the `OVERWRITE` of an existing plan under a focus, so re-generate
+*only* the sections in <sections/> of <task-content/> in-place, by
+closely following the defined plan format <format/> and injecting into
+them all the information from the <instruction/>, the <chosen-approach/>
+(if not empty), all decisions you derived from the <instruction/> and the
+<chosen-approach/>, and the grounding in the project. All other sections,
+the "backmatter", and all other frontmatter keys stay *unchanged*. Set the
+`Kind:` frontmatter key to <task-kind/>.
+</if>
+<else>
 Create a new plan from scratch and store the result as
 <task-content/> by closely following the defined plan format
 <format/> and injecting into it all the information from
@@ -219,6 +239,14 @@ the <instruction/>, the <chosen-approach/> (if not empty), all
 decisions you derived from the <instruction/> and the <chosen-approach/>, and
 the grounding in the project. Set the `Kind:` frontmatter key to
 <task-kind/>.
+
+<if condition="<getopt-option-focus/> is not equal `all`">
+Populate *only* the sections in <sections/> and keep all other sections
+*empty*, i.e., as bare `##` headings without any bullet-points, until a
+later round focuses them. Hence, the `CHANGELOG.md` bullet-point of the
+grounding above is due only if `DESIGN` is in <sections/>.
+</if>
+</else>
 
 <if condition="<task-kind/> is equal `RESOLVING`">
 The plan *MUST* carry code references, a precise description of the
@@ -238,7 +266,8 @@ Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
 `ase` MCP server and use the `text` field of its response
 for fresh <timestamp-created/> and <timestamp-modified/>
 information. Then insert the current <ase-task-id/>,
-<timestamp-created/>, and <timestamp-modified/> information.
+<timestamp-created/>, and <timestamp-modified/> information -- except
+for the `OVERWRITE` under a focus above, which keeps the `Created:` key.
 Set <task-content-dirty>true</task-content-dirty>.
 </define>
 
@@ -261,6 +290,23 @@ Set <args></args> (set args to empty).
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
         Do not output anything.
+
+        <expand name="task-focus" arg1="ase-task-edit"></expand>
+
+        Set <band-open>false</band-open>.
+        <if condition="<getopt-option-interactive/> is `true`">
+        The band of `--interactive` is drawn by the function hooks module
+        of the plugin, which provides the `mcp__ase__ase_task_band` tool
+        in an interactive terminal only. Load the schema of this tool (if
+        deferred, via `ToolSearch` with the query
+        `select:mcp__ase__ase_task_band`). If this tool does not exist,
+        only output the following <template/> and then immediately *STOP*
+        processing the entire current skill:
+
+        <template>
+        ⧉ **ASE**: ☻ skill: **ase-task-edit**, ▶ ERROR: `--interactive` requires the active ASE function hooks in an interactive terminal
+        </template>
+        </if>
 
     2.  Resolve a potential analyzer issue:
 
@@ -647,6 +693,7 @@ Set <args></args> (set args to empty).
         silently *skip* this entire step 3.3 (no MCP tool call and no
         output at all) and continue with step 3.4.
 
+        <if condition="<getopt-option-quiet/> is not equal `true` and <getopt-option-interactive/> is not equal `true`">
         <if condition="<task-render/> is empty">
         Call the `ase_markdown_prepare(text: "<task-content/>")` tool of
         the `ase` MCP server and set <task-render/> to the `text` output
@@ -684,22 +731,34 @@ Set <args></args> (set args to empty).
         ⇥   **Target:**    <task-target/>
         </format>
 
+        Set <focus-label></focus-label> (empty).
+        <if condition="<getopt-option-focus/> is not equal `all`">
+        For the *rendering only*, overriding the above, additionally drop
+        the glyph lines, the `#   TASK: <title/>` heading, every `##`
+        section whose name is *not* in <sections/>, and the entire
+        "backmatter", keeping the remaining sections, including their
+        `##` headings, in their plan order, and set <focus-label/> to
+        ` (<names/>)`, with <names/> being the comma-separated names of
+        these remaining sections.
+        </if>
+
         Only output the following <template/>, so the user
         can read the plan and react to it. Do *not* truncate,
-        summarize, or partially show the plan. Use the
-        following <template/>:
+        summarize, or partially show the plan, beyond the focus
+        above. Use the following <template/>:
 
         <template>
-        <ase-tpl-head title="TASK" subtitle="<task-id/>"/>
+        <ase-tpl-head title="TASK" subtitle="<task-id/><focus-label/>"/>
         <task-render/>
-        <ase-tpl-foot title="TASK" subtitle="<task-id/>"/>
+        <ase-tpl-foot title="TASK" subtitle="<task-id/><focus-label/>"/>
         </template>
+        </if>
 
         <if condition="the backmatter of <task-content/> contains an attachment
             block with the `Type` key value `text/x-diff; charset=utf-8; kind="draft"`
             which is *stale* according to the plan <format/> (its `Modified` key
             is absent or older than the `Modified` key of the frontmatter)">
-        Directly *after* this <template/>, only output the following
+        Directly *after* any rendering, only output the following
         <template/> and then give the corrective hint by expanding the
         subsequent construct (which, depending on the configured
         <ase-guidance-level/>, may expand into nothing and hence emit
@@ -742,7 +801,40 @@ Set <args></args> (set args to empty).
                 ⧉ **ASE**: ☻ skill: **ase-task-edit**, ▶ ERROR: invalid `--next` token: **<head/>**
                 </template>
 
-        -   If <getopt-option-next/> is equal to `none`:
+        -   If <getopt-option-next/> is equal to `none` and <getopt-option-interactive/> is `true`:
+
+            <if condition="<band-open/> is `false`">
+            Call the `mcp__ase__ase_task_band(id: "<ase-task-id/>")` tool --
+            if <getopt-option-focus/> is not equal `all`, additionally with
+            the argument `sections: "<sections/>"` -- to show the plan in the
+            band above the prompt, which from now on follows every change of
+            the plan on its own, and set <band-open>true</band-open>. If its
+            `text` output field starts with `ERROR: <info/>`, only output the
+            following <template/> and then immediately *STOP* processing the
+            entire current skill:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ ERROR: **<info/>**
+            </template>
+            </if>
+
+            Do *not* show any dialog. Only output the following <template/>,
+            end the current turn, wait for the user input, and store the
+            user input in <result/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **awaiting instruction**
+            </template>
+
+            If <result/>, with any leading and trailing whitespace stripped,
+            case-insensitively equals `DONE`, `GRILL`, `DRAFT`, `IMPLEMENT`,
+            or `CANCEL` -- exactly the inputs on which the band closes on its
+            own -- set <result/> to this upper-case token. Otherwise, set
+            <result>OTHER: <result/></result>, also for an input which merely
+            indicates that the user does not want to proceed, as the band
+            stays open on it.
+
+        -   If <getopt-option-next/> is equal to `none` and <getopt-option-interactive/> is not `true`:
 
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
@@ -772,6 +864,15 @@ Set <args></args> (set args to empty).
 
             *Break* out of the *loop*.
             <expand name="handoff-args"/>
+            <if condition="<getopt-option-quiet/> is `true`">
+                Set <args><args/> --quiet</args>.
+            </if>
+            <if condition="<getopt-option-interactive/> is `true`">
+                Set <args><args/> --int-interactive</args>.
+            </if>
+            <if condition="<getopt-option-focus/> is not equal `all`">
+                Set <args><args/> --focus <getopt-option-focus/></args>.
+            </if>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-grill", args: "<args/>")` tool
             to *grill* the finalized plan.

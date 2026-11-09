@@ -19,7 +19,7 @@ export type Surface = { view: View, minimized: string[], collapsed: string[], ti
 export type Board   = { mode: string, project: string, version: string, warnings: string[], users: string[], self: string, surface: Surface, moves: Record<string, string[]>, groups: Group[] }
 export type Tone    = "active" | "done" | "idle"
 export type Ref     = { id: string, tone: Tone }
-export type Task    = { id: string, title: string, tone: Tone, status: string, group: string, epic: string, doc: string, tabs: string[], pred: Ref[], succ: Ref[] }
+export type Task    = { id: string, title: string, tone: Tone, status: string, group: string, epic: string, doc: string, plan: { keys: [ string, string ][], body: string }, tabs: string[], pred: Ref[], succ: Ref[] }
 export type View    = "lanes" | "graph" | "stats" | "agents" | "flow"
 
 /*  the displayed names of the views (the persisted view ids being kept short)  */
@@ -206,6 +206,11 @@ export const api = async <T>(url: string, opts?: RequestInit, background = false
     }
 }
 
+/*  stamp the color theme of the page (see "board.web.theme") onto a
+    standalone document, so that it renders in the theme right away  */
+export const themed = (doc: string): string =>
+    doc.replace(/<html\b/, `<html data-theme="${document.documentElement.dataset.theme ?? "auto"}"`)
+
 /*  the state of the page  */
 export const board       = ref<Board | null>(null)
 export const boardError  = ref<string | null>(null)
@@ -232,11 +237,16 @@ export const prompt      = ref<{ id: string, text: string, name: string | null }
 export const scroll      = reactive({ all: true, info: "" })
 export const tab         = ref(0)
 export const tabDocs     = ref<Record<number, string>>({})
+export const taskDiff    = ref<string | null>(null)
 export const tabScroll   = reactive({ less: false, more: false })
 export const tabScrolls  = new Map<number, number>()
 export const filter      = ref("")
+
+/*  the task of the task viewer (if any), and why it is currently not shown  */
+export const watched     = new URLSearchParams(window.location.search).get("task")
+export const watchError  = ref<string | null>(null)
 let   query       = ""
-let   openId      = null as string | null
+let   openId      = watched
 let   openSeq     = 0
 let   reloadSeq   = 0
 let   graphSeq    = 0
@@ -531,11 +541,32 @@ export const openTask = async (id: string, background = false) => {
     if (seq !== openSeq)
         return
     if (t.error !== undefined) {
-        if (editing.value === null)
-            closeTask()
-        else
+        if (editing.value !== null)
             notice.value = { kind: "error", message: t.error }
+        else if (watched !== null) {
+            /*  the task viewer stays open, and shows the task again once it re-appears  */
+            task.value       = null
+            watchError.value = t.error
+        }
+        else
+            closeTask()
         return
+    }
+    watchError.value = null
+
+    /*  a change of the shown plan of the still open task replaces its diff (always
+        in the background), any other task starts without a diff  */
+    const prev = task.value?.id === id ? task.value : null
+    let   diff = prev !== null ? taskDiff.value : null
+    if (prev !== null && JSON.stringify(prev.plan) !== JSON.stringify(t.plan)) {
+        const d = await api<{ doc: string }>("/task-board/api/diff", {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({ before: prev.plan, after: t.plan })
+        }, true)
+        if (seq !== openSeq)
+            return
+        diff = d.error !== undefined ? null : d.doc
     }
 
     /*  replace the cached attachment documents only once the selected one is re-fetched  */
@@ -543,10 +574,17 @@ export const openTask = async (id: string, background = false) => {
     const doc = n > 0 ? await fetchTabDoc(id, n, background) : ""
     if (seq !== openSeq)
         return
-    tabDocs.value = n > 0 ? { [n]: doc } : {}
-    task.value    = t
-    tab.value     = n
+    tabDocs.value  = n > 0 ? { [n]: doc } : {}
+    taskDiff.value = diff
+    task.value     = t
+    tab.value      = n
     nextTick(updateTabScroll)
+}
+
+/*  drop the diff of the last change, so just the latest state of the task remains  */
+export const clearDiff = () => {
+    keepTabScroll()
+    taskDiff.value = null
 }
 
 /*  re-open the dialog under another task id (or none) with the next board reload  */
@@ -564,8 +602,9 @@ export const closeTask = () => {
     for (const hook of closeHooks)
         hook()
     openSeq++
-    openId     = null
-    task.value = null
+    openId         = null
+    task.value     = null
+    taskDiff.value = null
 }
 
 /*  fetch the document of an attachment tab, or load it into the cache
@@ -614,8 +653,8 @@ export const reload = async (background = false) => {
     }
     boardError.value = null
 
-    /*  start in the persisted view on the first load  */
-    if (board.value === null)
+    /*  start in the persisted view on the first load (the task viewer shows no view at all)  */
+    if (board.value === null && watched === null)
         view.value = data.surface.view
     board.value = data
     if (view.value === "graph")

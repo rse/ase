@@ -17,6 +17,7 @@ export const site = {
     author:      "Dr. Ralf S. Engelschall",
     email:       "rse@engelschall.com",
     repo:        "https://github.com/rse/ase",
+    discussions: "https://github.com/rse/ase/discussions",
 
     /*  steel-blue signal color, used for the browser toolbar tint on mobile.
         Kept in sync with the `--brand-*` scale in `styles/theme.css`.  */

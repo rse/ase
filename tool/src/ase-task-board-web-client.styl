@@ -71,6 +71,52 @@ vendors = official
     --c-signal:        var(--color-signal-42)
     --c-signal-ground: var(--color-signal-62)
 
+/*  the semantic colors of the dark theme: light texts on dark grounds, with the
+    steps picked by their lightness (the lowest steps of a spread are all nearly
+    black), except for the shade (still black for the shadows and backdrops)  */
+dark-theme()
+    --c-text:          var(--color-normal-56)
+    --c-text-strong:   var(--color-normal-44)
+    --c-text-soft:     var(--color-normal-48)
+    --c-paper:         var(--color-normal-15)
+    --c-shade:         var(--color-normal-1)
+    --c-mute:          var(--color-dim-42)
+    --c-line:          var(--color-dim-34)
+    --c-border-strong: var(--color-dim-28)
+    --c-border:        var(--color-dim-25)
+    --c-border-soft:   var(--color-dim-23)
+    --c-fill:          var(--color-dim-21)
+    --c-ground:        var(--color-dim-17)
+    --c-ground-light:  var(--color-dim-19)
+    --c-accent-strong: var(--color-accent-52)
+    --c-accent:        var(--color-accent-48)
+    --c-accent-light:  var(--color-accent-33)
+    --c-accent-line:   var(--color-accent-28)
+    --c-accent-border: var(--color-accent-25)
+    --c-accent-fill:   var(--color-accent-21)
+    --c-accent-ground: var(--color-accent-17)
+    --c-accent-paper:  var(--color-accent-15)
+    --c-signal-strong: var(--color-signal-52)
+    --c-signal:        var(--color-signal-46)
+    --c-signal-ground: var(--color-signal-17)
+    color-scheme: dark
+
+    /*  the odd series of multi-series XY charts: the library derives them as dark
+        shades, as it cannot detect the dark background behind a CSS variable  */
+    .diagram svg
+        --xychart-color-1: #38bdf8
+        --xychart-color-3: #22d3ee
+        --xychart-color-5: #2dd4bf
+        --xychart-color-7: #4ade80
+
+/*  the color theme (see "board.web.theme"): "dark" always, "auto"
+    whenever the operating system or browser prefers a dark one  */
+:root[data-theme="dark"]
+    dark-theme()
+@media (prefers-color-scheme: dark)
+    :root:not([data-theme="light"])
+        dark-theme()
+
 /*  the base settings  */
 *
     box-sizing: border-box
@@ -215,6 +261,12 @@ header
     flex: 1
     min-height: 0
     overflow-x: auto
+
+    /*  room within the clipping edges for the bold border of the selected lane, also
+        when scrolling a selected task box (nested 11px within its lane) into view  */
+    padding: 1px
+    margin: -1px
+    scroll-padding-inline: 12px
 
     /*  a double click opens or toggles, so it must not select text  */
     user-select: none
@@ -1743,6 +1795,22 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
     to
         left: 75%
 
+/*  the task viewer: its task dialog spans the entire window, resp. the
+    notice why it cannot show its task is centered in the empty window  */
+#dlg.full
+    left: 0
+    top: 0
+    transform: none
+    width: 100vw
+    height: 100vh
+    border: none
+    border-radius: 0
+    box-shadow: none
+#watch-note
+    margin: auto
+    padding: 16px
+    color: var(--c-signal)
+
 /*  the task dialog: horizontally centered, of a fixed height, with its rows stacked  */
 #dlg
     position: absolute
@@ -1898,16 +1966,16 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
         .cm-line
             padding: 0 20px
 
-        /*  the cursor as a filled block in the signal color with a white character
+        /*  the cursor as a filled block in the signal color with a paper-colored character
             (also the block cursor of the Vim key bindings), outlined only while unfocused,
             replacing the regular line cursor  */
         .cm-cursor
             display: none
         .cm-block-cursor, .cm-fat-cursor
             background: var(--c-signal)
-            color: #ffffff !important
+            color: var(--c-paper) !important
             *
-                color: #ffffff !important
+                color: var(--c-paper) !important
         .cm-editor:not(.cm-focused)
             .cm-block-cursor, .cm-fat-cursor
                 background: none
@@ -2067,6 +2135,36 @@ body.plan
         code
             font-size: 0.9rem
             padding: 0
+
+    /*  the diff of a changed task plan: added lines accented and removed lines signaled,
+        both on a light ground (each on its own row, except in code blocks, already
+        being broken into lines), and their changed words inverse  */
+    .chg
+        display: block
+        code
+            color: inherit
+        &.add
+            color: var(--c-accent)
+            background: var(--c-accent-ground)
+        &.del
+            color: var(--c-signal)
+            background: var(--c-signal-ground)
+        &.word
+            display: inline
+            color: var(--c-paper)
+        &.add.word
+            background: var(--c-accent)
+        &.del.word
+            background: var(--c-signal)
+    pre .chg
+        display: inline
+    table.fields tr
+        &.add td
+            color: var(--c-accent)
+            background: var(--c-accent-ground)
+        &.del td
+            color: var(--c-signal)
+            background: var(--c-signal-ground)
 
     /*  a draft diff: headers dimmed, inserted lines accented, removed lines signaled  */
     pre.diff code

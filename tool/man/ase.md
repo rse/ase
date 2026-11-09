@@ -27,7 +27,7 @@ board), the autonomous task lifecycle agents (plus their agent relay
 and fleet supervisor), the project artifact resolution, the
 *SpecBook*-based specification initializing, linting, exporting,
 querying, and previewing, and miscellaneous utilities like diagram rendering,
-identifier minting, and text measuring.
+identifier minting, text measuring, and SVG rasterizing.
 
 Most commands are sub-command groups. Each group and each command has
 its own manual page, named after the command path with dashes, e.g.,
@@ -76,6 +76,10 @@ The following top-level commands exist:
   Manage the layered *ASE* configuration of the scope chain `user` <
   `project` < `task` < `session`. See `ase-config`(1).
 
+- `ase alias` *command* \[...\]:
+  Manage the skill command aliases: full aliases, option aliases, and
+  option defaults of the *ASE* skills. See `ase-alias`(1).
+
 - `ase mcp`:
   Bridge stdio MCP to the per-project background service. Configured
   as an MCP server in the agent tool. See `ase-mcp`(1).
@@ -105,7 +109,8 @@ The following top-level commands exist:
 
 - `ase util` *command* \[...\]:
   Utility commands (meta files, compatibility probes, diagram rendering,
-  worktree resolution, identifier minting, and text measuring). See
+  worktree resolution, identifier minting, text measuring, and SVG
+  rasterizing). See
   `ase-util`(1).
 
 - `ase agent` *agent* *command* \[...\]:
@@ -162,7 +167,8 @@ The command-specific ones are described in their own manual pages.
   Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
   `$XDG_CONFIG_HOME/ase` (falling back to `~/.config/ase`) on Linux
   and other Unix systems. It holds the `user` scope configuration
-  `config.yaml`, the user agent definitions `agents/`, and the state
+  `config.yaml`, the user agent definitions `agents/`, the user skill
+  command aliases `aliases.yaml`, and the state
   of the task store server (`store.yaml`, `store.log`, `tasks/`) and
   agent relay server (`relay.yaml`, `relay.log`).
 
@@ -177,7 +183,8 @@ The command-specific ones are described in their own manual pages.
 - `.ase/`:
   The per-project *ASE* directory in the project root, holding the
   `project` scope configuration `config.yaml`, the agent definitions
-  `agents/`, the fleet configuration `fleet.yaml`, the task plans
+  `agents/`, the skill command aliases `aliases.yaml`, the fleet
+  configuration `fleet.yaml`, the task plans
   `task/` of the default local task store, and the machine-local
   runtime files (`service.yaml`, `service.log`, `board.yaml`, `agent/`,
   and `worktree/`), the latter covered by the self-ignoring
@@ -212,7 +219,7 @@ $ ase agent fleet start
 
 ## SEE ALSO
 
-`ase-setup`(1), `ase-config`(1), `ase-mcp`(1), `ase-service`(1),
+`ase-setup`(1), `ase-config`(1), `ase-alias`(1), `ase-mcp`(1), `ase-service`(1),
 `ase-hook`(1), `ase-statusline`(1), `ase-task`(1), `ase-artifact`(1),
 `ase-spec`(1), `ase-util`(1), `ase-agent`(1), `ase-man`(1),
 `claude`(1), `copilot`(1), `codex`(1), `git`(1).

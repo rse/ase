@@ -12,12 +12,23 @@ import { execa }              from "execa"
 import { StdioServerTransport }          from "@modelcontextprotocol/sdk/server/stdio.js"
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js"
 import { InMemoryTransport }             from "@modelcontextprotocol/sdk/inMemory.js"
+import { ErrorCode, isJSONRPCRequest }   from "@modelcontextprotocol/sdk/types.js"
 import type { JSONRPCMessage }           from "@modelcontextprotocol/sdk/types.js"
 
 import type Log                 from "./ase-lib-log.js"
 import { sessionState }         from "./ase-config-core.js"
 import ServiceCommand           from "./ase-service.js"
 import { SERVICE_HOST as HOST, probe, isConnRefused, loadServiceContext } from "./ase-service.js"
+
+/*  the innermost reason of a failed HTTP send, and whether it failed on the socket level  */
+const sendFailure = (err: unknown): { reason: string, socket: boolean } => {
+    let cause = err
+    while (cause instanceof Error && cause.cause instanceof Error)
+        cause = cause.cause
+    const reason = cause instanceof Error ? cause.message : String(cause)
+    const code   = String((cause as { code?: unknown } | null)?.code)
+    return { reason, socket: [ "ECONNRESET", "EPIPE", "UND_ERR_SOCKET" ].includes(code) || /other side closed/i.test(reason) }
+}
 
 /*  CLI command "ase mcp"  */
 export default class MCPCommand {
@@ -130,6 +141,36 @@ export default class MCPCommand {
             fails during the brief window right after we initiated a close  */
         const closedByUs = new WeakSet<StreamableHTTPClientTransport>()
 
+        /*  fetch watching the response stream of a request, and answering the request with
+            an error if the stream ends without its response, as the HTTP client just drops
+            such a request (the grace period lets the HTTP client finish the stream first)  */
+        const STREAM_GRACE_MS = 1000
+        const open = new Set<string | number>()
+        const fetchWatched = async (url: string | URL, init?: RequestInit): Promise<Response> => {
+            const response = await fetch(url, init)
+            const msg = init?.method === "POST" && typeof init.body === "string" ?
+                JSON.parse(init.body) as JSONRPCMessage : null
+            if (msg === null || !isJSONRPCRequest(msg) || !response.ok || response.body === null)
+                return response
+            const { id } = msg
+            const ended = (reason: string) => {
+                setTimeout(() => {
+                    if (!open.delete(id))
+                        return
+                    this.log.write("error", `mcp: http response: ${reason}`)
+                    const error = { code: ErrorCode.InternalError, message: `ase service connection lost, outcome of request unknown: ${reason}` }
+                    server.send({ jsonrpc: "2.0", id, error }).catch(() => {})
+                }, STREAM_GRACE_MS)
+            }
+            open.add(id)
+            const [ body, watched ] = response.body.tee()
+            watched.pipeTo(new WritableStream()).then(
+                ()               => { ended("stream ended without a response") },
+                (err: unknown)   => { ended(sendFailure(err).reason) }
+            )
+            return new Response(body, response)
+        }
+
         /*  cleanly shut down the whole bridge  */
         const shutdown = async () => {
             if (bridgeDone)
@@ -150,9 +191,11 @@ export default class MCPCommand {
             if (port === null)
                 throw new Error("mcp: no service port known")
             const url    = new URL(`http://${HOST}:${port}/mcp`)
-            const next   = new StreamableHTTPClientTransport(url)
+            const next   = new StreamableHTTPClientTransport(url, { fetch: fetchWatched })
 
             next.onmessage = (msg: JSONRPCMessage) => {
+                if ("id" in msg && !("method" in msg) && msg.id !== undefined)
+                    open.delete(msg.id)
                 server.send(msg).catch((err: unknown) => {
                     this.log.write("error", `mcp: stdout send: ${this.asError(err).message}`)
                 })
@@ -218,7 +261,7 @@ export default class MCPCommand {
 
         /*  forward a message to the HTTP client, buffering it while the client
             is disconnected so requests survive a reconnect window  */
-        const sendToClient = (msg: JSONRPCMessage) => {
+        const sendToClient = (msg: JSONRPCMessage, resent = false) => {
             if (client === null) {
                 if (pending.length >= MAX_PENDING) {
                     this.log.write("warning", "mcp: pending queue overflow, dropping oldest message")
@@ -230,7 +273,16 @@ export default class MCPCommand {
             const target = client
             target.send(msg).catch((err: unknown) => {
                 if (!isConnRefused(err)) {
-                    this.log.write("error", `mcp: http send: ${this.asError(err).message}`)
+                    /*  re-send once over a broken connection, else answer a request
+                        with an error, as an unanswered request lets the client hang  */
+                    const { reason, socket } = sendFailure(err)
+                    this.log.write("error", `mcp: http send: ${reason}`)
+                    if (socket && !resent)
+                        sendToClient(msg, true)
+                    else if ("method" in msg && "id" in msg) {
+                        const error = { code: ErrorCode.InternalError, message: `ase service unreachable: ${reason}` }
+                        server.send({ jsonrpc: "2.0", id: msg.id, error }).catch(() => {})
+                    }
                     return
                 }
 

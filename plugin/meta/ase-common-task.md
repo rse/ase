@@ -58,6 +58,30 @@ Task Skill Common Steps
 
 </define>
 
+<define name="task-focus">
+
+Resolve the plan sections under focus: treat <getopt-option-focus/> as a
+comma-separated list of *section tokens*. Trim every token, then expand
+the synonyms `SPEC` and `WHAT` to `SPECIFICATION`, the synonyms `DES` and
+`HOW` to `DESIGN`, and the synonyms `VERIFY`, `VER`, and `WHEN` to
+`VERIFICATION`, and expand the sentinel `all` (the default) to
+`SPECIFICATION,DESIGN,VERIFICATION`. Set <sections/> to the resulting
+list, *keeping the given order*. The getopt parser validates only the
+*first* token, so you *MUST* validate each token yourself: if any token
+is *empty*, *not* one of the recognized sections or synonyms (matched
+*case-sensitively*), or results in a section already present in
+<sections/>, bind <token/> to that offending token, then only output the
+following <template/> and immediately *STOP* processing the entire
+current skill:
+
+<template>
+⧉ **ASE**: ☻ skill: **<arg1/>**, ▶ ERROR: invalid `--focus` token: **<token/>**
+</template>
+
+Do not output anything else.
+
+</define>
+
 <define name="task-load-content">
 
 <if condition="

@@ -32,7 +32,7 @@ import type { GraphLayout, Place }            from "./ase-task-board-graph.js"
 import { flowOf, layoutFlow, flowState }      from "./ase-task-board-flow.js"
 import type { Flow }                          from "./ase-task-board-flow.js"
 import { fitGroups, agentLogWidth, agentOpLines, agentOpHeight, AGENT_INFO_H } from "./ase-task-board-tui-view.js"
-import { dialogTabs, planLines, attachmentLines, agentLogLines, agentLogKey, DIALOG_CHROME, DIALOG_WIDTH } from "./ase-task-board-tui-popup.js"
+import { dialogTabs, planLines, planChanged, planDiffLines, attachmentLines, agentLogLines, agentLogKey, DIALOG_CHROME, DIALOG_WIDTH } from "./ase-task-board-tui-popup.js"
 import type { PlanParts }                     from "./ase-task-board-tui-popup.js"
 import { pulseFrames }                        from "./ase-task-board-tui-style.js"
 
@@ -490,13 +490,14 @@ const usePromptActions = (ctx: {
     return { startPrompt, startRequest, cancelPrompt, submitPrompt }
 }
 
-/*  the state of the terminal board: all state, the derived values, and the actions  */
-export const useBoardState = (log: Log, initial: Board, relay?: string) => {
+/*  the state of the terminal board (resp. with a task id, of the
+    task viewer): all state, the derived values, and the actions  */
+export const useBoardState = (log: Log, initial: Board, relay?: string, watched?: string) => {
     const { exit, suspendTerminal } = useApp()
     const { columns, rows } = useWindowSize()
     const [ all,     setBoard   ] = React.useState<Board>(initial)
     const [ surface, setSurface ] = React.useState<Surface>(() => BoardState.load().tui)
-    const [ view,    setView    ] = React.useState<SurfaceView>(() => surface.view)
+    const [ view,    setView    ] = React.useState<SurfaceView>(() => watched !== undefined ? "lanes" : surface.view)
     const [ filter,  setFilter  ] = React.useState("")
     const [ typing,  setTyping  ] = React.useState(false)
 
@@ -508,8 +509,9 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
         return view === "graph" && !surface.standalone ? dropStandalone(found) : found
     }, [ all, filter, view, surface.standalone ])
     const [ sel,     setSel     ] = React.useState<Sel>(() => relocate(board, { g: 0, l: 0, id: "" }, surface))
-    const [ dialog,  setDialog  ] = React.useState<{ id: string, tab: number, first: number, scrolls: Record<number, number> } | null>(null)
-    const [ plan,    setPlan    ] = React.useState<{ id: string, parts: PlanParts } | null>(null)
+    const [ dialog,  setDialog  ] = React.useState<{ id: string, tab: number, first: number, scrolls: Record<number, number> } | null>(
+        watched !== undefined ? { id: watched, tab: 0, first: 0, scrolls: {} } : null)
+    const [ plan,    setPlan    ] = React.useState<{ id: string, parts: PlanParts, before?: PlanParts } | null>(null)
     const [ files,   setFiles   ] = React.useState<Map<string, Buffer | Error>>(new Map())
     const [ first,   setFirst   ] = React.useState(0)
     const [ scroll,  setScroll  ] = React.useState({ x: 0, y: 0 })
@@ -570,6 +572,8 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
 
     /*  persist the shown view for the next start of the terminal board  */
     React.useEffect(() => {
+        if (watched !== undefined)
+            return
         BoardState.setView("tui", view).catch((err: unknown) => {
             log.write("warning", `board: persisting view failed: ${err instanceof Error ? err.message : String(err)}`)
         })
@@ -618,6 +622,22 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
             setNotice(`editing task "${prompt.id}" by prompt cancelled: task vanished in the meantime`)
         }
     }, [ all, prompt ])
+
+    /*  quit the task viewer once its dialog is closed, resp. with a warning once
+        its task vanished (except while an edit may rename it, which the dialog follows)  */
+    const seen = React.useRef("")
+    React.useEffect(() => {
+        if (watched === undefined)
+            return
+        if (dialog === null)
+            exit()
+        else if (all.cards.has(dialog.id))
+            seen.current = dialog.id
+        else if (seen.current === dialog.id && !editing.current) {
+            log.write("warning", `board: task "${dialog.id}" no longer exists`)
+            exit()
+        }
+    }, [ all, dialog?.id ])
 
     /*  remember the box of every graph node for the spatial navigation and the scrolling  */
     const places = React.useMemo(() => placesOf(layout?.graph), [ layout ])
@@ -729,18 +749,26 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
 
     /*  fetch the plan (with its attachments) of the read dialog whenever it is opened or the board changes
         (the latter in the background, i.e. without the busy popup), together with loading the
-        syntax highlighter of YAML or JSON attachments (on the first opening only)  */
+        syntax highlighter of YAML or JSON attachments (on the first opening only), where a
+        change with a shown effect remembers its predecessor for the diff of the read dialog,
+        and where closing the dialog forgets the plan, as its changes are followed only while open  */
     const dialogId  = dialog?.id
     const dialogTab = dialog?.tab ?? 0
     React.useEffect(() => {
-        if (dialogId === undefined)
+        if (dialogId === undefined) {
+            setPlan(null)
             return
+        }
         let live = true
         const load = Promise.all([ Task.parts(log, dialogId), Task.attachments(log, dialogId), dataLoad() ])
         const run  = plan?.id === dialogId ? load : track({ text: "loading task", id: dialogId }, load)
         run.then(([ parts, atts ]) => {
             if (live)
-                setPlan({ id: dialogId, parts: parts === null ? null : { ...parts, atts } })
+                setPlan((prev) => {
+                    const next = parts === null ? null : { ...parts, atts }
+                    const same = prev?.id === dialogId && next !== null
+                    return { id: dialogId, parts: next, before: !same ? undefined : planChanged(prev.parts, next) ? prev.parts : prev.before }
+                })
         }).catch((err: unknown) => {
             log.write("warning", `board: loading plan failed: ${err instanceof Error ? err.message : String(err)}`)
             if (live)
@@ -822,6 +850,13 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
             const ref    = process.platform === "win32" ? "\"%ASE_TASK_FILE%\"" : "\"$ASE_TASK_FILE\""
             await suspendTerminal(async () => {
                 mouseReporting(false)
+
+                /*  stop the read of stdin still pending from Ink, which only removes its
+                    listener, as it else takes the next input away from the editor and
+                    passes it to the board afterwards (a pause in non-flowing mode does
+                    not emit the event on which Node stops reading, and the stop is deferred)  */
+                process.stdin.emit("pause")
+                await new Promise((resolve) => { process.nextTick(resolve) })
                 try {
                     await execa(`${editor} ${ref}`, { shell: true, stdio: "inherit", env: { ASE_TASK_FILE: file } })
                 }
@@ -909,9 +944,10 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
         }
     }
 
-    /*  delete a task (after its confirmation), closing its read dialog  */
+    /*  delete a task (after its confirmation), closing its read dialog
+        (in the task viewer only once it vanished, as closing it quits the process)  */
     const remove = (id: string): void => {
-        if (dialog?.id === id)
+        if (dialog?.id === id && watched === undefined)
             setDialog(null)
         track({ text: "deleting task", id }, Task.delete(log, id)).then((existed) => {
             setNotice(existed ? `task "${id}" deleted` : `task "${id}" no longer exists`)
@@ -1044,16 +1080,24 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
 
     /*  the tabs of the read dialog, the lines of its selected tab (clamped to
         the existing tabs), and the maximum scroll offset of these lines  */
-    const dialogW     = Math.min(columns - 2, DIALOG_WIDTH)
+    const dialogW     = watched !== undefined ? columns : Math.min(columns - 2, DIALOG_WIDTH)
     const dialogParts = dialog !== null && plan?.id === dialog.id ? plan.parts : undefined
     const tabLabels   = dialogTabs(dialogParts)
     const dialogSel   = Math.min(dialogTab, tabLabels.length - 1)
     const dialogAtt   = dialogSel > 0 && dialogParts !== undefined && dialogParts !== null && !(dialogParts instanceof Error) ?
         dialogParts.atts[dialogSel - 1] : undefined
+    const planDiff    = React.useMemo(() => plan?.before !== undefined ?
+        planDiffLines(plan.before, plan.parts, plan.id, Math.max(1, dialogW - 5)) : null, [ plan, dialogW ])
+    const dialogDiff  = planDiff !== null && dialogSel === 0 && plan?.id === dialog?.id
     const dialogLines = dialog === null ? [] : dialogAtt !== undefined ?
         attachmentLines(dialogAtt, files.get(`${dialog.id}:${dialogSel}`), Math.max(1, dialogW - 5)) :
-        planLines(dialogParts, dialog.id, Math.max(1, dialogW - 5))
+        dialogDiff ? planDiff : planLines(dialogParts, dialog.id, Math.max(1, dialogW - 5))
     const dialogMax   = Math.max(0, dialogLines.length - (rows - DIALOG_CHROME))
+
+    /*  drop the diff of the last change from the read dialog, so just the latest state remains  */
+    const clearDiff = () => {
+        setPlan((prev) => prev !== null ? { ...prev, before: undefined } : prev)
+    }
 
     /*  the entries of the transfer popup of its (still existing) task  */
     const transferCard = transfer !== null ? all.cards.get(transfer.id) : undefined
@@ -1157,11 +1201,11 @@ export const useBoardState = (log: Log, initial: Board, relay?: string) => {
     const { now, beatOf } = useBeats(agents, view)
 
     return {
-        log, exit, columns, rows, all, board, surface, view, setView, filter, setFilter, typing, setTyping,
+        log, exit, watched, columns, rows, all, board, surface, view, setView, filter, setFilter, typing, setTyping,
         sel, setSel, dialog, setDialog, scroll, layout, notice, setNotice, carry, setCarry, cycle,
         confirm, setConfirm, transfer, setTransfer, assign, setAssign, prompt, setPrompt, mouse, setMouse, lastClick, grown, setGrow,
         cardBoxes, laneBoxes, groupBoxes, headBoxes, agentBoxes, rangeBoxes, cardRef, laneRef, groupRef, headRef, agentRef, rangeRef, boxAt, graphView,
-        places, graphTitles, boardH, dialogW, tabLabels, dialogSel, dialogLines, dialogScroll,
+        places, graphTitles, boardH, dialogW, tabLabels, dialogSel, dialogLines, dialogScroll, dialogDiff, clearDiff,
         transferCard, transferList, fit, viewH, viewW, x, y, nodes, dim, pulse, now, beatOf, store, busy, busyTick,
         agents, working, cycleView, agentList, agentIdx, agent, agentOp, logLines, logH, logFirst, logMax, selectAgent, scrollLog, stats, usage, range, setRange, stepRange,
         flow, flowLayout, flowSel, setFlowSel, flowPlaces, focusAgent, scrollFlow,

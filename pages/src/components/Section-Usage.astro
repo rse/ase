@@ -15,6 +15,7 @@ import Terminal              from "./Widget-Terminal.astro"
 import Annotation            from "./Widget-Annotation.astro"
 import { skillPrefixGroups } from "../data/skills.ts"
 import { manColumns }        from "../data/manpages.ts"
+import { site }              from "../data/site.ts"
 import Compass               from "@lucide/astro/icons/compass"
 import Search                from "@lucide/astro/icons/search"
 import BookOpenText          from "@lucide/astro/icons/book-open-text"
@@ -51,6 +52,7 @@ columns[columns.length - 1].push(...skillPrefixGroups.filter((group) => !placed.
             keeps you in the driver's seat, but as a consequence
             for most tasks you have to at least trigger the desired <b>ASE</b> actions yourself.
             The following gives you a few hints on how to quickly get started.
+            If questions remain, just ask them in the <a href={site.discussions}>GitHub Discussions</a>.
         </p>
     </header>
 

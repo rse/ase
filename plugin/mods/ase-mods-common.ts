@@ -6,20 +6,23 @@
 
 /*  Claude Code function hooks module ("mod", EARLY ACCESS):
     Common parts, shared by the grill table, the decision matrix, the intent
-    help, the synopsis form, the manual band, the manpage browser, and the hint
-    band: the rows of the Markdown tables, the styled characters of the terminal
+    help, the synopsis form, the manual band, the manpage browser, the hint band,
+    the task band, and the image rendering: the rows of the Markdown tables, the styled characters of the terminal
     drawing, their Markdown conversion, wrapping, and framing, and the contract,
     keys, geometry, and drawing of the master/detail view in the band above the
     prompt.  */
 
-import type { Elements, Frozen, MatchedEvent, ModelCompleteRequest, ModelForkResult,
-    PromptBox, PromptEditInput, PromptFilled, RenderElement } from "claude-code"
+import type { Elements, Frozen, MatchedEvent, McpToolResult, ModelCompleteRequest, ModelForkResult,
+    PromptBox, PromptEditInput, PromptFilled, RenderElement, Timer } from "claude-code"
 
 /*  the services of the engine, bound by the hooking infrastructure for the
     modules (as the engine refuses to load a module passing "$" itself): the
     redrawing, the reading of a plugin file and of the names of the directories
     in a plugin directory, the forked and the plain model completion, the
-    waiting, and the reading and filling of the prompt  */
+    waiting, the reading and filling of the prompt, the loading of a task
+    (with its entity tag), the running of a repeating timer, the rasterizing
+    of an image (by the MCP tool "ase_rasterize"), and the reading of a file
+    as bytes (base64)  */
 export type Engine = {
     invalidate: () => void,
     read:       (file: string) => Promise<string>,
@@ -28,7 +31,12 @@ export type Engine = {
     complete:   (request: ModelCompleteRequest) => Promise<string>,
     sleep:      (ms: number) => Promise<void>,
     prompt:     () => Promise<PromptBox>,
-    fill:       (text: string) => Promise<PromptFilled>
+    fill:       (text: string) => Promise<PromptFilled>,
+    load:       (id: string) => Promise<string>,
+    every:      (ms: number, fn: () => void) => Timer,
+    rasterize:  (args: Record<string, unknown>) => Promise<McpToolResult>,
+    diagram:    (args: Record<string, unknown>) => Promise<McpToolResult>,
+    bytes:      (file: string) => Promise<string>
 }
 
 /*  the colors of a picked (resp. selected or focused) item, of a code span,
@@ -131,7 +139,7 @@ export const cells = (line: string): string[] => {
 }
 
 /*  a single styled character of the terminal drawing  */
-export type Char = { ch: string, bold: boolean, color: string | undefined }
+export type Char = { ch: string, bold: boolean, color: string | undefined, italic?: boolean, inverse?: boolean, background?: string }
 
 /*  extract a section of a manual page (without its heading)  */
 export const section = (manual: string, name: string): string =>
@@ -225,16 +233,21 @@ export const wrap = (chars: Char[], columns: number, indent: number, lead = 0): 
 }
 
 /*  a run of equally styled characters  */
-type Run = { text: string, bold: boolean, color: string | undefined }
+type Run = { text: string, bold: boolean, color: string | undefined, italic: boolean, inverse: boolean, background: string | undefined }
 
 /*  split a line of styled characters into runs of equally styled characters  */
 export const split = (chars: Char[]): Run[] => {
     const runs: Run[] = []
     for (let i = 0, j = 0; i < chars.length; i = j) {
         const { bold, color } = chars[i]!
-        while (j < chars.length && chars[j]!.bold === bold && chars[j]!.color === color)
+        const italic  = chars[i]!.italic  ?? false
+        const inverse = chars[i]!.inverse ?? false
+        const { background } = chars[i]!
+        while (j < chars.length && chars[j]!.bold === bold && chars[j]!.color === color &&
+            (chars[j]!.italic ?? false) === italic && (chars[j]!.inverse ?? false) === inverse &&
+            chars[j]!.background === background)
             j++
-        runs.push({ text: chars.slice(i, j).map((char) => char.ch).join(""), bold, color })
+        runs.push({ text: chars.slice(i, j).map((char) => char.ch).join(""), bold, color, italic, inverse, background })
     }
     return runs
 }
@@ -307,15 +320,15 @@ export const frame = (lines: Char[][], columns: number, color: string | undefine
 }
 
 /*  split a horizontal edge of a frame into runs with a title placed after its
-    first and another one before its last two characters (each if it fits, the
-    one at the end with precedence), flagged whether they are a title  */
-const titled = (line: string, head: string, tail: string): [ string, boolean ][] => {
-    const end   = tail !== "" && line.length >= tail.length + 4 ? tail : ""
-    const start = head !== "" && line.length >= head.length + (end !== "" ? end.length + 6 : 4) ? head : ""
-    const k     = end !== "" ? line.length - 2 - end.length : line.length
+    first "lead" and another one before its last "trail" characters (each if it
+    fits, the one at the end with precedence), flagged whether they are a title  */
+const titled = (line: string, head: string, tail: string, lead: number, trail: number): [ string, boolean ][] => {
+    const end   = tail !== "" && line.length >= tail.length + trail + 2 ? tail : ""
+    const start = head !== "" && line.length >= head.length + lead + trail + (end !== "" ? end.length + 2 : 0) ? head : ""
+    const k     = end !== "" ? line.length - trail - end.length : line.length
     return [
-        ...(start !== "" ? [ [ line.slice(0, 2), false ], [ start, true ] ] as [ string, boolean ][] : []),
-        [ line.slice(start !== "" ? 2 + start.length : 0, k), false ],
+        ...(start !== "" ? [ [ line.slice(0, lead), false ], [ start, true ] ] as [ string, boolean ][] : []),
+        [ line.slice(start !== "" ? lead + start.length : 0, k), false ],
         ...(end !== "" ? [ [ end, true ], [ line.slice(k + end.length), false ] ] as [ string, boolean ][] : [])
     ]
 }
@@ -348,14 +361,15 @@ export type Text = Elements["terminal"]["Text"]
 
 /*  draw a line of styled characters: its styled runs  */
 export const paint = (Text: Text, chars: Char[]): (string | RenderElement)[] =>
-    split(chars).map(({ text, bold, color }) =>
-        bold || color !== undefined ? Text({ bold, color, children: text }) : text)
+    split(chars).map(({ text, bold, color, italic, inverse, background }) =>
+        bold || italic || inverse || color !== undefined || background !== undefined ?
+            Text({ bold, italic, inverse, color, backgroundColor: background, children: text }) : text)
 
 /*  draw a horizontal edge of the self-drawn frame (dimmed), with titles at its
     start and its end (with their brackets dimmed, an "ASE" prefix before a colon
     in bold, and the rest dimmed)  */
-const edge = (Text: Text, line: string, head = "", tail = ""): RenderElement =>
-    Text({ children: titled(line, head, tail).flatMap(([ text, label ]) => {
+export const edge = (Text: Text, line: string, head = "", tail = "", lead = 2, trail = 2): RenderElement =>
+    Text({ children: titled(line, head, tail, lead, trail).flatMap(([ text, label ]) => {
         const m = /^(\[ )?([^:]*)(:.*?)( \])?$/.exec(text)
         if (!label || m === null)
             return [ Text({ ...BORDER, children: text }) ]
@@ -367,9 +381,10 @@ const edge = (Text: Text, line: string, head = "", tail = ""): RenderElement =>
         ]
     }) })
 
-/*  draw a row of a scrollbar: the thumb, the (dimmed) track, or nothing  */
+/*  draw a row of a scrollbar: the dark grey thumb (an inverse space, as it fills
+    the entire cell, unlike a block glyph), the (dimmed) track, or nothing  */
 const bar = (Text: Text, mark: Mark | undefined): RenderElement =>
-    mark === "thumb" ? Text({ children: "█" }) :
+    mark === "thumb" ? Text({ inverse: true, color: "ansi256(242)", children: " " }) :
         mark === "track" ? Text({ dimColor: true, children: "░" }) : Text({ children: " " })
 
 /*  the geometry of the band above the prompt: the inner columns of the self-drawn
@@ -384,7 +399,7 @@ export type Layout = { span: number, body: number, master: number, detail: numbe
     and, once focused, by the keys only for a tree taller than the band), all rows of
     the band but the one of the engine's "n more" row (as the band then takes them
     anyway), and the columns of the master view (by the given share) and of the
-    detail view (with a separator column between them, and a gap of two columns and
+    detail view (with a separator column between them, and a gap, a separator, and
     a scrollbar column right of the detail view)  */
 export const layout = (e: BandRender, share: number, band = BAND): Layout => {
     const span     = Math.max(20, e.props.bodyColumns - FRAME.cols)
@@ -412,10 +427,14 @@ export const wheel = (e: BandScroll, view: View, step?: (by: number) => void): v
 
 /*  draw the band above the prompt: inside the self-drawn frame (with the title
     in its top edge) either a single view of the given rows, a single view of the
-    given lines with its scrollbar, or a master view of the given rows (where the
-    given rule rows are horizontal lines joining the borders) and, joined by a
-    separator, a detail view of the given lines (optionally dimmed) with its
-    scrollbar, into the bottom edge the given status (if any) at its start and
+    given lines with its scrollbar (optionally with the first given characters of
+    each line in a gutter at the left border, separated by a vertical line joining
+    the edges, with the background of a line filling the columns up to its scrollbar),
+    or a master view of the given rows (where the given rule rows are horizontal lines
+    joining the borders) and, joined by a separator, a detail view of the given lines
+    (optionally dimmed) with its scrollbar, every scrollbar (of lines not always
+    fitting) separated by a vertical line joining the edges,
+    into the bottom edge the given status (if any) at its start and
     the scroll position of the lines (unless they always fit) at its end, and below
     the frame the key hints (followed by blank rows for an overflowing band),
     where the scroll position is clamped, and the page size (for the scroll keys)
@@ -428,7 +447,8 @@ export const panel = (ui: Elements["terminal"], { span, body, master, detail, ov
     rule?:   (i: number) => boolean,
     lines?:  Char[][],
     dim?:    boolean,
-    fit?:    boolean
+    fit?:    boolean,
+    gutter?: number
 }): RenderElement => {
     const { Box, Text } = ui
     const lines = spec.lines ?? []
@@ -438,22 +458,38 @@ export const panel = (ui: Elements["terminal"], { span, body, master, detail, ov
     view.scroll = Math.max(0, Math.min(view.scroll, lines.length - body))
     const marks  = scrollbar(body, lines.length, view.scroll)
     const blank  = Text({ children: " " })
+    const gutter = solo ? spec.gutter ?? 0 : 0
+    const rail   = spec.lines !== undefined && spec.fit !== true
+    const lead   = gutter > 0 ? gutter + 2 : 2
+    const trail  = rail ? 3 : 2
     const border = (left: string, joint: string, right: string) =>
-        left + (spec.lines === undefined || solo ? "─".repeat(span + 1) :
-            "─".repeat(master + 2) + joint + "─".repeat(detail + 4)) + right
-    const scrolled = (i: number, width: number) => [
-        Box({ width, flexShrink: 0, children:
-            Text({ wrap: "truncate-end", dimColor: spec.dim ?? false,
-                children: paint(Text, lines[view.scroll + i] ?? []) }) }),
-        Text({ children: "  " }),
-        bar(Text, marks[i])
-    ]
-    const rows: RenderElement[] = [ edge(Text, border("╭", "┬", "╮"), spec.title) ]
+        left + (!rail ? "─".repeat(span + 1) :
+            (gutter > 0 ? `${"─".repeat(gutter)}${joint}${"─".repeat(span - 2 - gutter)}` :
+                solo ? "─".repeat(span - 1) :
+                    `${"─".repeat(master + 2)}${joint}${"─".repeat(detail + 2)}`) + `${joint}─`) + right
+    const scrolled = (i: number, width: number) => {
+        const line = lines[view.scroll + i] ?? []
+        const fill = line[0]?.background
+        return [
+            ...(gutter > 0 ? [
+                Box({ width: gutter, flexShrink: 0, children: Text({ children: paint(Text, line.slice(0, gutter)) }) }),
+                Text({ ...BORDER, children: "│" }),
+                Text({ backgroundColor: fill, children: " " })
+            ] : []),
+            Box({ width, flexShrink: 0, children:
+                Text({ wrap: "truncate-end", dimColor: spec.dim ?? false,
+                    children: paint(Text, line.slice(gutter)) }) }),
+            ...(rail ? [ Text({ backgroundColor: fill, children: " " }), Text({ ...BORDER, children: "│" }) ] :
+                [ Text({ children: "  " }) ]),
+            bar(Text, marks[i])
+        ]
+    }
+    const rows: RenderElement[] = [ edge(Text, border("╭", "┬", "╮"), spec.title, "", lead, trail) ]
     for (let i = 0; i < body; i++) {
         const rule = !solo && spec.lines !== undefined && spec.rule?.(i) === true
         rows.push(Box({ flexDirection: "row", children: [
-            Text({ ...BORDER, children: rule ? "├─" : "│ " }),
-            ...(solo ? scrolled(i, span - 3) : spec.lines === undefined ? [
+            Text({ ...BORDER, children: rule ? "├─" : gutter > 0 ? "│" : "│ " }),
+            ...(solo ? scrolled(i, gutter > 0 ? span - 4 - gutter : span - 3) : spec.lines === undefined ? [
                 Box({ width: span, flexShrink: 0, children: spec.rows!(i) ?? blank })
             ] : [
                 rule ? Text({ ...BORDER, children: `${"─".repeat(master + 1)}┤ ` }) :
@@ -465,7 +501,7 @@ export const panel = (ui: Elements["terminal"], { span, body, master, detail, ov
         ] }))
     }
     rows.push(edge(Text, border("╰", "┴", "╯"), spec.status,
-        spec.fit === true ? "" : position(body, lines.length, view.scroll)))
+        spec.fit === true ? "" : position(body, lines.length, view.scroll), lead, trail))
     rows.push(Box({ paddingLeft: 1, children: Text({ dimColor: true, wrap: "truncate-end", children: spec.hints }) }))
     if (overflow)
         rows.push(blank, blank)

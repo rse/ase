@@ -16,6 +16,7 @@ import Annotation   from "./Widget-Annotation.astro"
 import HeroVideo    from "./Widget-Title-Video.astro"
 import Splash       from "./Widget-Splash.astro"
 import ModalYouTube from "./Modal-YouTube.astro"
+import { site }     from "../data/site.ts"
 import {
     Swiper,
     SwiperWrapper,
@@ -142,8 +143,9 @@ const badges = [
                 and with reduced functionality and support also for the alternative
                 tools <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a> and{" "}
                 <a href="https://github.com/openai/codex">OpenAI Codex CLI</a>.{" "}
-                It comprises agent hooks, parametrizable agent <a href="/usage/#deepdive">skills</a>, an underlying
-                Model-Context-Protocol (MCP) service, and a companion Command-Line Interface (CLI).
+                It comprises agent hooks, agent "mods", parametrizable agent <a href="/usage/#deepdive">skills</a>, an underlying
+                Model-Context-Protocol (MCP) backing service, a companion Command-Line Interface (CLI),
+                and companion Terminal and Web User Interfaces (TUI/WUI).
             </p>
 
             {/* second paragraph, with a YouTube preview floated top-right; the text
@@ -170,6 +172,7 @@ const badges = [
                     and many more.
                     Additionally, <b>ASE</b> provides a comprehensive <a href="/workflows/#task-management">task management</a>{" "}
                     and <i>autonomous agents</i>, which together allow agentic development pipelines to be established.
+                    Questions, ideas, and feedback are welcome in the <a href={site.discussions}>GitHub Discussions</a>.
                 </p>
             </div>
 

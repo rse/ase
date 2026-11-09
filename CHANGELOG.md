@@ -2,13 +2,129 @@
 ChangeLog
 =========
 
-2.0.8 (2026-11-XX)
+2.0.10 (2026-11-XX)
+-------------------
+
+-   FEATURE [code, docs]: SVG Rasterizing
+    The new `ase util rasterize` command and MCP tool `ase_rasterize` rasterize an SVG document
+    or PNG/GIF/JPEG image (from file, or raw, `data:` URL, or base64 data) via resvg (WebAssembly,
+    with bundled fonts) into PNG or auto-detected Kitty, iTerm2, or SIXEL terminal graphics, with
+    scaling into the terminal (sized by `--width`/`--height`), background, and `--smart` CSS
+    variable resolving, where the MCP tool rasterizes off the event loop in a worker thread.
+
+-   FEATURE [plugin, docs]: Inline Image Rendering
+    The new mod `ase-mods-render-image.ts` provides the tool `ase_mods_render_image`, which shows
+    an SVG/PNG/GIF/JPEG image, rasterized via `ase_rasterize` and fitted into the terminal width
+    (or into requested cells), inline below its tool call row, rasterized again on each width
+    change, and rasterized again with fewer pixels when its PNG is above 2 MiB.
+
+-   FEATURE [plugin, docs]: Inline Diagram Rendering
+    The image rendering mod additionally provides the tool `ase_mods_diagram`, which renders a
+    Mermaid or D2 diagram via `ase_diagram` into SVG and shows it inline as an image. The skills
+    use it for their diagrams when available and `agent.diagram` is `image` (the default), else
+    the ASCII diagrams of `ase-meta-diagram`.
+
+2.0.9 (2026-11-08)
 ------------------
+
+-   FEATURE [plugin, docs]: Change Set Import
+    The new `ase-repo-import` skill imports a pull/merge request or commit of GitHub, GitLab, or
+    Gitea (by URL or `#<number>`), or a patch file, into the working copy as unstaged and untracked
+    files, merged with local changes. Conflicts are resolved semantically, remaining ones keep their
+    markers and are reported as a TODO, and the change set is summarized with its changed files.
+
+-   FEATURE [plugin, code, docs]: Skill Command Aliases
+    The new `ase alias` command and `ase-meta-alias` skill manage per-user and per-project full
+    aliases (`/foo-bar` for any skill command line, provided as generated shim skills), option
+    aliases (`--custom` for several options), and option defaults of the skills, while the option
+    parser now accepts the negation `--no-x` of every option `--x` to drop an injected option.
+
+-   IMPROVEMENT [docs]: VCS as Sibling Project on the Website
+    The "Sibling Projects" section of the website now also lists VCS, the worktree management
+    for Git repositories, used by RSE with ASE.
+
+-   IMPROVEMENT [docs]: GitHub Discussions on the Website
+    The website now links the GitHub Discussions of ASE through a hint in the landing page
+    introduction, an entry in the "Project" pull-down of the header, the footer of all pages, and
+    the introduction of the "Get Started" section of the usage page.
+
+-   IMPROVEMENT [code]: Placement of Parts in Task Dissection
+    The skill `ase-task-dissect` now places the parts via `Group:` and `After:`: a task within an
+    epic is replaced by its parts (re-wiring its successors and deleting it), any other task becomes
+    the explicit epic of its parts. Each part lists its direct dependencies in `After:`, while the
+    root parts inherit the `After:` predecessors of the task.
+
+-   BUGFIX [code]: Responsive Service during SpecBook Lint and Export
+    The MCP tools `ase_specbook_lint` and `ase_specbook_export` now run the CPU-bound SpecBook
+    processing in a worker thread, so it no longer blocks parallel tool calls and the health
+    probes of the MCP bridge. The CLI commands `ase spec lint|export` stay in-process.
+
+-   BUGFIX [code, docs]: Fewer Lost Requests in MCP Bridge
+    On a failed HTTP send, `ase mcp` now re-sends a message once over a broken connection and
+    answers a still failing request with a JSON-RPC error, instead of dropping it and letting the
+    agent tool hang until its idle timeout. The service raises its keep-alive timeout to 65s.
+
+-   BUGFIX [code, docs]: Answer Requests on Lost Response Streams in MCP Bridge
+    `ase mcp` now answers a request with a JSON-RPC error if its response stream ends without its
+    response, e.g. as the service vanished during a tool call, instead of letting the agent tool
+    hang until its idle timeout. The request is not re-sent, as its outcome is unknown.
+
+-   BUGFIX [code]: Reliable Stop of Service
+    `ase service stop` now waits for the stopping service to clear its persisted port, instead of
+    also clearing it, which let the command frequently fail with `Lock file is already being held`.
+
+-   BUGFIX [code]: Unclipped Border of Selected Lane in Web Task Board
+    The lanes view now leaves room within its scroll container for the bold border of the selected
+    lane, which was clipped by one pixel at the outer edges, also when scrolling horizontally.
+
+2.0.8 (2026-11-07)
+------------------
+
+-   IMPROVEMENT [code, docs]: Dark Mode of Web Task Board
+    The new configuration `board.web.theme` selects the color theme `light`, `dark`, or `auto`
+    (default, following the operating system or browser) of the web board, including its task
+    dialog and task viewer. The key `L` cycles the three themes, remembered in the current browser
+    until cycled back to the configured one.
+
+-   IMPROVEMENT [code, docs]: Diff of Task Changes in Task Boards
+    The task dialog of `ase task board` now shows the last change of the plan as a diff in its
+    plan tab, in the rendered look, with colored lines and inverse changed words, until `#`
+    clears it or a next change replaces it. Closing the dialog or switching the task drops it.
+
+-   IMPROVEMENT [code, docs]: Standalone Task Viewer of Task Boards
+    The new option `--task`|`-T` of `ase task board` shows only the task dialog of the given task,
+    spanning the entire window and following all its changes, as a task viewer and watcher. The
+    terminal board quits on `q`, the web board stays open. `--text` prints the plan of the task.
+
+-   IMPROVEMENT [code, docs]: Interactive Band for Task Editing
+    The new option `--interactive`|`-i` of `ase-task-edit` shows the plan in a band above the prompt,
+    instead of printing it and showing a dialog, which follows all changes of the plan, keeps its
+    scroll position, shows the last change as a unified diff with line numbers (until `##` at the
+    prompt), and closes on `DONE`, `GRILL`, `DRAFT`, `IMPLEMENT`, or `CANCEL` at the prompt.
+
+-   IMPROVEMENT [code, docs]: Section Focus for Task Editing and Grilling
+    The new option `--focus`|`-f` of `ase-task-edit` edits and shows only the given plan sections
+    (without frontmatter and title), and is forwarded on the hand-offs to `ase-task-grill` and back.
+    The same option of `ase-task-grill` additionally accepts the synonyms `WHAT`, `HOW`, `VERIFY`,
+    and `WHEN`, matches upper-case only, and warns on answers changing sections outside the focus.
+
+-   IMPROVEMENT [code, docs]: Quiet Option for Task Editing and Grilling
+    The new option `--quiet`|`-q` of `ase-task-edit` suppresses the printing of the resulting plan
+    and of `ase-task-grill` the `PLAN CHANGES` box at the end of a round, while status lines and
+    dialogs stay. It is forwarded on the hand-offs between both skills, so a quiet refinement
+    stays quiet when switching between them.
 
 -   BUGFIX [code]: Server Probe with Foreign Dispatcher
     The server probe of `ase agent relay|task store start|status|stop` and the insecure relay and
     task store clients now send requests with an `undici` dispatcher through the `fetch` of the npm
     `undici` instead of the built-in one of Node, whose bundled `undici` rejected it (issue #116).
+
+-   REFACTOR [code, infr]: Unified Mods Filenames
+    The modules `ase-mods-evaluate.ts` and `ase-mods-grill.ts` of `plugin/mods/` are renamed to
+    `ase-mods-meta-evaluate.ts` resp. `ase-mods-task-grill.ts`, matching the naming of the other mods.
+
+-   UPDATE [infr]: NPM dependencies
+    Updated NPM dependencies.
 
 2.0.7 (2026-11-04)
 ------------------

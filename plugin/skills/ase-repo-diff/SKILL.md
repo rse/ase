@@ -313,16 +313,12 @@ Procedure
             *reverse-dependency* edges fan out to the dependent modules
             (origin → dependent).
 
-            Flag each *touched* node as a problem node per the
-            `ase-meta-diagram` anomaly convention - prefix its label
-            with `⚑ ` inside quotes, e.g. `T1["⚑ src/core.ts"]`. Keep
-            labels ultra short (basenames or module names only).
+            Flag each *touched* node as a problem node - prefix its
+            label with `⚑ ` inside quotes, e.g. `T1["⚑ src/core.ts"]`.
+            Keep labels ultra short (basenames or module names only).
 
-        2.  Dispatch the rendering to the `ase-meta-diagram` sub-agent by
-            calling the tool `Agent(description: "Diagram Rendering",
-            subagent_type: "ase:ase-meta-diagram", prompt:
-            "<mermaid-spec/>", run_in_background: false)` and capture
-            its returned *fenced code block* verbatim as <diagram/>.
+        2.  Render <mermaid-spec/> as <diagram/> according to the
+            *Diagrams* rule of the skill conventions.
 
     4.  Then emit the following <template/>, showing <diagram/> and
         appending a *brief impact summary* of bullets, where each

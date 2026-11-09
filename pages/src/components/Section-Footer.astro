@@ -5,11 +5,12 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-/*  page footer: the QR-code trigger, the copyright and license notice,
-    and the stacked variant of the install call-to-action.  */
+/*  page footer: the QR-code trigger, the copyright and license notice, the
+    Discussions link, and the stacked variant of the install call-to-action.  */
 
 import QRCode    from "./Widget-QR-Code.astro"
 import StickyCTA from "./Widget-Sticky-CTA.astro"
+import { site }  from "../data/site.ts"
 ---
 {/*  "relative" is load-bearing: the page decorations live inside the
      "isolate" <main>, which hence paints as one unit above every plain block
@@ -38,6 +39,9 @@ import StickyCTA from "./Widget-Sticky-CTA.astro"
             <p class="mt-2">
                 Copyright &copy; 2025-2026 <a href="/author/">Dr. Ralf S. Engelschall</a><br/>
                 Licensed under <a href="https://spdx.org/licenses/Apache-2.0">Apache-2.0</a> as Open Source
+            </p>
+            <p class="mt-2">
+                Questions or feedback? Join the <a href={site.discussions}>GitHub Discussions</a>.
             </p>
         </div>
 

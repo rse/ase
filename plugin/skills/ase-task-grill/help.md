@@ -13,6 +13,7 @@
     [`--ground`|`-G`]
     [`--focus`|`-f` *section*[,...]]
     [`--force`|`-F`]
+    [`--quiet`|`-q`]
     [`--next`|`-n` *option*[,...]]
     [*id*]
 
@@ -61,7 +62,7 @@ persisted, its `Tags:` frontmatter key records each grilled section as
 its own tag `grilled:`*section* (lower-case, kept alongside the tags of
 previously grilled sections, e.g. `grilled:specification,
 grilled:design`), and a `PLAN CHANGES` box shows the bullet-points
-changed by the round. Finally, the user is offered a complete
+changed by the round (unless `--quiet` is given). Finally, the user is offered a complete
 re-grilling (with the same grilling options), or a hand-off to editing,
 implementation, or draft.
 
@@ -123,18 +124,27 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
 
 -   `--focus`|`-f` *section*[,...]:
     Grill only the given plan *section*(s), in the given order. Each
-    *section* is one of `SPECIFICATION` (abbreviated `SPEC`), `DESIGN`
-    (abbreviated `DES`), or `VERIFICATION` (abbreviated `VER`), matched
-    case-insensitively, or the sentinel `all` (default), which expands
-    to `SPECIFICATION,DESIGN,VERIFICATION`. The questions are derived
-    from the themes of the focused sections only, while the entire plan
-    stays the context, and the answers may still update any section.
-    An unknown, empty, or duplicate *section* token aborts the skill.
+    *section* is one of `SPECIFICATION` (also `SPEC` or `WHAT`), `DESIGN`
+    (also `DES` or `HOW`), or `VERIFICATION` (also `VERIFY`, `VER`, or
+    `WHEN`), matched case-sensitively, or the sentinel `all` (default),
+    which expands to `SPECIFICATION,DESIGN,VERIFICATION`. The questions
+    are derived from the themes of the focused sections only, while the
+    entire plan stays the context, and an answer requiring a change
+    outside of the focus is applied nevertheless and reported by a
+    warning. An unknown, empty, or duplicate *section* token aborts the
+    skill. It is forwarded on a re-grilling and on a hand-off to
+    `ase-task-edit`, but not on a hand-off to another skill.
 
 -   `--force`|`-F`:
     Re-grill already grilled sections completely, i.e., ignore their
     `grilled:`*section* tags instead of skipping them resp. re-asking
     only their `[?]` bullet-points.
+
+-   `--quiet`|`-q`:
+    Do not print the `PLAN CHANGES` box of the bullet-points changed by
+    a round. The status lines and the dialogs stay. It is forwarded on a
+    re-grilling and on a hand-off to `ase-task-edit`, but not on a
+    hand-off to another skill.
 
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end

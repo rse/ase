@@ -19,7 +19,8 @@ export const projectClassification = {
 /*  agent classification taxonomy  */
 export const agentClassification = {
     persona:  [ "writer", "engineer", "journalist", "telegrapher", "caveman" ],
-    guidance: [ "none", "minimal", "normal", "verbose" ]
+    guidance: [ "none", "minimal", "normal", "verbose" ],
+    diagram:  [ "image", "text" ]
 } as const
 
 /*  the default colors of the four color roles of the terminal board
@@ -54,6 +55,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
     default: {
         "agent.persona":   "engineer",
         "agent.guidance":  "normal",
+        "agent.diagram":   "image",
         "project.name":    "Example Project",
         "project.boxing":  "white",
         "project.users":   "",
@@ -86,6 +88,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "board.web.color.accent":         webColorDefaults.accent,
         "board.web.color.signal":         webColorDefaults.signal,
         "board.web.editor.keymap":        "default",
+        "board.web.theme":                "auto",
         "telemetry.enabled":              "false",
         "telemetry.implicit":             "true",
         "telemetry.prices.ai":            "*=4.00/20.00/0.20/5.00",
@@ -140,6 +143,7 @@ export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"
     "board.web.color.accent":         [ "user", "project" ],
     "board.web.color.signal":         [ "user", "project" ],
     "board.web.editor.keymap":        [ "user", "project" ],
+    "board.web.theme":                [ "user", "project" ],
     "telemetry.enabled":              [ "user", "project" ],
     "telemetry.implicit":             [ "user", "project" ],
     "telemetry.service.port":         [ "user" ],
@@ -350,7 +354,8 @@ export const configSchema = v.nullish(v.strictObject({
     })),
     agent: v.optional(v.strictObject({
         persona:  v.optional(v.picklist(agentClassification.persona)),
-        guidance: v.optional(v.picklist(agentClassification.guidance))
+        guidance: v.optional(v.picklist(agentClassification.guidance)),
+        diagram:  v.optional(v.picklist(agentClassification.diagram))
     })),
     telemetry: v.optional(v.strictObject({
         enabled:  v.optional(v.union([ v.boolean(), v.picklist([ "true", "false" ]) ])),
@@ -388,7 +393,8 @@ export const configSchema = v.nullish(v.strictObject({
             })),
             editor: v.optional(v.strictObject({
                 keymap: v.optional(v.picklist([ "default", "vim", "emacs" ]))
-            }))
+            })),
+            theme: v.optional(v.picklist([ "auto", "light", "dark" ]))
         }))
     }))
 }))

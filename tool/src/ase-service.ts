@@ -43,6 +43,7 @@ import { SkillsMCP }                     from "./ase-service-skills.js"
 import { WorktreeMCP }                   from "./ase-util-worktree.js"
 import { MintMCP }                       from "./ase-util-mint.js"
 import { MetricMCP }                     from "./ase-util-metric.js"
+import { RasterizeMCP }                  from "./ase-util-rasterize.js"
 import { UsageTracker }                  from "./ase-service-otel.js"
 import type { UsageRecord }              from "./ase-service-otel.js"
 import pkg                               from "../package.json" with { type: "json" }
@@ -98,6 +99,7 @@ const PORT_ENV   = "ASE_SERVICE_PORT"
 const LEVEL_ENV  = "ASE_SERVICE_LOG_LEVEL"
 const IDLE_MS    = 30 * 60 * 1000
 const TICK_MS    = 60 * 1000
+const STOP_MS    = 5 * 1000
 
 /*  maximum length of the MCP tool call arguments logged per request  */
 const LOG_ARGS_MAX = 200
@@ -226,11 +228,12 @@ export default class ServiceCommand {
         new KVMCP().register(mcp)
         new TimestampMCP().register(mcp)
         new SleepMCP().register(mcp)
-        new GetoptMCP().register(mcp)
+        new GetoptMCP(log).register(mcp)
         new SkillsMCP().register(mcp)
         new WorktreeMCP().register(mcp)
         new MintMCP().register(mcp)
         new MetricMCP().register(mcp)
+        new RasterizeMCP().register(mcp)
         new ConfigMCP(log).register(mcp)
         new StateMCP(log).register(mcp)
         return mcp
@@ -328,6 +331,12 @@ export default class ServiceCommand {
     private async runService (ctx: Context & { port: number }, foreground = false): Promise<void> {
         /*  establish HAPI HTTP/REST service  */
         const server = Hapi.server({ host: HOST, port: ctx.port })
+
+        /*  keep idle connections long (default: 5s), as a request on an idle connection,
+            not yet read during a busy event loop, races the service closing that connection
+            (the clients adopt the advertised timeout minus a safety margin)  */
+        server.listener.keepAliveTimeout = 65 * 1000
+        server.listener.headersTimeout   = 66 * 1000
 
         /*  track start time and last activity  */
         const startTime  = Date.now()
@@ -713,7 +722,14 @@ export default class ServiceCommand {
         }
         const r = await ofetch.raw(`http://${HOST}:${ctx.port}/stop`, this.postRequest({}, 5000))
         const ok = r.status >= 200 && r.status < 300
-        Service.clearPort(ctx.svc)
+
+        /*  the stopping service clears its port itself, so wait for it and clear the
+            port here only as a fallback, as clearing on both sides collides on the lock  */
+        const deadline = ok ? Date.now() + STOP_MS : 0
+        while (Date.now() < deadline && fs.existsSync(ctx.svc.filename))
+            await new Promise<void>((resolve) => setTimeout(resolve, 50))
+        if (fs.existsSync(ctx.svc.filename))
+            Service.clearPort(ctx.svc)
         return ok ? 0 : 1
     }
 

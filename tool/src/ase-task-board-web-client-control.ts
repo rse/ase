@@ -11,18 +11,19 @@ import Mousetrap                          from "mousetrap"
 import {
     type Board, type Card, type Group, type Sel, type Surface,
     api, groupItems, rowLanes, relocate,
-    board, actionError, actionNote, view, graph, task, sel, grow, editing, confirmDel, transfer, assign, prompt,
-    tab, drag, busy, boardEl, graphEl, flowEl, flowSel, planEl, filterEl, agentList, agentSel, logEl, showFlowAgent,
-    surface, growable, grown, openTask, closeTask, selectTab, selectAgent, toggle, cycleView, stepStatsRange
+    board, actionError, actionNote, view, graph, task, sel, grow, editing, confirmDel, transfer, assign, prompt, watched,
+    tab, taskDiff, drag, busy, boardEl, graphEl, flowEl, flowSel, planEl, filterEl, agentList, agentSel, logEl, showFlowAgent,
+    surface, growable, grown, openTask, closeTask, clearDiff, selectTab, selectAgent, toggle, cycleView, stepStatsRange
 } from "./ase-task-board-web-client-model"
 import { startEdit, startNew, onEditorKey } from "./ase-task-board-web-client-editor"
 
-/*  delete a task (after its confirmation), closing its task dialog  */
+/*  delete a task (after its confirmation), closing its task dialog
+    (the task viewer stays open and notices the vanished task on its reload)  */
 export const deleteTask = async (id: string) => {
     confirmDel.value = null
     const res = await api<{ ok: boolean }>(`/task-board/api/task/${encodeURIComponent(id)}`, { method: "DELETE" })
     actionError.value = res.error ?? null
-    if (res.error === undefined && task.value?.id === id)
+    if (res.error === undefined && task.value?.id === id && watched === null)
         closeTask()
 }
 
@@ -302,6 +303,35 @@ const notify = (text: string) => {
     }, 5000)
 }
 
+/*  cycle the color theme (auto, light, dark) of the page and of the shown task document,
+    overriding the configured one in this browser until cycled back to it
+    (silently not remembered if the browser storage is unavailable), where
+    the page itself applies the remembered theme before its first paint  */
+const themes          = [ "auto", "light", "dark" ]
+const themeKey        = "ase-task-board:theme"
+const themeConfigured = document.documentElement.dataset.themeConfigured ?? "auto"
+const applyTheme = (theme: string) => {
+    document.documentElement.dataset.theme = theme
+    const root = planEl.value?.contentDocument?.documentElement
+    if (root !== undefined)
+        root.dataset.theme = theme
+}
+const cycleTheme = () => {
+    const current = document.documentElement.dataset.theme ?? "auto"
+    const theme   = themes[(themes.indexOf(current) + 1) % themes.length]
+    applyTheme(theme)
+    try {
+        if (theme === themeConfigured)
+            localStorage.removeItem(themeKey)
+        else
+            localStorage.setItem(themeKey, theme)
+    }
+    catch (_err: unknown) {
+        /*  not remembered  */
+    }
+    notify(`theme: ${theme}`)
+}
+
 /*  request the edit of a task by the prompt of its popup (processed by "ase agent editor"),
     dropping the draft of the task once sent, resp. keeping the prompt as its draft on failure  */
 export const submitPrompt = async () => {
@@ -376,13 +406,16 @@ const dialogKeys: Record<string, (id: string) => void> = {
     D: (id) => { confirmDel.value = id }
 }
 
-/*  in the task dialog, RETURN and ESC close it, "e" edits its plan, "E" edits it by a prompt,
-    "R" requests it by a prompt, "D" deletes, "T" transitions, and "A" assigns its task, the left/right arrows (also Tab/Shift+Tab) switch
-    its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
+/*  in the task dialog, RETURN and ESC close it (except in the task viewer, as a browser tab
+    cannot be closed by its page), "e" edits its plan, "E" edits it by a prompt, "R" requests it by a prompt,
+    "D" deletes, "T" transitions, and "A" assigns its task, "#" clears the diff of its plan, "L" cycles the color theme,
+    the left/right arrows (also Tab/Shift+Tab) switch its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
 const onDialogKey = (ev: KeyboardEvent) => {
     const win = planEl.value?.contentWindow ?? null
-    if (ev.key === "Escape" || ev.key === "Enter")
-        closeTask()
+    if (ev.key === "Escape" || ev.key === "Enter") {
+        if (watched === null)
+            closeTask()
+    }
     else if (ev.key === "e" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
         ev.preventDefault()
         startEdit()
@@ -390,6 +423,14 @@ const onDialogKey = (ev: KeyboardEvent) => {
     else if (Object.hasOwn(dialogKeys, ev.key) && !ev.ctrlKey && !ev.metaKey && !ev.altKey && task.value !== null) {
         ev.preventDefault()
         dialogKeys[ev.key](task.value.id)
+    }
+    else if (ev.key === "#" && tab.value === 0 && taskDiff.value !== null) {
+        ev.preventDefault()
+        clearDiff()
+    }
+    else if (ev.key === "L" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+        ev.preventDefault()
+        cycleTheme()
     }
     else if (ev.key === "ArrowLeft" || ev.key === "ArrowRight" || ev.key === "Tab") {
         ev.preventDefault()
@@ -818,7 +859,7 @@ const onKey = (ev: KeyboardEvent) => {
         onEditorKey(ev, editing.value.keymap)
     else if (task.value !== null)
         onDialogKey(ev)
-    else
+    else if (watched === null)
         onBoardKey(ev)
 }
 
@@ -831,20 +872,25 @@ const onBusyKey = (ev: KeyboardEvent) => {
     ev.stopImmediatePropagation()
 }
 
-/*  start the key handling: the single-key bindings (the graph view binds its zoom keys
-    itself), the dispatching of all other keys, and the swallowing of keys while busy  */
+/*  start the key handling: the single-key bindings of the board (the graph view binds its zoom
+    keys itself), the dispatching of all other keys, and the swallowing of keys while busy  */
 export const controlStart = () => {
-    Mousetrap.bind("t", () => { if (board.value !== null && (view.value === "lanes" || view.value === "graph")) toggle("titles", "") })
-    Mousetrap.bind("s", () => { if (board.value !== null && view.value === "graph" && task.value === null) toggle("standalone", "") })
-    Mousetrap.bind("v", () => { if (task.value === null) cycleView() })
-    Mousetrap.bind("V", () => { if (task.value === null) cycleView(true) })
-    Mousetrap.bind("?", () => { if (board.value !== null) toggle("keys", "") })
-    Mousetrap.bind("/", (ev) => {
-        if (task.value !== null || view.value === "agents" || view.value === "flow")
-            return
-        ev.preventDefault()
-        filterEl.value?.focus()
-    })
+    if (watched === null) {
+        Mousetrap.bind("t", () => { if (board.value !== null && (view.value === "lanes" || view.value === "graph")) toggle("titles", "") })
+        Mousetrap.bind("s", () => { if (board.value !== null && view.value === "graph" && task.value === null) toggle("standalone", "") })
+        Mousetrap.bind("v", () => { if (task.value === null) cycleView() })
+        Mousetrap.bind("V", () => { if (task.value === null) cycleView(true) })
+        Mousetrap.bind("?", () => { if (board.value !== null) toggle("keys", "") })
+        Mousetrap.bind("/", (ev) => {
+            if (task.value !== null || view.value === "agents" || view.value === "flow")
+                return
+            ev.preventDefault()
+            filterEl.value?.focus()
+        })
+    }
+
+    /*  (in the task dialog, "onDialogKey" handles it, as only keydown passes from its document)  */
+    Mousetrap.bind("L", () => { if (task.value === null) cycleTheme() })
     window.addEventListener("keydown", onBusyKey, true)
     document.addEventListener("keydown", onKey)
 }

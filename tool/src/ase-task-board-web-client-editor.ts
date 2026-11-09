@@ -122,7 +122,7 @@ export const startNew = async () => {
     actionError.value = null
     tab.value     = 0
     tabDocs.value = {}
-    task.value    = { id: "new", title: "New Task", tone: "idle", status: "", group: "", epic: "", doc: "", tabs: [ "0 ▶ plan" ], pred: [], succ: [] }
+    task.value    = { id: "new", title: "New Task", tone: "idle", status: "", group: "", epic: "", doc: "", plan: { keys: [], body: "" }, tabs: [ "0 ▶ plan" ], pred: [], succ: [] }
     await openEditor("", src.text, "", src.keymap, true)
 }
 

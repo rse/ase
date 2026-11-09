@@ -50,6 +50,7 @@
 ○   `ase-repo-stage`:      Stage a Part of the Changes
 ○   `ase-repo-merge`:      Merge a Branch
 ○   `ase-repo-resolve`:    Resolve Merge Conflicts
+○   `ase-repo-import`:     Import a Change Set
 
 ⎈   **TASK MANAGEMENT**
 ○   `ase-task-id`:         Configure Task Id
@@ -73,5 +74,6 @@
 ○   `ase-meta-workflow`:   Generate a Workflow Skill
 ○   `ase-meta-mint`:       Mint an Identifier or Name
 ○   `ase-meta-config`:     Configuration Management
+○   `ase-meta-alias`:      Skill Command Alias Management
 ○   `ase-meta-compat`:     Self-Test ASE Compatibility
 

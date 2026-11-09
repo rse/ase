@@ -41,7 +41,7 @@ export type Catalog = {
     any skill not listed here is caught by a trailing "OTHER" group  */
 const skillGroups: [ string, string[] ][] = [
     [ "HELP",           [ "ase-help-skill", "ase-help-intent" ] ],
-    [ "META: CONFIG",   [ "ase-meta-config", "ase-meta-compat" ] ],
+    [ "META: CONFIG",   [ "ase-meta-config", "ase-meta-alias", "ase-meta-compat" ] ],
     [ "META: EXPLAIN",  [ "ase-meta-why", "ase-meta-eli5" ] ],
     [ "META: JUDGE",    [ "ase-meta-evaluate", "ase-meta-diaboli", "ase-meta-steelman" ] ],
     [ "META: RESEARCH", [ "ase-meta-brainstorm", "ase-meta-search", "ase-meta-quorum",
@@ -52,7 +52,8 @@ const skillGroups: [ string, string[] ][] = [
     [ "SPEC",           [ "ase-spec-lint", "ase-spec-edit", "ase-spec-activate" ] ],
     [ "CODE",           [ "ase-code-edit", "ase-code-analyze", "ase-code-insight", "ase-code-explain", "ase-code-lint" ] ],
     [ "REPO",           [ "ase-repo-review", "ase-repo-diff", "ase-repo-changelog", "ase-repo-commit",
-        "ase-repo-dissect", "ase-repo-stage", "ase-repo-merge", "ase-repo-resolve" ] ],
+        "ase-repo-dissect", "ase-repo-stage", "ase-repo-merge", "ase-repo-resolve",
+        "ase-repo-import" ] ],
     [ "SYNC",           [ "ase-sync-reconcile", "ase-sync-import", "ase-sync-export" ] ],
     [ "TASK: MANAGE",   [ "ase-task-list", "ase-task-rename", "ase-task-delete" ] ],
     [ "TASK: HANDLE",   [ "ase-task-id", "ase-task-status", "ase-task-assign" ] ],
@@ -64,7 +65,7 @@ const skillGroups: [ string, string[] ][] = [
 /*  the order of the command groups: a copy of the column order of "manColumns"
     of "pages/src/data/manpages.ts", so keep both in sync, where any group not
     listed here (like the one of a newly added top-level command) is appended  */
-const commandGroups = [ "Top-Level", "setup", "config", "service", "task", "spec", "util", "artifact", "agent", "hook" ]
+const commandGroups = [ "Top-Level", "setup", "config", "alias", "service", "task", "spec", "util", "artifact", "agent", "hook" ]
 
 /*  read the Markdown sources of the entries of a directory, by the page
     names and the relative source paths derived from the entry names  */

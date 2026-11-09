@@ -55,7 +55,8 @@ following steps:
    the project id (a valid configured `project.id`, else derived from
    the project directory), the user id (`$USER`, else `$LOGNAME`, else
    `unknown`), the persona style `agent.persona`, the guidance level
-   `agent.guidance`, the boxing transparency `project.boxing`, the task
+   `agent.guidance`, the diagram mode `agent.diagram`, the boxing
+   transparency `project.boxing`, the task
    lifecycle model `project.task.lifecycle`, the defaults
    `project.task.default.source`, `project.task.default.changeset`, and
    `project.task.default.target`, the specification base directory
@@ -64,12 +65,12 @@ following steps:
 
    A setting not explicitly configured in any scope falls back to the
    environment variables `ASE_PERSONA_STYLE`, `ASE_GUIDANCE_LEVEL`,
-   `ASE_PROJECT_BOXING`, `ASE_PROJECT_TASK_LIFECYCLE`,
+   `ASE_DIAGRAM_MODE`, `ASE_PROJECT_BOXING`, `ASE_PROJECT_TASK_LIFECYCLE`,
    `ASE_PROJECT_TASK_DEFAULT_SOURCE`,
    `ASE_PROJECT_TASK_DEFAULT_CHANGESET`, and
    `ASE_PROJECT_TASK_DEFAULT_TARGET`, and finally to the defaults
-   `engineer`, `normal`, `white`, `solo`, `worktree`, `worktree`, and
-   `source`.
+   `engineer`, `normal`, `image`, `white`, `solo`, `worktree`,
+   `worktree`, and `source`.
 
 8. For `--tool claude` only, it appends `export` statements of the
    variables `ASE_VERSION`, `ASE_PLUGIN_ROOT`, `ASE_USER_ID`,
@@ -82,39 +83,46 @@ following steps:
    `CLAUDE_ENV_FILE` (if set), so they are available to all shell
    commands of the session.
 
-9. It writes the hook output payload to standard output: the session
-   information as XML-style tags (`<ase-version>`, `<ase-version-hint>`,
-   `<ase-plugin-root>`, `<ase-persona-style>`, `<ase-guidance-level>`,
-   `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
-   `<ase-project-task-lifecycle>`,
-   `<ase-project-task-default-source>`,
-   `<ase-project-task-default-changeset>`,
-   `<ase-project-task-default-target>`, `<ase-spec-basedir>`,
-   `<ase-spec-schema>`, `<ase-task-id>`, `<ase-session-id>`,
-   `<ase-headless>`, and `<ase-agent-tool>`), followed by the
-   constitution, with all `@`*file* references expanded recursively
-   (relative to the referencing file, `~/` denoting the home
-   directory).
+9. It synchronizes the shim skills of the full aliases of the user and
+   the project for the agent tool of the session (see `ase-alias`(1)),
+   e.g., after a pull of a changed project alias file, and determines the
+   skills with option aliases or option defaults. A failure is logged as
+   a warning only.
 
-   The persona rules are not part of this output, but are injected
-   separately by `ase hook session-persona`, as agent tools like
-   *Anthropic Claude Code CLI* show only a preview of a hook output
-   beyond 10,000 characters.
+10. It writes the hook output payload to standard output: the session
+    information as XML-style tags (`<ase-version>`, `<ase-version-hint>`,
+    `<ase-plugin-root>`, `<ase-persona-style>`, `<ase-guidance-level>`,
+    `<ase-diagram-mode>`, `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
+    `<ase-project-task-lifecycle>`,
+    `<ase-project-task-default-source>`,
+    `<ase-project-task-default-changeset>`,
+    `<ase-project-task-default-target>`, `<ase-spec-basedir>`,
+    `<ase-spec-schema>`, `<ase-getopt-tuned>` (the space-separated
+    skills with option aliases or option defaults), `<ase-task-id>`,
+    `<ase-session-id>`, `<ase-headless>`, and `<ase-agent-tool>`),
+    followed by the constitution, with all `@`*file* references expanded
+    recursively (relative to the referencing file, `~/` denoting the
+    home directory).
 
-   For `--tool copilot` and `--tool codex` only, the instructions of the
-   output style `ase-terse` (with its YAML frontmatter stripped) are
-   appended, as these agent tools have no output style concept, whereas
-   *Anthropic Claude Code CLI* applies the plugin output style natively.
-   The context is emitted as `hookSpecificOutput.additionalContext`
-   (`claude` and `codex`), resp. as the top-level field
-   `additionalContext` (`copilot`).
+    The persona rules are not part of this output, but are injected
+    separately by `ase hook session-persona`, as agent tools like
+    *Anthropic Claude Code CLI* show only a preview of a hook output
+    beyond 10,000 characters.
 
-   Additionally, for `claude` and `codex`, unless running headless
-   (`ASE_HEADLESS` is `true`) or with guidance level `none`, a
-   deterministic *ASE* banner (version, user, project, task, session,
-   persona, guidance, and boxing, plus usage hints for guidance level
-   `normal` and `verbose`) is emitted as the top-level field
-   `systemMessage`.
+    For `--tool copilot` and `--tool codex` only, the instructions of the
+    output style `ase-terse` (with its YAML frontmatter stripped) are
+    appended, as these agent tools have no output style concept, whereas
+    *Anthropic Claude Code CLI* applies the plugin output style natively.
+    The context is emitted as `hookSpecificOutput.additionalContext`
+    (`claude` and `codex`), resp. as the top-level field
+    `additionalContext` (`copilot`).
+
+    Additionally, for `claude` and `codex`, unless running headless
+    (`ASE_HEADLESS` is `true`) or with guidance level `none`, a
+    deterministic *ASE* banner (version, user, project, task, session,
+    persona, guidance, and boxing, plus usage hints for guidance level
+    `normal` and `verbose`) is emitted as the top-level field
+    `systemMessage`.
 
 ## OPTIONS
 
@@ -149,8 +157,8 @@ following steps:
 - `ASE_SETUP_DEV`:
   If set, the version hint notes a development setup.
 
-- `ASE_PERSONA_STYLE`, `ASE_GUIDANCE_LEVEL`, `ASE_PROJECT_BOXING`,
-  `ASE_PROJECT_TASK_LIFECYCLE`, `ASE_PROJECT_TASK_DEFAULT_SOURCE`,
+- `ASE_PERSONA_STYLE`, `ASE_GUIDANCE_LEVEL`, `ASE_DIAGRAM_MODE`,
+  `ASE_PROJECT_BOXING`, `ASE_PROJECT_TASK_LIFECYCLE`, `ASE_PROJECT_TASK_DEFAULT_SOURCE`,
   `ASE_PROJECT_TASK_DEFAULT_CHANGESET`,
   `ASE_PROJECT_TASK_DEFAULT_TARGET`:
   The fallbacks of the settings not explicitly configured.

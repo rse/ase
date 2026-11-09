@@ -1,3 +1,4 @@
+
 ## About
 
 **Agentic Software Engineering (ASE)** is the opinionated companion
@@ -16,7 +17,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 **ASE** ships three deliverables from one repository:
 
 -   `plugin/`: the agent tool plugin
-    -   `plugin/skills/ase-xxx-xxx/`: the 58 skills, each with a `SKILL.md`
+    -   `plugin/skills/ase-xxx-xxx/`: the 60 skills, each with a `SKILL.md`
         (agent instructions) and a `help.md` (Unix-style manual page), plus
         optional skill-specific files (like `ase-help-intent/data.md`, the
         concatenation of all `help.md` files, generated at build-time, or
@@ -50,8 +51,8 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         them), `ase-mods-common.ts` for the shared parts (Markdown table
         rows, styled characters, Markdown conversion, wrapping, framing,
         and the contract, keys, geometry, and drawing of the master/detail
-        view in the band above the prompt), `ase-mods-grill.ts` for
-        re-rendering the grilling tables of ASE, `ase-mods-evaluate.ts`
+        view in the band above the prompt), `ase-mods-task-grill.ts` for
+        re-rendering the grilling tables of ASE, `ase-mods-meta-evaluate.ts`
         for re-rendering the decision matrices of `ase-meta-evaluate`
         (with the best alternative in blue and the criteria rows sortable
         by clicking the header cells), `ase-mods-help-find.ts`
@@ -76,15 +77,34 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         (a prompt starting with a skill command showing the entire argument
         hint of the skill, wrapped over multiple lines, in the band above
         the prompt, instead of the truncated one-line argument hint of
-        Claude Code, which is dropped for the skills)
+        Claude Code, which is dropped for the skills),
+        `ase-mods-task-edit.ts` for the task band (the task of
+        `ase-task-edit --interactive`, signaled through a tool registered by
+        the module, rendered in the band above the prompt and following
+        all changes of the task, with the last change shown as a unified diff
+        with line numbers (removed by a `##` at the prompt), until a next
+        step of the skill is submitted), and `ase-mods-render-image.ts` for
+        the image and diagram rendering (an SVG/PNG/GIF/JPEG image of the
+        tool `ase_mods_render_image`, resp. a Mermaid or D2 diagram of the tool
+        `ase_mods_diagram`, rendered into SVG by the MCP tool `ase_diagram`
+        and used by the skills instead of the ASCII diagrams of the
+        `ase-meta-diagram` sub-agent, both tools registered by the module,
+        rasterized by the MCP tool `ase_rasterize`, fitted into the terminal
+        width, and shown below the row of the tool call)
     -   `plugin/.claude-plugin/`, `plugin/.codex-plugin/`,
         `plugin/.github/plugin/`: the per-agent-tool plugin manifests
 -   `tool/`: the `@rse/ase` CLI
     -   `tool/src/ase.ts`: the entry point, wiring all top-level commands
     -   `tool/src/ase-<command>.ts`: one module per CLI command resp.
-        command group: `setup`, `config`, `service`, `mcp`, `hook`,
+        command group: `setup`, `config`, `alias`, `service`, `mcp`, `hook`,
         `statusline`, `task`, `task-board`, `agent`, `artifact`, `spec`,
-        `man`, `util`, and `util-{meta,diagram,worktree,mint,metric,compat}`
+        `man`, `util`, and
+        `util-{meta,diagram,worktree,mint,metric,rasterize,compat}`
+    -   `tool/src/ase-alias-core.ts`: the skill command aliases of
+        `ase alias` (loading, merging, and modifying the alias files of
+        the user and the project, resolving the full aliases, and
+        synchronizing their shim skills), applied by the option parser
+        `service-getopt` and the session start hook
     -   `tool/src/ase-lib-*.ts`: the generic library modules (`lib-log`,
         `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`, `lib-hash`,
         `lib-fetch` for the HTTP requests through an `undici` dispatcher,
@@ -111,6 +131,12 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         and its AI usage accounting (`service-otel` for the OTLP ingress,
         the usage windows of the task assignments, and their bookings onto
         the usage attachments of the tasks)
+    -   `tool/src/ase-spec-worker.ts`: the worker thread entry point, running
+        the SpecBook lint and export of the MCP tools `ase_specbook_{lint,export}`
+        off the event loop of the service
+    -   `tool/src/ase-util-rasterize-worker.ts`: the persistent worker thread
+        entry point, running the rasterizing of the MCP tool `ase_rasterize`
+        off the event loop of the service
     -   `tool/src/ase-task-*.ts`: the task functionality, where `ase-task.ts`
         itself only forwards the `ase task` CLI and `ase_task_*` MCP tools to
         the task store selected by `project.task.store.url`, through the
@@ -130,8 +156,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             resp. GitHub, GitLab, and Gitea Issues), and `task-store-issues`
             for the common parts of all issue tracker storage plugins
         -   the task board: `task-board` for the `ase task board` CLI
-            command, `task-board-{core,graph,flow,filter,stats}` for its
-            model (where `flow` is the agent graph along the lifecycle model),
+            command, `task-board-{core,graph,flow,filter,stats,diff}` for its
+            model (where `flow` is the agent graph along the lifecycle model,
+            and `diff` the diff of the last change of a task plan),
             `task-board-tui` (split into `task-board-tui-{model,control,view,popup,style}`)
             for the terminal UI, and `task-board-web-server` for the browser
             UI, served by the service, with its client in
@@ -257,10 +284,11 @@ npm start fetch-types   # force re-download of mods/claude-code.d.ts
 
 cd tool
 npm start lint          # eslint over src/ + vue-tsc type-check of the web board client
-npm start build         # lint + build-cmd + build-man + build-plugin
+npm start build         # lint + build-cmd + build-man + build-font + build-plugin
 npm start build-cmd     # tsc of the program and its public types + vite build
                         # of the web board client (emits into dst/)
 npm start build-man     # copy of man/*.md into dst/man/*.md
+npm start build-font    # copy of the bundled rasterizer fonts into dst/font/*.ttf
 npm start build-plugin  # copy ../plugin and ../.claude-plugin into the package
 npm start build-container # build and push the multi-arch container image (etc/ase.dockerfile)
 npm start build-watch   # nodemon rebuild on src/**/*.{ts,vue,styl,html}
@@ -315,6 +343,10 @@ accepts `--force` to update even if already at the latest version.
 Beyond `ase setup`, the CLI provides:
 
 -   `ase config`: the layered `user` < `project` < `task` < `session` configuration
+-   `ase alias`: the skill command aliases of the user and the project:
+    full aliases (provided as generated shim skills), option aliases, and
+    option defaults of the skills, applied by the option parser `ase_getopt`
+    (which also accepts the negation `--no-x` of every option `--x`)
 -   `ase service`: the per-project background HTTP service
 -   `ase mcp`: the stdio-to-service MCP bridge
 -   `ase hook`: the agent tool hook handlers
@@ -369,7 +401,9 @@ Beyond `ase setup`, the CLI provides:
 -   `ase util`: the utility commands `ase util meta` (plugin meta file
     output), `ase util diagram` (Mermaid rendering), `ase util worktree`
     (ASE worktree path resolution), `ase util mint` (hash-derived
-    identifier minting), `ase util metric` (text length metrics), and
+    identifier minting), `ase util metric` (text length metrics),
+    `ase util rasterize` (SVG/PNG/GIF/JPEG rasterizing into PNG, Kitty, iTerm2 IIP, or
+    SIXEL, with bundled fonts copied into `dst/font/` at build-time), and
     `ase util compat` (probe values for the `ase-meta-compat` self-test
     skill)
 

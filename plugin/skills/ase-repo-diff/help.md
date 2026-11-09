@@ -47,8 +47,8 @@ dependencies*, plus a *brief impact summary*. It *extracts the touched
 modules* from the changed files, *scans the repository* for the
 first-party code that *imports* or *references* those modules, builds a
 blast-radius graph (touched modules as origin nodes, dependents fanning
-out along the edges), dispatches the rendering to the `ase-meta-diagram`
-sub-agent, and appends a short bullet list of the per-module impact -
+out along the edges), renders it (as an inline image where supported),
+and appends a short bullet list of the per-module impact -
 giving a visual sense of *what a diff endangers* before a deeper review.
 
 ##  ARGUMENTS

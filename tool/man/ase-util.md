@@ -27,6 +27,10 @@
 \[`-f`|`--file` *file*\]
 \[*text* \[...\]\]
 
+`ase util rasterize`
+\[*options*\]
+*input-file*|`-`|`-d`|`--data` *data*
+
 ## DESCRIPTION
 
 **ase util** is the entry point group for miscellaneous utility
@@ -66,6 +70,12 @@ with status `1`.
   Measure the words, lines, characters, and bytes of a file or a text.
   See `ase-util-metric`(1).
 
+- `ase util rasterize` \[*options*\] *input-file*|`-`|`-d`|`--data` *data*:
+  Rasterize an SVG document or PNG/GIF/JPEG image (raw, as `data:` URL, or
+  as base64 data) into a PNG image or into the
+  terminal graphics of the Kitty, iTerm2, or SIXEL protocol. See
+  `ase-util-rasterize`(1).
+
 ## EXIT STATUS
 
 The group command without a sub-command exits with status `1`.
@@ -74,7 +84,7 @@ The group command without a sub-command exits with status `1`.
 
 `ase`(1), `ase-util-meta`(1), `ase-util-compat`(1),
 `ase-util-diagram`(1), `ase-util-worktree`(1), `ase-util-mint`(1),
-`ase-util-metric`(1).
+`ase-util-metric`(1), `ase-util-rasterize`(1).
 
 ## AUTHOR
 

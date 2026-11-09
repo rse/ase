@@ -7,6 +7,7 @@
 \[`-w`|`--web`\]
 \[`-t`|`--text`\]
 \[`--agent-relay` *url*\]
+\[`-T`|`--task` *id*\]
 
 ## DESCRIPTION
 
@@ -88,6 +89,11 @@ attachment (type `text/x-diff`, like the implementation draft or the change
 set snapshot `kind="changeset"` of the `implementer` and `integrator`
 agents) is colored per line, YAML and JSON data are syntax-highlighted,
 and a change set snapshot older than the plan is marked `(stale)`.
+
+While the task dialog is open, the last change of the shown plan is displayed
+as a diff in the plan tab, with the removed and added lines colored (in the
+terminal board also signed) and their changed words shown inverse, until `#` clears it or a next change
+replaces it. Closing the task dialog or switching to another task drops it.
 
 A task is moved into another state (changing its `Status:`) either by
 picking it up with `SPACE` and dropping it with a second `SPACE` onto
@@ -213,6 +219,26 @@ the `✎` and `⚖` markers), title, and the agents busy with them (behind
 waiting) with their status and their last processing log line, and
 finally all warnings of the board (behind `⚠`, e.g. on dependency
 cycles).
+
+### Task Viewer
+
+With `--task`, the terminal and the web board act as a *task viewer*:
+instead of the board, they show only the task dialog of the given task,
+spanning the entire window and following all changes of the task live.
+All actions of the task dialog stay available, and a click onto a
+predecessor or successor shows that task instead. The shown view of the
+board stays untouched. An unknown task is refused with an error.
+
+The terminal board quits on `q` or `Ctrl`+`C` only, and with a warning
+once the shown task no longer exists (e.g. as it was deleted or renamed
+elsewhere).
+
+The web board has no closing keys, as a page cannot close its browser
+tab. Once the shown task no longer exists, it shows only a notice, and
+shows the task again as soon as it exists again.
+
+With `--text`, and also without an interactive terminal, the plan of the
+task is printed as plain text and the command exits.
 
 ### Statistics View
 
@@ -410,6 +436,10 @@ relay, the agent graph view is skipped.
   board always follows the configured `project.relay.url` (and hence
   warns about the option).
 
+- \[`-T`|`--task` *id*\]:
+  Show only the task dialog of the task *id* instead of the board, as a
+  viewer and watcher of the task (see **Task Viewer**).
+
 ## KEYS
 
 The following keys are supported by the terminal board (and, unless
@@ -426,6 +456,9 @@ letter under the kitty keyboard protocol.
   views).
 - `?`: Hide or show the key hint lines (persisted); while hidden, the
   information line ends with `?: show key hints`.
+- `L`: Cycle the color theme through `auto`, `light`, and `dark`,
+  overriding `board.web.theme` in the current browser until cycled back
+  to its value (web board only).
 - `D`: Delete the selected task, after a confirmation (not in the
   agent logs and statistics views).
 - `T`: Transfer the selected task to another state via the transfer
@@ -515,7 +548,8 @@ letter under the kitty keyboard protocol.
 - `↑`/`↓`: Scroll the content.
 - `PgUp`/`PgDn`: Scroll the content by one page.
 - `e`: Edit the task plan.
-- `D`, `T`, `A`, `E`, `R`, `M`: As in every view.
+- `#`: Clear the diff of the last change of the task plan.
+- `D`, `T`, `A`, `E`, `R`, `M`, `L`: As in every view.
 - `⏎`, `ESC`: Close the task dialog.
 
 ### Filter Field
@@ -594,6 +628,11 @@ The following configuration keys (on scope `user` or `project`, see
   The key bindings of the task plan editor of the web board: `default`,
   `vim`, or `emacs` (default: `default`).
 
+- `board.web.theme`:
+  The color theme of the web board: `light`, `dark`, or `auto`, which
+  follows the light or dark preference of the operating system resp.
+  browser (default: `auto`).
+
 - `project.relay.url`:
   The default agent relay of the boards (see `--agent-relay`).
 
@@ -625,7 +664,7 @@ The following configuration keys (on scope `user` or `project`, see
 The command exits with status `0` once the terminal board is quit, the
 text overview is printed, resp. the web board is opened, and with
 status `1` on any error (e.g. an *ASE* service without web board on
-`--web`).
+`--web`, or an unknown task on `--task`).
 
 ## EXAMPLES
 
@@ -635,6 +674,9 @@ $ ase task board
 
 # show the web board in the browser
 $ ase task board --web
+
+# view and watch a single task in the terminal
+$ ase task board --task T1
 
 # print the lane overview, including the agents of a remote agent relay
 $ ase task board --text --agent-relay ase://relay.example.com:42043
