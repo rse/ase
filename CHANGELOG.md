@@ -40,6 +40,8 @@ ChangeLog
     with bundled fonts) into PNG or auto-detected Kitty, iTerm2, or SIXEL terminal graphics, with
     scaling into the terminal (sized by `--width`/`--height`), background, and `--smart` CSS
     variable resolving, where the MCP tool rasterizes off the event loop in a worker thread.
+    NOTICE: On some Terminals (like Herdr) Kitty Graphics Protocol is supported but Claude
+    Code needs `CLAUDE_CODE_FORCE_TERMINAL_IMAGES=1` to be set to really use it!
 
 -   FEATURE [plugin, docs]: Inline Image Rendering
     The new mod `ase-mods-render-image.ts` provides the tool `ase_mods_render_image`, which shows
