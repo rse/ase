@@ -12,14 +12,15 @@ import type { RasterizeJob, RasterizeReply } from "./ase-util-rasterize.js"
 /*  worker thread entry point of "Rasterize.renderIsolated": rasterize the SVG
     documents of the jobs off the event loop of the service, one after the
     other, keeping resvg and the fonts loaded across the jobs, and post the
-    replies (without the RGBA pixels) back  */
+    replies (without the RGBA pixels, but optionally with their text art) back  */
 const post = (reply: RasterizeReply) => {
     parentPort?.postMessage(reply)
 }
 parentPort?.on("message", (job: RasterizeJob) => {
     Rasterize.render(job.svg, job.opts).then((image) => {
         const cells = image.cells !== undefined ? { cells: image.cells } : {}
-        post({ id: job.id, png: image.png, width: image.width, height: image.height, ...cells })
+        const text  = job.text ? { text: Rasterize.textify(image) } : {}
+        post({ id: job.id, png: image.png, width: image.width, height: image.height, ...cells, ...text })
     }, (err: unknown) => {
         post({ id: job.id, error: err instanceof Error ? err.message : String(err) })
     })

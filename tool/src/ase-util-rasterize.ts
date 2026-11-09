@@ -22,7 +22,7 @@ import { readStdinBuffer, writeStdout }          from "./ase-lib-stdio.js"
 import { Diagram }                               from "./ase-util-diagram.js"
 
 /*  supported output formats  */
-export type RasterizeFormat = "png" | "kitty" | "iip" | "sixel"
+export type RasterizeFormat = "png" | "kitty" | "iip" | "sixel" | "text"
 
 /*  options accepted by the rendering helper  */
 export interface RasterizeRenderOpts {
@@ -51,6 +51,14 @@ interface RasterizeOpts extends RasterizeRenderOpts {
     data?:  string
 }
 
+/*  the text art of a rasterized image: its lines (with ANSI escapes)
+    and its terminal cell box  */
+export interface RasterizeText {
+    lines:   string[]
+    columns: number
+    rows:    number
+}
+
 /*  the rasterized image  */
 export interface RasterizeImage {
     png:    Uint8Array
@@ -58,6 +66,7 @@ export interface RasterizeImage {
     width:  number
     height: number
     cells?: RasterizeCells
+    text?:  RasterizeText
 }
 
 /*  a job of the rasterizing worker thread, and its reply  */
@@ -65,9 +74,10 @@ export interface RasterizeJob {
     id:   number
     svg:  string
     opts: RasterizeRenderOpts
+    text: boolean
 }
 export type RasterizeReply = { id: number, error: string } |
-    { id: number, png: Uint8Array, width: number, height: number, cells?: RasterizeCells }
+    { id: number, png: Uint8Array, width: number, height: number, cells?: RasterizeCells, text?: RasterizeText }
 
 /*  the settling of a still running job of the rasterizing worker thread  */
 type RasterizeSettle = { resolve: (image: RasterizeImage) => void, reject: (err: Error) => void }
@@ -189,7 +199,11 @@ const kittyDiacritics = [
 /*  check whether an output format passes through tmux to the outer
     terminal, instead of being handled natively by tmux (SIXEL only)  */
 const tmuxPassthrough = (format: RasterizeFormat): boolean =>
-    insideTmux() && format !== "png" && !(format === "sixel" && tmux()?.sixel)
+    insideTmux() && format !== "png" && format !== "text" && !(format === "sixel" && tmux()?.sixel)
+
+/*  the least share of a pixel of the text art which has to be covered by the
+    image, else the pixel is left transparent (low, so thin lines survive)  */
+const TEXT_COVERAGE = 1 / 8
 
 /*  custom argument parser for Commander: scale factor or "auto"  */
 const parseScale = (value: string): number | "auto" => {
@@ -497,16 +511,72 @@ export class Rasterize {
         }
     }
 
+    /*  convert the (premultiplied) RGBA pixels of a rasterized image into the
+        Unicode half-block text art of its cell box (else of its pixels in the
+        assumed cells), with ANSI truecolor escapes, where each cell shows two
+        stacked pixels as the foreground of the upper half block and its
+        background, each the area average of the image pixels it covers  */
+    static textify (image: RasterizeImage): RasterizeText {
+        const { pixels, width, height } = image
+        const cell    = cellSize()
+        const columns = Math.max(1, image.cells?.columns ?? Math.ceil(width  / cell.width))
+        const rows    = Math.max(1, image.cells?.rows    ?? Math.ceil(height / cell.height))
+
+        /*  determine the color of a pixel of the text art, or null if transparent  */
+        const sample = (x: number, y: number): string | null => {
+            const x0 = Math.min(width  - 1, Math.floor(x * width  / columns))
+            const x1 = Math.min(width,      Math.max(x0 + 1, Math.floor((x + 1) * width  / columns)))
+            const y0 = Math.min(height - 1, Math.floor(y * height / (rows * 2)))
+            const y1 = Math.min(height,     Math.max(y0 + 1, Math.floor((y + 1) * height / (rows * 2))))
+            let [ r, g, b, a ] = [ 0, 0, 0, 0 ]
+            for (let j = y0; j < y1; j++) {
+                for (let i = x0; i < x1; i++) {
+                    const o = (j * width + i) * 4
+                    r += pixels[o]!
+                    g += pixels[o + 1]!
+                    b += pixels[o + 2]!
+                    a += pixels[o + 3]!
+                }
+            }
+            if (a === 0 || a < (x1 - x0) * (y1 - y0) * 255 * TEXT_COVERAGE)
+                return null
+            return [ r, g, b ].map((c) => Math.min(255, Math.round(c * 255 / a))).join(";")
+        }
+
+        /*  emit the cells as upper half blocks (or as lower half blocks over
+            a transparent upper pixel), with the escapes of changed colors only  */
+        const lines: string[] = []
+        for (let row = 0; row < rows; row++) {
+            let line = ""
+            let fg   = "39"
+            let bg   = "49"
+            for (let column = 0; column < columns; column++) {
+                const upper = sample(column, row * 2)
+                const lower = sample(column, row * 2 + 1)
+                const [ ch, f, b ] = upper !== null ? [ "▀", upper, lower ] : [ lower !== null ? "▄" : " ", lower, null ]
+                const codes: string[] = []
+                if (f !== null && `38;2;${f}` !== fg)
+                    codes.push(fg = `38;2;${f}`)
+                if ((b !== null ? `48;2;${b}` : "49") !== bg)
+                    codes.push(bg = b !== null ? `48;2;${b}` : "49")
+                line += (codes.length > 0 ? `\x1b[${codes.join(";")}m` : "") + ch
+            }
+            lines.push(line + (fg !== "39" || bg !== "49" ? "\x1b[0m" : ""))
+        }
+        return { lines, columns, rows }
+    }
+
     /*  the worker thread of "renderIsolated" (started on first use, and keeping
         the process alive only while it has jobs), with its still running jobs,
         and the number of the last job  */
     private static pool: { worker: Worker, jobs: Map<number, RasterizeSettle> } | null = null
     private static job = 0
 
-    /*  rasterize like "render", but without the RGBA pixels and in a persistent
-        worker thread (keeping resvg and the fonts loaded), as the rasterizing is
-        CPU-bound and would otherwise block the event loop of the service  */
-    static renderIsolated (svg: string, opts: RasterizeRenderOpts): Promise<RasterizeImage> {
+    /*  rasterize like "render", but without the RGBA pixels (and optionally with
+        their text art) and in a persistent worker thread (keeping resvg and the
+        fonts loaded), as the rasterizing is CPU-bound and would otherwise block
+        the event loop of the service  */
+    static renderIsolated (svg: string, opts: RasterizeRenderOpts, text = false): Promise<RasterizeImage> {
         if (Rasterize.pool === null) {
             const worker = new Worker(new URL("./ase-util-rasterize-worker.js", import.meta.url))
             const jobs   = new Map<number, RasterizeSettle>()
@@ -529,7 +599,9 @@ export class Rasterize {
                     job.reject(new Error(reply.error))
                 else {
                     const cells = reply.cells !== undefined ? { cells: reply.cells } : {}
-                    job.resolve({ png: reply.png, pixels: new Uint8Array(0), width: reply.width, height: reply.height, ...cells })
+                    const text  = reply.text  !== undefined ? { text:  reply.text  } : {}
+                    const image = { png: reply.png, pixels: new Uint8Array(0), width: reply.width, height: reply.height }
+                    job.resolve({ ...image, ...cells, ...text })
                 }
             })
             worker.on("error", (err: unknown) => { fail(err instanceof Error ? err : new Error(String(err))) })
@@ -542,16 +614,22 @@ export class Rasterize {
         return new Promise((resolve, reject) => {
             jobs.set(id, { resolve, reject })
             worker.ref()
-            worker.postMessage({ id, svg, opts: { ...opts, font: [ ...opts.font ] } } satisfies RasterizeJob)
+            worker.postMessage({ id, svg, opts: { ...opts, font: [ ...opts.font ] }, text } satisfies RasterizeJob)
         })
     }
 
-    /*  determine the output format for format "auto": PNG for a file
-        or non-terminal output, else the detected terminal protocol  */
+    /*  determine the output format for format "auto": PNG for a file or
+        non-terminal output, else the detected terminal protocol, else (or if
+        tmux drops the protocol) the text art  */
     static async detectFormat (output: string): Promise<RasterizeFormat> {
         if (output !== "-" || !process.stdout.isTTY)
             return "png"
+        const format = await Rasterize.detectProtocol()
+        return tmuxPassthrough(format) && tmux()?.passthrough === false ? "text" : format
+    }
 
+    /*  determine the terminal graphics protocol, or the text art if none is detected  */
+    private static async detectProtocol (): Promise<RasterizeFormat> {
         /*  under tmux, prefer the formats which tmux manages as regular pane
             content: Kitty with Unicode placeholders, or natively handled SIXEL  */
         const info = tmux()
@@ -594,8 +672,7 @@ export class Rasterize {
         else if (support.sixel)
             return "sixel"
         else
-            throw new Error("no terminal graphics protocol detected " +
-                `(${insideTmux() ? "inside tmux, the outer terminal is often hidden: " : ""}use an explicit --format)`)
+            return "text"
     }
 
     /*  check whether the agent tool can show inline images, which it draws only into
@@ -627,6 +704,8 @@ export class Rasterize {
         const wrap = (sequence: string) => passthrough ? tmuxWrap(sequence) : sequence
         if (format === "png")
             return image.png
+        else if (format === "text")
+            return (image.text ?? Rasterize.textify(image)).lines.join("\n")
         else if (format === "kitty") {
             /*  Kitty Graphics Protocol: transmit and display PNG data in chunks
                 of 4096 base64 characters, suppressing the terminal responses,
@@ -694,9 +773,10 @@ export default class RasterizeCommand {
     register (program: Command): void {
         program
             .command("rasterize")
-            .description("Rasterize SVG document or PNG/GIF/JPEG image into PNG, Kitty Graphics, iTerm2 Inline Image, or SIXEL")
+            .description("Rasterize SVG document or PNG/GIF/JPEG image into PNG, Kitty Graphics, iTerm2 Inline Image, " +
+                "SIXEL, or text art")
             .addOption(new Option("-f, --format <format>", "output format")
-                .choices([ "png", "kitty", "iip", "sixel", "auto" ]).default("auto"))
+                .choices([ "png", "kitty", "iip", "sixel", "text", "auto" ]).default("auto"))
             .option("-o, --output <file>",
                 "write output to <file> instead of stdout (\"-\")", "-")
             .option("-s, --scale <factor>",
@@ -734,9 +814,9 @@ export default class RasterizeCommand {
                     if (terminal)
                         Rasterize.checkTmuxPassthrough(format)
                     const scale   = opts.scale === "auto" && format === "png" ? 1 : opts.scale
-                    const density = format === "sixel" ? 1 : 2
+                    const density = format === "sixel" || format === "text" ? 1 : 2
                     const image   = info?.type === "image/png" && scale === 1
-                        && opts.background === "auto" && format !== "sixel" ?
+                        && opts.background === "auto" && format !== "sixel" && format !== "text" ?
                         { png: data, pixels: new Uint8Array(0), width: info.width, height: info.height } :
                         await Rasterize.render(svg, { ...opts, scale, density })
                     let out       = await Rasterize.encode(image, format, terminal)
@@ -813,7 +893,10 @@ export class RasterizeMCP {
                 "Pass either its content as `data`, or, preferably for existing files, its path as `file`. " +
                 "Returns the PNG image as image content, or, for `output` \"file\" (or \"auto\" and a PNG " +
                 "image above 2 MiB), the text \"[PNG: <file>, <width>x<height>]\" of a temporary PNG file, " +
-                "plus, for `scale` \"auto\", the text \"[Cells: <columns>x<rows>]\" of the fitted terminal cell box.",
+                "resp., for `output` \"text\", the Unicode half-block text art of the image (with ANSI " +
+                "truecolor escapes) and the text \"[Text: <width>x<height>]\" of its rasterized pixel size, " +
+                "plus, for `scale` \"auto\" (or `output` \"text\"), the text \"[Cells: <columns>x<rows>]\" " +
+                "of the fitted terminal cell box.",
             inputSchema: {
                 data: z.string().optional()
                     .describe("SVG document or PNG/GIF/JPEG image to rasterize, as raw SVG text, " +
@@ -833,9 +916,10 @@ export class RasterizeMCP {
                     .describe("resolve CSS custom properties and color mixings first (needed for `ase_diagram` SVG output)"),
                 maximum: z.number().int().positive().optional()
                     .describe("maximum width and height of the rasterized image in pixels (default: unbounded)"),
-                output: z.enum([ "inline", "file", "auto" ]).default("inline")
+                output: z.enum([ "inline", "file", "auto", "text" ]).default("inline")
                     .describe("return the PNG image as image content (\"inline\"), as a temporary file (\"file\"), " +
-                        "or as a temporary file only above 2 MiB (\"auto\")")
+                        "as a temporary file only above 2 MiB (\"auto\"), or as text art (\"text\", for terminals " +
+                        "without graphics)")
             }
         }, async (args) => {
             try {
@@ -854,7 +938,17 @@ export class RasterizeMCP {
                     scale: args.scale, width: args.width, height: args.height, density: 1,
                     background: args.background, font: [], smart: args.smart,
                     ...(args.maximum !== undefined ? { maximum: args.maximum } : {})
-                })
+                }, args.output === "text")
+                if (image.text !== undefined) {
+                    const { lines, columns, rows } = image.text
+                    return {
+                        content: [
+                            { type: "text", text: lines.join("\n") },
+                            { type: "text", text: `[Text: ${image.width}x${image.height}]` },
+                            { type: "text", text: `[Cells: ${columns}x${rows}]` }
+                        ]
+                    }
+                }
                 const cells = image.cells === undefined ? [] :
                     [ { type: "text" as const, text: `[Cells: ${image.cells.columns}x${image.cells.rows}]` } ]
                 if (args.output === "file" || (args.output === "auto" && image.png.length > RasterizeMCP.INLINE)) {

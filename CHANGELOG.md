@@ -5,6 +5,11 @@ ChangeLog
 2.0.12 (2026-11-XX)
 -------------------
 
+-   FEATURE [code, plugin, docs]: Text Art for Terminals without Graphics
+    `ase util rasterize --format text` and `ase_rasterize` with `output` `text` render Unicode
+    half-block text art with ANSI truecolor, used by format `auto` without a graphics protocol, and
+    by `ase_mods_render_image` on terminals without inline images (lacking `ase_mods_diagram`).
+
 -   IMPROVEMENT [plugin]: Implicit Image Background
     The `background` parameter of the tools `ase_mods_render_image` and `ase_mods_diagram` now
     tells the model to not pass it implicitly, but only on request or when the default fails.
