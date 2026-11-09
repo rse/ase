@@ -82,9 +82,12 @@ The MCP tool `ase_diagram` provides the same to the skills.
   The output format: `ascii` for Unicode/ASCII art (default) or `svg`
   for an SVG document. The clipping options apply to `ascii` only.
 
-- \[`-t`|`--theme` `light`|`dark`\]:
-  The theme style of the SVG document (`svg` only).
-  Default: the configured `agent.diagram.theme`, else `light`.
+- \[`-t`|`--theme` `auto`|`light`|`dark`\]:
+  The theme style of the SVG document (`svg` only), where `auto`
+  probes, in this order, `$ASE_TERM_THEME`, the background color index
+  of `$COLORFGBG`, the theme of *Claude Code* (in `~/.claude.json`), and
+  the system appearance (macOS, Windows, or GNOME), else `light`.
+  Default: the configured `agent.diagram.theme`, else `auto`.
 
 - \[`-T`|`--tone` *tone*\]:
   The theme color tone of the SVG document as one or two colors
@@ -144,6 +147,9 @@ All numeric values *n* have to be non-negative integers.
 
 - `ASE_TERM_WIDTH`, `ASE_TERM_HEIGHT`:
   The defaults of `--terminal-width` and `--terminal-height`.
+
+- `ASE_TERM_THEME`:
+  The theme style (`light` or `dark`) the `auto` of `--theme` resolves to.
 
 ## EXIT STATUS
 

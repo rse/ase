@@ -111,7 +111,7 @@ const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
 
 /*  the ASE session information determined by the session-start hook  */
 type SessionInfo = Record<"version" | "versionHint" | "pluginRoot" | "persona" | "guidance" | "diagram" |
-    "userId" | "projectId" | "boxing" | "lifecycle" | "defaultSource" | "defaultChangeset" |
+    "diagramProbe" | "userId" | "projectId" | "boxing" | "lifecycle" | "defaultSource" | "defaultChangeset" |
     "defaultTarget" | "specBasedir" | "specSchema" | "getoptTuned" | "taskId" | "sessionId" | "headless", string>
 
 /*  CLI command "ase hook"  */
@@ -427,13 +427,19 @@ export default class HookCommand {
             return typeof val === "string" ? val : (process.env[envVar] ?? dflt)
         }
 
-        /*  determine agent persona style, agent guidance level, agent diagram
-            format, project boxing transparency, and project task lifecycle  */
+        /*  determine agent persona style, agent guidance level,
+            project boxing transparency, and project task lifecycle  */
         const persona   = setting("agent.persona",          "ASE_PERSONA_STYLE",          "engineer")
         const guidance  = setting("agent.guidance",         "ASE_GUIDANCE_LEVEL",         "normal")
-        const diagram   = setting("agent.diagram.format",   "ASE_DIAGRAM_FORMAT",         "image")
         const boxing    = setting("project.boxing",         "ASE_PROJECT_BOXING",         "white")
         const lifecycle = setting("project.task.lifecycle", "ASE_PROJECT_TASK_LIFECYCLE", "solo")
+
+        /*  determine agent diagram format, resolving "auto" by a probe of the
+            terminal environment on whether the agent tool can show inline images  */
+        const { Rasterize } = await import("./ase-util-rasterize.js")
+        const diagramProbe  = Rasterize.detectInlineImages() ? "image" : "text"
+        const diagramFormat = setting("agent.diagram.format", "ASE_DIAGRAM_FORMAT", "auto")
+        const diagram       = diagramFormat === "auto" ? diagramProbe : diagramFormat
 
         /*  determine the defaults of the change set flow keys of the task plans  */
         const defaultSource    = setting("project.task.default.source",    "ASE_PROJECT_TASK_DEFAULT_SOURCE",    "worktree")
@@ -463,7 +469,7 @@ export default class HookCommand {
 
         /*  publish the ASE session information and emit it as the hook output payload  */
         const payload = this.publishSessionInfo(tool, {
-            version: versionCurrentPlugin, versionHint, pluginRoot, persona, guidance, diagram, userId, projectId,
+            version: versionCurrentPlugin, versionHint, pluginRoot, persona, guidance, diagram, diagramProbe, userId, projectId,
             boxing, lifecycle, defaultSource, defaultChangeset, defaultTarget,
             specBasedir, specSchema, getoptTuned, taskId, sessionId, headless
         }, md, path.dirname(fileMd), style)
@@ -497,7 +503,7 @@ export default class HookCommand {
         the deterministic ASE banner, into the "session-start" hook output payload  */
     private publishSessionInfo (tool: Tool, info: SessionInfo, md: string, mdDir: string, style: string): Record<string, unknown> {
         const {
-            version, versionHint, pluginRoot, persona, guidance, diagram, userId, projectId,
+            version, versionHint, pluginRoot, persona, guidance, diagram, diagramProbe, userId, projectId,
             boxing, lifecycle, defaultSource, defaultChangeset, defaultTarget,
             specBasedir, specSchema, getoptTuned, taskId, sessionId, headless
         } = info
@@ -530,6 +536,7 @@ export default class HookCommand {
             `<ase-persona-style>${persona}</ase-persona-style>\n` +
             `<ase-guidance-level>${guidance}</ase-guidance-level>\n` +
             `<ase-diagram-format>${diagram}</ase-diagram-format>\n` +
+            `<ase-diagram-probe>${diagramProbe}</ase-diagram-probe>\n` +
             `<ase-user-id>${userId}</ase-user-id>\n` +
             `<ase-project-id>${projectId}</ase-project-id>\n` +
             `<ase-project-boxing>${boxing}</ase-project-boxing>\n` +

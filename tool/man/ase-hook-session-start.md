@@ -69,8 +69,14 @@ following steps:
    `ASE_PROJECT_TASK_DEFAULT_SOURCE`,
    `ASE_PROJECT_TASK_DEFAULT_CHANGESET`, and
    `ASE_PROJECT_TASK_DEFAULT_TARGET`, and finally to the defaults
-   `engineer`, `normal`, `image`, `white`, `solo`, `worktree`,
-   `worktree`, and `source`.
+   `engineer`, `normal`, `auto`, `white`, `solo`, `worktree`,
+   `worktree`, and `source`, where `agent.diagram.format` falls back
+   to `auto`.
+
+   Additionally, it probes the terminal environment on whether the
+   agent tool can show inline images (Kitty or Ghostty, directly or
+   through *tmux* with passthrough), yielding `image` or `text`, and
+   resolves the diagram format `auto` to this probe result.
 
 8. For `--tool claude` only, it appends `export` statements of the
    variables `ASE_VERSION`, `ASE_PLUGIN_ROOT`, `ASE_USER_ID`,
@@ -92,7 +98,7 @@ following steps:
 10. It writes the hook output payload to standard output: the session
     information as XML-style tags (`<ase-version>`, `<ase-version-hint>`,
     `<ase-plugin-root>`, `<ase-persona-style>`, `<ase-guidance-level>`,
-    `<ase-diagram-format>`, `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
+    `<ase-diagram-format>`, `<ase-diagram-probe>`, `<ase-user-id>`, `<ase-project-id>`, `<ase-project-boxing>`,
     `<ase-project-task-lifecycle>`,
     `<ase-project-task-default-source>`,
     `<ase-project-task-default-changeset>`,

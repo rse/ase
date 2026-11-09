@@ -596,6 +596,21 @@ export class Rasterize {
                 `(${insideTmux() ? "inside tmux, the outer terminal is often hidden: " : ""}use an explicit --format)`)
     }
 
+    /*  check whether the agent tool can show inline images, which it draws only into
+        terminals with the Unicode placeholders of the Kitty Graphics Protocol (Kitty
+        and Ghostty), directly or through a tmux passing the terminal graphics through  */
+    static detectInlineImages (): boolean {
+        const info = tmux()
+        if (info !== null)
+            return info.passthrough && tmuxKittyPlaceholders(info)
+        else if (insideTmux())
+            return false
+        else
+            return !!(process.env.KITTY_WINDOW_ID || process.env.GHOSTTY_RESOURCES_DIR)
+                || /^xterm-(?:kitty|ghostty)$/.test(process.env.TERM ?? "")
+                || /^(?:kitty|ghostty)$/i.test(process.env.TERM_PROGRAM ?? "")
+    }
+
     /*  ensure that tmux passes the terminal graphics through to the outer terminal  */
     static checkTmuxPassthrough (format: RasterizeFormat): void {
         if (tmuxPassthrough(format) && tmux()?.passthrough === false)

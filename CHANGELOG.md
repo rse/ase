@@ -2,6 +2,19 @@
 ChangeLog
 =========
 
+2.0.11 (2026-11-XX)
+-------------------
+
+-   FEATURE [code, plugin, docs]: Automatic Diagram Format
+    The new default `auto` of `agent.diagram.format` lets the session-start hook probe whether the
+    terminal can show inline images (Kitty or Ghostty, directly or through tmux with passthrough),
+    resolving it into `image` or `text`, with the probe result exported as `<ase-diagram-probe/>`.
+
+-   FEATURE [code, plugin, docs]: Automatic Diagram Theme
+    The new default `auto` of `agent.diagram.theme` (and `--theme` of `ase util diagram`) probes on
+    rendering `$ASE_TERM_THEME`, `$COLORFGBG`, the Claude Code theme, and the system appearance
+    (macOS, Windows, GNOME), resolving it into `light` or `dark`.
+
 2.0.10 (2026-11-09)
 -------------------
 

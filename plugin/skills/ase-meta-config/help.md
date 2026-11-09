@@ -46,8 +46,9 @@ pyramid-structured `journalist`, the brief, factual, and abbreviating
 `agent.guidance` selects the number of unsolicited hints and is one of
 `none`, `minimal`, `normal` (the default), or `verbose`;
 `agent.diagram.format` selects the rendering of the diagrams of the skills and is
-one of `image` (the default, an inline image where the terminal supports it,
-else text) or `text` (always text); and
+one of `auto` (the default, an inline image if the terminal probe at session
+start detects support for it, else text), `image` (always an inline image), or
+`text` (always text); and
 `project.boxing` selects the artifact transparency and is one of `white`,
 `grey`, or `black`. Setting `agent.persona`, `agent.guidance`,
 `agent.diagram.format`, or `project.boxing` takes effect immediately, i.e. still
@@ -68,9 +69,10 @@ a `branch:<name>` or `attachment:<name>` value can carry the placeholder
 are exported at session start as
 `<ase-project-task-default-{source,changeset,target}/>`.
 
-The diagram images are styled by `agent.diagram.theme`, one of `light`
-(the default, dark node boxes with light labels) or `dark` (vice versa),
-and `agent.diagram.tone`, one or two theme colors `#rgb` or `#rrggbb`
+The diagram images are styled by `agent.diagram.theme`, one of `auto`
+(the default, probing the terminal background for one of the others),
+`light` (dark node boxes with light labels), or `dark` (vice versa), and
+`agent.diagram.tone`, one or two theme colors `#rgb` or `#rrggbb`
 (default: `#336699`), where a missing second color is derived as the
 complement of the first one (a brown for the default blue).
 

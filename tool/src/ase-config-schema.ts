@@ -20,8 +20,8 @@ export const projectClassification = {
 export const agentClassification = {
     persona:  [ "writer", "engineer", "journalist", "telegrapher", "caveman" ],
     guidance: [ "none", "minimal", "normal", "verbose" ],
-    diagram:  [ "image", "text" ],
-    theme:    [ "light", "dark" ]
+    diagram:  [ "auto", "image", "text" ],
+    theme:    [ "auto", "light", "dark" ]
 } as const
 
 /*  the default theme color tone of the diagrams  */
@@ -59,8 +59,8 @@ export const projectClassificationPresets: Record<string, Record<string, string>
     default: {
         "agent.persona":   "engineer",
         "agent.guidance":  "normal",
-        "agent.diagram.format": "image",
-        "agent.diagram.theme":  "light",
+        "agent.diagram.format": "auto",
+        "agent.diagram.theme":  "auto",
         "agent.diagram.tone":   diagramToneDefault,
         "project.name":    "Example Project",
         "project.boxing":  "white",

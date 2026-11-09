@@ -5,6 +5,9 @@
 */
 
 import fs                                        from "node:fs"
+import os                                        from "node:os"
+import path                                      from "node:path"
+import { execFileSync }                          from "node:child_process"
 
 import { Command, InvalidArgumentError, Option } from "commander"
 import { z }                                     from "zod"
@@ -39,8 +42,9 @@ export interface DiagramRenderOpts {
 }
 
 /*  internal command options type  */
-interface DiagramOpts extends DiagramRenderOpts {
+interface DiagramOpts extends Omit<DiagramRenderOpts, "theme"> {
     input?: string
+    theme?: DiagramTheme | "auto"
 }
 
 /*  custom argument parser for Commander: non-negative integer  */
@@ -55,6 +59,10 @@ const parseInteger = (name: string) => (value: string): number => {
     WebAssembly build of D2 in a worker thread, which keeps the process
     alive until the compiler is disposed)  */
 let d2: Promise<D2> | null = null
+
+/*  the probed theme style of "auto", cached for a few seconds only,
+    as the probe can spawn a process and the appearance can change  */
+let themeProbe: { theme: DiagramTheme, time: number } | null = null
 
 /*  turn a D2 compile failure (a JSON-encoded list of errors, whose source
     lines are shifted by the number of prepended lines) into a message  */
@@ -227,6 +235,63 @@ export class Diagram {
         return depth >= 8 ? "ansi256" : depth >= 4 ? "ansi16" : "none"
     }
 
+    /*  detect the theme style of the terminal background (for theme style "auto")  */
+    static detectTheme (): DiagramTheme {
+        if (themeProbe !== null && Date.now() - themeProbe.time < 10 * 1000)
+            return themeProbe.theme
+        const query = (cmd: string, args: string[]): string => {
+            try {
+                return execFileSync(cmd, args, { encoding: "utf8", stdio: [ "ignore", "pipe", "ignore" ], timeout: 1000 })
+            }
+            catch {
+                return ""
+            }
+        }
+        const probe = (): DiagramTheme => {
+            /*  attempt 1: query environment variable (explicitly)  */
+            const env = process.env.ASE_TERM_THEME
+            if (env === "light" || env === "dark")
+                return env
+
+            /*  attempt 2: query terminal colors (background as last ANSI color index)  */
+            const bg = Number.parseInt((process.env.COLORFGBG ?? "").split(";").at(-1) ?? "", 10)
+            if (bg >= 0 && bg <= 15)
+                return bg <= 6 || bg === 8 ? "dark" : "light"
+
+            /*  attempt 3: query theme of Claude Code (e.g. "dark" or "light-daltonized")  */
+            if ((process.env.ASE_TOOL ?? "claude") === "claude") {
+                try {
+                    const file = path.join(process.env.CLAUDE_CONFIG_DIR ?? os.homedir(), ".claude.json")
+                    const json = JSON.parse(fs.readFileSync(file, "utf8")) as { theme?: unknown }
+                    const m    = typeof json.theme === "string" ? /^(light|dark)/.exec(json.theme) : null
+                    if (m !== null)
+                        return m[1] as DiagramTheme
+                }
+                catch {
+                    /*  no or unreadable configuration  */
+                }
+            }
+
+            /*  attempt 4: query appearance of the system (on macOS the key exists in dark mode only,
+                on Windows the value is 0 in dark mode, and on GNOME the color scheme or GTK theme)  */
+            if (process.platform === "darwin")
+                return /dark/i.test(query("defaults", [ "read", "-g", "AppleInterfaceStyle" ])) ? "dark" : "light"
+            else if (process.platform === "win32") {
+                const out = query("reg", [ "query", "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                    "/v", "AppsUseLightTheme" ])
+                return /\b0x0\b/.test(out) ? "dark" : "light"
+            }
+            else {
+                const scheme = query("gsettings", [ "get", "org.gnome.desktop.interface", "color-scheme" ])
+                if (/prefer-(?:dark|light)/.test(scheme))
+                    return scheme.includes("dark") ? "dark" : "light"
+                return /dark/i.test(query("gsettings", [ "get", "org.gnome.desktop.interface", "gtk-theme" ])) ? "dark" : "light"
+            }
+        }
+        themeProbe = { theme: probe(), time: Date.now() }
+        return themeProbe.theme
+    }
+
     /*  determine the theme style and theme color tone of the SVG renderings
         from the "agent.diagram.{theme,tone}" configuration  */
     static configTheme (log: Log): { theme: DiagramTheme, tone: string } {
@@ -235,7 +300,7 @@ export class Diagram {
         const theme = cfg.get("agent.diagram.theme")
         const tone  = cfg.get("agent.diagram.tone")
         return {
-            theme: theme === "dark" ? "dark" : "light",
+            theme: theme === "light" || theme === "dark" ? theme : Diagram.detectTheme(),
             tone:  typeof tone === "string" && tone.trim() !== "" ? tone : diagramToneDefault
         }
     }
@@ -479,7 +544,7 @@ export default class DiagramCommand {
             .addOption(new Option("-f, --format <format>", "output format")
                 .choices([ "ascii", "svg" ]).default("ascii"))
             .addOption(new Option("-t, --theme <theme>", "theme style of SVG output (default: agent.diagram.theme)")
-                .choices([ "light", "dark" ]))
+                .choices([ "auto", "light", "dark" ]))
             .option("-T, --tone <tone>",
                 "theme color tone(s) of SVG output as \"#rrggbb [#rrggbb]\" (default: agent.diagram.tone)")
             .option("-a, --ascii",
@@ -532,7 +597,8 @@ export default class DiagramCommand {
                 let out: string
                 try {
                     const theme = Diagram.configTheme(this.log)
-                    out = await Diagram.render(src, { ...opts, theme: opts.theme ?? theme.theme, tone: opts.tone ?? theme.tone })
+                    const style = opts.theme === "auto" ? Diagram.detectTheme() : opts.theme ?? theme.theme
+                    out = await Diagram.render(src, { ...opts, theme: style, tone: opts.tone ?? theme.tone })
                 }
                 catch (err: unknown) {
                     const message = err instanceof Error ? err.message : String(err)
