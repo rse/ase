@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.0.12 (2026-11-XX)
+2.0.12 (2026-11-09)
 -------------------
 
 -   FEATURE [code, plugin, docs]: Text Art for Terminals without Graphics
