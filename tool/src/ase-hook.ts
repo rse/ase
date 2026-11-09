@@ -428,10 +428,10 @@ export default class HookCommand {
         }
 
         /*  determine agent persona style, agent guidance level, agent diagram
-            mode, project boxing transparency, and project task lifecycle  */
+            format, project boxing transparency, and project task lifecycle  */
         const persona   = setting("agent.persona",          "ASE_PERSONA_STYLE",          "engineer")
         const guidance  = setting("agent.guidance",         "ASE_GUIDANCE_LEVEL",         "normal")
-        const diagram   = setting("agent.diagram.format",   "ASE_DIAGRAM_MODE",           "image")
+        const diagram   = setting("agent.diagram.format",   "ASE_DIAGRAM_FORMAT",         "image")
         const boxing    = setting("project.boxing",         "ASE_PROJECT_BOXING",         "white")
         const lifecycle = setting("project.task.lifecycle", "ASE_PROJECT_TASK_LIFECYCLE", "solo")
 
@@ -529,7 +529,7 @@ export default class HookCommand {
             `<ase-plugin-root>${pluginRoot}</ase-plugin-root>\n` +
             `<ase-persona-style>${persona}</ase-persona-style>\n` +
             `<ase-guidance-level>${guidance}</ase-guidance-level>\n` +
-            `<ase-diagram-mode>${diagram}</ase-diagram-mode>\n` +
+            `<ase-diagram-format>${diagram}</ase-diagram-format>\n` +
             `<ase-user-id>${userId}</ase-user-id>\n` +
             `<ase-project-id>${projectId}</ase-project-id>\n` +
             `<ase-project-boxing>${boxing}</ase-project-boxing>\n` +

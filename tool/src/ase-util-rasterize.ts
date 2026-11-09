@@ -152,10 +152,17 @@ const cellSize = (): { width: number, height: number } => {
         { width: 10, height: 20 }
 }
 
+/*  check whether the output passes through tmux: a local one (by "TMUX"),
+    or a remote one, like for SSH from inside tmux (by a "TERM" of tmux, or
+    of "screen" outside of GNU screen, as tmux formerly defaulted to it)  */
+const insideTmux = (): boolean =>
+    !!process.env.TMUX || /^tmux\b/.test(process.env.TERM ?? "")
+        || (/^screen\b/.test(process.env.TERM ?? "") && !process.env.STY)
+
 /*  wrap an escape sequence into a tmux passthrough sequence (with all
     inner ESCs doubled), as tmux otherwise drops it silently  */
 const tmuxWrap = (sequence: string): string =>
-    process.env.TMUX ? `\x1bPtmux;${sequence.replaceAll("\x1b", "\x1b\x1b")}\x1b\\` : sequence
+    insideTmux() ? `\x1bPtmux;${sequence.replaceAll("\x1b", "\x1b\x1b")}\x1b\\` : sequence
 
 /*  the combining diacritics encoding the row and column numbers of the
     Unicode placeholders of the Kitty Graphics Protocol (the code point
@@ -182,7 +189,7 @@ const kittyDiacritics = [
 /*  check whether an output format passes through tmux to the outer
     terminal, instead of being handled natively by tmux (SIXEL only)  */
 const tmuxPassthrough = (format: RasterizeFormat): boolean =>
-    !!process.env.TMUX && format !== "png" && !(format === "sixel" && tmux()?.sixel)
+    insideTmux() && format !== "png" && !(format === "sixel" && tmux()?.sixel)
 
 /*  custom argument parser for Commander: scale factor or "auto"  */
 const parseScale = (value: string): number | "auto" => {
@@ -578,7 +585,7 @@ export class Rasterize {
             skip Kitty under tmux, as it then requires the Unicode placeholders  */
         if (support.iterm2 && termProgram === "iTerm.app")
             return "iip"
-        else if (support.kitty && info === null)
+        else if (support.kitty && !insideTmux())
             return "kitty"
         else if (support.iterm2)
             return "iip"
@@ -586,7 +593,7 @@ export class Rasterize {
             return "sixel"
         else
             throw new Error("no terminal graphics protocol detected " +
-                `(${process.env.TMUX ? "inside tmux, the outer terminal is often hidden: " : ""}use an explicit --format)`)
+                `(${insideTmux() ? "inside tmux, the outer terminal is often hidden: " : ""}use an explicit --format)`)
     }
 
     /*  ensure that tmux passes the terminal graphics through to the outer terminal  */
@@ -596,8 +603,11 @@ export class Rasterize {
                 "(enable it via \"tmux set -g allow-passthrough on\")")
     }
 
-    /*  encode the rasterized image into the output format  */
-    static async encode (image: RasterizeImage, format: RasterizeFormat): Promise<Uint8Array | string> {
+    /*  encode the rasterized image into the output format, where only the
+        output onto a terminal is passed through tmux (if inside tmux)  */
+    static async encode (image: RasterizeImage, format: RasterizeFormat, terminal = false): Promise<Uint8Array | string> {
+        const passthrough = terminal && tmuxPassthrough(format)
+        const wrap = (sequence: string) => passthrough ? tmuxWrap(sequence) : sequence
         if (format === "png")
             return image.png
         else if (format === "kitty") {
@@ -611,7 +621,7 @@ export class Rasterize {
             /*  inside tmux, display the image through a virtual placement and
                 its Unicode placeholders, i.e., text cells which tmux manages
                 like regular pane content (cell box limited to the diacritics)  */
-            const placeholders = tmuxPassthrough(format)
+            const placeholders = passthrough
             const cell    = cellSize()
             const columns = Math.min(image.cells?.columns ?? Math.ceil(image.width  / cell.width),  kittyDiacritics.length)
             const rows    = Math.min(image.cells?.rows    ?? Math.ceil(image.height / cell.height), kittyDiacritics.length)
@@ -623,7 +633,7 @@ export class Rasterize {
             for (let i = 0; i < data.length; i += 4096) {
                 const more = i + 4096 < data.length ? 1 : 0
                 const ctrl = i === 0 ? `f=100,a=T,q=2${size}` : "q=2"
-                out += tmuxWrap(`\x1b_G${ctrl},m=${more};${data.slice(i, i + 4096)}\x1b\\`)
+                out += wrap(`\x1b_G${ctrl},m=${more};${data.slice(i, i + 4096)}\x1b\\`)
             }
             if (placeholders) {
                 /*  one line of placeholders per row, each in the foreground color
@@ -641,10 +651,10 @@ export class Rasterize {
         }
         else if (format === "iip") {
             /*  iTerm2 Inline Image Protocol (scaled onto the fitted cell box)  */
-            const { image: iip } = await import("ansi-escapes")
-            const size = image.cells === undefined ? {} : image.cells.by === "columns" ?
-                { width: image.cells.columns } : { height: image.cells.rows }
-            return iip(image.png, size)
+            const size = image.cells === undefined ? "" : image.cells.by === "columns" ?
+                `;width=${image.cells.columns}` : `;height=${image.cells.rows}`
+            const data = Buffer.from(image.png)
+            return wrap(`\x1b]1337;File=inline=1${size};size=${data.byteLength}:${data.toString("base64")}\x07`)
         }
         else {
             /*  SIXEL: quantize a copy of the pixels into a palette (the
@@ -654,7 +664,7 @@ export class Rasterize {
             const { introducer, sixelEncode, FINALIZER } = await import("sixel")
             const { palette } = reduce(image.pixels.slice(), image.width, 256)
             const sixel = introducer(1) + sixelEncode(image.pixels, image.width, image.height, palette) + FINALIZER
-            return tmuxPassthrough(format) ? tmuxWrap(sixel) : sixel
+            return wrap(sixel)
         }
     }
 }
@@ -702,8 +712,9 @@ export default class RasterizeCommand {
 
                     /*  rasterize and encode SVG document (but pass through an
                         unchanged PNG image to all formats not needing its pixels)  */
-                    const format  = opts.format === "auto" ? await Rasterize.detectFormat(opts.output) : opts.format
-                    if (opts.output === "-" && process.stdout.isTTY)
+                    const format   = opts.format === "auto" ? await Rasterize.detectFormat(opts.output) : opts.format
+                    const terminal = opts.output === "-" && process.stdout.isTTY
+                    if (terminal)
                         Rasterize.checkTmuxPassthrough(format)
                     const scale   = opts.scale === "auto" && format === "png" ? 1 : opts.scale
                     const density = format === "sixel" ? 1 : 2
@@ -711,11 +722,11 @@ export default class RasterizeCommand {
                         && opts.background === "auto" && format !== "sixel" ?
                         { png: data, pixels: new Uint8Array(0), width: info.width, height: info.height } :
                         await Rasterize.render(svg, { ...opts, scale, density })
-                    let out       = await Rasterize.encode(image, format)
+                    let out       = await Rasterize.encode(image, format, terminal)
 
                     /*  output encoded image (on a terminal followed by a newline,
                         so the subsequent output starts below the image)  */
-                    if (opts.output === "-" && process.stdout.isTTY && typeof out === "string") {
+                    if (terminal && typeof out === "string") {
                         /*  inside tmux, which is unaware of the passed through image,
                             reserve its rows upfront, draw it at the reserved position
                             without moving the outer terminal cursor, and move the

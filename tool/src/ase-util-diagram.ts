@@ -342,12 +342,13 @@ export class Diagram {
             /*  determine the style of the node boxes: a darker accent color with lighter
                 labels on the light theme style and vice versa on the dark one, overridable
                 per property by a "classDef default" (as "beautiful-mermaid" does not apply
-                this class itself), escaped for the SVG attributes  */
+                this class itself), split at the commas outside of parentheses (as
+                in "rgb(...)"), and escaped for the SVG attributes  */
             const box: Record<string, string> = dark ?
                 { fill: a[23]!, stroke: a[26]!, color: b[6]!  } :
                 { fill: a[5]!,  stroke: a[3]!,  color: b[31]! }
             for (const m of src.matchAll(/^\s*classDef\s+default\s+(.+?);?\s*$/gm)) {
-                for (const pair of m[1]!.split(",")) {
+                for (const pair of m[1]!.split(/,(?![^(]*\))/)) {
                     const colon = pair.indexOf(":")
                     const key   = pair.slice(0, colon).trim()
                     const value = pair.slice(colon + 1).trim()

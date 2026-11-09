@@ -50,7 +50,7 @@ Skill Output
     specification <mermaid-spec/> and render it at the position of
     the diagram in the response as follows:
 
-    -   *Inline Image*: If <ase-diagram-mode/> is not equal `text` and
+    -   *Inline Image*: If <ase-diagram-format/> is not equal `text` and
         the tool `ase_mods_diagram` of the `ase` MCP server is available
         (if deferred, first load it via `ToolSearch`), emit the response
         text up to the diagram, call

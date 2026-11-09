@@ -74,7 +74,9 @@ above 2 MiB (`auto`).
   are reserved upfront, but as *tmux* is unaware of such an image, it
   stays on top of the pane content until the outer terminal redraws.
   The outer terminal is often hidden from the detection, so an explicit
-  format may be needed.
+  format may be needed. Besides a local *tmux* (`TMUX` set), a remote one,
+  like for *SSH* from inside *tmux*, is assumed for a `TERM` of `tmux*`,
+  or of `screen*` outside of *GNU screen* (`STY` unset).
 
 - \[`-o`|`--output` *file*|`-`\]:
   Write the output to *file* instead of standard output (`-`, the
