@@ -462,9 +462,11 @@ export class Rasterize {
         }
 
         /*  determine the zoom factor, bounded by the optional maximum
-            width and height of the rasterized image in pixels  */
+            width and height of the rasterized image in pixels (then fitted
+            exactly to it, as a zoom rounds the pixel size up beyond it)  */
         let zoom  = opts.scale === "auto" ? 1 : opts.scale
         let cells: RasterizeCells | null = null
+        let fitTo: { mode: "zoom" | "width" | "height", value: number } | null = null
         if (opts.scale === "auto" || opts.maximum !== undefined) {
             const probe = new Resvg(svg, options)
             if (opts.scale === "auto") {
@@ -475,13 +477,13 @@ export class Rasterize {
                         cells.columns * cell.width  * opts.density / probe.width :
                         cells.rows    * cell.height * opts.density / probe.height
             }
-            if (opts.maximum !== undefined)
-                zoom = Math.min(zoom, Math.floor(opts.maximum) / Math.max(probe.width, probe.height))
+            if (opts.maximum !== undefined && zoom * Math.max(probe.width, probe.height) > Math.floor(opts.maximum))
+                fitTo = { mode: probe.width >= probe.height ? "width" : "height", value: Math.floor(opts.maximum) }
             probe.free()
         }
 
         /*  rasterize the SVG document  */
-        const renderer = new Resvg(svg, { ...options, fitTo: { mode: "zoom", value: zoom } })
+        const renderer = new Resvg(svg, { ...options, fitTo: fitTo ?? { mode: "zoom", value: zoom } })
         try {
             const image = renderer.render()
             const result: RasterizeImage = { png: image.asPng(), pixels: image.pixels, width: image.width, height: image.height }

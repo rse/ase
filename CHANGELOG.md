@@ -15,6 +15,10 @@ ChangeLog
     rendering `$ASE_TERM_THEME`, `$COLORFGBG`, the Claude Code theme, and the system appearance
     (macOS, Windows, GNOME), resolving it into `light` or `dark`.
 
+-   BUGFIX [code]: Blank Inline Images
+    The `maximum` of `ase_rasterize` now fits the image exactly to its pixel size, as the zoom
+    rounded it up beyond (like 2049 instead of 2048 pixels), so the mods showed a blank box.
+
 2.0.10 (2026-11-09)
 -------------------
 
