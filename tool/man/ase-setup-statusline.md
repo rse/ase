@@ -55,7 +55,9 @@ and the command still exits with status `0`.
   an existing one of *ASE* in place.
 
   The entry is the object
-  `{ "type": "command", "command": "ase statusline ...", "padding": 0 }`,
+  `{ "type": "command", "command": "ase statusline ...", "padding": 0 }`
+  (for `claude` additionally with `"refreshInterval": 10`, re-running
+  the command every 10 seconds beside its event-driven updates),
   whose command is `ase statusline --tool` *tool* `-w` *width* `-m`
   *margin* `-p` *padding*, followed by `--no-icons` and `--no-labels`
   if given, and the *format* lines, each one single-quoted for the

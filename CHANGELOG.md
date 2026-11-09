@@ -9,6 +9,10 @@ ChangeLog
     The mod now titles the diagrams of `ase_mods_diagram` "Inline Image Rendering" as well,
     instead of "Inline Diagram Rendering".
 
+-   IMPROVEMENT [code]: Periodic Statusline Refresh
+    `ase setup statusline activate` now adds `"refreshInterval": 10` for Claude Code, so the
+    statusline also catches up with changes raising no event-driven update (like native commands).
+
 2.0.12 (2026-11-09)
 -------------------
 
