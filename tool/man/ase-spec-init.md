@@ -5,6 +5,7 @@
 `ase spec init`
 \[`-h`|`--help`\]
 \[`-s`|`--sample`\]
+\[`-F`|`--fetch` *mode*\]
 
 ## DESCRIPTION
 
@@ -36,6 +37,10 @@ configuration are taken from the *ASE* configuration (see
   Additionally scaffold one lint-clean sample object per allowed object
   kind into the created files, with placeholder values satisfying the
   schema configuration, so the format is learnable from them.
+
+- \[`-F`|`--fetch` *mode*\]:
+  When to fetch the remote schemas of the schema configuration through
+  the network: `never`, `auto` (the default), or `always` (see `ase-spec`(1)).
 
 ## EXIT STATUS
 

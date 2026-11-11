@@ -7,6 +7,8 @@
 \[`-o`|`--output` \[*format*`:`\]*file*\] \[...\]
 \[`-w`|`--watch`\]
 \[`-S`|`--schema`\]
+\[`-O`|`--omit` *aspect*\[`,`...\]\] \[...\]
+\[`-F`|`--fetch` *mode*\]
 
 ## DESCRIPTION
 
@@ -74,12 +76,34 @@ The MCP tool `ase_specbook_export` provides the same to the skills.
   Export the effective schema configuration `project.artifact.spec.schema`
   itself, rendered as a *SpecBook* document, instead of the specification.
 
+- \[`-O`|`--omit` *aspect*\[`,`...\]\]:
+  Omit content aspects from the `html` and `pdf` outputs instead of
+  just leaving them foldable in the browser, while the AST outputs
+  (`json`, `json5`, `yaml`, and `toon`) drop the omitted diagrams only,
+  and the `md` output ignores the option. The option is repeatable and
+  takes comma-separated lists. The *aspect* is one of:
+
+  - `diagram:graph`, `diagram:hub`, `diagram:grid`, `diagram:state`,
+    `diagram:layer`, `diagram:slice`, `diagram:tree`, `diagram:matrix`,
+    `diagram:sequence`, `diagram:petri`, `diagram:gantt`, `diagram:code`
+    (Mermaid/D2), `diagram:image` (images and PDF pages), and
+    `diagram:listing` (code listings): all diagrams of the type.
+  - `diagram:1` (alias: `diagram`), `diagram:2`, and `diagram:3`: all
+    diagrams from the object tree nesting level on (level `1` hence all,
+    including the "Diagram of Contents" page).
+  - `text:long`: every table cell towering over all other cells of its
+    row, cut at a word boundary and ended with a grey `[...]`.
+
+- \[`-F`|`--fetch` *mode*\]:
+  When to fetch the remote schemas of the schema configuration through
+  the network: `never`, `auto` (the default), or `always` (see `ase-spec`(1)).
+
 ## EXIT STATUS
 
 Exits with status `0` on success, and with status `1` on any lint
-diagnostic of `error` severity, an invalid output specification, a
-missing browser for `pdf`, an unwritable output file, or `--watch`
-combined with `-`.
+diagnostic of `error` severity, an invalid output specification, an
+unknown omit aspect, a missing browser for `pdf`, an unwritable output
+file, or `--watch` combined with `-`.
 
 ## EXAMPLES
 
@@ -98,6 +122,9 @@ $ ase spec export -o /tmp/spec.html -w
 
 # export the schema configuration as PDF
 $ ase spec export -S -o schema.pdf
+
+# export the specification as PDF without any diagrams
+$ ase spec export -O diagram -o spec.pdf
 ```
 
 ## SEE ALSO

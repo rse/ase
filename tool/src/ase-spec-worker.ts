@@ -30,9 +30,10 @@ const log = new ForwardLog("ase", "debug", "-")
 const job = workerData as SpecJob
 const run = async (): Promise<SpecReply> => {
     if (job.op === "lint")
-        return { type: "lint", diagnostics: await Spec.lint(log, job.markdown) }
+        return { type: "lint", diagnostics: await Spec.lint(log, job.markdown, job.fetch) }
     const notices = new Array<string>()
-    const buffers = await Spec.export(log, job.formats, { notices, schema: job.schema, rebase: job.rebase })
+    const buffers = await Spec.export(log, job.formats,
+        { notices, schema: job.schema, omit: job.omit, fetch: job.fetch, rebase: job.rebase })
     return { type: "export", buffers, notices }
 }
 run().then(post, (err: unknown) => {

@@ -7,6 +7,8 @@
 \[`-a`|`--addr` *ip-addr*\]
 \[`-p`|`--port` *tcp-port*\]
 \[`-S`|`--schema`\]
+\[`-O`|`--omit` *aspect*\[`,`...\]\] \[...\]
+\[`-F`|`--fetch` *mode*\]
 
 ## DESCRIPTION
 
@@ -38,10 +40,19 @@ interrupted (e.g., via `CTRL+C`).
   Preview the effective schema configuration `project.artifact.spec.schema`
   itself, rendered as a *SpecBook* document, instead of the specification.
 
+- \[`-O`|`--omit` *aspect*\[`,`...\]\]:
+  Omit content aspects from the HTML export instead of just leaving
+  them foldable in the browser, exactly like for `ase spec export` (see
+  `ase-spec-export`(1)). The option is repeatable.
+
+- \[`-F`|`--fetch` *mode*\]:
+  When to fetch the remote schemas of the schema configuration through
+  the network: `never`, `auto` (the default), or `always` (see `ase-spec`(1)).
+
 ## EXIT STATUS
 
-Runs until interrupted. Exits with status `1` on an invalid TCP port
-or if the server cannot be started.
+Runs until interrupted. Exits with status `1` on an invalid TCP port,
+an unknown omit aspect, or if the server cannot be started.
 
 ## EXAMPLES
 
@@ -54,6 +65,9 @@ $ ase spec preview -a 0.0.0.0 -p 8080
 
 # serve the live preview of the schema configuration
 $ ase spec preview -S
+
+# serve the live preview without the code diagrams and overlong cells
+$ ase spec preview -O diagram:code,text:long
 ```
 
 ## SEE ALSO

@@ -393,7 +393,7 @@ Beyond `ase setup`, the CLI provides:
         every exited member with an exponential backoff
 -   `ase artifact`: the artifact kind resolution
 -   `ase spec`: the SpecBook specification initializing, linting, exporting,
-    and previewing
+    and previewing, and the searching of shareable SpecBook schema configurations
 -   `ase man`: the interactive browser of the manual pages of `tool/man/`
     and of the skills shipped with the tool (plain text outside a terminal)
 -   `ase util`: the utility commands `ase util meta` (plugin meta file

@@ -9,14 +9,14 @@ import fs                       from "node:fs"
 import os                       from "node:os"
 import { Worker }               from "node:worker_threads"
 
-import { Command }              from "commander"
+import { Command, Option }      from "commander"
 import { isScalar }             from "yaml"
 import { z }                    from "zod"
 import sourceCodeError          from "source-code-error"
 import type { McpServer }       from "@modelcontextprotocol/sdk/server/mcp.js"
 import { renderDiagnostic }     from "@rse/specbook/dst/specbook-diagnostic.js"
 import { renderVerbose }        from "@rse/specbook/dst/specbook-verbose.js"
-import type { SpecBook, Diagnostic, ExportFormat, QueryFormat, VerboseLevel } from "@rse/specbook"
+import type { SpecBook, Diagnostic, ExportFormat, QueryFormat, VerboseLevel, FetchMode, SearchHit } from "@rse/specbook"
 
 import type Log                 from "./ase-lib-log.js"
 import type { LogLevel }        from "./ase-lib-log.js"
@@ -26,20 +26,28 @@ import { Task }                 from "./ase-task.js"
 import { Artifact }             from "./ase-artifact.js"
 import { writeStdout }          from "./ase-lib-stdio.js"
 
+/*  the options of reading the specification: the effective schema
+    configuration instead of the specification, and when to fetch the
+    remote references of the schema configuration through the network  */
+interface SpecSourceOptions {
+    schema?: boolean
+    fetch?:  FetchMode
+}
+
 /*  the options of exporting the specification: the collector of the emitted
-    environment notices, the export of the effective schema configuration
-    instead, and the per-format directories the image references of the
-    normalized Markdown are re-based onto (refusing one below the base directory)  */
-interface SpecExportOptions {
+    environment notices, the omitted content aspects, and the per-format
+    directories the image references of the normalized Markdown are
+    re-based onto (refusing one below the base directory)  */
+interface SpecExportOptions extends SpecSourceOptions {
     notices?: string[]
-    schema?:  boolean
+    omit?:    string[]
     rebase?:  (string | undefined)[]
 }
 
 /*  a job of the SpecBook worker thread (see "Spec.isolated") and its replies  */
 export type SpecJob =
-    { op: "lint",   markdown: boolean } |
-    { op: "export", formats:  ExportFormat[], schema: boolean, rebase?: (string | undefined)[] }
+    { op: "lint",   markdown: boolean, fetch?: FetchMode } |
+    { op: "export", formats:  ExportFormat[], schema: boolean, omit?: string[], fetch?: FetchMode, rebase?: (string | undefined)[] }
 export type SpecReply =
     { type: "log",    level: LogLevel, msg: string } |
     { type: "lint",   diagnostics: Diagnostic[] } |
@@ -59,6 +67,9 @@ export class Spec {
     static readonly queryFormats = Object.keys({
         json: true, json5: true, yaml: true, toon: true
     } satisfies Record<QueryFormat, true>) as [ QueryFormat, ...QueryFormat[] ]
+    static readonly fetchModes = Object.keys({
+        never: true, auto: true, always: true
+    } satisfies Record<FetchMode, true>) as [ FetchMode, ...FetchMode[] ]
 
     /*  whether a schema configuration entry is a reference SpecBook resolves
         itself (mirroring its internal check): the bundled "std", "meta", and
@@ -91,12 +102,14 @@ export class Spec {
     /*  the source options of the reading commands: the specification below
         the "spec" artifact base directory, or, under "schema", the effective
         schema configuration itself (to which no base directory applies)  */
-    private static source (log: Log, schema: boolean) {
+    private static source (log: Log, options: SpecSourceOptions) {
+        const schema = options.schema ?? false
         return {
             config:    Spec.configFiles(log),
             basedir:   schema ? undefined : Artifact.basedir(log, "spec"),
             gitignore: Spec.gitignore,
-            schema
+            schema,
+            fetch:     options.fetch
         }
     }
 
@@ -167,7 +180,7 @@ export class Spec {
         options file ".specbook.yaml" into a throw-away working directory, as
         ASE keeps these options in its own configuration, where "sample"
         scaffolds one sample object per allowed object kind into the files  */
-    static async init (log: Log, sample = false): Promise<string[]> {
+    static async init (log: Log, sample = false, fetch?: FetchMode): Promise<string[]> {
         const basedir = Artifact.basedir(log, "spec")
         const cwd     = await fs.promises.mkdtemp(path.join(os.tmpdir(), "ase-spec-"))
         try {
@@ -175,6 +188,7 @@ export class Spec {
                 config: Spec.configFiles(log),
                 basedir,
                 cwd,
+                fetch,
                 sample
             })))
             return result.files.map((file) => Spec.relativize(path.join(basedir, file)))
@@ -187,11 +201,12 @@ export class Spec {
     /*  lint the specification Markdown files below the "spec" artifact
         base directory against the schema configuration, optionally
         followed by the generic Markdown linting  */
-    static async lint (log: Log, markdown = false): Promise<Diagnostic[]> {
+    static async lint (log: Log, markdown = false, fetch?: FetchMode): Promise<Diagnostic[]> {
         const result = await Spec.unmarked(Spec.api(log).then((api) => api.lint({
             config:    Spec.configFiles(log),
             basedir:   Artifact.basedir(log, "spec"),
-            gitignore: Spec.gitignore
+            gitignore: Spec.gitignore,
+            fetch
         })))
         const diagnostics = result.diagnostics.map((d) => ({ ...d, file: Spec.relativize(d.file) }))
         return markdown ? diagnostics.concat(await Spec.markdownlint(log)) : diagnostics
@@ -225,8 +240,8 @@ export class Spec {
     }
 
     /*  lint like "lint", but in a worker thread  */
-    static async lintIsolated (log: Log, markdown: boolean): Promise<Diagnostic[]> {
-        const reply = await Spec.isolated(log, { op: "lint", markdown })
+    static async lintIsolated (log: Log, markdown: boolean, fetch?: FetchMode): Promise<Diagnostic[]> {
+        const reply = await Spec.isolated(log, { op: "lint", markdown, fetch })
         if (reply.type !== "lint")
             throw new Error(`SpecBook worker: unexpected "${reply.type}" reply`)
         return reply.diagnostics
@@ -234,7 +249,9 @@ export class Spec {
 
     /*  export like "export", but in a worker thread  */
     static async exportIsolated (log: Log, formats: ExportFormat[], options: SpecExportOptions = {}): Promise<Buffer[]> {
-        const reply = await Spec.isolated(log, { op: "export", formats, schema: options.schema ?? false, rebase: options.rebase })
+        const reply = await Spec.isolated(log, {
+            op: "export", formats, schema: options.schema ?? false, omit: options.omit, fetch: options.fetch, rebase: options.rebase
+        })
         if (reply.type !== "export")
             throw new Error(`SpecBook worker: unexpected "${reply.type}" reply`)
         options.notices?.push(...reply.notices)
@@ -312,8 +329,9 @@ export class Spec {
         base directory into the requested formats, one buffer per format  */
     static export (log: Log, formats: ExportFormat[], options: SpecExportOptions = {}): Promise<Buffer[]> {
         return Spec.unmarked(Spec.api(log, options.notices).then((api) => api.export({
-            ...Spec.source(log, options.schema ?? false),
+            ...Spec.source(log, options),
             formats,
+            omit:   options.omit,
             rebase: options.rebase
         })))
     }
@@ -330,8 +348,9 @@ export class Spec {
         options:  SpecExportOptions = {}
     ): Promise<void> {
         return Spec.unmarked(Spec.api(log, options.notices).then((api) => api.watch({
-            ...Spec.source(log, options.schema ?? false),
+            ...Spec.source(log, options),
             formats,
+            omit:   options.omit,
             rebase: options.rebase,
             outputs,
             onExport
@@ -349,11 +368,11 @@ export class Spec {
         params:   Record<string, string>,
         format:   QueryFormat,
         notices?: string[],
-        schema    = false
+        options:  SpecSourceOptions = {}
     ): Promise<string> {
         return Spec.unmarked(Spec.api(log, notices).then(async (api) => {
             const { renderNodes } = await import("@rse/specbook")
-            const document = await api.load(Spec.source(log, schema))
+            const document = await api.load(Spec.source(log, options))
             return renderNodes(document.query(selector, params), format)
         }))
     }
@@ -362,12 +381,34 @@ export class Spec {
         the effective schema configuration) as a live preview, kept in sync
         with its sources and pushed into the connected browsers as an
         in-place document update  */
-    static preview (log: Log, addr: string, port: number, schema = false): Promise<void> {
+    static preview (log: Log, addr: string, port: number,
+        options: SpecSourceOptions & { omit?: string[] } = {}): Promise<void> {
         return Spec.unmarked(Spec.api(log).then((api) => api.preview({
-            ...Spec.source(log, schema),
+            ...Spec.source(log, options),
+            omit: options.omit,
             addr,
             port
         })))
+    }
+
+    /*  search the bundled schema configurations and the shareable ones of
+        the npm registry and GitHub for all words of a search term  */
+    static search (log: Log, term: string, fetch?: FetchMode): Promise<SearchHit[]> {
+        return Spec.unmarked(Spec.api(log).then((api) => api.search({
+            term,
+            cwd: Task.projectRoot(),
+            fetch
+        })))
+    }
+
+    /*  render the search hits as aligned lines of their reference,
+        version, and description  */
+    static renderHits (hits: SearchHit[]): string {
+        if (hits.length === 0)
+            return "no matching schema configurations found\n"
+        const width = Math.max(0, ...hits.map((hit) => hit.ref.length))
+        return hits.map((hit) => (`${hit.ref.padEnd(width)}  ` +
+            `${(hit.version ?? "").padEnd(8)}  ${hit.description ?? ""}`).trimEnd() + "\n").join("")
     }
 }
 
@@ -380,19 +421,38 @@ export default class SpecCommand {
         /*  register CLI top-level command "ase spec"  */
         const spec = program
             .command("spec")
-            .description("Initialize, lint, export, query, and preview the SpecBook-based project specification")
+            .description("Initialize, lint, export, query, and preview the SpecBook-based project specification, " +
+                "and search for shareable SpecBook schema configurations")
             .action(() => {
                 spec.outputHelp()
                 process.exit(1)
             })
+
+        /*  the option of all sub-commands selecting when to fetch the remote
+            references of the schema configuration through the network, and
+            the repeatable option of the HTML-rendering sub-commands naming
+            the content aspects to omit (validated by SpecBook itself)  */
+        const fetchOption = () =>
+            new Option("-F, --fetch <mode>", "when to fetch the remote references through the network " +
+                "(\"never\": the download cache only, \"auto\": whenever the download cache lacks them " +
+                "or is no longer fresh, \"always\": ignoring the download cache; default: \"auto\")")
+                .choices(Spec.fetchModes)
+        const omitOption = () =>
+            new Option("-O, --omit <aspect[,...]>", "omit content aspects from the HTML, the PDF, and " +
+                "(the diagrams) the AST outputs (repeatable): \"diagram\" (all), \"diagram:<type>\", " +
+                "\"diagram:<level>\", or \"text:long\"")
+                .argParser((value: string, previous: string[] = []) => previous.concat(value))
+        const omitOf = (omit?: string[]) =>
+            omit !== undefined && omit.length > 0 ? omit : undefined
 
         /*  register CLI sub-command "ase spec init"  */
         spec
             .command("init")
             .description("Initialize the absent specification Markdown files of the SpecBook schema configuration")
             .option("-s, --sample", "scaffold one sample object per allowed object kind into the created files")
-            .action(async (opts: { sample?: boolean }) => {
-                const files = await Spec.init(this.log, opts.sample === true)
+            .addOption(fetchOption())
+            .action(async (opts: { sample?: boolean, fetch?: FetchMode }) => {
+                const files = await Spec.init(this.log, opts.sample === true, opts.fetch)
                 await writeStdout(files.length > 0 ?
                     `initialized artifact file(s): ${files.join(", ")}\n` :
                     "no artifact files were created\n")
@@ -404,8 +464,9 @@ export default class SpecCommand {
             .description("Lint the specification Markdown files against the SpecBook schema configuration")
             .option("-m, --markdown", "additionally lint the generic Markdown formatting via markdownlint")
             .option("-v, --verbose", "print each diagnostic with its affected source snippet")
-            .action(async (opts: { markdown?: boolean, verbose?: boolean }) => {
-                const diagnostics = await Spec.lint(this.log, opts.markdown === true)
+            .addOption(fetchOption())
+            .action(async (opts: { markdown?: boolean, verbose?: boolean, fetch?: FetchMode }) => {
+                const diagnostics = await Spec.lint(this.log, opts.markdown === true, opts.fetch)
                 for (const diagnostic of diagnostics) {
                     /*  report a diagnostic as a log message of its severity, tagged with its linter  */
                     const { file, line, column, severity, message } = diagnostic
@@ -432,9 +493,13 @@ export default class SpecCommand {
                 (value: string, previous: string[]) => previous.concat(value), new Array<string>())
             .option("-w, --watch", "keep the outputs in sync by re-exporting on every source change")
             .option("-S, --schema", "export the effective schema configuration itself instead of the specification")
-            .action(async (opts: { output: string[], watch?: boolean, schema?: boolean }) => {
+            .addOption(omitOption())
+            .addOption(fetchOption())
+            .action(async (opts: { output: string[], watch?: boolean, schema?: boolean, omit?: string[], fetch?: FetchMode }) => {
                 const { parseOutputSpec } = await import("@rse/specbook")
                 const schema   = opts.schema === true
+                const omit     = omitOf(opts.omit)
+                const fetch    = opts.fetch
                 const outputs  = (opts.output.length > 0 ? opts.output :
                     [ path.join(Artifact.basedir(this.log, "spec"), schema ? "schema.html" : "index.html") ])
                     .map(parseOutputSpec)
@@ -468,11 +533,12 @@ export default class SpecCommand {
                 const formats  = distinct.map(({ format }) => format)
                 const rebase   = distinct.map(rebaseOf)
                 if (opts.watch === true) {
-                    await Spec.watch(this.log, formats, outputs.map(({ output }) => output), write, { schema, rebase })
+                    await Spec.watch(this.log, formats, outputs.map(({ output }) => output), write,
+                        { schema, omit, fetch, rebase })
                     await new Promise<void>(() => { /*  never resolves  */ })
                 }
                 else
-                    await write(await Spec.export(this.log, formats, { schema, rebase }))
+                    await write(await Spec.export(this.log, formats, { schema, omit, fetch, rebase }))
             })
 
         /*  register CLI sub-command "ase spec query"  */
@@ -487,7 +553,8 @@ export default class SpecCommand {
                 "default: inferred from the output file like for \"export\", else json)")
             .option("-o, --output <[format:]file>", "output file (\"-\" for stdout)", "-")
             .option("-S, --schema", "query the effective schema configuration itself instead of the specification")
-            .action(async (selector: string, opts: { param: string[], format?: string, output: string, schema?: boolean }) => {
+            .addOption(fetchOption())
+            .action(async (selector: string, opts: { param: string[], format?: string, output: string, schema?: boolean, fetch?: FetchMode }) => {
                 const { parseQueryOutput } = await import("@rse/specbook")
                 const output = parseQueryOutput(opts.output, opts.format)
                 const params: Record<string, string> = {}
@@ -497,7 +564,8 @@ export default class SpecCommand {
                         throw new Error(`invalid query parameter "${param}" (expected "<name>=<value>")`)
                     params[m[1]] = m[2]
                 }
-                const text = await Spec.query(this.log, selector, params, output.format, undefined, opts.schema === true)
+                const options = { schema: opts.schema === true, fetch: opts.fetch }
+                const text = await Spec.query(this.log, selector, params, output.format, undefined, options)
                 if (output.output === "-")
                     await writeStdout(text)
                 else {
@@ -513,13 +581,28 @@ export default class SpecCommand {
             .option("-a, --addr <ip-addr>", "IP address to listen on (default: SpecBook preview address)")
             .option("-p, --port <tcp-port>", "TCP port to listen on (default: SpecBook preview port)")
             .option("-S, --schema", "preview the effective schema configuration itself instead of the specification")
-            .action(async (opts: { addr?: string, port?: string, schema?: boolean }) => {
+            .addOption(omitOption())
+            .addOption(fetchOption())
+            .action(async (opts: { addr?: string, port?: string, schema?: boolean, omit?: string[], fetch?: FetchMode }) => {
                 const { previewAddr, previewPort } = await import("@rse/specbook")
                 const port = Number(opts.port ?? previewPort)
                 if (!Number.isInteger(port) || port < 1 || port > 65535)
                     throw new Error(`invalid TCP port "${opts.port}"`)
-                await Spec.preview(this.log, opts.addr ?? previewAddr, port, opts.schema === true)
+                await Spec.preview(this.log, opts.addr ?? previewAddr, port,
+                    { schema: opts.schema === true, omit: omitOf(opts.omit), fetch: opts.fetch })
                 await new Promise<void>(() => { /*  never resolves  */ })
+            })
+
+        /*  register CLI sub-command "ase spec search"  */
+        spec
+            .command("search")
+            .description("Search the bundled SpecBook schema configurations, the npm registry, " +
+                "and GitHub for shareable schema configurations")
+            .argument("[term...]", "words a matching schema configuration has to carry")
+            .addOption(fetchOption())
+            .action(async (term: string[], opts: { fetch?: FetchMode }) => {
+                const hits = await Spec.search(this.log, term.join(" "), opts.fetch)
+                await writeStdout(Spec.renderHits(hits))
             })
     }
 }
@@ -529,6 +612,13 @@ const mcpToolError = (err: unknown) => ({
     isError: true,
     content: [ { type: "text" as const, text: `ERROR: ${err instanceof Error ? err.message : String(err)}` } ]
 })
+
+/*  the MCP tool parameter selecting when to fetch the remote references
+    of the schema configuration through the network  */
+const mcpFetch = () => z.enum(Spec.fetchModes).optional()
+    .describe("when to fetch the remote schema references through the network: `never` (the download " +
+        "cache only), `auto` (whenever the download cache lacks them or is no longer fresh), or " +
+        "`always` (ignoring the download cache) (default: `auto`)")
 
 /*  MCP registration entry point for SpecBook tools  */
 export class SpecMCP {
@@ -557,7 +647,8 @@ export class SpecMCP {
                 markdown: z.boolean().optional()
                     .describe("if true, additionally lint the generic Markdown formatting via markdownlint (default: false)"),
                 verbose: z.boolean().optional()
-                    .describe("if true, render each diagnostic with its affected source snippet (default: false)")
+                    .describe("if true, render each diagnostic with its affected source snippet (default: false)"),
+                fetch: mcpFetch()
             },
             outputSchema: {
                 diagnostics: z.array(z.object({
@@ -573,7 +664,7 @@ export class SpecMCP {
         }, async (args) => {
             try {
                 const verbose = args.verbose ?? false
-                const diagnostics: Array<Diagnostic & { snippet?: string }> = (await Spec.lintIsolated(this.log, args.markdown ?? false))
+                const diagnostics: Array<Diagnostic & { snippet?: string }> = (await Spec.lintIsolated(this.log, args.markdown ?? false, args.fetch))
                     .map((d) => verbose ? { ...d, snippet: Spec.render(d, false) } : d)
                 const text = diagnostics.length === 0 ? "specification valid" :
                     verbose ?
@@ -600,14 +691,21 @@ export class SpecMCP {
                 "The `notices` array carries the environment notices emitted during the export " +
                 "(like a PDF rendering falling back onto a system-installed browser), which are " +
                 "worth reporting to the user verbatim. With `schema`, the effective SpecBook YAML " +
-                "schema configuration itself is exported instead, as a SpecBook document.",
+                "schema configuration itself is exported instead, as a SpecBook document. With `omit`, " +
+                "content aspects are left out of the HTML, the PDF, and (the diagrams) the AST outputs: " +
+                "`diagram` (all diagrams), `diagram:<type>` (all diagrams of a type, like `diagram:graph` " +
+                "or `diagram:code`), `diagram:<level>` (all diagrams from object tree nesting level 1, 2, " +
+                "or 3 on), or `text:long` (overlong table cells cut).",
             inputSchema: {
                 format: z.enum(Spec.formats).optional()
                     .describe("output format (default: inferred from the `output` file extension, else `json`)"),
                 output: z.string().optional()
                     .describe("output file path (\"-\" or omitted returns the result directly)"),
                 schema: z.boolean().optional()
-                    .describe("if true, export the effective schema configuration instead of the specification (default: false)")
+                    .describe("if true, export the effective schema configuration instead of the specification (default: false)"),
+                omit: z.array(z.string()).optional()
+                    .describe("content aspects to omit, like `diagram` or `text:long` (default: none)"),
+                fetch: mcpFetch()
             },
             outputSchema: {
                 notices: z.array(z.string())
@@ -628,7 +726,7 @@ export class SpecMCP {
                 const rebase = spec.format === "md" && spec.output !== undefined && spec.output !== "-" ?
                     path.dirname(path.resolve(Task.projectRoot(), spec.output)) : undefined
                 const [ data ] = await Spec.exportIsolated(this.log, [ spec.format ],
-                    { notices, schema: args.schema ?? false, rebase: [ rebase ] })
+                    { notices, schema: args.schema ?? false, omit: args.omit, fetch: args.fetch, rebase: [ rebase ] })
                 if (spec.output !== undefined && spec.output !== "-") {
                     await fs.promises.writeFile(path.resolve(Task.projectRoot(), spec.output), data)
                     return {
@@ -683,7 +781,8 @@ export class SpecMCP {
                 output: z.string().optional()
                     .describe("output file path (\"-\" or omitted returns the result directly)"),
                 schema: z.boolean().optional()
-                    .describe("if true, query the effective schema configuration instead of the specification (default: false)")
+                    .describe("if true, query the effective schema configuration instead of the specification (default: false)"),
+                fetch: mcpFetch()
             },
             outputSchema: {
                 notices: z.array(z.string())
@@ -695,7 +794,7 @@ export class SpecMCP {
                 const { parseQueryOutput } = await import("@rse/specbook")
                 const spec = parseQueryOutput(args.output ?? "-", args.format)
                 const text = await Spec.query(this.log, args.selector, args.params ?? {},
-                    spec.format, notices, args.schema ?? false)
+                    spec.format, notices, { schema: args.schema ?? false, fetch: args.fetch })
                 if (spec.output !== "-") {
                     await fs.promises.writeFile(path.resolve(Task.projectRoot(), spec.output), text)
                     return {
@@ -706,6 +805,42 @@ export class SpecMCP {
                 return {
                     structuredContent: { notices },
                     content: [ { type: "text", text } ]
+                }
+            }
+            catch (err: unknown) {
+                return mcpToolError(err)
+            }
+        })
+
+        mcp.registerTool("ase_specbook_search", {
+            title: "ASE SpecBook search",
+            description:
+                "Search the SpecBook schema configurations bundled with SpecBook (`std`, `meta`, and `pm`, " +
+                "always listed first) and the shareable ones of the npm registry (keyword `specbook-schema`) " +
+                "and of GitHub (topic `specbook-schema`) for those carrying all words of `term`. Returns a " +
+                "`hits` array of `{ ref, name, version, description, source }` objects, where `ref` is usable " +
+                "as an entry of the `project.artifact.spec.schema` configuration, rendered as aligned lines " +
+                "in `text`. With `fetch` of `never`, only the bundled schema configurations are listed.",
+            inputSchema: {
+                term: z.string().optional()
+                    .describe("words a matching schema configuration has to carry (default: none, i.e., all)"),
+                fetch: mcpFetch()
+            },
+            outputSchema: {
+                hits: z.array(z.object({
+                    ref:         z.string().describe("reference of the schema configuration"),
+                    name:        z.string().describe("name of the schema configuration"),
+                    version:     z.string().optional().describe("version of the schema configuration"),
+                    description: z.string().optional().describe("description of the schema configuration"),
+                    source:      z.enum([ "builtin", "npm", "github" ]).describe("origin of the schema configuration")
+                })).describe("matching schema configurations, empty if there were none")
+            }
+        }, async (args) => {
+            try {
+                const hits = await Spec.search(this.log, args.term ?? "", args.fetch)
+                return {
+                    structuredContent: { hits },
+                    content: [ { type: "text", text: Spec.renderHits(hits).replace(/\n$/, "") } ]
                 }
             }
             catch (err: unknown) {

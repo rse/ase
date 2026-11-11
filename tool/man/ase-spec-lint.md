@@ -6,6 +6,7 @@
 \[`-h`|`--help`\]
 \[`-m`|`--markdown`\]
 \[`-v`|`--verbose`\]
+\[`-F`|`--fetch` *mode*\]
 
 ## DESCRIPTION
 
@@ -44,6 +45,10 @@ The MCP tool `ase_specbook_lint` provides the same to the skills.
   *markdownlint* diagnostic), colorized if standard output is a
   terminal. If the source file is unreadable or empty, the single-line
   message *file*`:`*line*`:`*column*`: `*message* is printed instead.
+
+- \[`-F`|`--fetch` *mode*\]:
+  When to fetch the remote schemas of the schema configuration through
+  the network: `never`, `auto` (the default), or `always` (see `ase-spec`(1)).
 
 ## EXIT STATUS
 

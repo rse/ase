@@ -8,6 +8,7 @@
 \[`-f`|`--format` *format*\]
 \[`-o`|`--output` \[*format*`:`\]*file*\]
 \[`-S`|`--schema`\]
+\[`-F`|`--fetch` *mode*\]
 *selector*
 
 ## DESCRIPTION
@@ -62,6 +63,10 @@ The MCP tool `ase_specbook_query` provides the same to the skills.
   Query the effective schema configuration `project.artifact.spec.schema`
   itself, described as a *SpecBook* document of the bundled meta schema
   configuration, instead of the specification.
+
+- \[`-F`|`--fetch` *mode*\]:
+  When to fetch the remote schemas of the schema configuration through
+  the network: `never`, `auto` (the default), or `always` (see `ase-spec`(1)).
 
 ## EXIT STATUS
 

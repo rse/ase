@@ -13,6 +13,12 @@ ChangeLog
     `ase setup statusline activate` now adds `"refreshInterval": 10` for Claude Code, so the
     statusline also catches up with changes raising no event-driven update (like native commands).
 
+-   FEATURE [code, docs]: SpecBook Omit, Fetch, and Search
+    `ase spec export|preview` (and `ase_specbook_export`) gained `-O|--omit <aspect>[,...]` to leave
+    out diagrams and overlong cells, all `ase spec` sub-commands (and `ase_specbook_*`) gained
+    `-F|--fetch never|auto|always` for the remote schemas, and the new `ase spec search [<term> ...]`
+    (and `ase_specbook_search`) finds shareable schemas.
+
 2.0.12 (2026-11-09)
 -------------------
 
