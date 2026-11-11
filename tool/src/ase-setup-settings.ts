@@ -110,8 +110,9 @@ export class SetupSettings {
 
     /*  build the "statusLine" member subtree natively inside the target
         AST, reproducing the exact whitespace tokens json-asty emits for a
-        canonically 4-space-indented settings.json  */
-    private statuslineBuildMember (root: AstNode, command: string): AstNode {
+        canonically 4-space-indented settings.json (for Claude Code with a
+        periodic refresh, as a native skill command raises no event-driven one)  */
+    private statuslineBuildMember (root: AstNode, tool: Tool, command: string): AstNode {
         const member = (key: string, val: string | number, epilog?: string): AstNode => {
             const type = typeof val === "number" ? "number"    : "string"
             const body = typeof val === "number" ? String(val) : JSON.stringify(val)
@@ -126,7 +127,12 @@ export class SetupSettings {
         obj.add(
             member("type",    "command", ",\n        "),
             member("command", command,   ",\n        "),
-            member("padding", 0)
+            ...(tool === "claude" ? [
+                member("padding",         0, ",\n        "),
+                member("refreshInterval", 10)
+            ] : [
+                member("padding",         0)
+            ])
         )
         const key = root.create("string").set({
             body:  JSON.stringify("statusLine"),
@@ -224,7 +230,7 @@ export class SetupSettings {
                 return 0
             }
             /*  replace the value object in place, preserving its epilog  */
-            const valNew = this.statuslineBuildMember(root, command).query("/ object")[0]!
+            const valNew = this.statuslineBuildMember(root, tool, command).query("/ object")[0]!
             const valOld = existing.query("/ * [ pos() == 2 ]")[0]!
             valNew.set({ epilog: valOld.get("epilog") })
             existing.del(valOld).add(valNew)
@@ -232,7 +238,7 @@ export class SetupSettings {
         }
         else {
             /*  insert a fresh statusLine member  */
-            this.settingsAddMember(root, this.statuslineBuildMember(root, command), false)
+            this.settingsAddMember(root, this.statuslineBuildMember(root, tool, command), false)
             this.log.write("info", `setup: statusline: activate: adding ASE "statusLine" to ${file}`)
         }
         await this.settingsWriteAst(file, root)

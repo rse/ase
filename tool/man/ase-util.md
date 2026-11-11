@@ -72,9 +72,9 @@ with status `1`.
 
 - `ase util rasterize` \[*options*\] *input-file*|`-`|`-d`|`--data` *data*:
   Rasterize an SVG document or PNG/GIF/JPEG image (raw, as `data:` URL, or
-  as base64 data) into a PNG image or into the
-  terminal graphics of the Kitty, iTerm2, or SIXEL protocol. See
-  `ase-util-rasterize`(1).
+  as base64 data) into a PNG image, into the
+  terminal graphics of the Kitty, iTerm2, or SIXEL protocol, or into
+  Unicode half-block text art. See `ase-util-rasterize`(1).
 
 ## EXIT STATUS
 

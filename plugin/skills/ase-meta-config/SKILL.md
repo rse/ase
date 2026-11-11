@@ -129,8 +129,10 @@ Procedure
         <ase-persona-style><value/></ase-persona-style> and re-evaluate
         the `Persona Communication Style` rules, for `agent.guidance` set
         <ase-guidance-level><value/></ase-guidance-level> and re-evaluate
-        the `Guidance Hint Level` rules, for `agent.diagram` set
-        <ase-diagram-mode><value/></ase-diagram-mode> and re-evaluate
+        the `Guidance Hint Level` rules, for `agent.diagram.format` set
+        <ase-diagram-format><value/></ase-diagram-format> (or, if <value/>
+        is `auto`, <ase-diagram-format><ase-diagram-probe/></ase-diagram-format>)
+        and re-evaluate
         the *Diagrams* rule of the skill conventions, and for `project.boxing` set
         <ase-project-boxing><value/></ase-project-boxing> and re-evaluate
         the `Artifact Boxing Transparency` rules. Do not output anything

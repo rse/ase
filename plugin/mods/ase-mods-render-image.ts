@@ -11,10 +11,11 @@
     tool "ase_diagram", inline in the transcript, below the row of the tool call,
     rasterized by the MCP tool "ase_rasterize" and fitted into the terminal (or into
     the requested cells), and rasterized again whenever the width of the terminal
-    changes.  */
+    changes, where a terminal without inline images gets the Unicode half-block
+    text art of the image instead (but no diagram tool at all).  */
 
 import type { Elements, Frozen, ImageSource, MatchedEvent, RenderElement, RenderViewport } from "claude-code"
-import { type Engine, edge } from "./ase-mods-common.ts"
+import { type Engine, type Char, edge, paint } from "./ase-mods-common.ts"
 
 /*  the tool showing an image, as listed for the model  */
 export const TOOL = {
@@ -34,7 +35,8 @@ export const TOOL = {
             data:       { type: "string",  description: "SVG document or PNG/GIF/JPEG image, as raw SVG text, " +
                 "as \"data:\" URL, or as base64 data" },
             background: { type: "string",  description: "CSS color to fill transparent areas with, " +
-                "or \"auto\" (default) to keep transparency" },
+                "or \"auto\" (default) to keep transparency; do NOT pass it implicitly, " +
+                "only when the user requests it or the default is known to not work" },
             smart:      { type: "boolean", description: "resolve CSS custom properties and color mixings first " +
                 "(needed for `ase_diagram` SVG output)" },
             columns:    { type: "number",  description: "maximum width in terminal columns (default: terminal width)" },
@@ -50,6 +52,11 @@ export const DIAGRAM = {
     description: "Render a Mermaid or D2 diagram inline into the terminal of the user as an image, " +
         "fitted into the terminal width, or into at most `columns` x `rows` character cells. Pass the " +
         "diagram specification as `diagram` and its language as `lang` (\"mermaid\" by default, or \"d2\"). " +
+        "Do not style any colors, as the diagram uses the theme colors only. " +
+        "Prefer a narrow and tall layout, as a wide diagram is downscaled to the terminal width: " +
+        "top-to-bottom direction, at most 4 nodes side by side, short labels, and more sibling " +
+        "nodes grouped into a Mermaid `subgraph` with `direction LR` resp. a D2 container with " +
+        "`grid-columns: 3`. " +
         "The user will see the diagram, while you only get `OK: ...` or `ERROR: ...` as text. On `OK: ...`, " +
         "do NOT reproduce, describe, comment on, or confirm the shown diagram, and if showing it was the " +
         "entire request, end your turn without any further text.",
@@ -60,7 +67,8 @@ export const DIAGRAM = {
             lang:       { type: "string",  enum: [ "mermaid", "d2" ], description: "diagram language: " +
                 "\"mermaid\" (default) for Mermaid, \"d2\" for D2" },
             background: { type: "string",  description: "CSS color to fill transparent areas with, " +
-                "or \"auto\" (default) to keep transparency" },
+                "or \"auto\" (default) to keep transparency; do NOT pass it implicitly, " +
+                "only when the user requests it or the default is known to not work" },
             columns:    { type: "number",  description: "maximum width in terminal columns (default: terminal width)" },
             rows:       { type: "number",  description: "maximum height in terminal rows (default: unbounded, " +
                 "as the transcript scrolls vertically)" }
@@ -76,8 +84,8 @@ export const DIAGRAM = {
     terminal shows a blank box), the largest PNG of an image (base64, as larger
     ones are rasterized again with fewer pixels, since a file is not shown by
     every terminal), the number of these rasterizings, the number of kept
-    images, and the viewport assumed before any was measured, and the titles of
-    the border  */
+    images, the viewport assumed before any was measured, the delays of sending
+    a drawn image again, and the titles of the border  */
 const NAME          = "mcp__ase__ase_mods_render_image"
 const NAME_DIAGRAM  = "mcp__ase__ase_mods_diagram"
 const MARGIN        = 2
@@ -89,8 +97,8 @@ const LIMIT         = 2 * 1024 * 1024 * 4 / 3
 const ATTEMPTS      = 4
 const KEEP          = 16
 const VIEWPORT      = { columns: 80, rows: 24 }
+const RESEND        = [ 250, 1000 ]
 const TITLE         = "[ ⧉ ASE: Inline Image Rendering ]"
-const TITLE_DIAGRAM = "[ ⧉ ASE: Inline Diagram Rendering ]"
 
 /*  the event of drawing the row of a tool call  */
 export type ImageRender = Frozen<MatchedEvent<"ui.render", { component: "ToolUse", surface: "terminal" }>>
@@ -109,9 +117,68 @@ const parse = (tool: string, raw: unknown): Input => {
 }
 
 /*  a rasterized image: the viewport width it was rasterized for, and either the
-    error of its rasterizing, or its PNG (base64), pixel size, and cell box  */
+    error of its rasterizing, or its PNG (base64) resp. its text art, its pixel
+    size, and its cell box  */
 type Shown = { width: number } & ({ error: string } |
-    { source: ImageSource, pixels: { width: number, height: number }, columns: number, rows: number })
+    ({ source: ImageSource } | { art: Char[][] }) &
+    { pixels: { width: number, height: number }, columns: number, rows: number })
+
+/*  the variables of the terminal environment probed for inline images  */
+export type Terminal = { tmux?: string, sty?: string, term?: string, termProgram?: string,
+    kitty?: string, ghostty?: string }
+
+/*  check whether the terminal can show inline images, as the session-start hook
+    probes for "<ase-diagram-probe/>": only Kitty and Ghostty (with the Unicode
+    placeholders of the Kitty Graphics Protocol), directly or through a local
+    tmux passing the terminal graphics through, where "query" yields the option
+    "allow-passthrough" of tmux and the "XTVERSION" answer and the "TERM" of its
+    outer terminal (tab-separated)  */
+export const graphics = async (env: Terminal, query: () => Promise<string>): Promise<boolean> => {
+    const outer = !!(env.kitty || env.ghostty)
+    if (env.tmux) {
+        const [ passthrough, termType, termName ] = (await query().catch(() => "")).replace(/\n$/, "").split("\t")
+        if (passthrough !== "on" && passthrough !== "all")
+            return false
+        const known = /^(?:kitty|ghostty)\b/i
+        return termType ? known.test(termType) : /^xterm-(?:kitty|ghostty)$/.test(termName ?? "") || outer
+    }
+    else if (/^tmux\b/.test(env.term ?? "") || (/^screen\b/.test(env.term ?? "") && !env.sty))
+        return false
+    return outer || /^xterm-(?:kitty|ghostty)$/.test(env.term ?? "")
+        || /^(?:kitty|ghostty)$/i.test(env.termProgram ?? "")
+}
+
+/*  convert a line of the text art of "ase_rasterize" (half blocks with
+    ANSI truecolor escapes) into styled characters  */
+const art = (line: string): Char[] => {
+    const chars: Char[] = []
+    let color: string | undefined
+    let background: string | undefined
+    const hex = (codes: number[], i: number) =>
+        "#" + codes.slice(i + 2, i + 5).map((c) => c.toString(16).padStart(2, "0")).join("")
+    for (const m of line.matchAll(/\u001b\[([\d;]*)m|([^\u001b])/gu)) {
+        if (m[2] !== undefined) {
+            chars.push({ ch: m[2], bold: false, color, ...(background !== undefined ? { background } : {}) })
+            continue
+        }
+        const codes = m[1]!.split(";").map(Number)
+        for (let i = 0; i < codes.length; i++) {
+            if (codes[i] === 0)
+                [ color, background ] = [ undefined, undefined ]
+            else if (codes[i] === 39)
+                color = undefined
+            else if (codes[i] === 49)
+                background = undefined
+            else if (codes[i] === 38 && codes[i + 1] === 2)
+                color = hex(codes, i)
+            else if (codes[i] === 48 && codes[i + 1] === 2)
+                background = hex(codes, i)
+            if (codes[i] === 38 || codes[i] === 48)
+                i += 4
+        }
+    }
+    return chars
+}
 
 /*  determine the pixel size of a PNG image (base64) from its IHDR chunk
     (decoding just the leading 24 bytes, as no base64 decoder is at hand)  */
@@ -140,12 +207,14 @@ export const modRenderImage = () => {
     /*  the last measured viewport, the rasterized images by their tool call,
         the viewport widths of the evicted images by their tool call (as they
         are not rasterized again for the same width, else the images beyond
-        the kept ones would evict each other in an endless loop), and the
-        still running rasterizings  */
+        the kept ones would evict each other in an endless loop), the still
+        running rasterizings, and the viewport widths the drawn images were
+        sent again for  */
     let viewport  = VIEWPORT
     const images  = new Map<string, Shown>()
     const evicted = new Map<string, number>()
     const pending = new Map<string, Promise<Shown>>()
+    const resent  = new Map<string, number>()
 
     /*  track the viewport of a drawing  */
     const track = (measured: RenderViewport | undefined): void => {
@@ -157,7 +226,8 @@ export const modRenderImage = () => {
         per width, joining a still running rasterizing), fitted into the
         terminal width, with an unbounded height (as the transcript scrolls
         vertically), resp. the requested cells, and keep the latest images only  */
-    const load = (id: string, input: Input, engine: Pick<Engine, "rasterize" | "diagram" | "bytes">): Promise<Shown> => {
+    const load = (id: string, input: Input,
+        engine: Pick<Engine, "rasterize" | "diagram" | "bytes" | "graphics">): Promise<Shown> => {
         const width = viewport.columns
         const known = images.get(id)
         if (known !== undefined && known.width === width)
@@ -209,6 +279,21 @@ export const modRenderImage = () => {
                     return { width, error: text || "no diagram rendered" }
                 source = { data: text, smart: true }
             }
+
+            /*  rasterize the image into its text art, if the terminal cannot show it  */
+            if (!await engine.graphics()) {
+                const result = await engine.rasterize({ ...args, ...source, maximum: PIXELS, output: "text" })
+                const texts  = result.content.filter((block) => block.type === "text").map((block) => block.text ?? "")
+                const pixels = /^\[Text: (\d+)x(\d+)\]$/.exec(texts[1] ?? "")
+                const cells  = /^\[Cells: (\d+)x(\d+)\]$/.exec(texts[2] ?? "")
+                if (result.isError || pixels === null || cells === null)
+                    return { width, error: texts.join(" ").trim() || "no text art rasterized" }
+                const lines = texts[0]!.split("\n").slice(0, box.rows).map(art)
+                return { width, art: lines, pixels: { width: Number(pixels[1]), height: Number(pixels[2]) },
+                    columns: Math.max(1, Math.min(Number(cells[1]), box.columns)), rows: Math.max(1, lines.length) }
+            }
+
+            /*  rasterize the image into a PNG image  */
             let maximum = PIXELS
             for (let attempt = 1; ; attempt++) {
                 const result = await rasterize(source, maximum)
@@ -236,6 +321,7 @@ export const modRenderImage = () => {
                 if (images.size <= KEEP)
                     break
                 images.delete(old)
+                resent.delete(old)
                 evicted.set(old, width)
             }
             return shown
@@ -247,7 +333,7 @@ export const modRenderImage = () => {
     /*  serve a call of either tool, rasterizing its image for the drawing of its
         row, and determine the answer of the tool  */
     const call = async (tool: string, id: string, e: unknown,
-        engine: Pick<Engine, "rasterize" | "diagram" | "bytes">): Promise<string> => {
+        engine: Pick<Engine, "rasterize" | "diagram" | "bytes" | "graphics">): Promise<string> => {
         const input = parse(tool, e)
         if (tool === NAME_DIAGRAM && typeof input.diagram !== "string")
             return "ERROR: `diagram` has to be given"
@@ -274,34 +360,59 @@ export const modRenderImage = () => {
         image meanwhile, but only for a resolved call, as before its input can
         still be partial  */
     const render = (e: ImageRender, ui: Elements["terminal"], row: RenderElement,
-        engine: Pick<Engine, "rasterize" | "diagram" | "bytes" | "invalidate">): RenderElement | undefined => {
+        engine: Pick<Engine, "rasterize" | "diagram" | "bytes" | "graphics" | "invalidate" | "sleep" | "blit">):
+        RenderElement | undefined => {
         if (e.props.tool !== NAME && e.props.tool !== NAME_DIAGRAM)
             return undefined
         track(e.viewport)
-        const id    = e.props.tool_use_id
-        const input = parse(e.props.tool, e.props.input)
-        const shown = images.get(id)
-        if (shown?.width !== viewport.columns && evicted.get(id) !== viewport.columns
-            && e.props.output !== undefined && !e.props.isErrored && !e.props.isInterrupted)
+        const id       = e.props.tool_use_id
+        const input    = parse(e.props.tool, e.props.input)
+        const shown    = images.get(id)
+        const resolved = e.props.output !== undefined && !e.props.isErrored && !e.props.isInterrupted
+        if (shown?.width !== viewport.columns && evicted.get(id) !== viewport.columns && resolved)
             load(id, input, engine).then(() => engine.invalidate()).catch(() => {
                 /*  ignore a failed rasterizing, as it is kept as an error  */
             })
-        if (shown === undefined || "error" in shown)
+
+        /*  draw the image only for a resolved call, as an image drawn for the
+            still running call is redrawn without being transmitted again  */
+        if (!resolved || shown === undefined || "error" in shown)
             return undefined
+
+        /*  send the drawn image again shortly after its first drawing at a
+            width (while still drawn), as the terminal sporadically misses its
+            transmission and then shows a blank box, while a blit always sends  */
+        if ("source" in shown && resent.get(id) !== shown.width) {
+            resent.set(id, shown.width)
+            const requestId = e.requestId
+            const resend = async () => {
+                for (const ms of RESEND) {
+                    await engine.sleep(ms)
+                    if (images.get(id) !== shown)
+                        break
+                    await engine.blit({ requestId, key: "image", source: shown.source,
+                        columns: shown.columns, rows: shown.rows })
+                }
+            }
+            resend().catch(() => {
+                /*  ignore a failed sending, as the image is drawn already  */
+            })
+        }
         const rule = "─".repeat(shown.columns)
         const side = () => ui.Text({ dimColor: true, children: Array(shown.rows).fill("│").join("\n") })
         const size = `[ ${shown.pixels.width}x${shown.pixels.height}px, ${shown.columns}x${shown.rows}ch ]`
         return ui.Box({ flexDirection: "column", children: [
             row,
             ui.Box({ flexDirection: "column", marginTop: 1, children: [
-                edge(ui.Text, `╭${rule}╮`, e.props.tool === NAME_DIAGRAM ? TITLE_DIAGRAM : TITLE),
+                edge(ui.Text, `╭${rule}╮`, TITLE),
                 ui.Box({ flexDirection: "row", children: [
                     side(),
-                    ui.Box({ width: shown.columns, height: shown.rows, flexShrink: 0, children: [
-                        ui.Image({ key: "image", source: shown.source, columns: shown.columns, rows: shown.rows,
-                            alt: input.file?.replace(/^.*[/\\]/, "") ??
-                                (input.diagram !== undefined ? "diagram" : "image") })
-                    ] }),
+                    ui.Box({ width: shown.columns, height: shown.rows, flexShrink: 0, flexDirection: "column",
+                        children: "source" in shown ? [
+                            ui.Image({ key: "image", source: shown.source, columns: shown.columns, rows: shown.rows,
+                                alt: input.file?.replace(/^.*[/\\]/, "") ??
+                                    (input.diagram !== undefined ? "diagram" : "image") })
+                        ] : shown.art.map((chars) => ui.Text({ wrap: "truncate", children: paint(ui.Text, chars) })) }),
                     side()
                 ] }),
                 edge(ui.Text, `╰${rule}╯`, "", size)

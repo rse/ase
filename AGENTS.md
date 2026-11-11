@@ -90,7 +90,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         and used by the skills instead of the ASCII diagrams of the
         `ase-meta-diagram` sub-agent, both tools registered by the module,
         rasterized by the MCP tool `ase_rasterize`, fitted into the terminal
-        width, and shown below the row of the tool call)
+        width, and shown below the row of the tool call, where on terminals
+        without inline images an image is shown as Unicode half-block text
+        art, while `ase_mods_diagram` is not provided, so diagrams stay ASCII)
     -   `plugin/.claude-plugin/`, `plugin/.codex-plugin/`,
         `plugin/.github/plugin/`: the per-agent-tool plugin manifests
 -   `tool/`: the `@rse/ase` CLI
@@ -107,6 +109,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `service-getopt` and the session start hook
     -   `tool/src/ase-lib-*.ts`: the generic library modules (`lib-log`,
         `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`, `lib-hash`,
+        `lib-color` for the confining of the SVG colors to a palette,
         `lib-fetch` for the HTTP requests through an `undici` dispatcher,
         `lib-daemon-cli` for the start/status/log/stop CLI commands of all
         background processes (servers, agents, and the agent fleet), and
@@ -402,8 +405,8 @@ Beyond `ase setup`, the CLI provides:
     output), `ase util diagram` (Mermaid rendering), `ase util worktree`
     (ASE worktree path resolution), `ase util mint` (hash-derived
     identifier minting), `ase util metric` (text length metrics),
-    `ase util rasterize` (SVG/PNG/GIF/JPEG rasterizing into PNG, Kitty, iTerm2 IIP, or
-    SIXEL, with bundled fonts copied into `dst/font/` at build-time), and
+    `ase util rasterize` (SVG/PNG/GIF/JPEG rasterizing into PNG, Kitty, iTerm2 IIP,
+    SIXEL, or text art, with bundled fonts copied into `dst/font/` at build-time), and
     `ase util compat` (probe values for the `ase-meta-compat` self-test
     skill)
 

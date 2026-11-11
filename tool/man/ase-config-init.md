@@ -52,7 +52,8 @@ file lock and atomically.
     - `default`:
       The complete baseline of the built-in `default` scope:
       `agent.persona` `engineer`, `agent.guidance` `normal`,
-      `agent.diagram` `image`,
+      `agent.diagram.format` `auto`, `agent.diagram.theme` `auto`,
+      `agent.diagram.tone` `#336699`,
       `project.name` `Example Project`, `project.boxing` `white`,
       `project.task.lifecycle` `solo`, `project.task.idscheme` `slug`,
       `project.task.store.url` `ase:./.ase/task`,

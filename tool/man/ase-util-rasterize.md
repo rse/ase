@@ -4,7 +4,7 @@
 
 `ase util rasterize`
 \[`-h`|`--help`\]
-\[`-f`|`--format` `png`|`kitty`|`iip`|`sixel`|`auto`\]
+\[`-f`|`--format` `png`|`kitty`|`iip`|`sixel`|`text`|`auto`\]
 \[`-o`|`--output` *file*|`-`\]
 \[`-s`|`--scale` *factor*|`auto`\]
 \[`--width` *columns*\]
@@ -18,9 +18,11 @@
 
 **ase util rasterize** rasterizes an SVG document or a PNG, GIF, or JPEG
 image (detected by its signature), read from *input-file*, from
-standard input (`-`), or from the *data* of `--data`, and writes it as a PNG image or as the terminal
+standard input (`-`), or from the *data* of `--data`, and writes it as a PNG image, as the terminal
 graphics escape sequences of the *Kitty Graphics Protocol*, the *iTerm2
-Inline Image Protocol* (IIP), or the *SIXEL* protocol. An image passes
+Inline Image Protocol* (IIP), or the *SIXEL* protocol, or, for terminals
+without graphics, as Unicode half-block text art with ANSI truecolor
+escapes (each character cell showing two stacked pixels). An image passes
 the same scaling and background filling as an SVG document (where of an
 animated GIF only the first frame is used). A PNG image with an
 effective scale *factor* of `1` and background `auto` is passed through
@@ -43,20 +45,20 @@ rendered by `ase util diagram`, with the same scale (default *factor*
 `1`), width, height, background, and smart options, plus a parameter
 `maximum`, bounding the width and height of the image in pixels, and a
 parameter `output`, returning the PNG image as image content (`inline`,
-the default), as a temporary file (`file`), or as a temporary file only
-above 2 MiB (`auto`).
+the default), as a temporary file (`file`), as a temporary file only
+above 2 MiB (`auto`), or as the text art of format `text` (`text`).
 
 ## OPTIONS
 
 - \[`-h`|`--help`\]:
   Show usage information and exit.
 
-- \[`-f`|`--format` `png`|`kitty`|`iip`|`sixel`|`auto`\]:
+- \[`-f`|`--format` `png`|`kitty`|`iip`|`sixel`|`text`|`auto`\]:
   The output format. The default `auto` chooses `png` for a *file*
   output and for a standard output which is not a terminal. For a
   terminal, it chooses the first supported protocol out of `kitty`,
-  `iip`, and `sixel` (but `iip` first under *iTerm2*), and fails if no
-  protocol is detected.
+  `iip`, and `sixel` (but `iip` first under *iTerm2*), and `text` if no
+  protocol is detected (or *tmux* would drop it).
 
   Inside *tmux*, `auto` prefers the formats which *tmux* manages as
   regular pane content: first `kitty` if the outer terminal is *Kitty*
@@ -66,15 +68,17 @@ above 2 MiB (`auto`).
   -as terminal-features ",xterm*:sixel"`). Otherwise, it detects the
   outer terminal from the *tmux* session environment and chooses `iip`
   or `sixel`, but never `kitty`. All other terminal formats are wrapped
-  into *tmux* passthrough sequences (failing if the *tmux* option
-  `allow-passthrough` is off). For `kitty`, the image is displayed
+  into *tmux* passthrough sequences (failing for an explicit format if
+  the *tmux* option `allow-passthrough` is off). For `kitty`, the image is displayed
   through *Unicode placeholders* (supported by, e.g., *Kitty* and
   *Ghostty*), i.e., text cells which *tmux* manages like regular pane
   content. For `iip` and a passed through `sixel`, the rows of the image
   are reserved upfront, but as *tmux* is unaware of such an image, it
   stays on top of the pane content until the outer terminal redraws.
   The outer terminal is often hidden from the detection, so an explicit
-  format may be needed.
+  format may be needed. Besides a local *tmux* (`TMUX` set), a remote one,
+  like for *SSH* from inside *tmux*, is assumed for a `TERM` of `tmux*`,
+  or of `screen*` outside of *GNU screen* (`STY` unset).
 
 - \[`-o`|`--output` *file*|`-`\]:
   Write the output to *file* instead of standard output (`-`, the
@@ -86,7 +90,8 @@ above 2 MiB (`auto`).
   `--height`, else determined from the `ASE_TERM_WIDTH` and
   `ASE_TERM_HEIGHT` environment variables or the standard output).
   For `kitty` and `iip`, the terminal itself scales
-  the image onto the fitted character cells. For the pixel size of the
+  the image onto the fitted character cells, while `text` fills them
+  with two area-averaged pixels each. For the pixel size of the
   character cells, the one reported by *tmux* is used, else 10x20
   pixels are assumed. For `png`, or without a known
   terminal size, `auto` means *factor* `1`.
@@ -128,8 +133,8 @@ above 2 MiB (`auto`).
 ## EXIT STATUS
 
 Exits with status `0` on success, and with status `1` if the input
-or a font file cannot be read or rasterized, or no terminal
-graphics protocol is detected for format `auto`.
+or a font file cannot be read or rasterized, or *tmux* drops the
+terminal graphics of an explicit format.
 
 ## EXAMPLES
 
@@ -145,6 +150,9 @@ $ ase util rasterize screenshot.png
 
 # show a PNG image in the terminal, fitted into 80x24 characters
 $ ase util rasterize --width 80 --height 24 screenshot.png
+
+# show a PNG image as text art, e.g., in a terminal without graphics
+$ ase util rasterize -f text screenshot.png
 
 # show an SVG document, given as a string, in the terminal
 $ ase util rasterize -d "$(cat logo.svg)"

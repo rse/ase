@@ -6,7 +6,7 @@
     "homepage":                             "https://ase.tools",
     "repository":                           { "url": "git+https://github.com/rse/ase.git", "type": "git" },
     "bugs":                                 { "url": "https://github.com/rse/ase/issues" },
-    "version":                              "2.0.9",
+    "version":                              "2.0.12",
     "license":                              "Apache-2.0",
     "author": {
         "name":                             "Dr. Ralf S. Engelschall",
@@ -84,7 +84,6 @@
         "@d2lang/d2":                       "0.1.34",
         "elkjs":                            "0.12.1",
         "@resvg/resvg-wasm":                "2.6.2",
-        "ansi-escapes":                     "7.3.0",
         "sixel":                            "0.16.0",
         "supports-terminal-graphics":       "0.1.0",
         "ink":                              "8.0.0",

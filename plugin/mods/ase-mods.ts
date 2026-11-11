@@ -27,7 +27,7 @@ import { modHelpShow }        from "./ase-mods-help-show.ts"
 import { modHelpBrowse }      from "./ase-mods-help-browse.ts"
 import { modHelpHint }        from "./ase-mods-help-hint.ts"
 import { modTaskEdit, TOOL }  from "./ase-mods-task-edit.ts"
-import { modRenderImage, TOOL as IMAGE, DIAGRAM } from "./ase-mods-render-image.ts"
+import { modRenderImage, TOOL as IMAGE, DIAGRAM, graphics } from "./ase-mods-render-image.ts"
 
 /*  function hook registration entry point  */
 export const register: Register = (on, options) => {
@@ -48,15 +48,31 @@ export const register: Register = (on, options) => {
     const task     = modTaskEdit()
     const image    = modRenderImage()
 
+    /*  whether the terminal can show inline images (assumed until probed),
+        else the image rendering shows the text art of the images  */
+    let probed: Promise<boolean> = Promise.resolve(true)
+
     /*  provide the tools of the task band and the image and diagram rendering
-        where a person sees the band resp. the image only, so the absence of the
-        former tells "ase-task-edit --interactive" that no band exists, resp. the
-        absence of the latter tells the skills to render ASCII diagrams instead  */
+        where a person sees the band resp. the image only (the diagram rendering
+        only where the terminal can show inline images, as a diagram in text art
+        is illegible), so the absence of the former tells "ase-task-edit
+        --interactive" that no band exists, resp. the absence of the latter
+        tells the skills to render ASCII diagrams instead  */
     on("session.start", async ($, e, next) => {
         if (e.isInteractive && e.surface === "terminal") {
+            probed = graphics({
+                tmux:        await $.env.get("TMUX"),
+                sty:         await $.env.get("STY"),
+                term:        await $.env.get("TERM"),
+                termProgram: await $.env.get("TERM_PROGRAM"),
+                kitty:       await $.env.get("KITTY_WINDOW_ID"),
+                ghostty:     await $.env.get("GHOSTTY_RESOURCES_DIR")
+            }, async () => (await $.process.run([ "tmux", "display", "-p",
+                "#{allow-passthrough}\t#{client_termtype}\t#{client_termname}" ])).stdout)
             await $.tool.register(TOOL)
             await $.tool.register(IMAGE)
-            await $.tool.register(DIAGRAM)
+            if (await probed)
+                await $.tool.register(DIAGRAM)
         }
         return next(e)
     })
@@ -82,7 +98,8 @@ export const register: Register = (on, options) => {
             result: await image.call(tool, e.tool_use_id, e, {
                 rasterize: (args) => $.mcp.call("plugin_ase_ase", "ase_rasterize", args),
                 diagram:   (args) => $.mcp.call("plugin_ase_ase", "ase_diagram", args),
-                bytes:     async (file) => (await $.fs.read(file, { as: "bytes" })).base64
+                bytes:     async (file) => (await $.fs.read(file, { as: "bytes" })).base64,
+                graphics:  () => probed
             })
         }))
     }
@@ -95,7 +112,10 @@ export const register: Register = (on, options) => {
             rasterize:  (args) => $.mcp.call("plugin_ase_ase", "ase_rasterize", args),
             diagram:    (args) => $.mcp.call("plugin_ase_ase", "ase_diagram", args),
             bytes:      async (file) => (await $.fs.read(file, { as: "bytes" })).base64,
-            invalidate: () => $.ui.invalidate("ui.render")
+            graphics:   () => probed,
+            invalidate: () => $.ui.invalidate("ui.render"),
+            sleep:      (ms) => $.clock.sleep(ms),
+            blit:       (args) => $.ui.blit(args)
         }) ?? drawn
     })
 

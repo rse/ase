@@ -2,7 +2,52 @@
 ChangeLog
 =========
 
-2.0.10 (2026-11-XX)
+2.0.13 (2026-11-XX)
+-------------------
+
+-   IMPROVEMENT [plugin]: Uniform Inline Image Title
+    The mod now titles the diagrams of `ase_mods_diagram` "Inline Image Rendering" as well,
+    instead of "Inline Diagram Rendering".
+
+-   IMPROVEMENT [code]: Periodic Statusline Refresh
+    `ase setup statusline activate` now adds `"refreshInterval": 10` for Claude Code, so the
+    statusline also catches up with changes raising no event-driven update (like native commands).
+
+2.0.12 (2026-11-09)
+-------------------
+
+-   FEATURE [code, plugin, docs]: Text Art for Terminals without Graphics
+    `ase util rasterize --format text` and `ase_rasterize` with `output` `text` render Unicode
+    half-block text art with ANSI truecolor, used by format `auto` without a graphics protocol, and
+    by `ase_mods_render_image` on terminals without inline images (lacking `ase_mods_diagram`).
+
+-   IMPROVEMENT [plugin]: Implicit Image Background
+    The `background` parameter of the tools `ase_mods_render_image` and `ase_mods_diagram` now
+    tells the model to not pass it implicitly, but only on request or when the default fails.
+
+-   BUGFIX [plugin]: Sporadically Blank Inline Images
+    The mod now draws the image of `ase_mods_render_image` and `ase_mods_diagram` only for the
+    resolved call, and sends it again shortly after drawing, as the terminal sporadically
+    missed its transmission and showed a blank box instead.
+
+2.0.11 (2026-11-09)
+-------------------
+
+-   FEATURE [code, plugin, docs]: Automatic Diagram Format
+    The new default `auto` of `agent.diagram.format` lets the session-start hook probe whether the
+    terminal can show inline images (Kitty or Ghostty, directly or through tmux with passthrough),
+    resolving it into `image` or `text`, with the probe result exported as `<ase-diagram-probe/>`.
+
+-   FEATURE [code, plugin, docs]: Automatic Diagram Theme
+    The new default `auto` of `agent.diagram.theme` (and `--theme` of `ase util diagram`) probes on
+    rendering `$ASE_TERM_THEME`, `$COLORFGBG`, the Claude Code theme, and the system appearance
+    (macOS, Windows, GNOME), resolving it into `light` or `dark`.
+
+-   BUGFIX [code]: Blank Inline Images
+    The `maximum` of `ase_rasterize` now fits the image exactly to its pixel size, as the zoom
+    rounded it up beyond (like 2049 instead of 2048 pixels), so the mods showed a blank box.
+
+2.0.10 (2026-11-09)
 -------------------
 
 -   FEATURE [code, docs]: SVG Rasterizing
@@ -11,6 +56,8 @@ ChangeLog
     with bundled fonts) into PNG or auto-detected Kitty, iTerm2, or SIXEL terminal graphics, with
     scaling into the terminal (sized by `--width`/`--height`), background, and `--smart` CSS
     variable resolving, where the MCP tool rasterizes off the event loop in a worker thread.
+    NOTICE: On some Terminals (like Herdr) Kitty Graphics Protocol is supported but Claude
+    Code needs `CLAUDE_CODE_FORCE_TERMINAL_IMAGES=1` to be set to really use it!
 
 -   FEATURE [plugin, docs]: Inline Image Rendering
     The new mod `ase-mods-render-image.ts` provides the tool `ase_mods_render_image`, which shows
@@ -21,8 +68,19 @@ ChangeLog
 -   FEATURE [plugin, docs]: Inline Diagram Rendering
     The image rendering mod additionally provides the tool `ase_mods_diagram`, which renders a
     Mermaid or D2 diagram via `ase_diagram` into SVG and shows it inline as an image. The skills
-    use it for their diagrams when available and `agent.diagram` is `image` (the default), else
-    the ASCII diagrams of `ase-meta-diagram`.
+    use it for their diagrams when available and `agent.diagram.format` is `image` (the
+    default), else the ASCII diagrams of `ase-meta-diagram`.
+
+-   FEATURE [code, plugin, docs]: Diagram Theming
+    The new `agent.diagram.theme` (`light`/`dark`) and `agent.diagram.tone` (one or two colors,
+    default `#336699` plus its derived complement) style the Mermaid and D2 SVG renderings after
+    SpecBook (also via `--theme`/`--tone`), in the bundled font, with every custom color replaced
+    by its perceptually nearest (OKLab) theme color, so the model is told not to style colors.
+
+-   IMPROVEMENT [code, plugin, docs]: Narrow Diagram Layouts
+    The skills and the diagram tools now ask for narrow and tall diagrams (at most 4 nodes side
+    by side, siblings wrapped via `subgraph` with `direction LR` resp. `grid-columns`), as wide
+    ones get downscaled to the terminal width, and D2 SVGs use a padding of 20 instead of 100.
 
 2.0.9 (2026-11-08)
 ------------------

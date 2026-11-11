@@ -13,7 +13,7 @@
     prompt.  */
 
 import type { Elements, Frozen, MatchedEvent, McpToolResult, ModelCompleteRequest, ModelForkResult,
-    PromptBox, PromptEditInput, PromptFilled, RenderElement, Timer } from "claude-code"
+    PromptBox, PromptEditInput, PromptFilled, RenderElement, Timer, UiBlitArgs, UiBlitResult } from "claude-code"
 
 /*  the services of the engine, bound by the hooking infrastructure for the
     modules (as the engine refuses to load a module passing "$" itself): the
@@ -21,8 +21,9 @@ import type { Elements, Frozen, MatchedEvent, McpToolResult, ModelCompleteReques
     in a plugin directory, the forked and the plain model completion, the
     waiting, the reading and filling of the prompt, the loading of a task
     (with its entity tag), the running of a repeating timer, the rasterizing
-    of an image (by the MCP tool "ase_rasterize"), and the reading of a file
-    as bytes (base64)  */
+    of an image (by the MCP tool "ase_rasterize"), the reading of a file
+    as bytes (base64), the swapping of the source of a drawn keyed image,
+    and the probe whether the terminal can show inline images  */
 export type Engine = {
     invalidate: () => void,
     read:       (file: string) => Promise<string>,
@@ -36,7 +37,9 @@ export type Engine = {
     every:      (ms: number, fn: () => void) => Timer,
     rasterize:  (args: Record<string, unknown>) => Promise<McpToolResult>,
     diagram:    (args: Record<string, unknown>) => Promise<McpToolResult>,
-    bytes:      (file: string) => Promise<string>
+    bytes:      (file: string) => Promise<string>,
+    blit:       (args: UiBlitArgs) => Promise<UiBlitResult>,
+    graphics:   () => Promise<boolean>
 }
 
 /*  the colors of a picked (resp. selected or focused) item, of a code span,
