@@ -33,6 +33,33 @@ export type CaseOutcome = {
     pass:    boolean
 }
 
+/*  the end of one stage of a staged run, for its live console progress  */
+export type StageEnd = {
+    durationMs: number
+    costUsd:    number
+    errored:    boolean
+    timedOut:   boolean
+    failure:    string
+    oracles:    OracleResult[]
+}
+
+/*  print the live console progress of one stage of a staged run: its start
+    (without "end"), resp. its end with duration, cost, and failed diagnostics  */
+export const reportStage = (label: string, stage: number, total: number, skill: string, end?: StageEnd): void => {
+    const what = `${label}: stage ${stage}/${total} ${skill}`
+    if (end === undefined) {
+        console.log(`${chalk.dim("▸")} ${what} ${chalk.dim("started")}`)
+        return
+    }
+    const bad  = end.errored || end.timedOut
+    const info = `(${prettyMs(end.durationMs)}, $${end.costUsd.toFixed(4)})`
+    console.log(`${bad ? chalk.red("▪") : chalk.green("▪")} ${what} ` +
+        `${bad ? chalk.red(end.timedOut ? "timed out" : `errored: ${end.failure}`) : "finished"} ${chalk.dim(info)}`)
+    for (const oracle of end.oracles)
+        if (!oracle.pass)
+            console.log(`    ${chalk.yellow(`◦ ${oracle.kind}`)}: ${oracle.detail}`)
+}
+
 /*  print the console report of one finished run  */
 export const reportRun = (name: string, outcome: RunOutcome): void => {
     const mark = outcome.outcome === "pass" ? chalk.green("✔") :

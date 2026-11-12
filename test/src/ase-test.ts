@@ -24,7 +24,7 @@ import type { StageOutcome }               from "./ase-test-transcript.js"
 import { oraclesRun, changesetDiff, skillSpoke } from "./ase-test-oracle.js"
 import type { OracleResult }               from "./ase-test-oracle.js"
 import { describeCase }                    from "./ase-test-describe.js"
-import { reportRun, reportSummary }        from "./ase-test-report.js"
+import { reportRun, reportStage, reportSummary } from "./ase-test-report.js"
 import type { RunOutcome, CaseOutcome }    from "./ase-test-report.js"
 
 /*  the CLI of the skill test harness  */
@@ -154,10 +154,14 @@ Promise<{ outcome: RunOutcome, retry: boolean }> => {
         const results:     SessionResult[] = []
         const stages:      StageOutcome[]  = []
         const diagnostics: OracleResult[]  = []
+        const label = `${caze.name} run ${run}${retried ? " (retry)" : ""}`
         for (const [ index, stage ] of caze.stages.entries()) {
             const args      = !caze.staged ? stage.args :
                 stage.args.replace(/\{\{stage(\d+)\.lastMessage\}\}/g, (_m, n: string) => results[Number(n) - 1].lastText)
             const simulator = simulatorCreate(stage, sandbox)
+            const begin     = Date.now()
+            if (caze.staged)
+                reportStage(label, index + 1, caze.stages.length, stage.skill)
             const result    = await runSession({ ...stage, args }, sandbox, simulator, transcript.record(index + 1))
             results.push(result)
 
@@ -178,6 +182,10 @@ Promise<{ outcome: RunOutcome, retry: boolean }> => {
             }
             oracles = oracles.map((oracle) => ({ ...oracle, kind: `stage${index + 1}/${oracle.kind}`, diagnostic: true }))
             diagnostics.push(...oracles)
+            reportStage(label, index + 1, caze.stages.length, stage.skill, {
+                durationMs: Date.now() - begin, costUsd: result.costUsd, errored: result.errored,
+                timedOut: result.timedOut, failure: result.failure, oracles
+            })
             stages.push({
                 stage: index + 1, skill: stage.skill, sessionId: result.sessionId, model: result.model,
                 costUsd: result.costUsd, turns: result.turns, errored: result.errored,

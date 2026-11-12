@@ -19,7 +19,7 @@ stages:
           id: roman
           exists: true
   - skill: ase-task-grill
-    args: "--rounds 2 --next DONE roman"
+    args: "--rounds 2 --until MAY --next DONE roman"
     timeoutSec: 900
     budget: { maxUsd: 4.00 }
     turns:

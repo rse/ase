@@ -17,7 +17,7 @@ import { judgeRubric, judgeSimilar } from "./ase-test-judge.js"
 
 /*  the verdict of one oracle (with the raw judge scores of the LLM judge oracles), where
     a diagnostic oracle of a stage explains a failure, but never decides the verdict  */
-export type OracleResult = { kind: string, pass: boolean, detail: string, scores?: number[], diagnostic?: boolean }
+export type OracleResult = { kind: string, pass: boolean, detail: string, scores?: number[], diagnostic?: boolean, log?: string }
 
 /*  whether a skill reported an error in its output lines, as the skills report
     their errors as "▶ ERROR: ..." while the agent tool still exits successfully
@@ -83,7 +83,7 @@ export const changesetDiff = async (sandbox: Sandbox): Promise<string> => {
 }
 
 /*  the file paths touched by a unified diff  */
-const diffPaths = (diff: string): string[] => {
+export const diffPaths = (diff: string): string[] => {
     const paths: string[] = []
     for (const m of diff.matchAll(/^diff --git a\/(.+?) b\/(.+)$/gm)) {
         paths.push(m[1])
@@ -306,11 +306,16 @@ export const oraclesRun = async (oracles: OracleSpec[], caze: TestCase, sandbox:
             const failures = Number(/failures=(\d+)/.exec(text)?.[1] ?? 0)
             const errors   = Number(/errors=(\d+)/.exec(text)?.[1] ?? 0)
             const skipped  = Number(/skipped=(\d+)/.exec(text)?.[1] ?? 0)
-            const failed   = [ ...text.matchAll(/^(\w+) \(.*?\)(?:\n.*?)? \.\.\. (FAIL|ERROR|skipped|unexpected success)\b/gm) ]
-                .map((m) => `${m[1]} (${m[2]})`)
+
+            /*  take the failures from the summary headers, which also cover failed subtests  */
+            const failed   = [ ...new Set([
+                ...[ ...text.matchAll(/^(FAIL|ERROR): (\w+) \(/gm) ].map((m) => `${m[2]} (${m[1]})`),
+                ...[ ...text.matchAll(/^(\w+) \(.*?\)(?:\n.*?)? \.\.\. (skipped|unexpected success)\b/gm) ]
+                    .map((m) => `${m[1]} (${m[2]})`)
+            ]) ]
             const pass     = run.exitCode === 0 && ran > 0 && failures === 0 && errors === 0 && skipped === 0
             results.push({
-                kind: "suite", pass,
+                kind: "suite", pass, log: text,
                 detail: pass ? `${ran}/${ran} tests passed` :
                     `ran ${ran}, failures ${failures}, errors ${errors}, skipped ${skipped}` +
                     (failed.length > 0 ? `; not passed: ${failed.join(", ")}` : "") +

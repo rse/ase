@@ -10,6 +10,7 @@ import * as path from "node:path"
 import type { TestCase }                     from "./ase-test-case.js"
 import type { Sandbox }                      from "./ase-test-sandbox.js"
 import type { SessionRecord, SessionResult } from "./ase-test-session.js"
+import { diffPaths }                         from "./ase-test-oracle.js"
 import type { OracleResult }                 from "./ase-test-oracle.js"
 
 /*  the per-run artifact recorder: the raw SDK messages as "transcript.jsonl",
@@ -99,9 +100,28 @@ export const transcriptFinish = async (transcript: Transcript, caze: TestCase, s
     stages: StageOutcome[] = []): Promise<void> => {
     if (diff !== "")
         await fs.promises.writeFile(path.join(transcript.dir, "diff.patch"), diff, "utf8")
+
+    /*  keep the final state of every added or modified project file (deleted ones
+        no longer exist), as the diff shows new files only as "+"-prefixed lines  */
+    for (const file of new Set(diffPaths(diff))) {
+        const source = path.resolve(sandbox.project, file)
+        if (!source.startsWith(sandbox.project + path.sep) || !fs.statSync(source, { throwIfNoEntry: false })?.isFile())
+            continue
+        const target = path.join(transcript.dir, "files", file)
+        await fs.promises.mkdir(path.dirname(target), { recursive: true })
+        await fs.promises.copyFile(source, target)
+    }
     const store = path.join(sandbox.project, ".ase", "task")
     if (fs.existsSync(store))
         await fs.promises.cp(store, path.join(transcript.dir, "taskstore"), { recursive: true })
+
+    /*  keep the complete output of the "suite" oracle in its own log file only (removed
+        in place, so it neither lands in "result.json" nor in "summary.json")  */
+    for (const oracle of oracles)
+        if (oracle.log !== undefined) {
+            await fs.promises.writeFile(path.join(transcript.dir, `${oracle.kind}.log`), oracle.log, "utf8")
+            delete oracle.log
+        }
     await fs.promises.writeFile(path.join(transcript.dir, "result.json"), JSON.stringify({
         case:      caze.name,
         pass,

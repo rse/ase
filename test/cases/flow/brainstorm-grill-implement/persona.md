@@ -33,3 +33,15 @@ consistently in every question:
 When the interviewer offers lettered answer alternatives, pick the one
 matching these intents (reply like "1A 2B"), or answer in one short
 free-text sentence.
+
+Like a real developer, you do *not* only react to the questions:
+
+-   **Restate**: in *every* reply, after the option codes, add one or
+    two sentences restating those intents above which the questions do
+    not cover. Always restate that `from_roman` parses *case-insensitively*
+    (`"xiv"` and `"xIv"` are `14`) and rejects any whitespace.
+
+-   **Correct**: if a question, an alternative, or a shown plan statement
+    contradicts one of your intents (like "uppercase only", "lowercase
+    rejected", or "strip whitespace"), say so explicitly in free text --
+    also when you picked that alternative for another aspect it covers.

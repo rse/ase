@@ -40,8 +40,10 @@ of the whole test suit on the anthropic models and local models.
     oracles) plus optional fixture files, simulator scripts
     (`answers.yaml`), personas, and rubrics
 -   `results/<timestamp>/`: the per-run artifacts (raw
-    `transcript.jsonl`, decoded `transcript.md`, `diff.patch`, task
-    store copy, `result.json`) and the `summary.json`, never committed
+    `transcript.jsonl`, decoded `transcript.md`, `diff.patch`, the final
+    added or modified project files under `files/`, the complete
+    `unittest` output of a `suite` oracle as `suite.log`, task store
+    copy, `result.json`) and the `summary.json`, never committed
 
 ## Prerequisites
 
@@ -205,7 +207,9 @@ with `stage <N> (<skill>) errored: ...`, without evaluating the
 top-level oracles. A staged run records each stage into its own
 `stage-<N>-transcript.{md,jsonl}` and `stage-<N>-stderr.log`, and its
 `result.json` additionally carries the per-stage results under
-`stages`.
+`stages`. While running, a staged run reports the start (`▸`) and the
+end (`▪`, with duration, cost, and failed diagnostics) of each stage
+live on the console.
 
 The LLM judges cast `votes` independent votes, each scoring 0.0 to 1.0,
 and pass when the majority reaches the `threshold`; when the majority
