@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 /*
-**  ASE review benchmark -- self-test of parser, assignment, metrics, runner helpers, and measurement log
+**  ASE review benchmark -- self-test of parser, assignment, metrics, runner helpers, measurement log,
+**  rules of the expected-results list, and proofs
 **  Expected values are computed by hand from the rules in DESIGN.md, not derived from the code.
 **  Usage: node selftest.mjs
 */
 
-import fs   from "node:fs"
-import os   from "node:os"
-import path from "node:path"
+import fs            from "node:fs"
+import os            from "node:os"
+import path          from "node:path"
+import { spawnSync } from "node:child_process"
 
-import { TESTDATA_DIR, resolveCase, stableStringify, readJson } from "./lib/common.mjs"
+import { BENCH_DIR, TESTDATA_DIR, resolveCase, stableStringify, readJson } from "./lib/common.mjs"
+import { nodeIsRecent, translate, applyEdits, proveCase, renderProof }     from "./lib/proof.mjs"
 import { collectRunDirs, buildReport }             from "./lib/report.mjs"
 import { seriesId, renderSection, appendJournal }  from "./lib/journal.mjs"
 import { parseReview, parseLocation }              from "./lib/parser.mjs"
@@ -345,6 +348,261 @@ for (const name of [ "correctness-cents", "security-refunds" ]) {
     const first = evaluateRun({ name: "r1", status: "ok", model: "m", review: replayText("normal.jsonl", shop.testdataDir), cost: 0.4, duration: 1000 }, expected)
     check("severity: the version 3 list of correctness-cents yields no severity fields", first.hits_adequate === undefined && first.recall.adequate === undefined
         && aggregate([ first ], base).recall.adequate === undefined)
+}
+
+/*  the hard case context-returns and the expected-results list version 5:
+    a class per finding, locations outside the change, and the structure of the case;
+    the list is validated against its own copy, altered copies of the list must fail  */
+{
+    const hard = resolveCase("context-returns")
+    check("cases: context-returns lives under cases/context-returns", hard.dir.endsWith(path.join("cases", "context-returns"))
+        && hard.changeMessage === "Add returns, partial refunds and store credit")
+    const exp  = readJson(hard.expectedFile)
+    const copy = buildCopy(hard)
+    try {
+        const clone   = () => JSON.parse(JSON.stringify(exp))
+        const entry   = (list, id) => list.entries.find((e) => e.id === id)
+        const result  = (list, id) => validateExpected(list, copy.dir).results.find((r) => r.id === id)
+        const globals = (list) => validateExpected(list, copy.dir).global
+        const res     = validateExpected(exp, copy.dir)
+        check("list v5: the context-returns list is valid", res.results.every((r) => r.ok) && res.global.length === 0, res.global.join("; "))
+        const tiers = (tier) => exp.entries.filter((e) => e.kind === "finding" && e.tier === tier).length
+        check("list v5: 8 findings (2 obvious, 2 medium, 4 hidden) and 5 decoys", tiers("obvious") === 2 && tiers("medium") === 2 && tiers("hidden") === 4
+            && exp.entries.filter((e) => e.kind === "decoy").length === 5)
+        check("list v5: at least 480 changed lines in at least 10 files, 60 per finding, 4 findings outside the change",
+            res.figures.changed_lines >= 480 && res.figures.changed_files >= 10 && res.figures.lines_per_finding >= 60 && res.figures.outside_change === 4,
+            JSON.stringify(res.figures))
+
+        const noSeverity = clone()
+        delete entry(noSeverity, "B-01").min_severity
+        check("list v5: a finding without min_severity is invalid (negative case)", result(noSeverity, "B-01").problems.some((p) => /min_severity/.test(p)))
+        const noClass = clone()
+        delete entry(noClass, "B-03").class
+        check("list v5: a finding without class is invalid (negative case)", result(noClass, "B-03").problems.some((p) => /class must be one of/.test(p)))
+        const obvious = clone()
+        entry(obvious, "B-01").class = "sequence"
+        check("list v5: an obvious finding of another class than plain is invalid (negative case)", result(obvious, "B-01").problems.some((p) => /must have the class plain/.test(p)))
+        const hiddenPlain = clone()
+        entry(hiddenPlain, "B-05").class = "plain"
+        check("list v5: a hidden finding of the class plain is invalid (negative case)", result(hiddenPlain, "B-05").problems.some((p) => /only an obvious finding may have the class plain/.test(p)))
+        const resembles = clone()
+        entry(resembles, "K-01").resembles = "plain"
+        check("list v5: a decoy that resembles no context class is invalid (negative case)", result(resembles, "K-01").problems.some((p) => /resembles must be one of/.test(p)))
+        const noDomain = clone()
+        entry(noDomain, "B-04").class = "sequence"
+        check("list v5: a list without a medium or hidden finding of the class domain is invalid (negative case)", globals(noDomain).some((g) => /class domain/.test(g)))
+
+        const onChanged = clone()
+        entry(onChanged, "B-05").locations[0].outside_change = true
+        check("list v5: outside_change on a changed line is invalid (negative case)", result(onChanged, "B-05").problems.some((p) => /contains a changed line/.test(p)))
+        const otherName = clone()
+        entry(otherName, "B-01").locations.push({ file: "./src/returns.ts", lines: [ 93, 94 ], outside_change: true })
+        check("list v5: a location outside the change must name its file as the copy lists it (negative case)", result(otherName, "B-01").problems.some((p) => /does not exist after the change/.test(p)))
+        const notTrue = clone()
+        entry(notTrue, "B-05").locations[1].outside_change = false
+        check("list v5: outside_change must be true (negative case)", eq(result(notTrue, "B-05").problems, [ "outside_change must be true or absent" ]))
+        const beyond = clone()
+        entry(beyond, "B-05").locations[1].lines = [ 400, 401 ]
+        check("list v5: a location outside the change beyond the end of its file is invalid (negative case)", result(beyond, "B-05").problems.some((p) => /beyond the end of the file/.test(p)))
+        const unmarked = clone()
+        delete entry(unmarked, "B-05").locations[1].outside_change
+        check("list v5: a location in an untouched file without outside_change is invalid (negative case)", result(unmarked, "B-05").problems.some((p) => /not touched by the change/.test(p)))
+        const v4 = clone()
+        v4.version = 4
+        check("list v4: outside_change needs version 5 (negative case)", eq(result(v4, "B-05").problems, [ "outside_change needs a list of version 5 or later" ]))
+        const onDecoy = clone()
+        entry(onDecoy, "K-03").locations.push({ file: "src/report.ts", lines: [ 30, 30 ], outside_change: true })
+        check("list v5: a decoy with a location outside the change is invalid (negative case)", result(onDecoy, "K-03").problems.some((p) => /only a finding/.test(p)))
+        const nowhere = clone()
+        entry(nowhere, "B-06").locations[1].file = "src/nowhere.ts"
+        check("list v5: a location outside the change in a missing file is invalid (negative case)", result(nowhere, "B-06").problems.some((p) => /does not exist after the change/.test(p)))
+        const allInside = clone()
+        entry(allInside, "B-08").locations = [ entry(allInside, "B-08").locations[1] ]
+        check("list v5: a finding with only locations outside the change is invalid (negative case)", result(allInside, "B-08").problems.some((p) => /no location lies in a changed line/.test(p)))
+
+        const fewOutside = clone()
+        fewOutside.structure.min_outside_change = 5
+        check("list v5: structure asks for 5 findings outside the change, 4 exist (negative case)", globals(fewOutside).some((g) => /4 findings with a location outside the change, at least 5/.test(g)))
+        const sparse = clone()
+        sparse.structure.min_changed_lines_per_finding = 1000
+        check("list v5: structure asks for 1000 changed lines per finding (negative case)", globals(sparse).some((g) => /changed lines per finding, at least 1000/.test(g)))
+        const manyFiles = clone()
+        manyFiles.structure.min_changed_files = 50
+        check("list v5: structure asks for 50 changed files (negative case)", globals(manyFiles).some((g) => /changed files, at least 50/.test(g)))
+        const negative = clone()
+        negative.structure.min_changed_files = -1
+        check("list v5: a negative figure in structure is invalid (negative case)", globals(negative).some((g) => /structure must give/.test(g)))
+        const noStructure = clone()
+        delete noStructure.structure
+        check("list v5: a list without structure is invalid (negative case)", globals(noStructure).some((g) => /structure must give/.test(g)))
+    }
+    finally {
+        removeCopy(copy)
+    }
+
+    /*  computed by hand from cases/context-returns/testdata/normal.jsonl:
+        B-01 HIGH (min MEDIUM, adequate), B-02 MEDIUM (min MEDIUM, adequate), B-03 MEDIUM (min HIGH, not adequate),
+        B-08 HIGH at the location outside the change in src/admin.ts (min HIGH, adequate); K-02 reported; api.ts unassignable
+        hits 4/8 = 0.5, obvious 1, medium 0.5, hidden 0.25; adequate 3/8 = 0.375; decoys 1/5 = 0.2  */
+    const r = evaluateRun({ name: "h1", status: "ok", model: "m", review: replayText("normal.jsonl", hard.testdataDir), cost: 0.7, duration: 1000 }, exp)
+    check("context-returns: hits B-01, B-02, B-03, and B-08 through its location outside the change", eq(r.hits, [ "B-01", "B-02", "B-03", "B-08" ]))
+    check("context-returns: recall overall 0.5, obvious 1, medium 0.5, hidden 0.25, adequate 0.375",
+        r.recall.overall === 0.5 && r.recall.obvious === 1 && r.recall.medium === 0.5 && r.recall.hidden === 0.25 && r.recall.adequate === 0.375)
+    check("context-returns: decoy K-02, false-alarm rate 0.2, 1 unassignable", eq(r.decoys_reported, [ "K-02" ]) && r.false_alarm_rate === 0.2 && r.unassignable === 1)
+}
+
+/*  proofs: edits of a fix, exit codes of a single test, the command line, translation of
+    TypeScript, and the proof of the hard case  */
+{
+    /*  the edits of a fix: text that occurs exactly once inside the project  */
+    const project = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-selftest-edits-"))
+    try {
+        fs.mkdirSync(path.join(project, "src"))
+        fs.writeFileSync(path.join(project, "src", "a.ts"), "const a = 1\r\nconst b = 2\r\nconst c = 2\r\n")
+        const edit = (file, find, replace) => applyEdits(project, [ { file, find, replace } ])
+        check("proof: an edit replaces its text once, also in a file with CRLF", eq(edit("src/a.ts", [ "const a = 1", "const b = 2" ], [ "const a = 3" ]), [])
+            && fs.readFileSync(path.join(project, "src", "a.ts"), "utf8") === "const a = 3\nconst c = 2\n")
+        check("proof: text that does not occur is a problem (negative case)", /occurs 0 times/.test(edit("src/a.ts", [ "const z" ], [ "" ])[0]))
+        check("proof: text that occurs twice is a problem (negative case)", /occurs 2 times/.test(edit("src/a.ts", [ "const" ], [ "let" ])[0]))
+        check("proof: a missing file and a folder are problems (negative case)", /does not exist/.test(edit("src/b.ts", [ "x" ], [ "y" ])[0])
+            && /does not exist/.test(edit("src", [ "x" ], [ "y" ])[0]))
+        check("proof: a file outside the project is a problem (negative case)", /outside the project/.test(edit("../elsewhere.ts", [ "x" ], [ "y" ])[0]))
+        check("proof: a malformed edit is a problem (negative case)", /invalid edit/.test(applyEdits(project, [ null ])[0])
+            && /invalid edit/.test(applyEdits(project, [ { file: "src/a.ts", find: "const a" } ])[0]))
+    }
+    finally {
+        fs.rmSync(project, { recursive: true, force: true })
+    }
+
+    /*  one test in a process of its own: 0 passes, 1 a failed assertion, 2 anything else  */
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-selftest-proof-"))
+    try {
+        const tests = {
+            "passes.mjs":    "export default async function ({ assert }) {\n    assert.equal(1, 1)\n}\n",
+            "fails.mjs":     "export default async function ({ assert }) {\n    console.log(\"a line of the project\")\n    assert.equal(1, 2, \"one is not two\")\n}\n",
+            "throws.mjs":    "export default async function () {\n    null.x\n}\n",
+            "floating.mjs":  "export default async function () {\n    Promise.reject(new Error(\"late\"))\n}\n",
+            "unawaited.mjs": "export default async function ({ assert }) {\n    assert.rejects(Promise.resolve(1), \"must reject\")\n}\n",
+            "then.mjs":      "export default function ({ assert }) {\n    Promise.resolve().then(() => assert.equal(1, 2))\n}\n",
+            "timer.mjs":     "export default async function ({ assert }) {\n    setTimeout(() => assert.equal(1, 2), 20)\n}\n",
+            "empty.mjs":     "export const nothing = 1\n"
+        }
+        const child = (name) => {
+            fs.writeFileSync(path.join(tmp, name), tests[name])
+            const res = spawnSync(process.execPath, [ path.join(BENCH_DIR, "lib", "proof-child.mjs"), tmp, path.join(tmp, name) ], { encoding: "utf8" })
+            return { status: res.status, out: res.stdout.trim().split("\n").at(-1) }
+        }
+        check("proof: a passing test ends with 0", eq(child("passes.mjs"), { status: 0, out: "pass" }))
+        check("proof: a failed assertion ends with 1 and its message in the last line", eq(child("fails.mjs"), { status: 1, out: "one is not two" }))
+        const thrown = child("throws.mjs")
+        check("proof: another exception ends with 2 (negative case)", thrown.status === 2 && thrown.out.startsWith("error: TypeError"))
+        check("proof: a rejection nobody handles ends with 2 (negative case)", child("floating.mjs").status === 2)
+        check("proof: an assertion the test does not wait for ends with 2 (negative case)", child("unawaited.mjs").status === 2
+            && child("then.mjs").status === 2 && child("timer.mjs").status === 2)
+        check("proof: a test file without a default export ends with 2 (negative case)", child("empty.mjs").status === 2)
+    }
+    finally {
+        fs.rmSync(tmp, { recursive: true, force: true })
+    }
+
+    /*  the command line of prove.mjs  */
+    const prove = (...args) => {
+        const res = spawnSync(process.execPath, [ path.join(BENCH_DIR, "prove.mjs"), ...args ], { encoding: "utf8" })
+        return { status: res.status, out: res.stdout, err: res.stderr }
+    }
+    const unknown = prove("--case", "other")
+    check("prove: an unknown case ends with 2 (negative case)", unknown.status === 2 && /unknown case "other"/.test(unknown.err))
+    const noName = prove("--case")
+    check("prove: --case without a name ends with 2 (negative case)", noName.status === 2 && /--case needs a name/.test(noName.err))
+    check("prove: an unknown option ends with 2 (negative case)", prove("--fast").status === 2)
+
+    const none = proveCase(resolveCase("correctness-cents"))
+    check("proof: a case without proofs is not proven (negative case)", !none.ok && none.problems.some((p) => /has no proofs/.test(p))
+        && renderProof(none).at(-1) === "result: FAILED")
+
+    if (!nodeIsRecent())
+        check("proof: this Node.js can translate TypeScript", false, `Node.js ${process.versions.node}`)
+    else {
+        const withoutProofs = prove()
+        check("prove: without --case the default case has no proofs and the command ends with 1 (negative case)", withoutProofs.status === 1
+            && /case correctness-cents has no proofs/.test(withoutProofs.out) && /result: FAILED/.test(withoutProofs.out))
+
+        const source = [
+            "import type { Order } from \"./order\"",
+            "import { total } from \"./cart\"",
+            "import { createHmac } from \"node:crypto\"",
+            "import { rate } from \"./rates.js\"",
+            "export { total as sum } from \"../shared/cart\"",
+            "/*  restore it from \"./backup\"  */",
+            "const note = 'restore it from \"./backup\"'",
+            "export function f(order: Order, n: number = 2): number {",
+            "    return total(order) as number",
+            "}"
+        ].join("\n")
+        const js = translate(source)
+        check("proof: the translation keeps the line count and blanks out the types", js.split("\n").length === 10
+            && !js.includes("./order") && !js.includes(": number") && !js.includes(" as number") && js.includes("f(order"))
+        check("proof: relative imports and exports get the suffix .mjs", js.includes("from \"./cart.mjs\"") && js.includes("from \"../shared/cart.mjs\""))
+        check("proof: other specifiers, specifiers with a suffix, comments, and strings stay as they are", js.includes("from \"node:crypto\"")
+            && js.includes("from \"./rates.js\"") && js.includes("/*  restore it from \"./backup\"  */") && js.includes("'restore it from \"./backup\"'"))
+
+        const hard = resolveCase("context-returns")
+        const exp  = readJson(hard.expectedFile)
+        const good = proveCase(hard)
+        const of   = (res, id) => res.entries.find((e) => e.id === id)
+        check("proof: every entry of context-returns is proven", good.ok && good.entries.length === 13 && good.entries.every((e) => e.proven), renderProof(good).join(" / "))
+        check("proof: every finding fails on the change and passes with its own fix",
+            good.entries.filter((e) => e.kind === "finding").every((e) => e.on_change === "fails" && e.with_fix === "pass"))
+        check("proof: every decoy passes on the change", good.entries.filter((e) => e.kind === "decoy").every((e) => e.on_change === "pass"))
+        check("proof: with all fixes together 13 of 13 tests pass", good.together.total === 13 && good.together.passed === 13
+            && renderProof(good).includes("all fixes together: 13 of 13 tests pass") && renderProof(good).at(-1) === "result: OK")
+
+        /*  four ways a proof must not go through, in one run:
+            B-01 with a fix that changes nothing, B-03 with a test that throws instead of asserting,
+            K-01 with a test whose only assertion is not waited for, K-02 with a test that fails  */
+        const fixes = readJson(hard.fixesFile).fixes
+        fixes["B-01"] = [ { file: "src/returns.ts", find: [ "    for (let i = 1; i < lines.length; i++)" ], replace: [ "    for (let i = 1; i <  lines.length; i++)" ] } ]
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), "ase-rr-selftest-proofs-"))
+        try {
+            fs.cpSync(hard.proofsDir, dir, { recursive: true })
+            fs.writeFileSync(path.join(dir, "B-03.mjs"), "export default async function ({ load }) {\n    (await load(\"credit\")).noSuchFunction()\n}\n")
+            fs.writeFileSync(path.join(dir, "K-01.mjs"), "export default async function ({ assert }) {\n    assert.rejects(Promise.resolve(1), \"must reject\")\n}\n")
+            fs.writeFileSync(path.join(dir, "K-02.mjs"), "export default async function ({ assert }) {\n    assert.equal(1, 2, \"one is not two\")\n}\n")
+            const bad = proveCase(hard, { fixes, proofsDir: dir })
+            check("proof: a fix that changes nothing leaves its finding unproven (negative case)", !bad.ok && !of(bad, "B-01").proven
+                && of(bad, "B-01").on_change === "fails" && of(bad, "B-01").with_fix === "fails")
+            check("proof: a test that throws instead of asserting proves nothing (negative case)", !of(bad, "B-03").proven && of(bad, "B-03").on_change === "error"
+                && of(bad, "B-03").message.startsWith("error:"))
+            check("proof: a decoy whose test does not wait for its assertion is not proven (negative case)", !of(bad, "K-01").proven && of(bad, "K-01").on_change === "error")
+            check("proof: a decoy whose test fails is not proven (negative case)", !of(bad, "K-02").proven && of(bad, "K-02").on_change === "fails")
+            check("proof: all fixes together name the tests that do not pass (negative case)", eq(bad.together.failing, [ "B-01", "B-03", "K-01", "K-02" ])
+                && renderProof(bad).includes("all fixes together: 9 of 13 tests pass (not: B-01, B-03, K-01, K-02)") && renderProof(bad).at(-1) === "result: FAILED")
+            check("proof: the other entries stay proven", bad.entries.filter((e) => ![ "B-01", "B-03", "K-01", "K-02" ].includes(e.id)).every((e) => e.proven))
+
+            /*  a fix whose text does not occur: its finding is not proven, and the fixes cannot be applied together  */
+            const absent = readJson(hard.fixesFile).fixes
+            absent["B-02"] = [ { file: "src/mail.ts", find: [ "            to:      order.customerId," ], replace: [ "            to:      order.customer.email," ] } ]
+            const noText = proveCase(hard, { fixes: absent })
+            check("proof: a fix whose text does not occur is reported (negative case)", !noText.ok && !of(noText, "B-02").proven && of(noText, "B-02").with_fix === "error"
+                && /occurs 0 times/.test(of(noText, "B-02").message) && noText.together === null
+                && noText.problems.some((p) => /all fixes together: src\/mail.ts/.test(p)))
+
+            fs.rmSync(path.join(dir, "K-05.mjs"))
+            fs.writeFileSync(path.join(dir, "K-09.mjs"), "export default async function () {}\n")
+            delete fixes["B-08"]
+            fixes["B-09"] = fixes["B-01"]
+            const incomplete = proveCase(hard, { fixes, proofsDir: dir })
+            check("proof: a missing test, a test without an entry, a missing fix, and a fix without a finding are reported (negative case)",
+                !incomplete.ok && incomplete.entries.length === 0
+                && incomplete.problems.some((p) => /K-05: no test/.test(p)) && incomplete.problems.some((p) => /K-09\.mjs: a test without an entry/.test(p))
+                && incomplete.problems.some((p) => /B-08: no fix/.test(p)) && incomplete.problems.some((p) => /B-09: a fix without a finding/.test(p)))
+        }
+        finally {
+            fs.rmSync(dir, { recursive: true, force: true })
+        }
+        check("proof: every finding of the list has a fix and every fix a finding", eq(Object.keys(readJson(hard.fixesFile).fixes).sort(),
+            exp.entries.filter((e) => e.kind === "finding").map((e) => e.id).sort()))
+    }
 }
 
 process.stdout.write(`\n${passed} passed, ${failed} failed\n`)

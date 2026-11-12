@@ -1,0 +1,154 @@
+{
+    "version": 1,
+    "fixes": {
+        "B-01": [
+            {
+                "file": "src/returns.ts",
+                "find": [
+                    "    for (let i = 1; i < lines.length; i++)"
+                ],
+                "replace": [
+                    "    for (let i = 0; i < lines.length; i++)"
+                ]
+            }
+        ],
+        "B-02": [
+            {
+                "file": "src/mail.ts",
+                "find": [
+                    "            to:      order.id,"
+                ],
+                "replace": [
+                    "            to:      order.customer.email,"
+                ]
+            }
+        ],
+        "B-03": [
+            {
+                "file": "src/credit.ts",
+                "find": [
+                    "    await book({ customerId, amount: -amount, reference })",
+                    "    balances.set(customerId, balance - amount)"
+                ],
+                "replace": [
+                    "    balances.set(customerId, balance - amount)",
+                    "    try {",
+                    "        await book({ customerId, amount: -amount, reference })",
+                    "    }",
+                    "    catch (err) {",
+                    "        balances.set(customerId, creditBalance(customerId) + amount)",
+                    "        throw err",
+                    "    }"
+                ]
+            }
+        ],
+        "B-04": [
+            {
+                "file": "src/returns.ts",
+                "find": [
+                    "import { requestRefund } from \"./refund\""
+                ],
+                "replace": [
+                    "import { refundable, requestRefund } from \"./refund\""
+                ]
+            },
+            {
+                "file": "src/returns.ts",
+                "find": [
+                    "/*  a parcel was checked in at the returns desk  */"
+                ],
+                "replace": [
+                    "/*  whether these lines bring back the last units of the order  */",
+                    "function completesOrder(order: Order, lines: ReturnLine[]): boolean {",
+                    "    return order.items.every((item) => {",
+                    "        const line = lines.find((l) => l.sku === item.sku)",
+                    "        return returnedQuantity(order.id, item.sku) + (line?.quantity ?? 0) === item.quantity",
+                    "    })",
+                    "}",
+                    "",
+                    "/*  a parcel was checked in at the returns desk  */"
+                ]
+            },
+            {
+                "file": "src/returns.ts",
+                "find": [
+                    "    const amount = returnAmount(order, lines)"
+                ],
+                "replace": [
+                    "    /*  the parcel that brings back the rest of the order is paid back the rest of the total  */",
+                    "    const share  = returnAmount(order, lines)",
+                    "    const amount = completesOrder(order, lines) ? refundable(order) : share"
+                ]
+            }
+        ],
+        "B-05": [
+            {
+                "file": "src/report.ts",
+                "find": [
+                    "import type { Order } from \"./order\""
+                ],
+                "replace": [
+                    "import type { Order } from \"./order\"",
+                    "import { refundedTotal } from \"./refund\""
+                ]
+            },
+            {
+                "file": "src/report.ts",
+                "find": [
+                    "        if (order.status === \"paid\")",
+                    "            sum += order.total"
+                ],
+                "replace": [
+                    "        if (order.status === \"paid\" || order.status === \"partially_refunded\")",
+                    "            sum += order.total - refundedTotal(order.id)"
+                ]
+            }
+        ],
+        "B-06": [
+            {
+                "file": "src/store.ts",
+                "find": [
+                    "        deliveredOn: order.deliveredOn"
+                ],
+                "replace": [
+                    "        deliveredOn: order.deliveredOn,",
+                    "        paidWith:    order.paidWith"
+                ]
+            }
+        ],
+        "B-07": [
+            {
+                "file": "src/webhook.ts",
+                "find": [
+                    "        settleRefund(order, refund)",
+                    "        return"
+                ],
+                "replace": [
+                    "        if (refund.status !== \"settled\")",
+                    "            settleRefund(order, refund)",
+                    "        return"
+                ]
+            }
+        ],
+        "B-08": [
+            {
+                "file": "src/admin.ts",
+                "find": [
+                    "import { issueRefund, refundedTotal } from \"./refund\""
+                ],
+                "replace": [
+                    "import { issueRefund, refundable } from \"./refund\""
+                ]
+            },
+            {
+                "file": "src/admin.ts",
+                "find": [
+                    "    if (req.amount > order.total - refundedTotal(order.id))"
+                ],
+                "replace": [
+                    "    if (req.amount > refundable(order))"
+                ]
+            }
+        ]
+    }
+}

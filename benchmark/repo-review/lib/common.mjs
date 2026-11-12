@@ -19,7 +19,8 @@ export const TESTDATA_DIR  = path.join(BENCH_DIR, "testdata")
 export const DEFAULT_CASE = "correctness-cents"
 const CASES = {
     "correctness-cents": { dir: path.join(BENCH_DIR, "cases", "correctness-cents"), changeMessage: "Update order handling" },
-    "security-refunds":  { dir: path.join(BENCH_DIR, "cases", "security-refunds"),  changeMessage: "Add admin refunds and payment webhooks" }
+    "security-refunds":  { dir: path.join(BENCH_DIR, "cases", "security-refunds"),  changeMessage: "Add admin refunds and payment webhooks" },
+    "context-returns":   { dir: path.join(BENCH_DIR, "cases", "context-returns"),   changeMessage: "Add returns, partial refunds and store credit" }
 }
 export const CASE_NAMES = Object.keys(CASES)
 
@@ -33,6 +34,8 @@ export function resolveCase (name = DEFAULT_CASE) {
         dir:           c.dir,
         fixtureDir:    path.join(c.dir, "fixture"),
         expectedFile:  path.join(c.dir, "solution", "expected.json"),
+        proofsDir:     path.join(c.dir, "solution", "proofs"),
+        fixesFile:     path.join(c.dir, "solution", "fixes.json"),
         thresholdFile: path.join(c.dir, "thresholds.json"),
         resultsDir:    path.join(c.dir, "results"),
         testdataDir:   path.join(c.dir, "testdata"),

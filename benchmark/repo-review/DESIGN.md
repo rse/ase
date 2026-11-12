@@ -18,8 +18,14 @@ documented revision.
    defect spanning two files, and at least three decoys, each with its locations.
    A list that records minimum severities (version 4 and later) names one for
    every defect and has at least one defect with two locations in the same file.
-2. **A valid expected-results list.** Every entry points to existing lines that
-   the change touches; `check.mjs` reports "valid" for every entry.
+   A list of version 5 also names a class for every defect, has a medium or
+   hidden defect of each of the five context classes, and states the structure
+   of its case, which must hold for the fixture.
+2. **A valid expected-results list.** Every entry points to existing lines, and
+   at least one of its locations lies in a line that the change touches. A
+   location outside the change is marked as such (version 5 and later, defects
+   only), lies in a file of the copy, and contains no changed line. `check.mjs`
+   reports "valid" for every entry.
 3. **No hint at the answers.** The working copy of a run contains neither the
    expected-results list nor any file name, comment, or commit message that hints
    at defects or decoys. The runner checks this before every model call and stops
@@ -75,6 +81,9 @@ documented revision.
 - It runs neither in CI nor on a schedule. Every run is started by hand, and every
   group of paid runs needs a deliberate decision about its cost.
 - The measurements do not use `--thorough`.
+- A proof shows that a listed defect makes the code behave wrongly and that a
+  decoy does not. It does not show that a review can find the defect, that a case
+  is hard enough, or that the fixture has no weakness outside the list.
 
 ## Design decisions
 
@@ -82,7 +91,9 @@ documented revision.
 
 The scripts are ES modules (`.mjs`) that use only Node.js built-ins and need
 Node.js 22, which `tool/` already requires. There is no `package.json` and no
-build step.
+build step. Only `prove.mjs` and the checks of the proofs in `selftest.mjs` need
+Node.js 22.18 or newer (see
+[Proofs for every entry of a list](#proofs-for-every-entry-of-a-list)).
 
 *Why:* the test must run on Windows without Bash and without an install step, and
 it must not touch any build target of the repository. *Price:* no TypeScript type
@@ -293,6 +304,85 @@ reported as a `LOW` style remark would be waved through. *Price:* the minimum
 severity is a judgement recorded in the list, made before the measurement and
 open to argument like the thresholds.
 
+### Two tiers, and a list that says what makes a case hard
+
+The cases `correctness-cents` and `security-refunds` are the base tier: every
+defect sits in a changed line and follows a familiar pattern. The case
+`context-returns` is the hard tier. Its list has version 5 and records three
+things the earlier versions do not:
+
+- a **class** per defect: `plain` for the two obvious anchors, and for the others
+  one of the context classes `false-assurance` (a comment or name promises a
+  safety the code does not have), `omission` (the change is right in itself, an
+  unchanged place no longer fits), `interplay` (two changes that are each right
+  are wrong together), `sequence` (the defect only shows over a sequence of
+  steps), and `domain` (business logic without a familiar pattern). Each context
+  class must occur in a medium or hidden defect; an obvious defect is `plain`,
+  and only an obvious defect is. A decoy may name the context class it
+  `resembles`.
+- locations **outside the change**: a location with `outside_change: true` names
+  a file of the copy exactly as the copy lists it and contains no changed line.
+  Only defects may have one, and every entry keeps at least one location in a
+  changed line. Without the field the earlier rule applies unchanged, so a
+  mistyped file or line cannot slip through as an outside location.
+- the **structure** of the case: the least number of defects with a location
+  outside the change, the least number of changed lines per defect, and the least
+  number of changed files. `check.mjs` computes the figures from the copy, prints
+  them for every case, and fails for a list of version 5 that the fixture no
+  longer meets. The changed lines are counted with a fixed diff algorithm, so
+  the figures do not depend on the Git configuration of the person who runs it.
+
+The matching needs no change: it compares files and lines and never asked
+whether a line was changed. The thresholds of the hard tier ask for a lower
+overall recall than the base tier.
+
+*Why:* the pilot showed a ceiling on the base tier, and a case is only harder if
+a review must leave the diff, check a claim, or think steps through; counting
+these properties in the list keeps them true when the fixture is edited. A defect
+caused by an omission has its real place in a module the change does not touch,
+and a review that names this place is right. *Price:* a third list format; the
+class of a defect and its tier remain the author's judgement; and a review may
+report such a defect at a third place, which the matching still misses.
+
+### Proofs for every entry of a list
+
+A case may carry proofs under `solution/`: one test per entry in
+`solution/proofs/<id>.mjs` and one fix per defect in `solution/fixes.json`, a
+list of text replacements. `prove.mjs` builds the copy as a run would, derives
+the states it needs (the change, the change with the fix of one defect, the
+change with all fixes), translates their TypeScript, and runs every test in a
+process of its own. A defect is proven if its test fails on the change and
+passes with its own fix alone; a decoy is proven if its test passes on the
+change; and with all fixes together every test must pass. A test that ends in
+anything but a failed assertion (an exception, a rejection nobody handles, a
+load error, a timeout) proves nothing and counts as not proven. A test passes
+only once nothing is left to run in its process, so an assertion it did not wait
+for still counts. A fix whose text does not occur exactly once, or whose file
+lies outside the project, is not applied and leaves its defect unproven.
+
+The translation uses `stripTypeScriptTypes` of `node:module`, which blanks the
+types out and keeps the line numbers, and appends `.mjs` to the relative
+specifier at the end of an import or export line. The fixture of a case with
+proofs therefore imports types only with `import type`, uses no enums or
+parameter properties, and writes its imports in one form: static, with double
+quotes, without a file suffix, the `from` on the last line of the statement.
+Any other form makes the affected test end with a load error, which is visible
+and counts as not proven.
+
+*Why:* the harder a defect, the easier it is to dispute, and the pilot showed a
+decoy that was a real weakness and real weaknesses that were on no list. The fix
+of one defect alone shows that this defect, and no other, makes the test fail.
+Separate processes are needed because the modules of the example project keep
+their state in module variables. Text replacements can be applied one by one and
+all together without keeping second copies of whole files, and nothing under
+`solution/` can reach a working copy, because the copy is built from `fixture/`
+alone. *Price:* `stripTypeScriptTypes` is marked experimental in Node.js 22, so
+`prove.mjs` asks for Node.js 22.18 and may break with a later version, which
+would show as failed proofs, never as wrong figures of a measurement. A proof
+run starts about 35 processes and takes some seconds. An edit to the fixture
+can invalidate the text of a fix, which is reported. Only `context-returns` has
+proofs so far.
+
 ### Cases are revised in place, with a placement rule for decoys
 
 A case that needs better decoys or a cleaner fixture is changed in place. Its
@@ -336,9 +426,20 @@ since been fixed; the scorer commit in each entry says which.
 
 ## Known risks
 
-- **Case too easy.** On reading the reviews, the strongest model found every
-  defect in every run. Harder cases are needed before results say anything about
-  open-weight models.
+- **Case too easy.** On reading the reviews of the pilot, the strongest model
+  found every defect of the base tier in every run. The hard tier was added for
+  that reason, but it is unmeasured: whether it leaves headroom for the strongest
+  model is unknown until a measurement and its manual reading.
+- **The author of the hard case.** `context-returns` was written with Claude
+  Fable. That model should not be measured on it, and its judgement of what is
+  hard to find is built into the tiers and classes.
+- **A weakness outside the list of the hard case.** A `paid` event that the
+  provider repeats after the order has moved on (refunded in the base, also
+  partially refunded after the change) is answered with an error, because the
+  check for repeats compares the status of the order with the status of the
+  event. The base has this weakness already. A finding about it lands on the
+  location of the defect about repeated refund events and has the same root; the
+  manual reading must tell the two apart.
 - **Scorer and reading disagree.** Location matching both misses correctly
   described defects and credits unrelated findings to decoys. Automated figures
   must be read together with a manual check until the matching improves.

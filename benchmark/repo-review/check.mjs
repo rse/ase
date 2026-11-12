@@ -37,7 +37,7 @@ const expected = loadExpected(file ?? c.expectedFile)
 const copy     = buildCopy(c)
 let failed = false
 try {
-    const { results, global } = validateExpected(expected, copy.dir)
+    const { results, global, figures } = validateExpected(expected, copy.dir)
     for (const r of results) {
         if (r.ok)
             process.stdout.write(`${r.id}: valid\n`)
@@ -54,6 +54,10 @@ try {
     process.stdout.write(`case: ${c.name}\n`)
     process.stdout.write(`summary: ${s.findings} findings (obvious ${s.obvious}, `
         + `medium ${s.medium}, hidden ${s.hidden}), ${s.decoys} decoys\n`)
+    if (figures)
+        process.stdout.write(`change: ${figures.changed_lines} changed lines in ${figures.changed_files} files, `
+            + `${figures.lines_per_finding.toFixed(1)} per finding; `
+            + `findings with a location outside the change: ${figures.outside_change}\n`)
     process.stdout.write(failed ? "result: FAILED\n" : "result: OK\n")
 }
 finally {

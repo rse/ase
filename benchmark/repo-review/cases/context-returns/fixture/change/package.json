@@ -1,0 +1,13 @@
+{
+    "name": "shop-core",
+    "version": "1.7.0",
+    "private": true,
+    "type": "module",
+    "description": "Order handling core of a small web shop",
+    "scripts": {
+        "build": "tsc"
+    },
+    "devDependencies": {
+        "typescript": "5.9.3"
+    }
+}
