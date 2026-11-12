@@ -9,7 +9,7 @@ import * as path from "node:path"
 import { query } from "@anthropic-ai/claude-agent-sdk"
 import type { Options, SDKUserMessage } from "@anthropic-ai/claude-agent-sdk"
 
-import type { TestCase }               from "./ase-test-case.js"
+import type { Stage }                  from "./ase-test-case.js"
 import type { Sandbox }                from "./ase-test-sandbox.js"
 import { repoRoot }                    from "./ase-test-sandbox.js"
 import type { Simulator, DialogEntry, Question } from "./ase-test-simulator.js"
@@ -52,13 +52,13 @@ export const skillPrompt = (skill: string, args: string): string => {
     simulator, else a multi-turn conversation with streaming input, in which the
     simulator answers the intercepted "AskUserQuestion" calls and composes the
     free-text user turns until it ends the session or the turn cap is reached  */
-export const runSession = async (caze: TestCase, sandbox: Sandbox,
+export const runSession = async (stage: Stage, sandbox: Sandbox,
     simulator: Simulator | null, record: SessionRecord): Promise<SessionResult> => {
     const result: SessionResult = {
         output: [], lastText: "", dialog: [], sessionId: "", model: "",
         costUsd: 0, costAccurate: true, turns: 0, errored: false, crashed: false, timedOut: false, failure: ""
     }
-    const prompt = caze.skill !== "" ? skillPrompt(caze.skill, caze.args) : caze.prompt
+    const prompt = stage.skill !== "" ? skillPrompt(stage.skill, stage.args) : stage.prompt
 
     /*  the streaming input queue: user messages are pushed as the conversation
         unfolds, and a null entry ends the input stream (and with it the session);
@@ -96,7 +96,7 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
             return
         result.timedOut = true
         abort.abort()
-    }, caze.timeoutSec * 1000)
+    }, stage.timeoutSec * 1000)
 
     /*  the session options: the working-copy plugin, the sandboxed environment and
         settings, automatically classified permissions, and a hard budget and turn cap
@@ -108,8 +108,8 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
         plugins:         [ { type: "local", path: path.join(repoRoot, "plugin") } ],
         settingSources:  [ "user" ],
         permissionMode:  "auto",
-        maxTurns:        simulator !== null ? caze.turns!.maxTurns * 4 : 32,
-        maxBudgetUsd:    caze.maxUsd,
+        maxTurns:        simulator !== null ? stage.turns!.maxTurns * 4 : 32,
+        maxBudgetUsd:    stage.maxUsd,
         abortController: abort,
         stderr:          record.onStderr,
         ...(process.env.ASE_TEST_MODEL !== undefined ? { model: process.env.ASE_TEST_MODEL } : {}),
@@ -172,7 +172,7 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
                     result.failure = `session error: ${msg.subtype}`
                     push(null)
                 }
-                else if (simulator === null || userTurns >= caze.turns!.maxTurns)
+                else if (simulator === null || userTurns >= stage.turns!.maxTurns)
                     push(null)
                 else {
                     const turn = await simulator.nextTurn(result.dialog)
@@ -191,7 +191,7 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
         result.errored      = true
         result.crashed      = !result.timedOut
         result.costAccurate = false
-        result.failure      = result.timedOut ? `timeout after ${caze.timeoutSec}s` :
+        result.failure      = result.timedOut ? `timeout after ${stage.timeoutSec}s` :
             `session crashed: ${err instanceof Error ? err.message : String(err)}`
     }
     finally {
@@ -201,7 +201,7 @@ export const runSession = async (caze: TestCase, sandbox: Sandbox,
         result.errored      = true
         result.costAccurate = false
         if (result.failure === "")
-            result.failure = `timeout after ${caze.timeoutSec}s`
+            result.failure = `timeout after ${stage.timeoutSec}s`
     }
     return result
 }

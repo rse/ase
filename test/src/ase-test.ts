@@ -17,9 +17,12 @@ import type { TestCase }                   from "./ase-test-case.js"
 import { sandboxCreate, sandboxTeardown, repoRoot } from "./ase-test-sandbox.js"
 import type { Sandbox }                    from "./ase-test-sandbox.js"
 import { runSession }                      from "./ase-test-session.js"
+import type { SessionResult }              from "./ase-test-session.js"
 import { simulatorCreate }                 from "./ase-test-simulator.js"
 import { transcriptOpen, transcriptFinish } from "./ase-test-transcript.js"
+import type { StageOutcome }               from "./ase-test-transcript.js"
 import { oraclesRun, changesetDiff, skillSpoke } from "./ase-test-oracle.js"
+import type { OracleResult }               from "./ase-test-oracle.js"
 import { describeCase }                    from "./ase-test-describe.js"
 import { reportRun, reportSummary }        from "./ase-test-report.js"
 import type { RunOutcome, CaseOutcome }    from "./ase-test-report.js"
@@ -68,7 +71,8 @@ if (globs.length > 0) {
 if (opts.list) {
     for (const caze of cases)
         console.log(`${caze.name} ` + chalk.dim(`(runs: ${caze.runs}, minPass: ${caze.minPass}, ` +
-            `${caze.turns !== null ? `interactive/${caze.turns.simulator}` : "single-shot"})`))
+            `${caze.staged ? `staged/${caze.stages.length}` :
+                (caze.turns !== null ? `interactive/${caze.turns.simulator}` : "single-shot")})`))
     process.exit(0)
 }
 if (cases.length === 0) {
@@ -92,6 +96,11 @@ if (process.env.ANTHROPIC_API_KEY === undefined
     && process.env.CLAUDE_CODE_OAUTH_TOKEN === undefined
     && !fs.existsSync(path.join(process.env.HOME ?? "", ".claude", ".credentials.json"))) {
     console.error(chalk.red("no agent tool credentials found: set ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN"))
+    process.exit(2)
+}
+if (cases.some((caze) => caze.oracles.some((oracle) => "suite" in oracle))
+    && (await execa("python3", [ "--version" ], { reject: false })).failed) {
+    console.error(chalk.red("no \"python3\" found in $PATH, but required by the \"suite\" oracle"))
     process.exit(2)
 }
 
@@ -136,40 +145,107 @@ Promise<{ outcome: RunOutcome, retry: boolean }> => {
         const transcript  = transcriptOpen(resultsDir, caze, run, retried)
         outcome.artifacts = transcript.dir
         sandbox           = await sandboxCreate(caze, run)
-        const simulator   = simulatorCreate(caze, sandbox)
-        const result      = await runSession(caze, sandbox, simulator, transcript.record)
-        outcome.costUsd   = result.costUsd
-        outcome.model     = result.model
 
-        /*  an inaccurate cost (timeout or crash before the final result message)
-            is only a lower bound, so book the full per-run budget globally  */
-        totalUsd += result.costAccurate ? result.costUsd : Math.max(result.costUsd, caze.maxUsd)
+        /*  run the stages one after the other in the shared sandbox (a single-skill
+            case is the degenerate one-stage case), where the arguments of a stage
+            receive the last messages of the earlier stages, the diagnostic oracles of
+            a stage are evaluated right after it, and an errored stage of a staged case
+            skips all remaining stages  */
+        const results:     SessionResult[] = []
+        const stages:      StageOutcome[]  = []
+        const diagnostics: OracleResult[]  = []
+        for (const [ index, stage ] of caze.stages.entries()) {
+            const args      = !caze.staged ? stage.args :
+                stage.args.replace(/\{\{stage(\d+)\.lastMessage\}\}/g, (_m, n: string) => results[Number(n) - 1].lastText)
+            const simulator = simulatorCreate(stage, sandbox)
+            const result    = await runSession({ ...stage, args }, sandbox, simulator, transcript.record(index + 1))
+            results.push(result)
+
+            /*  an inaccurate cost (timeout or crash before the final result message)
+                is only a lower bound, so book the full budget of the stage globally  */
+            totalUsd += result.costAccurate ? result.costUsd : Math.max(result.costUsd, stage.maxUsd)
+            if (!caze.staged)
+                continue
+
+            /*  an evaluation failure of a diagnostic oracle is diagnostic itself  */
+            let oracles: OracleResult[]
+            try {
+                const diff = stage.oracles.length > 0 ? await changesetDiff(sandbox) : ""
+                oracles = await oraclesRun(stage.oracles, caze, sandbox, result, diff)
+            }
+            catch (err) {
+                oracles = [ { kind: "evaluation", pass: false, detail: err instanceof Error ? err.message : String(err) } ]
+            }
+            oracles = oracles.map((oracle) => ({ ...oracle, kind: `stage${index + 1}/${oracle.kind}`, diagnostic: true }))
+            diagnostics.push(...oracles)
+            stages.push({
+                stage: index + 1, skill: stage.skill, sessionId: result.sessionId, model: result.model,
+                costUsd: result.costUsd, turns: result.turns, errored: result.errored,
+                timedOut: result.timedOut, failure: result.failure, oracles
+            })
+            if (result.errored)
+                break
+        }
+
+        /*  the overall session result: the one of a single-skill case, resp. the
+            merged results of the stages of a staged case, of which only the last
+            one can have errored  */
+        const last   = results[results.length - 1]
+        const where  = `stage ${results.length} (${caze.stages[results.length - 1].skill})`
+        const result: SessionResult = !caze.staged ? last : {
+            output:       results.flatMap((r) => r.output),
+            lastText:     last.lastText,
+            dialog:       results.flatMap((r) => r.dialog),
+            sessionId:    last.sessionId,
+            model:        [ ...new Set(results.map((r) => r.model)) ].join(", "),
+            costUsd:      results.reduce((sum, r) => sum + r.costUsd, 0),
+            costAccurate: results.every((r) => r.costAccurate),
+            turns:        results.reduce((sum, r) => sum + r.turns, 0),
+            errored:      last.errored,
+            crashed:      last.crashed,
+            timedOut:     last.timedOut,
+            failure:      last.failure !== "" ? `${where}: ${last.failure}` : ""
+        }
+        outcome.costUsd = result.costUsd
+        outcome.model   = result.model
 
         /*  an infrastructure failure is a crash without any skill output -- a
             timeout is never one, as retrying the most expensive failure mode
             would double the spend of a merely too slow case  */
-        const infra = result.crashed && !result.timedOut && !skillSpoke(result.output)
+        const infra = last.crashed && !last.timedOut && !skillSpoke(last.output)
         if (infra) {
             outcome.outcome = "error"
             outcome.failure = result.failure
+            outcome.oracles = diagnostics
             retry = !retried
-            await transcriptFinish(transcript, caze, sandbox, result, "", [], false)
+            await transcriptFinish(transcript, caze, sandbox, result, "", diagnostics, false, stages)
+        }
+        else if (caze.staged && last.errored) {
+            /*  an errored stage of a staged case fails the run without evaluating
+                the top-level oracles, as the remaining stages were skipped  */
+            outcome.outcome = "fail"
+            outcome.failure = `${where} errored: ${last.failure}`
+            outcome.oracles = diagnostics
+            await transcriptFinish(transcript, caze, sandbox, result, "", diagnostics, false, stages)
         }
         else {
             /*  an evaluation failure after the (expensive) session is a plain
                 case failure and never triggers the infrastructure retry  */
             try {
                 const diff      = await changesetDiff(sandbox)
-                outcome.oracles = await oraclesRun(caze, sandbox, result, diff)
-                if (result.costUsd > caze.maxUsd)
-                    outcome.oracles.push({
-                        kind: "budget", pass: false,
-                        detail: `run cost $${result.costUsd.toFixed(2)} exceeds budget $${caze.maxUsd.toFixed(2)}`
-                    })
-                outcome.outcome = outcome.oracles.every((oracle) => oracle.pass) ? "pass" : "fail"
+                outcome.oracles = [ ...diagnostics, ...await oraclesRun(caze.oracles, caze, sandbox, result, diff) ]
+                for (const [ index, r ] of results.entries())
+                    if (r.costUsd > caze.stages[index].maxUsd)
+                        outcome.oracles.push({
+                            kind: "budget", pass: false,
+                            detail: `${caze.staged ? `stage ${index + 1}` : "run"} cost $${r.costUsd.toFixed(2)} ` +
+                                `exceeds budget $${caze.stages[index].maxUsd.toFixed(2)}`
+                        })
+                outcome.outcome = outcome.oracles.every((oracle) => oracle.pass || oracle.diagnostic === true) ?
+                    "pass" : "fail"
                 outcome.failure = result.failure
                 await transcriptFinish(transcript, caze, sandbox, result, diff,
-                    outcome.oracles, outcome.outcome === "pass")
+                    outcome.oracles, outcome.outcome === "pass", stages)
             }
             catch (err) {
                 outcome.outcome = "fail"

@@ -15,8 +15,9 @@ import type { Sandbox }              from "./ase-test-sandbox.js"
 import type { SessionResult }        from "./ase-test-session.js"
 import { judgeRubric, judgeSimilar } from "./ase-test-judge.js"
 
-/*  the verdict of one oracle (with the raw judge scores of the LLM judge oracles)  */
-export type OracleResult = { kind: string, pass: boolean, detail: string, scores?: number[] }
+/*  the verdict of one oracle (with the raw judge scores of the LLM judge oracles), where
+    a diagnostic oracle of a stage explains a failure, but never decides the verdict  */
+export type OracleResult = { kind: string, pass: boolean, detail: string, scores?: number[], diagnostic?: boolean }
 
 /*  whether a skill reported an error in its output lines, as the skills report
     their errors as "▶ ERROR: ..." while the agent tool still exits successfully
@@ -136,13 +137,14 @@ const targetText = (spec: { in: string, file?: string, id?: string }, caze: Test
 const targetMissing = (spec: { in: string, file?: string, id?: string }): string =>
     spec.in === "taskBody" ? `target task "${spec.id}" missing` : `target file "${spec.file}" missing`
 
-/*  evaluate all oracles of a test case against the outcome of one run  */
-export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
+/*  evaluate the oracles of a test case (resp. of one of its stages) against the
+    outcome of one run (resp. of one stage)  */
+export const oraclesRun = async (oracles: OracleSpec[], caze: TestCase, sandbox: Sandbox,
     result: SessionResult, diff: string): Promise<OracleResult[]> => {
     const results: OracleResult[] = []
     const asList  = (value: string | string[] | undefined): string[] =>
         value === undefined ? [] : (Array.isArray(value) ? value : [ value ])
-    for (const oracle of caze.oracles) {
+    for (const oracle of oracles) {
         if ("notErrored" in oracle) {
             const errored = result.errored || skillErrored(result.output)
             results.push({
@@ -282,6 +284,38 @@ export const oraclesRun = async (caze: TestCase, sandbox: Sandbox,
             results.push({
                 kind: "exec", pass: faults.length === 0,
                 detail: faults.join("; ") || `${spec.stdin.length}/${spec.stdin.length} vectors match`
+            })
+        }
+        else if ("suite" in oracle) {
+            /*  copy the hidden suite into the project only now (after the changeset diff
+                was taken) and run it there, where the project root is on the module path  */
+            const spec   = oracle.suite
+            const name   = path.basename(spec.dir)
+            const target = path.join(sandbox.project, name)
+            if (fs.existsSync(target)) {
+                results.push({ kind: "suite", pass: false, detail: `suite directory "${name}" already exists in the project` })
+                continue
+            }
+            await fs.promises.cp(spec.dir, target, { recursive: true })
+            const run = await execa("python3", [ "-m", "unittest", "discover", "-s", name, "-v" ], {
+                cwd: sandbox.project, env: { ...sandbox.env, PYTHONDONTWRITEBYTECODE: "1" }, extendEnv: false,
+                stdin: "ignore", all: true, timeout: spec.timeoutSec * 1000, reject: false
+            })
+            const text     = String(run.all ?? "").replace(/\r\n/g, "\n")
+            const ran      = Number(/^Ran (\d+) tests?/m.exec(text)?.[1] ?? 0)
+            const failures = Number(/failures=(\d+)/.exec(text)?.[1] ?? 0)
+            const errors   = Number(/errors=(\d+)/.exec(text)?.[1] ?? 0)
+            const skipped  = Number(/skipped=(\d+)/.exec(text)?.[1] ?? 0)
+            const failed   = [ ...text.matchAll(/^(\w+) \(.*?\)(?:\n.*?)? \.\.\. (FAIL|ERROR|skipped|unexpected success)\b/gm) ]
+                .map((m) => `${m[1]} (${m[2]})`)
+            const pass     = run.exitCode === 0 && ran > 0 && failures === 0 && errors === 0 && skipped === 0
+            results.push({
+                kind: "suite", pass,
+                detail: pass ? `${ran}/${ran} tests passed` :
+                    `ran ${ran}, failures ${failures}, errors ${errors}, skipped ${skipped}` +
+                    (failed.length > 0 ? `; not passed: ${failed.join(", ")}` : "") +
+                    (run.timedOut ? `; timeout after ${spec.timeoutSec}s` : "") +
+                    (ran === 0 ? `; ${text.trim().split("\n").at(-1) ?? ""}` : "")
             })
         }
         else if ("rubric" in oracle)

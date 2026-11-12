@@ -134,7 +134,11 @@ a free-text prompt), the number of runs and the pass@k threshold
 ASE configuration, seeded task store, file tree), the optional
 interactive turns (a scripted `answers.yaml` or an LLM-driven persona),
 and the oracles (`notErrored`, `verdict`, `regex`, `fileExists`,
-`gitDiff`, `taskStore`, `textMetric`, `exec`, `rubric`, and `similar`).
+`gitDiff`, `taskStore`, `textMetric`, `exec`, `suite`, `rubric`, and
+`similar`). Instead of a single skill, a case can declare `stages`: a
+list of skill invocations run one after the other, each in its own
+session, but all in the *same* sandbox (e.g. brainstorm, plan, grill,
+and implement), see `cases/flow/brainstorm-grill-implement/`.
 The `exec` oracle compares behavior instead of text: a command run in
 the sandbox project (e.g. a generated program) must produce the same
 stdout as a case-local `reference` command (the "oracle code", run in
@@ -144,7 +148,12 @@ case directory states the decisions, facts, and constraints the result
 must carry, and an LLM judge scores the semantic similarity of the
 actual result (the skill output, the dialog, or the final task plan
 body via `in: taskBody`) against it, ignoring wording, structure, and
-ordering. See the existing cases for the shapes, and
+ordering. The `suite` oracle runs a *hidden* Python unit-test suite: the
+case-local directory `dir` is copied into the sandbox project only after
+the last session (and after the changeset diff was taken), so the skills
+never see the tests, and is run there via `python3 -m unittest discover
+-s <dir> -v`, passing only if every discovered test ran and passed.
+See the existing cases for the shapes, and
 `src/ase-test-case.ts` for the authoritative schema.
 
 To see the exact input (the first user turn, the fixture, and the
@@ -168,6 +177,9 @@ The defaults of an omitted `case.yaml` key:
 | `regex.flags`                             | `m`                | a JavaScript regex: no inline `(?i)`          |
 | `threshold`/`votes` (`rubric`, `similar`) | `0.7`/`3`          | judge model resp. `$ASE_TEST_JUDGE_MODEL`     |
 | `exec.timeoutSec`                         | `10`               | per command execution                         |
+| `suite.timeoutSec`                        | `120`              | for the whole test suite run                  |
+| `stages[].timeoutSec`                     | `300`              | per stage, a staged case sums them up         |
+| `stages[].budget.maxUsd`                  | `2.00`             | per stage, a staged case sums them up         |
 
 The oracle targets (`in`): `lastMessage` is the last assistant text
 block, `output` all assistant text, `dialog` the user/assistant texts
@@ -177,6 +189,23 @@ body of a task plan (with `id:`, `similar` only). A missing target file
 or task fails the oracle. The `exec` oracle runs both commands with the
 sandbox environment and compares stdout with trailing whitespace
 stripped; a failing `reference` command reports a case bug.
+
+A staged case declares `stages` *instead* of `skill`/`promptFile`, and
+then carries `turns`, `timeoutSec`, and `budget` per stage instead of
+per case. Each stage is a list entry with `skill`, `args`, and the
+optional `turns`, `timeoutSec`, `budget`, and `oracles`. The `args` of
+a stage may reference `{{stage<N>.lastMessage}}`, the whole last
+assistant text block of the earlier stage `<N>` (1-based), substituted
+verbatim. The `oracles` of a stage are *diagnostic*: they are evaluated
+right after their stage and reported as `stage<N>/<kind>` (marked `◦`
+on the console), but never decide the verdict, which is decided by the
+top-level `oracles` alone (the `suite` oracle is top-level only). An
+errored or crashed stage skips all remaining stages and fails the run
+with `stage <N> (<skill>) errored: ...`, without evaluating the
+top-level oracles. A staged run records each stage into its own
+`stage-<N>-transcript.{md,jsonl}` and `stage-<N>-stderr.log`, and its
+`result.json` additionally carries the per-stage results under
+`stages`.
 
 The LLM judges cast `votes` independent votes, each scoring 0.0 to 1.0,
 and pass when the majority reaches the `threshold`; when the majority

@@ -9,8 +9,8 @@ import * as path from "node:path"
 
 import chalk     from "chalk"
 
-import type { TestCase, OracleSpec } from "./ase-test-case.js"
-import { skillPrompt }               from "./ase-test-session.js"
+import type { TestCase, OracleSpec, Turns } from "./ase-test-case.js"
+import { skillPrompt }                      from "./ase-test-session.js"
 
 /*  normalize a string-or-list oracle value into a list  */
 const asList = (value: string | string[] | undefined): string[] =>
@@ -99,6 +99,9 @@ const describeOracle = (caze: TestCase, oracle: OracleSpec): string[] => {
         for (const input of oracle.exec.stdin)
             lines.push(`        ${JSON.stringify(input)}`)
     }
+    else if ("suite" in oracle)
+        lines.push(`    - hidden Python test suite "${path.relative(caze.dir, oracle.suite.dir)}" passes completely ` +
+            "(copied into the project only after the last stage, run via \"python3 -m unittest\")")
     else if ("rubric" in oracle) {
         lines.push(`    - LLM judge scores the output against rubric "${path.relative(caze.dir, oracle.rubric.file)}" ` +
             `(threshold: ${oracle.rubric.threshold.toFixed(2)}, votes: ${oracle.rubric.votes}):`)
@@ -115,19 +118,39 @@ const describeOracle = (caze: TestCase, oracle: OracleSpec): string[] => {
     return lines
 }
 
+/*  render the simulator line of the interactive turns of a case resp. stage  */
+const describeTurns = (caze: TestCase, turns: Turns): string => {
+    if (turns.simulator === "scripted") {
+        const script = turns.scriptData!
+        return `simulator: scripted "${path.relative(caze.dir, turns.script)}" ` +
+            `(rules: ${script.rules?.length ?? 0}` +
+            (script.default !== undefined ? `, default: "${script.default}"` : "") +
+            (script.end     !== undefined ? `, end: /${script.end}/` : "") +
+            `, max turns: ${turns.maxTurns})`
+    }
+    const model   = turns.model !== "" ? turns.model :
+        (process.env.ASE_TEST_SIM_MODEL ?? "claude-haiku-5-5")
+    const persona = turns.persona !== "" ?
+        `"${path.relative(caze.dir, turns.persona)}"` : "(none)"
+    return `simulator: llm persona ${persona} (model: ${model}, max turns: ${turns.maxTurns})`
+}
+
 /*  render the human-readable description of one test case: its exact input
-    (prompt, fixture, simulator) and its expected output (the oracles in prose)  */
+    (prompt, fixture, simulator, resp. the stages) and its expected output
+    (the oracles in prose)  */
 export const describeCase = (caze: TestCase): string => {
     const lines: string[] = []
     lines.push(chalk.bold(caze.name) + " " + chalk.dim(`(runs: ${caze.runs}, minPass: ${caze.minPass}, ` +
-        `${caze.turns !== null ? `interactive/${caze.turns.simulator}` : "single-shot"}, ` +
+        `${caze.staged ? `staged/${caze.stages.length}` :
+            (caze.turns !== null ? `interactive/${caze.turns.simulator}` : "single-shot")}, ` +
         `timeout: ${caze.timeoutSec}s, budget: $${caze.maxUsd.toFixed(2)})`))
 
-    /*  the input: the first user turn, the sandbox fixture, and the simulator  */
+    /*  the input: the first user turn (of a single-skill case), the sandbox
+        fixture, and the simulator  */
     lines.push(chalk.underline("  INPUT"))
-    if (caze.skill !== "")
+    if (!caze.staged && caze.skill !== "")
         lines.push(`    prompt:    ${skillPrompt(caze.skill, caze.args)}`)
-    else
+    else if (!caze.staged)
         lines.push(`    prompt:    ${caze.prompt.split("\n")[0]}` +
             (caze.prompt.includes("\n") ? chalk.dim(` (+${caze.prompt.split("\n").length - 1} more lines)`) : ""))
     const fixture: string[] = []
@@ -141,22 +164,22 @@ export const describeCase = (caze: TestCase): string => {
     for (const task of caze.fixture.tasks)
         fixture.push(`task ${taskSummary(task)}`)
     lines.push(`    fixture:   ${fixture.join(", ")}`)
-    if (caze.turns !== null) {
-        if (caze.turns.simulator === "scripted") {
-            const script = caze.turns.scriptData!
-            lines.push(`    simulator: scripted "${path.relative(caze.dir, caze.turns.script)}" ` +
-                `(rules: ${script.rules?.length ?? 0}` +
-                (script.default !== undefined ? `, default: "${script.default}"` : "") +
-                (script.end     !== undefined ? `, end: /${script.end}/` : "") +
-                `, max turns: ${caze.turns.maxTurns})`)
-        }
-        else {
-            const model   = caze.turns.model !== "" ? caze.turns.model :
-                (process.env.ASE_TEST_SIM_MODEL ?? "claude-haiku-5-5")
-            const persona = caze.turns.persona !== "" ?
-                `"${path.relative(caze.dir, caze.turns.persona)}"` : "(none)"
-            lines.push(`    simulator: llm persona ${persona} ` +
-                `(model: ${model}, max turns: ${caze.turns.maxTurns})`)
+    if (caze.turns !== null)
+        lines.push(`    ${describeTurns(caze, caze.turns)}`)
+
+    /*  the stages of a staged case: their first user turns, simulators, and
+        diagnostic oracles  */
+    for (const [ index, stage ] of (caze.staged ? caze.stages : []).entries()) {
+        const prompt = skillPrompt(stage.skill, stage.args).split("\n")
+        lines.push(`    stage ${index + 1}:   ${prompt[0]}` +
+            (prompt.length > 1 ? chalk.dim(` (+${prompt.length - 1} more lines)`) : "") +
+            chalk.dim(` (timeout: ${stage.timeoutSec}s, budget: $${stage.maxUsd.toFixed(2)})`))
+        if (stage.turns !== null)
+            lines.push(`      ${describeTurns(caze, stage.turns)}`)
+        if (stage.oracles.length > 0) {
+            lines.push("      diagnostic:")
+            for (const oracle of stage.oracles)
+                lines.push(...describeOracle(caze, oracle).map((line) => `    ${line}`))
         }
     }
 
