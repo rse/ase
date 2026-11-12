@@ -92,6 +92,16 @@ const oracleSchema = z.union([
         })
     }),
 
+    /*  a hidden Python unit-test suite: the case-local directory is copied into
+        the sandbox project only after the last stage and run there, where it
+        passes only if every discovered test ran and passed  */
+    z.strictObject({
+        suite: z.strictObject({
+            dir:          z.string(),
+            timeoutSec:   z.number().int().min(1).default(120)
+        })
+    }),
+
     /*  an LLM judge scoring the run output against a rubric (majority of votes)  */
     z.strictObject({
         rubric: z.strictObject({
@@ -115,11 +125,34 @@ const oracleSchema = z.union([
 ])
 export type OracleSpec = z.infer<typeof oracleSchema>
 
+/*  the schema of the interactive turns of a session  */
+const turnsSchema = z.strictObject({
+    simulator:  z.enum([ "scripted", "llm" ]),
+    script:     z.string().optional(),
+    persona:    z.string().optional(),
+    model:      z.string().optional(),
+    maxTurns:   z.number().int().min(1).optional()
+})
+
+/*  the schema of one stage of a staged case: a session of its own in the shared
+    sandbox, with its own limits and its diagnostic (never verdict-deciding) oracles  */
+const stageSchema = z.strictObject({
+    skill:      z.string(),
+    args:       z.string().optional(),
+    timeoutSec: z.number().int().min(1).optional(),
+    budget:     z.strictObject({
+        maxUsd:     z.number().positive()
+    }).optional(),
+    turns:      turnsSchema.optional(),
+    oracles:    z.array(oracleSchema).optional()
+})
+
 /*  the schema of a "case.yaml" file (unknown keys are errors)  */
 const caseSchema = z.strictObject({
     skill:      z.string().optional(),
     args:       z.string().optional(),
     promptFile: z.string().optional(),
+    stages:     z.array(stageSchema).min(1).optional(),
     runs:       z.number().int().min(1).optional(),
     minPass:    z.number().int().min(1).optional(),
     timeoutSec: z.number().int().min(1).optional(),
@@ -133,17 +166,34 @@ const caseSchema = z.strictObject({
         tasks:      z.array(z.string()).optional(),
         files:      z.string().optional()
     }).optional(),
-    turns:      z.strictObject({
-        simulator:  z.enum([ "scripted", "llm" ]),
-        script:     z.string().optional(),
-        persona:    z.string().optional(),
-        model:      z.string().optional(),
-        maxTurns:   z.number().int().min(1).optional()
-    }).optional(),
+    turns:      turnsSchema.optional(),
     oracles:    z.array(oracleSchema).min(1)
 })
 
-/*  a loaded and normalized test case  */
+/*  the loaded and normalized interactive turns of a session  */
+export type Turns = {
+    simulator:  "scripted" | "llm"
+    script:     string
+    scriptData: Script | null
+    persona:    string
+    model:      string
+    maxTurns:   number
+}
+
+/*  one loaded and normalized stage: a single session in the shared sandbox,
+    with its diagnostic oracles (a single-skill case is one stage without any)  */
+export type Stage = {
+    skill:      string
+    args:       string
+    prompt:     string
+    timeoutSec: number
+    maxUsd:     number
+    turns:      Turns | null
+    oracles:    OracleSpec[]
+}
+
+/*  a loaded and normalized test case, where a staged case carries the sum of
+    the limits of its stages and the skill names of its stages joined by " > "  */
 export type TestCase = {
     name:       string
     dir:        string
@@ -161,15 +211,10 @@ export type TestCase = {
         tasks:      string[]
         files:      string
     }
-    turns: {
-        simulator:  "scripted" | "llm"
-        script:     string
-        scriptData: Script | null
-        persona:    string
-        model:      string
-        maxTurns:   number
-    } | null
+    turns:      Turns | null
     oracles:    OracleSpec[]
+    staged:     boolean
+    stages:     Stage[]
 }
 
 /*  load and normalize one "case.yaml" file, resolving the relative file
@@ -182,9 +227,13 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
         throw new Error(`case "${name}": invalid "case.yaml": ${z.prettifyError(raw.error)}`)
     const spec = raw.data
 
-    /*  exactly one of the two inputs: both set or both unset is an error  */
-    if ((spec.skill === undefined) === (spec.promptFile === undefined))
-        throw new Error(`case "${name}": exactly one of "skill" or "promptFile" is required`)
+    /*  exactly one of the three inputs: a skill, a prompt file, or a list of stages,
+        where the limits and turns of a staged case belong to its stages  */
+    if ([ spec.skill, spec.promptFile, spec.stages ].filter((input) => input !== undefined).length !== 1)
+        throw new Error(`case "${name}": exactly one of "skill", "promptFile", or "stages" is required`)
+    if (spec.stages !== undefined
+        && (spec.turns !== undefined || spec.timeoutSec !== undefined || spec.budget !== undefined))
+        throw new Error(`case "${name}": "turns", "timeoutSec", and "budget" belong to the stages of a staged case`)
     const resolve = (ref: string, kind: string): string => {
         const resolved = path.resolve(dir, ref)
         if (!resolved.startsWith(dir + path.sep))
@@ -196,19 +245,76 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
     const runs = spec.runs ?? 1
     if ((spec.minPass ?? 1) > runs)
         throw new Error(`case "${name}": "minPass" exceeds "runs"`)
-    if (spec.turns?.simulator === "scripted" && spec.turns.script === undefined)
-        throw new Error(`case "${name}": scripted simulator requires "script"`)
+
+    /*  load the interactive turns of the case resp. of one of its stages  */
+    const turnsLoad = (turns: z.infer<typeof turnsSchema> | undefined, where: string): Turns | null => {
+        if (turns === undefined)
+            return null
+        if (turns.simulator === "scripted" && turns.script === undefined)
+            throw new Error(`case "${name}": scripted simulator${where} requires "script"`)
+        return {
+            simulator:  turns.simulator,
+            script:     turns.script  !== undefined ? resolve(turns.script,  "script")  : "",
+            scriptData: turns.script  !== undefined ? scriptLoad(resolve(turns.script, "script"), name) : null,
+            persona:    turns.persona !== undefined ? resolve(turns.persona, "persona") : "",
+            model:      process.env.ASE_TEST_FORCE_MODEL ?? turns.model ?? "",
+            maxTurns:   turns.maxTurns ?? 16
+        }
+    }
+
+    /*  resolve the file references of one oracle  */
+    const oracleResolve = (oracle: OracleSpec): OracleSpec => {
+        if ("rubric" in oracle)
+            return { rubric: { ...oracle.rubric, file: resolve(oracle.rubric.file, "rubric") } }
+        else if ("similar" in oracle) {
+            if (oracle.similar.in === "taskBody" && oracle.similar.id === undefined)
+                throw new Error(`case "${name}": similar oracle target "taskBody" requires the "id" key`)
+            return { similar: { ...oracle.similar, expected: resolve(oracle.similar.expected, "expected") } }
+        }
+        else if ("suite" in oracle) {
+            const suite = resolve(oracle.suite.dir, "suite")
+            if (!fs.statSync(suite).isDirectory())
+                throw new Error(`case "${name}": suite "${oracle.suite.dir}" is no directory`)
+            return { suite: { ...oracle.suite, dir: suite } }
+        }
+        return oracle
+    }
+
+    /*  load the stages of a staged case, whose arguments may only reference the
+        last message of an earlier stage, and whose diagnostic oracles must never
+        expose the hidden suite before the last stage has finished  */
+    const stages: Stage[] = (spec.stages ?? []).map((stage, index) => {
+        const where = ` of stage ${index + 1}`
+        for (const m of (stage.args ?? "").matchAll(/\{\{(.*?)\}\}/g)) {
+            const ref = /^stage(\d+)\.lastMessage$/.exec(m[1])
+            if (ref === null || Number(ref[1]) < 1 || Number(ref[1]) > index)
+                throw new Error(`case "${name}": invalid placeholder "${m[0]}"${where} ` +
+                    "(only \"{{stage<N>.lastMessage}}\" of an earlier stage is supported)")
+        }
+        if ((stage.oracles ?? []).some((oracle) => "suite" in oracle))
+            throw new Error(`case "${name}": "suite" oracle${where} is allowed at the top-level only`)
+        return {
+            skill:      stage.skill,
+            args:       stage.args ?? "",
+            prompt:     "",
+            timeoutSec: stage.timeoutSec ?? 300,
+            maxUsd:     stage.budget?.maxUsd ?? 2.0,
+            turns:      turnsLoad(stage.turns, where),
+            oracles:    (stage.oracles ?? []).map(oracleResolve)
+        }
+    })
+    const staged = spec.stages !== undefined
     const result: TestCase = {
         name,
         dir,
-        skill:      spec.skill ?? "",
+        skill:      staged ? stages.map((stage) => stage.skill).join(" > ") : (spec.skill ?? ""),
         args:       spec.args ?? "",
         prompt:     spec.promptFile !== undefined ?
             fs.readFileSync(resolve(spec.promptFile, "prompt"), "utf8").trim() : "",
         runs,
         minPass:    spec.minPass ?? runs,
-        timeoutSec: spec.timeoutSec ?? 300,
-        maxUsd:     spec.budget?.maxUsd ?? 2.0,
+        timeoutSec: staged ? stages.reduce((sum, stage) => sum + stage.timeoutSec, 0) : (spec.timeoutSec ?? 300),
+        maxUsd:     staged ? stages.reduce((sum, stage) => sum + stage.maxUsd, 0) : (spec.budget?.maxUsd ?? 2.0),
         fixture: {
             git:        spec.fixture?.git ?? false,
             lifecycle:  spec.fixture?.lifecycle ?? "solo",
@@ -216,25 +322,23 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
             tasks:      (spec.fixture?.tasks ?? []).map((task) => resolve(task, "task")),
             files:      spec.fixture?.files !== undefined ? resolve(spec.fixture.files, "files") : ""
         },
-        turns: spec.turns !== undefined ? {
-            simulator:  spec.turns.simulator,
-            script:     spec.turns.script  !== undefined ? resolve(spec.turns.script,  "script")  : "",
-            scriptData: spec.turns.script  !== undefined ? scriptLoad(resolve(spec.turns.script, "script"), name) : null,
-            persona:    spec.turns.persona !== undefined ? resolve(spec.turns.persona, "persona") : "",
-            model:      process.env.ASE_TEST_FORCE_MODEL ?? spec.turns.model ?? "",
-            maxTurns:   spec.turns.maxTurns ?? 16
-        } : null,
-        oracles: spec.oracles.map((oracle) => {
-            if ("rubric" in oracle)
-                return { rubric: { ...oracle.rubric, file: resolve(oracle.rubric.file, "rubric") } }
-            else if ("similar" in oracle) {
-                if (oracle.similar.in === "taskBody" && oracle.similar.id === undefined)
-                    throw new Error(`case "${name}": similar oracle target "taskBody" requires the "id" key`)
-                return { similar: { ...oracle.similar, expected: resolve(oracle.similar.expected, "expected") } }
-            }
-            return oracle
-        })
+        turns:      turnsLoad(spec.turns, ""),
+        oracles:    spec.oracles.map(oracleResolve),
+        staged,
+        stages
     }
+
+    /*  a single-skill case is the degenerate one-stage case without diagnostic oracles  */
+    if (!staged)
+        result.stages = [ {
+            skill:      result.skill,
+            args:       result.args,
+            prompt:     result.prompt,
+            timeoutSec: result.timeoutSec,
+            maxUsd:     result.maxUsd,
+            turns:      result.turns,
+            oracles:    []
+        } ]
     caseCheckRes(result)
     return result
 }
@@ -257,7 +361,7 @@ const caseCheckRes = (caze: TestCase): void => {
     }
     const asList = (value: string | string[] | undefined): (string | undefined)[] =>
         value === undefined ? [] : (Array.isArray(value) ? value : [ value ])
-    for (const oracle of caze.oracles) {
+    for (const oracle of [ ...caze.oracles, ...caze.stages.flatMap((stage) => stage.oracles) ]) {
         if ("regex" in oracle)
             check([ ...asList(oracle.regex.match), ...asList(oracle.regex.not) ],
                 oracle.regex.flags, "regex oracle")

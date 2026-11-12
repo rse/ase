@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   FEATURE [test]: Staged Test Cases and Hidden Test Suites
+    A test case can now chain several skills as `stages`, each in its own session, but all in one
+    sandbox, with per-stage diagnostic oracles, and the new `suite` oracle runs a hidden Python test
+    suite, copied into the project only after the last stage, as in `flow/brainstorm-grill-implement`.
+
 -   IMPROVEMENT [plugin]: Uniform Inline Image Title
     The mod now titles the diagrams of `ase_mods_diagram` "Inline Image Rendering" as well,
     instead of "Inline Diagram Rendering".

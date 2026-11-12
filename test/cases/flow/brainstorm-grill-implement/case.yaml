@@ -1,0 +1,51 @@
+stages:
+  - skill: ase-meta-brainstorm
+    args: >-
+      --max-clarify 0 --min-ideas 6 --max-shortlist 2
+      a small, dependency-free Python module "roman.py" with the two functions
+      "to_roman(n)" and "from_roman(s)", converting between integers and Roman numerals
+    timeoutSec: 600
+    budget: { maxUsd: 2.00 }
+    oracles:
+      - regex:
+          in: output
+          match: "RECOMMENDED"
+  - skill: ase-task-edit
+    args: "--plan OVERWRITE --next DONE roman: {{stage1.lastMessage}}"
+    timeoutSec: 600
+    budget: { maxUsd: 2.00 }
+    oracles:
+      - taskStore:
+          id: roman
+          exists: true
+  - skill: ase-task-grill
+    args: "--rounds 2 --next DONE roman"
+    timeoutSec: 900
+    budget: { maxUsd: 4.00 }
+    turns:
+      simulator: llm
+      persona: persona.md
+      maxTurns: 10
+    oracles:
+      - regex:
+          in: output
+          match: "GRILLING"
+  - skill: ase-task-implement
+    args: "--next DONE roman"
+    timeoutSec: 900
+    budget: { maxUsd: 3.00 }
+    oracles:
+      - fileExists: roman.py
+runs: 3
+minPass: 2
+fixture:
+  git: true
+  lifecycle: solo
+  config:
+    project:
+      task:
+        default:
+          changeset: worktree
+oracles:
+  - suite:
+      dir: suite

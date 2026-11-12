@@ -9,9 +9,9 @@ import * as fs      from "node:fs"
 import YAML         from "yaml"
 import { z }        from "zod"
 
-import type { TestCase } from "./ase-test-case.js"
-import type { Sandbox }  from "./ase-test-sandbox.js"
-import { llmText }       from "./ase-test-llm.js"
+import type { Stage }   from "./ase-test-case.js"
+import type { Sandbox } from "./ase-test-sandbox.js"
+import { llmText }      from "./ase-test-llm.js"
 
 /*  one entry of the recorded dialog between the tested session and the simulated user  */
 export type DialogEntry = { role: "user" | "assistant", text: string }
@@ -73,8 +73,8 @@ const FALLBACK_ANSWER = "proceed"
     a question plus its option labels (for an "AskUserQuestion" call) resp. against
     the last assistant message (for a free-text turn), with the script parsed and
     validated once at case load time  */
-const scriptedSimulator = (caze: TestCase): Simulator => {
-    const script = caze.turns!.scriptData!
+const scriptedSimulator = (stage: Stage): Simulator => {
+    const script = stage.turns!.scriptData!
     const rules  = (script.rules ?? []).map((rule) => ({ when: new RegExp(rule.when, "s"), answer: rule.answer }))
     const end    = script.end !== undefined ? new RegExp(script.end, "s") : null
     const match  = (text: string): string | null => {
@@ -108,10 +108,10 @@ const END_TOKEN = "<<END>>"
 
 /*  the LLM-driven simulator: a foreign LLM session plays the user along
     a persona, seeing the tested session's messages as its inputs  */
-const llmSimulator = (caze: TestCase, sandbox: Sandbox): Simulator => {
-    const model   = caze.turns!.model !== "" ? caze.turns!.model :
+const llmSimulator = (stage: Stage, sandbox: Sandbox): Simulator => {
+    const model   = stage.turns!.model !== "" ? stage.turns!.model :
         (process.env.ASE_TEST_SIM_MODEL ?? "claude-haiku-5-5")
-    const persona = caze.turns!.persona !== "" ? fs.readFileSync(caze.turns!.persona, "utf8") : ""
+    const persona = stage.turns!.persona !== "" ? fs.readFileSync(stage.turns!.persona, "utf8") : ""
     const system  =
         "You simulate the human user of an interactive AI coding assistant session under test.\n" +
         "Stay fully in character and answer the assistant's questions consistently and concisely.\n" +
@@ -149,9 +149,9 @@ const llmSimulator = (caze: TestCase, sandbox: Sandbox): Simulator => {
     }
 }
 
-/*  create the simulator of a test case (null for a single-shot case)  */
-export const simulatorCreate = (caze: TestCase, sandbox: Sandbox): Simulator | null => {
-    if (caze.turns === null)
+/*  create the simulator of a stage of a test case (null for a single-shot stage)  */
+export const simulatorCreate = (stage: Stage, sandbox: Sandbox): Simulator | null => {
+    if (stage.turns === null)
         return null
-    return caze.turns.simulator === "scripted" ? scriptedSimulator(caze) : llmSimulator(caze, sandbox)
+    return stage.turns.simulator === "scripted" ? scriptedSimulator(stage) : llmSimulator(stage, sandbox)
 }

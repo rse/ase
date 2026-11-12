@@ -14,10 +14,25 @@ import type { OracleResult }                 from "./ase-test-oracle.js"
 
 /*  the per-run artifact recorder: the raw SDK messages as "transcript.jsonl",
     a decoded human-readable "transcript.md", the agent tool stderr, and at the
-    end the changeset diff, a copy of the task store, and the "result.json"  */
+    end the changeset diff, a copy of the task store, and the "result.json",
+    where a staged case records each stage <N> into "stage-<N>-" prefixed files  */
 export type Transcript = {
     dir:    string
-    record: SessionRecord
+    record: (stage: number) => SessionRecord
+}
+
+/*  the outcome of one stage of a staged case, as part of its "result.json"  */
+export type StageOutcome = {
+    stage:     number
+    skill:     string
+    sessionId: string
+    model:     string
+    costUsd:   number
+    turns:     number
+    errored:   boolean
+    timedOut:  boolean
+    failure:   string
+    oracles:   OracleResult[]
 }
 
 /*  abbreviate a value into a single line of at most <max> characters
@@ -32,41 +47,47 @@ const brief = (value: unknown, max = 160): string => {
 export const transcriptOpen = (resultsDir: string, caze: TestCase, run: number, retried = false): Transcript => {
     const dir = path.join(resultsDir, ...caze.name.split("/"), `run-${run}${retried ? "-retry" : ""}`)
     fs.mkdirSync(dir, { recursive: true })
-    const jsonl = path.join(dir, "transcript.jsonl")
-    const md    = path.join(dir, "transcript.md")
-    fs.writeFileSync(md, `# ${caze.name} (run ${run})\n\n`, "utf8")
-    const record: SessionRecord = {
-        onMessage: (msg) => {
-            fs.appendFileSync(jsonl, `${JSON.stringify(msg)}\n`, "utf8")
-            const lines: string[] = []
-            if (msg.type === "system" && msg.subtype === "init")
-                lines.push(`**SESSION**: \`${msg.session_id}\` (model: \`${msg.model}\`)`)
-            else if (msg.type === "assistant") {
-                for (const block of (Array.isArray(msg.message?.content) ? msg.message.content : []))
-                    if (block.type === "text" && block.text.trim() !== "")
-                        lines.push(`**ASSISTANT**:\n\n${block.text}`)
-                    else if (block.type === "tool_use")
-                        lines.push(`**TOOL** \`${block.name}\`: ${brief(block.input)}`)
+
+    /*  the recorder of the stage <stage> (of a single-skill case only stage 1, unprefixed)  */
+    const record = (stage: number): SessionRecord => {
+        const prefix = caze.staged ? `stage-${stage}-` : ""
+        const jsonl  = path.join(dir, `${prefix}transcript.jsonl`)
+        const md     = path.join(dir, `${prefix}transcript.md`)
+        fs.writeFileSync(md, `# ${caze.name} (run ${run}` +
+            `${caze.staged ? `, stage ${stage}: ${caze.stages[stage - 1].skill}` : ""})\n\n`, "utf8")
+        return {
+            onMessage: (msg) => {
+                fs.appendFileSync(jsonl, `${JSON.stringify(msg)}\n`, "utf8")
+                const lines: string[] = []
+                if (msg.type === "system" && msg.subtype === "init")
+                    lines.push(`**SESSION**: \`${msg.session_id}\` (model: \`${msg.model}\`)`)
+                else if (msg.type === "assistant") {
+                    for (const block of (Array.isArray(msg.message?.content) ? msg.message.content : []))
+                        if (block.type === "text" && block.text.trim() !== "")
+                            lines.push(`**ASSISTANT**:\n\n${block.text}`)
+                        else if (block.type === "tool_use")
+                            lines.push(`**TOOL** \`${block.name}\`: ${brief(block.input)}`)
+                }
+                else if (msg.type === "user") {
+                    const content = msg.message?.content
+                    if (typeof content === "string")
+                        lines.push(`**USER**:\n\n${content}`)
+                    else if (Array.isArray(content))
+                        for (const block of content)
+                            if (block.type === "text")
+                                lines.push(`**USER**:\n\n${block.text}`)
+                            else if (block.type === "tool_result" && block.is_error === true)
+                                lines.push(`**TOOL FAILED**: ${brief(block.content)}`)
+                }
+                else if (msg.type === "result")
+                    lines.push(`**RESULT**: ${msg.subtype} (turns: ${msg.num_turns}, ` +
+                        `cost: $${Number(msg.total_cost_usd ?? 0).toFixed(4)})`)
+                if (lines.length > 0)
+                    fs.appendFileSync(md, `${lines.join("\n\n")}\n\n`, "utf8")
+            },
+            onStderr: (data) => {
+                fs.appendFileSync(path.join(dir, `${prefix}stderr.log`), data, "utf8")
             }
-            else if (msg.type === "user") {
-                const content = msg.message?.content
-                if (typeof content === "string")
-                    lines.push(`**USER**:\n\n${content}`)
-                else if (Array.isArray(content))
-                    for (const block of content)
-                        if (block.type === "text")
-                            lines.push(`**USER**:\n\n${block.text}`)
-                        else if (block.type === "tool_result" && block.is_error === true)
-                            lines.push(`**TOOL FAILED**: ${brief(block.content)}`)
-            }
-            else if (msg.type === "result")
-                lines.push(`**RESULT**: ${msg.subtype} (turns: ${msg.num_turns}, ` +
-                    `cost: $${Number(msg.total_cost_usd ?? 0).toFixed(4)})`)
-            if (lines.length > 0)
-                fs.appendFileSync(md, `${lines.join("\n\n")}\n\n`, "utf8")
-        },
-        onStderr: (data) => {
-            fs.appendFileSync(path.join(dir, "stderr.log"), data, "utf8")
         }
     }
     return { dir, record }
@@ -74,7 +95,8 @@ export const transcriptOpen = (resultsDir: string, caze: TestCase, run: number, 
 
 /*  finish the transcript of one run with the remaining artifacts  */
 export const transcriptFinish = async (transcript: Transcript, caze: TestCase, sandbox: Sandbox,
-    result: SessionResult, diff: string, oracles: OracleResult[], pass: boolean): Promise<void> => {
+    result: SessionResult, diff: string, oracles: OracleResult[], pass: boolean,
+    stages: StageOutcome[] = []): Promise<void> => {
     if (diff !== "")
         await fs.promises.writeFile(path.join(transcript.dir, "diff.patch"), diff, "utf8")
     const store = path.join(sandbox.project, ".ase", "task")
@@ -90,6 +112,7 @@ export const transcriptFinish = async (transcript: Transcript, caze: TestCase, s
         errored:   result.errored,
         timedOut:  result.timedOut,
         failure:   result.failure,
-        oracles
+        oracles,
+        ...(caze.staged ? { stages } : {})
     }, null, 4), "utf8")
 }

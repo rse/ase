@@ -98,7 +98,8 @@ test/cases/<group>/<name>/
 ├── persona.md         # optional: persona of the LLM-simulated user
 ├── rubric.md          # optional: criteria for the "rubric" judge
 ├── expected-*.md      # optional: golden output for the "similar" judge
-└── oracle.py          # optional: reference program for the "exec" oracle
+├── oracle.py          # optional: reference program for the "exec" oracle
+└── suite/             # optional: hidden Python test suite for the "suite" oracle
 ```
 
 Pick the oracles by what the skill produces:
@@ -107,10 +108,17 @@ Pick the oracles by what the skill produces:
 flowchart TD
     Q["What does the skill produce?"]
     Q --> T["Text output"] --> T1["regex, rubric, similar"]
-    Q --> F["Files or code"] --> F1["fileExists, gitDiff, exec"]
+    Q --> F["Files or code"] --> F1["fileExists, gitDiff, exec, suite"]
     Q --> P["Task plans"] --> P1["taskStore, similar (taskBody)"]
     Q --> I["Asks the user questions"] --> I1["add turns: scripted or llm"]
+    Q --> S["A flow of several skills"] --> S1["stages, with diagnostic oracles per stage"]
 ```
+
+A *staged* case chains several skills, each in its own session, but all
+in the same sandbox: the top-level oracles alone decide the verdict
+(e.g. a hidden `suite`, copied into the project only after the last
+stage), while the oracles of each stage only explain *where* a failed
+run went wrong.
 
 Prefer the mechanical oracles (`regex`, `fileExists`, `gitDiff`,
 `taskStore`, `exec`): they are free and deterministic. Use the LLM

@@ -42,9 +42,10 @@ export const reportRun = (name: string, outcome: RunOutcome): void => {
     console.log(`${mark} ${name} run ${outcome.run} ${chalk.dim(info)}`)
     for (const oracle of outcome.oracles)
         if (!oracle.pass)
-            console.log(`    ${chalk.red(`✘ ${oracle.kind}`)}: ${oracle.detail}`)
+            console.log(`    ${oracle.diagnostic === true ?
+                chalk.yellow(`◦ ${oracle.kind}`) : chalk.red(`✘ ${oracle.kind}`)}: ${oracle.detail}`)
     if (outcome.outcome === "fail" && outcome.failure !== ""
-        && !outcome.oracles.some((oracle) => !oracle.pass))
+        && !outcome.oracles.some((oracle) => !oracle.pass && oracle.diagnostic !== true))
         console.log(`    ${chalk.red("✘ evaluation")}: ${outcome.failure}`)
     if (outcome.outcome === "error")
         console.log(`    ${chalk.red("⚠ infra")}: ${outcome.failure}`)
