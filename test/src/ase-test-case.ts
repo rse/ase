@@ -221,7 +221,7 @@ export const caseLoad = (casesDir: string, file: string): TestCase => {
             script:     spec.turns.script  !== undefined ? resolve(spec.turns.script,  "script")  : "",
             scriptData: spec.turns.script  !== undefined ? scriptLoad(resolve(spec.turns.script, "script"), name) : null,
             persona:    spec.turns.persona !== undefined ? resolve(spec.turns.persona, "persona") : "",
-            model:      spec.turns.model ?? "",
+            model:      process.env.ASE_TEST_FORCE_MODEL ?? spec.turns.model ?? "",
             maxTurns:   spec.turns.maxTurns ?? 16
         } : null,
         oracles: spec.oracles.map((oracle) => {

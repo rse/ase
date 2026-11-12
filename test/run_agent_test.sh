@@ -8,6 +8,8 @@
 ##  Usage: ./run_agent_test.sh [agent test options, e.g. --keep-failed --tool codex]
 ##
 ##  With "--case <name>", only this single case runs.
+##  With "--force-model <model>", all models of the agents (including the
+##  sub-agent aliases) are forced to <model>.
 ##
 ##  Environment:
 ##  -   ASE_TEST_JOBS=1:          run the cases one after the other instead of
@@ -30,11 +32,14 @@ cases=(wordcount-python fibonacci-fleet)
 single=0
 nocost=0
 caseGiven=0
+forceModel=""
 args=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --case )            cases=("${2:?--case needs a case name}"); caseGiven=1; shift 2; continue ;;
         --case=* )          cases=("${1#--case=}"); caseGiven=1; shift; continue ;;
+        --force-model )     forceModel="${2:?--force-model needs a model name}"; shift 2; continue ;;
+        --force-model=* )   forceModel="${1#--force-model=}"; shift; continue ;;
         --suite-only | --suite-only=* | -h | --help ) single=1 ;;
     esac
     case "$1" in
@@ -44,6 +49,14 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 set -- ${args[@]+"${args[@]}"}
+
+#   force all models onto the given one
+if [[ -n "$forceModel" ]]; then
+    for var in ANTHROPIC_MODEL ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL; do
+        export "$var=$forceModel"
+    done
+    echo "forcing all models to: $forceModel"
+fi
 
 #   warn about the costs and ask for confirmation
 #   (runs without any agent spend no tokens, so need no confirmation)
