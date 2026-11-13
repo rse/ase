@@ -546,7 +546,7 @@ Procedure
         the plan does not carry yet at its position in the key order of
         the plan <format/>:
 
-        -   <if condition="<getopt-option-stateless/> is not equal `true` and <ase-project-task-lifecycle/> is `team` or `enterprise` and the `Status:` key was set to `IMPLEMENTING` in step 1 above">
+        -   <if condition="<getopt-option-stateless/> is not equal `true` and <ase-project-task-lifecycle/> is `team` or `enterprise` and the `Status:` key is `IMPLEMENTING` (set in step 1 above, or already before by the agent which claimed the task)">
             Set the `Status:` key to `IMPLEMENTED` if the change set was
             applied *completely* and *successfully* (with the skipped
             `[-]` and `[>]` bullet-points not counting, and the skipped
