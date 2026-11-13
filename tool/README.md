@@ -6,7 +6,7 @@
 [![github (project release)](https://img.shields.io/github/v/release/rse/ase?logo=github&label=project%20release&color=%233377aa)](https://github.com/rse/ase)
 <br/>
 [![github (project stars)](https://img.shields.io/github/stars/rse/ase?logo=github&label=project%20stars&color=%233377aa)](https://github.com/rse/ase)
-[![npm (project downloads)](https://img.shields.io/npm/d18m/%40rse%2Fase?logo=npm&label=project%20downloads&color=%233377aa)](https://www.npmjs.com/package/@rse/ase)
+[![npm (project downloads)](https://img.shields.io/npm/dw/%40rse%2Fase?logo=npm&label=project%20downloads&color=%233377aa)](https://www.npmjs.com/package/@rse/ase)
 
 [ase.tools](https://ase.tools)
 

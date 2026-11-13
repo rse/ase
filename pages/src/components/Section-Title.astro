@@ -6,7 +6,7 @@
 */
 
 /*  "Title" section: the page hero with the ASE logo, the headline, the
-    rotating quote carousel, the GitHub badges, the two intro paragraphs with
+    rotating quote carousel, the GitHub/NPM badges, the two intro paragraphs with
     the floated video preview, and the typed-out skill demo.  */
 
 import LogoASE      from "./Widget-Logo-ASE.astro"
@@ -35,15 +35,16 @@ const quotes = [
     "Various operation modes provided &mdash;<br/>you choose the best for the job!"
 ]
 
-/*  GitHub badges via Shields.io: one shared URL helper and the plain badge
-    list (the "project stars" badge is rendered separately below, as it
+/*  GitHub and NPM badges via Shields.io: one shared URL helper and the plain
+    badge list (the "project stars" badge is rendered separately below, as it
     carries the annotation and the hover guide).  */
 const badgeURL = (path: string) =>
     `https://img.shields.io/${path}&style=for-the-badge&logoColor=%23e0f0ff&labelColor=%23225588&color=%23114477`
 const badges = [
-    { href: "https://github.com/rse",              path: "github/stars/rse?logo=github&label=author%20stars",            alt: "github (author stars)"     },
-    { href: "https://github.com/rse",              path: "github/followers/rse?logo=github&label=author%20followers",    alt: "github (author followers)" },
-    { href: "https://github.com/rse/ase/releases", path: "github/v/release/rse/ase?logo=github&label=project%20release", alt: "github (release)"          }
+    { href: "https://github.com/rse",                 path: "github/stars/rse?logo=github&label=author%20stars",            alt: "github (author stars)"     },
+    { href: "https://github.com/rse",                 path: "github/followers/rse?logo=github&label=author%20followers",    alt: "github (author followers)" },
+    { href: "https://github.com/rse/ase/releases",    path: "github/v/release/rse/ase?logo=github&label=project%20release", alt: "github (release)"          },
+    { href: "https://www.npmjs.com/package/@rse/ase", path: "npm/dw/%40rse%2Fase?logo=npm&label=project%20downloads",       alt: "npm (project downloads)"   }
 ]
 ---
 <section id="overview" class="relative isolate overflow-hidden">
@@ -102,15 +103,19 @@ const badges = [
                 </SwiperWrapper>
             </Swiper>
 
-            {/* GitHub badges */}
+            {/* GitHub and NPM badges */}
             <div class="link-plain relative z-40 mt-6 flex min-h-[28px] flex-wrap items-center justify-center gap-2">
-                {badges.map((badge) => (
-                    <a href={badge.href} class="inline-flex overflow-hidden rounded-md">
-                        <img src={badgeURL(badge.path)} alt={badge.alt} />
-                    </a>
+                {badges.map((badge, i) => (
+                    <>
+                        <a href={badge.href} class="inline-flex overflow-hidden rounded-md">
+                            <img src={badgeURL(badge.path)} alt={badge.alt} />
+                        </a>
+                        {/* force a line break after the two author badges */}
+                        {i === 1 && <span class="h-0 basis-full" aria-hidden="true"></span>}
+                    </>
                 ))}
                 <span class="group relative inline-flex">
-                    <Annotation fade class="left-1/2 -translate-x-1/4">
+                    <Annotation fade class="left-1/2 translate-x-0">
                         If you like ASE,<br/>
                         please support it<br/>
                         by giving a star!<br/>
