@@ -83,7 +83,8 @@
             "description": "handlePaymentEvent relies on isRepeat for repeated deliveries, which only recognizes an event whose status the order already has. After a partial refund the order is `partially_refunded`, not `refunded`, so a repeated `refunded` event is not recognized, settleRefund throws because the refund is already settled, and the provider, which repeats a delivery until it gets an answer, retries forever.",
             "locations": [
                 { "file": "src/webhook.ts", "lines": [ 83, 90 ] },
-                { "file": "src/webhook.ts", "lines": [ 75, 76 ], "outside_change": true }
+                { "file": "src/webhook.ts", "lines": [ 75, 76 ], "outside_change": true },
+                { "file": "src/webhook.ts", "lines": [ 38, 40 ], "outside_change": true }
             ]
         },
         {
