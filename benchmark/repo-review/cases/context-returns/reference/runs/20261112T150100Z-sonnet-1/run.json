@@ -1,0 +1,107 @@
+{
+    "ase": {
+        "commit": "5aeeeb471f5c36869332615dd49a7895b6915dac",
+        "version": "2.0.6",
+        "working_copy_modified": false
+    },
+    "budget_usd": 5,
+    "case": "context-returns",
+    "child_env": [
+        "CLAUDE_CODE_GIT_BASH_PATH"
+    ],
+    "cli_version": "2.1.302 (Claude Code)",
+    "copy_dir": null,
+    "cost_usd": 0.44894220000000007,
+    "details": [],
+    "dry_run": false,
+    "duration_ms": 81693,
+    "endpoint": {
+        "base_url": "default",
+        "token_set": false
+    },
+    "expected_digest": "sha256:56134d25de88c9e9f9c7fc99b2f6b4fbead1ab77120f3a45dc5f65565823d132",
+    "fixture_digest": "sha256:8806d7052b67560d2659e4111549d9d9dc95d48cc8d09708c977a3be13589002",
+    "init_mcp": [
+        "ase:connected"
+    ],
+    "init_plugins": [
+        "ase",
+        "cc-plugin-agents-md (builtin)",
+        "cc-plugin-plugin-authoring (builtin)",
+        "cc-plugin-sec-default (builtin)",
+        "cc-plugin-telemetry (builtin)"
+    ],
+    "invocation": {
+        "args": [
+            "-p",
+            "/ase:ase-repo-review -c HEAD -S LOW",
+            "--plugin-dir",
+            "C:\\AI\\rse\\ase-review-benchmark\\plugin",
+            "--model",
+            "sonnet",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--max-budget-usd",
+            "5",
+            "--no-session-persistence",
+            "--setting-sources",
+            "",
+            "--strict-mcp-config",
+            "--mcp-config",
+            "C:\\Users\\golda\\AppData\\Local\\Temp\\ase-rr-mcp-5MPm8Y\\ase-mcp.json",
+            "--permission-mode",
+            "dontAsk",
+            "--allowedTools",
+            "Read",
+            "Grep",
+            "Glob",
+            "Skill",
+            "Task",
+            "Agent",
+            "ToolSearch",
+            "Bash(git:*)",
+            "Bash(cd:*)",
+            "PowerShell(git:*)",
+            "PowerShell(cd:*)",
+            "mcp__ase__*",
+            "--disallowedTools",
+            "Edit",
+            "Write",
+            "NotebookEdit",
+            "WebFetch",
+            "WebSearch"
+        ],
+        "mcp_config": {
+            "mcpServers": {
+                "ase": {
+                    "args": [
+                        "C:\\AI\\rse\\ase-review-benchmark\\tool\\bin\\ase",
+                        "mcp"
+                    ],
+                    "command": "C:\\nvm4w\\nodejs\\node.exe"
+                }
+            }
+        },
+        "program": "claude",
+        "prompt": "/ase:ase-repo-review -c HEAD -S LOW"
+    },
+    "leftovers_killed": [
+        "C:\\nvm4w\\nodejs\\node.exe C:\\AI\\rse\\ase-review-benchmark\\tool\\dst\\ase.js service start"
+    ],
+    "model": {
+        "reported": [
+            "claude-sonnet-5-5"
+        ],
+        "requested": "sonnet"
+    },
+    "permission_denials": 0,
+    "reason": null,
+    "replay": null,
+    "schema": 1,
+    "simulate": null,
+    "started_at": "2026-11-12T15:01:00.587Z",
+    "status": "ok",
+    "timeout_min": 20,
+    "user_ase_config": []
+}
