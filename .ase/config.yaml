@@ -19,10 +19,10 @@ project:
                 **/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}"
     task:
         lifecycle: enterprise
-        default:
-            source: "branch:master"
-            changeset: "branch:cs-{id}"
-            target: "branch:master"
+        #default:
+        #    source: "branch:master"
+        #    changeset: "branch:cs-{id}"
+        #    target: "branch:master"
     service:
         port: "43210"
 agent:
