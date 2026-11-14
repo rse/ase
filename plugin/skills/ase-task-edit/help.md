@@ -9,7 +9,7 @@
     [`--help`|`-h`]
     [`--plan`|`-p` *option*]
     [`--mode`|`-m` `auto`|`craft`|`refactor`|`resolve`|`specify`]
-    [`--approach`|`-a`]
+    [`--approach`|`-A`]
     [`--unverified`|`-u`]
     [`--focus`|`-f` *section*[,...]]
     [`--quiet`|`-q`]
@@ -81,7 +81,7 @@ stale draft.
     refinement), and otherwise leaves the `Kind:` key of an existing
     plan as it is and honors its tenets.
 
--   `--approach`|`-a`:
+-   `--approach`|`-A`:
     Before a new plan is composed, propose one or more crafting,
     refactoring, resolution, or specification approaches with pros and
     cons, recommend one of them, and let the user pick the preferred one

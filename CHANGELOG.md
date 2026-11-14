@@ -10,6 +10,10 @@ ChangeLog
     `--auto|-a` of `ase-task-grill` pick every `★` answer instead of asking, leaving questions without a
     recommendation unanswered. The short option of `--approach` in both edit skills moves to `-A`.
 
+-   IMPROVEMENT [plugin]: Consistent Approach Short Option
+    The short option of `--approach` of `ase-task-edit` moves from `-a` to `-A`, too,
+    aligning it with `ase-code-edit` and `ase-spec-edit`.
+
 -   NEW FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
     Besides the `⚑` current decision state, grilling tables now mark the answer critically judged best
     (judge-first, context before world knowledge) with `★`, if any. Unaddressed `ase-task-grill`

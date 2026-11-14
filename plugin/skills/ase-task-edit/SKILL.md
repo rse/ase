@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-a] [--unverified|-u] [--focus|-f <section>[,...]] [--quiet|-q] [--interactive|-i] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-A] [--unverified|-u] [--focus|-f <section>[,...]] [--quiet|-q] [--interactive|-i] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. A new plan is optionally composed along the
@@ -27,7 +27,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-a --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-A --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
     $ARGUMENTS
 </expand>
 
