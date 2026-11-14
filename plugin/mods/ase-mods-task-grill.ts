@@ -26,8 +26,8 @@ export const TOOL = {
         "`nX` of each answer (question number and answer letter, like \"1A\") to the longer form of the " +
         "answer (at most 3-4 sentences), and optionally `rationales` as an object mapping the short response " +
         "of each answer of a question with a recommended (`★`) answer to the reason (1-2 sentences) why it " +
-        "is the best answer resp. why not, compared to the recommended one (shown in italics, prefixed " +
-        "with \"WHY:\" resp. \"WHY NOT:\"). Returns `OK: ...` or `ERROR: ...` as text. On `OK: ...`, do NOT " +
+        "is the best answer resp. why not, compared to the recommended one (shown prefixed with " +
+        "\"★ Recommendation: WHY:\" resp. \"★ Recommendation: WHY NOT:\"). Returns `OK: ...` or `ERROR: ...` as text. On `OK: ...`, do NOT " +
         "mention, describe, or confirm this call in the response.",
     inputSchema: {
         type: "object",
@@ -42,10 +42,9 @@ export const TOOL = {
     }
 }
 
-/*  the full name of the tool, and the color of the frame of a detail card
-    (the color of the picked items)  */
+/*  the full name of the tool, and the color of the frame of a detail card  */
 const NAME = "mcp__ase__ase_mods_grill_details"
-const RIM  = PICKED
+const RIM  = "blue"
 
 /*  the marker line above a grilling table (single-round and multi-round,
     optionally labeled with the perspective and/or grounding)  */
@@ -323,7 +322,7 @@ export const modGrill = () => {
                 [ ...rim("┏━"), ...[ ...uniform(" ", true, RIM), ...label, ...uniform(" ", true, RIM) ]
                     .map((char) => ({ ...char, color: RIM, inverse: true })),
                 ...rim(`${"━".repeat(Math.max(0, w2 - 5 - width(label)))}┓`) ],
-                ...[ ...wrap(style(detail, undefined), w2 - 4, 0),
+                ...[ ...wrap([ ...uniform("WHAT: ", true, undefined), ...style(detail, undefined) ], w2 - 4, 0),
                     ...(reason !== undefined ? [ [], ...wrap(reason, w2 - 4, 0) ] : []) ].map((line) => [ ...rim("┃ "), ...line,
                     ...uniform(" ".repeat(Math.max(0, w2 - 4 - width(line))), false, undefined), ...rim(" ┃") ]),
                 rim(`┗${"━".repeat(w2 - 2)}┛`)
@@ -336,7 +335,8 @@ export const modGrill = () => {
 
         /*  draw the table as a grid: a rule between all rows and one answer per line
             (remembering the grid rows of the answers with a detail for their cards,
-            and prefixing a rationale by "WHY" for the recommended answer, else "WHY NOT")  */
+            and prefixing a detail by "WHAT", and a rationale by "★ Recommendation" and
+            "WHY" for the recommended answer, else "WHY NOT")  */
         const rule = (l: string, m: string, r: string) =>
             Text({ wrap: "truncate-end", children: l + "─".repeat(w1 + 2) + m + "─".repeat(w2 + 2) + r })
         const grid: RenderElement[] = [
@@ -361,8 +361,9 @@ export const modGrill = () => {
                 const label  = LABEL.exec(text)?.[1] ?? ""
                 if (e.requestId === latest && letter !== "" && detail !== undefined && w2 >= 20)
                     spots.push({ group: `a${number}${letter}`, detail,
-                        reason: reason !== undefined ? [ ...uniform(label.includes(STAR) ? "WHY: " : "WHY NOT: ", true, undefined),
-                            ...style(reason, undefined) ].map((char) => ({ ...char, italic: true })) : undefined,
+                        reason: reason !== undefined ? [ ...uniform(`${STAR} Recommendation: ` +
+                            (label.includes(STAR) ? "WHY: " : "WHY NOT: "), true, undefined),
+                            ...style(reason, undefined) ] : undefined,
                         first: grid.length + offset, last: grid.length + offset + lines.length - 1,
                         title: [ ...uniform(`${number}${letter} ▶ `, true, undefined),
                             ...style(label, undefined).map((char) => ({ ...char, bold: true })) ] })

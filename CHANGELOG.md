@@ -17,7 +17,7 @@ ChangeLog
 -   NEW FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
     Besides the `⚑` current decision state, grilling tables now mark the answer critically judged best
     (judge-first, context before world knowledge) with `★`, if any. Unaddressed `ase-task-grill`
-    questions accept it, and the hover cards show italic `WHY:`/`WHY NOT:` rationales.
+    questions accept it, and the blue hover cards show `WHAT:` details and `★ Recommendation:` rationales.
 
 -   IMPROVEMENT [plugin]: Dimension-Wise Grounding Beyond Grilling
     Grounding (`ase-common-ground.md`) now runs per dimension `WHAT`, `HOW`, `WHEN` in parallel
