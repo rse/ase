@@ -123,6 +123,9 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
     project facts relevant to the plan, and the Internet/Web is searched
     iteratively, with at most 5 searches per dimension, for the
     established practices, standards, patterns, and pitfalls about it.
+    Both focus especially on the special and less known terms and
+    concepts and on the aspects which potentially could be outdated in
+    the model knowledge, judging every Web fact by its date or version.
 
     These facts serve all rounds, both for raising the questions and for
     preferably deriving their answer alternatives. The grounding is shown

@@ -194,8 +194,10 @@ questions:
     Derive the open points primarily from the grounding facts in
     <ground-facts/> instead of from your world knowledge alone: raise
     the decisions these facts reveal as open -- like a project
-    convention the subject deviates from, or an established practice
-    or pitfall the subject does not address yet.
+    convention the subject deviates from, an established practice or
+    pitfall the subject does not address yet, a `TERM` fact the subject
+    contradicts, or a `CURRENT` fact the subject assumes in an outdated
+    state.
     </if>
 
     <content/>

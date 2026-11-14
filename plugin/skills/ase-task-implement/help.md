@@ -184,9 +184,12 @@ plan, unless `--next` pre-selects this choice.
     test and CI files for `WHEN`) are scanned for the project facts
     relevant to the plan, and the Internet/Web is searched iteratively,
     with at most 5 searches per dimension, for the established
-    practices, standards, patterns, and pitfalls about it. If no usable
-    facts are found, a warning is shown and the implementation falls
-    back to model knowledge.
+    practices, standards, patterns, and pitfalls about it. Both focus
+    especially on the special and less known terms and concepts and on
+    the aspects which potentially could be outdated in the model
+    knowledge, judging every Web fact by its date or version. If no
+    usable facts are found, a warning is shown and the implementation
+    falls back to model knowledge.
 
 ##  ARGUMENTS
 

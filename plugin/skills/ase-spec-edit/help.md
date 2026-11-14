@@ -150,6 +150,9 @@ timestamp refreshed.
     for the project facts relevant to the query, and the Internet/Web is
     searched iteratively, with at most 5 searches per dimension, for the
     established practices, standards, patterns, and pitfalls about it.
+    Both focus especially on the special and less known terms and
+    concepts and on the aspects which potentially could be outdated in
+    the model knowledge, judging every Web fact by its date or version.
 
     These facts serve all subsequent states: under `--grill` all rounds,
     both for raising the questions and for preferably deriving their

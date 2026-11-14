@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   IMPROVEMENT [plugin]: Focused Grounding
+    `--ground` of `ase-code-edit`, `ase-spec-edit`, `ase-task-implement`, and `ase-task-grill` now
+    focuses especially on special, less known terms and on potentially outdated aspects: explicit
+    search targets, Web facts judged by date or version, and `TERM`/`CURRENT`/`OUTDATED` labels.
+
 -   NEW FEATURE [plugin, code]: Plan Diff after Grilling
     The new option `--diff|-d` of `ase-task-grill` shows, before the next-step dialog, the cumulative
     change of the plan body by all rounds as a unified diff (e.g. to review `--auto` answers),

@@ -16,6 +16,12 @@ verifying -- which *prefer* them over the world knowledge of the model,
 which only fills their gaps. Do not output anything, except for the
 warning below.
 
+The grounding focuses *especially* on the *special terms* of the
+subject -- its special and less known words and concepts -- and on its
+*outdatable aspects* -- the aspects which potentially could be outdated
+in the world knowledge of the model --, as there this world knowledge
+is least reliable.
+
 Each dimension grounds one part of the plan triad and maps to the
 artifacts read for its *local* grounding:
 
@@ -60,6 +66,16 @@ artifacts read for its *local* grounding:
     ` below the directory <arg2/>` if <arg2/> is not empty, or to empty
     otherwise.
 
+    Set <specials/> to the list of the *special terms* of <arg1/> --
+    rare external terms, like niche jargon, acronyms, and lesser-known
+    libraries, standards, or products, and project-coined terms -- and
+    of its *outdatable aspects* -- like dependency versions and APIs,
+    standards, specifications, tools, renamed products, and practices --,
+    or to `none` if there are none. Set <web-specials/> to <specials/>
+    without any confidential project internals (like the project-coined
+    terms), or to `none` if nothing remains, as it leaves the project
+    together with <topic/>.
+
     Then, for *each* dimension <dimension/> of <arg3/>, invoke the
     following *two* tools, emitting *all* invocations *in one single
     message* so they run in *parallel*:
@@ -67,14 +83,14 @@ artifacts read for its *local* grounding:
     `Agent(
         description: "Local Grounding: <dimension/>",
         subagent_type: "Explore",
-        prompt: "Strictly read-only, gather the project facts on the <dimension/> dimension of the following subject: <subject/>. Read the parts relevant for the subject of the following files<below/>: <files/>. Return the existing decisions, conventions, constraints, and terminology, each condensed with its project-relative file path, and nothing else.",
+        prompt: "Strictly read-only, gather the project facts on the <dimension/> dimension of the following subject: <subject/>. Read the parts relevant for the subject of the following files<below/>: <files/>. Especially, return the project-specific meaning of the following special terms and the current state of the following outdatable aspects in the project: <specials/>. Return the existing decisions, conventions, constraints, and terminology, each condensed with its project-relative file path, and nothing else.",
         run_in_background: false
     )`
 
     `Agent(
         description: "Web Grounding: <dimension/>",
         subagent_type: "ase:ase-meta-search",
-        prompt: "Search the Internet/Web for the established maxims, principles, practices, standards, definitions, patterns, and pitfalls on the <dimension/> dimension of the following topic: <topic/>. Perform the searches *iteratively*: derive every further query from the gaps of the previous results and stop early once the results are saturated, but perform *at most 5* searches, where issuing the same query to several search tools counts as one search. Give back the plain responses of all searches.",
+        prompt: "Search the Internet/Web for the established maxims, principles, practices, standards, definitions, patterns, and pitfalls on the <dimension/> dimension of the following topic: <topic/>. Especially and first, search for the current definitions of the following special terms and the current state of the following outdatable aspects, preferring current primary sources like official documentation, changelogs, and release notes: <web-specials/>. Perform the searches *iteratively*: derive every further query from the gaps of the previous results and stop early once the results are saturated, but perform *at most 5* searches, where issuing the same query to several search tools counts as one search. Give back the plain responses of all searches, each with its source URL and, if available, its publication date or the version it applies to.",
         run_in_background: false
     )`
 
@@ -90,7 +106,13 @@ artifacts read for its *local* grounding:
     project-relative file path or its source URL -- *per dimension*
     into <ground-facts/>, each fact labeled with its dimension, so every
     subsequent step draws primarily on the facts of the dimension it
-    deals with. Do not output anything.
+    deals with. Additionally, label every fact defining a special term
+    with `TERM` and every fact stating the current state of an
+    outdatable aspect with `CURRENT`, so every subsequent step honors
+    them explicitly. Judge every Web fact by its date or version, prefer
+    the facts of current primary sources, and keep a fact superseded by
+    a newer one only labeled with `OUTDATED`, so it is never applied. Do
+    not output anything.
 
 4.  <if condition="<ground-facts/> contains no usable facts">
 
