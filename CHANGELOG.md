@@ -18,6 +18,11 @@ ChangeLog
     `ase task board` now enters raw mode before Ink queries the kitty keyboard protocol, so the
     echoed response of terminals like Ghostty no longer shifts the first frame and blanks the header.
 
+-   BUGFIX [plugin]: Mod Validation Against Claude Code 2.1.325
+    The mod modules now import each other without the `.ts` suffix, which `claude plugin validate`
+    refuses without `allowImportingTsExtensions`, and type the new result objects of
+    `$.model.complete` and `$.model.fork` (instead of a string resp. `null`).
+
 -   IMPROVEMENT [code, docs]: Untracked Usage Hint in Statistics View
     Without any usage attachment within the time range, the `Usage` and `Top-5 Tasks` frames of the
     task board statistics view show "no tracked usage data available (see telemetry.enabled)", and
