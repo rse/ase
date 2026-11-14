@@ -1,0 +1,11 @@
+skill: ase-meta-mint
+args: "uuid test harness fixture"
+runs: 1
+timeoutSec: 240
+budget: { maxUsd: 1.00 }
+oracles:
+  - notErrored: true
+  - regex:
+      in: output
+      match:
+        - "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"

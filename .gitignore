@@ -10,3 +10,6 @@ node_modules/
 .DS_Store
 .playwright-mcp
 package-lock.json
+
+test/results/
+test/etc/llm-*.env
