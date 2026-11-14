@@ -1,0 +1,1 @@
+SessionEnd hook [ase hook session-end] failed: Hook cancelled

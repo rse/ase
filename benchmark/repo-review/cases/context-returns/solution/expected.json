@@ -1,0 +1,149 @@
+{
+    "version": 5,
+    "fixture": "context-returns",
+    "structure": {
+        "min_outside_change": 4,
+        "min_changed_lines_per_finding": 60,
+        "min_changed_files": 10
+    },
+    "entries": [
+        {
+            "id": "B-01",
+            "kind": "finding",
+            "tier": "obvious",
+            "class": "plain",
+            "min_severity": "MEDIUM",
+            "title": "Restocking skips the first line of a return",
+            "description": "restockLines starts its loop at index 1, so the first line of every return is never put back into stock; a return of a single item restocks nothing, and the units stay unavailable for sale.",
+            "locations": [ { "file": "src/returns.ts", "lines": [ 93, 94 ] } ]
+        },
+        {
+            "id": "B-02",
+            "kind": "finding",
+            "tier": "obvious",
+            "class": "plain",
+            "min_severity": "MEDIUM",
+            "title": "Return confirmation is addressed to the order id",
+            "description": "sendReturnConfirmation queues the mail with `to: order.id` instead of the customer's e-mail address; queueMail rejects the recipient, the error is only logged, and no customer ever receives a confirmation of a return.",
+            "locations": [ { "file": "src/mail.ts", "lines": [ 77, 77 ] } ]
+        },
+        {
+            "id": "B-03",
+            "kind": "finding",
+            "tier": "medium",
+            "class": "sequence",
+            "min_severity": "HIGH",
+            "title": "Store credit can be spent twice at the same time",
+            "description": "spendCredit reads the balance, checks it, awaits the journal booking, and only then writes the balance it read minus the amount. Two payments that overlap both pass the check against the same balance and both succeed; the customer spends more credit than was granted, and the balance ends too high.",
+            "locations": [ { "file": "src/credit.ts", "lines": [ 49, 53 ] } ]
+        },
+        {
+            "id": "B-04",
+            "kind": "finding",
+            "tier": "medium",
+            "class": "domain",
+            "min_severity": "MEDIUM",
+            "title": "Line refunds are rounded one by one and do not add up to what was paid",
+            "description": "returnAmount rounds the share of every returned line on its own. For three items of 4.35 with a 15 percent code (11.09 paid) each line gives 3.70, so the three returns add up to 11.10: the third return exceeds what is left on the order and is rejected. With other prices the customer is paid back a cent too little. The README promises exactly what was paid when everything comes back.",
+            "locations": [ { "file": "src/returns.ts", "lines": [ 72, 72 ] } ]
+        },
+        {
+            "id": "B-05",
+            "kind": "finding",
+            "tier": "hidden",
+            "class": "omission",
+            "min_severity": "MEDIUM",
+            "title": "Revenue report drops partially refunded orders",
+            "description": "The change introduces the status `partially_refunded`, but revenue in report.ts still counts only orders whose status is `paid`. An order drops out of the revenue completely as soon as a part of it is paid back, instead of counting with what is left; the daily report understates revenue.",
+            "locations": [
+                { "file": "src/order.ts", "lines": [ 21, 21 ] },
+                { "file": "src/report.ts", "lines": [ 14, 15 ], "outside_change": true }
+            ]
+        },
+        {
+            "id": "B-06",
+            "kind": "finding",
+            "tier": "hidden",
+            "class": "omission",
+            "min_severity": "HIGH",
+            "title": "Stored orders lose that store credit paid for them",
+            "description": "The change adds the optional field `paidWith` to Order, but the store copies orders field by field in toRecord, which is not extended. Every stored order has lost `paidWith`, so refunds of orders that were paid with store credit go out as cash through the payment provider: credit can be turned into money.",
+            "locations": [
+                { "file": "src/order.ts", "lines": [ 36, 36 ] },
+                { "file": "src/store.ts", "lines": [ 14, 16 ], "outside_change": true }
+            ]
+        },
+        {
+            "id": "B-07",
+            "kind": "finding",
+            "tier": "hidden",
+            "class": "false-assurance",
+            "min_severity": "MEDIUM",
+            "title": "Repeated event of a partial refund raises instead of being acknowledged",
+            "description": "handlePaymentEvent relies on isRepeat for repeated deliveries, which only recognizes an event whose status the order already has. After a partial refund the order is `partially_refunded`, not `refunded`, so a repeated `refunded` event is not recognized, settleRefund throws because the refund is already settled, and the provider, which repeats a delivery until it gets an answer, retries forever.",
+            "locations": [
+                { "file": "src/webhook.ts", "lines": [ 83, 90 ] },
+                { "file": "src/webhook.ts", "lines": [ 75, 76 ], "outside_change": true },
+                { "file": "src/webhook.ts", "lines": [ 38, 40 ], "outside_change": true }
+            ]
+        },
+        {
+            "id": "B-08",
+            "kind": "finding",
+            "tier": "hidden",
+            "class": "interplay",
+            "min_severity": "HIGH",
+            "title": "Goodwill refunds ignore refunds that are still pending",
+            "description": "After the change a refund stays pending until the provider reports it, and refundedTotal counts settled refunds only. adminRefund still limits a goodwill refund to `order.total - refundedTotal(order.id)`, so pending refunds do not count: two goodwill refunds of 30.00 on an order of 50.00 are both accepted, and more is paid back than was paid.",
+            "locations": [
+                { "file": "src/refund.ts", "lines": [ 36, 41 ] },
+                { "file": "src/admin.ts", "lines": [ 42, 43 ], "outside_change": true }
+            ]
+        },
+        {
+            "id": "K-01",
+            "kind": "decoy",
+            "resembles": "sequence",
+            "title": "Refund limit is checked before an asynchronous booking",
+            "description": "requestRefund checks the amount against what is left and then calls the asynchronous issueRefund, which awaits the store credit booking.",
+            "rationale": "issueRefund adds the refund to the list before its first await, and refundable counts every refund on the list, pending or settled. A second request that overlaps sees the first one already booked and is rejected; nothing is read before the await and written after it.",
+            "locations": [ { "file": "src/refund.ts", "lines": [ 114, 116 ] } ]
+        },
+        {
+            "id": "K-02",
+            "kind": "decoy",
+            "resembles": "domain",
+            "title": "Return window compares dates as strings",
+            "description": "returnWindowOpen compares `today` with the last day of the window using `<=` on strings.",
+            "rationale": "Both values are calendar days written as YYYY-MM-DD, which sort as text exactly as they sort as dates. addDays computes the last day in UTC, which the README names as the calendar of the shop, and the 14th day after delivery is included, as the README states.",
+            "locations": [ { "file": "src/returns.ts", "lines": [ 42, 42 ] } ]
+        },
+        {
+            "id": "K-03",
+            "kind": "decoy",
+            "resembles": "omission",
+            "title": "Refund share divides by the order total",
+            "description": "refundShare divides the amount paid back by `order.total` without a check for zero.",
+            "rationale": "createOrder rejects every order whose total is below 10.00, and nothing lowers the total afterwards, so a stored order never has a total of zero. The amount paid back never exceeds the total, so the share stays between 0 and 100; it is rounded down, as the field says, so it reads 100 only when everything was paid back.",
+            "locations": [ { "file": "src/api.ts", "lines": [ 105, 106 ] } ]
+        },
+        {
+            "id": "K-04",
+            "kind": "decoy",
+            "resembles": "false-assurance",
+            "title": "Article number goes into the return mail without escaping",
+            "description": "renderReturnConfirmation writes `line.sku` into the HTML of the mail without escapeHtml.",
+            "rationale": "The function is private to mail.ts and only reached through receiveReturn, which rejects every line whose article number is not one of the order's. Article numbers of orders match a pattern of upper-case letters, digits, and hyphens, checked by isValidCart when the order is created, so no markup can reach the mail.",
+            "locations": [ { "file": "src/mail.ts", "lines": [ 35, 35 ] } ]
+        },
+        {
+            "id": "K-05",
+            "kind": "decoy",
+            "resembles": "interplay",
+            "title": "Order paid with store credit is marked paid without the provider",
+            "description": "createOrder calls markPaid itself for an order that is paid with store credit, although orders are otherwise only marked paid by the payment callback.",
+            "rationale": "Store credit pays for an order only if it covers the whole total, so nothing is left for the payment provider to collect and no callback will ever arrive. spendCredit has succeeded before the order is marked, and the credit is given back if the order cannot be stored.",
+            "locations": [ { "file": "src/order.ts", "lines": [ 99, 100 ] } ]
+        }
+    ]
+}

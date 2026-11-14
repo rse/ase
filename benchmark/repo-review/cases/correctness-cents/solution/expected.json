@@ -1,0 +1,100 @@
+{
+    "version": 3,
+    "fixture": "correctness-cents",
+    "entries": [
+        {
+            "id": "B-01",
+            "title": "countUnits loops one position past the end of the cart",
+            "kind": "finding",
+            "tier": "obvious",
+            "description": "countUnits loops with `i <= items.length`, one position past the end of the array, and reads `items[items.length].quantity` (TypeError).",
+            "locations": [ { "file": "src/cart.ts", "lines": [ 30, 31 ] } ]
+        },
+        {
+            "id": "B-02",
+            "title": "percentOff returns the discount instead of the reduced total",
+            "kind": "finding",
+            "tier": "obvious",
+            "description": "percentOff returns the discount amount instead of the discounted total: `total * percent / 100` instead of `total - total * percent / 100`; a 15 % code turns 100 EUR into 15 EUR.",
+            "locations": [ { "file": "src/discount.ts", "lines": [ 51, 52 ] } ]
+        },
+        {
+            "id": "B-03",
+            "title": "saveOrder without await inside try, so the catch never runs",
+            "kind": "finding",
+            "tier": "medium",
+            "description": "saveOrder is called without await inside the try block; a rejected promise never reaches the catch, the reservations are not released, and the order counts as created.",
+            "locations": [ { "file": "src/order.ts", "lines": [ 82, 84 ] } ]
+        },
+        {
+            "id": "B-04",
+            "title": "Default order options are mutated through the shared tags array",
+            "kind": "finding",
+            "tier": "medium",
+            "description": "Without explicit options the shared DEFAULT_OPTIONS object is mutated (`options.tags.push(\"bulk\")`); all later orders without options then carry the `bulk` tag.",
+            "locations": [ { "file": "src/order.ts", "lines": [ 51, 52 ] } ]
+        },
+        {
+            "id": "B-05",
+            "title": "Duplicate SKU throws without releasing the reservations",
+            "kind": "finding",
+            "tier": "medium",
+            "description": "On a duplicate SKU an exception is thrown after the reservation succeeded, without releasing the reservations (unlike the other error paths, which call releaseAll).",
+            "locations": [ { "file": "src/order.ts", "lines": [ 64, 65 ] } ]
+        },
+        {
+            "id": "B-06",
+            "title": "Cents formatted as euros in the API response",
+            "kind": "finding",
+            "tier": "hidden",
+            "description": "After the change cartTotal returns cents instead of euros; the API response still formats order.total with formatEuro and shows a hundred times the amount.",
+            "locations": [
+                { "file": "src/cart.ts", "lines": [ 10, 14 ] },
+                { "file": "src/api.ts", "lines": [ 35, 35 ] }
+            ]
+        },
+        {
+            "id": "B-07",
+            "title": "Refund ignores the order currency",
+            "kind": "finding",
+            "tier": "hidden",
+            "description": "Orders now carry a currency, but refundOrder does not pass order.currency to issueRefund; refunds of CHF orders are booked as EUR.",
+            "locations": [
+                { "file": "src/refund.ts", "lines": [ 21, 21 ] },
+                { "file": "src/order.ts", "lines": [ 24, 24 ] }
+            ]
+        },
+        {
+            "id": "K-01",
+            "title": "Documented fall-through in describeCode",
+            "kind": "decoy",
+            "description": "describeCode falls through from `seasonal` to `percent` in its switch.",
+            "rationale": "A seasonal code is a percentage code with an expiry date. With a date the seasonal branch returns its own text; only a seasonal code without a date reaches the percent branch, which describes it correctly as a plain percentage. The `falls through` comment marks the fall-through by the usual lint convention, and the branch touches no amount.",
+            "locations": [ { "file": "src/discount.ts", "lines": [ 26, 30 ] } ]
+        },
+        {
+            "id": "K-02",
+            "title": "Non-null assertion on the optional customer",
+            "kind": "decoy",
+            "description": "Non-null assertion `order.customer!.email` although customer is optional.",
+            "rationale": "sendConfirmation is only called in createOrder, after validateOrder, which throws when the customer is missing.",
+            "locations": [ { "file": "src/notify.ts", "lines": [ 7, 7 ] } ]
+        },
+        {
+            "id": "K-03",
+            "title": "Loop bound items.length - 1 in hasDuplicateSku",
+            "kind": "decoy",
+            "description": "Loop only up to `items.length - 1` in hasDuplicateSku.",
+            "rationale": "Neighbouring pairs `items[i]` and `items[i + 1]` are compared; the last index has no successor, so the bound is correct. The only caller sorts by SKU first.",
+            "locations": [ { "file": "src/cart.ts", "lines": [ 43, 45 ] } ]
+        },
+        {
+            "id": "K-04",
+            "title": "Loose equality req.code == null",
+            "kind": "decoy",
+            "description": "Loose equality `req.code == null` instead of `===`.",
+            "rationale": "`== null` deliberately checks for `null` and `undefined` at once; the field is declared optional as `string | null`.",
+            "locations": [ { "file": "src/api.ts", "lines": [ 20, 20 ] } ]
+        }
+    ]
+}
