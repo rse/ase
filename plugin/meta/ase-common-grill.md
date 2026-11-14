@@ -343,14 +343,18 @@ questions:
     entire table into a plain text rendering.
 
     Before the table, set <grill-summary/> to a *single* paragraph of
-    just a few short sentences, which briefly summarizes *what* the
-    grilled subject is about -- focusing on the *what* only, without
-    any information about the *why* and *how*:
+    just a few short, factual sentences, which briefly summarize *what*
+    the grilled subject is about -- focusing on the *what* only, without
+    any information about the *why* and *how*. State the facts
+    directly, *without* any meta-level lead-in referring to the subject
+    itself (like "The edit adds ...", "The task does ...", or "This
+    plan ..."), e.g., "New option `--foo` for skill `bar`, ..."
+    instead of "The edit adds a new option `--foo` to skill `bar`, ...":
 
     <template>
     ⧉ **ASE**: <round-id/><grill-label/>: *Relentless Interviewing Until Clarity*
 
-    <grill-summary/>
+    **SUMMARY:** <grill-summary/>
 
     | QUESTION      | ANSWERS     |
     | ------------- | ----------- |

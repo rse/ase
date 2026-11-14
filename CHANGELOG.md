@@ -10,6 +10,10 @@ ChangeLog
     grilling (1-4 approach questions, never finished early): standalone `GRILLING (approach)`, or with
     `--grill` the `GRILLING ROUND 0/L (approach)` before the regular rounds. Also fixed `-a` in README.
 
+-   IMPROVEMENT [plugin]: Factual Grilling Summary
+    The summary in front of the grilling tables is now prefixed with a bold `SUMMARY:` and states
+    only the facts, without any lead-in like "The edit adds" or "The task does".
+
 -   NEW FEATURE [plugin]: Automatic Grilling
     The new options `--grill-auto|-a` of `ase-code-edit` and `ase-spec-edit` (implying `--grill`) and
     `--auto|-a` of `ase-task-grill` pick every `★` answer instead of asking, leaving questions without a
