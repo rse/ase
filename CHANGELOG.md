@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [plugin, docs]: Answer Details in Grilling Tables
+    The grilling skills optionally pass a 1-2 sentence detail per answer to the new mod tool
+    `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled
+    with the short response and label of the answer, while the pointer hovers over the answer.
+
 -   NEW FEATURE [code, docs]: Interactive Configuration Editor
     The new `ase config ui` opens a terminal UI with a parameter view (all keys, values, and scopes)
     and a scope view (per-scope YAML), toggled by `v`, where a modal edits a value on any writable

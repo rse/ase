@@ -10,10 +10,36 @@
     the answers picked in the prompt via "nX" short responses and the
     question selected in the prompt via the last standalone "n". In the
     latest table, questions and answers are clickable and insert their
-    "n" or "nX" into the prompt.  */
+    "n" or "nX" into the prompt, and an answer with a detail (provided
+    through the tool "ase_mods_grill_details", registered by this mod)
+    reveals it in a card while hovered.  */
 
 import type { Elements, Frozen, MatchedEvent, RenderElement } from "claude-code"
-import { type Engine, type Char, PICKED, ROW, RULE, cells, style, width, wrap, split, paint } from "./ase-mods-common"
+import { type Engine, type Char, PICKED, ROW, RULE, cells, style, width, wrap, split, paint,
+    uniform } from "./ase-mods-common"
+
+/*  the tool providing the details of the answers of the latest grilling table, as listed for the model  */
+export const TOOL = {
+    name:        "ase_mods_grill_details",
+    description: "Provide the details of the answers of the grilling table of ASE, which is output right " +
+        "after this call, shown to the user in a card while hovering over an answer. Pass `details` as an object mapping the short response " +
+        "`nX` of each answer (question number and answer letter, like \"1A\") to the longer form of the " +
+        "answer (1-2 sentences). Returns `OK: ...` or `ERROR: ...` as text. On `OK: ...`, do NOT mention, " +
+        "describe, or confirm this call in the response.",
+    inputSchema: {
+        type: "object",
+        properties: {
+            details: { type: "object", additionalProperties: { type: "string" },
+                description: "longer form (1-2 sentences) of each answer, keyed by its short response \"nX\"" }
+        },
+        required: [ "details" ]
+    }
+}
+
+/*  the full name of the tool, and the color of the frame of a detail card
+    (the color of the picked items)  */
+const NAME = "mcp__ase__ase_mods_grill_details"
+const RIM  = PICKED
 
 /*  the marker line above a grilling table (single-round and multi-round,
     optionally labeled with the perspective and/or grounding)  */
@@ -24,6 +50,9 @@ const MARKER = /⧉ \*{0,2}ASE\*{0,2}: GRILLING(?: ROUND \d+\/\d+)?(?: \([^)]*\)
 const ANSWER = /,\s+(?=\*{0,2}[A-Z]\*{0,2}\s+▶)/
 const LETTER = /^\*{0,2}([A-Z])\*{0,2}\s+▶/
 const NUMBER = /^\*{0,2}(\d+)\*{0,2}\s+▶/
+
+/*  the label of an answer  */
+const LABEL = /^\*{0,2}[A-Z]\*{0,2}\s+▶\s+(.*?):(?:\s|$)/
 
 /*  a short response "nX" inside the prompt  */
 const PICK = /(?<![^\s,])(\d+)([a-zA-Z])(?![^\s,])/g
@@ -138,13 +167,15 @@ const layout = (table: Table, avail: number,
 export const modGrill = () => {
     /*  the last known width of the terminal, the already seen tables, the
         latest (still unanswered) table, the picks and the selected question of the
-        still unsubmitted prompt, and the frozen picks of the already answered tables  */
+        still unsubmitted prompt, the frozen picks of the already answered tables,
+        and the details of the answers of the latest table (keyed by "nX")  */
     let columns  = 80
     const seen   = new Set<string>()
     let latest: string | undefined
     let picks    = new Map<number, string>()
     let selected: number | undefined
     const frozen = new Map<string, Map<number, string>>()
+    let details  = new Map<string, string>()
 
     /*  refresh the picks and the selection from the prompt  */
     const refresh = (text: string) => {
@@ -166,7 +197,25 @@ export const modGrill = () => {
         latest   = undefined
         picks    = new Map()
         selected = undefined
+        details  = new Map()
     }
+
+    /*  take the details of the answers of the latest table from the tool  */
+    const provide = (input: unknown): string => {
+        if (typeof input !== "object" || input === null || Array.isArray(input))
+            return "ERROR: invalid \"details\" argument: object expected"
+        details = new Map(Object.entries(input).flatMap(([ key, text ]): [ string, string ][] => {
+            const m = /^\s*(\d+)\s*([a-zA-Z])\s*$/.exec(key)
+            return m !== null && typeof text === "string" && text.trim() !== "" ?
+                [ [ `${Number(m[1]!)}${m[2]!.toUpperCase()}`, text.trim() ] ] : []
+        }))
+        return `OK: details of ${details.size} answers revealed to the user on hovering`
+    }
+
+    /*  draw the rows of a successful call of the tool as nothing,
+        as the call is mere plumbing for the user (terminal only)  */
+    const hide = (tool: string, errored: boolean | undefined, ui: Elements["terminal"]): RenderElement | undefined =>
+        tool === NAME && errored !== true ? ui.Box({ children: [] }) : undefined
 
     /*  insert the number of a clicked question or the short response of a clicked
         answer into the prompt and refresh the picks and the selection from it  */
@@ -238,7 +287,37 @@ export const modGrill = () => {
             ]
         }
 
-        /*  draw the table as a grid: a rule between all rows and one answer per line  */
+        /*  draw the detail card of an answer in the latest table: its detail inside a
+            heavy frame of the answer column width, with the short response and the
+            label of the answer as its title in the top edge (inverse, in the frame
+            color, with a blank on both sides), placed
+            absolutely (with the grid rows "first" to "last" of the answer) one row below
+            the answer if it fits into the grid, else one row above it (so the adjacent
+            row stays visible and reachable), and revealed while any line of the answer
+            is hovered (appended after all grid rows, as an absolute box paints over the
+            boxes before it only)  */
+        const card = (group: string, title: Char[], detail: string, first: number, last: number,
+            rowsTotal: number): RenderElement => {
+            const rim   = (text: string) => uniform(text, false, RIM)
+            const label = [ ...title ]
+            while (width(label) > w2 - 6)
+                label.pop()
+            const lines = [
+                [ ...rim("┏━"), ...[ ...uniform(" ", true, RIM), ...label, ...uniform(" ", true, RIM) ]
+                    .map((char) => ({ ...char, color: RIM, inverse: true })),
+                ...rim(`${"━".repeat(Math.max(0, w2 - 5 - width(label)))}┓`) ],
+                ...wrap(style(detail, undefined), w2 - 4, 0).map((line) => [ ...rim("┃ "), ...line,
+                    ...uniform(" ".repeat(Math.max(0, w2 - 4 - width(line))), false, undefined), ...rim(" ┃") ]),
+                rim(`┗${"━".repeat(w2 - 2)}┛`)
+            ]
+            const top = last + 2 + lines.length <= rowsTotal ? last + 2 : first - 1 - lines.length
+            return Box({ position: "absolute", top, left: w1 + 5, width: w2, flexDirection: "column",
+                display: "none", hover: { scope: group, display: "flex" },
+                children: lines.map((line) => Text({ wrap: "truncate-end", children: paint(Text, line) })) })
+        }
+
+        /*  draw the table as a grid: a rule between all rows and one answer per line
+            (remembering the grid rows of the answers with a detail for their cards)  */
         const rule = (l: string, m: string, r: string) =>
             Text({ wrap: "truncate-end", children: l + "─".repeat(w1 + 2) + m + "─".repeat(w2 + 2) + r })
         const grid: RenderElement[] = [
@@ -247,14 +326,24 @@ export const modGrill = () => {
                 [ "│ ", ...padded(head[0]!, w1), " │ ", ...padded(head[1]!, w2), " │" ] }),
             rule("├", "┼", "┤")
         ]
+        const spots: { group: string, title: Char[], detail: string, first: number, last: number }[] = []
         rows.forEach((row, k) => {
             const number = table.rows[k]!.number
             const q = wrap(row.question, w1, row.indent, row.lead).map((line, i) =>
                 draw(line, w1, `q${number}`, i, press(engine, number)))
+            let offset = 0
             const a = row.answers.flatMap((answer, j) => {
-                const letter = table.rows[k]!.answers[j]!.letter
-                return wrap(answer, w2, INDENT).map((line, i) =>
+                const { letter, text } = table.rows[k]!.answers[j]!
+                const lines  = wrap(answer, w2, INDENT).map((line, i) =>
                     draw(line, w2, `a${number}${letter}`, i, letter !== "" ? press(engine, number, letter) : undefined))
+                const detail = details.get(`${number}${letter}`)
+                if (e.requestId === latest && letter !== "" && detail !== undefined && w2 >= 20)
+                    spots.push({ group: `a${number}${letter}`, detail,
+                        first: grid.length + offset, last: grid.length + offset + lines.length - 1,
+                        title: [ ...uniform(`${number}${letter} ▶ `, true, undefined),
+                            ...style(LABEL.exec(text)?.[1] ?? "", undefined).map((char) => ({ ...char, bold: true })) ] })
+                offset += lines.length
+                return lines
             })
             for (let i = 0; i < Math.max(q.length, a.length); i++)
                 grid.push(Box({ flexDirection: "row", children: [
@@ -266,18 +355,20 @@ export const modGrill = () => {
                 ] }))
             grid.push(k < rows.length - 1 ? rule("├", "┼", "┤") : rule("└", "┴", "┘"))
         })
+        const cards = spots.map(({ group, title, detail, first, last }) =>
+            card(group, title, detail, first, last, grid.length))
 
         /*  mimic the reply row of the engine: blank row above and bullet gutter  */
         return Box({ flexDirection: "row", marginTop: 1, width: "100%", children: [
             Box({ flexShrink: 0, minWidth: 2, children: Text({ children: e.props.isFirstOfReply ? "⏺" : " " }) }),
             Box({ flexDirection: "column", flexGrow: 1, flexShrink: 1, children: [
                 ...(table.before !== "" ? [ Markdown({ text: table.before }) ] : []),
-                Box({ flexDirection: "column", marginTop: table.before !== "" ? 1 : 0, children: grid }),
+                Box({ flexDirection: "column", marginTop: table.before !== "" ? 1 : 0, children: [ ...grid, ...cards ] }),
                 ...(table.after !== "" ? [ Box({ marginTop: 1, children: Markdown({ text: table.after }) }) ] : [])
             ] })
         ] })
     }
 
-    return { refresh, track, submit, render }
+    return { refresh, track, submit, provide, hide, render }
 }
 

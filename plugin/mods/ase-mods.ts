@@ -6,7 +6,7 @@
 
 /*  Claude Code function hooks module ("mod", EARLY ACCESS):
     Hooking infrastructure, registering the function hooks and dispatching
-    them into the grill table ("ase-mods-task-grill.ts"), the decision matrix
+    them into the grill table with its answer details ("ase-mods-task-grill.ts"), the decision matrix
     ("ase-mods-meta-evaluate.ts"), the intent help ("ase-mods-help-find.ts"),
     the synopsis form ("ase-mods-help-compose.ts"),
     the manual band ("ase-mods-help-show.ts"), the manpage browser
@@ -19,7 +19,7 @@
 
 import type { Register, PromptBox, Timer } from "claude-code"
 import { type Band, TRIGGER } from "./ase-mods-common"
-import { modGrill }           from "./ase-mods-task-grill"
+import { modGrill, TOOL as DETAILS } from "./ase-mods-task-grill"
 import { modEvaluate }        from "./ase-mods-meta-evaluate"
 import { modHelpFind }        from "./ase-mods-help-find"
 import { modHelpCompose }     from "./ase-mods-help-compose"
@@ -52,12 +52,13 @@ export const register: Register = (on, options) => {
         else the image rendering shows the text art of the images  */
     let probed: Promise<boolean> = Promise.resolve(true)
 
-    /*  provide the tools of the task band and the image and diagram rendering
-        where a person sees the band resp. the image only (the diagram rendering
-        only where the terminal can show inline images, as a diagram in text art
-        is illegible), so the absence of the former tells "ase-task-edit
-        --interactive" that no band exists, resp. the absence of the latter
-        tells the skills to render ASCII diagrams instead  */
+    /*  provide the tools of the task band, the answer details of the grill table,
+        and the image and diagram rendering where a person sees the band, the
+        details, resp. the image only (the diagram rendering only where the terminal
+        can show inline images, as a diagram in text art is illegible), so the
+        absence of the first tells "ase-task-edit --interactive" that no band exists,
+        resp. the absence of the others tells the skills to provide no details
+        resp. to render ASCII diagrams instead  */
     on("session.start", async ($, e, next) => {
         if (e.isInteractive && e.surface === "terminal") {
             probed = graphics({
@@ -70,6 +71,7 @@ export const register: Register = (on, options) => {
             }, async () => (await $.process.run([ "tmux", "display", "-p",
                 "#{allow-passthrough}\t#{client_termtype}\t#{client_termname}" ])).stdout)
             await $.tool.register(TOOL)
+            await $.tool.register(DETAILS)
             await $.tool.register(IMAGE)
             if (await probed)
                 await $.tool.register(DIAGRAM)
@@ -89,6 +91,15 @@ export const register: Register = (on, options) => {
         })
     }))
 
+    /*  serve the tool of the answer details of the grill table, which needs no
+        permission, as it just takes the details for revealing them on hovering  */
+    on("tool.check", { tool: "mcp__ase__ase_mods_grill_details" }, () => ({ decision: "allow" }))
+    on("tool.call", { tool: "mcp__ase__ase_mods_grill_details" }, ($, e) => {
+        const result = grill.provide(e.details)
+        $.ui.invalidate("ui.render")
+        return { result }
+    })
+
     /*  serve the tools of the image and diagram rendering, which need no
         permission, as they just show an image, and whose rendering and
         rasterizing of the image is as harmless  */
@@ -104,11 +115,12 @@ export const register: Register = (on, options) => {
         }))
     }
 
-    /*  draw the image below the row of a call of the tools of the image and
-        diagram rendering (terminal only)  */
+    /*  draw nothing for a call of the tool of the answer details of the grill
+        table, resp. the image below the row of a call of the tools of the image
+        and diagram rendering (terminal only)  */
     on("ui.render", { component: "ToolUse", surface: "terminal" }, async ($, e, next) => {
         const drawn = await next(e)
-        return image.render(e, $.ui.resolve(e), drawn, {
+        return grill.hide(e.props.tool, e.props.isErrored, $.ui.resolve(e)) ?? image.render(e, $.ui.resolve(e), drawn, {
             rasterize:  (args) => $.mcp.call("plugin_ase_ase", "ase_rasterize", args),
             diagram:    (args) => $.mcp.call("plugin_ase_ase", "ase_diagram", args),
             bytes:      async (file) => (await $.fs.read(file, { as: "bytes" })).base64,
@@ -119,10 +131,12 @@ export const register: Register = (on, options) => {
         }) ?? drawn
     })
 
-    /*  draw the notice of a call of the tools of the image and diagram rendering
-        dimmed, or nothing while the border of the shown image carries it (terminal only)  */
+    /*  draw nothing for the answer of a call of the tool of the answer details of
+        the grill table, resp. the notice of a call of the tools of the image and
+        diagram rendering dimmed, or nothing while the border of the shown image
+        carries it (terminal only)  */
     on("ui.render", { component: "ToolResult", surface: "terminal" }, async ($, e, next) =>
-        image.result(e, $.ui.resolve(e)) ?? next(e))
+        grill.hide(e.props.tool, e.props.isErrored, $.ui.resolve(e)) ?? image.result(e, $.ui.resolve(e)) ?? next(e))
 
     /*  the bands above the prompt (the synopsis form, the intent band, and the
         manpage browser, opened in this order), the shown one (as at most one is

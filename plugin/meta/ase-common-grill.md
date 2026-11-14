@@ -361,7 +361,24 @@ questions:
     its table cell and silently degrades the entire table into a
     plain text rendering.
 
-5.  SHOW QUESTIONS:
+5.  PROVIDE DETAILS:
+
+    Check whether the tool `ase_mods_grill_details` of the `ase` MCP
+    server is available (if deferred, first load it via `ToolSearch`
+    with the query `select:mcp__ase__ase_mods_grill_details`). If it is
+    *not* available, silently *skip* this item.
+
+    Otherwise, *before* showing the questions in item 6 below, determine for
+    every <answer-N-K/> a detail <answer-N-K-detail/> -- the longer but still
+    brief form of its <answer-N-K-description/>, of at most *3-4 sentences* --
+    and call this tool with `details: { "<question-N-id/><answer-N-K-id/>":
+    "<answer-N-K-detail/>", [...] }`, covering all answers of all questions of
+    the round. The function hooks module reveals each detail to the user while
+    hovering over its answer in the subsequently shown table. Do not output
+    anything. If the tool returns `ERROR: ...`, ignore it and continue, as the
+    details are optional.
+
+6.  SHOW QUESTIONS:
 
     Output only the following <template/> -- it lists *all*
     questions of the round up-front, one table row per
