@@ -12,7 +12,8 @@ ChangeLog
 
 -   IMPROVEMENT [plugin]: Highlighted Grilling Markers
     The function hooks module now renders the `★` (recommendation) and `⚑` (current decision)
-    markers in the grilling tables and the texts of their hover cards in red resp. blue.
+    markers in the grilling tables and the texts of their hover cards in red resp. blue
+    (both in red on a picked answer resp. selected question line).
 
 -   IMPROVEMENT [plugin, docs]: Approach Selection as Grilling Round
     `--approach` of `ase-code-edit`, `ase-spec-edit`, and `ase-task-edit` now runs an approach round of

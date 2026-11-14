@@ -9,8 +9,9 @@
     alternative per line (wrapped lines indented) and rendering in red
     the answers picked in the prompt via "nX" short responses and the
     question selected in the prompt via the last standalone "n", and
-    rendering the "★" marker in red and the "⚑" marker in blue (in the
-    table and in the texts, but not the titles, of the cards). In the
+    rendering the "★" marker in red and the "⚑" marker in blue, resp. in red
+    on a picked or selected line (in the table and in the texts, but not
+    the titles, of the cards). In the
     latest table, questions and answers are clickable and insert their
     "n" or "nX" into the prompt, and a question with a detail resp. an answer
     with a detail and optional rationale (provided through the tool
@@ -73,9 +74,10 @@ const TOPIC = /^\*{0,2}\d+\*{0,2}\s+▶\s+(.*?):(?:\s|$)/
 /*  the colors of the recommendation and current decision markers  */
 const MARKS = new Map([ [ "★", "red" ], [ "⚑", "blue" ] ])
 
-/*  color the recommendation and current decision markers of styled characters  */
-const glyphs = (chars: Char[]): Char[] =>
-    chars.map((char) => MARKS.has(char.ch) ? { ...char, color: MARKS.get(char.ch) } : char)
+/*  color the recommendation and current decision markers of styled characters
+    (in the color of a picked resp. selected line, if given)  */
+const glyphs = (chars: Char[], picked?: string): Char[] =>
+    chars.map((char) => MARKS.has(char.ch) ? { ...char, color: picked ?? MARKS.get(char.ch) } : char)
 
 /*  a short response "nX" inside the prompt  */
 const PICK = /(?<![^\s,])(\d+)([a-zA-Z])(?![^\s,])/g
@@ -170,12 +172,15 @@ const layout = (table: Table, avail: number,
     const digits = Math.max(...table.rows.map((row) => String(row.number).length))
     const rows   = table.rows.map((row) => {
         const numbered = NUMBER.test(row.question)
+        const color    = marked === row.number ? PICKED : undefined
         return {
             lead:     numbered ? digits - String(row.number).length : 0,
             indent:   numbered ? digits + 3 : 0,
-            question: glyphs(style(row.question, marked === row.number ? PICKED : undefined)),
-            answers:  row.answers.map((answer) =>
-                glyphs(style(answer.text, chosen?.get(row.number) === answer.letter ? PICKED : undefined)))
+            question: glyphs(style(row.question, color), color),
+            answers:  row.answers.map((answer) => {
+                const color = chosen?.get(row.number) === answer.letter ? PICKED : undefined
+                return glyphs(style(answer.text, color), color)
+            })
         }
     })
     const w1nat = Math.max(width(head[0]!), ...rows.map((row) => row.lead + width(row.question)))
