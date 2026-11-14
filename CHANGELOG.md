@@ -10,6 +10,10 @@ ChangeLog
     and a scope view (per-scope YAML), toggled by `v`, where a modal edits a value on any writable
     scope (toggle, pull-down, or input field) and stores it immediately, and `e` edits a scope file.
 
+-   BUGFIX [code, docs]: View Changes Not Shared Across Web Boards
+    Switching the view of a web task board via `v` now immediately switches all other open web
+    boards of the project, too, like the toggling of the titles via `t` already did.
+
 -   BUGFIX [code]: Task Board Header Damaged in Ghostty
     `ase task board` now enters raw mode before Ink queries the kitty keyboard protocol, so the
     echoed response of terminals like Ghostty no longer shifts the first frame and blanks the header.

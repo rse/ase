@@ -59,7 +59,8 @@ header).
 
 The last shown view, the minimized lanes, the collapsed phases, and the
 shown flags are persisted in `.ase/board.yaml` (separately for the
-terminal and the web board).
+terminal and the web board), where each change of them in a web board
+is immediately applied to all other open web boards of the project.
 
 ### Terminal Board
 

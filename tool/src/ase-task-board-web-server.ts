@@ -804,7 +804,7 @@ const registerUpdateRoutes = (server: Hapi.Server, log: Log): void => {
 
 /*  register the surface routes of the web board: view changes, surface toggles, keep-alive, and change events  */
 const registerSurfaceRoutes = (server: Hapi.Server, log: Log): void => {
-    /*  set the shown view (lanes, graph, stats, agents, or flow) of the web surface, as the view of newly opened web boards  */
+    /*  set the shown view (lanes, graph, stats, agents, or flow) of the web surface, for all open and newly opened web boards  */
     server.route({
         method:  "POST",
         path:    "/task-board/api/view",
@@ -813,7 +813,9 @@ const registerSurfaceRoutes = (server: Hapi.Server, log: Log): void => {
             const p = request.payload as { view?: unknown } | null
             if (p === null || (p.view !== "lanes" && p.view !== "graph" && p.view !== "stats" && p.view !== "agents" && p.view !== "flow"))
                 return h.response({ error: "invalid view request" }).code(400)
-            return h.response((await BoardState.setView("web", p.view)).web)
+            const surface = (await BoardState.setView("web", p.view)).web
+            emit("surface", surface)
+            return h.response(surface)
         })
     })
 

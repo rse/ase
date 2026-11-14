@@ -685,13 +685,20 @@ export const clearFilter = () => {
     filterEl.value?.blur()
 }
 
-/*  apply a changed surface state, with the graph re-laid out if the showing of titles or standalone tasks changed  */
+/*  the number of view changes of this board still being persisted  */
+let viewPending = 0
+
+/*  apply a changed surface state: switch to a view changed by another board (except
+    while own view changes are pending, and in the task viewer, which shows no view),
+    and re-lay out the graph if the showing of titles or standalone tasks changed  */
 const applySurface = (s: Surface) => {
     if (board.value === null)
         return
     const relayout = board.value.surface.titles !== s.titles || board.value.surface.standalone !== s.standalone
     board.value.surface = s
-    if (relayout && view.value === "graph")
+    if (viewPending === 0 && watched === null && s.view !== view.value)
+        showView(s.view)
+    else if (relayout && view.value === "graph")
         renderGraph()
 }
 
@@ -715,8 +722,8 @@ export const cycleView = (back = false) => {
     setView(views[(views.indexOf(view.value) + (back ? views.length - 1 : 1)) % views.length])
 }
 
-/*  switch between the lanes, the graph, the stats, the agents, and the flow view, persisting it for newly opened web boards  */
-export const setView = (v: View) => {
+/*  show one of the lanes, the graph, the stats, the agents, and the flow view  */
+const showView = (v: View) => {
     view.value = v
     if (v !== "lanes")
         drag.value = null
@@ -726,11 +733,19 @@ export const setView = (v: View) => {
         renderFlow()
     else if (v === "stats")
         loadStats(stats.value !== null)
+}
+
+/*  switch between the views, persisting it for all open and newly opened web boards  */
+export const setView = (v: View) => {
+    showView(v)
+    viewPending++
     api<Surface>("/task-board/api/view", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ view: v })
     }).then((s) => {
         if (s.error !== undefined)
             actionError.value = s.error
+    }).finally(() => {
+        viewPending--
     })
 }
 
