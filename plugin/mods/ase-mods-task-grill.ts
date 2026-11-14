@@ -9,7 +9,8 @@
     alternative per line (wrapped lines indented) and rendering in red
     the answers picked in the prompt via "nX" short responses and the
     question selected in the prompt via the last standalone "n", and
-    rendering the "★" marker in red and the "⚑" marker in blue. In the
+    rendering the "★" marker in red and the "⚑" marker in blue (in the
+    table and in the texts, but not the titles, of the cards). In the
     latest table, questions and answers are clickable and insert their
     "n" or "nX" into the prompt, and a question with a detail resp. an answer
     with a detail and optional rationale (provided through the tool
@@ -351,7 +352,7 @@ export const modGrill = () => {
                     .map((char) => ({ ...char, color: RIM, inverse: true })),
                 ...rim(`${"━".repeat(Math.max(0, span - 5 - width(label)))}┓`) ],
                 ...[ ...wrap([ ...uniform("WHAT: ", true, undefined), ...style(detail, undefined) ], span - 4, 0),
-                    ...(reason !== undefined ? [ [], ...wrap(reason, span - 4, 0) ] : []) ].map((line) => [ ...rim("┃ "), ...line,
+                    ...(reason !== undefined ? [ [], ...wrap(reason, span - 4, 0) ] : []) ].map((line) => [ ...rim("┃ "), ...glyphs(line),
                     ...uniform(" ".repeat(Math.max(0, span - 4 - width(line))), false, undefined), ...rim(" ┃") ]),
                 rim(`┗${"━".repeat(span - 2)}┛`)
             ]
