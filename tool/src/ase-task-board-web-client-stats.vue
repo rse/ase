@@ -13,7 +13,8 @@
       column scaled to the maximum of the column (with the framed column chart "Effort"
       of the numbers of tasks per effort size beside it), and the framed table "Top-5 Tasks" of the
       tasks of the highest usage (with the framed "Finished Tasks" of the average usage per finished
-      task and the framed "Efficiency" of the AI usage beside it)  -->
+      task and the framed "Efficiency" of the AI usage beside it), where the usage sections
+      show a hint (resp. "n/a" values) without any tracked usage data  -->
 <template>
     <div v-show="view === 'stats'" id="stats">
         <div class="sranges">
@@ -70,7 +71,8 @@
             <div class="spair">
                 <section class="susage">
                     <div class="stitle">Usage</div>
-                    <div class="smatrix">
+                    <div v-if="!stats.tracked" class="sempty">{{ UNTRACKED }}</div>
+                    <div v-else class="smatrix">
                         <span class="shead">Time:</span>
                         <span class="shead">Token:</span>
                         <span class="shead">Cost:</span>
@@ -140,7 +142,7 @@
                                 </td>
                             </tr>
                             <tr v-for="k in TOP_N - stats.top.length" :key="`empty-${k}`" class="sblank">
-                                <td colspan="5">{{ k === 1 && stats.top.length === 0 ? "no usage" : "" }}</td>
+                                <td colspan="5">{{ k === 1 && stats.top.length === 0 ? (stats.tracked ? "no usage" : UNTRACKED) : "" }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -148,9 +150,16 @@
                 <div class="ssplit">
                     <section class="seffect">
                         <div class="stitle">Finished Tasks</div>
-                        <div class="sline"><span>AI cost (⌀)</span><b>{{ cost(stats.efficiency.costAI) }}</b></div>
-                        <div class="sline"><span>HR cost (⌀)</span><b>{{ cost(stats.efficiency.costHR) }}</b></div>
-                        <div class="sline"><span>AI token (⌀)</span><b title="input ▷ output tokens">{{ tokens(stats.efficiency.input) }}<span class="sflow">▷</span>{{ tokens(stats.efficiency.output) }}</b></div>
+                        <template v-if="stats.tracked">
+                            <div class="sline"><span>AI cost (⌀)</span><b>{{ cost(stats.efficiency.costAI) }}</b></div>
+                            <div class="sline"><span>HR cost (⌀)</span><b>{{ cost(stats.efficiency.costHR) }}</b></div>
+                            <div class="sline"><span>AI token (⌀)</span><b title="input ▷ output tokens">{{ tokens(stats.efficiency.input) }}<span class="sflow">▷</span>{{ tokens(stats.efficiency.output) }}</b></div>
+                        </template>
+                        <template v-else>
+                            <div class="sline"><span>AI cost (⌀)</span><b>n/a</b></div>
+                            <div class="sline"><span>HR cost (⌀)</span><b>n/a</b></div>
+                            <div class="sline"><span>AI token (⌀)</span><b>n/a</b></div>
+                        </template>
                         <div class="sline"><span>lead (median)</span><b>{{ duration(stats.efficiency.leadMedian) }}</b></div>
                         <div class="sline"><span>lead (p85)</span><b>{{ duration(stats.efficiency.leadP85) }}</b></div>
                     </section>
@@ -214,6 +223,9 @@ const rangeLabel = (range: string, label: string) => {
 /*  the (maximum) number of tasks of the highest usage, always shown as rows (with blank
     rows for the missing tasks), to keep the height of their table (like in the TUI)  */
 const TOP_N = 5
+
+/*  the hint of the usage sections without any tracked usage data (like in the TUI)  */
+const UNTRACKED = "no tracked usage data available (see telemetry.enabled)"
 
 /*  the widths (in characters) of the input and output tokens of the tasks of the
     highest usage, to vertically align the "▷" between them (like in the TUI)  */

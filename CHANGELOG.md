@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   IMPROVEMENT [code, docs]: Untracked Usage Hint in Statistics View
+    Without any usage attachment within the time range, the `Usage` and `Top-5 Tasks` frames of the
+    task board statistics view show "no tracked usage data available (see telemetry.enabled)", and
+    `Finished Tasks` shows `n/a` for its averages, instead of misleading zero values.
+
 -   IMPROVEMENT [plugin]: Uniform Inline Image Title
     The mod now titles the diagrams of `ase_mods_diagram` "Inline Image Rendering" as well,
     instead of "Inline Diagram Rendering".

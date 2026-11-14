@@ -92,11 +92,12 @@ export type StatsForecast = { backlog: number, weeks: number | null }
     tasks (from the smallest to the largest size), the total AI usage
     of the tasks, the (up to five) tasks of the highest usage, the efficiency of the AI usage,
     the throughput of the last weeks (oldest first, ending with the current week), the forecast
-    of the backlog, and the number of days of the time range "total" (from the creation of the
-    oldest task until now)  */
+    of the backlog, the number of days of the time range "total" (from the creation of the
+    oldest task until now), and whether any usage attachment of the tasks overlaps with the time range  */
 export type Stats = {
     range:      StatsRange
     days:       number
+    tracked:    boolean
     states:     StatsState[]
     progress:   StatsProgress
     readiness:  StatsReadiness
@@ -301,6 +302,7 @@ export const statsOf = (board: Board, all: Board, usage: Map<string, { usage: Ta
     const total    = zero()
     const finished = zero()
     const tops     = [] as StatsTop[]
+    let tracked    = false
     for (const card of board.cards.values()) {
         const u = usage.get(card.id)
         if (u === undefined || board.context.has(card.id))
@@ -308,6 +310,7 @@ export const statsOf = (board: Board, all: Board, usage: Map<string, { usage: Ta
         const share = shareOf(u.period.created, u.period.modified, range, now)
         if (share === null)
             continue
+        tracked = true
         const task = zero()
         for (const [ field, key ] of usageFields)
             task[field] = (u.usage[key] ?? 0) * share
@@ -372,6 +375,6 @@ export const statsOf = (board: Board, all: Board, usage: Map<string, { usage: Ta
 
     /*  the number of days of the time range "total"  */
     const days = daysOf(board, now)
-    return { range, days, states, progress, readiness, sizes, usage: total, top, efficiency, throughput, forecast }
+    return { range, days, tracked, states, progress, readiness, sizes, usage: total, top, efficiency, throughput, forecast }
 }
 

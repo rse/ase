@@ -54,13 +54,14 @@ export type FlowStats  = { agents: number, states: number }
     their effort sizes (the number of tasks per size), their total AI usage (times in minutes,
     costs in USD), the tasks of the highest usage, the efficiency of the AI usage, the
     finished tasks of the last weeks (oldest first), and the forecast of the backlog, with
-    the number of days of the time range "total"  */
+    the number of days of the time range "total", and whether any usage data is tracked  */
 export type StatsRange  = "total" | "30d" | "7d"
 export type StatsUsage  = { timeAI: number, timeHR: number, timeReal: number, cread: number, cwrite: number, input: number, output: number, costAI: number, costHR: number }
 export type StatsEffort = { minutes: number, estimated: number, tasks: number }
 export type BoardStats  = {
     range:      StatsRange
     days:       number
+    tracked:    boolean
     states:     { phase: string, status: string, count: number, tone: Tone, effort: StatsEffort }[]
     progress:   { finished: number, cancelled: number, wip: number, open: number }
     readiness:  { ready: number, blocked: number }

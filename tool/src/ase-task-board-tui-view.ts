@@ -902,7 +902,9 @@ const statsColChart = (dim: boolean, key: string, title: string, width: number,
     of the total times, tokens, and costs of the tasks (with the framed column chart "Effort"
     of the numbers of tasks per effort size beside it), and the framed table "Top-5 Tasks" of the
     tasks of the highest usage (with the framed "Finished Tasks" of the usage per finished task and
-    the framed "Efficiency" of the AI usage beside it), below the buttons of the time ranges  */
+    the framed "Efficiency" of the AI usage beside it), below the buttons of the time ranges, where
+    the usage frames show a hint (resp. "n/a" values) without any tracked usage data  */
+const UNTRACKED = "no tracked usage data available (see telemetry.enabled)"
 export const renderStats = (ctx: BoardCtx) => {
     const { stats, usage, range, rangeRef, columns, boardH, dim, mouse, filter, agents } = ctx
     const innerW = Math.max(20, columns - 6)
@@ -1042,7 +1044,8 @@ export const renderStats = (ctx: BoardCtx) => {
     const head    = h(Text, { key: "head", ...cx("normal", "bold", "truncate", dim && "dimmed") },
         "Time:".padEnd(cellW) + "Token:".padEnd(tokenW) + "Cost:")
     const matrix  = frame("usage", USAGE_H, "Usage", 1, ...(usage === null ?
-        [ h(Text, { key: "loading", ...cx("dim", dim && "dimmed") }, "loading …") ] : [ head, ...lines ]))
+        [ h(Text, { key: "loading", ...cx("dim", dim && "dimmed") }, "loading …") ] :
+        !stats.tracked ? [ h(Text, { key: "none", ...cx("dim", "truncate", dim && "dimmed") }, UNTRACKED) ] : [ head, ...lines ]))
 
     /*  the compact column chart of the distribution of the effort sizes (the numbers of the
         estimated tasks per size, from the smallest to the largest size), with the numbers of
@@ -1073,7 +1076,7 @@ export const renderStats = (ctx: BoardCtx) => {
         [ "Task Id".padEnd(idW), "Task Title".padEnd(titleW), "Total Share".padEnd(pctW),
             "Cost".padStart(costW), "Token".padEnd(tokW) ].join(gap))
     const topList = usage === null ? [ h(Text, { key: "loading", ...cx("dim", dim && "dimmed") }, "loading …") ] :
-        stats.top.length === 0 ? [ h(Text, { key: "none", ...cx("dim", dim && "dimmed") }, "no usage") ] :
+        stats.top.length === 0 ? [ h(Text, { key: "none", ...cx("dim", "truncate", dim && "dimmed") }, stats.tracked ? "no usage" : UNTRACKED) ] :
             [ topHead, ...stats.top.map((t, i) => {
                 const id = fit(t.id, idW - 4).trimEnd()
                 return h(Text, { key: `top${i}`, ...cx("normal", "truncate", dim && "dimmed") },
@@ -1098,9 +1101,9 @@ export const renderStats = (ctx: BoardCtx) => {
             fit(label, Math.max(0, width - 4 - value.length)), h(Text, { key: "v", ...cx("bold") }, value))
     const loading = [ h(Text, { key: "loading", ...cx("dim", dim && "dimmed") }, "loading …") ]
     const avgList = usage === null ? loading : [
-        valLine("cost-ai", avgW, "AI cost (⌀)",  statsCost(eff.costAI)),
-        valLine("cost-hr", avgW, "HR cost (⌀)",  statsCost(eff.costHR)),
-        valLine("tokens",  avgW, "AI token (⌀)", `${statsTokens(eff.input)} ▷ ${statsTokens(eff.output)}`),
+        valLine("cost-ai", avgW, "AI cost (⌀)",  stats.tracked ? statsCost(eff.costAI) : "n/a"),
+        valLine("cost-hr", avgW, "HR cost (⌀)",  stats.tracked ? statsCost(eff.costHR) : "n/a"),
+        valLine("tokens",  avgW, "AI token (⌀)", stats.tracked ? `${statsTokens(eff.input)} ▷ ${statsTokens(eff.output)}` : "n/a"),
         valLine("lead-median", avgW, "lead (median)", statsDuration(eff.leadMedian)),
         valLine("lead-p85",    avgW, "lead (p85)",    statsDuration(eff.leadP85))
     ]

@@ -332,6 +332,12 @@ the usage attachment does not track when the usage accrued, the usage
 is taken as being evenly spread over this period, so the usage within
 these time ranges is just an approximation.
 
+Without any usage attachment of the tasks within the time range (e.g.,
+as the AI usage accounting is disabled, see `telemetry.enabled` in
+`ase-config`(1)), `Usage` and `Top-5 Tasks` show the hint `no tracked
+usage data available (see telemetry.enabled)` instead, and `Finished
+Tasks` shows `n/a` for its averages, while the lead times are kept.
+
 ### Agent Logs View
 
 With an agent relay (see `--agent-relay`), the boards additionally
