@@ -95,7 +95,7 @@ export const register: Register = (on, options) => {
         permission, as it just takes the details for revealing them on hovering  */
     on("tool.check", { tool: "mcp__ase__ase_mods_grill_details" }, () => ({ decision: "allow" }))
     on("tool.call", { tool: "mcp__ase__ase_mods_grill_details" }, ($, e) => {
-        const result = grill.provide(e.details)
+        const result = grill.provide(e.details, e.rationales)
         $.ui.invalidate("ui.render")
         return { result }
     })

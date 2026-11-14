@@ -10,9 +10,9 @@
     the answers picked in the prompt via "nX" short responses and the
     question selected in the prompt via the last standalone "n". In the
     latest table, questions and answers are clickable and insert their
-    "n" or "nX" into the prompt, and an answer with a detail (provided
-    through the tool "ase_mods_grill_details", registered by this mod)
-    reveals it in a card while hovered.  */
+    "n" or "nX" into the prompt, and an answer with a detail and optional
+    rationale (provided through the tool "ase_mods_grill_details",
+    registered by this mod) reveals them in a card while hovered.  */
 
 import type { Elements, Frozen, MatchedEvent, RenderElement } from "claude-code"
 import { type Engine, type Char, PICKED, ROW, RULE, cells, style, width, wrap, split, paint,
@@ -24,13 +24,19 @@ export const TOOL = {
     description: "Provide the details of the answers of the grilling table of ASE, which is output right " +
         "after this call, shown to the user in a card while hovering over an answer. Pass `details` as an object mapping the short response " +
         "`nX` of each answer (question number and answer letter, like \"1A\") to the longer form of the " +
-        "answer (1-2 sentences). Returns `OK: ...` or `ERROR: ...` as text. On `OK: ...`, do NOT mention, " +
-        "describe, or confirm this call in the response.",
+        "answer (at most 3-4 sentences), and optionally `rationales` as an object mapping the short response " +
+        "of each answer of a question with a recommended (`★`) answer to the reason (1-2 sentences) why it " +
+        "is the best answer resp. why not, compared to the recommended one (shown in italics, prefixed " +
+        "with \"WHY:\" resp. \"WHY NOT:\"). Returns `OK: ...` or `ERROR: ...` as text. On `OK: ...`, do NOT " +
+        "mention, describe, or confirm this call in the response.",
     inputSchema: {
         type: "object",
         properties: {
-            details: { type: "object", additionalProperties: { type: "string" },
-                description: "longer form (1-2 sentences) of each answer, keyed by its short response \"nX\"" }
+            details:    { type: "object", additionalProperties: { type: "string" },
+                description: "longer form (at most 3-4 sentences) of each answer, keyed by its short response \"nX\"" },
+            rationales: { type: "object", additionalProperties: { type: "string" },
+                description: "reason (1-2 sentences) why (not) of each answer of a question with a " +
+                    "recommended answer, keyed by its short response \"nX\"" }
         },
         required: [ "details" ]
     }
@@ -51,8 +57,9 @@ const ANSWER = /,\s+(?=\*{0,2}[A-Z]\*{0,2}\s+▶)/
 const LETTER = /^\*{0,2}([A-Z])\*{0,2}\s+▶/
 const NUMBER = /^\*{0,2}(\d+)\*{0,2}\s+▶/
 
-/*  the label of an answer  */
+/*  the label of an answer and the recommendation marker inside it  */
 const LABEL = /^\*{0,2}[A-Z]\*{0,2}\s+▶\s+(.*?):(?:\s|$)/
+const STAR  = "★"
 
 /*  a short response "nX" inside the prompt  */
 const PICK = /(?<![^\s,])(\d+)([a-zA-Z])(?![^\s,])/g
@@ -168,7 +175,7 @@ export const modGrill = () => {
     /*  the last known width of the terminal, the already seen tables, the
         latest (still unanswered) table, the picks and the selected question of the
         still unsubmitted prompt, the frozen picks of the already answered tables,
-        and the details of the answers of the latest table (keyed by "nX")  */
+        and the details and rationales of the answers of the latest table (keyed by "nX")  */
     let columns  = 80
     const seen   = new Set<string>()
     let latest: string | undefined
@@ -176,6 +183,7 @@ export const modGrill = () => {
     let selected: number | undefined
     const frozen = new Map<string, Map<number, string>>()
     let details  = new Map<string, string>()
+    let reasons  = new Map<string, string>()
 
     /*  refresh the picks and the selection from the prompt  */
     const refresh = (text: string) => {
@@ -198,18 +206,26 @@ export const modGrill = () => {
         picks    = new Map()
         selected = undefined
         details  = new Map()
+        reasons  = new Map()
     }
 
-    /*  take the details of the answers of the latest table from the tool  */
-    const provide = (input: unknown): string => {
-        if (typeof input !== "object" || input === null || Array.isArray(input))
+    /*  take the details and the optional rationales of the answers of the latest table from the tool  */
+    const provide = (input: unknown, extra?: unknown): string => {
+        const object = (value: unknown): value is object =>
+            typeof value === "object" && value !== null && !Array.isArray(value)
+        const keyed = (value: object) =>
+            new Map(Object.entries(value).flatMap(([ key, text ]): [ string, string ][] => {
+                const m = /^\s*(\d+)\s*([a-zA-Z])\s*$/.exec(key)
+                return m !== null && typeof text === "string" && text.trim() !== "" ?
+                    [ [ `${Number(m[1]!)}${m[2]!.toUpperCase()}`, text.trim() ] ] : []
+            }))
+        if (!object(input))
             return "ERROR: invalid \"details\" argument: object expected"
-        details = new Map(Object.entries(input).flatMap(([ key, text ]): [ string, string ][] => {
-            const m = /^\s*(\d+)\s*([a-zA-Z])\s*$/.exec(key)
-            return m !== null && typeof text === "string" && text.trim() !== "" ?
-                [ [ `${Number(m[1]!)}${m[2]!.toUpperCase()}`, text.trim() ] ] : []
-        }))
-        return `OK: details of ${details.size} answers revealed to the user on hovering`
+        if (extra !== undefined && !object(extra))
+            return "ERROR: invalid \"rationales\" argument: object expected"
+        details = keyed(input)
+        reasons = extra !== undefined ? keyed(extra) : new Map()
+        return `OK: details of ${details.size} answers (${reasons.size} with rationale) revealed to the user on hovering`
     }
 
     /*  draw the rows of a successful call of the tool as nothing,
@@ -287,7 +303,8 @@ export const modGrill = () => {
             ]
         }
 
-        /*  draw the detail card of an answer in the latest table: its detail inside a
+        /*  draw the detail card of an answer in the latest table: its detail (plus its
+            optional rationale, below a blank line) inside a
             heavy frame of the answer column width, with the short response and the
             label of the answer as its title in the top edge (inverse, in the frame
             color, with a blank on both sides), placed
@@ -296,8 +313,8 @@ export const modGrill = () => {
             row stays visible and reachable), and revealed while any line of the answer
             is hovered (appended after all grid rows, as an absolute box paints over the
             boxes before it only)  */
-        const card = (group: string, title: Char[], detail: string, first: number, last: number,
-            rowsTotal: number): RenderElement => {
+        const card = (group: string, title: Char[], detail: string, reason: Char[] | undefined,
+            first: number, last: number, rowsTotal: number): RenderElement => {
             const rim   = (text: string) => uniform(text, false, RIM)
             const label = [ ...title ]
             while (width(label) > w2 - 6)
@@ -306,7 +323,8 @@ export const modGrill = () => {
                 [ ...rim("┏━"), ...[ ...uniform(" ", true, RIM), ...label, ...uniform(" ", true, RIM) ]
                     .map((char) => ({ ...char, color: RIM, inverse: true })),
                 ...rim(`${"━".repeat(Math.max(0, w2 - 5 - width(label)))}┓`) ],
-                ...wrap(style(detail, undefined), w2 - 4, 0).map((line) => [ ...rim("┃ "), ...line,
+                ...[ ...wrap(style(detail, undefined), w2 - 4, 0),
+                    ...(reason !== undefined ? [ [], ...wrap(reason, w2 - 4, 0) ] : []) ].map((line) => [ ...rim("┃ "), ...line,
                     ...uniform(" ".repeat(Math.max(0, w2 - 4 - width(line))), false, undefined), ...rim(" ┃") ]),
                 rim(`┗${"━".repeat(w2 - 2)}┛`)
             ]
@@ -317,7 +335,8 @@ export const modGrill = () => {
         }
 
         /*  draw the table as a grid: a rule between all rows and one answer per line
-            (remembering the grid rows of the answers with a detail for their cards)  */
+            (remembering the grid rows of the answers with a detail for their cards,
+            and prefixing a rationale by "WHY" for the recommended answer, else "WHY NOT")  */
         const rule = (l: string, m: string, r: string) =>
             Text({ wrap: "truncate-end", children: l + "─".repeat(w1 + 2) + m + "─".repeat(w2 + 2) + r })
         const grid: RenderElement[] = [
@@ -326,7 +345,8 @@ export const modGrill = () => {
                 [ "│ ", ...padded(head[0]!, w1), " │ ", ...padded(head[1]!, w2), " │" ] }),
             rule("├", "┼", "┤")
         ]
-        const spots: { group: string, title: Char[], detail: string, first: number, last: number }[] = []
+        const spots: { group: string, title: Char[], detail: string, reason: Char[] | undefined,
+            first: number, last: number }[] = []
         rows.forEach((row, k) => {
             const number = table.rows[k]!.number
             const q = wrap(row.question, w1, row.indent, row.lead).map((line, i) =>
@@ -337,11 +357,15 @@ export const modGrill = () => {
                 const lines  = wrap(answer, w2, INDENT).map((line, i) =>
                     draw(line, w2, `a${number}${letter}`, i, letter !== "" ? press(engine, number, letter) : undefined))
                 const detail = details.get(`${number}${letter}`)
+                const reason = reasons.get(`${number}${letter}`)
+                const label  = LABEL.exec(text)?.[1] ?? ""
                 if (e.requestId === latest && letter !== "" && detail !== undefined && w2 >= 20)
                     spots.push({ group: `a${number}${letter}`, detail,
+                        reason: reason !== undefined ? [ ...uniform(label.includes(STAR) ? "WHY: " : "WHY NOT: ", true, undefined),
+                            ...style(reason, undefined) ].map((char) => ({ ...char, italic: true })) : undefined,
                         first: grid.length + offset, last: grid.length + offset + lines.length - 1,
                         title: [ ...uniform(`${number}${letter} ▶ `, true, undefined),
-                            ...style(LABEL.exec(text)?.[1] ?? "", undefined).map((char) => ({ ...char, bold: true })) ] })
+                            ...style(label, undefined).map((char) => ({ ...char, bold: true })) ] })
                 offset += lines.length
                 return lines
             })
@@ -355,8 +379,8 @@ export const modGrill = () => {
                 ] }))
             grid.push(k < rows.length - 1 ? rule("├", "┼", "┤") : rule("└", "┴", "┘"))
         })
-        const cards = spots.map(({ group, title, detail, first, last }) =>
-            card(group, title, detail, first, last, grid.length))
+        const cards = spots.map(({ group, title, detail, reason, first, last }) =>
+            card(group, title, detail, reason, first, last, grid.length))
 
         /*  mimic the reply row of the engine: blank row above and bullet gutter  */
         return Box({ flexDirection: "row", marginTop: 1, width: "100%", children: [

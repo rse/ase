@@ -1,6 +1,6 @@
 ---
 name: ase-spec-edit
-argument-hint: "[--help|-h] [--approach|-a] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--ground|-G] [--verify|-v light|none|full] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>]"
+argument-hint: "[--help|-h] [--approach|-A] [--grill|-g] [--grill-auto|-a] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--ground|-G] [--verify|-v light|none|full] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>]"
 description: >
     Edit Specification: Use when the user wants to "edit" the
     SpecBook-based specification (SPEC) in one shot from a query, with
@@ -22,7 +22,7 @@ Edit Specification
 
 <expand name="getopt"
     arg1="ase-spec-edit"
-    arg2="--approach|-a --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --ground|-G --verify|-v=(light|none|full) --worktree|-w= --loop|-l">
+    arg2="--approach|-A --grill|-g --grill-auto|-a --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --ground|-G --verify|-v=(light|none|full) --worktree|-w= --loop|-l">
     $ARGUMENTS
 </expand>
 
@@ -74,7 +74,10 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
     1.  Set <query><getopt-arguments/></query> (with any leading and
         trailing whitespace stripped), set <todo-what></todo-what> and
         <todo-how></todo-how> (both empty), and set
-        <worktree-dir></worktree-dir> (empty). Do not output anything.
+        <worktree-dir></worktree-dir> (empty). If
+        <getopt-option-grill-auto/> is `true`, set
+        <getopt-option-grill>true</getopt-option-grill>, as
+        `--grill-auto` implies `--grill`. Do not output anything.
 
     2.  If <getopt-option-grill-rounds/> is not a positive integer,
         only output the following <template/> and then immediately
@@ -267,6 +270,16 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
         3.  INTERACTIVE DIALOG:
 
+            <if condition="<getopt-option-grill-auto/> is equal `true`">
+            Answer the questions without any dialog:
+
+            <expand name="grill-auto"
+                arg1="✪ skill: **ase-spec-edit**"></expand>
+
+            Treat <result/> as the combined free-text answers to all
+            questions of the round and continue with item 4 below.
+            </if>
+            <else>
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
             custom dialog according to the expanded `custom-dialog`
@@ -303,6 +316,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
             prefix from <result/> and treat the remainder as the
             combined free-text answers to all questions of the
             round.
+            </else>
 
         4.  MERGE ANSWERS INTO TODO:
 

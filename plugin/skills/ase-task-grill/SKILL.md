@@ -1,6 +1,6 @@
 ---
 name: ase-task-grill
-argument-hint: "[--help|-h] [--rounds|-r <n>] [--until|-u MUST|SHOULD|MAY] [--perspective|-p <perspective>] [--ground|-G] [--focus|-f <section>[,...]] [--force|-F] [--quiet|-q] [--next|-n <option>[,...]] [<id>]"
+argument-hint: "[--help|-h] [--rounds|-r <n>] [--until|-u MUST|SHOULD|MAY] [--perspective|-p <perspective>] [--ground|-G] [--auto|-a] [--focus|-f <section>[,...]] [--force|-F] [--quiet|-q] [--next|-n <option>[,...]] [<id>]"
 description: >
     Interview the user relentlessly about the task plan until reaching a
     shared understanding, resolving each branch of the question decision
@@ -22,7 +22,7 @@ Iteratively Grill a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-grill"
-    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task --int-interactive">
+    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --auto|-a --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task --int-interactive">
     $ARGUMENTS
 </expand>
 
@@ -202,6 +202,16 @@ Set <args>--int-reuse-task</args>.
 
         3.  INTERACTIVE DIALOG:
 
+            <if condition="<getopt-option-auto/> is equal `true`">
+            Answer the questions without any dialog:
+
+            <expand name="grill-auto"
+                arg1="◉ task: **<ase-task-id/>**"></expand>
+
+            Treat <result/> as the combined free-text answers to all
+            questions of the round and continue with item 4 below.
+            </if>
+            <else>
             In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
             custom dialog according to the expanded `custom-dialog`
@@ -239,6 +249,7 @@ Set <args>--int-reuse-task</args>.
             Otherwise, strip any leading `OTHER: ` prefix from
             <result/> and treat the remainder as the combined free-text
             answers to all questions of the round.
+            </else>
 
         4.  MERGE ANSWERS INTO PLAN:
 
@@ -248,7 +259,7 @@ Set <args>--int-reuse-task</args>.
             <expand name="grill-short-responses"></expand>
 
             A question *not* addressed by the combined reply accepts its
-            answer marked with `⚑` (the current plan) if one exists, and
+            answer marked with `★` (the recommendation) if one exists, and
             otherwise stays *unanswered*. Additionally, record the
             *open* questions in the checkboxes of the body
             bullet-points, changing *only* checkboxes in state `[ ]` or
@@ -357,6 +368,9 @@ Set <args>--int-reuse-task</args>.
             </if>
             <if condition="<getopt-option-ground/> is `true`">
                 Set <args><args/> --ground</args>.
+            </if>
+            <if condition="<getopt-option-auto/> is `true`">
+                Set <args><args/> --auto</args>.
             </if>
             <if condition="<getopt-option-quiet/> is `true`">
                 Set <args><args/> --quiet</args>.

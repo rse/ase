@@ -11,6 +11,7 @@
     [`--until`|`-u` `MUST`|`SHOULD`|`MAY`]
     [`--perspective`|`-p` *perspective*]
     [`--ground`|`-G`]
+    [`--auto`|`-a`]
     [`--focus`|`-f` *section*[,...]]
     [`--force`|`-F`]
     [`--quiet`|`-q`]
@@ -47,7 +48,9 @@ As with `ase-code-edit --grill`, all questions of a round are announced
 together below a `GRILLING ROUND K/L` line (plain `GRILLING` for a
 single round) as a `QUESTION`/`ANSWERS` table with one row per
 question, each row carrying two to three *grounded* answer alternatives
-(the one reflecting the current plan marked with `⚑`). They are then
+(the one reflecting the current plan marked with `⚑`, and the one
+critically judged best, if any, marked with `★` as the recommendation,
+whose rationale shows up in the hover card of every answer). They are then
 asked in *one* batch via a single interactive dialog, whose only answer
 option is the fixed `SKIP GRILLING` (skip the remaining grilling, but
 still update the plan with the answers of the previous rounds), plus
@@ -55,7 +58,7 @@ free-text input. The questions are numbered `1`, `2`, etc. and their
 answer alternatives are lettered `A`, `B`, etc., so the free-text input
 can cherry-pick answers with short responses matching `\d+[a-zA-Z]`
 (like `1A 2c`), freely mixed with keyword text. A question not
-addressed by the reply accepts its `⚑` answer, if one exists.
+addressed by the reply accepts its `★` answer, if one exists.
 Cancelling the dialog stops the skill without updating the plan with
 the current round. After every round, the plan is updated and
 persisted, its `Tags:` frontmatter key records each grilled section as
@@ -125,6 +128,15 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
     in the announcement line, like `GRILLING (security, grounded)`. If
     no usable facts are found, a warning is shown and the grilling falls
     back to model knowledge.
+
+-   `--auto`|`-a`:
+    Answer the questions automatically instead of asking the user via
+    the interactive dialog: every question gets its `★` recommended
+    answer, while a question without a recommendation stays unanswered
+    (and hence `[?]`), like a question skipped in an interactive reply.
+    The questions table is still shown, followed by a status line naming
+    the auto-chosen answers, like `auto-chosen answers 1A 3B`. It is
+    forwarded on a re-grilling.
 
 -   `--focus`|`-f` *section*[,...]:
     Grill only the given plan *section*(s), in the given order. Each
@@ -209,6 +221,13 @@ current task plan:
 
 ```text
 ❯ /ase-task-grill --focus DES,SPEC
+```
+
+Grill the current task plan with automatically chosen recommended
+answers:
+
+```text
+❯ /ase-task-grill --auto
 ```
 
 Re-grill the already grilled current task plan completely:

@@ -7,8 +7,9 @@
 
 `ase-spec-edit`
     [`--help`|`-h`]
-    [`--approach`|`-a`]
+    [`--approach`|`-A`]
     [`--grill`|`-g`]
+    [`--grill-auto`|`-a`]
     [`--grill-rounds`|`-r` *n*]
     [`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`]
     [`--grill-perspective`|`-p` *perspective*]
@@ -51,7 +52,7 @@ timestamp refreshed.
 
 ##  OPTIONS
 
--   `--approach`|`-a`:
+-   `--approach`|`-A`:
     Before applying the change set, propose one or more specification
     approaches with pros and cons, recommend one of them, and let the
     user pick the preferred one via an interactive dialog (or, under the
@@ -81,8 +82,10 @@ timestamp refreshed.
     omitted when only a single round is performed) as a
     `QUESTION`/`ANSWERS` table with one row per question, each row
     carrying two to three grounded answer alternatives (with the
-    alternative reflecting the current understanding marked with `⚑`).
-    They are then asked in *one* batch via a single interactive dialog,
+    alternative reflecting the current understanding marked with `⚑`,
+    and the one critically judged best, if any, marked with `★` as the
+    recommendation, whose rationale shows up in the hover card of every
+    answer). They are then asked in *one* batch via a single interactive dialog,
     whose question asks for the combined answer to all (or a subset) of
     the listed questions and whose only answer options are the fixed
     `SKIP GRILLING` (skip the remaining grilling) and `STOP SKILL` (stop
@@ -94,6 +97,15 @@ timestamp refreshed.
     parts of the query. Without `--grill`, no questions are asked at
     all.
 
+-   `--grill-auto`|`-a`:
+    Grill the query like `--grill` (which it implies), but answer the
+    questions automatically instead of asking the user via the
+    interactive dialog: every question gets its `★` recommended answer,
+    while a question without a recommendation stays unanswered, like a
+    question skipped in an interactive reply. The questions table is
+    still shown, followed by a status line naming the auto-chosen
+    answers, like `auto-chosen answers 1A 3B`.
+
 -   `--grill-rounds`|`-r` *n*:
     The *maximum* number of grill rounds to apply (default: `1`). Each
     round starts from scratch from only the current WHAT and HOW parts,
@@ -101,7 +113,7 @@ timestamp refreshed.
     `EDIT TODO` box. The grilling stops early -- announced by a
     `grilling finished early` status line -- once a round, even the
     first one, finds the open points clear enough according to
-    `--grill-until`. Only effective together with `--grill`.
+    `--grill-until`. Only effective together with `--grill` or `--grill-auto`.
 
 -   `--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`:
     Grill until at least all open points of the given severity or
@@ -111,7 +123,7 @@ timestamp refreshed.
     (`IMPLEMENTATION`). Independent of this, every open point is rated
     with an individual impact (`HIGH`, `MEDIUM`, or `LOW`), which
     decides which points are raised as questions and in which order
-    within a focus area. Only effective together with `--grill`.
+    within a focus area. Only effective together with `--grill` or `--grill-auto`.
 
 -   `--grill-perspective`|`-p` *perspective*:
     Grill exclusively from the logical *perspective* -- a keyword or
@@ -120,7 +132,7 @@ timestamp refreshed.
     this perspective are raised as questions, while every question still
     carries its focus area, severity, and impact. The active perspective
     is shown in the announcement line, like `GRILLING (security)`.
-    Without a perspective, the grilling is holistic. Only effective together with `--grill`.
+    Without a perspective, the grilling is holistic. Only effective together with `--grill` or `--grill-auto`.
 
 -   `--ground`|`-G`:
     Ground the edit in facts instead of the world knowledge of the
@@ -210,7 +222,14 @@ Let the user pick one of several specification approaches first, then
 edit:
 
 ```text
-❯ /ase-spec-edit -a model the access permissions of the personas
+❯ /ase-spec-edit -A model the access permissions of the personas
+```
+
+Grill the query with automatically chosen recommended answers, then
+edit:
+
+```text
+❯ /ase-spec-edit -a add a Reviewer persona to the persona model
 ```
 
 Grill the query exclusively from the domain perspective, grounded in

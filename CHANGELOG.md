@@ -5,6 +5,16 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [plugin]: Automatic Grilling
+    The new options `--grill-auto|-a` of `ase-code-edit` and `ase-spec-edit` (implying `--grill`) and
+    `--auto|-a` of `ase-task-grill` pick every `★` answer instead of asking, leaving questions without a
+    recommendation unanswered. The short option of `--approach` in both edit skills moves to `-A`.
+
+-   NEW FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
+    Besides the `⚑` current decision state, grilling tables now mark the answer critically judged best
+    (judge-first, context before world knowledge) with `★`, if any. Unaddressed `ase-task-grill`
+    questions accept it, and the hover cards show italic `WHY:`/`WHY NOT:` rationales.
+
 -   IMPROVEMENT [plugin]: Dimension-Wise Grounding Beyond Grilling
     Grounding (`ase-common-ground.md`) now runs per dimension `WHAT`, `HOW`, `WHEN` in parallel
     sub-agents (local artifacts, plus at most 5 iterative web searches), and the new option

@@ -278,6 +278,19 @@ questions:
     current decision state of the grilled subject, append
     ` ⚑` to its <answer-N-K-label/>.
 
+    Then, for every question, *critically* determine the
+    *recommended* answer -- the alternative *you* judge best,
+    based primarily on all contextual information (the sources
+    checked above) and only secondarily on your world knowledge.
+    Judge all alternatives on their merits *first*, as if no `⚑`
+    existed, and only *then* compare with the `⚑` answer, so the
+    recommendation does not anchor on the grilled subject:
+    actively challenge its decisions and recommend another
+    alternative whenever that one is better. If no alternative
+    is clearly best, give *no* recommendation for the question.
+    For the recommended answer, append ` ★` to its
+    <answer-N-K-label/>, after a potential ` ⚑` (like `label ⚑ ★`).
+
     Assemble an <answer-N/> out of `**<answer-N-1-id/>**
     ▶ **<answer-N-1-label/>**: <answer-N-1-description/>,
     **<answer-N-2-id/>** ▶ **<answer-N-2-label/>**:
@@ -299,9 +312,16 @@ questions:
     Otherwise, *before* showing the questions in item 6 below, determine for
     every <answer-N-K/> a detail <answer-N-K-detail/> -- the longer but still
     brief form of its <answer-N-K-description/>, of at most *3-4 sentences* --
-    and call this tool with `details: { "<question-N-id/><answer-N-K-id/>":
-    "<answer-N-K-detail/>", [...] }`, covering all answers of all questions of
-    the round. The function hooks module reveals each detail to the user while
+    and, for every answer of a question *with* a recommended answer, a
+    rationale <answer-N-K-rationale/> of at most *1-2 sentences*: *why* the
+    recommended answer is the best one, resp. *why not* any other answer,
+    contrasted with the recommended one (without a `WHY:` or `WHY NOT:`
+    prefix, as the module adds it). Call this tool with `details: {
+    "<question-N-id/><answer-N-K-id/>": "<answer-N-K-detail/>", [...] }`,
+    covering all answers of all questions of the round, and `rationales: {
+    "<question-N-id/><answer-N-K-id/>": "<answer-N-K-rationale/>", [...] }`,
+    covering all answers of the questions with a recommended answer. The
+    function hooks module reveals each detail and rationale to the user while
     hovering over its answer in the subsequently shown table. Do not output
     anything. If the tool returns `ERROR: ...`, ignore it and continue, as the
     details are optional.
@@ -338,7 +358,7 @@ questions:
 
     Legend: **DOM**: Domain       (MUST)    **IFC**: Interface      (MUST)    **n**: round-local question number
             **ARC**: Architecture (SHOULD)  **IMP**: Implementation (MAY)     **X**: question-local answer letter
-            **REG**: Regression   (SHOULD)  **CON**: Confirmation   (SHOULD)  ⚑: current decision state
+            **REG**: Regression   (SHOULD)  **CON**: Confirmation   (SHOULD)  ⚑: current decision, ★: recommendation
     </template>
 
 </define>
@@ -353,6 +373,26 @@ response*, which cherry-picks for the question with
 <answer-N-K-id/> equal to its letter (case-insensitive). A
 token referencing a non-existing question or answer is
 treated as plain free text.
+
+</define>
+
+<define name="grill-auto">
+
+Answer the questions of the current grilling round *automatically*
+instead of asking the user through the interactive dialog, where <arg1/>
+is the skill chrome of the status line. For every question, pick its
+answer marked with `★` (the recommendation), and pick *nothing* for a
+question without any recommendation, so it stays *unanswered*, exactly
+like a question the user skips in an interactive reply. Set <result/> to
+the space-separated `nX` short responses of all picks (or to empty if
+nothing was picked), so the subsequent merging treats it like the
+combined reply of an interactive dialog. Set <picks/> to <result/>, or
+to `(none)` if <result/> is empty, and only output the following
+<template/>:
+
+<template>
+⧉ **ASE**: <arg1/>, ▶ status: **auto-chosen answers <picks/>**
+</template>
 
 </define>
 

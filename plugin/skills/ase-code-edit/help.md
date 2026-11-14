@@ -8,8 +8,9 @@
 `ase-code-edit`
     [`--help`|`-h`]
     [`--mode`|`-m` `auto`|`craft`|`refactor`|`resolve`]
-    [`--approach`|`-a`]
+    [`--approach`|`-A`]
     [`--grill`|`-g`]
+    [`--grill-auto`|`-a`]
     [`--grill-rounds`|`-r` *n*]
     [`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`]
     [`--grill-perspective`|`-p` *perspective*]
@@ -47,7 +48,7 @@ information.
     (CRAFTING), `refactor` (REFACTORING), or `resolve` (RESOLVING).
     The default `auto` infers the tenet set from the query itself.
 
--   `--approach`|`-a`:
+-   `--approach`|`-A`:
     Before applying the change set, propose one or more crafting,
     refactoring, or resolution approaches with pros and cons, recommend
     one of them, and let the user pick the preferred one via an
@@ -78,7 +79,9 @@ information.
     a single round is performed) as a `QUESTION`/`ANSWERS` table with
     one row per question, each row carrying two to three grounded answer
     alternatives (with the alternative reflecting the current understanding
-    marked with `⚑`). They are then asked in *one* batch via a single
+    marked with `⚑`, and the one critically judged best, if any, marked
+    with `★` as the recommendation, whose rationale shows up in the hover
+    card of every answer). They are then asked in *one* batch via a single
     interactive dialog titled `GRILLING ROUND K/L` (or plain `GRILLING`
     for a single round), whose question asks for the combined answer to
     all (or a subset) of the listed aspect questions and whose only
@@ -91,6 +94,15 @@ information.
     merged back into the WHAT and HOW parts of the query. Without
     `--grill`, no questions are asked at all.
 
+-   `--grill-auto`|`-a`:
+    Grill the query like `--grill` (which it implies), but answer the
+    questions automatically instead of asking the user via the
+    interactive dialog: every question gets its `★` recommended answer,
+    while a question without a recommendation stays unanswered, like a
+    question skipped in an interactive reply. The questions table is
+    still shown, followed by a status line naming the auto-chosen
+    answers, like `auto-chosen answers 1A 3B`.
+
 -   `--grill-rounds`|`-r` *n*:
     The *maximum* number of grill rounds to apply (default: `1`). Each
     round starts from scratch from only the current WHAT and HOW parts,
@@ -98,7 +110,7 @@ information.
     `EDIT TODO` box. The grilling stops early -- announced by a
     `grilling finished early` status line -- once a round, even the
     first one, finds the open points clear enough according to
-    `--grill-until`. Only effective together with `--grill`.
+    `--grill-until`. Only effective together with `--grill` or `--grill-auto`.
 
 -   `--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`:
     Grill until at least all open points of the given severity or
@@ -108,7 +120,7 @@ information.
     (`IMPLEMENTATION`). Independent of this, every open point is rated
     with an individual impact (`HIGH`, `MEDIUM`, or `LOW`), which
     decides which points are raised as questions and in which order
-    within a focus area. Only effective together with `--grill`.
+    within a focus area. Only effective together with `--grill` or `--grill-auto`.
 
 -   `--grill-perspective`|`-p` *perspective*:
     Grill exclusively from the logical *perspective* -- a keyword or
@@ -117,7 +129,7 @@ information.
     this perspective are raised as questions, while every question still
     carries its focus area, severity, and impact. The active perspective
     is shown in the announcement line, like `GRILLING (security)`.
-    Without a perspective, the grilling is holistic. Only effective together with `--grill`.
+    Without a perspective, the grilling is holistic. Only effective together with `--grill` or `--grill-auto`.
 
 -   `--ground`|`-G`:
     Ground the edit in facts instead of the world knowledge of the
@@ -210,7 +222,14 @@ Let the user pick one of several resolution approaches first, then
 implement:
 
 ```text
-❯ /ase-code-edit -a fix race condition in cache invalidation
+❯ /ase-code-edit -A fix race condition in cache invalidation
+```
+
+Grill the query with automatically chosen recommended answers, then
+implement:
+
+```text
+❯ /ase-code-edit -a add a --verbose option to the CLI
 ```
 
 Grill the query exclusively from the security perspective, grounded in
