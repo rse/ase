@@ -1,6 +1,6 @@
 ---
 name: ase-task-implement
-argument-hint: "[--help|-h] [--next|-n <option>[,...]] [--worktree|-w <name>] [--source|-s <source>] [--changeset|-c <changeset>] [--draft|-d] [--no-cleanup|-K] [--stateless|-S] [<id>]"
+argument-hint: "[--help|-h] [--next|-n <option>[,...]] [--worktree|-w <name>] [--source|-s <source>] [--changeset|-c <changeset>] [--draft|-d] [--no-cleanup|-K] [--stateless|-S] [--ground|-G] [<id>]"
 description: >
     Implement current or given task plan, optionally as an implementation
     draft attachment only. Use when the user calls to "implement", "realize",
@@ -22,7 +22,7 @@ Implement a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-implement"
-    arg2="--next|-n=(none|DONE|EDIT|INTEGRATE|DELETE)... --worktree|-w= --source|-s= --changeset|-c= --draft|-d --no-cleanup|-K --stateless|-S --int-reuse-task">
+    arg2="--next|-n=(none|DONE|EDIT|INTEGRATE|DELETE)... --worktree|-w= --source|-s= --changeset|-c= --draft|-d --no-cleanup|-K --stateless|-S --ground|-G --int-reuse-task">
     $ARGUMENTS
 </expand>
 
@@ -36,6 +36,7 @@ Implement a Task Plan
 @${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-code.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-changeset.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 
 Procedure
 ---------
@@ -394,6 +395,15 @@ Procedure
         <task-content/>:
 
         <expand name="changeset-land" arg1="<work-dir/>"></expand>
+
+        <if condition="<getopt-option-ground/> is equal `true`">
+        Ground the implementation *before* modifying any artifact:
+
+        <expand name="ground"
+            arg1="the task plan in <task-content/>"
+            arg2="<work-dir/>"
+            arg3="WHAT HOW WHEN"></expand>
+        </if>
 
         <if condition="<task-kind/> is `SPECIFYING`, or the task plan otherwise creates, revises, or removes statements of `SPEC` artifacts">
         <expand name="task-spec-format"/>

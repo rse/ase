@@ -111,11 +111,15 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
 
 -   `--ground`|`-G`:
     Ground the grilling in facts instead of the world knowledge of the
-    model alone: once before the first round, the artifacts of all kinds
-    (`SPEC`, `CODE`, `DOCS`, `INFR`, and `OTHR`) are scanned for
-    the project facts relevant to the grilled subject (from the given
-    perspective, if any) and the Internet/Web is searched for the
+    model alone: once before the first round, each dimension of the
+    sections under `--focus` -- `WHAT` (`SPECIFICATION`), `HOW`
+    (`DESIGN`), and `WHEN` (`VERIFICATION`) -- is grounded in parallel.
+    Its artifacts (`SPEC` and `DOCS` for `WHAT`, `CODE` and `INFR` for
+    `HOW`, and the test and CI files for `WHEN`) are scanned for the
+    project facts relevant to the plan, and the Internet/Web is searched
+    iteratively, with at most 5 searches per dimension, for the
     established practices, standards, patterns, and pitfalls about it.
+
     These facts serve all rounds, both for raising the questions and for
     preferably deriving their answer alternatives. The grounding is shown
     in the announcement line, like `GRILLING (security, grounded)`. If

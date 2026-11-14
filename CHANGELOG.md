@@ -5,6 +5,12 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   IMPROVEMENT [plugin]: Dimension-Wise Grounding Beyond Grilling
+    Grounding (`ase-common-ground.md`) now runs per dimension `WHAT`, `HOW`, `WHEN` in parallel
+    sub-agents (local artifacts, plus at most 5 iterative web searches), and the new option
+    `--ground` (formerly `--grill-ground`) grounds the entire `ase-code-edit`, `ase-spec-edit`, and
+    `ase-task-implement` operation, not only the grilling.
+
 -   NEW FEATURE [plugin, docs]: Answer Details in Grilling Tables
     The grilling skills optionally pass a 1-2 sentence detail per answer to the new mod tool
     `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled

@@ -13,7 +13,7 @@
     [`--grill-rounds`|`-r` *n*]
     [`--grill-until`|`-u` `MUST`|`SHOULD`|`MAY`]
     [`--grill-perspective`|`-p` *perspective*]
-    [`--grill-ground`|`-G`]
+    [`--ground`|`-G`]
     [`--verify`|`-v` `light`|`none`|`full`]
     [`--worktree`|`-w` *name*[`:`*branch*]]
     [`--loop`|`-l`]
@@ -119,18 +119,23 @@ information.
     is shown in the announcement line, like `GRILLING (security)`.
     Without a perspective, the grilling is holistic. Only effective together with `--grill`.
 
--   `--grill-ground`|`-G`:
-    Ground the grilling in facts instead of the world knowledge of the
-    model alone: once before the first round, the artifacts of all kinds
-    (`SPEC`, `CODE`, `DOCS`, `INFR`, and `OTHR`) are scanned for
-    the project facts relevant to the grilled subject (from the given
-    perspective, if any) and the Internet/Web is searched for the
+-   `--ground`|`-G`:
+    Ground the edit in facts instead of the world knowledge of the
+    model alone: once after discovering, each dimension -- `WHAT` (the
+    requirements), `HOW` (the realization), and `WHEN` (the
+    verification, skipped under `--verify none`) -- is grounded in
+    parallel. Its artifacts (`SPEC` and `DOCS` for `WHAT`, `CODE` and
+    `INFR` for `HOW`, and the test and CI files for `WHEN`) are scanned
+    for the project facts relevant to the query, and the Internet/Web is
+    searched iteratively, with at most 5 searches per dimension, for the
     established practices, standards, patterns, and pitfalls about it.
-    These facts serve all rounds, both for raising the questions and for
-    preferably deriving their answer alternatives. The grounding is shown
-    in the announcement line, like `GRILLING (security, grounded)`. If
-    no usable facts are found, a warning is shown and the grilling falls
-    back to model knowledge. Only effective together with `--grill`.
+
+    These facts serve all subsequent states: under `--grill` all rounds,
+    both for raising the questions and for preferably deriving their
+    answer alternatives (shown in the announcement line, like
+    `GRILLING (security, grounded)`), as well as the implementing and
+    verifying. If no usable facts are found, a warning is shown and the
+    edit falls back to model knowledge.
 
 -   `--verify`|`-v` `light`|`none`|`full`:
     Verify whether the implementation fulfills the requirements, and

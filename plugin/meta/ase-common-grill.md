@@ -5,9 +5,13 @@ Grill Skill Common Steps
 <define name="grill-understanding">
 
 Set <grill-perspective><arg2/></grill-perspective> (with any leading
-and trailing whitespace stripped), set <grill-ground><arg3/></grill-ground>,
-and set <grill-facts></grill-facts> (empty). Set <grill-label/> to
-` (<grill-perspective/>, grounded)` if <grill-perspective/> is not empty
+and trailing whitespace stripped), and set
+<grill-ground><arg3/></grill-ground>, which is `true` if the grounding
+facts <ground-facts/> of the `ground` definition (see
+`ase-common-ground.md`) were gathered before. These facts -- unlike all
+other information gathered by a round -- are *exempt* from the
+forgetting at the start of every round and hence serve *all* rounds.
+Set <grill-label/> to ` (<grill-perspective/>, grounded)` if <grill-perspective/> is not empty
 and <grill-ground/> is `true`, to ` (<grill-perspective/>)` if only
 <grill-perspective/> is not empty, to ` (grounded)` if only
 <grill-ground/> is `true`, or to empty otherwise. Do not output
@@ -141,82 +145,6 @@ anything.
 
 </define>
 
-<define name="grill-ground">
-
-Ground the grilling *once*, before its first round, where <arg1/> is
-the grilled subject and <arg2/> is the directory of the working copy
-the local artifacts are read from (or empty for the project working
-copy). It sets <grill-facts/> to the grounding facts, which -- unlike
-all other information gathered by a round -- are *exempt* from the
-forgetting at the start of every round and hence serve *all* rounds.
-Do not output anything, except for the warning below.
-
-<if condition="<grill-ground/> is equal `true`">
-
-1.  LOCAL GROUNDING:
-
-    Resolve the artifact kinds `spec`, `code`, `docs`, `infr`, and
-    `othr` to their project-relative file lists:
-
-    <if condition="<arg2/> is not empty">
-    Run the command `ase artifact list` *once* with <arg2/> as its
-    working directory and parse its `# <kind/>:` and `- <file/>` output
-    lines into the file lists -- the `ase_artifact_list` tool always
-    resolves against the *project* working copy and hence *MUST* *NOT*
-    be used here.
-    </if>
-    <else>
-    Call the `ase_artifact_list(kind: [ "spec", "code", "docs", "infr",
-    "othr" ])` tool of the `ase` MCP server *once* and read the returned
-    `artifacts` array of `{ kind, files }` objects into the file lists.
-    </else>
-
-    From these file lists, determine the files (or their parts) which
-    are relevant for <arg1/>
-    <if condition="<grill-perspective/> is not empty">
-    when viewed from the perspective <grill-perspective/>
-    </if>
-    -- across *all* artifact kinds, not only the grilled subject itself
-    -- and *read* them. Condense their relevant *project facts* --
-    existing decisions, conventions, constraints, and terminology --
-    each with its project-relative file path, into <grill-facts/>.
-
-2.  WEB GROUNDING:
-
-    Use the `ase-meta-search` skill in a sub-agent to gather *world
-    facts* -- established practices, standards, patterns, and pitfalls
-    -- with the following tool call, where <topic/> is a concise,
-    self-contained summary of <arg1/>
-    <if condition="<grill-perspective/> is not empty">
-    from the perspective <grill-perspective/>
-    </if>
-    which mentions *no* confidential project internals:
-
-    `Agent(
-        description: "Query Web Search Service",
-        subagent_type: "ase:ase-meta-search",
-        prompt: "Search the Internet/Web and gather established maxims, principles, tenets, practices, standards, definitions, patterns, and pitfalls about the following topic: <topic/>",
-        run_in_background: false
-    )`
-
-    Condense the returned relevant facts, each with its source, and
-    append them to <grill-facts/>.
-
-3.  <if condition="<grill-facts/> contains no usable facts">
-
-    Set <grill-facts></grill-facts> (empty), so the grilling falls back
-    to model knowledge, and output the following <template/>:
-
-    <template>
-    <ase-tpl-bullet-secondary/> **WARNING**: grounding found no usable facts -- falling back to model knowledge.
-    </template>
-
-    </if>
-
-</if>
-
-</define>
-
 <define name="grill-stop">
 
 The requested number of grilling rounds is a *maximum* only: the
@@ -262,9 +190,9 @@ questions:
     <grill-perspective/>
     </if>.
 
-    <if condition="<grill-facts/> is not empty">
+    <if condition="<ground-facts/> is not empty">
     Derive the open points primarily from the grounding facts in
-    <grill-facts/> instead of from your world knowledge alone: raise
+    <ground-facts/> instead of from your world knowledge alone: raise
     the decisions these facts reveal as open -- like a project
     convention the subject deviates from, or an established practice
     or pitfall the subject does not address yet.
@@ -332,8 +260,8 @@ questions:
 4.  DETERMINE ANSWERS:
 
     For all remaining <question-N/>, check <arg4/> and
-    <if condition="<grill-facts/> is not empty">
-    the grounding facts in <grill-facts/> -- preferring them over
+    <if condition="<ground-facts/> is not empty">
+    the grounding facts in <ground-facts/> -- preferring them over
     your world knowledge, which only fills their gaps --
     </if>
     <else>

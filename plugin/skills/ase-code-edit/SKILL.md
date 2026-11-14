@@ -1,6 +1,6 @@
 ---
 name: ase-code-edit
-argument-hint: "[--help|-h] [--mode|-m auto|craft|refactor|resolve] [--approach|-a] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--grill-ground|-G] [--verify|-v light|none|full] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>|<issue-id>]"
+argument-hint: "[--help|-h] [--mode|-m auto|craft|refactor|resolve] [--approach|-a] [--grill|-g] [--grill-rounds|-r <n>] [--grill-until|-u MUST|SHOULD|MAY] [--grill-perspective|-p <perspective>] [--ground|-G] [--verify|-v light|none|full] [--worktree|-w <name>[:<branch>]] [--loop|-l] [<query>|<issue-id>]"
 description: >
     Edit Source Code: Use when the user wants to "edit" the code base in
     one shot from a query or a bare analyzer issue id like "P1", fusing
@@ -22,7 +22,7 @@ Edit Source Code
 
 <expand name="getopt"
     arg1="ase-code-edit"
-    arg2="--mode|-m=(auto|craft|refactor|resolve) --approach|-a --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --grill-ground|-G --verify|-v=(light|none|full) --worktree|-w= --loop|-l">
+    arg2="--mode|-m=(auto|craft|refactor|resolve) --approach|-a --grill|-g --grill-rounds|-r=1 --grill-until|-u=(MUST|SHOULD|MAY) --grill-perspective|-p= --ground|-G --verify|-v=(light|none|full) --worktree|-w= --loop|-l">
     $ARGUMENTS
 </expand>
 
@@ -33,6 +33,7 @@ resolving in one shot -- through the states *querying*, *discovering*,
 </objective>
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-grill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-changeset.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-approach.md
@@ -193,6 +194,20 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         existing code base to understand the overall structures and
         dynamics. Do not output anything.
 
+    4.  <if condition="<getopt-option-ground/> is equal `true`">
+
+        Ground the edit, where <dimensions/> is `WHAT HOW WHEN` if
+        <getopt-option-verify/> is not equal `none`, or `WHAT HOW`
+        otherwise, as under `--verify none` no verification takes
+        place:
+
+        <expand name="ground"
+            arg1="the edit query in <todo-what/> and <todo-how/>"
+            arg2="<worktree-dir/>"
+            arg3="<dimensions/>"></expand>
+
+        </if>
+
 5.  **State: grilling:**
 
     Enter this state only if <getopt-option-grill/> is equal `true`;
@@ -204,15 +219,9 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         <expand name="grill-understanding"
             arg1="the edit query in <todo-what/> and <todo-how/>"
             arg2="<getopt-option-grill-perspective/>"
-            arg3="<getopt-option-grill-ground/>"></expand>
+            arg3="<getopt-option-ground/>"></expand>
 
-    2.  Ground the grilling:
-
-        <expand name="grill-ground"
-            arg1="the edit query in <todo-what/> and <todo-how/>"
-            arg2="<worktree-dir/>"></expand>
-
-    3.  Perform *at most* <getopt-option-grill-rounds/> grilling
+    2.  Perform *at most* <getopt-option-grill-rounds/> grilling
         *rounds*, numbered <m/> (1-<getopt-option-grill-rounds/>) --
         the round count is a *maximum* only, as every round can
         *stop* the grilling *early* in its item 2 below.
@@ -224,7 +233,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
             Explicitly start *from scratch* from *only* the current
             <todo-what/> and <todo-how/> and *forget* all information
             gathered in previous rounds -- except the grounding facts
-            <grill-facts/>. Set <round-id/> to
+            <ground-facts/>. Set <round-id/> to
             `GRILLING ROUND <m/>/<getopt-option-grill-rounds/>` if
             <getopt-option-grill-rounds/> is greater than 1, or to
             `GRILLING` otherwise (a single round needs no round

@@ -14,6 +14,7 @@
     [`--draft`|`-d`]
     [`--no-cleanup`|`-K`]
     [`--stateless`|`-S`]
+    [`--ground`|`-G`]
     [*id*]
 
 ##  DESCRIPTION
@@ -173,6 +174,19 @@ plan, unless `--next` pre-selects this choice.
 
 -   `--stateless`|`-S`:
     Leave the plan's `Status:` key untouched.
+
+-   `--ground`|`-G`:
+    Ground the implementation in facts instead of the world knowledge
+    of the model alone: before any artifact is modified, each dimension
+    -- `WHAT` (the requirements), `HOW` (the realization), and `WHEN`
+    (the verification) -- is grounded in parallel. Its artifacts
+    (`SPEC` and `DOCS` for `WHAT`, `CODE` and `INFR` for `HOW`, and the
+    test and CI files for `WHEN`) are scanned for the project facts
+    relevant to the plan, and the Internet/Web is searched iteratively,
+    with at most 5 searches per dimension, for the established
+    practices, standards, patterns, and pitfalls about it. If no usable
+    facts are found, a warning is shown and the implementation falls
+    back to model knowledge.
 
 ##  ARGUMENTS
 

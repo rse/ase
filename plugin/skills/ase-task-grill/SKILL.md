@@ -33,6 +33,7 @@ task plan until reaching a shared understanding.
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-grill.md
 
 Procedure
@@ -133,11 +134,16 @@ Set <args>--int-reuse-task</args>.
             arg2="<getopt-option-perspective/>"
             arg3="<getopt-option-ground/>"></expand>
 
-        Ground the grilling:
+        <if condition="<getopt-option-ground/> is equal `true`">
+        Ground the grilling, where <dimensions/> lists, in the order of
+        <sections/>, `WHAT` for `SPECIFICATION`, `HOW` for `DESIGN`, and
+        `WHEN` for `VERIFICATION`:
 
-        <expand name="grill-ground"
+        <expand name="ground"
             arg1="the task plan in <task-content/>"
-            arg2=""></expand>
+            arg2=""
+            arg3="<dimensions/>"></expand>
+        </if>
 
     2.  <if condition="the frontmatter of <task-content/> carries a `Created: <text/>` key">
         Set <timestamp-created><text/></timestamp-created> (set
@@ -156,7 +162,7 @@ Set <args>--int-reuse-task</args>.
             Explicitly start *from scratch* from *only* the *current*
             <task-content/> -- as updated by all previous rounds -- and
             *forget* all questions and answers gathered in previous
-            rounds -- except the grounding facts <grill-facts/>. Set
+            rounds -- except the grounding facts <ground-facts/>. Set
             <round-id/> to
             `GRILLING ROUND <m/>/<getopt-option-rounds/>` if
             <getopt-option-rounds/> is greater than 1, or to
