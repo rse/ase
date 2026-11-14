@@ -445,11 +445,12 @@ Procedure
             If <merge-verdict/> is `MERGED`, set the `Status:` key to
             `CLOSED` for the `solo` model (traversing the transition from
             `OPEN`) or to `INTEGRATED` for the `enterprise` model (if it
-            was set to `INTEGRATING` in step 1 above). Otherwise, keep
-            the `Status:` key for the `solo` model (`OPEN`), and set it
-            to `QUALIFIED` (for <merge-verdict/> `NOOP`) or `DEFERRED`
-            (otherwise) for the `enterprise` model (if it was set to
-            `INTEGRATING` in step 1 above). The `team` model defines no
+            is `INTEGRATING`, set in step 1 above, or already before by
+            the agent which claimed the task). Otherwise, keep the
+            `Status:` key for the `solo` model (`OPEN`), and set it to
+            `QUALIFIED` (for <merge-verdict/> `NOOP`) or `DEFERRED`
+            (otherwise) for the `enterprise` model (if it is
+            `INTEGRATING`, as above). The `team` model defines no
             integration states, so its `Status:` key stays *untouched*.
             </if>
 
