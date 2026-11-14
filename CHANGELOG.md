@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [plugin, code]: Plan Diff after Grilling
+    The new option `--diff|-d` of `ase-task-grill` shows, before the next-step dialog, the cumulative
+    change of the plan body by all rounds as a unified diff (e.g. to review `--auto` answers),
+    computed deterministically by the new MCP tool `ase_text_diff`.
+
 -   IMPROVEMENT [plugin]: Highlighted Grilling Markers
     The function hooks module now renders the `★` (recommendation) and `⚑` (current decision)
     markers in the grilling tables and the texts of their hover cards in red resp. blue.

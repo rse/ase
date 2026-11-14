@@ -1,6 +1,6 @@
 ---
 name: ase-task-grill
-argument-hint: "[--help|-h] [--rounds|-r <n>] [--until|-u MUST|SHOULD|MAY] [--perspective|-p <perspective>] [--ground|-G] [--auto|-a] [--focus|-f <section>[,...]] [--force|-F] [--quiet|-q] [--next|-n <option>[,...]] [<id>]"
+argument-hint: "[--help|-h] [--rounds|-r <n>] [--until|-u MUST|SHOULD|MAY] [--perspective|-p <perspective>] [--ground|-G] [--auto|-a] [--focus|-f <section>[,...]] [--force|-F] [--quiet|-q] [--diff|-d] [--next|-n <option>[,...]] [<id>]"
 description: >
     Interview the user relentlessly about the task plan until reaching a
     shared understanding, resolving each branch of the question decision
@@ -22,7 +22,7 @@ Iteratively Grill a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-grill"
-    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --auto|-a --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --force|-F --quiet|-q --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task --int-interactive">
+    arg2="--rounds|-r=1 --until|-u=(MUST|SHOULD|MAY) --perspective|-p= --ground|-G --auto|-a --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --force|-F --quiet|-q --diff|-d --next|-n=(none|DONE|GRILL|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task --int-interactive">
     $ARGUMENTS
 </expand>
 
@@ -86,6 +86,15 @@ Set <args>--int-reuse-task</args>.
         Complain and tell the user to use the `ase-task-edit` skill
         first to create a task plan. Then immediately stop processing
         this skill.
+        </if>
+
+        <if condition="<getopt-option-diff/> is equal `true`">
+        Set <body-before/> to the *body* of <task-content/>: its lines
+        from the `#   TASK:` title line up to, but excluding, the `---`
+        line opening its first backmatter block (or up to its end, if it
+        has none), i.e., without its frontmatter and backmatter. This
+        remembers the plan *before* all rounds for step 4. Do not output
+        anything.
         </if>
 
     3.  Determine the *grilling scope* of each section in <sections/>,
@@ -334,7 +343,39 @@ Set <args>--int-reuse-task</args>.
             </template>
             </if>
 
-4.  **Decide Next Step:**
+4.  **Show Plan Diff:**
+
+    <if condition="<getopt-option-diff/> is equal `true`">
+    Set <body-after/> to the *body* of the current <task-content/> -- as
+    saved by the last round, or unchanged if no round saved it --
+    determined exactly like <body-before/> in step 2.2. Call the
+    `ase_text_diff(before: "<body-before/>", after: "<body-after/>",
+    label: "<ase-task-id/>")` tool of the `ase` MCP server and set
+    <diff/> to the `text` output field of this tool call. You *MUST*
+    *NEVER* compose the diff yourself.
+
+    If <diff/> is empty, set <diff-block>(none)</diff-block>. Otherwise,
+    set <diff-block/> to <diff/>, emitted *verbatim*, inside a fenced
+    code block with the info string `diff`, whose fence is one backtick
+    longer than the longest backtick run within <diff/> (and at least
+    three backticks long).
+
+    Then only output the following <template/>, which shows the
+    cumulative change of all rounds -- *independent* of
+    <getopt-option-quiet/> and of <ase-project-boxing/>, whose exposure
+    rules are explicitly *overridden* here, as the user explicitly
+    requested the diff:
+
+    <template>
+    <ase-tpl-head title="PLAN DIFF" subtitle="after grilling"/>
+
+    <diff-block/>
+
+    <ase-tpl-foot title="PLAN DIFF" subtitle="after grilling"/>
+    </template>
+    </if>
+
+5.  **Decide Next Step:**
 
     1.  *Determine next step*:
 
@@ -374,6 +415,9 @@ Set <args>--int-reuse-task</args>.
             </if>
             <if condition="<getopt-option-quiet/> is `true`">
                 Set <args><args/> --quiet</args>.
+            </if>
+            <if condition="<getopt-option-diff/> is `true`">
+                Set <args><args/> --diff</args>.
             </if>
             <if condition="<getopt-option-int-interactive/> is `true`">
                 Set <args><args/> --int-interactive</args>.

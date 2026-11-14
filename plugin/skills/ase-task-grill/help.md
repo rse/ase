@@ -15,6 +15,7 @@
     [`--focus`|`-f` *section*[,...]]
     [`--force`|`-F`]
     [`--quiet`|`-q`]
+    [`--diff`|`-d`]
     [`--next`|`-n` *option*[,...]]
     [*id*]
 
@@ -162,6 +163,17 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
     re-grilling and on a hand-off to `ase-task-edit`, but not on a
     hand-off to another skill.
 
+-   `--diff`|`-d`:
+    Show how the grilling actually changed the plan: once after all
+    rounds, right before the next-step dialog, a `PLAN DIFF` box shows
+    the cumulative change of the plan body (title and sections, without
+    frontmatter and attachments) between the plan as loaded at the start
+    and the final plan as a unified diff, or `(none)` if nothing
+    changed. This is especially useful together with `--auto`, to review
+    the auto-chosen answers. The diff is always shown in full, also
+    together with `--quiet`, and not when the dialog is cancelled. It
+    is forwarded on a re-grilling.
+
 -   `--next`|`-n` *option*[,...]:
     Automatically answer the user dialog for the next step (at the end
     of this skill). *option* is a single token or a *comma-separated
@@ -228,6 +240,13 @@ answers:
 
 ```text
 ❯ /ase-task-grill --auto
+```
+
+Grill the current task plan with automatically chosen recommended
+answers and review the resulting plan changes as a unified diff:
+
+```text
+❯ /ase-task-grill --auto --diff
 ```
 
 Re-grill the already grilled current task plan completely:
