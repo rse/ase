@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   IMPROVEMENT [plugin, docs]: Approach Selection as Grilling Round
+    `--approach` of `ase-code-edit`, `ase-spec-edit`, and `ase-task-edit` now runs an approach round of
+    grilling (1-4 approach questions, never finished early): standalone `GRILLING (approach)`, or with
+    `--grill` the `GRILLING ROUND 0/L (approach)` before the regular rounds. Also fixed `-a` in README.
+
 -   NEW FEATURE [plugin]: Automatic Grilling
     The new options `--grill-auto|-a` of `ase-code-edit` and `ase-spec-edit` (implying `--grill`) and
     `--auto|-a` of `ase-task-grill` pick every `★` answer instead of asking, leaving questions without a

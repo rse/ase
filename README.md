@@ -90,7 +90,7 @@ see whether **ASE** is right for you:
   Plan Mode is too unstructured and too direct because you want to
   leverage a funnel of alternative approaches first?
   &rarr; [`/ase-task-edit`](plugin/skills/ase-task-edit/help.md)
-  `-a hello: "ase hello" CLI command which prints a nice "Hello World" in red`
+  `-A hello: "ase hello" CLI command which prints a nice "Hello World" in red`
 
 - **Named and Persisted Plans**:
   You prefer a plan-driven approach, but the agent harness's Plan Mode is
@@ -336,14 +336,14 @@ see whether **ASE** is right for you:
   funnel of candidate root causes and fix approaches instead of a direct,
   unstructured patch?
   &rarr; [`/ase-task-edit`](plugin/skills/ase-task-edit/help.md)
-  `-a -m resolve the CLI crashes on an empty config file`
+  `-A -m resolve the CLI crashes on an empty config file`
 
 - **Guided Refactoring**:
   You want the code base refactored through a structured funnel of
   alternative refactoring approaches, optionally captured as a named,
   persisted task plan?
   &rarr; [`/ase-task-edit`](plugin/skills/ase-task-edit/help.md)
-  `-a -m refactor extract the config loading into a dedicated module`
+  `-A -m refactor extract the config loading into a dedicated module`
 
 - **Plan-less Code Editing**:
   You want the code base edited directly from a query in one shot,

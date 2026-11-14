@@ -135,7 +135,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         domain-specific, non-implementation-detail information -- and
         <todo-how/> -- the remaining information -- discarding all
         <todo-what/>/<todo-how/> content of any previous iteration.
-        Without `--grill` you *MUST* *NOT* ask any clarifying questions
+        Without `--grill` or `--approach` you *MUST* *NOT* ask any clarifying questions
         and during later implementation just interpret the query best-effort.
         Do not output anything.
 
@@ -214,9 +214,9 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
 5.  **State: grilling:**
 
-    Enter this state only if <getopt-option-grill/> is equal `true`;
-    otherwise silently *skip* the entire state. Do not output anything
-    about the skipping.
+    Enter this state only if <getopt-option-grill/> or
+    <getopt-option-approach/> is equal `true`; otherwise silently *skip*
+    the entire state. Do not output anything about the skipping.
 
     1.  Understand what "grilling" is about:
 
@@ -225,7 +225,44 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
             arg2="<getopt-option-grill-perspective/>"
             arg3="<getopt-option-ground/>"></expand>
 
-    2.  Perform *at most* <getopt-option-grill-rounds/> grilling
+    2.  <if condition="<getopt-option-approach/> is equal `true`">
+
+        Perform the *approach round* -- the grilling *round 0* before
+        the regular rounds -- based on <todo-what/> and <todo-how/> plus
+        the information gathered in the *discovering* state. Set
+        <round-id/> to `GRILLING ROUND 0/<getopt-option-grill-rounds/>`
+        if <getopt-option-grill/> is equal `true`, or to `GRILLING`
+        otherwise. Do not output anything.
+
+        <expand name="approach-select"
+            arg1="specification"
+            arg2="✪ skill: **ase-spec-edit**"
+            arg3="<getopt-option-grill-auto/>"
+            arg4="file paths, artifact ids, object kinds, object ids, property keys, references, and literal values"
+            arg5="the specification"></expand>
+
+        If <approach-result/> is `STOP`, only output the following
+        <template/> and then immediately *STOP* processing the entire
+        current skill:
+
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-spec-edit**, ▶ status: **editing stopped**
+        </template>
+
+        Otherwise, merge <chosen-approach/> *exclusively* into <todo-how/>,
+        where the chosen approach overrides any conflicting
+        implementation detail, and expand the following:
+
+        <expand name="todo-box" arg1="current state (after approaching)"></expand>
+
+        If <approach-result/> is `SKIP`, skip all regular rounds below
+        and continue with the *implementing* state.
+
+        </if>
+
+    3.  <if condition="<getopt-option-grill/> is equal `true`">
+
+        Perform *at most* <getopt-option-grill-rounds/> grilling
         *rounds*, numbered <m/> (1-<getopt-option-grill-rounds/>) --
         the round count is a *maximum* only, as every round can
         *stop* the grilling *early* in its item 2 below.
@@ -239,9 +276,10 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
             gathered in previous rounds -- except the grounding facts
             <ground-facts/>. Set <round-id/> to
             `GRILLING ROUND <m/>/<getopt-option-grill-rounds/>` if
-            <getopt-option-grill-rounds/> is greater than 1, or to
-            `GRILLING` otherwise (a single round needs no round
-            numbering). Do not output anything.
+            <getopt-option-grill-rounds/> is greater than 1 or
+            <getopt-option-approach/> is equal `true`, or to `GRILLING`
+            otherwise (a single round without an approach round needs
+            no round numbering). Do not output anything.
 
         2.  DETERMINE QUESTIONS:
 
@@ -330,12 +368,15 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
             Set <round-suffix/> to
             ` round <m/>/<getopt-option-grill-rounds/>` if
-            <getopt-option-grill-rounds/> is greater than 1, or to
-            empty otherwise, and expand the following -- this
-            intentionally closes *every* round, so the intermediate
+            <getopt-option-grill-rounds/> is greater than 1 or
+            <getopt-option-approach/> is equal `true`, or to empty
+            otherwise, and expand the following -- this intentionally
+            closes *every* round, so the intermediate
             <todo-what/>/<todo-how/> states stay visible:
 
             <expand name="todo-box" arg1="current state (after grilling<round-suffix/>)"></expand>
+
+        </if>
 
 6.  **State: implementing:**
 
@@ -345,36 +386,11 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         the following creation and updating of specification content. Do
         not output anything.
 
-    2.  <if condition="<getopt-option-approach/> is equal `true`">
-
-        Determine the overall approach of the edit, based on
-        <todo-what/> and <todo-how/> plus the information gathered in
-        the *discovering* state:
-
-        <expand name="approach-select"
-            arg1="specification"
-            arg2="✪ skill: **ase-spec-edit**"></expand>
-
-        If <chosen-approach/> is empty, only output the following <template/>
-        and then immediately *STOP* processing the entire current skill:
-
-        <template>
-        ⧉ **ASE**: ✪ skill: **ase-spec-edit**, ▶ status: **editing stopped**
-        </template>
-
-        Otherwise, merge <chosen-approach/> *exclusively* into <todo-how/>,
-        where the chosen approach overrides any conflicting
-        implementation detail, and expand the following:
-
-        <expand name="todo-box" arg1="current state (after approaching)"></expand>
-
-        </if>
-
-    3.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
+    2.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP server *once* to find out the current time and store
         it in <timestamp-modified/>. Do not output anything.
 
-    4.  Apply the edit by modifying the affected `SPEC` *artifacts* with
+    3.  Apply the edit by modifying the affected `SPEC` *artifacts* with
         a corresponding, complete *change set*, honoring *only*
         <todo-what/> and <todo-how/> plus the information gathered in
         the *discovering* state.
@@ -401,7 +417,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         <expand name="changeset-land" arg1="<worktree-dir/>"></expand>
         </if>
 
-    5.  Output only the following <template/>. You *MUST* *NOT* output a
+    4.  Output only the following <template/>. You *MUST* *NOT* output a
         change summary, a list of modified artifacts, a rationale, or a
         unified diff of the changes -- *independent* of
         <ase-project-boxing/>, whose exposure rules are explicitly

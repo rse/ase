@@ -4,114 +4,92 @@ Approach Skill Common Steps
 
 <define name="approach-select">
 
-Determine, compare, and select the overall *<arg1/> approach*, where
-<arg2/> is the identification prefix of the status line of the
-automatic choice (like `◉ task: **<ase-task-id/>**`).
+Perform the *approach round* -- a special grilling round whose questions
+target *exclusively* the overall *<arg1/> approach* -- where <arg2/> is
+the skill chrome of the status lines, <arg3/> is `true` if the answers
+are chosen automatically on request (like via `--grill-auto`), or
+`false` otherwise, <arg4/> is the list of *literal aspects*, and <arg5/>
+is the source of the grounded answer alternatives. It requires the
+preceding expansion of the `grill-understanding` definition (see
+`ase-common-grill.md`) and the <round-id/> set by the caller. It sets
+<approach-result/> to `DONE` (approach decided), `SKIP` (all grilling
+skipped), or `STOP` (skill stopped), and <chosen-approach/> to the
+decided approach. Do not output anything, except for the templates
+below.
 
-Set <approach-label><arg1/></approach-label> and
-<approach-status><arg2/></approach-status>, so both stay available
-inside the nested expansions below, which bind their own arguments.
-Set <approach-auto>true</approach-auto> if <ase-project-boxing/> is
-equal `black` or <ase-headless/> is equal `true`, else set
-<approach-auto>false</approach-auto>. Set
-<chosen-approach></chosen-approach> (empty). Do not output anything.
+1.  Set <approach-label><arg1/></approach-label>,
+    <approach-status><arg2/></approach-status>,
+    <approach-aspects><arg4/></approach-aspects>, and
+    <approach-source><arg5/></approach-source>, so all stay available
+    inside the nested expansions below, which bind their own arguments.
+    Set <chosen-approach></chosen-approach> (empty) and
+    <approach-result>DONE</approach-result>. Set
+    <approach-auto>true</approach-auto> if <arg3/> is `true`,
+    <ase-project-boxing/> is equal `black`, or <ase-headless/> is equal
+    `true`, else set <approach-auto>false</approach-auto>. Set
+    <approach-grill-label/> to <grill-label/> and set <grill-label/> to
+    ` (approach)` if <approach-grill-label/> is empty, or to
+    <approach-grill-label/> with its leading ` (` replaced by
+    ` (approach, ` otherwise. Do not output anything.
 
-You *MUST* perform the following sub-steps *internally* and *without
-any output* until and including the recommendation decision. In
-particular, you *MUST* *NEVER* output any placeholder, tag, or marker
-(like `<xxx/>`) on your own, as all placeholders above and below are
-internal state only. Only
-sub-steps 4-8 below are allowed to produce output; sub-steps 4-6 only if
-<approach-auto/> is equal `false`.
+2.  Determine and show the questions of the approach round:
 
-If <approach-auto/> is equal `true`, *skip* the reporting sub-steps 4-6
-entirely (they perform no output at all) to speed up processing.
-
-1.  *Propose* a corresponding *<arg1/> approach*, optionally including
-    some *alternative* <arg1/> approaches. Do *not* output anything
-    in this sub-step.
-
-2.  *Reflect* on and *critique* the proposed approaches by deriving,
-    per approach, a small set of concrete *pros* and *cons*. Do
-    *not* output anything in this sub-step.
-
-3.  Based on the reflection, *decide* which approach to recommend
-    and annotate it with an <annotation/> of
-    ` ⚝ **RECOMMENDATION** ⚝`. All other approaches receive an
-    empty <annotation/>. Do *not* output anything in this sub-step.
-
-4.  Indicate start of reporting by showing the following <template/>,
-    which *MUST* be the very first output of this definition -- output
-    nothing at all before it:
-
-    <template>
-    <ase-tpl-head title="APPROACHES"/>
-    </template>
-
-5.  Now report each approach with the following <template/>,
-    inlining its pros/cons derived in sub-step 2, and do not output
-    anything else in this step:
-
-    <template>
-    ●   **APPROACH A<n/>**<annotation/>: **<summary/>**
-    ○   [...]
-    ⊕   *PRO*: [...]
-    ⊖   *CON*: [...]
-    </template>
-
-    Hints:
-
-    -   Give a short one-sentence <summary/> of the <arg1/> approach
-        plus *precise* and *ultra brief and concise* <arg1/>
-        information. Try to keep the number of bullet points
-        (`○ [...]`) in the range of 1-4.
-
-6.  Indicate end of reporting by showing the following <template/>:
-
-    <template>
-    <ase-tpl-foot title="APPROACHES"/>
-    </template>
-
-7.  <if condition="<approach-auto/> is equal `false`">
-
-    In the following, you *MUST* *NOT* use your built-in
-    <user-dialog-tool/> tool! Instead, you *MUST* just show a
-    custom dialog according to the expanded `custom-dialog`
-    definition. You *MUST* closely follow this definition.
-
-    Let the user choose the preferred approach A<n/> by raising
-    a question with the following custom dialog, where per
-    approach A<n/>, you determine an ultra brief summary
-    <short-summary/> and then use the answer option `A<n/>:
-    ⚝ **RECOMMENDATION** ⚝ - <short-summary/>` for your
-    recommended approach plus zero or more answer options `A<n/>:
-    <short-summary/>` for all other approaches:
-
-    <expand name="custom-dialog" arg1="--no-other">
-        Select Approach: Select your preferred <approach-label/> approach to follow?
-        A<n/>: <short-summary/>
-        [...]
+    <expand name="grill-questions"
+        arg1="MAY"
+        arg2="<approach-status/>"
+        arg3="<approach-aspects/>"
+        arg4="<approach-source/>"
+        arg5="">
+        Override the *Focus Areas* to raise *exclusively* questions on
+        the overall *<approach-label/> approach* -- its strategy, its shape, and
+        its fundamental realization decisions -- and *no* questions on
+        any other detail, which the regular grilling rounds or the
+        implementation decide. Raise *one to four* questions: usually
+        just *one*, and more only for *independent* approach decisions,
+        but *always* at least one, as this round is *never* finished
+        early. The answer alternatives of a question are the competing
+        approaches for its decision, distinct in their strategy or
+        trade-off, and the detail of every answer carries its pros and
+        cons.
     </expand>
 
-    If <result/> is `CANCEL`, keep <chosen-approach/> empty and *skip*
-    sub-step 8. Otherwise, set <n/> to the number of the approach
-    A<n/> selected by <result/>.
+    Then restore <grill-label/> to <approach-grill-label/>. Do not
+    output anything.
 
+3.  <if condition="<approach-auto/> is equal `true`">
+    Answer the questions without any dialog:
+
+    <expand name="grill-auto" arg1="<approach-status/>"></expand>
     </if>
     <else>
+    In the following, you *MUST* *NOT* use your built-in
+    <user-dialog-tool/> tool! Instead, you *MUST* just show a custom
+    dialog according to the expanded `custom-dialog` definition. You
+    *MUST* closely follow this definition. Its only answer options are
+    the two fixed ones, so the user normally answers all aspects in
+    *one* free-text reply:
 
-    Set <n/> to the number of the <approach-label/> approach A<n/> you recommend.
-    Output a hint with the following <template/>:
+    <expand name="custom-dialog" arg1="--other">
+        <round-id/>: What is your (combined) answer to all (or a subset) of the above questions? (keywords or `nX` short responses are sufficient)
+        SKIP GRILLING: skip all remaining grilling and continue
+        STOP SKILL: stop the entire skill immediately
+    </expand>
 
-    <template>
-    ⧉ **ASE**: <approach-status/>, ▶ status: **auto-chosen approach A<n/>**
-    </template>
-
+    If <result/> is `STOP SKILL`, set <approach-result>STOP</approach-result>
+    and *skip* sub-step 4. If <result/> is `SKIP GRILLING` or `CANCEL`, set
+    <approach-result>SKIP</approach-result> and *skip* sub-step 4.
+    Otherwise, strip any leading `OTHER: ` prefix from <result/>.
     </else>
 
-8.  Set <chosen-approach/> to the complete description of the chosen approach
-    A<n/>: its summary, its details, and all realization decisions it
-    implies. Do not output anything in this sub-step.
+4.  Treat <result/> as the combined free-text answers to all questions
+    of the approach round:
+
+    <expand name="grill-short-responses"></expand>
+
+    Set <chosen-approach/> to the complete description of every decided
+    approach: its summary, its details, and all realization decisions it
+    implies. A question the answers leave open stays undecided. Do not
+    output anything.
 
 </define>
 

@@ -37,10 +37,10 @@ change* (stored in the `Kind:` key of the plan) and internalizes the
 corresponding tenets (for example KISS, YAGNI, and DRY for crafting,
 or Surgical Changes and Origin Proximity for resolving). For a
 resolution, it first reports the `PROBLEM CONTEXT` and `PROBLEM
-DETAILS`. Under `--approach`, it then proposes one or more *approaches*
-with pros and cons, recommends one of them, and lets the user pick the
-preferred one via an interactive dialog, and the new plan is then
-composed along the chosen approach.
+DETAILS`. Under `--approach`, it then decides the overall *approach* in
+an approach round of grilling, which raises 1-4 questions with the
+competing approaches as answer alternatives, and the new plan is then
+composed along the decided approach.
 
 If the current task is `default` and a new plan is generated from an
 *instruction*, a new task id is allocated from the instruction
@@ -82,12 +82,18 @@ stale draft.
     plan as it is and honors its tenets.
 
 -   `--approach`|`-A`:
-    Before a new plan is composed, propose one or more crafting,
-    refactoring, resolution, or specification approaches with pros and
-    cons, recommend one of them, and let the user pick the preferred one
-    via an interactive dialog (or, under the `black` project boxing or
-    in headless mode, automatically pick the recommended one). The new
-    plan is then composed along the chosen approach. Without
+    Before a new plan is composed, decide the overall crafting,
+    refactoring, resolution, or specification approach in a special
+    *approach round* of grilling, announced as `GRILLING (approach)`:
+    like a round of `ase-task-grill`, it shows a `QUESTION`/`ANSWERS`
+    table, but raises only 1-4 questions on the overall approach, with
+    the competing approaches as answer alternatives (their pros and
+    cons show up in the hover card), and asks for the combined answer
+    via an interactive dialog, whose fixed option `SKIP GRILLING`
+    composes the plan without an approach and `STOP SKILL` cancels the
+    plan generation (under the `black` project boxing or in headless
+    mode, the recommended answers are chosen automatically). The new
+    plan is then composed along the decided approach. Without
     `--approach`, no approaches are determined at all.
 
 -   `--unverified`|`-u`:

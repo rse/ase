@@ -35,12 +35,12 @@ interactive `Edit Query` dialog, and split it into its domain-specific
 WHAT and its implementation-detail HOW parts), *discovering* (resolve
 the `SPEC` artifacts, read the *SpecBook* schema configuration of the
 project, and read the specification artifacts related to the query),
-*grilling* (optionally stress-test the query with rounds of questions),
-*implementing* (optionally select an approach, then apply the change set
-in place, honoring the GENERIC and SPECIFYING tenets and the `SPEC`
-format contract), and *verifying* (validate the specification until it
-passes, unless disabled via `--verify none`). The *querying* state, every *grilling* round, and the
-approach selection close with an `EDIT TODO` box showing the established
+*grilling* (optionally decide the approach in an approach round and
+stress-test the query with rounds of questions), *implementing* (apply
+the change set in place, honoring the GENERIC and SPECIFYING tenets and
+the `SPEC` format contract), and *verifying* (validate the specification until it
+passes, unless disabled via `--verify none`). The *querying* state, the approach round, and
+every *grilling* round close with an `EDIT TODO` box showing the established
 `WHAT` and `HOW` information.
 
 The change set stays strictly restricted to the `SPEC` artifacts -- the
@@ -53,13 +53,19 @@ timestamp refreshed.
 ##  OPTIONS
 
 -   `--approach`|`-A`:
-    Before applying the change set, propose one or more specification
-    approaches with pros and cons, recommend one of them, and let the
-    user pick the preferred one via an interactive dialog (or, under the
-    `black` project boxing or in headless mode, automatically pick the
-    recommended one). The chosen approach is merged into the HOW part of
-    the query. Without `--approach`, no approaches are determined at
-    all.
+    Decide the overall specification approach in a special *approach
+    round* of grilling, which works like a regular `--grill` round, but
+    raises only 1-4 questions on the overall approach, with the
+    competing approaches as answer alternatives (their pros and cons
+    show up in the hover card), and is never finished early by
+    `--grill-until`. Alone, it is announced as `GRILLING (approach)`;
+    together with `--grill`, it is the round 0 before the regular
+    rounds, announced as `GRILLING ROUND 0/L (approach)`, followed by
+    `GRILLING ROUND 1/L` etc. Its answers are chosen automatically
+    under `--grill-auto`, the `black` project boxing, or in headless
+    mode, and `SKIP GRILLING` skips it together with all regular
+    rounds. The decided approach is merged into the HOW part of the
+    query. Without `--approach`, no approaches are determined at all.
 
 -   `--grill`|`-g`:
     Grill the query before implementing, similar to `ase-task-grill`:
@@ -218,8 +224,8 @@ Grill the query with two rounds first, then edit and fully validate:
 ❯ /ase-spec-edit -g -r 2 -v full split the Event entity into Event and EventSeries
 ```
 
-Let the user pick one of several specification approaches first, then
-edit:
+Let the user decide the specification approach in an approach round
+first, then edit:
 
 ```text
 ❯ /ase-spec-edit -A model the access permissions of the personas

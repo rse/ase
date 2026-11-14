@@ -41,6 +41,7 @@ draft.
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-grill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-approach.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 
@@ -203,15 +204,26 @@ Hints:
 </if>
 
 <if condition="<getopt-option-approach/> is equal `true`">
-Determine the overall approach of the new plan, based on the
-<instruction/> and the grounding in the project:
+Determine the overall approach of the new plan in a standalone
+*approach round* of grilling, based on the <instruction/> and the
+grounding in the project:
+
+<expand name="grill-understanding"
+    arg1="the <instruction/>"
+    arg2=""
+    arg3="false"></expand>
+
+Set <round-id>GRILLING</round-id>. Do not output anything.
 
 <expand name="approach-select"
     arg1="<approach-kind/>"
-    arg2="◉ task: **<ase-task-id/>**"></expand>
+    arg2="◉ task: **<ase-task-id/>**"
+    arg3="false"
+    arg4="file and directory paths, identifiers, symbols, types, commands, options, configuration keys, and literal values"
+    arg5="the specification and the code base"></expand>
 
-If <chosen-approach/> is empty, only output the following <template/> and
-then immediately *STOP* processing the entire current skill:
+If <approach-result/> is `STOP`, only output the following <template/>
+and then immediately *STOP* processing the entire current skill:
 
 <template>
 ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan generation cancelled**
