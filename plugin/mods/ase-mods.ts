@@ -6,7 +6,7 @@
 
 /*  Claude Code function hooks module ("mod", EARLY ACCESS):
     Hooking infrastructure, registering the function hooks and dispatching
-    them into the grill table with its answer details ("ase-mods-task-grill.ts"), the decision matrix
+    them into the grill table with its question and answer details ("ase-mods-task-grill.ts"), the decision matrix
     ("ase-mods-meta-evaluate.ts"), the intent help ("ase-mods-help-find.ts"),
     the synopsis form ("ase-mods-help-compose.ts"),
     the manual band ("ase-mods-help-show.ts"), the manpage browser
@@ -91,11 +91,11 @@ export const register: Register = (on, options) => {
         })
     }))
 
-    /*  serve the tool of the answer details of the grill table, which needs no
+    /*  serve the tool of the question and answer details of the grill table, which needs no
         permission, as it just takes the details for revealing them on hovering  */
     on("tool.check", { tool: "mcp__ase__ase_mods_grill_details" }, () => ({ decision: "allow" }))
     on("tool.call", { tool: "mcp__ase__ase_mods_grill_details" }, ($, e) => {
-        const result = grill.provide(e.details, e.rationales)
+        const result = grill.provide(e.details, e.rationales, e.questions)
         $.ui.invalidate("ui.render")
         return { result }
     })

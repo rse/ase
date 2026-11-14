@@ -53,11 +53,11 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         and the contract, keys, geometry, and drawing of the master/detail
         view in the band above the prompt), `ase-mods-task-grill.ts` for
         re-rendering the grilling tables of ASE (with the details of the
-        answers, prefixed with a bold `WHAT:`, and the `WHY:`/`WHY NOT:`
+        questions and answers, prefixed with a bold `WHAT:`, and the
         rationales of the `★` recommendation, prefixed with a bold
-        `★ Recommendation:`, provided by the skills through the tool
+        `WHY ★:` resp. `WHY NOT ★:`, provided by the skills through the tool
         `ase_mods_grill_details` registered by the module, revealed in a
-        card while hovering over an answer), `ase-mods-meta-evaluate.ts`
+        card while hovering over a question resp. an answer), `ase-mods-meta-evaluate.ts`
         for re-rendering the decision matrices of `ase-meta-evaluate`
         (with the best alternative in blue and the criteria rows sortable
         by clicking the header cells), `ase-mods-help-find.ts`

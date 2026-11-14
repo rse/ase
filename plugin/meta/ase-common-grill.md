@@ -312,6 +312,9 @@ questions:
     *not* available, silently *skip* this item.
 
     Otherwise, *before* showing the questions in item 6 below, determine for
+    every <question-N/> a detail <question-N-detail/> -- the longer
+    description of *what* the question is about, of at most *3-4
+    sentences* -- and for
     every <answer-N-K/> a detail <answer-N-K-detail/> -- the longer but still
     brief form of its <answer-N-K-description/>, of at most *3-4 sentences* --
     and, for every answer of a question *with* a recommended answer, a
@@ -320,11 +323,14 @@ questions:
     contrasted with the recommended one (without a `WHY:` or `WHY NOT:`
     prefix, as the module adds it). Call this tool with `details: {
     "<question-N-id/><answer-N-K-id/>": "<answer-N-K-detail/>", [...] }`,
-    covering all answers of all questions of the round, and `rationales: {
+    covering all answers of all questions of the round, `rationales: {
     "<question-N-id/><answer-N-K-id/>": "<answer-N-K-rationale/>", [...] }`,
-    covering all answers of the questions with a recommended answer. The
-    function hooks module reveals each detail and rationale to the user while
-    hovering over its answer in the subsequently shown table. Do not output
+    covering all answers of the questions with a recommended answer, and
+    `questions: { "<question-N-id/>": "<question-N-detail/>", [...] }`,
+    covering all questions of the round (without a `WHAT:` prefix, as the
+    module adds it). The function hooks module reveals each detail and
+    rationale to the user while hovering over its question resp. answer in
+    the subsequently shown table. Do not output
     anything. If the tool returns `ERROR: ...`, ignore it and continue, as the
     details are optional.
 

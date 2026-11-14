@@ -26,7 +26,8 @@ ChangeLog
 -   NEW FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
     Besides the `⚑` current decision state, grilling tables now mark the answer critically judged best
     (judge-first, context before world knowledge) with `★`, if any. Unaddressed `ase-task-grill`
-    questions accept it, and the blue hover cards show `WHAT:` details and `★ Recommendation:` rationales.
+    questions accept it, and the blue hover cards show `WHAT:` details and `WHY ★:`/`WHY NOT ★:`
+    rationales.
 
 -   IMPROVEMENT [plugin]: Dimension-Wise Grounding Beyond Grilling
     Grounding (`ase-common-ground.md`) now runs per dimension `WHAT`, `HOW`, `WHEN` in parallel
@@ -35,9 +36,10 @@ ChangeLog
     `ase-task-implement` operation, not only the grilling.
 
 -   NEW FEATURE [plugin, docs]: Answer Details in Grilling Tables
-    The grilling skills optionally pass a 1-2 sentence detail per answer to the new mod tool
-    `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled
-    with the short response and label of the answer, while the pointer hovers over the answer.
+    The grilling skills optionally pass a 3-4 sentence detail per question and answer to the new mod
+    tool `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled
+    with the number, focus, and topic of the question resp. the short response and label of the
+    answer, while the pointer hovers over the question resp. answer.
 
 -   IMPROVEMENT [plugin]: Subject Summary Above Grilling Tables
     Every grilling table is now preceded by a short paragraph, which briefly summarizes what the
