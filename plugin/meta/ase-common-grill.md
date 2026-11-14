@@ -390,10 +390,17 @@ questions:
     open *and* close every backtick code span within the
     *same* cell -- an unescaped pipe or an unbalanced
     backtick run splits the cell and silently degrades the
-    entire table into a plain text rendering:
+    entire table into a plain text rendering.
+
+    Before the table, set <grill-summary/> to a *single* paragraph of
+    just a few short sentences, which briefly summarizes *what* the
+    grilled subject is about -- focusing on the *what* only, without
+    any information about the *why* and *how*:
 
     <template>
     ⧉ **ASE**: <round-id/><grill-label/>: *Relentless Interviewing Until Clarity*
+
+    <grill-summary/>
 
     | QUESTION      | ANSWERS     |
     | ------------- | ----------- |

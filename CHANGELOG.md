@@ -10,6 +10,10 @@ ChangeLog
     `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled
     with the short response and label of the answer, while the pointer hovers over the answer.
 
+-   IMPROVEMENT [plugin]: Subject Summary Above Grilling Tables
+    Every grilling table is now preceded by a short paragraph, which briefly summarizes what the
+    grilled subject is about (the what only, not the why).
+
 -   NEW FEATURE [code, docs]: Interactive Configuration Editor
     The new `ase config ui` opens a terminal UI with a parameter view (all keys, values, and scopes)
     and a scope view (per-scope YAML), toggled by `v`, where a modal edits a value on any writable
