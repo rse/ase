@@ -15,7 +15,7 @@
 
 import type { Elements, RenderElement } from "claude-code"
 import { type Engine, type Char, type BandRender, type View, COMMAND,
-    wrap, uniform, layout, panel } from "./ase-mods-common.ts"
+    wrap, uniform, layout, panel } from "./ase-mods-common"
 
 /*  the skill command (followed by a blank) at the start of the prompt, the
     argument hint in the frontmatter of a skill, its groups (the bracketed

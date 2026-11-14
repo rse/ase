@@ -16,7 +16,7 @@
 
 import type { Elements, Frozen, PromptBox, PromptEditInput, RenderElement } from "claude-code"
 import { type Engine, type Text, type Key, type BandRender, type BandScroll, type View, PICKED, COMMAND,
-    held, decode, section, wrap, uniform, flow, frame, paint, layout, wheel, panel } from "./ase-mods-common.ts"
+    held, decode, section, wrap, uniform, flow, frame, paint, layout, wheel, panel } from "./ase-mods-common"
 
 /*  the trigger of a synopsis form inside the prompt (a skill command suffixed
     with "!!", and with its typed options and arguments, if any, separated by

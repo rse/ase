@@ -19,8 +19,8 @@
 
 import type { Elements, Frozen, PromptBox, PromptEditInput, RenderElement } from "claude-code"
 import { type Engine, type Char, type BandRender, type BandScroll, type View, PICKED,
-    held, decode, uniform, wrap, layout, wheel, panel } from "./ase-mods-common.ts"
-import { page } from "./ase-mods-help-show.ts"
+    held, decode, uniform, wrap, layout, wheel, panel } from "./ase-mods-common"
+import { page } from "./ase-mods-help-show"
 
 /*  the trigger of a manpage browser inside the prompt (just "//", or a free text
     suffixed with a blank and "//"), the skill directories (relative to the plugin

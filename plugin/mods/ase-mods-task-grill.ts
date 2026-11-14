@@ -13,7 +13,7 @@
     "n" or "nX" into the prompt.  */
 
 import type { Elements, Frozen, MatchedEvent, RenderElement } from "claude-code"
-import { type Engine, type Char, PICKED, ROW, RULE, cells, style, width, wrap, split, paint } from "./ase-mods-common.ts"
+import { type Engine, type Char, PICKED, ROW, RULE, cells, style, width, wrap, split, paint } from "./ase-mods-common"
 
 /*  the marker line above a grilling table (single-round and multi-round,
     optionally labeled with the perspective and/or grounding)  */

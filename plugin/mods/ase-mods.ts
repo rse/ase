@@ -18,16 +18,16 @@
     services needed by the other modules as plain functions.  */
 
 import type { Register, PromptBox, Timer } from "claude-code"
-import { type Band, TRIGGER } from "./ase-mods-common.ts"
-import { modGrill }           from "./ase-mods-task-grill.ts"
-import { modEvaluate }        from "./ase-mods-meta-evaluate.ts"
-import { modHelpFind }        from "./ase-mods-help-find.ts"
-import { modHelpCompose }     from "./ase-mods-help-compose.ts"
-import { modHelpShow }        from "./ase-mods-help-show.ts"
-import { modHelpBrowse }      from "./ase-mods-help-browse.ts"
-import { modHelpHint }        from "./ase-mods-help-hint.ts"
-import { modTaskEdit, TOOL }  from "./ase-mods-task-edit.ts"
-import { modRenderImage, TOOL as IMAGE, DIAGRAM, graphics } from "./ase-mods-render-image.ts"
+import { type Band, TRIGGER } from "./ase-mods-common"
+import { modGrill }           from "./ase-mods-task-grill"
+import { modEvaluate }        from "./ase-mods-meta-evaluate"
+import { modHelpFind }        from "./ase-mods-help-find"
+import { modHelpCompose }     from "./ase-mods-help-compose"
+import { modHelpShow }        from "./ase-mods-help-show"
+import { modHelpBrowse }      from "./ase-mods-help-browse"
+import { modHelpHint }        from "./ase-mods-help-hint"
+import { modTaskEdit, TOOL }  from "./ase-mods-task-edit"
+import { modRenderImage, TOOL as IMAGE, DIAGRAM, graphics } from "./ase-mods-render-image"
 
 /*  function hook registration entry point  */
 export const register: Register = (on, options) => {

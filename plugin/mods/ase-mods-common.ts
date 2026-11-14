@@ -12,7 +12,7 @@
     keys, geometry, and drawing of the master/detail view in the band above the
     prompt.  */
 
-import type { Elements, Frozen, MatchedEvent, McpToolResult, ModelCompleteRequest, ModelForkResult,
+import type { Elements, Frozen, MatchedEvent, McpToolResult, ModelCompleteRequest, ModelCompleteResult, ModelForkResult,
     PromptBox, PromptEditInput, PromptFilled, RenderElement, Timer, UiBlitArgs, UiBlitResult } from "claude-code"
 
 /*  the services of the engine, bound by the hooking infrastructure for the
@@ -28,8 +28,8 @@ export type Engine = {
     invalidate: () => void,
     read:       (file: string) => Promise<string>,
     dirs:       (dir: string) => Promise<string[]>,
-    fork:       (prompt: string) => Promise<ModelForkResult | null>,
-    complete:   (request: ModelCompleteRequest) => Promise<string>,
+    fork:       (prompt: string) => Promise<ModelForkResult>,
+    complete:   (request: ModelCompleteRequest) => Promise<ModelCompleteResult>,
     sleep:      (ms: number) => Promise<void>,
     prompt:     () => Promise<PromptBox>,
     fill:       (text: string) => Promise<PromptFilled>,

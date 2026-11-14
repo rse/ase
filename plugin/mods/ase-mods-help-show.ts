@@ -15,7 +15,7 @@
 
 import type { Elements, PromptBox, RenderElement } from "claude-code"
 import { type Engine, type Char, type BandRender, type BandScroll, type View,
-    uniform, flow, layout, wheel, panel } from "./ase-mods-common.ts"
+    uniform, flow, layout, wheel, panel } from "./ase-mods-common"
 
 /*  the trigger of a manual band inside the prompt (a skill command suffixed
     with a blank and "//", with its typed options and arguments, if any,

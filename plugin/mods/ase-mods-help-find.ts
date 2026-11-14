@@ -17,7 +17,7 @@
 
 import type { Elements, Frozen, PromptBox, PromptEditInput, RenderElement } from "claude-code"
 import { type Engine, type Char, type BandRender, type BandScroll, type View, PICKED, CODE,
-    held, decode, section, wrap, uniform, flow, frame, layout, wheel, panel } from "./ase-mods-common.ts"
+    held, decode, section, wrap, uniform, flow, frame, layout, wheel, panel } from "./ase-mods-common"
 
 /*  the trigger of an intent inside the prompt (suffixed with a blank and "!!",
     so the doubled exclamation mark of a sentence is no trigger), the skill of

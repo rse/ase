@@ -16,7 +16,7 @@
 
 import type { Elements, PromptBox, RenderElement, Timer } from "claude-code"
 import { type Engine, type Char, type BandRender, type BandScroll, type View, PICKED,
-    uniform, width, wrap, layout, wheel, panel } from "./ase-mods-common.ts"
+    uniform, width, wrap, layout, wheel, panel } from "./ase-mods-common"
 
 /*  the tool signaling the band, as listed for the model  */
 export const TOOL = {

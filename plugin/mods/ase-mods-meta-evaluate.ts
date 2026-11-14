@@ -13,7 +13,7 @@
     rating row stays the last one.  */
 
 import type { Elements, Frozen, MatchedEvent, RenderElement } from "claude-code"
-import { type Engine, type Char, ROW, RULE, cells, strip, style, width, wrap, split, paint } from "./ase-mods-common.ts"
+import { type Engine, type Char, ROW, RULE, cells, strip, style, width, wrap, split, paint } from "./ase-mods-common"
 
 /*  the marker line above a decision matrix  */
 const MARKER = /\*{0,2}EVALUATION\*{0,2}:\s+\*{0,2}Weighted Multi-Criteria Decision Matrix/

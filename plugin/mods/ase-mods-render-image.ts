@@ -15,7 +15,7 @@
     text art of the image instead (but no diagram tool at all).  */
 
 import type { Elements, Frozen, ImageSource, MatchedEvent, RenderElement, RenderViewport } from "claude-code"
-import { type Engine, type Char, edge, paint } from "./ase-mods-common.ts"
+import { type Engine, type Char, edge, paint } from "./ase-mods-common"
 
 /*  the tool showing an image, as listed for the model  */
 export const TOOL = {
