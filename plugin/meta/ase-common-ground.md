@@ -65,14 +65,14 @@ artifacts read for its *local* grounding:
     message* so they run in *parallel*:
 
     `Agent(
-        description: "Ground Locally: <dimension/>",
+        description: "Local Grounding: <dimension/>",
         subagent_type: "Explore",
         prompt: "Strictly read-only, gather the project facts on the <dimension/> dimension of the following subject: <subject/>. Read the parts relevant for the subject of the following files<below/>: <files/>. Return the existing decisions, conventions, constraints, and terminology, each condensed with its project-relative file path, and nothing else.",
         run_in_background: false
     )`
 
     `Agent(
-        description: "Ground on the Web: <dimension/>",
+        description: "Web Grounding: <dimension/>",
         subagent_type: "ase:ase-meta-search",
         prompt: "Search the Internet/Web for the established maxims, principles, practices, standards, definitions, patterns, and pitfalls on the <dimension/> dimension of the following topic: <topic/>. Perform the searches *iteratively*: derive every further query from the gaps of the previous results and stop early once the results are saturated, but perform *at most 5* searches, where issuing the same query to several search tools counts as one search. Give back the plain responses of all searches.",
         run_in_background: false
