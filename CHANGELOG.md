@@ -5,6 +5,10 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   BUGFIX [code]: Task Board Header Damaged in Ghostty
+    `ase task board` now enters raw mode before Ink queries the kitty keyboard protocol, so the
+    echoed response of terminals like Ghostty no longer shifts the first frame and blanks the header.
+
 -   IMPROVEMENT [code, docs]: Untracked Usage Hint in Statistics View
     Without any usage attachment within the time range, the `Usage` and `Top-5 Tasks` frames of the
     task board statistics view show "no tracked usage data available (see telemetry.enabled)", and

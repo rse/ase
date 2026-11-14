@@ -269,6 +269,11 @@ export const runTUI = async (log: Log, relay?: string, watched?: string): Promis
     /*  defer stderr log output while Ink draws, as it bypasses patchConsole  */
     log.defer(true)
 
+    /*  enter raw mode before Ink queries the kitty keyboard protocol, as otherwise the
+        terminal response (e.g. of Ghostty) is echoed and shifts the first frame by a line  */
+    const tty = process.stdin.isTTY ? process.stdin : null
+    tty?.setRawMode(true)
+
     /*  ensure the terminal never stays in mouse reporting mode,
         even on a premature process exit (e.g. an uncaught exception)  */
     const reset = () => {
@@ -290,6 +295,7 @@ export const runTUI = async (log: Log, relay?: string, watched?: string): Promis
     finally {
         process.off("exit", reset)
         mouseReporting(false)
+        tty?.setRawMode(false)
         log.defer(false)
     }
 }
