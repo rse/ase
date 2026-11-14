@@ -5,6 +5,10 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   IMPROVEMENT [plugin]: Highlighted Grilling Markers
+    The function hooks module now renders the `★` (recommendation) and `⚑` (current decision)
+    markers in the grilling tables in red resp. blue.
+
 -   IMPROVEMENT [plugin, docs]: Approach Selection as Grilling Round
     `--approach` of `ase-code-edit`, `ase-spec-edit`, and `ase-task-edit` now runs an approach round of
     grilling (1-4 approach questions, never finished early): standalone `GRILLING (approach)`, or with

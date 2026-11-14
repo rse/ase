@@ -52,8 +52,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         rows, styled characters, Markdown conversion, wrapping, framing,
         and the contract, keys, geometry, and drawing of the master/detail
         view in the band above the prompt), `ase-mods-task-grill.ts` for
-        re-rendering the grilling tables of ASE (with the details of the
-        questions and answers, prefixed with a bold `WHAT:`, and the
+        re-rendering the grilling tables of ASE (with the `★` marker rendered
+        in red and the `⚑` marker in blue, the details of the questions
+        and answers, prefixed with a bold `WHAT:`, and the
         rationales of the `★` recommendation, prefixed with a bold
         `WHY ★:` resp. `WHY NOT ★:`, provided by the skills through the tool
         `ase_mods_grill_details` registered by the module, revealed in a

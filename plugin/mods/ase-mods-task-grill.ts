@@ -8,7 +8,8 @@
     Grill table, redrawing the grilling tables of ASE with one answer
     alternative per line (wrapped lines indented) and rendering in red
     the answers picked in the prompt via "nX" short responses and the
-    question selected in the prompt via the last standalone "n". In the
+    question selected in the prompt via the last standalone "n", and
+    rendering the "★" marker in red and the "⚑" marker in blue. In the
     latest table, questions and answers are clickable and insert their
     "n" or "nX" into the prompt, and a question with a detail resp. an answer
     with a detail and optional rationale (provided through the tool
@@ -67,6 +68,13 @@ const NUMBER = /^\*{0,2}(\d+)\*{0,2}\s+▶/
 const LABEL = /^\*{0,2}[A-Z]\*{0,2}\s+▶\s+(.*?):(?:\s|$)/
 const STAR  = "★"
 const TOPIC = /^\*{0,2}\d+\*{0,2}\s+▶\s+(.*?):(?:\s|$)/
+
+/*  the colors of the recommendation and current decision markers  */
+const MARKS = new Map([ [ "★", "red" ], [ "⚑", "blue" ] ])
+
+/*  color the recommendation and current decision markers of styled characters  */
+const glyphs = (chars: Char[]): Char[] =>
+    chars.map((char) => MARKS.has(char.ch) ? { ...char, color: MARKS.get(char.ch) } : char)
 
 /*  a short response "nX" inside the prompt  */
 const PICK = /(?<![^\s,])(\d+)([a-zA-Z])(?![^\s,])/g
@@ -164,9 +172,9 @@ const layout = (table: Table, avail: number,
         return {
             lead:     numbered ? digits - String(row.number).length : 0,
             indent:   numbered ? digits + 3 : 0,
-            question: style(row.question, marked === row.number ? PICKED : undefined),
+            question: glyphs(style(row.question, marked === row.number ? PICKED : undefined)),
             answers:  row.answers.map((answer) =>
-                style(answer.text, chosen?.get(row.number) === answer.letter ? PICKED : undefined))
+                glyphs(style(answer.text, chosen?.get(row.number) === answer.letter ? PICKED : undefined)))
         }
     })
     const w1nat = Math.max(width(head[0]!), ...rows.map((row) => row.lead + width(row.question)))
