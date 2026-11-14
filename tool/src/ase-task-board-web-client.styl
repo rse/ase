@@ -385,7 +385,8 @@ header
 
 /*  the grown lane: all other groups and lanes (and the group header) hidden, and
     the cards in a grid of at least four columns, or more if the cards then still
-    keep their minimum width, with all cards of a row having the same height  */
+    keep their minimum width, with all cards of a row having the same height
+    (rows sized to their content, as clipping cards would let them collapse)  */
 #board.grown
     overflow-x: hidden
     .group:not(.grown), .group.grown > .ghd, .group.grown > .lane:not(.grown)
@@ -395,6 +396,7 @@ header
         .cards
             display: grid
             grid-template-columns: repeat(auto-fill, minmax(unquote("min(240px, calc((100% - 3 * 8px) / 4))"), 1fr))
+            grid-auto-rows: max-content
             align-content: start
 
 /*  the task boxes (of both the lanes and the graph view), with the task id in a
