@@ -200,11 +200,13 @@ questions:
 
     <content/>
 
-    For <question-N-text/> use the format `Shall...?` for
-    questions of focus area `DOMAIN`, `INTERFACE`, `REGRESSION`,
-    and `CONFIRMATION`, the format `Should...?` for questions of
-    focus area `ARCHITECTURE`, and the format `May...?` for
-    questions of focus area `IMPLEMENTATION`.
+    For <question-N-text/> use the format `Shall...?` (or the equivalent
+    in the language which is used in the question) for questions of focus
+    area `DOMAIN`, `INTERFACE`, `REGRESSION`, and `CONFIRMATION`, the format
+    `Should...?` (or the equivalent in the language which is used in the
+    question) for questions of focus area `ARCHITECTURE`, and the format
+    `May...?` (or the equivalent in the language which is used in the question)
+    for questions of focus area `IMPLEMENTATION`.
 
     In every <question-N-text/>, encode all *literal aspects*
     -- <arg3/> -- with backticks.
