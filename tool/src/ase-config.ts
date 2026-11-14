@@ -126,6 +126,18 @@ export default class ConfigCommand {
                 }
             })
 
+        /*  register CLI sub-command "ase config ui"  */
+        configCmd
+            .command("ui")
+            .description("edit configuration interactively in a terminal UI")
+            .action(async (_opts: unknown, cmd: Command) => {
+                if (!process.stdin.isTTY || !process.stdout.isTTY)
+                    throw new Error("the terminal UI requires an interactive terminal (stdin and stdout)")
+                const scope = parseScope(cmd.optsWithGlobals().scope as string | undefined)
+                const { runConfigTUI } = await import("./ase-config-tui.js")
+                await runConfigTUI(this.log, scope)
+            })
+
         /*  register CLI sub-command "ase config get"  */
         configCmd
             .command("get")

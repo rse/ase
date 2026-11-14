@@ -14,6 +14,8 @@
 
 `ase config` \[`--scope` *scope*\] `edit`
 
+`ase config` \[`--scope` *scope*\] `ui`
+
 `ase config` \[`--scope` *scope*\] `get` *key*
 
 `ase config` \[`--scope` *scope*\] `set` *key* *value*
@@ -95,6 +97,10 @@ exits with status `1`.
 - `edit`:
   Edit the configuration file of the target scope with the text editor.
   See `ase-config-edit`(1).
+
+- `ui`:
+  Browse and edit the configuration of all scopes of the chain
+  interactively in a terminal UI. See `ase-config-ui`(1).
 
 - `get` *key*:
   Print the effective value of *key*. See `ase-config-get`(1).
@@ -387,7 +393,7 @@ Task board (all writable on the `user` and `project` scopes only, see
 ## ENVIRONMENT
 
 - `EDITOR`, `VISUAL`:
-  The text editor of `ase config edit`.
+  The text editor of `ase config edit` and `ase config ui`.
 
 - `XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `APPDATA`, `LOCALAPPDATA`:
   The base directories of the *per-user configuration directory* and
@@ -443,8 +449,8 @@ $ ase config get persona
 ## SEE ALSO
 
 `ase`(1), `ase-config-init`(1), `ase-config-list`(1),
-`ase-config-edit`(1), `ase-config-get`(1), `ase-config-set`(1),
-`ase-config-delete`(1).
+`ase-config-edit`(1), `ase-config-ui`(1), `ase-config-get`(1),
+`ase-config-set`(1), `ase-config-delete`(1).
 
 ## AUTHOR
 

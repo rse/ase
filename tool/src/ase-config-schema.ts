@@ -167,6 +167,89 @@ export const configWritableScopesDefault: ReadonlyArray<ScopeTerm["kind"]> =
 /*  keys carrying secrets, whose values are masked in listings  */
 export const configSecretKeys: ReadonlyArray<string> = [ "project.task.store.token", "project.relay.token", "telemetry.service.token" ]
 
+/*  short descriptions of the configuration keys (shown by "ase config ui"),
+    condensed from the CONFIGURATION KEYS section of the manual page ase-config(1)  */
+export const configDescriptions: Record<string, string> = {
+    "project.id":                     "The unique id of the project (default: the sanitized basename of the project root). " +
+                                      "An explicit id is required for a remote task store and for the agent relay.",
+    "project.name":                   "The full name of the project.",
+    "project.boxing":                 "Whether the project artifacts are treated as a white box (fully transparent), grey box (partially), " +
+                                      "or black box (not at all), which modulates the work depth and output visibility of the skills.",
+    "project.users":                  "The comma-separated list of the known human assignees of the tasks, suggested by the task boards " +
+                                      "and checked on assignments.",
+    "project.task.lifecycle":         "The task lifecycle model: single-phase for a local solo developer, two-phase for a small team, " +
+                                      "or four-phase for a gated enterprise pipeline.",
+    "project.task.store.url":         "The URL of the task store: \"ase:<path>\" (local), \"ase[s]://<addr>:<port>[/<token>]\" (remote " +
+                                      "task store server), or a GitHub, GitLab, or Gitea issue tracker.",
+    "project.task.store.token":       "The bearer token of a remote task store, resp. the token of a GitHub, GitLab, or Gitea task store.",
+    "project.task.store.crt":         "The PEM certificate (chain) file of the task store server, relative to the configuration file.",
+    "project.task.store.key":         "The PEM private key file of the task store server, relative to the configuration file.",
+    "project.task.idscheme":          "The task id scheme: \"slug[:<words>]\", \"seq[:<template>]\", or \"any\".",
+    "project.task.default.source":    "The default of the \"Source:\" key of the task plans: \"worktree\" or \"branch:<name>\".",
+    "project.task.default.changeset": "The default of the \"Changeset:\" key of the task plans: \"worktree\", \"branch:<name>\", " +
+                                      "or \"attachment:<name>\".",
+    "project.task.default.target":    "The default of the \"Target:\" key of the task plans: \"worktree\", \"branch:<name>\", or \"source\".",
+    "project.task.effort.scale":      "The upper bounds of the effort size bands XS, S, M, and L, in strictly ascending human minutes, " +
+                                      "while XL is open-ended.",
+    "project.task.effort.factor":     "The human minutes per point of the attention score of the effort estimation.",
+    "project.task.effort.file":       "The additional human minutes per touched file of the volume score of the effort estimation.",
+    "project.task.effort.line":       "The additional human minutes per predicted changed line of the volume score of the effort estimation.",
+    "project.task.effort.iteration":  "The multiplier (at least 1) of the estimated minutes of a task whose main deliverable is an " +
+                                      "interactive or visual user interface.",
+    "project.relay.url":              "The URL of the agent relay, as \"ase[s]://<addr>:<port>[/<token>]\".",
+    "project.relay.token":            "The bearer token of the agent relay.",
+    "project.relay.crt":              "The PEM certificate (chain) file of the agent relay server, relative to the configuration file.",
+    "project.relay.key":              "The PEM private key file of the agent relay server, relative to the configuration file.",
+    "project.service.port":           "The preferred port (1024-65535) of the per-project background service on 127.0.0.1, " +
+                                      "falling back to a random port if unavailable.",
+    "project.artifact.spec.basedir":  "The base directory of the specification files, relative to the project root.",
+    "project.artifact.spec.files":    "The whitespace-separated glob specification of the specification files, relative to their base " +
+                                      "directory, with \"!\" negating a glob.",
+    "project.artifact.spec.schema":   "The whitespace-separated list of SpecBook schema configuration files (empty: the bundled " +
+                                      "standard one \"std\").",
+    "project.artifact.code.basedir":  "The base directory of the source code files, relative to the project root.",
+    "project.artifact.code.files":    "The whitespace-separated glob specification of the source code files, relative to their base " +
+                                      "directory, with \"!\" negating a glob.",
+    "project.artifact.docs.basedir":  "The base directory of the documentation files, relative to the project root.",
+    "project.artifact.docs.files":    "The whitespace-separated glob specification of the documentation files, relative to their base " +
+                                      "directory, with \"!\" negating a glob.",
+    "project.artifact.infr.basedir":  "The base directory of the infrastructure files, relative to the project root.",
+    "project.artifact.infr.files":    "The whitespace-separated glob specification of the infrastructure files, relative to their base " +
+                                      "directory, with \"!\" negating a glob.",
+    "agent.persona":                  "The communication style of the AI agent.",
+    "agent.guidance":                 "The amount of unsolicited help hints of the AI agent.",
+    "agent.diagram.format":           "The rendering of the diagrams of the skills: as an inline image if the terminal supports it " +
+                                      "(auto), always as an inline image, or always as text.",
+    "agent.diagram.theme":            "The theme style of the diagram images: probed from the terminal background (auto), light, or dark.",
+    "agent.diagram.tone":             "The theme color tone of the diagram images, as one or two colors \"#rgb\" or \"#rrggbb\".",
+    "telemetry.enabled":              "Whether the AI usage accounting is enabled as a whole.",
+    "telemetry.implicit":             "Whether the usage of an interactive session is also accounted onto its active task while the " +
+                                      "task is unassigned.",
+    "telemetry.service.port":         "The port (1024-65535) of the per-user OTLP ingress on 127.0.0.1.",
+    "telemetry.service.token":        "The bearer token of the OTLP ingress, generated by \"ase setup telemetry activate\".",
+    "telemetry.service.interval":     "The interval in minutes of the interim bookings of the open usage windows (0 disables).",
+    "telemetry.service.idle":         "The idle time in minutes after which a usage window pauses (0 disables).",
+    "telemetry.prices.ai":            "The price table \"<model>=<input>/<output>[/<cread>/<cwrite>] [...]\" in USD per million tokens, " +
+                                      "with \"*\" for all other models.",
+    "telemetry.prices.hr":            "The hourly rate table \"<user-id>=<usd-per-hour>[,...]\" of the human time, with \"*\" for all " +
+                                      "other users.",
+    "board.tui.color.dim":            "The color of the dim role of the terminal board: \"default\", a color name, \"#rrggbb\", " +
+                                      "\"ansi256(<n>)\", or \"rgb(<r>,<g>,<b>)\".",
+    "board.tui.color.normal":         "The color of the normal role of the terminal board: \"default\", a color name, \"#rrggbb\", " +
+                                      "\"ansi256(<n>)\", or \"rgb(<r>,<g>,<b>)\".",
+    "board.tui.color.accent":         "The color of the accent role of the terminal board: \"default\", a color name, \"#rrggbb\", " +
+                                      "\"ansi256(<n>)\", or \"rgb(<r>,<g>,<b>)\".",
+    "board.tui.color.signal":         "The color of the signal role of the terminal board: \"default\", a color name, \"#rrggbb\", " +
+                                      "\"ansi256(<n>)\", or \"rgb(<r>,<g>,<b>)\".",
+    "board.web.color.dim":            "The base color of the dim role of the web board: \"default\", a color name, \"#rgb\", or \"#rrggbb\".",
+    "board.web.color.normal":         "The base color of the normal role of the web board: \"default\", a color name, \"#rgb\", or \"#rrggbb\".",
+    "board.web.color.accent":         "The base color of the accent role of the web board: \"default\", a color name, \"#rgb\", or \"#rrggbb\".",
+    "board.web.color.signal":         "The base color of the signal role of the web board: \"default\", a color name, \"#rgb\", or \"#rrggbb\".",
+    "board.web.editor.keymap":        "The key bindings of the task plan editor of the web board.",
+    "board.web.theme":                "The color theme of the web board, where \"auto\" follows the preference of the operating system " +
+                                      "resp. browser."
+}
+
 /*  the token counts of the AI usage accounting: the tokens read from resp. written to
     the prompt cache, the (uncached) input tokens, and the output tokens  */
 export type TokenCounts = { cread: number, cwrite: number, input: number, output: number }

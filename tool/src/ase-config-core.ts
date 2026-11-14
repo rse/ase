@@ -26,6 +26,19 @@ import {
 /*  single layer inside the scope-inheritance stack  */
 type Layer = { scope: ScopeTerm, filename: string, doc: Document }
 
+/*  the value type of a configuration key, as derived from its schema leaf  */
+export type KeyType = { type: "boolean" | "number" | "string" } | { type: "enum", options: string[] }
+
+/*  a node of the attached valibot schema, unwrapped from its optional wrappers  */
+type SchemaNode = { type?: string, wrapped?: unknown, entries?: Record<string, unknown>, options?: unknown[] }
+const unwrapSchema = (s: unknown): SchemaNode | null => {
+    let cur = s as SchemaNode | null | undefined
+    while (cur !== undefined && cur !== null && (cur.type === "optional" || cur.type === "nullish"
+        || cur.type === "nullable" || cur.type === "undefinedable"))
+        cur = cur.wrapped as SchemaNode | null | undefined
+    return cur ?? null
+}
+
 /*  encapsulate read/write access to a stack of "<name>.yaml" configuration files,
     each associated with a scope term; reads cascade along user < project < task < session,
     writes are confined to the target (strongest) scope term  */
@@ -320,16 +333,8 @@ export class Config {
 
     /*  enumerate all full dotted leaf paths from the attached valibot schema  */
     private schemaLeafPaths (): string[][] {
-        type SchemaNode = { type?: string, wrapped?: unknown, entries?: Record<string, unknown> }
-        const unwrap = (s: unknown): SchemaNode | null => {
-            let cur = s as SchemaNode | null | undefined
-            while (cur !== undefined && cur !== null && (cur.type === "optional" || cur.type === "nullish"
-                || cur.type === "nullable" || cur.type === "undefinedable"))
-                cur = cur.wrapped as SchemaNode | null | undefined
-            return cur ?? null
-        }
         const walk = (s: unknown, prefix: string[]): string[][] => {
-            const u = unwrap(s)
+            const u = unwrapSchema(s)
             if (u !== null
                 && (u.type === "object" || u.type === "strict_object" || u.type === "loose_object")
                 && u.entries !== undefined) {
@@ -438,6 +443,32 @@ export class Config {
         }
         result.sort((a, b) => a.key.localeCompare(b.key))
         return result
+    }
+
+    /*  determine the value type of a dotted key from its schema leaf: an enum (a picklist,
+        with its options), a boolean resp. number (a union with such a member), or a string  */
+    keyType (key: string): KeyType {
+        let node = unwrapSchema(this.schema)
+        for (const seg of this.resolveKey(key).split("."))
+            node = unwrapSchema(node?.entries?.[seg])
+        if (node?.type === "picklist")
+            return { type: "enum", options: (node.options ?? []).map((o) => String(o)) }
+        const members = node?.type === "union" ? (node.options ?? []).map((o) => (o as SchemaNode).type) : []
+        if (members.includes("boolean"))
+            return { type: "boolean" }
+        else if (members.includes("number"))
+            return { type: "number" }
+        return { type: "string" }
+    }
+
+    /*  retrieve the values of a dotted key on all scopes of the chain (after reading),
+        from the weakest to the strongest scope, with undefined for an unset value  */
+    getLayered (key: string): Array<{ scope: ScopeTerm, value: unknown }> {
+        const segs = this.resolveKey(key).split(".")
+        return this.docs.map((layer) => {
+            const node = layer.doc.getIn(segs)
+            return { scope: layer.scope, value: isScalar(node) ? node.value : node }
+        })
     }
 
     /*  determine whether a key is writable on a given scope kind  */
