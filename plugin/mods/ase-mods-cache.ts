@@ -43,8 +43,8 @@ export type Controller = {
 /*  the time unit, the short resp. long TTL of the prompt cache (reduce both for
     debugging), the interval of the heartbeat, and the warning lead of a cooling cache  */
 const MIN       = 60 * 1000
-const TTL_SHORT =  1 * MIN
-const TTL_LONG  =  2 * MIN
+const TTL_SHORT =  5 * MIN
+const TTL_LONG  = 60 * MIN
 const BEAT      = Math.min(30 * 1000, TTL_SHORT / 10)
 const COOLING   = TTL_SHORT
 
