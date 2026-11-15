@@ -241,15 +241,14 @@ export const modRenderImage = () => {
         }
         const args = Object.fromEntries(Object.entries({
             file: input.file, data: input.data, background: input.background, smart: input.smart,
-            scale: "auto", width: box.columns, height: box.rows + FREE, output: "auto"
+            scale: "auto", width: box.columns, height: box.rows + FREE, output: "file"
         }).filter(([ , value ]) => value !== undefined))
 
         /*  rasterize the image, bounded by a pixel width and height, into a PNG
-            image (base64), taking over one passed as a temporary file by
-            "ase_rasterize" resp. persisted into a file by the engine, as then
-            just referenced by a text block "[PNG: <file>, ...]" resp.
-            "[Image: source: <file>, ...]", plus the cell box fitted by
-            "ase_rasterize" for the actual pixel size of the terminal cells  */
+            image (base64), always taken over from the temporary file of
+            "ase_rasterize" (as the engine may drop or rewrite image blocks of
+            "$.mcp.call"), referenced by a text block "[PNG: <file>, ...]",
+            plus the cell box fitted for the actual pixel size of the cells  */
         type Raster = { png: string, cells?: { columns: number, rows: number } } | { error: string }
         const rasterize = async (source: Record<string, unknown>, maximum: number): Promise<Raster> => {
             const result = await engine.rasterize({ ...args, ...source, maximum })
@@ -258,11 +257,10 @@ export const modRenderImage = () => {
                 return { error }
             const texts = result.content.filter((block) => block.type === "text").map((block) => block.text ?? "")
             const match = (re: RegExp) => texts.map((text) => re.exec(text)).find((m) => m !== null)
-            const image = result.content.find((block) => block.type === "image")?.data
-            const file  = match(/^\[PNG: (.+), \d+x\d+\]$/)?.[1] ?? match(/^\[Image: source: (.+?\.png)(?:,|\])/)?.[1]
+            const file  = match(/^\[PNG: (.+), \d+x\d+\]$/)?.[1]
             const box   = match(/^\[Cells: (\d+)x(\d+)\]$/)
             const cells = box ? { columns: Number(box[1]), rows: Number(box[2]) } : undefined
-            const png   = typeof image === "string" ? image : file !== undefined ? await engine.bytes(file) : undefined
+            const png   = file !== undefined ? await engine.bytes(file) : undefined
             return png === undefined ? { error } : { png, ...(cells !== undefined ? { cells } : {}) }
         }
 

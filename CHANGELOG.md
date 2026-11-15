@@ -17,6 +17,11 @@ ChangeLog
     The configuration editor of `ase config edit` now edits number keys whose schema carries the
     metadata `text` as free text, so values like `150k` or `4,8,12` can be typed in.
 
+-   BUGFIX [plugin]: Inline Image Rendering on Image-Dropping Engines (#127)
+    The mod `ase-mods-render-image.ts` now always takes the PNG of `ase_rasterize` from a temporary
+    file, as some Claude Code versions drop the image blocks of `$.mcp.call`, which yielded
+    `ERROR: [Cells: WxH]` instead of the image.
+
 -   NEW FEATURE [plugin]: Grounded Plan Editing
     The new option `--ground|-G` of `ase-task-edit` grounds the plan once per run in the project
     artifacts and the Internet/Web, serving its generation, its refinements, and the approach round
