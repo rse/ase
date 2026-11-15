@@ -4,13 +4,8 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import path                       from "node:path"
-import fs                         from "node:fs"
-import readline                   from "node:readline/promises"
-
 import { Command }                from "commander"
 import { isMap, isScalar }        from "yaml"
-import { execaSync }              from "execa"
 import { z }                      from "zod"
 import type { McpServer }         from "@modelcontextprotocol/sdk/server/mcp.js"
 
@@ -91,44 +86,6 @@ export default class ConfigCommand {
         /*  register CLI sub-command "ase config edit"  */
         configCmd
             .command("edit")
-            .description("edit configuration file with $EDITOR")
-            .action(async (_opts: unknown, cmd: Command) => {
-                const scope  = parseScope(cmd.optsWithGlobals().scope as string | undefined)
-                const editor = [ process.env.VISUAL, process.env.EDITOR ]
-                    .find((e) => e !== undefined && e.trim() !== "") ?? "vi"
-                const [ editorCmd, ...editorArgs ] = editor.trim().split(/\s+/)
-                const cfg    = new Config("config", configSchema, this.log, scope)
-                fs.mkdirSync(path.dirname(cfg.filename), { recursive: true })
-                if (!fs.existsSync(cfg.filename))
-                    fs.writeFileSync(cfg.filename, "", {
-                        encoding: "utf8",
-                        mode:     scope[scope.length - 1].kind === "user" ? 0o600 : undefined
-                    })
-                const rl = readline.createInterface({ input: process.stdin, output: process.stderr })
-                try {
-                    for (;;) {
-                        execaSync(editorCmd, [ ...editorArgs, cfg.filename ], { stdio: "inherit" })
-                        try {
-                            cfg.read("strict")
-                            break
-                        }
-                        catch (err) {
-                            const msg = err instanceof Error ? err.message : String(err)
-                            this.log.write("error", msg)
-                            const ans = (await rl.question("re-edit? [Y/n] ")).trim().toLowerCase()
-                            if (ans === "n" || ans === "no")
-                                throw err
-                        }
-                    }
-                }
-                finally {
-                    rl.close()
-                }
-            })
-
-        /*  register CLI sub-command "ase config ui"  */
-        configCmd
-            .command("ui")
             .description("edit configuration interactively in a terminal UI")
             .action(async (_opts: unknown, cmd: Command) => {
                 if (!process.stdin.isTTY || !process.stdout.isTTY)

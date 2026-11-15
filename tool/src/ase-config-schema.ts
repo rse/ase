@@ -167,7 +167,7 @@ export const configWritableScopesDefault: ReadonlyArray<ScopeTerm["kind"]> =
 /*  keys carrying secrets, whose values are masked in listings  */
 export const configSecretKeys: ReadonlyArray<string> = [ "project.task.store.token", "project.relay.token", "telemetry.service.token" ]
 
-/*  short descriptions of the configuration keys (shown by "ase config ui"),
+/*  short descriptions of the configuration keys (shown by "ase config edit"),
     condensed from the CONFIGURATION KEYS section of the manual page ase-config(1)  */
 export const configDescriptions: Record<string, string> = {
     "project.id":                     "The unique id of the project (default: the sanitized basename of the project root). " +

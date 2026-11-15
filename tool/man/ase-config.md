@@ -37,7 +37,7 @@ unknown or invalid entries are warned about and dropped from the
 in-memory view, while on set, delete, and write they lead to a fatal
 error. A target file still carrying invalid content is never
 overwritten, as the skipped content would otherwise be lost: repair
-it first (e.g. via `ase config edit`).
+it first (e.g. via the key `e` in the scope view of `ase config edit`).
 
 Obsolete (pre-1.1.0) entries `project.artifact.task.{basedir,files}`
 and `agent.{task,skill}` are migrated in place on reading: a `basedir`
@@ -95,12 +95,8 @@ exits with status `1`.
   scopes supplying them. See `ase-config-list`(1).
 
 - `edit`:
-  Edit the configuration file of the target scope with the text editor.
-  See `ase-config-edit`(1).
-
-- `ui`:
   Browse and edit the configuration of all scopes of the chain
-  interactively in a terminal UI. See `ase-config-ui`(1).
+  interactively in a terminal UI. See `ase-config-edit`(1).
 
 - `get` *key*:
   Print the effective value of *key*. See `ase-config-get`(1).
@@ -393,7 +389,7 @@ Task board (all writable on the `user` and `project` scopes only, see
 ## ENVIRONMENT
 
 - `EDITOR`, `VISUAL`:
-  The text editor of `ase config edit` and `ase config ui`.
+  The text editor of the key `e` of `ase config edit`.
 
 - `XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `APPDATA`, `LOCALAPPDATA`:
   The base directories of the *per-user configuration directory* and
@@ -449,7 +445,7 @@ $ ase config get persona
 ## SEE ALSO
 
 `ase`(1), `ase-config-init`(1), `ase-config-list`(1),
-`ase-config-edit`(1), `ase-config-ui`(1), `ase-config-get`(1),
+`ase-config-edit`(1), `ase-config-get`(1),
 `ase-config-set`(1), `ase-config-delete`(1).
 
 ## AUTHOR

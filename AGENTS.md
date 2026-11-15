@@ -135,7 +135,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `config-schema` for the schema, presets, write policies, and key
         descriptions, `config-core` for the layered `Config` class and the
         internal session state, and `config-tui` for the interactive,
-        full-screen configuration editor of `ase config ui`)
+        full-screen configuration editor of `ase config edit`)
     -   `tool/src/ase-service-*.ts`: the MCP-only tool modules of the
         service (`service-{kv,getopt,markdown,skills,sleep,state,timestamp,diff}`)
         and its AI usage accounting (`service-otel` for the OTLP ingress,

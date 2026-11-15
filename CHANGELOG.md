@@ -5,12 +5,16 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   IMPROVEMENT [code, docs, plugin]: Configuration Editor as "ase config edit"
+    The terminal UI of `ase config ui` is renamed to `ase config edit`, replacing the former
+    `$EDITOR`-based `ase config edit`, whose function remains as the key `e` in the scope view.
+
 -   IMPROVEMENT [code, docs]: Context Tokens in Statusline Context Bar
     The statusline placeholder `%c` now appends the current context tokens to its progress bar and
     percentage, e.g. `████████░░░░░░░░░░░░ 42% (84.2k)`.
 
 -   BUGFIX [code]: Textual Numbers in Configuration Editor
-    The configuration editor of `ase config ui` now edits number keys whose schema carries the
+    The configuration editor of `ase config edit` now edits number keys whose schema carries the
     metadata `text` as free text, so values like `150k` or `4,8,12` can be typed in.
 
 -   NEW FEATURE [plugin]: Grounded Plan Editing

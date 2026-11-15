@@ -93,7 +93,7 @@ The following *operations* exist:
   scope. A key that is not present is silently ignored.
 
 The `init` and `edit` subcommands of the `ase config` CLI are
-deliberately *not* mirrored: `edit` is bound to the interactive `$EDITOR`
+deliberately *not* mirrored: `edit` is bound to an interactive terminal UI
 and therefore has no meaning inside an assistant turn, and `init` is a
 preset-bootstrapping operation that stays a shell concern next to
 `ase setup`. Both remain available as `ase config init` and
