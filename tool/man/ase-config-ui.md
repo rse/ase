@@ -36,7 +36,11 @@ containing the typed text. The key `v` toggles between the two views:
   (and, except on `default`, additionally in the accent color), while
   the others show the value inherited from the weaker scopes (or `~` if
   none). `RETURN` opens the modal on the scope of the tab
-  (read-only for a key not writable on it). The key `e` opens the
+  (read-only for a key not writable on it). The key `c` cycles the
+  collapse mode (shown in the header) through `none` (all keys),
+  `writable` (only the keys writable on the scope), and `configured`
+  (only the keys carrying a value on the scope), where the parent maps
+  of the shown keys always stay visible. The key `e` opens the
   configuration file of the scope in the text editor (creating it if
   missing); after the editor exits, the file is strictly validated and
   an invalid file is reported in the status line.
@@ -78,7 +82,8 @@ clear text in the modal.
   keeps the filter, and `ESCAPE` clears it, both leaving the field.
 
 - In the scope view:
-  `CURSOR-LEFT`/`CURSOR-RIGHT` (or a click) select the tab, `DELETE`
+  `CURSOR-LEFT`/`CURSOR-RIGHT` (or a click) select the tab, `c`
+  cycles the collapse mode, `DELETE`
   deletes the selected key from the scope of the tab (if writable on
   it), and `e` edits the file of this scope (not on the `default` tab).
 

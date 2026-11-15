@@ -110,12 +110,13 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
     const { columns, rows } = useWindowSize()
 
     /*  the state: the view, the selected key (shared by both views), the selected tab
-        of the scope view, the key filter (and whether it is being typed), the open
-        modal, the status line report, the revision of the configuration files, and
-        whether the key hints are shown  */
-    const [ view,   setView   ] = React.useState<"param" | "scope">("param")
-    const [ sel,    setSel    ] = React.useState("")
-    const [ tab,    setTab    ] = React.useState(chain.length - 1)
+        and the collapse mode of the scope view, the key filter (and whether it is being
+        typed), the open modal, the status line report, the revision of the
+        configuration files, and whether the key hints are shown  */
+    const [ view,     setView     ] = React.useState<"param" | "scope">("param")
+    const [ sel,      setSel      ] = React.useState("")
+    const [ tab,      setTab      ] = React.useState(chain.length - 1)
+    const [ collapse, setCollapse ] = React.useState<"none" | "writable" | "configured">("none")
     const [ query,  setQuery  ] = React.useState("")
     const [ typing, setTyping ] = React.useState(false)
     const [ modal,  setModal  ] = React.useState<Modal | null>(null)
@@ -163,7 +164,8 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
 
     /*  the keys of the parameter view (sorted, as in "ase config list") and the lines
         of the YAML rendering of the selected tab (in schema order), both reduced by the
-        key filter (with the map lines of the matching keys only)  */
+        key filter, the latter also by the collapse mode to the keys writable resp.
+        configured on the scope (with the map lines of the remaining keys only)  */
     const matches   = (key: string) => query === "" || key.toLowerCase().includes(query.toLowerCase())
     const sorted    = React.useMemo(() => [ ...data.keys ].sort((a, b) => a.localeCompare(b)), [ data ])
     const paramKeys = sorted.filter((key) => matches(key))
@@ -171,21 +173,23 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         const lines = [] as YamlLine[]
         let prev = [] as string[]
         for (const key of data.keys.filter((k) => matches(k))) {
+            const vals = data.layers.get(key) ?? []
+            const own  = vals[tab]
+            const base = vals.slice(0, tab).findLast((v) => v !== undefined)
+            const can  = data.writable.get(key)?.[tab] ?? false
+            if ((collapse === "writable" && !can) || (collapse === "configured" && own === undefined))
+                continue
             const segs = key.split(".")
             let k = 0
             while (k < segs.length - 1 && k < prev.length - 1 && segs[k] === prev[k])
                 k++
             for (let i = k; i < segs.length - 1; i++)
                 lines.push({ indent: i, seg: segs[i], key: null, value: "", explicit: false, writable: false })
-            const vals = data.layers.get(key) ?? []
-            const own  = vals[tab]
-            const base = vals.slice(0, tab).findLast((v) => v !== undefined)
-            const can  = data.writable.get(key)?.[tab] ?? false
             lines.push({ indent: segs.length - 1, seg: segs[segs.length - 1], key, value: yamlText(key, own ?? base), explicit: own !== undefined, writable: can })
             prev = segs
         }
         return lines
-    }, [ data, tab, query ])
+    }, [ data, tab, query, collapse ])
     const scopeKeys = yaml.flatMap((l) => l.key !== null ? [ l.key ] : [])
 
     /*  the selected key of the current view, which falls back to its first key if the
@@ -618,8 +622,8 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
             return
         }
 
-        /*  selecting and configuring a key, filtering the keys, selecting a tab,
-            deleting a key from the scope of the tab, and editing its file  */
+        /*  selecting and configuring a key, filtering the keys, selecting a tab, cycling
+            the collapse mode, deleting a key from the scope of the tab, and editing its file  */
         if (key.upArrow || key.downArrow)
             step(key.upArrow ? -1 : 1)
         else if (key.pageUp || key.pageDown)
@@ -632,6 +636,8 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
             setTyping(true)
         else if (view === "scope" && (key.leftArrow || key.rightArrow))
             setTab(Math.max(0, Math.min(chain.length - 1, tab + (key.leftArrow ? -1 : 1))))
+        else if (view === "scope" && input === "c")
+            setCollapse(collapse === "none" ? "writable" : collapse === "writable" ? "configured" : "none")
         else if (view === "scope" && key.delete && list.includes(cur) && writable(cur)[tab] === true)
             unset(cur, tab)
         else if (view === "scope" && input === "e" && tab > 0)
@@ -660,6 +666,7 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
                 "⧉ ASE: ", h(Text, cx("bold"), "Configuration Editor"),
                 " · keys: ", h(Text, cx("bold", list.length === 0 && "signal"), count),
                 " · view: ", h(Text, cx("dim", "badge"), ` ${(view === "param" ? "parameters" : "scopes").padEnd(10)} `),
+                ...(view === "scope" ? [ " · collapse: ", h(Text, { key: "collapse", ...cx("dim", "badge") }, ` ${collapse.padEnd(10)} `) ] : []),
                 " · filter: ", h(Text, cx(typing ? "signal" : "dim", "badge"), field + (query !== "" ? "✕ " : "  ")))),
         h(Box, cx("fixed"), h(Text, cx("dim"), "│")))
 
@@ -749,7 +756,8 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         "↑/↓/⇞/⇟/⇤/⇥/Wheel: select key · ⏎/Click: configure key · v: scope view",
         quit
     ] : [
-        "←/→/Click: select scope · ↑/↓/⇞/⇟/⇤/⇥/Wheel: select key · ⏎/Click: configure key",
+        "←/→/Click: select scope · ↑/↓/⇞/⇟/⇤/⇥/Wheel: select key · ⏎/Click: configure key · " +
+            (collapse === "none" ? "c: collapse to writable" : collapse === "writable" ? "c: collapse to configured" : "c: collapse none"),
         `DEL: delete key · e: edit scope file · v: parameter view · ${quit}`
     ]
 
