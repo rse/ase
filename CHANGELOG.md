@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   BUGFIX [code]: Web Board Drag & Drop in Off-Screen Web Views
+    The web board now drags task boxes onto lanes through pointer events instead of HTML5 drag & drop,
+    which off-screen rendering web views (like the one of the Herdr desktop app) do not support,
+    with a floating clone of the task box following the pointer (ESC cancels).
+
 -   NEW FEATURE [plugin, docs]: Change Set to Task
     The new `ase-repo-task` skill reverse-engineers a change set (staged, unstaged, `--branch`, or
     `--commit`), optionally narrowed to a scope topic, into a new task plan (or only its `--focus`

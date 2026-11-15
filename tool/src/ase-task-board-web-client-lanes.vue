@@ -13,10 +13,9 @@
                   vertically written status and number of cards (expanding the phase on double click)  -->
             <div v-if="surface.collapsed.includes(g.title)" class="group coll">
                 <div class="ghd" :class="{ sel: sel.g === gi }" @click="selectPhase(gi)" @dblclick="toggle('collapsed', g.title)"><span class="arr right">▼</span></div>
-                <div v-for="(l, li) in g.lanes" :key="l.status" class="lane" tabindex="-1"
+                <div v-for="(l, li) in g.lanes" :key="l.status" class="lane" tabindex="-1" :data-status="l.status"
                     :class="[ { active: l.active, dashed: l.dashed, done: l.kind === 'terminal', sel: sel.g === gi && sel.l === li }, dropClass(l.status) ]"
-                    :style="{ flex: `${l.weight} 1 0` }" @click="selectLane(gi, li)" @dblclick="toggle('collapsed', g.title)"
-                    @dragover="dragOver($event, l.status)" @dragleave="dragLeave($event, l.status)" @drop="drop($event, l.status)">
+                    :style="{ flex: `${l.weight} 1 0` }" @click="selectLane(gi, li)" @dblclick="toggle('collapsed', g.title)">
                     <span class="arr right">▼</span>
                     <span class="vt">{{ l.status.toUpperCase() }}</span>
                     <span class="cnt">{{ l.cards.length }}</span>
@@ -27,10 +26,9 @@
                   minimizes/maximizes a lane (resp. shrinks a grown lane), or collapses a phase  -->
             <div v-else class="group" :class="{ grown: grown && sel.g === gi }">
                 <div class="ghd" :class="{ sel: sel.g === gi }" @click="selectPhase(gi)" @dblclick="toggle('collapsed', g.title)"><span class="arr">▼</span><span class="ttl">{{ g.title }}</span></div>
-                <div v-for="(l, li) in g.lanes" :key="l.status" class="lane" tabindex="-1"
+                <div v-for="(l, li) in g.lanes" :key="l.status" class="lane" tabindex="-1" :data-status="l.status"
                     :class="[ { active: l.active, dashed: l.dashed, done: l.kind === 'terminal', min: surface.minimized.includes(l.status), sel: sel.g === gi && sel.l === li, grown: grown && sel.g === gi && sel.l === li }, dropClass(l.status) ]"
-                    :style="{ flex: `${l.weight} 1 0` }" @click="selectLane(gi, li)" @dblclick="grown ? (grow = false) : toggle('minimized', l.status)"
-                    @dragover="dragOver($event, l.status)" @dragleave="dragLeave($event, l.status)" @drop="drop($event, l.status)">
+                    :style="{ flex: `${l.weight} 1 0` }" @click="selectLane(gi, li)" @dblclick="grown ? (grow = false) : toggle('minimized', l.status)">
                     <div class="lhd" :title="grown ? 'shrink lane (g)' : ''">
                         <span>{{ grown ? "◆" : surface.minimized.includes(l.status) ? "▶" : "▼" }}<span class="ttl">{{ l.status }}</span></span>
                         <span>{{ l.cards.length }}</span>
@@ -40,10 +38,10 @@
                         <div v-if="carried !== null && drag?.over === l.status" class="card held sel carried" :class="`tone-${carried.tone}`">
                             <div class="cbody"><TaskTitle :id="carried.id" :epic="carried.group" :title="carried.title" :edit="carried.edit" :effort="carried.effort" /></div>
                         </div>
-                        <div v-for="c in l.cards" :key="c.id" class="card" draggable="true"
+                        <div v-for="c in l.cards" :key="c.id" class="card"
                             :class="[ `tone-${c.tone}`, { sel: sel.id === c.id, badged: badges.has(c.id) }, carryClass(c.id) ]"
                             @click="sel = { g: gi, l: li, id: c.id }" @dblclick.stop="openTask(c.id)"
-                            @dragstart="dragStart($event, c.id, l.status, c.moves)" @dragend="dragEnd">
+                            @pointerdown="pointerDown($event, c.id, l.status, c.moves)">
                             <div v-if="badges.has(c.id)" class="cagents"><span v-for="(b, bi) in badges.get(c.id)!" :key="bi" class="cagent"><span class="aicon">{{ b.icon }}</span> {{ b.name }}</span></div>
                             <div class="cbody"><TaskTitle :id="c.id" :epic="c.group" :title="c.title" :edit="c.edit" :effort="c.effort" /></div>
                         </div>
@@ -55,8 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, watch } from "vue"
-import TaskTitle                     from "./ase-task-board-web-client-title.vue"
+import { computed, nextTick, onMounted, onUnmounted, watch } from "vue"
+import TaskTitle                                            from "./ase-task-board-web-client-title.vue"
 import {
     groupItems,
     board, boardError, view, graph, task, sel, grow, drag, boardEl,
@@ -101,37 +99,78 @@ const dropClass = (status: string) => drag.value === null ? {} : {
     blocked: !canDrop(status) && status !== drag.value.from
 }
 
-/*  drag & drop a task box onto another lane (see "drag" of the model)  */
-const dragStart = (ev: DragEvent, id: string, from: string, moves?: string[]) => {
-    drag.value = { id, from, moves, over: null }
-    if (ev.dataTransfer !== null) {
-        ev.dataTransfer.setData("text/plain", id)
-        ev.dataTransfer.effectAllowed = "move"
+/*  drag & drop a task box onto another lane (see "drag" of the model) through pointer events, as HTML5
+    drag & drop is unsupported by off-screen rendering web views (like the one of the Herdr desktop app),
+    where the drag starts once the pressed pointer moved a few pixels, with a floating clone of the
+    task box following the pointer (like the HTML5 drag image), and ESC cancels it  */
+let press: { id: string, from: string, moves?: string[], x: number, y: number, el: HTMLElement, pid: number, ghost: HTMLElement | null } | null = null
+const laneAt = (ev: PointerEvent) =>
+    document.elementFromPoint(ev.clientX, ev.clientY)?.closest<HTMLElement>("#board .lane[data-status]")?.dataset.status ?? null
+const release = () => {
+    press?.ghost?.remove()
+    press = null
+}
+const pointerDown = (ev: PointerEvent, id: string, from: string, moves?: string[]) => {
+    if (ev.button !== 0 || drag.value !== null)
+        return
+    press = { id, from, moves, x: ev.clientX, y: ev.clientY, el: ev.currentTarget as HTMLElement, pid: ev.pointerId, ghost: null }
+}
+const pointerMove = (ev: PointerEvent) => {
+    if (press === null || ev.pointerId !== press.pid)
+        return
+    if (press.ghost === null) {
+        if (Math.hypot(ev.clientX - press.x, ev.clientY - press.y) < 5)
+            return
+        const r = press.el.getBoundingClientRect()
+        press.ghost = press.el.cloneNode(true) as HTMLElement
+        press.ghost.classList.add("floating")
+        Object.assign(press.ghost.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px` })
+        boardEl.value?.appendChild(press.ghost)
+        press.el.setPointerCapture(ev.pointerId)
+        drag.value = { id: press.id, from: press.from, moves: press.moves, over: null }
     }
-}
-const dragOver = (ev: DragEvent, status: string) => {
-    if (!canDrop(status))
+    if (drag.value?.id !== press.id || drag.value.key === true) {
+        release()
         return
-    ev.preventDefault()
-    if (ev.dataTransfer !== null)
-        ev.dataTransfer.dropEffect = "move"
-    drag.value!.over = status
+    }
+    press.ghost.style.transform = `translate(${ev.clientX - press.x}px, ${ev.clientY - press.y}px)`
+    const status = laneAt(ev)
+    drag.value.over = status !== null && canDrop(status) ? status : null
 }
-const dragLeave = (ev: DragEvent, status: string) => {
-    if (drag.value?.over === status && !(ev.currentTarget as Element).contains(ev.relatedTarget as Node | null))
-        drag.value.over = null
-}
-const dragEnd = () => {
-    drag.value = null
-}
-const drop = async (ev: DragEvent, status: string) => {
-    ev.preventDefault()
+const pointerUp = async (ev: PointerEvent) => {
+    if (press === null || ev.pointerId !== press.pid)
+        return
+    const started = press.ghost !== null
+    const id      = press.id
+    release()
     const d = drag.value
-    if (d === null || !canDrop(status))
+    if (!started || d?.id !== id || d.key === true)
         return
+    const status = laneAt(ev)
+    const ok     = status !== null && canDrop(status)
     drag.value = null
-    await moveTask(d.id, status)
+    if (ok)
+        await moveTask(d.id, status)
 }
+const pointerCancel = (ev?: Event) => {
+    if (press === null || (ev instanceof KeyboardEvent && ev.key !== "Escape"))
+        return
+    if (press.ghost !== null && drag.value?.id === press.id && drag.value.key !== true)
+        drag.value = null
+    release()
+}
+onMounted(() => {
+    window.addEventListener("pointermove",   pointerMove)
+    window.addEventListener("pointerup",     pointerUp)
+    window.addEventListener("pointercancel", pointerCancel)
+    window.addEventListener("keydown",       pointerCancel)
+})
+onUnmounted(() => {
+    window.removeEventListener("pointermove",   pointerMove)
+    window.removeEventListener("pointerup",     pointerUp)
+    window.removeEventListener("pointercancel", pointerCancel)
+    window.removeEventListener("keydown",       pointerCancel)
+})
 
 /*  scroll the selection into view, and focus the selected lane,
     so keys like HOME/END scroll it (unless typing elsewhere)  */

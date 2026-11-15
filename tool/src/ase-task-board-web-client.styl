@@ -567,12 +567,20 @@ header
     #busy .spinner, #busy .bar .block
         animation: none
 
-/*  the drag & drop of task boxes: the dragged task box, the lanes it can be
-    dropped onto (filled while hovered), and the lanes it cannot be dropped onto
+/*  the drag & drop of task boxes: the dragged task box (dimmed at its origin, and
+    its floating clone following the pointer), the lanes it can be dropped onto
+    (filled while hovered), and the lanes it cannot be dropped onto
     (with the lanes view id raising the specificity above the lane grounds)  */
 #board
     .card.dragging
         opacity: 0.4
+    .card.floating
+        position: fixed
+        z-index: 100
+        margin: 0
+        pointer-events: none
+        opacity: 0.85
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25)
     .lane.target
         border-color: var(--c-accent)
         border-style: dashed
