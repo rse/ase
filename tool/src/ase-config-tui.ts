@@ -32,7 +32,7 @@ import { sanitize }                           from "./ase-task-board-tui-popup.j
     (margin, frame, and padding), the label width of the modal, the debounce delay
     of the text inputs, and the minimum window size  */
 const HEAD    = 2
-const DESC    = 3
+const DESC    = 6
 const FOOT    = 4
 const PRE     = { param: 2, scope: 2 } as const
 const FILTER  = 14
@@ -49,9 +49,25 @@ const UNSET   = "(unset)"
 type Seg = [ string, TextProps? ]
 
 /*  a line of the YAML rendering of a scope: a map line (of a key prefix, without key)
-    or a key line (with its value, explicitly configured on the scope or inherited,
-    and whether the key is writable on the scope)  */
-type YamlLine = { indent: number, seg: string, key: string | null, value: string, explicit: boolean, writable: boolean }
+    or a key line (with its value, the tone of its value, and whether the key is
+    writable on the scope)  */
+type YamlLine = { indent: number, seg: string, key: string | null, value: string, tone: ValueTone, writable: boolean }
+
+/*  the tones of the values and the keys, and their styles (in the order of the legend)  */
+type ValueTone = "selected" | "configured" | "inherited" | "default" | "unset"
+type KeyTone   = "writable" | "read-only" | "parent-only"
+const valueStyles = (): Record<ValueTone, TextProps> => ({
+    selected:      { color: palette.signal, inverse: true },
+    configured:    cx("accent", "bold"),
+    inherited:     cx("normal", "bold"),
+    default:       cx("dim", "bold"),
+    unset:         { ...cx("dim"), dimColor: true }
+})
+const keyStyles = (): Record<KeyTone, TextProps> => ({
+    "writable":    cx("normal"),
+    "read-only":   cx("dim"),
+    "parent-only": { ...cx("dim"), dimColor: true }
+})
 
 /*  the open configuration modal: the key, the chain index of the selected scope (or -1
     if the key is writable on no scope of the chain), the text of the value editor (the
@@ -99,6 +115,18 @@ const segLine = (key: string, segs: Seg[], width: number) => {
         " ".repeat(Math.max(0, width - used)))
 }
 
+/*  dim an element tree (all its texts and borders in the dim color), as the backdrop
+    of a popup, where the faint attribute is avoided, as Ink loses it after bold texts  */
+const dimTree = (node: React.ReactNode): React.ReactNode => {
+    if (!React.isValidElement<Record<string, unknown>>(node))
+        return node
+    const color = palette.dim ?? "gray"
+    const props = node.type === Text ? { color } : node.type === Box ? { borderColor: color } : {}
+    const kids  = node.props.children as React.ReactNode
+    return kids === undefined ? React.cloneElement(node, props) :
+        React.cloneElement(node, props, ...React.Children.toArray(kids).map(dimTree))
+}
+
 /*  keep an index visible within a viewport of a height, by minimally moving its
     offset, where scrolling up reveals the entries from a top index on  */
 const follow = (off: number, top: number, idx: number, height: number, total: number): number =>
@@ -123,10 +151,11 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
     const [ report, setReport ] = React.useState<string | null>(null)
     const [ rev,    setRev    ] = React.useState(0)
     const [ keys,   setKeys   ] = React.useState(true)
-    const paramOff = React.useRef(0)
-    const scopeOff = React.useRef(0)
-    const pending  = React.useRef<{ key: string, idx: number, text: string } | null>(null)
-    const timer    = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+    const paramOff  = React.useRef(0)
+    const scopeOff  = React.useRef(0)
+    const pending   = React.useRef<{ key: string, idx: number, text: string } | null>(null)
+    const timer     = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+    const lastClick = React.useRef<{ key: string, at: number } | null>(null)
 
     /*  report mouse presses while the editor runs  */
     React.useEffect(() => {
@@ -154,6 +183,13 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         const vals = data.layers.get(key) ?? []
         const idx  = vals.findLastIndex((v) => v !== undefined)
         return idx >= 0 ? { value: vals[idx], idx } : undefined
+    }
+
+    /*  the tone of the value of a key as seen from the scope at a chain index: configured
+        on this scope, inherited from a weaker scope, a built-in default, or unset  */
+    const valueTone = (key: string, idx: number): ValueTone => {
+        const src = (data.layers.get(key) ?? []).slice(0, idx + 1).findLastIndex((v) => v !== undefined)
+        return src < 0 ? "unset" : src === 0 ? "default" : src === idx ? "configured" : "inherited"
     }
 
     /*  the labels of the scopes and the files of the tabs  */
@@ -184,8 +220,8 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
             while (k < segs.length - 1 && k < prev.length - 1 && segs[k] === prev[k])
                 k++
             for (let i = k; i < segs.length - 1; i++)
-                lines.push({ indent: i, seg: segs[i], key: null, value: "", explicit: false, writable: false })
-            lines.push({ indent: segs.length - 1, seg: segs[segs.length - 1], key, value: yamlText(key, own ?? base), explicit: own !== undefined, writable: can })
+                lines.push({ indent: i, seg: segs[i], key: null, value: "", tone: "unset", writable: false })
+            lines.push({ indent: segs.length - 1, seg: segs[segs.length - 1], key, value: yamlText(key, own ?? base), tone: valueTone(key, tab), writable: can })
             prev = segs
         }
         return lines
@@ -335,7 +371,7 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         const type   = typeOf(m.key)
         const w      = writable(m.key)
         const lines  = [] as Seg[][]
-        lines.push([ [ " " ], [ m.key, cx("accent", "bold") ] ])
+        lines.push([ [ " " ], [ m.key, cx("normal", "bold") ] ])
         lines.push([])
         for (const text of wrapText(configDescriptions[m.key] ?? "", textW, 4))
             lines.push([ [ " " ], [ text, cx("normal") ] ])
@@ -523,7 +559,8 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
     /*  handle the mouse: within the modal a click onto a writable scope selects it,
         else the wheel (64/65: up/down) steps the selection, a click onto the search
         field starts typing into it, a click onto a tab selects it, and a click onto a
-        key selects it, resp. opens its modal if already selected  */
+        key selects it, resp. a double click (onto the same key within 400ms, like in
+        the task board) opens its modal  */
     useMouseReports((btn, mx, my) => {
         const wheel = btn === 64 ? -1 : btn === 65 ? 1 : 0
         if (btn !== 0 && wheel === 0)
@@ -560,7 +597,11 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         const key = view === "param" ? paramKeys[n] : yaml[n]?.key
         if (key === undefined || key === null)
             return
-        if (key === cur)
+        const now    = Date.now()
+        const last   = lastClick.current
+        const double = last !== null && last.key === key && now - last.at <= 400
+        lastClick.current = double ? null : { key, at: now }
+        if (double)
             open(key)
         else
             setSel(key)
@@ -672,6 +713,12 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
 
     /*  the content of the parameter view: the column header, a rule below it (connected
         to the frame of the panel, like the one below the tabs), and the table rows  */
+    const vs   = valueStyles()
+    const ks   = keyStyles()
+
+    /*  render a style as selected (if so): only its color and inverse change, its weight is kept  */
+    const mark = (props: TextProps, on: boolean): TextProps =>
+        on ? { ...props, color: vs.selected.color, inverse: true } : props
     let content: React.ReactElement[]
     if (view === "param") {
         const kw  = Math.min(Math.floor(W * 0.45), Math.max(3, ...data.keys.map((k) => k.length)))
@@ -685,18 +732,15 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
                 h(Text, { color: palette.signal }, `├${"─".repeat(W + 2)}┤`)),
             ...(paramKeys.length === 0 ? [ h(Text, { key: "none", ...cx("dim") }, "(no matching keys)") ] :
                 paramKeys.slice(paramOff.current, paramOff.current + H).map((key) => {
-                    /*  an existing value is bold, an explicitly set one (outside of "default") also accented  */
+                    /*  the key and the value (with its scope) styled as seen from the target scope  */
                     const eff = effective(key)
                     const col = `${fit(key, kw)} `
                     const val = `${fit(eff !== undefined ? valueText(key, eff.value) : "~", vw)} `
                     const scp = fit(eff !== undefined ? labels[eff.idx] : "-", sw)
-                    const exp = eff !== undefined && eff.idx > 0
-                    return key === cur ?
-                        h(Text, { key, color: palette.signal, inverse: true, wrap: "truncate" }, col + val + scp) :
-                        h(Text, { key, wrap: "truncate" },
-                            h(Text, cx("normal"), col),
-                            h(Text, cx(exp ? "accent" : eff !== undefined ? "normal" : "dim", eff !== undefined && "bold"), val),
-                            h(Text, cx(exp ? "accent" : "dim", exp && "bold"), scp))
+                    const tgt = chain.length - 1
+                    return h(Text, { key, wrap: "truncate" },
+                        h(Text, mark(ks[writable(key)[tgt] === true ? "writable" : "read-only"], key === cur), col),
+                        h(Text, mark(vs[valueTone(key, tgt)], key === cur), val + scp))
                 }))
         ]
     }
@@ -709,8 +753,10 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         while (top > 0 && yaml[top - 1].key === null)
             top--
         scopeOff.current = follow(scopeOff.current, Math.max(0, top), Math.max(0, idx), H, yaml.length)
+        /*  the tabs, bold and with their scope kinds (but not their case-sensitive ids) in uppercase  */
         const tabSegs = labels.flatMap((label, i) => [
-            [ ` ${label} `, i === tab ? { color: palette.signal, inverse: true, bold: true } : cx(i === 0 ? "dim" : "normal") ],
+            [ ` ${label.replace(/^[^:]+/, (kind) => kind.toUpperCase())} `,
+                i === tab ? { color: palette.signal, inverse: true, bold: true } : cx(i === 0 ? "dim" : "normal", "bold") ],
             [ " " ]
         ] as Seg[])
         /*  the rule below the tabs, connected to the frame of the panel (by a negative
@@ -721,50 +767,82 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
             segLine("tabs", tabSegs, W),
             h(Box, { key: "rule", marginLeft: -2, width: W + 4 },
                 h(Text, { wrap: "truncate" },
-                    h(Text, { color: palette.signal }, `├${"─".repeat(Math.max(0, W + 1 - file.length - 2))} `),
+                    h(Text, { color: palette.signal }, `├${"─".repeat(Math.max(0, W - 3 - file.length))}[ `),
                     h(Text, cx("dim"), file),
-                    h(Text, { color: palette.signal }, " ─┤"))),
+                    h(Text, { color: palette.signal }, " ]─┤"))),
             ...(yaml.length === 0 ? [ h(Text, { key: "none", ...cx("dim") }, "(no matching keys)") ] :
                 yaml.slice(scopeOff.current, scopeOff.current + H).map((l, i) => {
-                    const text = fit("    ".repeat(l.indent) + l.seg + ":" + (l.key !== null ? ` ${l.value}` : ""), W)
-                    const props = l.key !== null && l.key === cur ? { color: palette.signal, inverse: true } :
-                        cx(l.key !== null && !l.writable ? "dim" : "normal", l.explicit && tab > 0 && "accent", l.explicit && "bold")
-                    return h(Text, { key: `line-${scopeOff.current + i}`, ...props, wrap: "truncate" }, text)
+                    /*  the key (resp. map) part and the value part, styled separately  */
+                    const head = "    ".repeat(l.indent) + l.seg + ":"
+                    const text = fit(head + (l.key !== null ? ` ${l.value}` : ""), W)
+                    const on   = l.key !== null && l.key === cur
+                    return h(Text, { key: `line-${scopeOff.current + i}`, wrap: "truncate" },
+                        h(Text, mark(ks[l.key === null ? "parent-only" : l.writable ? "writable" : "read-only"], on), text.slice(0, head.length)),
+                        h(Text, mark(vs[l.tone], on), text.slice(head.length)))
                 }))
         ]
     }
 
-    /*  the description box of the selected key, with the key in its top border  */
-    const boxW  = columns - 2
-    const descW = boxW - 4
-    const title = cur !== "" ? ` ${cur} ` : ""
-    const desc  = wrapText(configDescriptions[cur] ?? "", descW, DESC)
-    const descBox = h(Box, { flexDirection: "column", marginX: 1 },
-        h(Text, cx("dim"), "╭─", h(Text, cx("accent", "bold"), title), "─".repeat(Math.max(0, boxW - 3 - title.length)) + "╮"),
-        ...Array.from({ length: DESC }, (_, i) => h(Text, { key: `desc-${i}` },
-            h(Text, cx("dim"), "│ "), h(Text, cx("normal"), fit(desc[i] ?? "", descW)), h(Text, cx("dim"), " │"))),
-        h(Text, cx("dim"), `╰${"─".repeat(Math.max(0, boxW - 2))}╯`))
+    /*  the information box of the selected key (its key on the first line, and its
+        description on the following lines, both labeled, with the wrapped lines indented
+        like the labels), and right of it the legend box (of a fixed width) of the key
+        styles and value styles, in two columns with headings, both boxes with their
+        titles in the color of their borders  */
+    const legend = [
+        [ [ "KEY:",   cx("normal", "bold") ] as Seg, ...Object.entries(ks) as Seg[] ],
+        [ [ "VALUE:", cx("normal", "bold") ] as Seg, ...Object.entries(vs) as Seg[] ]
+    ]
+    const legC  = legend.map((col) => Math.max(...col.map(([ text ]) => text.length)))
+    const legW  = legC[0] + 2 + legC[1]
+    const descO = columns - 2 - (legW + 4) - 1
+    const descW = descO - 4
+    const infoW = Math.max(1, descW - 7)
+    const desc  = wrapText(configDescriptions[cur] ?? "", infoW, DESC - 1)
+    const info  = [
+        [ [ "KEY:   ", cx("normal", "bold") ], [ fit(cur, infoW), cx("normal", "bold") ] ],
+        ...Array.from({ length: DESC - 1 }, (_, i) =>
+            [ [ i === 0 ? "VALUE: " : "       ", cx("normal", "bold") ], [ fit(desc[i] ?? "", infoW), cx("normal") ] ])
+    ] as Seg[][]
+    const descBox = h(Box, { flexDirection: "row", marginX: 1 },
+        h(Box, { flexDirection: "column", width: descO },
+            h(Text, cx("dim"), "╭─[ parameter information ]" + "─".repeat(Math.max(0, descO - 28)) + "╮"),
+            ...info.map((segs, i) => h(Text, { key: `desc-${i}`, wrap: "truncate" },
+                h(Text, cx("dim"), "│ "),
+                ...segs.map(([ text, props ], j) => h(Text, { key: j, ...(props ?? {}) }, text)),
+                h(Text, cx("dim"), " │"))),
+            h(Text, cx("dim"), `╰${"─".repeat(Math.max(0, descO - 2))}╯`)),
+        h(Box, { flexDirection: "column", width: legW + 4, marginLeft: 1 },
+            h(Text, cx("dim"), "╭─[ legend ]" + "─".repeat(legW + 4 - 13) + "╮"),
+            ...Array.from({ length: DESC }, (_, r) => h(Text, { key: `legend-${r}` },
+                h(Text, cx("dim"), "│ "),
+                ...[ 0, 1 ].flatMap((c) => {
+                    const [ text, props ] = legend[c][r] ?? [ "" ]
+                    return [ h(Text, { key: c, ...(props ?? {}) }, text), " ".repeat(legC[c] - text.length + (c === 0 ? 2 : 0)) ]
+                }),
+                h(Text, cx("dim"), " │"))),
+            h(Text, cx("dim"), `╰${"─".repeat(legW + 2)}╯`)))
 
     /*  the key hints (toggled by "?", like in the task board) and the status line in
         the last line of the screen, enclosed on its left and right side by the downward
         lines of the rule above it, which shows how to show the hidden key hints again  */
-    const quit  = `/: filter keys · ?: hide key hints · ESC: ${query !== "" ? "clear filter" : "quit"} · q: quit`
+    const quit  = `/: filter parameters · ?: hide hints · ${query !== "" ? "ESC: clear filter · q: quit" : "ESC/q: quit"}`
     const hints = typing ? [
-        "↑/↓/⇞/⇟/⇤/⇥/Wheel: select key",
-        "type to filter keys · ⏎: keep filter · ESC: clear filter · ⌫: delete character"
+        "↑/↓/⇞/⇟/⇤/⇥/wheel: select parameter",
+        "type to filter parameters · ⏎: keep filter · ESC: clear filter · ⌫: delete character"
     ] : view === "param" ? [
-        "↑/↓/⇞/⇟/⇤/⇥/Wheel: select key · ⏎/Click: configure key · v: scope view",
+        "↑/↓/⇞/⇟/⇤/⇥/wheel: select parameter · ⏎/double-click: configure parameter · v: scope view",
         quit
     ] : [
-        "←/→/Click: select scope · ↑/↓/⇞/⇟/⇤/⇥/Wheel: select key · ⏎/Click: configure key · " +
+        "←/→/click: select scope · ↑/↓/⇞/⇟/⇤/⇥/wheel: select parameter · ⏎/double-click: configure parameter · " +
             (collapse === "none" ? "c: collapse to writable" : collapse === "writable" ? "c: collapse to configured" : "c: collapse none"),
-        `DEL: delete key · e: edit scope file · v: parameter view · ${quit}`
+        `DEL: unset value · e: edit scope file · v: parameter view · ${quit}`
     ]
 
-    /*  the screen: the header, the panel with the view content, the description box,
-        the key hints, the status line, and the modal on top of it all  */
+    /*  the screen: the header, the panel with the view content, the information and
+        legend boxes, the key hints, the status line (all dimmed as the backdrop of an
+        open modal), and the modal on top of it all  */
     const panel = { borderStyle: "round", borderColor: palette.signal, marginX: 1, paddingX: 1, flexDirection: "column", height: PRE[view] + H + 2 } as const
-    return h(Box, { width: columns, height: rows, flexDirection: "column" },
+    const screen = [
         header,
         h(Text, cx("dim"), " ╰" + "─".repeat(Math.max(0, columns - 4)) + "╯ "),
         h(Box, panel, ...content),
@@ -777,8 +855,11 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
                 h(Text, cx("hint", report !== null && "signal"),
                     report !== null ? sanitize(report) : [ "⧉ ASE: ", h(Text, { key: "app", ...cx("bold") }, "Configuration Editor"),
                         " · version: ", h(Text, { key: "version", ...cx("bold") }, `ASE ${pkg.version}`),
-                        ...(keys ? [] : [ " · ?: show key hints" ]) ])),
-            h(Box, cx("fixed"), h(Text, cx("dim"), "│"))),
+                        ...(keys ? [] : [ " · ?: show hints" ]) ])),
+            h(Box, cx("fixed"), h(Text, cx("dim"), "│")))
+    ]
+    return h(Box, { width: columns, height: rows, flexDirection: "column" },
+        ...(layout !== null ? screen.map(dimTree) : screen),
         ...(layout !== null ? [ h(Box, { key: "modal", top: layout.top, left: layout.left, width: layout.width, height: layout.height, ...cx("popup", "border-signal") },
             ...layout.lines.map((segs, i) => segLine(`modal-${i}`, segs, layout.innerW))) ] : []))
 }

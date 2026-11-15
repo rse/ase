@@ -15,27 +15,34 @@ interactive terminal on both standard input and standard output, and
 otherwise fails.
 
 The screen shows a header (with the key count, the view, and the key
-filter), the content of the current view, a box with
-the description of the selected key, the key hints, and a status line
-(reporting errors). The key `/` (or a click onto the header) starts
+filter), the content of the current view, an information box with
+the key and the description of the selected parameter, right of it a legend box of the
+key and value styles, the key hints, and a status line (reporting
+errors). The key `/` (or a click onto the header) starts
 typing into the key filter, which reduces both views to the keys
-containing the typed text. The key `v` toggles between the two views:
+containing the typed text.
+
+Both views style keys and values alike, as seen from a reference scope
+(the target scope in the parameter view, the scope of the selected tab
+in the scope view). A key is `writable` (regular color) or `read-only`
+(dimmed) on it, and a map of the YAML rendering is `parent-only`
+(dimmed and faint). A value is `selected` (inverse in the signal color,
+the entire line), `configured` on the scope (bold in the accent color),
+`inherited` from a weaker scope (bold), a built-in `default` (bold and
+dimmed), or `unset` (a dimmed and faint `~`).
+
+The key `v` toggles between the two views:
 
 - *parameter view* (initial):
   A table of all configuration keys with their effective values and the
-  scopes supplying them, like `ase config list`. Existing values are
-  bold, and explicitly set ones (on a scope other than `default`) are
-  additionally in the accent color, while a missing value is shown as a
-  dimmed `~`. Too long values are truncated with an ellipsis.
+  scopes supplying them, like `ase config list`. Too long values are
+  truncated with an ellipsis.
 
 - *scope view*:
   The scopes of the chain as tabs (initially the target scope), and
   below the selected tab a YAML rendering of the full configuration of
-  its scope: keys not writable on the scope are dimmed, the others are
-  in regular color, and keys carrying a value on the scope are bold
-  (and, except on `default`, additionally in the accent color), while
-  the others show the value inherited from the weaker scopes (or `~` if
-  none). `RETURN` opens the modal on the scope of the tab
+  its scope, where keys without a value on the scope show the value
+  inherited from the weaker scopes. `RETURN` opens the modal on the scope of the tab
   (read-only for a key not writable on it). The key `c` cycles the
   collapse mode (shown in the header) through `none` (all keys),
   `writable` (only the keys writable on the scope), and `configured`
@@ -45,7 +52,7 @@ containing the typed text. The key `v` toggles between the two views:
   missing); after the editor exits, the file is strictly validated and
   an invalid file is reported in the status line.
 
-`RETURN` on a key opens a modal, which shows the key, its description,
+`RETURN` on a key opens a modal (dimming the screen behind it), which shows the key, its description,
 the scopes of the chain, and the value editor of the selected scope. In
 the scope list, scopes the key is not writable on are dimmed, the
 others are in regular color, scopes carrying a value are bold (and,
@@ -71,7 +78,7 @@ clear text in the modal.
 
 - In both views:
   `CURSOR-UP`/`CURSOR-DOWN`, `PAGE-UP`/`PAGE-DOWN`, `HOME`/`END`, and
-  the mouse wheel select a key, `RETURN` (or a click onto the selected
+  the mouse wheel select a key, `RETURN` (or a double click onto a
   key) opens its modal, a click selects a key, `v` toggles the view, `/`
   starts typing into the key filter, `?` hides resp. shows the key
   hints at the bottom (like in the task board), and `ESCAPE` or `q`
@@ -84,8 +91,8 @@ clear text in the modal.
 - In the scope view:
   `CURSOR-LEFT`/`CURSOR-RIGHT` (or a click) select the tab, `c`
   cycles the collapse mode, `DELETE`
-  deletes the selected key from the scope of the tab (if writable on
-  it), and `e` edits the file of this scope (not on the `default` tab).
+  unsets the value of the selected key on the scope of the tab (if
+  writable on it), and `e` edits the file of this scope (not on the `default` tab).
 
 - In the modal:
   `TAB`/`SHIFT-TAB` (or a click) cycle through the scopes, and

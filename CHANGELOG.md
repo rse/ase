@@ -5,11 +5,6 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
--   NEW FEATURE [code, docs]: Collapsible Configuration Scope View
-    In the scope view of `ase config ui`, `c` cycles the collapse mode through `none`, `writable`,
-    and `configured`, reducing the YAML tree to all, the writable, resp. the configured keys of the
-    scope, while always keeping the parent maps of the shown keys.
-
 -   NEW FEATURE [code, docs]: Resizable Task Board Lanes
     In the task lanes view of both boards, `+`/`-` resize the selected lane against its neighbor lane
     and `0` resets the lane heights of its phase, while the web board additionally offers a grip bar
