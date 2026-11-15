@@ -12,6 +12,7 @@
     [`--approach`|`-A`]
     [`--unverified`|`-u`]
     [`--focus`|`-f` *section*[,...]]
+    [`--ground`|`-G`]
     [`--quiet`|`-q`]
     [`--interactive`|`-i`]
     [`--next`|`-n` *option*[,...]]
@@ -120,6 +121,27 @@ stale draft.
     forwarded on a hand-off to `ase-task-grill`, but not on a hand-off
     to another skill.
 
+-   `--ground`|`-G`:
+    Ground the plan in facts instead of the world knowledge of the
+    model alone: once before the first generation or refinement of the
+    plan, each dimension of the sections under `--focus` -- `WHAT`
+    (`SPECIFICATION`), `HOW` (`DESIGN`), and `WHEN` (`VERIFICATION`,
+    skipped under `--unverified`) -- is grounded in parallel. Its
+    artifacts (`SPEC` and `DOCS` for `WHAT`, `CODE` and `INFR` for
+    `HOW`, and the test and CI files for `WHEN`) are scanned for the
+    project facts relevant to the plan, and the Internet/Web is searched
+    iteratively, with at most 5 searches per dimension, for the
+    established practices, standards, patterns, and pitfalls about it.
+
+    Both focus especially on the special and less known terms and
+    concepts and on the aspects which potentially could be outdated in
+    the model knowledge, judging every Web fact by its date or version.
+    These facts serve all rounds, including the approach round of
+    `--approach`, announced as `GRILLING (approach, grounded)`. If no
+    usable facts are found, a warning is shown and the planning falls
+    back to model knowledge. It is forwarded on a hand-off to
+    `ase-task-grill`, but not on a hand-off to another skill.
+
 -   `--quiet`|`-q`:
     Do not print the resulting plan at the end of a planning round. The
     status lines, the dialogs, and the warning on a stale implementation
@@ -181,6 +203,7 @@ stale draft.
 -   You want a task planned through chat-driven refinement
 -   You want a plan created or refined round by round
 -   You want approaches with pros and cons before a plan is composed
+-   You want a plan grounded in project facts and current Web knowledge
 -   You want a plan to craft a feature, refactor code, or resolve a problem
 -   You want an analyzer issue like `P1` turned into a plan
 -   You want plan refinement with hand-off to draft or implementation
@@ -212,6 +235,13 @@ chosen approach, and directly hand off to implementation:
 
 ```text
 ❯ /ase-task-edit --approach --next IMPLEMENT P1
+```
+
+Craft a new plan under the id `otel`, grounded in the project
+artifacts and the Internet/Web, along an interactively chosen approach:
+
+```text
+❯ /ase-task-edit --ground --approach otel: export the usage metrics via OpenTelemetry.
 ```
 
 Plan a refactoring under the id `cleanup`:

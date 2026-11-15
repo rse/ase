@@ -444,6 +444,9 @@ Set <args>--int-reuse-task</args>.
             <if condition="<getopt-option-focus/> is not equal `all`">
                 Set <args><args/> --focus <getopt-option-focus/></args>.
             </if>
+            <if condition="<getopt-option-ground/> is `true`">
+                Set <args><args/> --ground</args>.
+            </if>
             Only output the following <template/> and then call the
             tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`
             to invoke the `ase:ase-task-edit` skill in order to *edit*

@@ -1,6 +1,6 @@
 ---
 name: ase-task-edit
-argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-A] [--unverified|-u] [--focus|-f <section>[,...]] [--quiet|-q] [--interactive|-i] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
+argument-hint: "[--help|-h] [--plan|-p <option>] [--mode|-m auto|craft|refactor|resolve|specify] [--approach|-A] [--unverified|-u] [--focus|-f <section>[,...]] [--ground|-G] [--quiet|-q] [--interactive|-i] [--next|-n <option>[,...]] [<id> | <id>: <instruction> | <instruction> | <issue-id>]"
 description: >
     Iteratively edit and refine a named plan for a task through a
     conversational loop. A new plan is optionally composed along the
@@ -27,7 +27,7 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-A --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-A --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --ground|-G --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
     $ARGUMENTS
 </expand>
 
@@ -43,10 +43,29 @@ draft.
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-grill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-approach.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 
 Procedure
 ---------
+
+<define name="ground-plan">
+<if condition="<getopt-option-ground/> is equal `true` and <task-grounded/> is equal `false`">
+Ground the plan *once* per skill run -- the grounding facts
+<ground-facts/> serve this and *all* subsequent generations and
+refinements of the plan --, where <dimensions/> lists, in the order of
+<sections/>, `WHAT` for `SPECIFICATION`, `HOW` for `DESIGN`, and `WHEN`
+for `VERIFICATION` -- the latter only if the plan has (resp. gets) a
+`##  VERIFICATION (WHEN)` section:
+
+<expand name="ground"
+    arg1="<arg1/>"
+    arg2="<getopt-option-int-source-dir/>"
+    arg3="<dimensions/>"></expand>
+
+Set <task-grounded>true</task-grounded>.
+</if>
+</define>
 
 <define name="apply-refinement">
 Determine the *kind of change* of the refined plan:
@@ -74,9 +93,13 @@ refinement of the plan. Do not output anything.
 <expand name="task-spec-format"/>
 </if>
 
+<expand name="ground-plan"
+    arg1="the task plan in <task-content/> and its refinement instruction <instruction/>"></expand>
+
 Treat the <instruction/> as a *refinement instruction* for
 the plan, and update <task-content/> in-place by *applying* the
-requested <instruction/> to the *plan*.
+requested <instruction/> to the *plan*, preferring the grounding facts
+<ground-facts/> (if any) over the world knowledge of the model.
 
 When refining the plan this way, preserve the overall structure of the
 plan and only modify what the user actually requested. Do *not* rewrite
@@ -131,6 +154,9 @@ Set <task-content-dirty>true</task-content-dirty>.
 
 <define name="generate-plan">
 <expand name="task-ground-plan" arg1="<getopt-option-int-source-dir/>"/>
+
+<expand name="ground-plan"
+    arg1="the <instruction/> for a new task plan"></expand>
 
 Determine the *kind of change* of the new plan:
 
@@ -211,7 +237,7 @@ grounding in the project:
 <expand name="grill-understanding"
     arg1="the <instruction/>"
     arg2=""
-    arg3="false"></expand>
+    arg3="<task-grounded/>"></expand>
 
 Set <round-id>GRILLING</round-id>. Do not output anything.
 
@@ -239,7 +265,8 @@ This is the `OVERWRITE` of an existing plan under a focus, so re-generate
 closely following the defined plan format <format/> and injecting into
 them all the information from the <instruction/>, the <chosen-approach/>
 (if not empty), all decisions you derived from the <instruction/> and the
-<chosen-approach/>, and the grounding in the project. All other sections,
+<chosen-approach/>, the grounding in the project, and the grounding facts
+<ground-facts/> (if any). All other sections,
 the "backmatter", and all other frontmatter keys stay *unchanged*. Set the
 `Kind:` frontmatter key to <task-kind/>.
 </if>
@@ -248,8 +275,9 @@ Create a new plan from scratch and store the result as
 <task-content/> by closely following the defined plan format
 <format/> and injecting into it all the information from
 the <instruction/>, the <chosen-approach/> (if not empty), all
-decisions you derived from the <instruction/> and the <chosen-approach/>, and
-the grounding in the project. Set the `Kind:` frontmatter key to
+decisions you derived from the <instruction/> and the <chosen-approach/>,
+the grounding in the project, and the grounding facts <ground-facts/> (if
+any). Set the `Kind:` frontmatter key to
 <task-kind/>.
 
 <if condition="<getopt-option-focus/> is not equal `all`">
@@ -297,7 +325,9 @@ Set <args></args> (set args to empty).
 
     1.  Set <instruction><getopt-arguments/></instruction> initially.
         Set <issue-id></issue-id> (empty),
-        <task-allocated>false</task-allocated>, and
+        <task-allocated>false</task-allocated>,
+        <task-grounded>false</task-grounded>,
+        <ground-facts></ground-facts> (empty), and
         <task-origin>task inherited</task-origin>.
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
@@ -884,6 +914,9 @@ Set <args></args> (set args to empty).
             </if>
             <if condition="<getopt-option-focus/> is not equal `all`">
                 Set <args><args/> --focus <getopt-option-focus/></args>.
+            </if>
+            <if condition="<getopt-option-ground/> is `true`">
+                Set <args><args/> --ground</args>.
             </if>
             Only output the following <template/> and then call the
             `Skill(skill: "ase:ase-task-grill", args: "<args/>")` tool

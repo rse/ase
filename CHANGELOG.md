@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [plugin]: Grounded Plan Editing
+    The new option `--ground|-G` of `ase-task-edit` grounds the plan once per run in the project
+    artifacts and the Internet/Web, serving its generation, its refinements, and the approach round
+    of `--approach`, and is forwarded between `ase-task-edit` and `ase-task-grill` on their hand-offs.
+
 -   NEW FEATURE [code, docs]: Plan Grilling Agent
     The new built-in agent `ase agent griller` grills the plans of the `DRAFTED` tasks explicitly
     assigned to it via `ase-task-grill --ground --auto` (up to 3 rounds, stopping early on `MUST`,

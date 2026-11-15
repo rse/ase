@@ -131,7 +131,8 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
     preferably deriving their answer alternatives. The grounding is shown
     in the announcement line, like `GRILLING (security, grounded)`. If
     no usable facts are found, a warning is shown and the grilling falls
-    back to model knowledge.
+    back to model knowledge. It is forwarded on a re-grilling and on a
+    hand-off to `ase-task-edit`, but not on a hand-off to another skill.
 
 -   `--auto`|`-a`:
     Answer the questions automatically instead of asking the user via
