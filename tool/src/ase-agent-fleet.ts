@@ -166,6 +166,8 @@ const initConfig = (tool: string, lifecycle: string): string => [
         parallel:       1               # maximum number of tasks processed in parallel
     condenser:                          # compress the wording of the plan
         parallel:       1               # maximum number of tasks processed in parallel
+    griller:                            # grill the plan with grounded, auto-chosen answers
+        parallel:       1               # maximum number of tasks processed in parallel
     researcher:                         # research and ground the plan content
         mode:           phase           # "phase" (assigned tasks) or "request" (on request)
         parallel:       1               # maximum number of tasks processed in parallel

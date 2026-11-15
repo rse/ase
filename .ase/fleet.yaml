@@ -26,6 +26,8 @@ PA-REBOOTER:
     kind:           rebooter
 PA-CONDENSER:
     kind:           condenser
+PA-GRILLER:
+    kind:           griller
 PA-ESTIMATOR:
     kind:           estimator
     mode:           phase

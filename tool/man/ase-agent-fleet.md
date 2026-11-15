@@ -102,7 +102,7 @@ members) or `ase agent fleet stop`.
       `Changeset:` via the `ase-task-implement` skill, and puts them
       into `STALLED` unless they became `IMPLEMENTED`.
     - `enterprise`: the planning phase agents `rebooter`, `condenser`,
-      and `researcher` (mode `phase`), each processing only the `DRAFTED`
+      `griller`, and `researcher` (mode `phase`), each processing only the `DRAFTED`
       tasks explicitly assigned to it, and the phase agents
       `implementer` (mode `implement`, 2 tasks in parallel, waiting for
       the effort estimation, with its parameter `effort-wait` commented
@@ -214,7 +214,7 @@ value omits an option, and a list repeats an option:
   neither the name of another agent kind, nor `relay` or `fleet`), with
   the options of `ase agent` *kind* `start` and an optional `kind`
   (default: the section name), i.e., one of the built-in kinds
-  `rebooter`, `condenser`, `implementer`, `qualifier`, `integrator`,
+  `rebooter`, `condenser`, `griller`, `implementer`, `qualifier`, `integrator`,
   `editor`, `estimator`, and `researcher`, a definition kind of the project or the user, or `adhoc`
   (see `ase-agent-adhoc`(1)). Hence, an agent of a definition kind is
   given by a section of its kind (or with `kind:` *kind*), and an agent
@@ -351,7 +351,7 @@ lint:
 ## SEE ALSO
 
 `ase`(1), `ase-agent`(1), `ase-agent-adhoc`(1), `ase-agent-relay`(1),
-`ase-agent-rebooter`(1), `ase-agent-condenser`(1),
+`ase-agent-rebooter`(1), `ase-agent-condenser`(1), `ase-agent-griller`(1),
 `ase-agent-researcher`(1), `ase-agent-implementer`(1),
 `ase-agent-qualifier`(1), `ase-agent-integrator`(1),
 `ase-agent-editor`(1), `ase-agent-estimator`(1), `ase-task-board`(1).

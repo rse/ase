@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [code, docs]: Plan Grilling Agent
+    The new built-in agent `ase agent griller` grills the plans of the `DRAFTED` tasks explicitly
+    assigned to it via `ase-task-grill --ground --auto` (up to 3 rounds, stopping early on `MUST`,
+    with `--diff`), and puts them back into `DRAFTED`, unassigned (`DRAFTED` > `PLANNING` > `DRAFTED`).
+
 -   NEW FEATURE [code, docs]: Resizable Task Board Lanes
     In the task lanes view of both boards, `+`/`-` resize the selected lane against its neighbor lane
     and `0` resets the lane heights of its phase, while the web board additionally offers a grip bar

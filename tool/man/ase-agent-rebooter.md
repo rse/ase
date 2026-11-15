@@ -378,7 +378,7 @@ $ ase task assign FOO-42 rebooter
 
 ## SEE ALSO
 
-`ase`(1), `ase-agent`(1), `ase-agent-condenser`(1),
+`ase`(1), `ase-agent`(1), `ase-agent-condenser`(1), `ase-agent-griller`(1),
 `ase-agent-researcher`(1), `ase-agent-implementer`(1),
 `ase-agent-qualifier`(1), `ase-agent-integrator`(1),
 `ase-agent-editor`(1), `ase-agent-estimator`(1), `ase-agent-adhoc`(1),

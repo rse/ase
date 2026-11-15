@@ -218,7 +218,7 @@ export const requestsOf = (name: string): TaskRequests => {
     if (!REQUEST_NAME_RE.test(name))
         throw new Error(`invalid request name "${name}" ` +
             "(expected a lower-case word of letters, digits, and dashes, not ending in \"-running\" or \"-failed\")")
-    if ([ "rebooter", "condenser", "implementer", "qualifier", "integrator", "editor", "estimator", "researcher" ].includes(name))
+    if ([ "rebooter", "condenser", "griller", "implementer", "qualifier", "integrator", "editor", "estimator", "researcher" ].includes(name))
         throw new Error(`invalid request name "${name}" (its tag "ase-agent-${name}" is the one of a built-in agent)`)
     return name === edits.name ? edits : new TaskRequests(name, `ase-agent-${name}`, "processed")
 }

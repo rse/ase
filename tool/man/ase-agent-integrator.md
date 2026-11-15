@@ -445,7 +445,7 @@ $ ase agent integrator start -m merge -r git@github.com:example/project.git
 ## SEE ALSO
 
 `ase`(1), `ase-agent`(1), `ase-agent-rebooter`(1),
-`ase-agent-condenser`(1), `ase-agent-researcher`(1),
+`ase-agent-condenser`(1), `ase-agent-griller`(1), `ase-agent-researcher`(1),
 `ase-agent-implementer`(1), `ase-agent-qualifier`(1),
 `ase-agent-editor`(1), `ase-agent-estimator`(1), `ase-agent-adhoc`(1),
 `ase-agent-fleet`(1), `ase-agent-relay`(1), `ase-task`(1),

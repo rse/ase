@@ -377,7 +377,7 @@ $ ase task assign FOO-42 condenser
 
 ## SEE ALSO
 
-`ase`(1), `ase-agent`(1), `ase-agent-rebooter`(1),
+`ase`(1), `ase-agent`(1), `ase-agent-rebooter`(1), `ase-agent-griller`(1),
 `ase-agent-researcher`(1), `ase-agent-implementer`(1),
 `ase-agent-qualifier`(1), `ase-agent-integrator`(1),
 `ase-agent-editor`(1), `ase-agent-estimator`(1), `ase-agent-adhoc`(1),

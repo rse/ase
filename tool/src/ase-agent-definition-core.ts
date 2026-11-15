@@ -19,6 +19,7 @@ import type { AgentPrompt }         from "./ase-agent-relay-core.js"
 import { statePrevious }            from "./ase-agent-runtime-phase.js"
 import rebooter                     from "./ase-agent-definition-builtin/rebooter.js"
 import condenser                    from "./ase-agent-definition-builtin/condenser.js"
+import griller                      from "./ase-agent-definition-builtin/griller.js"
 import implementer                  from "./ase-agent-definition-builtin/implementer.js"
 import qualifier                    from "./ase-agent-definition-builtin/qualifier.js"
 import integrator                   from "./ase-agent-definition-builtin/integrator.js"
@@ -39,7 +40,7 @@ export type AgentKind = {
 
 /*  the built-in agent kinds  */
 export const builtinKinds: AgentKind[] = [
-    rebooter, condenser, implementer, qualifier, integrator, editor, estimator, researcher
+    rebooter, condenser, griller, implementer, qualifier, integrator, editor, estimator, researcher
 ]
 
 /*  a definition agent kind ("ase agent <kind>"): its name (the base name of its

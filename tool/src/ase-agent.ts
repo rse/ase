@@ -32,7 +32,7 @@ export default class AgentCommand {
         const cmd = program
             .command("agent")
             .description("Autonomous agents driving the task lifecycle phases (implementer, qualifier, integrator), " +
-                "rebooting and condensing the plans of tasks (rebooter, condenser), " +
+                "rebooting, condensing, and grilling the plans of tasks (rebooter, condenser, griller), " +
                 "processing the edit requests of tasks (editor), estimating the effort of tasks (estimator), " +
                 "researching the plans and topics of tasks (researcher), " +
                 "or of the definitions of the user or the project " +

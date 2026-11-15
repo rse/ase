@@ -63,7 +63,7 @@ The MCP tool `ase_task_request` provides the same functionality.
 - *name*:
   The request name: a lower-case word of letters, digits, and dashes,
   starting with a letter, not ending in `-running` or `-failed`, and
-  none of the built-in agent kinds `rebooter`, `condenser`,
+  none of the built-in agent kinds `rebooter`, `condenser`, `griller`,
   `implementer`, `qualifier`, `integrator`, `editor`, `estimator`, and
   `researcher` (as
   its tag `ase-agent-`*name* is the one of a built-in agent). The name

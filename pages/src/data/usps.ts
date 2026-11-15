@@ -104,7 +104,7 @@ export const usps: USP[] = [
             "from the planned to the integrated state, each one running in its own process: the <b>implementer</b> " +
             "implements the planned tasks into their change sets, the <b>qualifier</b> reviews and judges them, " +
             "and the <b>integrator</b> lands them into their targets. Meanwhile, the <b>researcher</b>, <b>rebooter</b>, " +
-            "<b>condenser</b>, <b>estimator</b>, and <b>editor</b> agents support you in planning the tasks. " +
+            "<b>condenser</b>, <b>griller</b>, <b>estimator</b>, and <b>editor</b> agents support you in planning the tasks. " +
             "Supervise this agentic development pipeline live on the task board, through the agent <b>graph</b> " +
             "along the task lifecycle model and the agent <b>logs</b> of their operations."
         ],

@@ -60,11 +60,12 @@ An agent definition configures the behavior of an agent declaratively.
 All agents of **ase** are agents of a definition, run by the same
 agent engine:
 
-- *built-in agents* (`ase agent rebooter`, `condenser`, `implementer`,
-  `qualifier`, `integrator`, `editor`, `estimator`, and `researcher`):
-  each mode of them is a built-in definition, which can be referenced as
-  `builtin:`*kind*`-`*mode* (resp. `builtin:`*kind* for its default
-  mode): `builtin:rebooter-reboot`, `builtin:condenser-condense`,
+- *built-in agents* (`ase agent rebooter`, `condenser`, `griller`,
+  `implementer`, `qualifier`, `integrator`, `editor`, `estimator`, and
+  `researcher`): each mode of them is a built-in definition, which can
+  be referenced as `builtin:`*kind*`-`*mode* (resp. `builtin:`*kind* for
+  its default mode): `builtin:rebooter-reboot`,
+  `builtin:condenser-condense`, `builtin:griller-grill`,
   `builtin:implementer-implement`, `builtin:implementer-draft`,
   `builtin:qualifier-judge`, `builtin:qualifier-qualify`,
   `builtin:integrator-merge`, `builtin:integrator-rebase`,
@@ -1173,7 +1174,7 @@ Started via `ase agent reviewer start --params severity=MEDIUM` (resp. with
 ## SEE ALSO
 
 `ase`(1), `ase-agent`(1), `ase-agent-rebooter`(1),
-`ase-agent-condenser`(1), `ase-agent-researcher`(1),
+`ase-agent-condenser`(1), `ase-agent-griller`(1), `ase-agent-researcher`(1),
 `ase-agent-implementer`(1), `ase-agent-qualifier`(1),
 `ase-agent-integrator`(1), `ase-agent-editor`(1),
 `ase-agent-estimator`(1), `ase-agent-relay`(1), `ase-agent-fleet`(1),

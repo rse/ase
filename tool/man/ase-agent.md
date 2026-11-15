@@ -50,10 +50,10 @@ The *agent* is one of the following agent kinds:
   lifecycle model, so that the three agents together realize the
   model from the planned to the integrated tasks,
 
-- the built-in phase agents `rebooter` and `condenser`, which re-create
-  resp. condense the plans of the tasks of the `Planning` phase of the
-  `enterprise` task lifecycle model explicitly assigned to them
-  (`DRAFTED` > `PLANNING` > `DRAFTED`),
+- the built-in phase agents `rebooter`, `condenser`, and `griller`,
+  which re-create, condense, resp. grill the plans of the tasks of the
+  `Planning` phase of the `enterprise` task lifecycle model explicitly
+  assigned to them (`DRAFTED` > `PLANNING` > `DRAFTED`),
 
 - the built-in request agent `editor`, which processes the edit
   requests of tasks in any task lifecycle model,
@@ -123,7 +123,7 @@ pre-assigned to a particular agent of a pool, while a task assigned to
 anybody else (e.g., a human) is left alone.
 
 An agent can require a task to be already assigned to it (like
-`rebooter`, `condenser`, and `researcher` in the mode `phase`, see
+`rebooter`, `condenser`, `griller`, and `researcher` in the mode `phase`, see
 `--assign-required`). Such an agent can leave a processed task untagged
 (see `--tag-success none`), as the unassignment of the task keeps it from
 being claimed again, while assigning it to the agent again requests
@@ -194,7 +194,7 @@ phase of the agent (or no longer exist). The predecessors of a task are
 the tasks of its `After:` frontmatter key and, for an explicit epic (a
 task whose `Group:` is its own id), implicitly all other tasks of its
 group. An agent whose passed state (see below) is the first state of
-the task lifecycle model (like `rebooter`, `condenser`, and
+the task lifecycle model (like `rebooter`, `condenser`, `griller`, and
 `researcher` in the mode `phase`, with `DRAFTED`) hence imposes no gate,
 except for a predecessor still being processed by an agent of its kind
 or a cancelled `After:` predecessor.
@@ -243,7 +243,8 @@ for `claude` only.
 
 The agent tool and, for an agent of a working directory other than
 `project` (i.e., all built-in agents except `rebooter`, `condenser`,
-and `estimator`, see `--workdir`), `git` have to be found in `$PATH`.
+`griller`, and `estimator`, see `--workdir`), `git` have to be found in
+`$PATH`.
 
 All processing information, including the output of the agent tool
 (which streams its agent messages, tool calls, failures, and final
@@ -333,10 +334,11 @@ default `branch:cs-{id}` implements every task onto its own branch.
 
 Without `--repo`, all tasks are processed in the Git working copy the
 agent is started in, which is hence mandatory (except for an agent of
-the working directory `project`, like `rebooter`, `condenser`, and
-`estimator`, which work in the project root only, where `rebooter`,
-`condenser`, and `estimator` do not accept `--repo` and `--tempdir` at
-all, while any other such agent ignores them).
+the working directory `project`, like `rebooter`, `condenser`,
+`griller`, and `estimator`, which work in the project root only, where
+`rebooter`, `condenser`, `griller`, and `estimator` do not accept
+`--repo` and `--tempdir` at all, while any other such agent ignores
+them).
 
 With `--repo` *url*, each agent instead clones the Git repository *url* once
 into its temporary directory (removed on termination) and processes every
@@ -451,6 +453,12 @@ The following sub-command groups exist:
   of the `enterprise` task lifecycle model explicitly assigned to it,
   putting them back into `DRAFTED` afterwards. See
   `ase-agent-condenser`(1).
+
+- `ase agent griller` `start`|`status`|`log`|`stop`:
+  The agent grilling the plans of the `DRAFTED` tasks of the
+  `enterprise` task lifecycle model explicitly assigned to it, with
+  grounded and automatically chosen answers, putting them back into
+  `DRAFTED` afterwards. See `ase-agent-griller`(1).
 
 - `ase agent implementer` `start`|`status`|`log`|`stop`:
   The agent of the `Implementation` phase of the `enterprise` task
@@ -575,7 +583,7 @@ The sub-commands of every agent kind *agent* are:
   The run lock (a directory, refreshed periodically and considered stale
   after 30 seconds without refresh) and the run record (process id, process
   start time, and claimed tasks) of each agent process of agent *kind*
-  (`rebooter`, `condenser`, `implementer`, `qualifier`, `integrator`,
+  (`rebooter`, `condenser`, `griller`, `implementer`, `qualifier`, `integrator`,
   `editor`, `estimator`, or `researcher`, resp. `tag-`*word* per tag `ase-agent-`*word* of the
   agents of the definition kinds and of `adhoc`), where *store-hash* is
   the first 12 hex digits of the SHA-1 digest of the identity of the
@@ -601,6 +609,7 @@ information and exits with status `1`.
 # start the phase agents of the "enterprise" lifecycle model
 $ ase agent rebooter start
 $ ase agent condenser start
+$ ase agent griller start
 $ ase agent researcher start
 $ ase agent implementer start -p 2
 $ ase agent qualifier start -m judge
@@ -617,8 +626,8 @@ $ ase agent implementer stop -n impl-codex
 
 ## SEE ALSO
 
-`ase`(1), `ase-agent-rebooter`(1), `ase-agent-condenser`(1), `ase-agent-implementer`(1),
-`ase-agent-qualifier`(1), `ase-agent-integrator`(1),
+`ase`(1), `ase-agent-rebooter`(1), `ase-agent-condenser`(1), `ase-agent-griller`(1),
+`ase-agent-implementer`(1), `ase-agent-qualifier`(1), `ase-agent-integrator`(1),
 `ase-agent-editor`(1), `ase-agent-estimator`(1), `ase-agent-researcher`(1),
 `ase-agent-adhoc`(1), `ase-agent-relay`(1), `ase-agent-fleet`(1), `ase-task`(1),
 `ase-task-board`(1), `ase-task-request`(1), `ase-config`(1).
