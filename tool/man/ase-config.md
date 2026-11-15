@@ -312,6 +312,34 @@ Agent:
   where a missing second one is derived as the complement of the
   first one (default: `#336699`, a blue with a derived brown).
 
+- `agent.cache.guard` (`true` or `false`):
+  Whether the cache controller asks before a prompt is sent into a
+  big cold prompt cache (default: `true`).
+
+- `agent.cache.threshold` (*tokens*\[`k`|`M`\]):
+  The least context tokens of a big prompt cache, which gets a SOFT
+  auto-warm and the guard (default: `150k`).
+
+- `agent.cache.soft` (*pings*):
+  The keep-alive pings of the automatic SOFT auto-warm of a big idle
+  prompt cache, once per idle period, where `0` disables it (default:
+  `4`). It is intentionally a count of pings and not a duration, as
+  each ping is sent shortly before the prompt cache expires: the
+  interval between the pings follows the detected cache TTL (about 52
+  minutes for the 1-hour TTL, and about 3.5 minutes for the 5-minute
+  TTL), so the count bounds the costs of the pings, whatever the TTL.
+
+- `agent.cache.hard` (*hours*\[`,`*hours*...\]):
+  The 1-9 hours (0.1-24 each, where fractions like `0.1` for 6 minutes
+  are allowed) offered by the escalation band for a HARD auto-warm of a
+  cooling prompt cache, where the first one is the default of
+  `/ase-mods-auto-warm` (default: `4,8,12,16,24`). Unlike
+  `agent.cache.soft`, these are intentionally hours and not counts of
+  pings, as a HARD auto-warm is explicitly requested to keep the prompt
+  cache warm until a certain time (for instance, over a lunch break or
+  a meeting), and the pings needed for this depend on the detected
+  cache TTL.
+
 AI usage accounting (see `ase-task-assign`(1) and
 `ase-setup-telemetry`(1)):
 

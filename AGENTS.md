@@ -89,7 +89,14 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         the module, rendered in the band above the prompt and following
         all changes of the task, with the last change shown as a unified diff
         with line numbers (removed by a `##` at the prompt), until a next
-        step of the skill is submitted), and `ase-mods-render-image.ts` for
+        step of the skill is submitted), `ase-mods-cache.ts` for the
+        cache controller of the own session (the state of the prompt cache in a
+        label of the footer, a SOFT auto-warm of a big idle cache by a few forked
+        pings, a HARD auto-warm on request for some hours, through the band or
+        the command `/ase-mods-auto-warm` registered by the module, the escalation of a
+        cooling resp. cold cache in the band above the prompt, and asking before
+        a prompt is sent into a big cold cache, configured by `agent.cache.*`),
+        and `ase-mods-render-image.ts` for
         the image and diagram rendering (an SVG/PNG/GIF/JPEG image of the
         tool `ase_mods_render_image`, resp. a Mermaid or D2 diagram of the tool
         `ase_mods_diagram`, rendered into SVG by the MCP tool `ase_diagram`

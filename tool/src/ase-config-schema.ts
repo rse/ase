@@ -62,6 +62,10 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "agent.diagram.format": "auto",
         "agent.diagram.theme":  "auto",
         "agent.diagram.tone":   diagramToneDefault,
+        "agent.cache.guard":     "true",
+        "agent.cache.threshold": "150k",
+        "agent.cache.soft":      "4",
+        "agent.cache.hard":      "4,8,12,16,24",
         "project.name":    "Example Project",
         "project.boxing":  "white",
         "project.users":   "",
@@ -222,7 +226,11 @@ export const configDescriptions: Record<string, string> = {
                                       "(auto), always as an inline image, or always as text.",
     "agent.diagram.theme":            "The theme style of the diagram images: probed from the terminal background (auto), light, or dark.",
     "agent.diagram.tone":             "The theme color tone of the diagram images, as one or two colors \"#rgb\" or \"#rrggbb\".",
-    "telemetry.enabled":              "Whether the AI usage accounting is enabled as a whole.",
+    "agent.cache.guard":              "Whether the cache controller asks before a prompt is sent into a big cold prompt cache.",
+    "agent.cache.threshold":          "The least context tokens of a big prompt cache (with an optional \"k\" or \"M\" suffix).",
+    "agent.cache.soft":               "The pings of the automatic SOFT auto-warm of a big idle prompt cache (0 disables).",
+    "agent.cache.hard":               "The comma-separated hours (0.1-24, at most 9) offered for a HARD auto-warm of a cooling prompt cache.",
+    "telemetry.enabled":             "Whether the AI usage accounting is enabled as a whole.",
     "telemetry.implicit":             "Whether the usage of an interactive session is also accounted onto its active task while the " +
                                       "task is unassigned.",
     "telemetry.service.port":         "The port (1024-65535) of the per-user OTLP ingress on 127.0.0.1.",
@@ -449,6 +457,17 @@ export const configSchema = v.nullish(v.strictObject({
             theme:    v.optional(v.picklist(agentClassification.theme)),
             tone:     v.optional(v.pipe(v.string(), v.check((s) => /^#(?:[0-9a-fA-F]{3}){1,2}(?:\s+#(?:[0-9a-fA-F]{3}){1,2})?$/.test(s.trim()),
                 "expected \"#rgb\" or \"#rrggbb\", optionally followed by a second one")))
+        })),
+        cache:    v.optional(v.strictObject({
+            guard:     v.optional(v.union([ v.boolean(), v.picklist([ "true", "false" ]) ])),
+            threshold: v.optional(v.pipe(v.union([ v.number(), v.string() ]), v.check((s) =>
+                /^\d+(?:\.\d+)?[kKmM]?$/.test(String(s)), "expected a number of tokens, optionally suffixed by \"k\" or \"M\""), v.metadata({ text: true }))),
+            soft:      v.optional(v.pipe(v.union([ v.number(), v.string() ]), v.check((s) =>
+                /^\d+$/.test(String(s)), "expected a number of pings (0 disables)"))),
+            hard:      v.optional(v.pipe(v.union([ v.number(), v.string() ]), v.check((s) => {
+                const hours = String(s).split(",").map((h) => h.trim())
+                return hours.length <= 9 && hours.every((h) => /^\d+(?:\.\d+)?$/.test(h) && Number(h) >= 0.1 && Number(h) <= 24)
+            }, "expected 1-9 comma-separated hours (0.1-24 each)"), v.metadata({ text: true })))
         }))
     })),
     telemetry: v.optional(v.strictObject({

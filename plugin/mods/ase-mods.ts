@@ -11,13 +11,14 @@
     the synopsis form ("ase-mods-help-compose.ts"),
     the manual band ("ase-mods-help-show.ts"), the manpage browser
     ("ase-mods-help-browse.ts"), the hint band ("ase-mods-help-hint.ts"),
-    the task band ("ase-mods-task-edit.ts"), and the image and diagram
-    rendering ("ase-mods-render-image.ts").
+    the task band ("ase-mods-task-edit.ts"), the image and diagram
+    rendering ("ase-mods-render-image.ts"), and the cache controller
+    ("ase-mods-cache.ts").
     As the engine loads only a module spelling "on", "$", and "next" literally,
     this is the only module touching the engine, and it binds the engine
     services needed by the other modules as plain functions.  */
 
-import type { Register, PromptBox, Timer } from "claude-code"
+import type { Register, PromptBox, Timer, EngineInterface } from "claude-code"
 import { type Band, TRIGGER } from "./ase-mods-common"
 import { modGrill, TOOL as DETAILS } from "./ase-mods-task-grill"
 import { modEvaluate }        from "./ase-mods-meta-evaluate"
@@ -28,6 +29,30 @@ import { modHelpBrowse }      from "./ase-mods-help-browse"
 import { modHelpHint }        from "./ase-mods-help-hint"
 import { modTaskEdit, TOOL }  from "./ase-mods-task-edit"
 import { modRenderImage, TOOL as IMAGE, DIAGRAM, graphics } from "./ase-mods-render-image"
+import { modCacheControl, type Controller, COMMAND as CACHE } from "./ase-mods-cache"
+
+/*  bind the engine services of the cache controller (at the top level of this
+    module, as the engine follows "$" only into such a function)  */
+const controller = ($: EngineInterface): Controller => ({
+    now:        () => $.clock.now(),
+    invalidate: () => $.ui.invalidate("ui.render"),
+    ask:        (question, options) => $.ui.ask(question, options),
+    fork:       (prompt) => $.model.fork({ prompt }),
+    config:     async (scope) => {
+        type Entries = { entries?: { key: string, value: string }[] }
+        const result = await $.mcp.call("plugin_ase_ase", "ase_config_list", { scope })
+        const block  = result.content.find((c) => c.type === "text")
+        const text   = block !== undefined && "text" in block ? String(block.text) : ""
+        if (result.isError)
+            throw new Error(`ase_config_list failed: ${text}`)
+        const entries = (result.structuredContent as Entries | undefined)?.entries
+            ?? (text !== "" ? (JSON.parse(text) as Entries).entries : undefined) ?? []
+        return Object.fromEntries(entries.map((entry) => [ entry.key, entry.value ]))
+    },
+    usage:      () => $.session.usage(),
+    compact:    () => $.session.compact({}),
+    every:      (ms, fn) => $.clock.every(ms, fn)
+})
 
 /*  function hook registration entry point  */
 export const register: Register = (on, options) => {
@@ -36,8 +61,8 @@ export const register: Register = (on, options) => {
         return
 
     /*  the grill table, the decision matrix, the intent help, the synopsis form,
-        the manual band, the manpage browser, the hint band, the task band, and
-        the image rendering  */
+        the manual band, the manpage browser, the hint band, the task band, the
+        image rendering, and the cache controller  */
     const grill    = modGrill()
     const evaluate = modEvaluate()
     const intent   = modHelpFind()
@@ -47,6 +72,7 @@ export const register: Register = (on, options) => {
     const hint     = modHelpHint()
     const task     = modTaskEdit()
     const image    = modRenderImage()
+    const cache    = modCacheControl()
 
     /*  whether the terminal can show inline images (assumed until probed),
         else the image rendering shows the text art of the images  */
@@ -76,7 +102,68 @@ export const register: Register = (on, options) => {
             if (await probed)
                 await $.tool.register(DIAGRAM)
         }
+        await $.command.register(CACHE)
+        await cache.start({ id: await $.session.id(), interactive: e.isInteractive }, controller($))
         return next(e)
+    })
+
+    /*  track the cache of the session: its new id after "/clear", a resume, or
+        a fork (whose cache is unknown), its end, its turns, its requests (whether
+        they read or rewrote the cache), its compactions, and its status line figures  */
+    on("classic.SessionStart", { source: [ "clear", "resume", "fork" ] }, async ($, e, next) => {
+        cache.restart(await $.session.id())
+        return next(e)
+    })
+    on("session.end", ($, e, next) => {
+        cache.end(e.reason === "clear" || e.reason === "resume")
+        return next(e)
+    })
+    on("turn.start", async ($, e, next) => {
+        if (e.agentId === undefined)
+            await cache.turnStart(controller($))
+        return next(e)
+    })
+    on("turn.step", async function* ($, e, next) {
+        const startedAt = await $.clock.now()
+        const result    = yield* next(e)
+        if (e.agentId === undefined && result.usage !== null)
+            cache.step(result.usage, startedAt, await $.clock.now())
+        return result
+    })
+    on("turn.complete", async ($, e, next) => {
+        const result = await next(e)
+        if (e.agentId === undefined)
+            await cache.complete(controller($))
+        return result
+    })
+    on("session.compact", async ($, e, next) => {
+        const result = await next(e)
+        cache.compacted()
+        return result
+    })
+    on("session.measure", ($, e, next) => {
+        cache.figures(e)
+        return next(e)
+    })
+    /*  serve the command of the cache controller  */
+    on("command.run", { command: CACHE.name }, async ($, e) => {
+        const text = await cache.command(e.args, controller($))
+        return text !== "" ? { text } : {}
+    })
+
+    /*  add the label of the cache controller to the footer: on the terminal
+        as an own tree of the other modes and the label over two or three lines,
+        elsewhere as one more mode  */
+    on("ui.render", { component: "SessionMode" }, ($, e, next) => {
+        const label = cache.footer()
+        if (label === undefined)
+            return next(e)
+        else if (e.surface !== "terminal")
+            return next({ ...e, props: { ...e.props, modes: [ ...e.props.modes, label.join(" ") ] } })
+        const { Box, Text } = $.ui.resolve(e)
+        const lines = e.props.modes.length > 0 ? [ e.props.modes.join(" & "), ...label ] : label
+        return Box({ flexDirection: "column", alignItems: "flex-end",
+            children: lines.map((line) => Text({ dimColor: true, children: line })) })
     })
 
     /*  serve the tool of the task band, which needs no permission, as it just
@@ -247,7 +334,7 @@ export const register: Register = (on, options) => {
     /*  operate the intent band and the synopsis form by RETURN, resp. freeze the
         picks in the latest table and close the intent band and the synopsis form
         once the prompt is submitted  */
-    on("prompt.submit", ($, e, next) => {
+    on("prompt.submit", async ($, e, next) => {
         /*  while the intent band or the synopsis form is shown, RETURN at the prompt
             (which usually arrives as an edit of the held prompt instead, so this is
             the fallback only) is a key of it, entering nothing and refilling the
@@ -292,6 +379,17 @@ export const register: Register = (on, options) => {
         if (band !== undefined)
             return next(e)
 
+        /*  ask before a big cold prompt cache is rewritten, and keep the prompt
+            for a later sending, if it was cancelled  */
+        if (!await cache.guard(e, controller($))) {
+            $.clock.after(50, () => {
+                $.prompt.fill({ text: e.text }).catch(() => {
+                    /*  ignore a prompt which is no longer accessible  */
+                })
+            })
+            return { drop: "cancelled before a cold prompt cache rewrite" }
+        }
+
         submissions++
         grill.submit(e.text)
         reset()
@@ -321,12 +419,14 @@ export const register: Register = (on, options) => {
     })
 
     /*  draw the intent band resp. the synopsis form, else the manual page, else
-        the task, else the argument hint, into the band above the prompt (terminal only)  */
+        the task, else the argument hint, else the cache escalation (on top of the
+        drawing beneath), into the band above the prompt (terminal only)  */
     on("ui.render", { component: "AbovePrompt", surface: "terminal" }, async ($, e, next) => {
         const drawn = await next(e)
         const ui    = $.ui.resolve(e)
         image.track(e.viewport)
-        return shown()?.render(e, ui) ?? manual.render(e, ui) ?? task.render(e, ui) ?? hint.render(e, ui) ?? drawn
+        return shown()?.render(e, ui) ?? manual.render(e, ui) ?? task.render(e, ui) ?? hint.render(e, ui)
+            ?? cache.render(e, ui, drawn, controller($)) ?? drawn
     }).catch(($, e, next) => {
         /*  close a failed intent band resp. synopsis form, restore the prompt
             resp. the command as typed (instead of the held prompt), resp. close

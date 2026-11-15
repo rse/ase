@@ -54,6 +54,8 @@ file lock and atomically.
       `agent.persona` `engineer`, `agent.guidance` `normal`,
       `agent.diagram.format` `auto`, `agent.diagram.theme` `auto`,
       `agent.diagram.tone` `#336699`,
+      `agent.cache.guard` `true`, `agent.cache.threshold` `150k`,
+      `agent.cache.soft` `4`, `agent.cache.hard` `4,8,12,16,24`,
       `project.name` `Example Project`, `project.boxing` `white`,
       `project.task.lifecycle` `solo`, `project.task.idscheme` `slug`,
       `project.task.store.url` `ase:./.ase/task`,

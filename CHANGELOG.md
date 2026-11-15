@@ -5,6 +5,12 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [plugin, docs]: Prompt Cache Controller
+    The new mod `ase-mods-cache.ts` shows the prompt cache state in the footer, SOFT auto-warms
+    big idle caches, escalates cooling/cold caches above the prompt with HARD auto-warm buttons,
+    and asks before cold sends, configured by the new `agent.cache.*` keys and operated by the new
+    command `/ase-mods-auto-warm`.
+
 -   IMPROVEMENT [code, docs, plugin]: Configuration Editor as "ase config edit"
     The terminal UI of `ase config ui` is renamed to `ase config edit`, replacing the former
     `$EDITOR`-based `ase config edit`, whose function remains as the key `e` in the scope view.
