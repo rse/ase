@@ -158,8 +158,9 @@ Context:
 
 - `%c`:
   The context usage (`context_window.used_percentage`) as a progress
-  bar of 20 cells (`█` filled, `░` empty) plus the percentage, with
-  icon `◔`.
+  bar of 20 cells (`█` filled, `░` empty) plus the percentage and, if
+  known, the current context tokens (as for `%C`), e.g.,
+  `████████░░░░░░░░░░░░ 42% (84.2k)`, with icon `◔`.
 
 - `%C`:
   The current and the maximum context tokens, e.g., `334.0k/1.0M`, with

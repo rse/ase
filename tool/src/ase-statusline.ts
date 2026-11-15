@@ -443,7 +443,13 @@ const createRenderers = (ctx: RenderCtx): Record<string, () => void> => {
             const barSize = 20
             const filled  = Math.round(pct / 100 * barSize)
             const bar     = "█".repeat(filled) + "░".repeat(barSize - filled)
-            emit(`${prefix("◔", "context")}${bar} ${pct}%`)
+
+            /*  append the current context tokens (probed as in "%C"), if known  */
+            const cw      = data.context_window
+            const tokens  = cw?.current_context_tokens ??
+                cw?.last_call_input_tokens ?? cw?.total_input_tokens ?? 0
+            const count   = tokens > 0 ? ` (${formatTokens(tokens)})` : ""
+            emit(`${prefix("◔", "context")}${bar} ${pct}%${count}`)
         },
         C: () => {
             /*  probe the live-context fields first and fall back to the

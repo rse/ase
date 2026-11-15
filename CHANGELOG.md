@@ -5,6 +5,10 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   IMPROVEMENT [code, docs]: Context Tokens in Statusline Context Bar
+    The statusline placeholder `%c` now appends the current context tokens to its progress bar and
+    percentage, e.g. `████████░░░░░░░░░░░░ 42% (84.2k)`.
+
 -   NEW FEATURE [plugin]: Grounded Plan Editing
     The new option `--ground|-G` of `ase-task-edit` grounds the plan once per run in the project
     artifacts and the Internet/Web, serving its generation, its refinements, and the approach round
