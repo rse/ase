@@ -25,6 +25,11 @@ Skill Output
     Unicode characters, and the potential reduction of prose according
     to the currently defined persona style.
 
+-   *IMPORTANT*: The tags `<template>` and `</template>` are just the
+    delimiters of a <template/> section and *NOT* part of its content.
+    You *MUST* *NEVER* output these tags themselves, only the content
+    between them.
+
 -   *IMPORTANT*: For *Final-Message-Only Display* ("focus mode"):
     some agent harnesses show the user only the *final* text message of
     a turn and *hide* all text emitted *between* tool calls. If your
