@@ -57,8 +57,8 @@ agent relay the *agent logs* view and the *agent graph* view. All
 views are cycled via `v` (or a click onto the `view:` value of the
 header).
 
-The last shown view, the minimized lanes, the collapsed phases, and the
-shown flags are persisted in `.ase/board.yaml` (separately for the
+The last shown view, the minimized lanes, the collapsed phases, the lane
+heights, and the shown flags are persisted in `.ase/board.yaml` (separately for the
 terminal and the web board), where each change of them in a web board
 is immediately applied to all other open web boards of the project.
 
@@ -80,7 +80,9 @@ the agent relay (if any), and the *ASE* version, or a notice instead.
 In the task lanes view, lanes can be minimized (`m`), lane rows collapsed
 (`C`), and phases collapsed (`c`), and the selected lane can be
 *grown* via `g` to the full board, showing all its cards in a grid of
-at least four columns.
+at least four columns. The selected lane can also be resized in height
+against its neighbor lane (`+` and `-`), resp. the lane heights of its
+phase reset (`0`).
 
 A card opens its plan in a full-height *task dialog* (`⏎` or a mouse
 double click), which shows the frontmatter keys, the predecessors and successors
@@ -186,12 +188,13 @@ output and opened in the default browser (via `open`, `xdg-open`, resp.
 `start`).
 
 It offers the same views and keys as the terminal board, where a task
-is additionally moved by dragging its card onto a reachable lane, the
-graph is zoomed by the mouse wheel (and `+`, `-`, and `0`) and panned
-by dragging it, and an image attachment is zoomed by the mouse wheel.
-Its minimized lanes and collapsed phases are stored once per project,
-not per browser, so all open web boards share them and pick up a change
-immediately.
+is additionally moved by dragging its card onto a reachable lane, a lane
+is resized against its lower neighbor lane by dragging the grip bar
+between both lanes, the graph is zoomed by the mouse wheel (and
+`+`, `-`, and `0`) and panned by dragging it, and an image attachment
+is zoomed by the mouse wheel. Its minimized lanes, collapsed phases,
+and lane heights are stored once per project, not per browser, so all
+open web boards share them and pick up a change immediately.
 
 In the task dialog of the web board, `e` (or `✎`) edits the task plan
 in a Markdown editor (in the task lanes and task graph views, `e` opens the
@@ -502,6 +505,12 @@ letter under the kitty keyboard protocol.
   all its lanes are collapsed already (persisted).
 - `g`: Grow the selected lane to the full board (only a maximized lane
   of an expanded phase), resp. shrink it back again.
+- `+`, `-`: Increase or decrease the height of the selected lane (only a
+  maximized lane of an expanded phase) by taking it from, resp. giving it
+  to, its nearest maximized lower neighbor lane (for the last lane, its
+  upper one), in steps of one line (terminal board) resp. about 45
+  pixels, snapped onto a grid of 30 pixels (web board) (persisted).
+- `0`: Reset the lane heights of the phase of the selected lane (persisted).
 - `t`: Cut the card titles onto a single line, resp. wrap them onto at
   most three lines (persisted).
 
@@ -658,7 +667,8 @@ The following configuration keys (on scope `user` or `project`, see
   The display state of the boards in the project root: separately for
   the terminal board (`tui`) and the web board (`web`), the shown `view`
   (`lanes`, `graph`, `stats`, `agents`, or `flow`), the `minimized` lanes, the
-  `collapsed` phases, and whether the task `titles` are wrapped onto
+  `collapsed` phases, the `heights` of the resized lanes (as their weights
+  within their phase), and whether the task `titles` are wrapped onto
   multiple lines, the key hint lines are shown (`keys`), and the graph
   shows the `standalone` tasks.
 

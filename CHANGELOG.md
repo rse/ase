@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [code, docs]: Resizable Task Board Lanes
+    In the task lanes view of both boards, `+`/`-` resize the selected lane against its neighbor lane
+    and `0` resets the lane heights of its phase, while the web board additionally offers a grip bar
+    between the lanes for resizing by dragging (persisted in `.ase/board.yaml`).
+
 -   BUGFIX [code]: Web Board Drag & Drop in Off-Screen Web Views
     The web board now drags task boxes onto lanes through pointer events instead of HTML5 drag & drop,
     which off-screen rendering web views (like the one of the Herdr desktop app) do not support,

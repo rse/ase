@@ -8,7 +8,7 @@ import React                                  from "react"
 import { Box, Text }                          from "ink"
 import type { BoxProps, DOMElement }          from "ink"
 
-import { splitHeight, rowLanes, toneOf, cardLabel, groupLabel, editMarker, effortMarker, clampLines, glueId, glueTitle, glueGroup, agentLabel, agentUser, agentUptime, agentUsage, agentDuration, badgesOf, viewCycleHint } from "./ase-task-board-core.js"
+import { splitHeight, laneWeight, rowLanes, toneOf, cardLabel, groupLabel, editMarker, effortMarker, clampLines, glueId, glueTitle, glueGroup, agentLabel, agentUser, agentUptime, agentUsage, agentDuration, badgesOf, viewCycleHint } from "./ase-task-board-core.js"
 import type { Board, Card, GroupSpec, LaneSpec, Surface, AgentsState } from "./ase-task-board-core.js"
 import type { AgentPresence }                 from "./ase-agent-relay-core.js"
 import { drawGraphText }                      from "./ase-task-board-graph.js"
@@ -365,7 +365,7 @@ const renderGroup = (ctx: ViewCtx, group: GroupSpec, g: number, width: number, h
     if (surface.collapsed.includes(group.title)) {
         /*  render each lane of the collapsed phase as a narrow column with
             its vertically written status and number of cards  */
-        const heights = splitHeight(height - 1, group.lanes.map((l) => l.weight), 3)
+        const heights = splitHeight(height - 1, group.lanes.map((l) => laneWeight(surface, l)), 3)
         const label   = "▶"
         const rest    = Math.max(0, width - label.length)
         const left    = Math.floor(rest / 2)
@@ -411,7 +411,7 @@ const renderGroup = (ctx: ViewCtx, group: GroupSpec, g: number, width: number, h
     }
     const min     = group.lanes.map((l) => surface.minimized.includes(l.status))
     const free    = height - 1 - min.filter((m) => m).length * 3
-    const heights = splitHeight(free, group.lanes.map((l, i) => min[i] ? 0 : l.weight), 3)
+    const heights = splitHeight(free, group.lanes.map((l, i) => min[i] ? 0 : laneWeight(surface, l)), 3)
     const label   = ` ▼ ${group.title} `
     const rest    = Math.max(0, width - label.length)
     const left    = Math.floor(rest / 2)
@@ -460,7 +460,7 @@ export const renderLanes = (ctx: BoardCtx) => {
         h(Box, { key: "keys3", ...cx("bar") },
             h(Text, cx("hint", dim && "dimmed"),
                 (grown ? "" :
-                    `c: ${folded ? "expand" : "collapse"} phase · C: ${rowMin ? "expand" : "collapse"} lane row · `) +
+                    `c: ${folded ? "expand" : "collapse"} phase · C: ${rowMin ? "expand" : "collapse"} lane row · +/-/0: resize/reset lane · `) +
                 `t: ${surface.titles ? "collapse" : "expand"} titles · ` +
                 `/: filter tasks · v/V: ${viewCycleHint("lanes", agents !== null)}`)),
         h(Box, { key: "keys4", ...cx("bar") },

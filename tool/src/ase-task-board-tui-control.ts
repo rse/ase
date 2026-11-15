@@ -7,7 +7,7 @@
 import { measureElement }                     from "ink"
 import type { Key }                           from "ink"
 
-import { reachableStates, rowLanes }          from "./ase-task-board-core.js"
+import { reachableStates, rowLanes, splitHeight, laneWeight } from "./ase-task-board-core.js"
 import { nearestPlace }                       from "./ase-task-board-graph.js"
 import { groupItems, relocate, requestChoices, assignChoices } from "./ase-task-board-tui-model.js"
 import type { BoardCtx, PromptFocus }         from "./ase-task-board-tui-model.js"
@@ -522,7 +522,7 @@ const handleDialogKey = (ctx: BoardCtx, dialog: NonNullable<BoardCtx["dialog"]>,
 
 /*  handle a key press within the lane view: moving and growing, else navigating  */
 const handleLaneKey = (ctx: BoardCtx, input: string, key: Key): void => {
-    const { columns, board, surface, sel, setSel, setNotice, carry, setCarry, cycle, drop, grown, setGrow, boardH } = ctx
+    const { columns, board, surface, sel, setSel, setNotice, carry, setCarry, cycle, drop, grown, setGrow, setHeights, boardH } = ctx
     if (key.escape && carry !== null) {
         /*  cancel the move and return the selection to the task at its original position  */
         setCarry(null)
@@ -572,6 +572,44 @@ const handleLaneKey = (ctx: BoardCtx, input: string, key: Key): void => {
             setNotice("only a maximized lane of an expanded phase can grow")
         else
             setGrow(!grown)
+        return
+    }
+
+    /*  grow or shrink the selected lane by one line against its neighbor lane (the nearest maximized
+        lower one, resp. for the last lane the upper one), resp. reset the lane heights of its phase
+        (under the kitty keyboard protocol, "+" may arrive as "=" with the shift modifier)  */
+    const plus = input === "+" || (input === "=" && key.shift)
+    if (plus || input === "-" || input === "0") {
+        if (carry !== null)
+            return
+        const group = board.groups[sel.g]
+        if (grown || surface.collapsed.includes(group.title) || surface.minimized.includes(group.lanes[sel.l].status))
+            setNotice("only a maximized lane of an expanded phase can be resized")
+        else if (input === "0")
+            setHeights(Object.fromEntries(group.lanes.map((lane) => [ lane.status, null ])))
+        else {
+            const min   = group.lanes.map((lane) => surface.minimized.includes(lane.status))
+            const below = min.findIndex((m, i) => !m && i > sel.l)
+            const n     = below >= 0 ? below : min.findLastIndex((m, i) => !m && i < sel.l)
+            if (n < 0)
+                setNotice("only a lane with a maximized neighbor lane can be resized")
+            else {
+                /*  move the line between both lanes (as rendered by "renderGroup"), keeping both at
+                    least at 7 lines (so their titles never vanish), and derive the weights of all maximized lanes of the phase from
+                    their resulting lines above the minimum, raised slightly, which the distribution
+                    of "splitHeight" by the largest fractional parts then reproduces exactly  */
+                const free = boardH - 1 - min.filter((m) => m).length * 3
+                const rows = splitHeight(free, group.lanes.map((lane, i) => min[i] ? 0 : laneWeight(surface, lane)), 3)
+                const step = plus ? 1 : -1
+                if (rows[sel.l] + step >= 7 && rows[n] - step >= 7) {
+                    rows[sel.l] += step
+                    rows[n]     -= step
+                    const base = Math.min(3, Math.floor(free / min.filter((m) => !m).length))
+                    setHeights(Object.fromEntries(group.lanes.flatMap((lane, i) =>
+                        min[i] ? [] : [ [ lane.status, rows[i] - base + 0.01 ] ])))
+                }
+            }
+        }
         return
     }
     if (grown) {

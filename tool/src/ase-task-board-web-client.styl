@@ -341,6 +341,7 @@ header
     &.right
         transform: rotate(-90deg)
 .lane
+    position: relative
     display: flex
     flex-direction: column
     min-height: 0
@@ -354,6 +355,11 @@ header
         border-style: dashed
     &.min
         flex: none !important
+
+    /*  the gap between the lanes of a phase widened from 8px to 12px, as it holds the grip bar
+        (also within collapsed phases, to keep their lanes aligned with the ones of expanded phases)  */
+    & + .lane
+        margin-top: 4px
 .lhd
     display: flex
     justify-content: space-between
@@ -373,6 +379,30 @@ header
         color: var(--c-line)
 .lane, .cards
     outline: none
+
+/*  the thick grip bar over the full width of a lane, exactly filling the gap of 12px below its
+    bottom border (of 1px) to its lower neighbor lane, with two horizontal grip lines, resizing
+    it against this lane by dragging it vertically (without the browser panning on touch)  */
+.grip
+    position: absolute
+    left: -1px
+    right: -1px
+    bottom: -13px
+    height: 12px
+    display: flex
+    align-items: center
+    justify-content: center
+    background: transparent
+    cursor: ns-resize
+    touch-action: none
+    &::before
+        content: ""
+        width: 56px
+        height: 2px
+        border-top: 1px solid var(--c-border-strong)
+        border-bottom: 1px solid var(--c-border-strong)
+    &:hover::before
+        border-color: var(--c-signal)
 /*  the cards of a lane, keeping their padding also when scrolling
     the selected task box into view (e.g. via the cursor keys)  */
 .cards

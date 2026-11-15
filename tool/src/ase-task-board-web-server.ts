@@ -802,7 +802,7 @@ const registerUpdateRoutes = (server: Hapi.Server, log: Log): void => {
     })
 }
 
-/*  register the surface routes of the web board: view changes, surface toggles, keep-alive, and change events  */
+/*  register the surface routes of the web board: view changes, surface toggles, lane heights, keep-alive, and change events  */
 const registerSurfaceRoutes = (server: Hapi.Server, log: Log): void => {
     /*  set the shown view (lanes, graph, stats, agents, or flow) of the web surface, for all open and newly opened web boards  */
     server.route({
@@ -848,6 +848,30 @@ const registerSurfaceRoutes = (server: Hapi.Server, log: Log): void => {
             const surface = (await BoardState.toggle("web", p.list, entries)).web
 
             /*  push the shared surface state into all open web boards  */
+            emit("surface", surface)
+            return h.response(surface)
+        })
+    })
+
+    /*  set (resp. with null reset) the height weights of lanes of the web surface  */
+    server.route({
+        method:  "POST",
+        path:    "/task-board/api/height",
+        options: { payload: { parse: true, allow: "application/json" } },
+        handler: guarded(async (request, h) => {
+            const p = request.payload as { heights?: unknown } | null
+            if (p === null || typeof p.heights !== "object" || p.heights === null || Array.isArray(p.heights)
+                || !Object.values(p.heights).every((w) => w === null || (typeof w === "number" && Number.isFinite(w) && w > 0)))
+                return h.response({ error: "invalid height request" }).code(400)
+
+            /*  accept only lanes of the current board layout  */
+            const board   = await currentBoard(log)
+            const names   = board.groups.flatMap((g) => g.lanes.map((l) => l.status))
+            const entries = p.heights as Record<string, number | null>
+            const unknown = Object.keys(entries).find((e) => !names.includes(e))
+            if (unknown !== undefined)
+                return h.response({ error: `unknown lane "${unknown}"` }).code(400)
+            const surface = (await BoardState.setHeights("web", entries)).web
             emit("surface", surface)
             return h.response(surface)
         })

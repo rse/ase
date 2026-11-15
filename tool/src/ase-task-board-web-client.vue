@@ -185,6 +185,7 @@ const hints     = computed(() => {
     ], [
         { key: "c",             action: `${folded ? "expand" : "collapse"} phase` },
         { key: "C",             action: `${rowMin ? "expand" : "collapse"} lane row` },
+        { key: "+/-/0",         action: "resize/reset lane" },
         { key: "t",             action: `${titles.value ? "collapse" : "expand"} titles` },
         { key: "/",             action: "filter tasks" },
         { key: "v/V",           action: cycleHint("lanes") }
@@ -192,6 +193,7 @@ const hints     = computed(() => {
         { key: "Left-Click",    action: "select task/lane/phase" },
         { key: "Double-Click",  action: "view task, collapse/expand lane/phase" },
         { key: "Drag & Drop",   action: "directly transition task" },
+        { key: "Grip-Drag",     action: "resize lane" },
         { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "agents" ? [ [

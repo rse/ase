@@ -15,7 +15,7 @@ export type EditState = "pending" | "active" | "failed"
 export type Card    = { id: string, title: string, group: string, tone: string, moves?: string[], edit: EditState | "", finished: boolean, assignee: string, effort: string }
 export type Lane    = { status: string, active: boolean, weight: number, dashed: boolean, kind: "initial" | "regular" | "terminal", cards: Card[] }
 export type Group   = { title: string, lanes: Lane[] }
-export type Surface = { view: View, minimized: string[], collapsed: string[], titles: boolean, keys: boolean, standalone: boolean }
+export type Surface = { view: View, minimized: string[], collapsed: string[], heights: Record<string, number>, titles: boolean, keys: boolean, standalone: boolean }
 export type Board   = { mode: string, project: string, version: string, warnings: string[], users: string[], self: string, surface: Surface, moves: Record<string, string[]>, groups: Group[] }
 export type Tone    = "active" | "done" | "idle"
 export type Ref     = { id: string, tone: Tone }
@@ -116,6 +116,27 @@ export const groupItems = (b: Board, g: number, s: Surface): Sel[] => {
 export const rowLanes = (b: Board, s: Surface, l: number): string[] =>
     b.groups.filter((g) => l < g.lanes.length && !s.collapsed.includes(g.title)).map((g) => g.lanes[l].status)
 
+/*  the height weight of a lane: its persisted one (see "+"/"-" and the grip), else the one of its lane layout  */
+export const laneWeight = (s: Surface, lane: Lane): number =>
+    s.heights[lane.status] ?? lane.weight
+
+/*  move height between a lane of a phase and its nearest maximized lower (resp., for the last
+    lane, upper) neighbor lane, by a share of the weights of all maximized lanes of the phase,
+    keeping both lanes at least at 10% of them, and answer the new weights of both lanes
+    (or null if the lane is minimized or has no maximized neighbor lane)  */
+export const resizeLane = (lanes: Lane[], weights: number[], minimized: string[], l: number, share: number): Record<string, number> | null => {
+    const open  = lanes.map((lane) => !minimized.includes(lane.status))
+    const below = open.findIndex((o, i) => o && i > l)
+    const n     = below >= 0 ? below : open.findLastIndex((o, i) => o && i < l)
+    if (!open[l] || n < 0)
+        return null
+    const total = weights.reduce((sum, w, i) => sum + (open[i] ? w : 0), 0)
+    const min   = total * 0.1
+    const delta = Math.min(weights[n] - min, Math.max(min - weights[l], share * total))
+    const round = (w: number) => Math.round(w * 1000) / 1000
+    return { [lanes[l].status]: round(weights[l] + delta), [lanes[n].status]: round(weights[n] - delta) }
+}
+
 /*  re-locate a selection on a (possibly changed) board: a selected card
     is followed into its current lane, otherwise the lane is kept  */
 export const relocate = (b: Board, sel: Sel, s: Surface): Sel => {
@@ -163,7 +184,8 @@ const busyLabel = (url: string, opts?: RequestInit): BusyLabel => {
         flow:   "loading agent graph",
         stats:  "loading statistics",
         new:    "preparing new task",
-        toggle: "saving board state"
+        toggle: "saving board state",
+        height: "saving board state"
     }
     if (Object.hasOwn(fixed, name))
         return { text: fixed[name] }
@@ -305,7 +327,7 @@ export const selectAgent = (id: string) => {
 }
 
 /*  the derived values of the page  */
-export const surface   = computed<Surface>(() => board.value?.surface ?? { view: "lanes", minimized: [], collapsed: [], titles: false, keys: true, standalone: true })
+export const surface   = computed<Surface>(() => board.value?.surface ?? { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
 export const titles    = computed(() => surface.value.titles)
 
 /*  the names of the agents busy with each task (kept as the previous value while unchanged,
@@ -714,6 +736,87 @@ export const toggle = async (list: "minimized" | "collapsed" | "titles" | "keys"
     }
     actionError.value = null
     applySurface(s)
+}
+
+/*  set (resp. with null reset) the height weights of lanes, applied right away
+    and persisted for all open and newly opened web boards  */
+export const setHeights = async (entries: Record<string, number | null>) => {
+    if (board.value !== null) {
+        const heights = Object.fromEntries(Object.entries({ ...board.value.surface.heights, ...entries })
+            .filter((entry): entry is [ string, number ] => entry[1] !== null))
+        board.value.surface = { ...board.value.surface, heights }
+    }
+    const s = await api<Surface>("/task-board/api/height", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ heights: entries })
+    })
+    if (s.error !== undefined) {
+        actionError.value = s.error
+        return
+    }
+    actionError.value = null
+    applySurface(s)
+}
+
+/*  the lane weights shown instead of the persisted ones (while dragging a grip, resp. snapping a
+    lane), the shown weight of a lane, and the stop of a running snapping (keeping the shown weights)  */
+export const lanePreview = ref<Record<string, number> | null>(null)
+export const shownWeight = (lane: Lane): number => lanePreview.value?.[lane.status] ?? laneWeight(surface.value, lane)
+let snapFrame = 0
+export const stopSnap = () => {
+    cancelAnimationFrame(snapFrame)
+}
+
+/*  the pixel geometry of a lane for resizing it against its neighbor lane (see "resizeLane"): the
+    shown weights of its phase, the offset of its border to the neighbor lane from the phase top, the
+    direction of this border (1 for its bottom, -1 for its top), and the heights of all maximized lanes  */
+export type LaneGeometry = { weights: number[], edge: number, sign: number, px: number }
+export const laneGeometry = (g: number, l: number): LaneGeometry | null => {
+    const group = board.value?.groups[g]
+    const phase = boardEl.value?.querySelectorAll<HTMLElement>(":scope > .group")[g]
+    const lane  = phase?.querySelectorAll<HTMLElement>(":scope > .lane")[l]
+    if (group === undefined || phase === undefined || lane === undefined)
+        return null
+    const lower = group.lanes.some((it, i) => i > l && !surface.value.minimized.includes(it.status))
+    const box   = lane.getBoundingClientRect()
+    const px    = [ ...phase.querySelectorAll<HTMLElement>(":scope > .lane:not(.min)") ].reduce((n, el) => n + el.clientHeight, 0)
+    if (px <= 0)
+        return null
+    return {
+        weights: group.lanes.map(shownWeight),
+        edge:    (lower ? box.bottom : box.top) - phase.getBoundingClientRect().top,
+        sign:    lower ? 1 : -1,
+        px
+    }
+}
+
+/*  resize a lane against its neighbor lane by moving the border of its geometry by pixels (positive
+    grows it), snapped onto a grid of 30px from the phase top (rounding halves into the direction of
+    the move, to align lanes across phases), persisted right away, and shown in a smooth transition of
+    250ms with a sine easing from the shown weights (answering whether the lane could be resized)  */
+export const snapLane = (g: number, l: number, geom: LaneGeometry, dy: number): boolean => {
+    const group = board.value?.groups[g]
+    if (group === undefined)
+        return false
+    const move    = geom.sign * dy
+    const target  = (geom.edge + move) / 30
+    const snapped = (move >= 0 ? Math.round(target) : -Math.round(-target)) * 30
+    const entries = resizeLane(group.lanes, geom.weights, surface.value.minimized, l, geom.sign * (snapped - geom.edge) / geom.px)
+    if (entries === null)
+        return false
+    const from = group.lanes.map(shownWeight)
+    stopSnap()
+    setHeights(entries)
+    const to    = group.lanes.map((lane) => laneWeight(surface.value, lane))
+    const start = performance.now()
+    const step  = (now: number) => {
+        const t = Math.min(1, (now - start) / 250)
+        const e = (1 - Math.cos(Math.PI * t)) / 2
+        lanePreview.value = t >= 1 ? null :
+            Object.fromEntries(group.lanes.map((lane, i) => [ lane.status, from[i] + (to[i] - from[i]) * e ]))
+        snapFrame = t >= 1 ? 0 : requestAnimationFrame(step)
+    }
+    snapFrame = requestAnimationFrame(step)
+    return true
 }
 
 /*  cycle (forward or backward) through the views: lanes, graph, stats, and (with an agent relay) agents and flow  */

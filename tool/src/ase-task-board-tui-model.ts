@@ -836,6 +836,15 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         })
     }
 
+    /*  set (resp. with null reset) the height weights of lanes of the TUI surface  */
+    const setHeights = (entries: Record<string, number | null>): void => {
+        BoardState.setHeights("tui", entries).then((state) => {
+            setSurface(state.tui)
+        }).catch((err: unknown) => {
+            log.write("warning", `board: resizing lanes failed: ${err instanceof Error ? err.message : String(err)}`)
+        })
+    }
+
     /*  run $EDITOR on a text in a temporary file, handing the terminal over
         to the editor, and return the edited text  */
     const runEditor = async (name: string, text: string): Promise<string> => {
@@ -1209,7 +1218,7 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         transferCard, transferList, fit, viewH, viewW, x, y, nodes, dim, pulse, now, beatOf, store, busy, busyTick,
         agents, working, cycleView, agentList, agentIdx, agent, agentOp, logLines, logH, logFirst, logMax, selectAgent, scrollLog, stats, usage, range, setRange, stepRange,
         flow, flowLayout, flowSel, setFlowSel, flowPlaces, focusAgent, scrollFlow,
-        toggle, toggleFlag, startEdit, startPrompt, startRequest, cancelPrompt, submitPrompt, remove, transferTo,
+        toggle, toggleFlag, setHeights, startEdit, startPrompt, startRequest, cancelPrompt, submitPrompt, remove, transferTo,
         startAssign, assignTo, drop
     }
 }

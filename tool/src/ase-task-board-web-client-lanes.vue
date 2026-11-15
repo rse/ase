@@ -15,7 +15,7 @@
                 <div class="ghd" :class="{ sel: sel.g === gi }" @click="selectPhase(gi)" @dblclick="toggle('collapsed', g.title)"><span class="arr right">▼</span></div>
                 <div v-for="(l, li) in g.lanes" :key="l.status" class="lane" tabindex="-1" :data-status="l.status"
                     :class="[ { active: l.active, dashed: l.dashed, done: l.kind === 'terminal', sel: sel.g === gi && sel.l === li }, dropClass(l.status) ]"
-                    :style="{ flex: `${l.weight} 1 0` }" @click="selectLane(gi, li)" @dblclick="toggle('collapsed', g.title)">
+                    :style="{ flex: `${shownWeight(l)} 1 0` }" @click="selectLane(gi, li)" @dblclick="toggle('collapsed', g.title)">
                     <span class="arr right">▼</span>
                     <span class="vt">{{ l.status.toUpperCase() }}</span>
                     <span class="cnt">{{ l.cards.length }}</span>
@@ -28,7 +28,7 @@
                 <div class="ghd" :class="{ sel: sel.g === gi }" @click="selectPhase(gi)" @dblclick="toggle('collapsed', g.title)"><span class="arr">▼</span><span class="ttl">{{ g.title }}</span></div>
                 <div v-for="(l, li) in g.lanes" :key="l.status" class="lane" tabindex="-1" :data-status="l.status"
                     :class="[ { active: l.active, dashed: l.dashed, done: l.kind === 'terminal', min: surface.minimized.includes(l.status), sel: sel.g === gi && sel.l === li, grown: grown && sel.g === gi && sel.l === li }, dropClass(l.status) ]"
-                    :style="{ flex: `${l.weight} 1 0` }" @click="selectLane(gi, li)" @dblclick="grown ? (grow = false) : toggle('minimized', l.status)">
+                    :style="{ flex: `${shownWeight(l)} 1 0` }" @click="selectLane(gi, li)" @dblclick="grown ? (grow = false) : toggle('minimized', l.status)">
                     <div class="lhd" :title="grown ? 'shrink lane (g)' : ''">
                         <span>{{ grown ? "◆" : surface.minimized.includes(l.status) ? "▶" : "▼" }}<span class="ttl">{{ l.status }}</span></span>
                         <span>{{ l.cards.length }}</span>
@@ -46,6 +46,10 @@
                             <div class="cbody"><TaskTitle :id="c.id" :epic="c.group" :title="c.title" :edit="c.edit" :effort="c.effort" /></div>
                         </div>
                     </div>
+                    <!--  the grip bar between the lane and its lower neighbor lane,
+                          moving the border to it by dragging it vertically  -->
+                    <div v-if="!grown && hasLower(g, li)" class="grip" title="resize lane (drag, or +/-/0)"
+                        @pointerdown.stop="gripDown($event, gi, li)" @dblclick.stop></div>
                 </div>
             </div>
         </template>
@@ -56,7 +60,8 @@
 import { computed, nextTick, onMounted, onUnmounted, watch } from "vue"
 import TaskTitle                                            from "./ase-task-board-web-client-title.vue"
 import {
-    groupItems,
+    type Group, type LaneGeometry,
+    groupItems, resizeLane, lanePreview, shownWeight, stopSnap, laneGeometry, snapLane,
     board, boardError, view, graph, task, sel, grow, drag, boardEl,
     surface, titles, grown, badges, openTask, toggle, updateScroll
 } from "./ase-task-board-web-client-model"
@@ -159,17 +164,69 @@ const pointerCancel = (ev?: Event) => {
         drag.value = null
     release()
 }
+
+/*  resize a lane against its lower neighbor lane by dragging its grip, where the pixels moved are
+    taken as a share of the pixel heights of all maximized lanes of the phase (which flex distributes
+    by their weights), with the resized weights previewed while dragging (starting from the shown
+    ones, also within a running snapping), snapped onto the grid of the lanes and persisted on its
+    release (see "snapLane"), and dropped by ESC  */
+let resize: { geom: LaneGeometry, base: Record<string, number>, g: number, l: number, y: number, pid: number } | null = null
+const hasLower = (g: Group, l: number) => !surface.value.minimized.includes(g.lanes[l].status)
+    && g.lanes.some((lane, i) => i > l && !surface.value.minimized.includes(lane.status))
+const gripDown = (ev: PointerEvent, gi: number, li: number) => {
+    const el = ev.currentTarget as HTMLElement
+    if (ev.button !== 0 || drag.value !== null)
+        return
+    stopSnap()
+    const geom = laneGeometry(gi, li)
+    if (geom === null)
+        return
+    resize = { geom, base: lanePreview.value ?? {}, g: gi, l: li, y: ev.clientY, pid: ev.pointerId }
+    el.setPointerCapture(ev.pointerId)
+    ev.preventDefault()
+}
+const gripMove = (ev: PointerEvent) => {
+    const lanes = resize === null ? undefined : board.value?.groups[resize.g]?.lanes
+    if (resize === null || ev.pointerId !== resize.pid || lanes === undefined)
+        return
+    const share   = resize.geom.sign * (ev.clientY - resize.y) / resize.geom.px
+    const entries = resizeLane(lanes, resize.geom.weights, surface.value.minimized, resize.l, share)
+    if (entries !== null)
+        lanePreview.value = { ...resize.base, ...entries }
+}
+const gripUp = (ev: PointerEvent) => {
+    if (resize === null || ev.pointerId !== resize.pid)
+        return
+    const r = resize
+    resize = null
+    if (!snapLane(r.g, r.l, r.geom, r.geom.sign * (ev.clientY - r.y)))
+        lanePreview.value = null
+}
+const gripCancel = (ev?: Event) => {
+    if (resize === null || (ev instanceof KeyboardEvent && ev.key !== "Escape"))
+        return
+    resize = null
+    lanePreview.value = null
+}
 onMounted(() => {
     window.addEventListener("pointermove",   pointerMove)
     window.addEventListener("pointerup",     pointerUp)
     window.addEventListener("pointercancel", pointerCancel)
     window.addEventListener("keydown",       pointerCancel)
+    window.addEventListener("pointermove",   gripMove)
+    window.addEventListener("pointerup",     gripUp)
+    window.addEventListener("pointercancel", gripCancel)
+    window.addEventListener("keydown",       gripCancel)
 })
 onUnmounted(() => {
     window.removeEventListener("pointermove",   pointerMove)
     window.removeEventListener("pointerup",     pointerUp)
     window.removeEventListener("pointercancel", pointerCancel)
     window.removeEventListener("keydown",       pointerCancel)
+    window.removeEventListener("pointermove",   gripMove)
+    window.removeEventListener("pointerup",     gripUp)
+    window.removeEventListener("pointercancel", gripCancel)
+    window.removeEventListener("keydown",       gripCancel)
 })
 
 /*  scroll the selection into view, and focus the selected lane,

@@ -82,9 +82,9 @@ export type Board = {
 }
 
 /*  the per-surface view state: the shown view (the lanes, the dependency graph, the statistics, the agents,
-    or the agent graph), minimized lanes, collapsed phases, and whether the task titles, the key hints, and the
-    standalone tasks of the graph are shown  */
-export type Surface     = { view: SurfaceView, minimized: string[], collapsed: string[], titles: boolean, keys: boolean, standalone: boolean }
+    or the agent graph), minimized lanes, collapsed phases, resized lanes (with their height weights), and
+    whether the task titles, the key hints, and the standalone tasks of the graph are shown  */
+export type Surface     = { view: SurfaceView, minimized: string[], collapsed: string[], heights: Record<string, number>, titles: boolean, keys: boolean, standalone: boolean }
 export type SurfaceView = "lanes" | "graph" | "stats" | "agents" | "flow"
 
 /*  the displayed names of the views (the persisted view ids being kept short)  */
@@ -168,7 +168,9 @@ export const rowLanes = (groups: GroupSpec[], collapsed: string[], l: number): s
 
 /*  split a height into integer shares by weights, where each positively
     weighted share first gets a minimum (as far as the total allows), the
-    rest is split by weights, and the remainder goes to the first such share  */
+    rest is split by weights, and the remainder goes one by one to the shares
+    of the largest fractional parts (the first ones on ties), so that moving
+    weight between two shares never changes the height of any other share  */
 export const splitHeight = (total: number, weights: number[], min = 0): number[] => {
     const sum = weights.reduce((n, w) => n + w, 0)
     if (sum <= 0 || total <= 0)
@@ -176,16 +178,26 @@ export const splitHeight = (total: number, weights: number[], min = 0): number[]
     const n    = weights.filter((w) => w > 0).length
     const base = Math.min(min, Math.floor(total / n))
     const rest = total - base * n
-    const hs   = weights.map((w) => w > 0 ? base + Math.floor(rest * w / sum) : 0)
-    hs[weights.findIndex((w) => w > 0)] += total - hs.reduce((n, h) => n + h, 0)
+    const quot = weights.map((w) => w > 0 ? rest * w / sum : 0)
+    const hs   = weights.map((w, i) => w > 0 ? base + Math.floor(quot[i]) : 0)
+    const frac = (i: number) => quot[i] - Math.floor(quot[i])
+    weights.map((_w, i) => i).filter((i) => weights[i] > 0)
+        .sort((a, b) => frac(b) - frac(a) || a - b)
+        .slice(0, total - hs.reduce((n, h) => n + h, 0))
+        .forEach((i) => { hs[i]++ })
     return hs
 }
+
+/*  the height weight of a lane: its persisted one (see "+"/"-"), else the one of its lane layout  */
+export const laneWeight = (surface: Surface, lane: LaneSpec): number =>
+    surface.heights[lane.status] ?? lane.weight
 
 /*  the valibot schema of the persisted board state  */
 const surfaceSchema = v.object({
     view:       v.optional(v.picklist([ "lanes", "graph", "stats", "agents", "flow" ]), "lanes"),
     minimized:  v.optional(v.array(v.string()), []),
     collapsed:  v.optional(v.array(v.string()), []),
+    heights:    v.optional(v.record(v.string(), v.pipe(v.number(), v.gtValue(0))), {}),
 
     /*  (a string of an older state file maps "all" onto true, else false)  */
     titles:     v.optional(v.pipe(v.union([ v.boolean(), v.string() ]),
@@ -194,8 +206,8 @@ const surfaceSchema = v.object({
     standalone: v.optional(v.boolean(), true)
 })
 const stateSchema = v.object({
-    tui: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], titles: false, keys: true, standalone: true }),
-    web: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], titles: false, keys: true, standalone: true })
+    tui: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true }),
+    web: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
 })
 
 /*  reusable functionality: the persisted per-project board state in
@@ -282,6 +294,14 @@ export class BoardState {
     static setView (surface: "tui" | "web", view: SurfaceView): Promise<State> {
         return BoardState.update((state) => {
             state[surface].view = view
+        })
+    }
+
+    /*  set the height weights of lanes, resp. reset them (with null) to the ones of their lane layout  */
+    static setHeights (surface: "tui" | "web", entries: Record<string, number | null>): Promise<State> {
+        return BoardState.update((state) => {
+            state[surface].heights = Object.fromEntries(Object.entries({ ...state[surface].heights, ...entries })
+                .filter((entry): entry is [ string, number ] => entry[1] !== null))
         })
     }
 }

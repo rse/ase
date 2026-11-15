@@ -10,7 +10,7 @@ import { ref, computed, nextTick, watch } from "vue"
 import Mousetrap                          from "mousetrap"
 import {
     type Board, type Card, type Group, type Sel, type Surface,
-    api, groupItems, rowLanes, relocate,
+    api, groupItems, rowLanes, relocate, setHeights, lanePreview, stopSnap, laneGeometry, snapLane,
     board, actionError, actionNote, view, graph, task, sel, grow, editing, confirmDel, transfer, assign, prompt, watched,
     tab, taskDiff, drag, busy, boardEl, graphEl, flowEl, flowSel, planEl, filterEl, agentList, agentSel, logEl, showFlowAgent,
     surface, growable, grown, openTask, closeTask, clearDiff, selectTab, selectAgent, toggle, cycleView, stepStatsRange
@@ -680,6 +680,27 @@ const onBoardKey = (ev: KeyboardEvent) => {
         else {
             actionError.value = null
             grow.value = !grown.value
+        }
+    }
+    else if (ev.key === "+" || ev.key === "-" || ev.key === "0") {
+        /*  grow or shrink the selected lane against its neighbor lane by 45px, snapped
+            onto the grid of the lanes, resp. reset the lane heights of its phase  */
+        if (carry !== null)
+            return
+        if (grown.value || surf.collapsed.includes(group.title) || surf.minimized.includes(group.lanes[s.l].status))
+            actionError.value = "only a maximized lane of an expanded phase can be resized"
+        else if (ev.key === "0") {
+            actionError.value = null
+            stopSnap()
+            lanePreview.value = null
+            setHeights(Object.fromEntries(group.lanes.map((lane) => [ lane.status, null ])))
+        }
+        else {
+            const geom = laneGeometry(s.g, s.l)
+            if (geom === null || !snapLane(s.g, s.l, geom, ev.key === "+" ? 45 : -45))
+                actionError.value = "only a lane with a maximized neighbor lane can be resized"
+            else
+                actionError.value = null
         }
     }
     else if (grown.value && ev.key !== " ") {
