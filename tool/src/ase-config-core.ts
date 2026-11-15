@@ -30,7 +30,7 @@ type Layer = { scope: ScopeTerm, filename: string, doc: Document }
 export type KeyType = { type: "boolean" | "number" | "string" } | { type: "enum", options: string[] }
 
 /*  a node of the attached valibot schema, unwrapped from its optional wrappers  */
-type SchemaNode = { type?: string, wrapped?: unknown, entries?: Record<string, unknown>, options?: unknown[] }
+type SchemaNode = { type?: string, wrapped?: unknown, entries?: Record<string, unknown>, options?: unknown[], pipe?: unknown[], metadata?: Record<string, unknown> }
 const unwrapSchema = (s: unknown): SchemaNode | null => {
     let cur = s as SchemaNode | null | undefined
     while (cur !== undefined && cur !== null && (cur.type === "optional" || cur.type === "nullish"
@@ -446,7 +446,8 @@ export class Config {
     }
 
     /*  determine the value type of a dotted key from its schema leaf: an enum (a picklist,
-        with its options), a boolean resp. number (a union with such a member), or a string  */
+        with its options), a boolean resp. number (a union with such a member, unless
+        its pipe carries the metadata "text" for numbers with non-digits), or a string  */
     keyType (key: string): KeyType {
         let node = unwrapSchema(this.schema)
         for (const seg of this.resolveKey(key).split("."))
@@ -454,9 +455,11 @@ export class Config {
         if (node?.type === "picklist")
             return { type: "enum", options: (node.options ?? []).map((o) => String(o)) }
         const members = node?.type === "union" ? (node.options ?? []).map((o) => (o as SchemaNode).type) : []
+        const text    = (node?.pipe ?? []).some((a) => (a as SchemaNode).type === "metadata"
+            && (a as SchemaNode).metadata?.text === true)
         if (members.includes("boolean"))
             return { type: "boolean" }
-        else if (members.includes("number"))
+        else if (members.includes("number") && !text)
             return { type: "number" }
         return { type: "string" }
     }
