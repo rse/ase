@@ -53,7 +53,7 @@ const skillGroups: [ string, string[] ][] = [
     [ "CODE",           [ "ase-code-edit", "ase-code-analyze", "ase-code-insight", "ase-code-explain", "ase-code-lint" ] ],
     [ "REPO",           [ "ase-repo-review", "ase-repo-diff", "ase-repo-changelog", "ase-repo-commit",
         "ase-repo-dissect", "ase-repo-stage", "ase-repo-merge", "ase-repo-resolve",
-        "ase-repo-import" ] ],
+        "ase-repo-import", "ase-repo-task" ] ],
     [ "SYNC",           [ "ase-sync-reconcile", "ase-sync-import", "ase-sync-export" ] ],
     [ "TASK: MANAGE",   [ "ase-task-list", "ase-task-rename", "ase-task-delete" ] ],
     [ "TASK: HANDLE",   [ "ase-task-id", "ase-task-status", "ase-task-assign" ] ],

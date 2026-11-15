@@ -51,6 +51,7 @@
 ○   `ase-repo-merge`:      Merge a Branch
 ○   `ase-repo-resolve`:    Resolve Merge Conflicts
 ○   `ase-repo-import`:     Import a Change Set
+○   `ase-repo-task`:       Derive a Task from a Change Set
 
 ⎈   **TASK MANAGEMENT**
 ○   `ase-task-id`:         Configure Task Id

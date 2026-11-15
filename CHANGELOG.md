@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [plugin, docs]: Change Set to Task
+    The new `ase-repo-task` skill reverse-engineers a change set (staged, unstaged, `--branch`, or
+    `--commit`), optionally narrowed to a scope topic, into a new task plan (or only its `--focus`
+    sections), precise enough for a re-implementation yielding a similar change set.
+
 -   IMPROVEMENT [plugin]: Focused Grounding
     `--ground` of `ase-code-edit`, `ase-spec-edit`, `ase-task-implement`, and `ase-task-grill` now
     focuses especially on special, less known terms and on potentially outdated aspects: explicit

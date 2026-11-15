@@ -32,6 +32,7 @@ START               -> ase-repo-stage
 START               -> ase-repo-merge
 START               -> ase-repo-resolve
 START               -> ase-repo-import
+START               -> ase-repo-task
 ase-help-skill      -> END
 ase-meta-config     -> END
 ase-meta-why        -> END
@@ -81,6 +82,7 @@ ase-task-edit       -> APPROACHES
 ase-code-edit       -> ARTIFACT
 ase-spec-edit       -> ARTIFACT
 APPROACHES          -> TASK
+ase-repo-task       -> TASK
 TASK                -> ase-task-id
 ase-task-id         -> TASK
 TASK                -> ase-task-edit
