@@ -10,6 +10,21 @@ ChangeLog
     a task via the native soft cost cap of the agent tool (`--max-budget-usd` of `claude` resp.
     `--max-ai-credits` of `copilot`), where an exhausted budget fails the processing.
 
+-   CLEANUP [code]: Skill Lint Corrections and Shared Diff Hunk Rendering
+    About 25 lint findings fixed across the skills: stale or wrong help pages, flow and logic slips
+    (`ase-repo-import`, `ase-repo-stage`, `ase-docs-shorten`, `ase-task-view`), and a branch name
+    check in `ase-repo-merge`. The diff hunk rendering of the `ase-docs-*` skills moved into the
+    new `ase-common-diff.md`, and the hand-offs of `ase-task-grill` reuse `task-next-handoff`.
+
+-   CLEANUP [code]: Mods Robustness Fixes
+    The prompt cache label of `ase-mods-cache` no longer shows `warm` within the margin and drops
+    pings overtaken by a new turn, `ase-mods-render-image` sanitizes non-finite sizes, and
+    `ase-mods-task-edit` tolerates a failed task load and a `---` line without `Type:`.
+
+-   CLEANUP [docs]: Website Cache Options and Comment Cleanups
+    The configuration table of the website lists the new `agent.cache.*` keys, and the terminal
+    widget, progress feature, and title section got clarified comments and formatting.
+
 2.1.0 (2026-11-16)
 ------------------
 
