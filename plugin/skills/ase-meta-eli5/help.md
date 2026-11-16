@@ -7,7 +7,7 @@
 
 `ase-meta-eli5`
     [`--help`|`-h`]
-    [`--ground`|`-g`]
+    [`--ground`|`-G`]
     *topic*
 
 ##  DESCRIPTION
@@ -21,7 +21,7 @@ structured into three labeled blocks: *WHAT* (a plain-words summary),
 topic matters), each kept brief with 1-3 bullet points.
 
 By default the explanation is derived from model knowledge only. With
-the `--ground`/`-g` option, the skill first searches the Internet/Web
+the `--ground`/`-G` option, the skill first searches the Internet/Web
 for facts about the topic via the `ase-meta-search` skill (dispatched
 in a sub-agent, querying all available search backends) and grounds
 the explanation in the found facts. If the grounding yields no usable
@@ -30,7 +30,7 @@ knowledge.
 
 ##  OPTIONS
 
--   `--ground`|`-g`:
+-   `--ground`|`-G`:
     Ground the explanation in Internet/Web facts gathered via the
     `ase-meta-search` skill before explaining. Without this option,
     the explanation is derived from model knowledge only.

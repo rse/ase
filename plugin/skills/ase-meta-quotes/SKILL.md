@@ -1,6 +1,6 @@
 ---
 name: ase-meta-quotes
-argument-hint: "[--help|-h] [--ground|-g] [--proximity|-p] [--count|-c <count>] <topic-keywords>"
+argument-hint: "[--help|-h] [--ground|-G] [--proximity|-p] [--count|-c <count>] <topic-keywords>"
 description: >
     Find quotes for a set of topic keywords and place them into a
     2x2 matrix, spanned by the presence of an author/origin and by
@@ -25,7 +25,7 @@ Find Quotes on a Topic
 
 <expand name="getopt"
     arg1="ase-meta-quotes"
-    arg2="--ground|-g --proximity|-p --count|-c=8">
+    arg2="--ground|-G --proximity|-p --count|-c=8">
     $ARGUMENTS
 </expand>
 

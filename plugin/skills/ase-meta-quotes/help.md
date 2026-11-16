@@ -7,7 +7,7 @@
 
 `ase-meta-quotes`
     [`--help`|`-h`]
-    [`--ground`|`-g`]
+    [`--ground`|`-G`]
     [`--proximity`|`-p`]
     [`--count`|`-c` *count*]
     *topic-keywords*
@@ -50,7 +50,7 @@ the attribution of the quote.
 
 ##  OPTIONS
 
--   `--ground`|`-g`:
+-   `--ground`|`-G`:
     Gather quotes from the Internet/Web via the `ase-meta-search` skill
     (dispatched in a sub-agent, querying all available search backends)
     *in addition to* -- and never *instead* of -- the model knowledge,

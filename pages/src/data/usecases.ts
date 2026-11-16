@@ -166,7 +166,7 @@ export const useCases: UseCase[] = [
                 body:     "The first results come back full of jargon, so the term at their center is " +
                           "re-told in child-friendly words — grounded in web facts to keep it true.",
                 commands: [
-                    "**/ase-meta-eli5** -g " +
+                    "**/ase-meta-eli5** -G " +
                     "difference between Unix-style long and short options"
                 ]
             },

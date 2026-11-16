@@ -120,6 +120,10 @@ ChangeLog
     The short option of `--approach` of `ase-task-edit` moves from `-a` to `-A`, too,
     aligning it with `ase-code-edit` and `ase-spec-edit`.
 
+-   IMPROVEMENT [plugin, docs]: Consistent Ground Short Option
+    The short option of `--ground` of `ase-meta-{eli5,proximity,quotes}` moves from `-g` to `-G`,
+    aligning it with all other skills providing `--ground`.
+
 -   IMPROVEMENT [plugin]: Dimension-Wise Grounding Beyond Grilling
     Grounding (`ase-common-ground.md`) now runs per dimension `WHAT`, `HOW`, `WHEN` in parallel
     sub-agents (local artifacts, plus at most 5 iterative web searches), and the new option

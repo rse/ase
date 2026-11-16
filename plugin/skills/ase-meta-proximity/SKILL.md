@@ -1,6 +1,6 @@
 ---
 name: ase-meta-proximity
-argument-hint: "[--help|-h] [--ground|-g] [--loop|-l] <topic>"
+argument-hint: "[--help|-h] [--ground|-G] [--loop|-l] <topic>"
 description: >
     Determine the conceptual proximity of a topic -- its parent topic,
     its most relevant sibling topics, and its most relevant child
@@ -26,7 +26,7 @@ Determine the Conceptual Proximity of a Topic
 
 <expand name="getopt"
     arg1="ase-meta-proximity"
-    arg2="--ground|-g --loop|-l">
+    arg2="--ground|-G --loop|-l">
     $ARGUMENTS
 </expand>
 

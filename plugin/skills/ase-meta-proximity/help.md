@@ -7,7 +7,7 @@
 
 `ase-meta-proximity`
     [`--help`|`-h`]
-    [`--ground`|`-g`]
+    [`--ground`|`-G`]
     [`--loop`|`-l`]
     *topic*
 
@@ -22,7 +22,7 @@ four most relevant narrower topics that specialize *topic*).
 
 The determination itself is delegated to the `ase-meta-proximity` agent,
 which is shared with the `ase-meta-quotes` skill. By default the
-proximity is derived from model knowledge only. With the `--ground`/`-g`
+proximity is derived from model knowledge only. With the `--ground`/`-G`
 option, the agent first searches the Internet/Web for facts about the
 topic, about its broader topic, and about its narrower topics, and
 grounds the determination in the found facts.
@@ -39,7 +39,7 @@ the `ase-meta-proximity` sub-agent before its proximity is re-determined.
 
 ##  OPTIONS
 
--   `--ground`|`-g`:
+-   `--ground`|`-G`:
     Ground the determination in Internet/Web facts gathered by the
     `ase-meta-proximity` agent before determining the proximity. Without
     this option, the determination is derived from model knowledge only.

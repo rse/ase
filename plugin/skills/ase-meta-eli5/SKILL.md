@@ -1,6 +1,6 @@
 ---
 name: ase-meta-eli5
-argument-hint: "[--help|-h] [--ground|-g] <topic>"
+argument-hint: "[--help|-h] [--ground|-G] <topic>"
 description: >
     Explain a topic in "Explain Like I'm 5" (ELI5) style, optionally
     grounded in Internet/Web facts. Use when the user wants a topic
@@ -23,7 +23,7 @@ Explain a Topic Like I'm 5
 
 <expand name="getopt"
     arg1="ase-meta-eli5"
-    arg2="--ground|-g">
+    arg2="--ground|-G">
     $ARGUMENTS
 </expand>
 
