@@ -570,6 +570,12 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         }
     }, [ log, all ])
 
+    /*  take over the surface state changed by other terminal boards of the project, except
+        their view, as each terminal board keeps its own view (taken from the surface on start only)  */
+    React.useEffect(() => BoardState.watch(log, (state) => {
+        setSurface(state.tui)
+    }), [ log ])
+
     /*  persist the shown view for the next start of the terminal board  */
     React.useEffect(() => {
         if (watched !== undefined)

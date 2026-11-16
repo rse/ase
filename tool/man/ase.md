@@ -187,8 +187,8 @@ The command-specific ones are described in their own manual pages.
 
 - *per-user state directory*:
   The machine-local per-user *ASE* state (session configurations, task
-  lifecycle deviation warnings, agent run records, and telemetry
-  state), never roamed or versioned: `$ASE_STATE_DIR`, if set, else
+  lifecycle deviation warnings, agent run records, telemetry state, and
+  the display state of the terminal task board), never roamed or versioned: `$ASE_STATE_DIR`, if set, else
   `$ASE_CONFIG_DIR`, if set, else `~/Library/Application Support/ase`
   on macOS, `%LOCALAPPDATA%\ase` on Windows, and
   `$XDG_STATE_HOME/ase` (falling back to `~/.local/state/ase`) on Linux
@@ -200,7 +200,7 @@ The command-specific ones are described in their own manual pages.
   `agents/`, the skill command aliases `aliases.yaml`, the fleet
   configuration `fleet.yaml`, the task plans
   `task/` of the default local task store, and the machine-local
-  runtime files (`service.yaml`, `service.log`, `board.yaml`, `agent/`,
+  runtime files (`service.yaml`, `service.log`, `agent/`,
   and `worktree/`), the latter covered by the self-ignoring
   `.ase/.gitignore`.
 

@@ -27,12 +27,12 @@ ChangeLog
 
 -   IMPROVEMENT [code, docs]: Context Tokens in Statusline Context Bar
     The statusline placeholder `%c` now appends the current context tokens to its progress bar and
-    percentage, e.g. `████████░░░░░░░░░░░░ 42% (84.2k)`.
+    percentage.
 
--   IMPROVEMENT [code, docs]: Per-Browser Web Board Display State
-    The display state of the web board (view, lanes, phases, heights, and flags) is now kept per
-    project in the local storage of each browser instead of the `web` section of `.ase/board.yaml`,
-    which now holds the state of the terminal board only. Each browser tab keeps its own view.
+-   IMPROVEMENT [code, docs]: Per-User/Per-Browser Task Board Display State
+    The display state of the task boards now moves from `.ase/board.yaml` per project into the
+    per-user state directory (terminal board) resp. the local storage of each browser (web board),
+    applied live to all other open boards of the user resp. browser, except their own view.
 
 -   BUGFIX [code]: Textual Numbers in Configuration Editor
     The configuration editor of `ase config edit` now edits number keys whose schema carries the

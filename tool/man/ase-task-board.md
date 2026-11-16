@@ -58,12 +58,13 @@ views are cycled via `v` (or a click onto the `view:` value of the
 header).
 
 The last shown view, the minimized lanes, the collapsed phases, the lane
-heights, and the shown flags are persisted: for the terminal board in
-`.ase/board.yaml`, and for the web board per project in the local storage
-of each browser, where each change of them in a web board is immediately
-applied to all other open web boards of the project in the same browser,
-except the shown view, which each browser tab keeps on its own (a newly
-opened tab starts in the last shown view of any tab).
+heights, and the shown flags are persisted per project: for the terminal
+board per user (see **FILES**), and for the web board in the local storage
+of each browser. Each change of them is immediately applied to all other
+open terminal boards of the user, resp. to all other open web boards in the
+same browser, except the shown view, which each terminal board and
+browser tab keeps on its own (a newly opened one starts in the last shown
+view of any of them).
 
 ### Terminal Board
 
@@ -666,8 +667,9 @@ The following configuration keys (on scope `user` or `project`, see
 
 ## FILES
 
-- `.ase/board.yaml`:
-  The display state of the terminal board in the project root (`tui`): the shown `view`
+- *per-user state directory*`/board/`*project-id*`.yaml`:
+  The display state of the terminal board of the user per project (`tui`), where the
+  per-user state directory is described in **ase**(1): the shown `view`
   (`lanes`, `graph`, `stats`, `agents`, or `flow`), the `minimized` lanes, the
   `collapsed` phases, the `heights` of the resized lanes (as their weights
   within their phase), and whether the task `titles` are wrapped onto
@@ -676,8 +678,8 @@ The following configuration keys (on scope `user` or `project`, see
 
   The display state of the web board is instead kept per project in the
   local storage of each browser, shared by all its tabs showing the web board.
-  The file never holds task content, and is covered by the self-ignoring
-  `.ase/.gitignore`.
+  The file never holds task content. A `.ase/board.yaml` of older versions
+  is no longer used and can be removed.
 
 ## EXIT STATUS
 

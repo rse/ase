@@ -17,7 +17,7 @@ import * as v                    from "valibot"
 import type { HighlighterCore }  from "shiki/core"
 
 import type Log                  from "./ase-lib-log.js"
-import { ensureAseGitignore }    from "./ase-config-scope.js"
+import { userStateDir }          from "./ase-config-scope.js"
 import { Task }                  from "./ase-task.js"
 import { Problem }               from "./ase-task-store-core.js"
 import type { TaskLifecycle }    from "./ase-task-format.js"
@@ -210,14 +210,13 @@ const stateSchema = v.object({
     tui: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
 })
 
-/*  reusable functionality: the persisted per-project board state in
-    ".ase/board.yaml", holding the view state of the TUI surface (the
-    "web" section of older state files is dropped on the next update),
-    which is display state only and hence never written into any task  */
+/*  reusable functionality: the persisted board state of the user per project in
+    "board/<project-id>.yaml" of the user state directory, holding the view state of
+    the TUI surface, which is display state only and hence never written into any task  */
 export class BoardState {
     /*  resolve the state file of the current project  */
     static filename (): string {
-        return path.join(Task.projectRoot(), ".ase", "board.yaml")
+        return path.join(userStateDir(), "board", `${Task.projectIdOf(Task.projectRoot())}.yaml`)
     }
 
     /*  parse a state file text, falling back to the empty state on any error  */
@@ -241,12 +240,11 @@ export class BoardState {
     static async update (fn: (state: State) => void): Promise<State> {
         const file = BoardState.filename()
         fs.mkdirSync(path.dirname(file), { recursive: true })
-        ensureAseGitignore(path.dirname(file))
 
         /*  ensure the lockable file exists without truncating a concurrently written one  */
         fs.appendFileSync(file, "", "utf8")
 
-        /*  wait for a concurrent holder (e.g. TUI vs. web service) instead of failing with ELOCKED  */
+        /*  wait for a concurrent holder (another TUI) instead of failing with ELOCKED  */
         const release = await lockfile.lock(file, {
             retries: { retries: 50, minTimeout: 20, maxTimeout: 200 }
         })
@@ -261,6 +259,44 @@ export class BoardState {
         }
         finally {
             await release()
+        }
+    }
+
+    /*  watch the state file (via its directory, as the file may not exist yet) for changes,
+        e.g. by another TUI, and invoke the callback with each changed state; returns a function
+        to stop watching  */
+    static watch (log: Log, onChange: (state: State) => void): (() => void) {
+        const file = BoardState.filename()
+        const dir  = path.dirname(file)
+        const read = () => {
+            try {
+                return fs.readFileSync(file, "utf8")
+            }
+            catch {
+                return ""
+            }
+        }
+        fs.mkdirSync(dir, { recursive: true })
+        let last = read()
+        const watcher = watch(dir, {
+            ignoreInitial: true,
+            depth:         0,
+            ignored:       (f, stats) => stats !== undefined && f !== dir && f !== file
+        })
+        watcher.on("all", (_event, f) => {
+            if (f !== file)
+                return
+            const text = read()
+            if (text === last)
+                return
+            last = text
+            onChange(BoardState.parse(text))
+        })
+        watcher.on("error", (err: unknown) => {
+            log.write("warning", `board: state watcher: ${err instanceof Error ? err.message : String(err)}`)
+        })
+        return () => {
+            watcher.close().catch(() => {})
         }
     }
 
