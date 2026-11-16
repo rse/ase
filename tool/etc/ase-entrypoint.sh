@@ -8,7 +8,7 @@
 #   container entrypoint: ensure Claude Code CLI and ASE plugin
 #   exist on a fresh home volume and then run the given command
 
-set -e
+set -eo pipefail
 
 if [[ ! -x "$HOME/.local/bin/claude" ]]; then
     echo "++ installing Claude Code"

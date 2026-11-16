@@ -48,9 +48,9 @@ interface DiagramOpts extends Omit<DiagramRenderOpts, "theme"> {
 }
 
 /*  custom argument parser for Commander: non-negative integer  */
-const parseInteger = (name: string) => (value: string): number => {
-    const n = Number.parseInt(value, 10)
-    if (!Number.isFinite(n) || n < 0)
+export const parseInteger = (name: string) => (value: string): number => {
+    const n = Number(value)
+    if (!Number.isInteger(n) || n < 0)
         throw new InvalidArgumentError(`${name} must be a non-negative integer`)
     return n
 }

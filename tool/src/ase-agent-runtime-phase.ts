@@ -35,14 +35,14 @@ const reassign = (plan: API.TaskPlan, name: string, assignee: string): void => {
         delete plan.header.Assignee
 }
 
-/*  the agent driving one phase of the "enterprise" task lifecycle model:
-    it claims every task in one of the "incoming" states, which does not carry the tag
-    "ase-agent-<kind>" yet, whose "After:" predecessors all passed the phase, and
-    which is either still unassigned (unless the agent requires the assignment) or
-    already assigned to the agent, into the "activity" state, processes it via an ASE skill of the headless agent
-    tool, tags it, and moves it into the state decided by the concrete agent, or,
-    processing the tasks unclaimed (see "unclaimed"), it processes every task in its
-    states, which does not carry the tag yet, without claiming it, and just tags it  */
+/*  the agent driving one phase of a task lifecycle model (by default "enterprise", see
+    "lifecycles"): it claims every task in one of the "incoming" states, which does not
+    carry the tag "ase-agent-<kind>" yet, whose "After:" predecessors all passed the phase,
+    and which is either still unassigned (unless the agent requires the assignment) or
+    already assigned to the agent, into the "activity" state, processes it via an ASE skill
+    of the headless agent tool, tags it, and moves it into the state decided by the concrete
+    agent, or, processing the tasks unclaimed (see "unclaimed"), it processes every task in
+    its states, which does not carry the tag yet, without claiming it, and just tags it  */
 export abstract class PhaseAgent extends Agent {
     /*  the phase states of the agent  */
     protected abstract readonly states: AgentStates

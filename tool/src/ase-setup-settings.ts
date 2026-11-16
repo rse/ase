@@ -282,13 +282,10 @@ export class SetupSettings {
         return 0
     }
 
-    /*  probe the ASE statusline registrations by inspecting the tool
-        settings files of all applicable installation scopes  */
-    async statuslineStatus (tool: Tool): Promise<{ file: string, scope: string, status: string }[]> {
-        /*  the OpenAI Codex CLI has no scriptable statusline mechanism at all  */
-        if (tool === "codex")
-            return []
-        const scopes: Scope[] = tool === "claude" ? [ "user", "project", "local" ] : [ "user" ]
+    /*  probe a setting in the tool settings files of the given installation scopes,
+        where "probe" determines its status (or undefined if it is absent)  */
+    private async settingsStatus (tool: Tool, scopes: Scope[],
+        probe: (root: AstNode) => string | undefined): Promise<{ file: string, scope: string, status: string }[]> {
         const entries: { file: string, scope: string, status: string }[] = []
         for (const scope of scopes) {
             const file = this.settingsFile(tool, scope)
@@ -300,16 +297,23 @@ export class SetupSettings {
                 /*  an unparsable settings file carries no usable state  */
                 continue
             }
-            const member = this.settingsFindMember(root, "statusLine")
-            if (member === undefined)
-                continue
-            entries.push({
-                file:   this.fileDisplay(file),
-                scope:  tool === "claude" ? scope : "(n/a)",
-                status: this.statuslineIsOwned(member) ? "activated" : "foreign"
-            })
+            const status = probe(root)
+            if (status !== undefined)
+                entries.push({ file: this.fileDisplay(file), scope: tool === "claude" ? scope : "(n/a)", status })
         }
         return entries
+    }
+
+    /*  probe the ASE statusline registrations by inspecting the tool
+        settings files of all applicable installation scopes  */
+    async statuslineStatus (tool: Tool): Promise<{ file: string, scope: string, status: string }[]> {
+        /*  the OpenAI Codex CLI has no scriptable statusline mechanism at all  */
+        if (tool === "codex")
+            return []
+        return this.settingsStatus(tool, tool === "claude" ? [ "user", "project", "local" ] : [ "user" ], (root) => {
+            const member = this.settingsFindMember(root, "statusLine")
+            return member === undefined ? undefined : this.statuslineIsOwned(member) ? "activated" : "foreign"
+        })
     }
 
     /*  determine whether an existing "outputStyle" value is owned by us  */
@@ -378,28 +382,10 @@ export class SetupSettings {
     async outputStyleStatus (tool: Tool): Promise<{ file: string, scope: string, status: string }[]> {
         if (tool !== "claude")
             return []
-        const scopes: Scope[] = [ "user", "project", "local" ]
-        const entries: { file: string, scope: string, status: string }[] = []
-        for (const scope of scopes) {
-            const file = this.settingsFile(tool, scope)
-            let root: AstNode
-            try {
-                root = await this.settingsReadAst(file)
-            }
-            catch {
-                /*  an unparsable settings file carries no usable state  */
-                continue
-            }
+        return this.settingsStatus(tool, [ "user", "project", "local" ], (root) => {
             const member = this.settingsFindMember(root, "outputStyle")
-            if (member === undefined)
-                continue
-            entries.push({
-                file:   this.fileDisplay(file),
-                scope,
-                status: this.outputStyleIsOwned(member) ? "selected" : "foreign"
-            })
-        }
-        return entries
+            return member === undefined ? undefined : this.outputStyleIsOwned(member) ? "selected" : "foreign"
+        })
     }
 
     /*  the environment variable enabling the function hooks of the plugin-shipped mods
@@ -500,29 +486,11 @@ export class SetupSettings {
     async functionHooksStatus (tool: Tool): Promise<{ file: string, scope: string, status: string }[]> {
         if (tool !== "claude")
             return []
-        const scopes: Scope[] = [ "user", "project", "local" ]
-        const entries: { file: string, scope: string, status: string }[] = []
-        for (const scope of scopes) {
-            const file = this.settingsFile(tool, scope)
-            let root: AstNode
-            try {
-                root = await this.settingsReadAst(file)
-            }
-            catch {
-                /*  an unparsable settings file carries no usable state  */
-                continue
-            }
+        return this.settingsStatus(tool, [ "user", "project", "local" ], (root) => {
             const env   = this.settingsFindMember(root, "env")?.query("/ * [ pos() == 2 ]")[0]
             const value = env !== undefined && env.type() === "object" ? this.functionHooksValue(env) : undefined
-            if (value === undefined)
-                continue
-            entries.push({
-                file:   this.fileDisplay(file),
-                scope,
-                status: value === "1" ? "enabled" : "foreign"
-            })
-        }
-        return entries
+            return value === undefined ? undefined : value === "1" ? "enabled" : "foreign"
+        })
     }
 
     /*  auto-detect the scope in which the ASE plugin is currently
@@ -988,25 +956,14 @@ export class SetupSettings {
     /*  probe the ASE telemetry configurations of a tool  */
     async telemetryStatus (tool: Tool): Promise<{ file: string, scope: string, status: string }[]> {
         const entries: { file: string, scope: string, status: string }[] = []
-        if (tool === "claude") {
-            const file = this.settingsFile("claude", "user")
-            let root: AstNode
-            try {
-                root = await this.settingsReadAst(file)
-            }
-            catch {
-                /*  an unparsable settings file carries no usable state  */
-                return entries
-            }
-            const env     = this.settingsFindMember(root, "env")?.query("/ * [ pos() == 2 ]")[0]
-            const present = env !== undefined && env.type() === "object" ? this.telemetryClaudePresent(env) : []
-            if (env !== undefined && present.length > 0)
-                entries.push({
-                    file:   this.fileDisplay(file),
-                    scope:  "user",
-                    status: this.telemetryClaudeIsOwned(env) ? "activated" : "foreign"
-                })
-        }
+        if (tool === "claude")
+            return this.settingsStatus(tool, [ "user" ], (root) => {
+                const env     = this.settingsFindMember(root, "env")?.query("/ * [ pos() == 2 ]")[0]
+                const present = env !== undefined && env.type() === "object" ? this.telemetryClaudePresent(env) : []
+                if (env === undefined || present.length === 0)
+                    return undefined
+                return this.telemetryClaudeIsOwned(env) ? "activated" : "foreign"
+            })
         else {
             const files = tool === "codex" ? [ this.telemetryCodexFile() ] : this.telemetryShellProfiles()
             for (const file of files) {

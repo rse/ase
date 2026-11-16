@@ -80,7 +80,7 @@ export const splitArgs = (text: string): string[] =>
 
 /*  join tokens into a command line, quoting only the tokens which need it  */
 export const joinArgs = (tokens: string[]): string =>
-    tokens.map((token) => /^[^\s"'\\$`#]+$/.test(token) ? token : `'${token.replace(/'/g, "'\\''")}'`).join(" ")
+    tokens.map((token) => /^[^\s"'\\$`#;&|<>()]+$/.test(token) ? token : `'${token.replace(/'/g, "'\\''")}'`).join(" ")
 
 /*  determine the command name of the first token of a command line, i.e., the token
     without its leading "/" (resp. "$" of OpenAI Codex CLI) and its "ase:" plugin prefix  */
@@ -233,11 +233,6 @@ export class Aliases {
                 fs.rmSync(file, { force: true })
             throw err
         }
-    }
-
-    /*  the alias file of a scope, or null for the project scope outside of a project  */
-    file (scope: AliasScope): string | null {
-        return this.files[scope]?.file ?? null
     }
 
     /*  the effective entries of both scopes (or of a single scope only)  */

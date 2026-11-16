@@ -37,7 +37,7 @@ import pkg                       from "../package.json" with { type: "json" }
 export const BOARD_BUILD = (() => {
     const dir  = path.dirname(fileURLToPath(import.meta.url))
     const hash = crypto.createHash("sha1")
-    for (const f of [ "core.js", "filter.js", "flow.js", "graph.js", "stats.js", "web-server.js", "web-client.html", "web-client.css", "web-client.js" ])
+    for (const f of [ "core.js", "diff.js", "filter.js", "flow.js", "graph.js", "stats.js", "web-server.js", "web-client.html", "web-client.css", "web-client.js" ])
         hash.update(fs.readFileSync(path.join(dir, `ase-task-board-${f}`)))
     return `${pkg.version}:${hash.digest("hex")}`
 })()

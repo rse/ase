@@ -8,6 +8,9 @@
 #   base image: official Node.js on Alpine Linux
 FROM        node:24-alpine
 
+#   fail a RUN on any failed command inside a pipe (like "curl ... | bash")
+SHELL       [ "/bin/ash", "-eo", "pipefail", "-c" ]
+
 #   install additional tools
 #   (libgcc, libstdc++ and ripgrep are required by the native Claude Code CLI on Alpine Linux)
 RUN         apk add --no-cache \

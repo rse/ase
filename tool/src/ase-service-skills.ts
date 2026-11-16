@@ -8,6 +8,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { z }              from "zod"
 import { ofetch }         from "ofetch"
 import pacote             from "pacote"
+import PQueue             from "p-queue"
 
 /*  shape of a single component-info entry  */
 export interface ComponentInfo {
@@ -29,22 +30,9 @@ export class Skills {
 
     /*  cap concurrent ofetch web requests to avoid hammering the remote
         endpoints (GitHub API, npm downloads API)  */
-    private static readonly HTTP_CONCURRENCY = 4
-    private static httpActive                = 0
-    private static httpQueue: Array<() => void> = []
-    private static async httpLimit<T> (fn: () => Promise<T>): Promise<T> {
-        while (Skills.httpActive >= Skills.HTTP_CONCURRENCY)
-            await new Promise<void>((resolve) => Skills.httpQueue.push(resolve))
-        Skills.httpActive++
-        try {
-            return await fn()
-        }
-        finally {
-            Skills.httpActive--
-            const next = Skills.httpQueue.shift()
-            if (next !== undefined)
-                next()
-        }
+    private static readonly httpQueue = new PQueue({ concurrency: 4 })
+    private static httpLimit<T> (fn: () => Promise<T>) {
+        return Skills.httpQueue.add(fn)
     }
 
     /*  fetch the full registry packument for a single package  */
@@ -380,6 +368,17 @@ export class Skills {
     }
 }
 
+/*  render the JSON-encoded result of a computation (or its error) as an MCP tool result  */
+const mcpJsonResult = async (fn: () => unknown) => {
+    try {
+        return { content: [ { type: "text" as const, text: JSON.stringify(await fn()) } ] }
+    }
+    catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err)
+        return { isError: true, content: [ { type: "text" as const, text: `ERROR: ${message}` } ] }
+    }
+}
+
 /*  MCP registration entry point for various skill helper tools  */
 export class SkillsMCP {
     register (mcp: McpServer): void {
@@ -415,21 +414,7 @@ export class SkillsMCP {
                 smallScope: z.boolean().optional()
                     .describe("If true, penalize each component by its direct-dependency count (small-scope need)")
             }
-        }, async (args) => {
-            try {
-                const result = await Skills.info(args.stack, args.components, args.staleMonths, args.smallScope)
-                return {
-                    content: [ { type: "text", text: JSON.stringify(result) } ]
-                }
-            }
-            catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
-            }
-        })
+        }, async (args) => mcpJsonResult(() => Skills.info(args.stack, args.components, args.staleMonths, args.smallScope)))
         mcp.registerTool("ase_decision_matrix", {
             title: "ASE decision matrix",
             description:
@@ -446,20 +431,6 @@ export class SkillsMCP {
                 matrix: z.array(z.array(z.number()))
                     .describe("Decision matrix rows: each row is `[weight, eval_1, ..., eval_N]`")
             }
-        }, async (args) => {
-            try {
-                const result = Skills.productSum(args.matrix)
-                return {
-                    content: [ { type: "text", text: JSON.stringify(result) } ]
-                }
-            }
-            catch (err: unknown) {
-                const message = err instanceof Error ? err.message : String(err)
-                return {
-                    isError: true,
-                    content: [ { type: "text", text: `ERROR: ${message}` } ]
-                }
-            }
-        })
+        }, async (args) => mcpJsonResult(() => Skills.productSum(args.matrix)))
     }
 }

@@ -428,7 +428,7 @@ export const agentLabel = (agent: Agent) =>
     agent.name !== agent.kind ? `${agent.name} (${agent.kind})` : agent.name
 
 /*  tick the wall-clock every second while the agents view is shown, for the live
-    durations of its footer (the time in the current state and the age of the heartbeat)  */
+    age of the heartbeat of the selected agent (in its accounting pane)  */
 export const agentNow = ref(Date.now())
 let   agentTimer = null as ReturnType<typeof setInterval> | null
 watch(view, (v) => {

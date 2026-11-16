@@ -19,7 +19,7 @@ import type { McpServer }                        from "@modelcontextprotocol/sdk
 
 import type Log                                  from "./ase-lib-log.js"
 import { readStdinBuffer, writeStdout }          from "./ase-lib-stdio.js"
-import { Diagram }                               from "./ase-util-diagram.js"
+import { Diagram, parseInteger }                 from "./ase-util-diagram.js"
 
 /*  supported output formats  */
 export type RasterizeFormat = "png" | "kitty" | "iip" | "sixel" | "text"
@@ -212,14 +212,6 @@ const parseScale = (value: string): number | "auto" => {
     const n = Number(value)
     if (!Number.isFinite(n) || n <= 0)
         throw new InvalidArgumentError("--scale must be a positive number or \"auto\"")
-    return n
-}
-
-/*  custom argument parser for Commander: non-negative integer  */
-const parseInteger = (name: string) => (value: string): number => {
-    const n = Number(value)
-    if (!Number.isInteger(n) || n < 0)
-        throw new InvalidArgumentError(`${name} must be a non-negative integer`)
     return n
 }
 
@@ -868,6 +860,10 @@ export class RasterizeMCP {
                 .then((dir) => {
                     process.once("exit", () => { fs.rmSync(dir, { recursive: true, force: true }) })
                     return dir
+                })
+                .catch((err: unknown) => {
+                    RasterizeMCP.dir = null
+                    throw err
                 })
         }
         const dir  = await RasterizeMCP.dir

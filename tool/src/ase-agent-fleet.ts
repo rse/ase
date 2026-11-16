@@ -72,9 +72,10 @@ const initPlanned: Record<string, string> = { solo: "OPEN", team: "PLANNING", en
 
 /*  the initial configuration of a fleet (see "ase agent fleet init") for a task lifecycle
     model: the agent relay, the edit request agent, and the effort estimation agent for all
-    models, plus the four phase agents for "enterprise" resp. an ad-hoc implementation agent
-    for "team" (as the built-in phase agents support "enterprise" only), while "solo" has no
-    activity states and hence no phase agents at all  */
+    models, plus the planning, implementation, qualification, and integration phase agents
+    for "enterprise" resp. an ad-hoc implementation agent for "team" (as the built-in phase
+    agents support "enterprise" only), while "solo" has no activity states and hence no
+    phase agents at all  */
 const initConfig = (tool: string, lifecycle: string): string => [
     textframe`
     ##
@@ -847,7 +848,8 @@ export default class AgentFleetCommand extends DaemonCommand {
             .command("init")
             .description("Create the initial configuration file for a task lifecycle model, " +
                 "with the agent relay, the edit request agent, and the effort estimation agent, " +
-                "plus the four phase agents for \"enterprise\" resp. an ad-hoc implementation agent for \"team\"")
+                "plus the planning, implementation, qualification, and integration phase agents for \"enterprise\" " +
+                "resp. an ad-hoc implementation agent for \"team\"")
             .option("-c, --config <file>", "YAML configuration file to create (default: \".ase/fleet.yaml\")")
             .option("-t, --tool <tool>", "agent tool of all agents (\"claude\", \"copilot\", or \"codex\"; " +
                 "default: $ASE_TOOL, else \"claude\")")
