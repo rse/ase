@@ -197,7 +197,11 @@ artifacts. Do not output anything.
 Update <timestamp-modified/> with the current time in ISO-style
 format, which has to be determined by calling the
 `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
-MCP server and using the `text` field of its response. If
+MCP server and using the `text` field of its response. But if
+only the frontmatter changed, i.e., the body of <task-content/> is
+unchanged against the loaded plan, keep its `Modified:` value as
+<timestamp-modified/> instead, as a frontmatter-only change *MUST
+NOT* refresh it (see the plan format). If
 <timestamp-created/> is still unset (because the plan content
 had no `Created:` frontmatter key), set
 <timestamp-created><timestamp-modified/></timestamp-created>

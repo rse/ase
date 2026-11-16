@@ -72,6 +72,13 @@ Set <args>--int-reuse-task</args>.
         `VERIFICATION` selects `REGRESSION` and `CONFIRMATION`. Do not
         output anything.
 
+        As the severity follows from the focus area, the focused
+        sections yield at most the severity `MUST` (`SPECIFICATION`)
+        resp. `SHOULD` (`DESIGN`, `VERIFICATION`). Hence, step 3.2 below
+        caps the `--until` severity at the highest severity the
+        remaining sections can yield, so a grilling of only `DESIGN`
+        or `VERIFICATION` does not stop before asking anything.
+
     4.  React on task id:
 
         <expand name="task-react-id" arg1="ase-task-grill"></expand>
@@ -159,6 +166,11 @@ Set <args>--int-reuse-task</args>.
         timestamp-created to extracted text).
         </if>
 
+        Set <grill-until/> to <getopt-option-until/>, but lowered to
+        `SHOULD` if it is `MUST` and <sections/> does *not* contain
+        `SPECIFICATION`, as only `SPECIFICATION` yields questions of
+        severity `MUST`. Do not output anything.
+
     3.  Perform *at most* <getopt-option-rounds/> grilling *rounds*,
         numbered <m/> (1-<getopt-option-rounds/>) -- the round count is
         a *maximum* only, as every round can *stop* the grilling *early*
@@ -181,7 +193,7 @@ Set <args>--int-reuse-task</args>.
         2.  DETERMINE QUESTIONS:
 
             <expand name="grill-questions"
-                arg1="<getopt-option-until/>"
+                arg1="<grill-until/>"
                 arg2="◉ task: **<ase-task-id/>**"
                 arg3="file and directory paths, identifiers, symbols, types, commands, options, configuration keys, and literal values"
                 arg4="the <task-content/>, the code base,"
@@ -318,7 +330,17 @@ Set <args>--int-reuse-task</args>.
             `grilled:specification, grilled:design,
             grilled:verification`.
 
+            <if condition="neither the body nor the `Tags:` key of <task-content/> changed in this round">
+            Skip the saving, as there is nothing to persist, and only
+            output the following <template/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan unchanged**
+            </template>
+            </if>
+            <else>
             <expand name="task-save-content" arg1="plan updated"></expand>
+            </else>
 
         6.  SHOW PLAN CHANGES:
 

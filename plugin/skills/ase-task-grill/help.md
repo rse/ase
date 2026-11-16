@@ -99,7 +99,9 @@ in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
     higher are clear (default: `MUST`), where the severity follows from
     the focus area: `MUST` (`DOMAIN`, `INTERFACE`), `SHOULD`
     (`ARCHITECTURE`, `REGRESSION`, `CONFIRMATION`), and `MAY`
-    (`IMPLEMENTATION`). Independent of this, every open point is rated
+    (`IMPLEMENTATION`). Without `SPECIFICATION` in the `--focus`, the
+    severity `MUST` is lowered to `SHOULD`, as no other section yields
+    `MUST` points. Independent of this, every open point is rated
     with an individual impact (`HIGH`, `MEDIUM`, or `LOW`), which
     decides which points are raised as questions and in which order
     within a focus area.

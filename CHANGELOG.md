@@ -34,6 +34,11 @@ ChangeLog
     per-user state directory (terminal board) resp. the local storage of each browser (web board),
     applied live to all other open boards of the user resp. browser, except their own view.
 
+-   BUGFIX [plugin]: Grilling of Design/Verification Only
+    The skill `ase-task-grill` now lowers `--until MUST` to `SHOULD` when `SPECIFICATION` is not
+    in focus, so `--focus HOW|WHEN` no longer stops before asking anything, and no longer saves
+    (and bumps `Modified:` of) an unchanged plan.
+
 -   BUGFIX [code]: Textual Numbers in Configuration Editor
     The configuration editor of `ase config edit` now edits number keys whose schema carries the
     metadata `text` as free text, so values like `150k` or `4,8,12` can be typed in.
