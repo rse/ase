@@ -62,7 +62,7 @@ const logLevelRe  = /^([^|]*\| [^:]+: \[[^\]]+\]: )\[(ERROR|WARNING|INFO|DEBUG)\
     agents, and applied to an agent only if it supports them)  */
 const fleetKeys   = [ "foreground" ]
 const relayKeys   = [ "address", "port", "token", "cors", "tls-cert", "tls-key" ]
-const defaultKeys = [ "tool", "model", "parallel", "timeout", "repo", "tempdir", "agent-relay" ]
+const defaultKeys = [ "tool", "model", "parallel", "timeout", "budget", "repo", "tempdir", "agent-relay" ]
 
 /*  the options not allowed in the section of an agent, as the fleet decides on them  */
 const deniedKeys = [ "name", "one-shot", "foreground", "help" ]
@@ -100,6 +100,7 @@ const initConfig = (tool: string, lifecycle: string): string => [
         #model:         <model>         # model of the agent tool (or "<size>=<model>" pairs per "Effort:" size)
         parallel:       1               # maximum number of tasks processed in parallel
         timeout:        60m             # maximum duration of processing a task (<number><unit> with unit "s", "m", or "h")
+        #budget:        20              # maximum costs of processing a task in USD (a soft cap, unsupported by "codex")
         #repo:          <url>           # Git repository to clone temporarily for the tasks without "worktree"
         #tempdir:       <dir>           # directory for the temporary files like the clone of "repo"
 

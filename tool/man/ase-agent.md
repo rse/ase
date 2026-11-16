@@ -153,8 +153,9 @@ its *success* or *failure* (parking) state, where the pseudo state
 `previous` restores the incoming state the task was claimed from (for an
 agent claiming tasks from multiple incoming states).
 
-A processing failure, or a processing exceeding the duration of
-`--timeout`, always leads to the failure state. A task whose status the
+A processing failure, a processing exceeding the duration of
+`--timeout`, or a processing exhausting the costs of `--budget`, always
+leads to the failure state. A task whose status the
 skill itself moved elsewhere is tagged, too, and left in that state.
 
 The preparing of a processing (e.g., creating a worktree) and its
@@ -223,18 +224,20 @@ Each task is processed through the headless agent tool of `--tool`,
 with the environment variable `ASE_HEADLESS=true` and without any
 standard input, i.e., via
 
-- `claude` \[`--add-dir` *dir* ...\] `-p --output-format stream-json
-  --verbose --disallowedTools AskUserQuestion --permission-mode auto
-  --permission-prompts none` *prompt*,
+- `claude` \[`--add-dir` *dir* ...\] `--max-budget-usd` *usd* `-p
+  --output-format stream-json --verbose --disallowedTools AskUserQuestion
+  --permission-mode auto --permission-prompts none` *prompt*,
 
-- `copilot` \[`--add-dir` *dir* ...\] `--allow-all-tools --no-ask-user
-  --no-color --output-format json -p` *prompt*, resp.
+- `copilot` \[`--add-dir` *dir* ...\] `--max-ai-credits` *credits*
+  `--allow-all-tools --no-ask-user --no-color --output-format json -p`
+  *prompt*, resp.
 
 - `codex exec` \[`--add-dir` *dir* ...\] `--json --approve-for-me
   --color never` *prompt*,
 
 where risky actions are denied or automatically reviewed instead of
-being prompted for, and where each additional directory a skill needs
+being prompted for, where *usd* resp. *credits* (of $0.01 each) is the
+budget of `--budget`, and where each additional directory a skill needs
 access to besides its working directory is granted through an
 additional `--add-dir` *dir*. A skill *prompt* is `/`*skill* *args*
 (`claude` and `copilot`) resp. `$`*skill* *args* (`codex`), where an

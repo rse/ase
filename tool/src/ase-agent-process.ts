@@ -77,7 +77,7 @@ export const validateName = (name: string, kind: string, kinds: string[]): void 
     is derived from the ASE_TOOL environment variable, validated lazily in "setup")  */
 export const agentDefaults = (): AgentOpts => {
     const envTool = process.env.ASE_TOOL ?? ""
-    return { tool: envTool !== "" ? envTool : "claude", parallel: "1", timeout: "60m", oneShot: false }
+    return { tool: envTool !== "" ? envTool : "claude", parallel: "1", timeout: "60m", budget: "20", oneShot: false }
 }
 
 /*  the command-line arguments of the explicitly given options of a command (except "--foreground"),

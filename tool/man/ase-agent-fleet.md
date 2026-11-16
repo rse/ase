@@ -79,7 +79,7 @@ members) or `ase agent fleet stop`.
   (with all its options commented out, so they fall back to
   `project.relay.url`, `project.relay.crt`, and `project.relay.key`),
   the section `default` (with `tool`, `parallel: 1`, and `timeout: 60m`,
-  plus `model`, `repo`, and `tempdir` commented out), the edit request agent
+  plus `model`, `budget`, `repo`, and `tempdir` commented out), the edit request agent
   `editor`, the effort estimation agent `estimator` (mode `phase`,
   estimating the planned tasks, i.e., the `OPEN` tasks for `solo`, the
   `PLANNING` tasks for `team`, and the `PLANNED` tasks for `enterprise`,
@@ -202,7 +202,7 @@ value omits an option, and a list repeats an option:
 
 - `default`:
   (optional) The default options of all agents: `tool`, `model`,
-  `parallel`, `timeout`, `repo`, `tempdir`, and `agent-relay` (see
+  `parallel`, `timeout`, `budget`, `repo`, `tempdir`, and `agent-relay` (see
   `ase-agent`(1) and `ase-agent-adhoc`(1)),
   each one applied only to the agents supporting it (e.g., `repo` not to
   `rebooter`), and overridden by the section of an agent. The option

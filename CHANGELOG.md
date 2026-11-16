@@ -2,6 +2,14 @@
 ChangeLog
 =========
 
+2.1.1 (2026-11-XX)
+------------------
+
+-   FEATURE [code, docs]: Agent Budget Option "-B|--budget"
+    The new option `-B|--budget <usd>` of all agents (default: `20`) limits the costs of processing
+    a task via the native soft cost cap of the agent tool (`--max-budget-usd` of `claude` resp.
+    `--max-ai-credits` of `copilot`), where an exhausted budget fails the processing.
+
 2.1.0 (2026-11-16)
 ------------------
 

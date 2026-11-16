@@ -24,17 +24,24 @@ const TEXT_MAX = 20
 /*  the "--model" option of all tools for the model <model> (none for the default model)  */
 const modelArgs = (model: string): string[] => model !== "" ? [ "--model", model ] : []
 
+/*  the AI credits of Copilot ($0.01 each) for the budget <budget> in USD, rounded up  */
+export const budgetCredits = (budget: string): number =>
+    Math.ceil(Number((Number.parseFloat(budget) * 100).toFixed(6)))
+
 /*  the per-tool headless invocation of the rendered prompt <prompt> with access to the
-    additional directories <add> (the "--add-dir" options) and the model <model>, streaming JSONL
+    additional directories <add> (the "--add-dir" options), the model <model>, and the native
+    cost cap of the budget <budget> in USD (none if empty, and none of Codex at all), streaming JSONL
     events, where risky actions are denied or automatically reviewed instead of being prompted for
     (the variadic "--add-dir" of Claude has to precede the other options to not consume the prompt)  */
-export const toolArgs: Record<Tool, (prompt: string, add: string[], model: string) => string[]> = {
-    "claude":  (prompt, add, model) => [
-        ...add, ...modelArgs(model), "-p", "--output-format", "stream-json", "--verbose", "--disallowedTools", "AskUserQuestion",
+export const toolArgs: Record<Tool, (prompt: string, add: string[], model: string, budget: string) => string[]> = {
+    "claude":  (prompt, add, model, budget) => [
+        ...add, ...modelArgs(model), ...(budget !== "" ? [ "--max-budget-usd", budget ] : []),
+        "-p", "--output-format", "stream-json", "--verbose", "--disallowedTools", "AskUserQuestion",
         "--permission-mode", "auto", "--permission-prompts", "none", prompt
     ],
-    "copilot": (prompt, add, model) => [
-        ...add, ...modelArgs(model), "--allow-all-tools", "--no-ask-user", "--no-color", "--output-format", "json", "-p", prompt
+    "copilot": (prompt, add, model, budget) => [
+        ...add, ...modelArgs(model), ...(budget !== "" ? [ "--max-ai-credits", String(budgetCredits(budget)) ] : []),
+        "--allow-all-tools", "--no-ask-user", "--no-color", "--output-format", "json", "-p", prompt
     ],
     "codex":   (prompt, add, model) => [
         "exec", ...add, ...modelArgs(model), "--json", "--approve-for-me", "--color", "never", prompt
@@ -83,6 +90,7 @@ const toolEvents: Record<Tool, (ev: any) => ToolEntry[]> = {
             return [
                 ...(Array.isArray(ev.permission_denials) ? ev.permission_denials : [])
                     .map((denial: any) => warn(`permission denied: tool ${denial.tool_name}: ${brief(denial.tool_input)}`)),
+                ...(ev.subtype === "error_max_budget_usd" ? [ warn(`budget exhausted: ${brief(ev.errors ?? "")}`) ] : []),
                 note(ev.is_error === true, `result: ${ev.subtype} (turns: ${ev.num_turns}, ` +
                     `duration: ${Math.round((ev.duration_ms ?? 0) / 1000)}s, cost: $${Number(ev.total_cost_usd ?? 0).toFixed(2)})`)
             ]

@@ -7,6 +7,7 @@
 \[`-t`|`--tool` *tool*\]
 \[`-p`|`--parallel` *num*\]
 \[`-T`|`--timeout` *duration*\]
+\[`-B`|`--budget` *usd*\]
 \[`-o`|`--one-shot`\]
 \[`--agent-relay` *url*\]
 \[`-C`|`--cwd` *dir*\]
@@ -266,6 +267,15 @@ The following options are shared by all agents (see also
   *unit* `s`, `m`, or `h` (default: `60m`), where a processing
   exceeding it fails. The preparing and the finishing of a processing
   are each limited to a fixed duration of 240 seconds in addition.
+
+- \[`-B`|`--budget` *usd*\]:
+  The maximum costs of processing a task in USD, as a positive number
+  (default: `20`), passed to the agent tool as its native cost cap
+  (`--max-budget-usd` of `claude` resp. `--max-ai-credits` of `copilot`,
+  requiring at least `0.30` USD), where a processing exhausting it fails.
+  It is a soft cap, checked by the agent tool only after each model
+  response. It is unsupported by `codex`, where a given budget is
+  refused and the default one is ignored.
 
 - \[`-o`|`--one-shot`\]:
   Terminate the agent, instead of observing for further tasks, once a

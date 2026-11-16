@@ -29,7 +29,7 @@ import { AgentPresenceReporter }    from "./ase-agent-relay-client.js"
 import type { AgentRelayClient }    from "./ase-agent-relay-client.js"
 import type { AgentUsage, AgentFlow, AgentPrompt } from "./ase-agent-relay-core.js"
 import { telemetryEnabled }         from "./ase-service-otel.js"
-import { toolArgs, toolEntries, skillPrompt } from "./ase-agent-runtime-tool.js"
+import { toolArgs, toolEntries, skillPrompt, budgetCredits } from "./ase-agent-runtime-tool.js"
 import type { ToolCosts }           from "./ase-agent-runtime-tool.js"
 import {
     tempPreserved, tempDir, exclusive, execaJob, jobScope, withinJobTimeout,
@@ -44,6 +44,7 @@ export interface AgentOpts {
     tool:        string
     parallel:    string
     timeout:     string
+    budget:      string
     oneShot:     boolean
     cwd?:        string
     repo?:       string
@@ -119,6 +120,16 @@ const parseDuration = (spec: string): number => {
     if (ms < 1 || ms > 2 ** 31 - 1)
         throw new Error(`agent: invalid duration "${spec}" (expected <number><unit> with unit s, m, or h, up to about 24 days)`)
     return ms
+}
+
+/*  parse a budget "<number>" in USD for the agent tool <tool>,
+    where Copilot requires at least 30 of its AI credits of $0.01 each  */
+const parseBudget = (spec: string, tool: Tool): string => {
+    if (!/^\d+(\.\d+)?$/.test(spec) || Number.parseFloat(spec) <= 0)
+        throw new Error(`agent: invalid budget "${spec}" (expected a positive number of USD)`)
+    else if (tool === "copilot" && budgetCredits(spec) < 30)
+        throw new Error(`agent: budget "${spec}" too small for agent tool "copilot" (expected at least 0.30 USD)`)
+    return spec
 }
 
 /*  the plain tags of the "Tags:" frontmatter key of a task  */
@@ -297,6 +308,7 @@ export abstract class Agent {
     private parallel                                     = 1
     private timeoutSpec                                  = ""
     private timeout                                      = 0
+    private budget                                       = ""
     private oneShot                                      = false
     protected lifecycle: TaskFormat.TaskLifecycle | null = null
 
@@ -1055,14 +1067,14 @@ export abstract class Agent {
         buffering them, as the output of the agent tool can be huge), where the quiet entries are
         only echoed (i.e., not kept in the processing log attachment of the task), and return its success  */
     private async invoke (taskId: string, job: AgentJob, abort: AbortSignal, log: AgentLog, echo: AgentLog, output: string[]): Promise<boolean> {
-        const { tool, timeout, timeoutSpec } = this
+        const { tool, timeout, timeoutSpec, budget } = this
         const { cwd } = job
         const cli   = toolSpecs[tool].cli
         const cmd   = job.cmd ?? ""
         const i     = cmd.indexOf(" ")
         const model = job.model ?? ""
         const args  = toolArgs[tool](job.prompt ?? skillPrompt(tool, i < 0 ? cmd : cmd.slice(0, i), i < 0 ? "" : cmd.slice(i + 1)),
-            [ ...new Set(job.dirs ?? []) ].filter((dir) => dir !== cwd).flatMap((dir) => [ "--add-dir", dir ]), model)
+            [ ...new Set(job.dirs ?? []) ].filter((dir) => dir !== cwd).flatMap((dir) => [ "--add-dir", dir ]), model, budget)
         await log("info", `running: ${cli} ${args.map((arg) => arg.includes(" ") ? `"${arg}"` : arg).join(" ")}`)
         const started = Date.now()
         const costs: ToolCosts = { costToken: null, costUSD: null, cread: 0, cwrite: 0, input: 0, apiMs: null }
@@ -1248,6 +1260,8 @@ export abstract class Agent {
                 .option("-p, --parallel <num>",     "maximum number of tasks processed in parallel (default: 1)")
                 .option("-T, --timeout <duration>", "maximum duration of processing a task " +
                     "as <number><unit> with unit s, m, or h (default: 60m)")
+                .option("-B, --budget <usd>",       "maximum costs of processing a task in USD, as a soft cap " +
+                    "(default: 20, unsupported by agent tool \"codex\")")
                 .option("-o, --one-shot",           "terminate once all dispatchable incoming tasks are processed")
                 .option("--agent-relay <url>",      "agent relay to pass the live presence of the agent to, " +
                     "as \"ase[s]://<addr>:<port>[/<token>]\" (default: the configured \"project.relay.url\", else none)")
@@ -1326,6 +1340,9 @@ export abstract class Agent {
         }
         this.timeoutSpec = opts.timeout
         this.timeout     = parseDuration(opts.timeout)
+        if (this.tool === "codex" && own.budget !== undefined)
+            throw new Error(`agent: ${this.name}: "--budget" is unsupported by agent tool "codex" (which has no cost cap)`)
+        this.budget      = this.tool !== "codex" ? parseBudget(opts.budget, this.tool) : ""
         this.oneShot     = opts.oneShot
         this.lifecycle   = await Task.lifecycle(this.log)
         if (!this.lifecycles.includes(this.lifecycle.name))
@@ -1522,7 +1539,8 @@ export abstract class Agent {
                 await this.cloneRepo()
 
             await this.write("info", this.name, `observing ${this.observing()} ` +
-                `(tool: ${tool}${this.modelSpec !== "" ? `, model: ${this.modelSpec}` : ""}, parallel: ${parallel}, timeout: ${this.timeoutSpec}${this.oneShot ? ", one-shot" : ""})`)
+                `(tool: ${tool}${this.modelSpec !== "" ? `, model: ${this.modelSpec}` : ""}, parallel: ${parallel}, timeout: ${this.timeoutSpec}, ` +
+                `budget: ${this.budget !== "" ? `$${this.budget}` : "none"}${this.oneShot ? ", one-shot" : ""})`)
             let finished = false
             let failure: unknown = null
             while (!abort.signal.aborted && !finished) {
