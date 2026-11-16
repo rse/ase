@@ -86,15 +86,15 @@ type Row = { chars: Char[], number: number | undefined }
 
 /*  split a task into the keys of its frontmatter (without "Type"), each with its
     line, and its body with its first line (without the backmatter, which starts
-    at the first "---" line outside a fenced code block)  */
+    at the first "---" line outside a fenced code block followed by a "Type:" line)  */
 const parts = (source: string): { keys: [ string, string, number ][], body: string, first: number } => {
     const head  = /^---\n([^]*?)\n---\n/.exec(source)
     const lines = source.slice(head?.[0].length ?? 0).split("\n")
     let fence   = false
-    const end   = lines.findIndex((line) => {
+    const end   = lines.findIndex((line, k) => {
         if (line.startsWith("```"))
             fence = !fence
-        return !fence && line === "---"
+        return !fence && line === "---" && /^Type:/.test(lines[k + 1] ?? "")
     })
     return {
         keys: (head?.[1] ?? "").split("\n").flatMap((line, k): [ string, string, number ][] => {
@@ -332,7 +332,7 @@ export const modTaskEdit = () => {
         update keeps the scroll position, and determine the answer of the tool  */
     const open = async (id: string, sections: string,
         engine: Pick<Engine, "load" | "every" | "invalidate">): Promise<string> => {
-        const loaded = await engine.load(id)
+        const loaded = await engine.load(id).catch(() => "")
         if (!TAG.test(loaded))
             return `ERROR: task "${id}" cannot be loaded`
         reset()

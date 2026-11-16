@@ -138,7 +138,7 @@ export const modCacheControl = () => {
     const coldTokens = () => S.colds.reduce((sum, c) => sum + c.tokens, 0)
     const left   = () => ttl() - (now - S.activity)
     const kind   = () => S.activity === 0 ? "unknown"
-        : left() <= 0 ? "cold" : left() <= COOLING || spent() ? "cooling" : "warm"
+        : left() <= 0 ? "cold" : left() <= Math.min(COOLING, margin()) || spent() ? "cooling" : "warm"
 
     /*  whether a SOFT auto-warm sent all its pings (and the cache cools down until cold)  */
     const spent  = () => S.warm === "soft" && S.pings >= settings.soft
@@ -199,12 +199,17 @@ export const modCacheControl = () => {
 
         /*  ping without overlapping a ping of the next beat, asking for haste
             in the prompt (instead of an "effort", which would cost the cache)  */
-        pinging = true
+        pinging  = true
+        const id = S.id
         const reply = await k.fork("ASE cache controller keep-alive ping. You have no tools. " +
             "Answer straight away without thinking it over. Reply with only: ok")
             .catch(() => undefined).finally(() => { pinging = false })
         if (reply === undefined || !reply.isAnswered)
             return warmOff()
+
+        /*  drop the outcome of a ping overtaken by a new turn or session  */
+        if (S.working || S.id !== id)
+            return
         const u = reply.usage
         S.pings++
         if (S.warm === "soft")

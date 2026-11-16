@@ -235,9 +235,11 @@ export const modRenderImage = () => {
         const running = pending.get(id)
         if (running !== undefined)
             return running
+        const cap = (n: number | undefined, max: number) =>
+            Math.max(1, Math.min(n !== undefined && Number.isFinite(n) ? Math.floor(n) : CELLS, max))
         const box = {
-            columns: Math.max(1, Math.min(input.columns ?? CELLS, width - MARGIN - BORDER, CELLS)),
-            rows:    Math.max(1, Math.min(input.rows    ?? CELLS, CELLS))
+            columns: cap(input.columns, Math.min(width - MARGIN - BORDER, CELLS)),
+            rows:    cap(input.rows, CELLS)
         }
         const args = Object.fromEntries(Object.entries({
             file: input.file, data: input.data, background: input.background, smart: input.smart,
