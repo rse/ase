@@ -14,7 +14,7 @@ import lockfile                                     from "proper-lockfile"
 
 import type Log                                     from "./ase-lib-log.js"
 import type { ScopeTerm, Scope }                    from "./ase-config-scope.js"
-import { projectRoot, userConfigDir, userStateDir } from "./ase-config-scope.js"
+import { projectRoot, userConfigDir, userStateDir, withOverride } from "./ase-config-scope.js"
 import {
     projectClassificationPresets,
     configWritableScopes,
@@ -40,8 +40,8 @@ const unwrapSchema = (s: unknown): SchemaNode | null => {
 }
 
 /*  encapsulate read/write access to a stack of "<name>.yaml" configuration files,
-    each associated with a scope term; reads cascade along user < project < task < session,
-    writes are confined to the target (strongest) scope term  */
+    each associated with a scope term; reads cascade along user < project < task < override < session,
+    writes are confined to the target (strongest explicit) scope term  */
 export class Config {
     /*  public state  */
     public  filename: string
@@ -83,7 +83,7 @@ export class Config {
 
     /*  render a scope term as a short textual label  */
     static scopeLabel (term: ScopeTerm): string {
-        if (term.kind === "default" || term.kind === "user" || term.kind === "project")
+        if (term.kind === "default" || term.kind === "user" || term.kind === "project" || term.kind === "override")
             return term.kind
         return `${term.kind}:${term.id}`
     }
@@ -94,6 +94,8 @@ export class Config {
             throw new Error("internal error: \"default\" scope has no filename")
         if (term.kind === "user")
             return path.join(userConfigDir(), `${name}.yaml`)
+        else if (term.kind === "override")
+            return path.join(userConfigDir(), "override.yaml")
         else if (term.kind === "project") {
             const rel   = path.join(".ase", `${name}.yaml`)
             const root  = projectRoot() ?? process.cwd()
@@ -128,14 +130,15 @@ export class Config {
         return null
     }
 
-    /*  read the full scope chain into memory; the requested mode applies
-        to the target scope only, inherited scopes are always lenient  */
+    /*  read the full scope chain into memory (for the configuration including the
+        implicit "override" scope, which never becomes the target); the requested
+        mode applies to the target scope only, inherited scopes are always lenient  */
     read (mode: "strict" | "lenient" = "lenient"): void {
-        const chain = this.scope
+        const tgt   = this.scope[this.scope.length - 1]
+        const chain = this.name === "config" ? withOverride(this.scope) : this.scope
         const docs: Layer[] = []
         this.pruned = []
-        for (let i = 0; i < chain.length; i++) {
-            const sc = chain[i]
+        for (const sc of chain) {
             if (sc.kind === "default") {
                 const doc = new Document()
                 doc.contents = doc.createNode({})
@@ -156,7 +159,7 @@ export class Config {
                 continue
             }
             const filename   = this.resolveFilename(this.name, sc)
-            const isTarget   = (i === chain.length - 1)
+            const isTarget   = (sc === tgt)
             const perDocMode: "strict" | "lenient" = isTarget ? mode : "lenient"
             const text       = fs.existsSync(filename) ? fs.readFileSync(filename, "utf8") : ""
             let   doc: Document = parseDocument(text)
@@ -202,7 +205,7 @@ export class Config {
             docs.push({ scope: sc, filename, doc })
         }
         this.docs   = docs
-        this.target = docs.length - 1
+        this.target = docs.findIndex((d) => d.scope === tgt)
         for (let i = 0; i < docs.length; i++) {
             const isTarget   = (i === this.target)
             const perDocMode: "strict" | "lenient" = isTarget ? mode : "lenient"

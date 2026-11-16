@@ -17,14 +17,15 @@ export type ScopeTerm =
     | { kind: "user"                }
     | { kind: "project"             }
     | { kind: "task",    id: string }
+    | { kind: "override"            }
     | { kind: "session", id: string }
 
-/*  a scope chain (one or more terms, canonical order default<user<project<task<session)  */
+/*  a scope chain (one or more terms, canonical order default<user<project<task<override<session)  */
 export type Scope = ScopeTerm[]
 
 /*  canonical ordering rank of a scope kind  */
 const scopeRank = (kind: ScopeTerm["kind"]): number =>
-    ({ default: -1, user: 0, project: 1, task: 2, session: 3 })[kind]
+    ({ default: -1, user: 0, project: 1, task: 2, override: 2.5, session: 3 })[kind]
 
 /*  parse a single scope term  */
 const parseScopeTerm = (value: string): ScopeTerm => {
@@ -87,6 +88,25 @@ export const userConfigDir = (): string => {
         const base = xdg !== undefined && xdg !== "" ? xdg : path.join(os.homedir(), ".config")
         return path.join(base, "ase")
     }
+}
+
+/*  resolve the file of the read-only "override" scope, which exists only
+    for an explicitly set $ASE_CONFIG_DIR (or null otherwise)  */
+export const userOverrideFile = (): string | null => {
+    const dir = envDir("ASE_CONFIG_DIR")
+    return dir !== null ? path.join(dir, "override.yaml") : null
+}
+
+/*  insert the implicit "override" term into a scope chain, directly below a
+    "session" term (else at its top), if its file exists and it is not yet
+    part of the chain; the terms of the chain keep their identity  */
+export const withOverride = (scope: Scope): Scope => {
+    const file = userOverrideFile()
+    if (file === null || !fs.existsSync(file) || scope.some((t) => t.kind === "override"))
+        return scope
+    const i = scope.findIndex((t) => t.kind === "session")
+    return i < 0 ? [ ...scope, { kind: "override" } ] :
+        [ ...scope.slice(0, i), { kind: "override" }, ...scope.slice(i) ]
 }
 
 /*  resolve the per-OS user-scope state directory (per-session state and

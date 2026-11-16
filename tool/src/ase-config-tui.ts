@@ -16,6 +16,7 @@ import { stringify }                          from "yaml"
 import type Log                               from "./ase-lib-log.js"
 import pkg                                    from "../package.json" with { type: "json" }
 import type { Scope }                         from "./ase-config-scope.js"
+import { withOverride }                       from "./ase-config-scope.js"
 import { configSchema, configSecretKeys, configDescriptions } from "./ase-config-schema.js"
 import { Config }                             from "./ase-config-core.js"
 import type { KeyType }                       from "./ase-config-core.js"
@@ -137,13 +138,16 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
     const { exit, suspendTerminal } = useApp()
     const { columns, rows } = useWindowSize()
 
+    /*  the chain index of the target scope (the strongest one, except the read-only "override" scope)  */
+    const target = chain.findLastIndex((t) => t.kind !== "override")
+
     /*  the state: the view, the selected key (shared by both views), the selected tab
         and the collapse mode of the scope view, the key filter (and whether it is being
         typed), the open modal, the status line report, the revision of the
         configuration files, and whether the key hints are shown  */
     const [ view,     setView     ] = React.useState<"param" | "scope">("param")
     const [ sel,      setSel      ] = React.useState("")
-    const [ tab,      setTab      ] = React.useState(chain.length - 1)
+    const [ tab,      setTab      ] = React.useState(target)
     const [ collapse, setCollapse ] = React.useState<"none" | "writable" | "configured">("none")
     const [ query,  setQuery  ] = React.useState("")
     const [ typing, setTyping ] = React.useState(false)
@@ -293,7 +297,7 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
     }
     const open = (key: string) => {
         if (view === "param")
-            openModal(key, chain.length - 1)
+            openModal(key, target)
         else
             setModal({ key, idx: tab, ...editState(key, tab), pull: null })
     }
@@ -737,10 +741,9 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
                     const col = `${fit(key, kw)} `
                     const val = `${fit(eff !== undefined ? valueText(key, eff.value) : "~", vw)} `
                     const scp = fit(eff !== undefined ? labels[eff.idx] : "-", sw)
-                    const tgt = chain.length - 1
                     return h(Text, { key, wrap: "truncate" },
-                        h(Text, mark(ks[writable(key)[tgt] === true ? "writable" : "read-only"], key === cur), col),
-                        h(Text, mark(vs[valueTone(key, tgt)], key === cur), val + scp))
+                        h(Text, mark(ks[writable(key)[target] === true ? "writable" : "read-only"], key === cur), col),
+                        h(Text, mark(vs[valueTone(key, chain.length - 1)], key === cur), val + scp))
                 }))
         ]
     }
@@ -878,7 +881,7 @@ export const runConfigTUI = async (log: Log, scope: Scope): Promise<void> => {
     }
     process.once("exit", reset)
     try {
-        const app = render(h(App, { log, chain: scope }), {
+        const app = render(h(App, { log, chain: withOverride(scope) }), {
             alternateScreen: true, exitOnCtrlC: true, patchConsole: true
         })
         await app.waitUntilExit()

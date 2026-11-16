@@ -354,7 +354,10 @@ accepts `--force` to update even if already at the latest version.
 
 Beyond `ase setup`, the CLI provides:
 
--   `ase config`: the layered `user` < `project` < `task` < `session` configuration
+-   `ase config`: the layered `user` < `project` < `task` < `override` < `session`
+    configuration, where `ASE_CONFIG_DIR` and `ASE_STATE_DIR` relocate the per-user
+    directories and the read-only `override` scope of `$ASE_CONFIG_DIR/override.yaml`
+    exists only with `ASE_CONFIG_DIR` set
 -   `ase alias`: the skill command aliases of the user and the project:
     full aliases (provided as generated shim skills), option aliases, and
     option defaults of the skills, applied by the option parser `ase_getopt`

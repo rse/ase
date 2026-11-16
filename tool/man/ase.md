@@ -74,7 +74,7 @@ The following top-level commands exist:
 
 - `ase config` \[`--scope` *scope*\] *command* \[...\]:
   Manage the layered *ASE* configuration of the scope chain `user` <
-  `project` < `task` < `session`. See `ase-config`(1).
+  `project` < `task` < `override` < `session`. See `ase-config`(1).
 
 - `ase alias` *command* \[...\]:
   Manage the skill command aliases: full aliases, option aliases, and
@@ -159,7 +159,9 @@ The command-specific ones are described in their own manual pages.
 - `ASE_CONFIG_DIR`:
   The *per-user configuration directory* (see **FILES**), overriding
   its per-OS default, e.g. to run agents with their own configuration
-  inside a dedicated base directory.
+  inside a dedicated base directory. It also enables the read-only
+  `override` scope of `$ASE_CONFIG_DIR/override.yaml` above the
+  `project` and `task` scopes (see `ase-config`(1)).
 
 - `ASE_STATE_DIR`:
   The *per-user state directory* (see **FILES**), overriding its
@@ -173,12 +175,14 @@ The command-specific ones are described in their own manual pages.
 
 - *per-user configuration directory*:
   The per-user *ASE* configuration directory: `$ASE_CONFIG_DIR`, if
-  set, else `~/Library/Application Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
-  `$XDG_CONFIG_HOME/ase` (falling back to `~/.config/ase`) on Linux
-  and other Unix systems. It holds the `user` scope configuration
-  `config.yaml`, the user agent definitions `agents/`, the user skill
-  command aliases `aliases.yaml`, and the state
-  of the task store server (`store.yaml`, `store.log`, `tasks/`) and
+  set, else `~/Library/Application Support/ase` on macOS,
+  `%APPDATA%\ase` on Windows, and `$XDG_CONFIG_HOME/ase` (falling back
+  to `~/.config/ase`) on Linux and other Unix systems. It holds the
+  `user` scope configuration `config.yaml`, the read-only `override`
+  scope configuration `override.yaml` (honored only with
+  `ASE_CONFIG_DIR` set), the user agent definitions `agents/`, the
+  user skill command aliases `aliases.yaml`, and the state of the task
+  store server (`store.yaml`, `store.log`, `tasks/`) and
   agent relay server (`relay.yaml`, `relay.log`).
 
 - *per-user state directory*:

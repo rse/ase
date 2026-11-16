@@ -277,7 +277,10 @@ are checked only once the corresponding member starts.
   The per-user configuration resp. state directory (see `ase`(1)),
   inherited by all agents, so a fleet started with both pointing into a
   dedicated base directory runs with its own user configuration, agent
-  definitions, agent relay, and agent run records.
+  definitions, agent relay, and agent run records. Additionally, its
+  `$ASE_CONFIG_DIR/override.yaml` overrides even the project
+  configuration, e.g. `project.task.default.changeset` for the fleet
+  only (see `ase-config`(1)).
 
 ## FILES
 

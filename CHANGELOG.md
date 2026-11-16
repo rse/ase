@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [code, docs]: Configuration Override Scope
+    A set `ASE_CONFIG_DIR` now enables the read-only configuration scope `override` of the file
+    `$ASE_CONFIG_DIR/override.yaml`, read above `project` and `task` (but below `session`), e.g.
+    for an agent fleet with its own `project.task.default.*` values.
+
 -   NEW FEATURE [code, docs]: Overridable Per-User Directories
     The new environment variables `ASE_CONFIG_DIR` and `ASE_STATE_DIR` (falling back to
     `ASE_CONFIG_DIR`) override the per-user configuration resp. state directory, e.g. to run

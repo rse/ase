@@ -32,6 +32,14 @@ weakest one and return the first defined value, while writes are
 always confined to the file of the strongest scope of the chain (the
 *target* scope).
 
+With `ASE_CONFIG_DIR` set, the read-only `override` scope of the file
+`$ASE_CONFIG_DIR/override.yaml` (if existing) is implicitly inserted
+directly below `session` (resp. at the top of the chain without a
+`session` term), but never becomes the target scope. It allows a
+dedicated setup, like an agent fleet, to override even the `project`
+and `task` scopes, including the keys only writable on `user` and
+`project`. It is edited by hand only.
+
 All files are validated against the configuration schema: on read,
 unknown or invalid entries are warned about and dropped from the
 in-memory view, while on set, delete, and write they lead to a fatal
@@ -78,6 +86,8 @@ exits with status `1`.
       user` is never silently retargeted to `project`.
     - Specifying `project` explicitly without a project context is an
       error.
+    - `override` cannot be specified, but is implicitly added with
+      `ASE_CONFIG_DIR` (see **DESCRIPTION**).
 
   Without `--scope`, the chain is `project` (with `user` below it) when
   a project context exists, otherwise `user` only. Example: `--scope
@@ -422,7 +432,8 @@ Task board (all writable on the `user` and `project` scopes only, see
 - `ASE_CONFIG_DIR`, `ASE_STATE_DIR`:
   The *per-user configuration directory* resp. the *per-user state
   directory* (see **FILES**), overriding their per-OS defaults, where
-  `ASE_STATE_DIR` falls back to `ASE_CONFIG_DIR`.
+  `ASE_STATE_DIR` falls back to `ASE_CONFIG_DIR`. A set
+  `ASE_CONFIG_DIR` also enables the `override` scope.
 
 - `XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `APPDATA`, `LOCALAPPDATA`:
   The base directories of the *per-user configuration directory* and
@@ -433,8 +444,13 @@ Task board (all writable on the `user` and `project` scopes only, see
 - *per-user configuration directory*`/config.yaml`:
   The configuration of scope `user` (with file mode `0600`). The
   per-user configuration directory is `$ASE_CONFIG_DIR`, if set, else
-  `~/Library/Application Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
-  `$XDG_CONFIG_HOME/ase` (falling back to `~/.config/ase`) elsewhere.
+  `~/Library/Application Support/ase` on macOS, `%APPDATA%\ase` on
+  Windows, and `$XDG_CONFIG_HOME/ase` (falling back to
+  `~/.config/ase`) elsewhere.
+
+- `$ASE_CONFIG_DIR/override.yaml`:
+  The configuration of the read-only scope `override`, honored only
+  with `ASE_CONFIG_DIR` set and edited by hand only.
 
 - `.ase/config.yaml`:
   The configuration of scope `project`, searched upward from the

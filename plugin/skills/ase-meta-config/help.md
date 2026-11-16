@@ -24,7 +24,9 @@ The configuration is organized as a chain of *scopes*, canonically
 ordered `default` < `user` < `project` < `task` < `session`. Reads
 cascade from the strongest (rightmost) scope down to the weakest and
 return the first value that is defined; writes are always confined to
-the strongest (target) scope of the chain.
+the strongest (target) scope of the chain. With `ASE_CONFIG_DIR` set,
+the read-only `override` scope of `$ASE_CONFIG_DIR/override.yaml` is
+read directly below `session`, overriding even `project` and `task`.
 
 The recognized keys are grouped under `project.*` (`project.id`,
 `project.name`, `project.boxing`, `project.task.lifecycle`,
