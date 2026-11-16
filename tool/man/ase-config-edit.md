@@ -117,7 +117,10 @@ clear text in the modal.
   Select the scope chain, whose scopes are shown and editable. As an
   option of `ase config`, it has to be given *before* `edit`. See
   `ase-config`(1) for details. Default: `project` inside a project
-  context, else `user`.
+  context, else `user`. With `ASE_CONFIG_DIR` set, the chain always
+  shows the read-only `override` scope, too (even if its file
+  `override.yaml` is still missing), whose keys can be edited only
+  through the key `e`.
 
 ## ENVIRONMENT
 

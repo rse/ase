@@ -98,11 +98,12 @@ export const userOverrideFile = (): string | null => {
 }
 
 /*  insert the implicit "override" term into a scope chain, directly below a
-    "session" term (else at its top), if its file exists and it is not yet
-    part of the chain; the terms of the chain keep their identity  */
-export const withOverride = (scope: Scope): Scope => {
+    "session" term (else at its top), if its file exists (or regardless of
+    this if requested) and it is not yet part of the chain; the terms of the
+    chain keep their identity  */
+export const withOverride = (scope: Scope, always = false): Scope => {
     const file = userOverrideFile()
-    if (file === null || !fs.existsSync(file) || scope.some((t) => t.kind === "override"))
+    if (file === null || (!always && !fs.existsSync(file)) || scope.some((t) => t.kind === "override"))
         return scope
     const i = scope.findIndex((t) => t.kind === "session")
     return i < 0 ? [ ...scope, { kind: "override" } ] :

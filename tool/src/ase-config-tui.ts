@@ -334,8 +334,9 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         const cfg  = new Config("config", configSchema, log, chain.slice(0, tab + 1))
         try {
             fs.mkdirSync(path.dirname(cfg.filename), { recursive: true })
+            const mode = term.kind === "user" || term.kind === "override" ? 0o600 : undefined
             if (!fs.existsSync(cfg.filename))
-                fs.writeFileSync(cfg.filename, "", { encoding: "utf8", mode: term.kind === "user" ? 0o600 : undefined })
+                fs.writeFileSync(cfg.filename, "", { encoding: "utf8", mode })
 
             /*  run the editor through the shell (to support values with arguments or
                 quoting), passing the file via the environment to avoid quoting it  */
@@ -881,7 +882,7 @@ export const runConfigTUI = async (log: Log, scope: Scope): Promise<void> => {
     }
     process.once("exit", reset)
     try {
-        const app = render(h(App, { log, chain: withOverride(scope) }), {
+        const app = render(h(App, { log, chain: withOverride(scope, true) }), {
             alternateScreen: true, exitOnCtrlC: true, patchConsole: true
         })
         await app.waitUntilExit()
