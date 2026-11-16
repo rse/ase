@@ -197,8 +197,9 @@ is resized against its lower neighbor lane by dragging the grip bar
 between both lanes, the graph is zoomed by the mouse wheel (and
 `+`, `-`, and `0`) and panned by dragging it, and an image attachment
 is zoomed by the mouse wheel. Its minimized lanes, collapsed phases,
-and lane heights are stored once per project, not per browser, so all
-open web boards share them and pick up a change immediately.
+and lane heights are stored once per project in the local storage of
+the browser, so all open web boards of the same browser share them and
+pick up a change immediately.
 
 In the task dialog of the web board, `e` (or `✎`) edits the task plan
 in a Markdown editor (in the task lanes and task graph views, `e` opens the
@@ -458,8 +459,8 @@ relay, the agent graph view is skipped.
 
 The following keys are supported by the terminal board (and, unless
 noted otherwise, equally by the web board). The keys `D`, `E`, `N`,
-`R`, `T`, `A`, and `M` are also accepted as `Shift` with the lower-case
-letter under the kitty keyboard protocol.
+`R`, `T`, `A`, `M`, `C`, and `V` are also accepted as `Shift` with the
+lower-case letter under the kitty keyboard protocol.
 
 ### Every View
 
@@ -474,15 +475,15 @@ letter under the kitty keyboard protocol.
   overriding `board.web.theme` in the current browser until cycled back
   to its value (web board only).
 - `D`: Delete the selected task, after a confirmation (not in the
-  agent logs and statistics views).
+  statistics, agent logs, and agent graph views).
 - `T`: Transfer the selected task to another state via the transfer
-  popup (not in the agent logs and statistics views).
-- `A`: Assign the selected task via the assign popup (not in the agent
-  logs and statistics views).
+  popup (not in the statistics, agent logs, and agent graph views).
+- `A`: Assign the selected task via the assign popup (not in the
+  statistics, agent logs, and agent graph views).
 - `E`: Request the edit of the selected task by a prompt (not in the
-  agent logs and statistics views).
+  statistics, agent logs, and agent graph views).
 - `R`: Request the selected task by a prompt under a request name (not
-  in the agent logs and statistics views).
+  in the statistics, agent logs, and agent graph views).
 - `M`: Disable or enable the mouse support (terminal board only).
 - `q`, `Ctrl`+`C`: Quit (terminal board only).
 
@@ -589,7 +590,9 @@ letter under the kitty keyboard protocol.
   under the kitty keyboard protocol or where the terminal sends it as
   `ESC`+`⏎`, e.g. with "Option as Meta" on macOS, and `Ctrl`+`J` in
   every terminal; web: `Shift`+`⏎` only).
-- `←`/`→`: Move the cursor by one character.
+- `←`/`→`: Move the cursor by one character (terminal board, on a
+  button: switch between the request and cancel buttons).
+- `SPACE`: On a button, press it (terminal board).
 - `Home`/`End`: Move the cursor to the start/end of the prompt.
 - `Backspace`/`Delete`: Remove the character before/at the cursor.
 - `Tab`/`Shift`+`Tab`: Switch to the next/previous field: the request
@@ -619,10 +622,11 @@ letter under the kitty keyboard protocol.
 ### Deletion Confirmation
 
 - `y`: Delete the task.
-- `ESC`: Cancel (web board: also `n`).
+- `ESC`: Cancel (web board: also `n`, and a click outside of the popup).
 - `←`/`→`, `Tab`: Switch between the `delete` and `cancel` buttons
-  (terminal board; web board: by the regular focus switching).
-- `⏎`: Press the selected button (default: `cancel`).
+  (terminal board only).
+- `⏎`: Press the selected button (default: `cancel`; terminal board
+  only, while the web board presses a button by a click onto it).
 
 ## CONFIGURATION
 

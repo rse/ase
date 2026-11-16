@@ -34,7 +34,9 @@ confident resolution *keeps its conflict markers* in the file and is
 listed at the end as the *TODO*, together with the changes which cannot
 be expressed as conflict markers (e.g., of a file missing locally). The
 verdict is then `CONFLICT`. On a `FAILED` verdict, the working copy is
-left untouched. The skill does *not* build or test the result, so the
+left untouched. A working copy with unresolved conflicts is refused
+with `FAILED`, as the conflicts of the import could not be told apart
+from the existing ones. The skill does *not* build or test the result, so the
 imported changes still deserve a review.
 
 Unless the verdict is `FAILED`, the skill finally summarizes briefly
@@ -59,7 +61,8 @@ to the root of the working copy, and a summary of the change.
 -   *url*:
     The URL of a pull or merge request (`.../pull/103` of GitHub,
     `.../pulls/103` of Gitea, or `.../-/merge_requests/103` of GitLab)
-    or of a commit (`.../commit/<sha>` or `.../-/commit/<sha>`).
+    or of a commit (`.../commit/<sha>` or `.../-/commit/<sha>`, or
+    `.../pull/103/commits/<sha>` resp. `.../pulls/103/commits/<sha>`).
 
 -   `#`*number*:
     The number of a pull or merge request on the forge of the remote

@@ -26,7 +26,7 @@ Both *target* and *source* are comma-separated lists over the six
 recognized artifact kinds `SPEC` (Specification, covering both
 requirements and architecture), `CODE` (Source Code), `DOCS`
 (Documentation), `TASK` (Task Plans), `INFR` (Infrastructure), and
-`OTHR` (catch-all). When *source* is `auto`, it resolves to all six
+`OTHR` (catch-all). When *source* is `AUTO`, it resolves to all six
 kinds *minus* the kinds listed in *target*. Unless `--bidirectional` is
 given, a kind present in *target* is never used as its own source.
 
@@ -73,7 +73,7 @@ a unified diff instead.
 
 -   `--source`|`-s` *source*[,...]:
     The comma-separated list of artifact kinds to update *from*. The
-    special value `auto` (the default) resolves to all recognized kinds
+    special value `AUTO` (the default) resolves to all recognized kinds
     except those in *target*.
 
 ##  ARGUMENTS

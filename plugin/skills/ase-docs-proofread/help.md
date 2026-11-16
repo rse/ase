@@ -22,7 +22,10 @@ For each detected problem, the skill renders a unified-diff
 *CORRECTION* preview and either asks the user to `ACCEPT` or `REJECT`
 the proposed correction interactively (or refine it via a free-text
 hint, which re-proposes the correction without limit) or - with
-`--auto` - applies all corrections automatically.
+`--auto` - applies all corrections automatically. For a project with
+`grey` boxing, the preview shows only a condensed one-line form instead
+of the full unified diff, and for a project with `black` boxing, the
+documents are not proofread at all.
 
 `ase-docs-proofread` is the correctness-fixing member of the document
 triple. The recommended order over one document is

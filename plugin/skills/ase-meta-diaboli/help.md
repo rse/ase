@@ -23,8 +23,9 @@ yielding where the argument genuinely holds.
 
 The skill iterates until it has found at least *count* anti-theses
 (counter-arguments) each ranked at least 7 on a 0 (weak) to 10
-(strong) Likert scale, reports the top *count* sorted from strongest to
-weakest, and finally applies *Hegelian dialectics* (*Thesis* +
+(strong) Likert scale (or until it has checked *count* x 5 candidates,
+then surfacing the highest-ranked ones regardless), reports the top
+*count* sorted from strongest to weakest, and finally applies *Hegelian dialectics* (*Thesis* +
 *Antithesis* → *Synthesis*) to derive a single-sentence *SYNTHESIS*
 that preserves what is true in both the thesis and its antitheses
 while discarding what is false.

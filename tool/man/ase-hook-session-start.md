@@ -44,8 +44,9 @@ following steps:
 5. It determines the project directory (the Git top-level directory of
    `cwd`, else `cwd` itself) and, for a valid session id (matching
    `[A-Za-z0-9._-]+`), persists the active task id (`$ASE_TASK_ID`,
-   else `default`) and the project directory into the internal session
-   state *per-user state directory*`/session/`*id*`/state.yaml`.
+   else `default`), the project directory, and the headless mode
+   (`true` if `$ASE_HEADLESS` is `true`, else `false`) into the internal
+   session state *per-user state directory*`/session/`*id*`/state.yaml`.
 
 6. Inside a *tmux* pane, it sets the per-pane user option
    `@ase_agent_status` to `⏸` (ready).
@@ -178,8 +179,8 @@ following steps:
 ## FILES
 
 - *per-user state directory*`/session/`*id*`/state.yaml`:
-  The internal session state, holding the active task id and the
-  project directory of the session.
+  The internal session state, holding the active task id, the project
+  directory, and the headless mode of the session.
 
 ## EXIT STATUS
 

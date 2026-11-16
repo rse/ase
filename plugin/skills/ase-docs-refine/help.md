@@ -62,6 +62,9 @@ hint, which re-proposes the refinement without limit) or - with
 `--auto` - applies all refinements automatically. A proposal which
 shifts the meaning even slightly - a lost negation, a changed
 qualifier, a renamed technical term - is dropped instead of applied.
+For a project with `grey` boxing, the preview shows only a condensed
+one-line form instead of the full unified diff, and for a project with
+`black` boxing, the documents are not refined at all.
 
 ##  OPTIONS
 

@@ -204,7 +204,7 @@ see whether **ASE** is right for you:
   plain description, in one shot and kept conformant to its format
   contract?
   &rarr; [`/ase-spec-edit`](plugin/skills/ase-spec-edit/help.md)
-  `-g -v add a Reviewer persona`
+  `-g -v full add a Reviewer persona`
 
 - **Specification Linting**:
   You want your SpecBook-based specification checked for syntax and
@@ -304,9 +304,9 @@ see whether **ASE** is right for you:
   `-m 4`
 
 - **Partial Staging**:
-  You want only the hunks of a topic, of the last ChangeLog entry, or of
-  the last turn staged, with mixed hunks split and the staged state
-  checked to build on its own?
+  You want only the hunks of a topic, of the last ChangeLog entry, of
+  the last turn, or of the entire session staged, with mixed hunks split
+  and the staged state checked to build on its own?
   &rarr; [`/ase-repo-stage`](plugin/skills/ase-repo-stage/help.md)
   `--turn --commit`
 
@@ -357,7 +357,7 @@ see whether **ASE** is right for you:
   without any task plan ceremony, but optionally grilled, verified, and
   isolated in a Git WorkTree?
   &rarr; [`/ase-code-edit`](plugin/skills/ase-code-edit/help.md)
-  `-g -v add a --verbose option to the CLI`
+  `-g -v full add a --verbose option to the CLI`
 
 - **Autonomous Agent Pipeline**:
   You want a fleet of autonomous agents to drive your tasks headless
@@ -530,7 +530,8 @@ ase setup disable   [--tool claude|copilot|codex] [--scope user|project|local]
 ### Status
 
 ```
-#   report ASE plugin, MCP server, output style, statusline, and telemetry registrations in agent tool
+#   report ASE plugin, MCP server, output style, function hooks,
+#   statusline, and telemetry registrations in agent tool
 ase setup status    [--tool claude|copilot|codex]
 ```
 
@@ -538,12 +539,14 @@ The report lists, across *all* scopes at once, the registration scope
 and enabled/disabled state of the *ASE* plugin, the registration scope
 of each currently registered MCP server, the settings files carrying a
 `selected` (*ASE*-owned) or `foreign` (hand-selected) `outputStyle`
-entry, the settings files carrying an `activated` (*ASE*-owned) or
-`foreign` (hand-crafted) `statusLine` entry, and the configuration files
-carrying an `activated` (towards *ASE*) or `foreign` telemetry export.
-It is read-only, takes no `--scope` (reporting every scope is the
-point), and exits with status 0 in all regular cases, i.e., unless the
-agent tool CLI is missing or an option is invalid.
+entry, the settings files carrying an `enabled` (*ASE*-owned) or
+`foreign` (hand-crafted) function hooks variable, the settings files
+carrying an `activated` (*ASE*-owned) or `foreign` (hand-crafted)
+`statusLine` entry, and the configuration files carrying an `activated`
+(towards *ASE*) or `foreign` telemetry export. It is read-only, takes no
+`--scope` (reporting every scope is the point), and exits with status 0
+in all regular cases, i.e., unless the agent tool CLI is missing or an
+option is invalid.
 
 ### Output Style
 
@@ -557,6 +560,16 @@ is always preserved. You can switch it at any time via `/config`. For
 `--tool copilot` and `--tool codex`, which have no output style concept,
 the identical style instructions are injected into the session context
 by the *ASE* session-start hook instead.
+
+### Function Hooks
+
+The *ASE* plugin also ships Claude Code function hooks modules, which
+enhance the terminal UI (e.g. the grilling tables, the skill manpage
+browser, and the inline image rendering). For `--tool claude`, `ase setup
+install` (and `ase setup update`) enables them by writing
+`"CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"` into the `env` of the
+`settings.json` of the given `--scope`, `ase setup uninstall` removes
+this again, and a foreign value is always preserved.
 
 ### Statusline
 
@@ -577,7 +590,9 @@ without any, the three default lines `"<blue>%u</blue> <red>%p</red>
 (model, effort, and thinking), and `"%P %h %B %c"` (persona, guidance
 level, boxing, and context usage) are used.
 
-The `--scope` option defaults to `user` (today's global, machine-wide behavior). Use
+The `--scope` option defaults to `user` (today's global, machine-wide behavior),
+except for `update`, `uninstall`, `enable`, and `disable`, which auto-detect the
+scope of the existing plugin installation. Use
 `--scope project` to share the plugin registration via the repository, or `--scope
 local` to keep it out of version control and confined to a single repository. `--scope`
 is only supported for `--tool claude`; a non-`user` scope is rejected for `copilot` and
@@ -622,7 +637,8 @@ variable `ASE_MCP_KEY_XXX`, where `XXX` is the server id in
 upper-case with dashes replaced by underscores (e.g. the server
 `openai-chatgpt` uses `ASE_MCP_KEY_OPENAI_CHATGPT`). These variables
 are also automatically sourced from `.env` files. A server whose
-key variable is unset or empty is silently skipped on activation.
+key variable is unset or empty is skipped on the activation of all
+servers, but rejected when it is named explicitly.
 The harness-based servers (`anthropic-claude`, `openai-codex` and
 `github-copilot`) require no API key at all -- their variable instead
 carries the harness model identifier (or the special value `default` for

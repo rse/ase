@@ -63,7 +63,7 @@ with status `1`.
   `<repo-root>/.ase/worktree`. See `ase-util-worktree`(1).
 
 - `ase util mint` \[*options*\] \[*hint* \[...\]\]:
-  Mint hash-derived identifiers (UUID, SHA-1) out of a hint. See
+  Mint hash-derived identifiers (UUID, SHA-1, NanoId) out of a hint. See
   `ase-util-mint`(1).
 
 - `ase util metric` \[*options*\] \[*text* \[...\]\]:

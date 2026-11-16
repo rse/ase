@@ -61,7 +61,10 @@ either accepts or rejects each block interactively (or refines it via a
 free-text hint, which re-proposes the block without limit) or - with
 `--auto` - applies all of them automatically. A closing *LENGTH REPORT*
 states the achieved length against the target, so rejected blocks stay
-visible in the outcome.
+visible in the outcome. A document which already meets the target is
+left untouched. For a project with `grey` boxing, each block is shown
+only as a condensed, elided two-line diff, and for a project with
+`black` boxing, the document is not shortened at all.
 
 `ase-docs-shorten` is the length-reducing member of the document triple.
 The recommended order over one document is `ase-docs-shorten` first (cut

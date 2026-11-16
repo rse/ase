@@ -23,7 +23,8 @@ blocks (component boundaries, structural organization, architecture
 principles, interface quality, quality attributes, architecture
 governance, and package cohesion), renders a high-level architecture
 diagram, and reports findings as either `PROBLEM` or `TRADEOFF` entries
-based on a built-in tension matrix.
+based on a built-in tension matrix. For a project with `black` boxing,
+the analysis is suppressed entirely.
 
 The `--prefix`|`-P` *prefix* option prefixes every reported finding id
 with *prefix* and a hyphen, so `P1` becomes `<prefix>-P1` and `T1`

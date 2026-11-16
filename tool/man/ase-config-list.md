@@ -15,8 +15,8 @@ the scope chain, with their effective values, rendered as a table with
 the three columns `KEY`, `VALUE`, and `SCOPE`, sorted by key.
 
 The `SCOPE` column names the scope which supplied the value: `default`
-(the built-in defaults), `user`, `project`, `task:`*id*, or
-`session:`*id*. For a key set on multiple scopes, only the value of the
+(the built-in defaults), `user`, `project`, `task:`*id*, `override`,
+or `session:`*id*. For a key set on multiple scopes, only the value of the
 strongest scope is shown. A key which is not set on any scope is shown
 with an empty `VALUE` and the `SCOPE` `-`. The values of the secret keys
 `project.task.store.token`, `project.relay.token`, and

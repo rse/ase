@@ -237,8 +237,9 @@ built-in storage plugins exist:
   The default, file-based plugin, persisting the task plans in the
   textual task format as `TASK-`*id*`.md` files. Its options are
   `basedir` (the base directory, see `--basedir`), `solo` (see
-  `--solo`), and `lifecycle` (the task lifecycle model of newly
-  registered projects, default: `solo`).
+  `--solo`), `lifecycle` (the task lifecycle model of newly
+  registered projects, default: `solo`), and `idscheme` (the task id
+  scheme of newly registered projects, default: `slug`).
 
   Without `solo`, every project is stored below
   *basedir*`/`*project-id*`/`, with its `PROJECT.yaml` as the project

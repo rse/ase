@@ -32,8 +32,9 @@ the entry, turn, and session selections.
 The changes are picked at the granularity of individual *lines*: hunks which belong to the
 selection only partially are *split*, and untracked files are selectable, even partially.
 Mutually dependent changes, like a use and its import, are kept together. Unless `--merge` is
-given, the selection *replaces* the current index content. Only the Git index is changed, never
-the content of a working copy file.
+given, the selection *replaces* the current index content, which is refused if a file has both
+staged and unstaged changes. Only the Git index is changed, never the content of a working copy
+file.
 
 After staging, the skill checks that the *staged state alone builds*, with the build command
 auto-detected from the project. By default, the remaining unstaged changes are temporarily
@@ -41,7 +42,7 @@ stashed for this, or -- under `--worktree` -- the staged state is built in a tem
 A failed build keeps the staged selection and is reported with its essential error lines.
 
 Finally, the skill optionally chains into the ChangeLog updating and the commit message
-crafting, both for the staged selection.
+crafting, both for the staged selection, unless the build check failed.
 
 ##  OPTIONS
 

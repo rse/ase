@@ -88,13 +88,15 @@ agent tool:
     Name of the skill to generate, matching `^[a-z][a-z0-9-]*$`.
     It is used as the directory name, as the frontmatter `name`, and as
     the resulting `/`*skill-name* command (respectively the
-    `$`*skill-name* mention under *OpenAI Codex*).
+    `$`*skill-name* mention under *OpenAI Codex*). If it is missing or
+    invalid, it is asked for interactively.
 
 -   *workflow-description*:
     Free-text description of the workflow the generated skill should
     perform. Mentioning that actions run "in parallel", that they are
     dispatched "in a sub-agent", or naming concrete `ase-xxx-xxx` skills
-    steers the derived structure accordingly.
+    steers the derived structure accordingly. If it is missing, it is
+    asked for interactively.
 
 ##  SCENARIOS
 

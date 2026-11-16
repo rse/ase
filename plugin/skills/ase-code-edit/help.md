@@ -18,7 +18,7 @@
     [`--verify`|`-v` `light`|`none`|`full`]
     [`--worktree`|`-w` *name*[`:`*branch*]]
     [`--loop`|`-l`]
-    [*query*]
+    [*query* | *issue-id*]
 
 ##  DESCRIPTION
 
@@ -46,7 +46,8 @@ information.
 -   `--mode`|`-m` `auto`|`craft`|`refactor`|`resolve`:
     Select the tenet set internalized for the implementation: `craft`
     (CRAFTING), `refactor` (REFACTORING), or `resolve` (RESOLVING).
-    The default `auto` infers the tenet set from the query itself.
+    The default `auto` infers the tenet set from the query itself, and
+    uses `resolve` (RESOLVING) for an *issue-id*.
 
 -   `--approach`|`-A`:
     Decide the overall crafting, refactoring, or resolution approach
@@ -136,7 +137,8 @@ information.
     this perspective are raised as questions, while every question still
     carries its focus area, severity, and impact. The active perspective
     is shown in the announcement line, like `GRILLING (security)`.
-    Without a perspective, the grilling is holistic. Only effective together with `--grill` or `--grill-auto`.
+    Without a perspective, the grilling is holistic. Only effective together with `--grill`,
+    `--grill-auto`, or `--approach`.
 
 -   `--ground`|`-G`:
     Ground the edit in facts instead of the world knowledge of the
@@ -195,10 +197,14 @@ information.
 
 ##  ARGUMENTS
 
--   *query*:
+-   *query* | *issue-id*:
     Description of the edit to perform. When omitted, the skill asks
     for the query via an interactive `Edit Query` dialog, carrying the
-    fixed `STOP SKILL` option plus free-text input.
+    fixed `STOP SKILL` option plus free-text input. Instead, a bare
+    *issue-id* (like `P1`, `T1`, or `<prefix>-P1`), previously reported
+    by `ase-code-analyze` or `ase-arch-analyze`, uses the description of
+    this issue as the *query*, and the issue is removed once the edit is
+    applied. If no such issue exists, the skill reports an error.
 
 ##  SCENARIOS
 
@@ -220,6 +226,12 @@ Edit in one shot, without any questions or verification:
 
 ```text
 ❯ /ase-code-edit -v none add a --verbose option to the CLI
+```
+
+Fix the analyzer issue `P1` of a previous `ase-code-analyze` run directly:
+
+```text
+❯ /ase-code-edit P1
 ```
 
 Grill the query with two rounds first, then implement and fully verify:

@@ -217,8 +217,8 @@ All other options belong to the sub-commands (see **COMMANDS**).
       declared by the definition (repeatable). Built-in: none declared.
 
     - \[`--state-incoming` *state*\]: The state of the tasks to claim
-      (mandatory for `phase`, repeatable with `--unclaimed` only).
-      Built-in: `IMPLEMENTED`.
+      (mandatory for `phase`, repeatable with `--unclaimed` or
+      `--state-activity` only). Built-in: `IMPLEMENTED`.
 
     - \[`--state-activity` *state*\]: The state of a task during its
       processing. Generic default: the incoming state. Built-in:

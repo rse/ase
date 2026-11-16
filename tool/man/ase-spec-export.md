@@ -26,7 +26,9 @@ or more output files. The supported formats are:
   A normalized single Markdown document.
 
 The specification is parsed once, and each distinct format is exported
-once, even if requested for multiple outputs. Each written file is
+once, even if requested for multiple outputs, except for the `md`
+format, which is exported once per output directory, as its image
+references are re-based onto that directory. Each written file is
 logged at the `info` level. The export fails on any lint diagnostic
 of `error` severity (see `ase-spec-lint`(1)), while warnings are only
 logged, so a partial or invalid specification is never emitted.

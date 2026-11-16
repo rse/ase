@@ -18,6 +18,9 @@ way along six dimensions: *WHAT* (functionality), *WHY* (rationale),
 diagram of control flow, data flow, or structure), *CRUXES* (what to
 notice), and *GOTCHAS* (what to not stumble over).
 
+For a project with `black` boxing, only the minimal *WHAT* dimension is
+explained.
+
 ##  ARGUMENTS
 
 -   *source-reference*:

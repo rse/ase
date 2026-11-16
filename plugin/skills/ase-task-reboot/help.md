@@ -24,7 +24,8 @@ exists), preserving the original creation
 timestamp, the remaining frontmatter keys, and all attachments, and
 writing fresh plan content via `ase_task_save`. As the rebooted plan
 starts its lifecycle anew, its `Status:` key is reset to the default
-state of the task lifecycle model, all `grilled:` tags are dropped
+state of the task lifecycle model, all of its bullet points start in
+the `[ ]` todo state, all `grilled:` tags are dropped
 from its `Tags:` key, and its `Source:`, `Changeset:`, and `Target:`
 keys are dropped, so they read as their configured defaults
 `project.task.default.{source,changeset,target}`.

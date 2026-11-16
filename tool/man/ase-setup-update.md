@@ -20,8 +20,9 @@ keep running the old code.
 
 In the regular mode, the current version of the tool is compared with
 the latest version of `@rse/ase` known from the NPM registry (as
-determined by a cached background check, refreshed at most once per
-hour). If both are equal, the command reports that *ASE* is already at
+determined by a direct query of the registry, falling back to the
+result of the cached background check on failure). If both are equal,
+the command reports that *ASE* is already at
 the latest version and exits without any further action (unless
 `--force` is given).
 

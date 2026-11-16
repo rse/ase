@@ -27,7 +27,8 @@ Brave, or `WebSearch` individually.
 -   `--services`|`-s`=(`all`|`perplexity`|`brave`|`exa`|`websearch`)...:
     The comma-separated list of search backends to query. The default
     `all` queries every available backend;
-    otherwise only the listed backends are queried.
+    otherwise only the listed backends are queried. If none of the
+    selected backends is available, the skill stops with an error.
 
 ##  ARGUMENTS
 

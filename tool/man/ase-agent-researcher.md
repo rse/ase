@@ -294,6 +294,9 @@ All other options belong to the sub-commands (see **COMMANDS**).
       set (mode `phase`), hence `DRAFTED`, the first state, so the
       predecessors impose no gate.
 
+    - \[`--state-verdict` *VERDICT*`=`*state*\]: The target state per
+      verdict (repeatable). Built-in: not set.
+
     - \[`--tag-name` *tag*\]: The tag of the processed tasks
       (`ase-agent-`*word*). Generic default: `ase-agent-`*name*, resp.
       for `request` always `ase-agent-`*request-name*. Built-in: not set
@@ -311,6 +314,10 @@ All other options belong to the sub-commands (see **COMMANDS**).
 
     - \[`--tag-exclude` *tag*\]: A tag a claimable task must not carry
       (repeatable). Built-in: not set.
+
+    - \[`--tag-retry`\]: A shorthand for `--tag-failure none`, so a
+      failed task is claimed again after a growing delay (`phase` only).
+      Built-in: not set.
 
     - \[`--assign-name` *who*\]: The assignee under which the tasks are
       claimed, held, recognized, and released, and which names the
@@ -383,6 +390,19 @@ All other options belong to the sub-commands (see **COMMANDS**).
       \[*mime-type*`;`\]*kind* to be created or changed by the
       processing for the success criterion `attachment`. Built-in:
       `text/markdown;research`.
+
+    - \[`--attach-skip` *spec*\]: The attachment
+      \[*mime-type*`;`\]*kind* leaving a task unclaimed (`phase` only).
+      Built-in: not set.
+
+    - \[`--attach-changeset` *kind*\]: The kind of the attachment
+      `text/x-diff;`*kind* storing the change set snapshot of the task
+      (with `--workdir changeset` or `target` only). Built-in: not set.
+      Not allowed, as the researcher works with `--workdir source`.
+
+    - \[`--finish-commit`\]: Commit the work onto a `branch:` changeset
+      and publish it (with `--workdir changeset` only). Built-in: not
+      set. Not allowed, as the researcher works with `--workdir source`.
 
     - \[`--finish-success` *cmd*\]: A shell command run in the working
       directory after a successful processing. Built-in: not set.

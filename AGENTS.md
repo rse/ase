@@ -467,13 +467,13 @@ Beyond `ase setup`, the CLI provides:
 -   `ase artifact`: the artifact kind resolution
 
 -   `ase spec`: the SpecBook specification initializing, linting, exporting,
-    and previewing, and the searching of shareable SpecBook schema configurations
+    querying, and previewing, and the searching of shareable SpecBook schema configurations
 
 -   `ase man`: the interactive browser of the manual pages of `tool/man/`
     and of the skills shipped with the tool (plain text outside a terminal)
 
 -   `ase util`: the utility commands `ase util meta` (plugin meta file
-    output), `ase util diagram` (Mermaid rendering), `ase util worktree`
+    output), `ase util diagram` (Mermaid and D2 rendering), `ase util worktree`
     (ASE worktree path resolution), `ase util mint` (hash-derived
     identifier minting), `ase util metric` (text length metrics),
     `ase util rasterize` (SVG/PNG/GIF/JPEG rasterizing into PNG, Kitty, iTerm2 IIP,

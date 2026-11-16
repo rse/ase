@@ -224,7 +224,7 @@ value omits an option, and a list repeats an option:
   definition file (e.g., `prompt: { text: ... }`), where a key must not
   be given both flat and nested. The values of the parameters
   declared by the definition are given by the map `params` (e.g.,
-  `params: { severity: high }`), which repeats the option `--params`
+  `params: { severity: HIGH }`), which repeats the option `--params`
   *name*`=`*value* per parameter.
 
   The `definition` of `kind: adhoc` (unless a `builtin:` one) and the
@@ -351,7 +351,7 @@ editor-codex:
 reviewer:
     parallel: 2
     params:
-        severity: high
+        severity: MEDIUM
 lint:
     kind:     adhoc
     type:     request

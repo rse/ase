@@ -28,7 +28,8 @@ reuse-first, and wildcard), without judging them.
 Next it *converges* by clustering the ideas into coherent themes,
 pruning speculative or out-of-scope ones via *YAGNI*, and scoring the
 survivors on a 0-10 fit scale (keeping only those ranked `--min-rank`,
-default 7, or higher). Finally it distills a *shortlist* of the top
+default 7, or higher, or, with a notice, the highest-ranked ones if none
+reaches it). Finally it distills a *shortlist* of the top
 `--max-shortlist`, default 4, directions - drawn from distinct clusters
 wherever possible - and derives a single *RECOMMENDATION*, being either
 the highest-ranked option or a principled synthesis of the shortlist.

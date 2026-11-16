@@ -23,7 +23,9 @@ computes the final ratings via the `ase_decision_matrix` MCP tool.
 The result is reported as a Markdown decision matrix along with the
 single *BEST ALTERNATIVE*, including a warning if multiple
 alternatives tie, if the distance to the second best is small, or if
-all alternatives rate negatively.
+all alternatives rate negatively. The skill stops with an error if
+fewer than two alternatives are given, or if the alternatives are not
+members of a single, mutually comparable class.
 
 ##  ARGUMENTS
 

@@ -14,8 +14,6 @@
 
 `ase config` \[`--scope` *scope*\] `edit`
 
-`ase config` \[`--scope` *scope*\] `ui`
-
 `ase config` \[`--scope` *scope*\] `get` *key*
 
 `ase config` \[`--scope` *scope*\] `set` *key* *value*

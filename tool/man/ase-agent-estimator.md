@@ -91,8 +91,9 @@ its effort via the skill invocation `ase-task-estimate --force` *id*,
 i.e., even if it already carries a valid `Effort:` key, restores its
 previous assignee, and removes the request on success, else turns it
 into a failed request (to be re-requested). The estimation succeeds
-under the same conditions as in the mode `phase`, so a request for an
-explicit epic or a task with an empty plan fails.
+under the same conditions as in the mode `phase`, plus an output line of
+the skill reporting the stored estimation (see `--success-match`), so a
+request for an explicit epic or a task with an empty plan fails.
 
 Both modes can run side by side as two agents of the kind `estimator`
 under different names (e.g., `estimator` and `estimator-request`).
@@ -233,7 +234,8 @@ All other options belong to the sub-commands (see **COMMANDS**).
       declared by the definition (repeatable). Built-in: none declared.
 
     - \[`--state-incoming` *state*\]: The state of the tasks to process
-      (mandatory for `phase`, repeatable with `--unclaimed` only), where
+      (mandatory for `phase`, repeatable with `--unclaimed` or
+      `--state-activity` only), where
       each state is adapted onto the task lifecycle model of the project.
       Built-in: `PLANNED` (i.e., `PLANNING` for `team` and `OPEN` for
       `solo`) (mode `phase`) resp. not set (mode `request`). For
@@ -352,7 +354,9 @@ All other options belong to the sub-commands (see **COMMANDS**).
       carry a valid `Effort:` key afterwards.
 
     - \[`--success-match` *regex*\]: A regular expression an output line
-      has to match (repeatable). Built-in: not set.
+      has to match (repeatable). Built-in: not set (mode `phase`) resp.
+      `status:\W*effort estimated\b` (mode `request`), as a failed
+      re-estimation leaves the old, still valid `Effort:` key untouched.
 
     - \[`--verdict-label` *label*\]: The label after which the verdict
       is given in the output. Built-in: not set.

@@ -17,7 +17,7 @@ The `ase-repo-diff` skill turns a raw Git diff into a *concise*,
 *human-readable* narrative of what changed and why, *grouped by
 intent* (such as *Feature*, *Improvement*, *Bugfix*, *Update*,
 *Cleanup*, or *Refactor*) rather than by file. It inspects the
-*staged* changes (`git diff --cached HEAD`). The result is a compact
+*staged* changes (`git diff --cached`). The result is a compact
 table, one row per intent group, each naming the affected files
 with their per-file `[+N/-M]` line counts - giving you the essence
 of the changes at a glance.
@@ -50,6 +50,10 @@ blast-radius graph (touched modules as origin nodes, dependents fanning
 out along the edges), renders it (as an inline image where supported),
 and appends a short bullet list of the per-module impact -
 giving a visual sense of *what a diff endangers* before a deeper review.
+
+For a project with `black` boxing (`project.boxing`), the scrutiny of
+`--coherence`, `--risk`, and `--blast` is suppressed, and only the
+intent-grouped summary is shown.
 
 ##  ARGUMENTS
 

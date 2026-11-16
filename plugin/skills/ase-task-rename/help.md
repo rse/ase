@@ -17,12 +17,18 @@ given, it is treated as *new* and *old* defaults to the *current*
 task id. When the renamed task is the current task, the current
 task id is automatically switched to *new*.
 
+The rename also rewrites the `After:` references of all other task
+plans to *new*, and, if the task is an explicit epic (its `Group:`
+names itself), the `Group:` references of itself and its member tasks.
+A rename onto an already existing task id is refused.
+
 ##  ARGUMENTS
 
 -   [*old*] *new*:
     The *old* task id to rename and the *new* task id to assign.
     If only one token is given, *old* defaults to the current
-    task id.
+    task id. A *new* id not conforming to the task id scheme of the
+    project (`project.task.idscheme`) is accepted, but noticed.
 
 ##  SCENARIOS
 

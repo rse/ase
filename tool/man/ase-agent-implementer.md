@@ -293,8 +293,8 @@ All other options belong to the sub-commands (see **COMMANDS**).
       **DESCRIPTION**).
 
     - \[`--state-incoming` *state*\]: The state of the tasks to claim
-      (mandatory for `phase`, repeatable with `--unclaimed` only).
-      Built-in: `PLANNED`.
+      (mandatory for `phase`, repeatable with `--unclaimed` or
+      `--state-activity` only). Built-in: `PLANNED`.
 
     - \[`--state-activity` *state*\]: The state of a task during its
       processing. Generic default: the incoming state. Built-in:

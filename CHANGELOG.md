@@ -10,6 +10,11 @@ ChangeLog
     a task via the native soft cost cap of the agent tool (`--max-budget-usd` of `claude` resp.
     `--max-ai-credits` of `copilot`), where an exhausted budget fails the processing.
 
+-   CLEANUP [docs]: Documentation Reconciled with Implementation
+    `README.md`, `AGENTS.md`, 21 manual pages of `tool/man/`, and 24 skill `help.md`
+    files corrected against `tool/src/` resp. `SKILL.md`: wrong defaults, examples, and behaviors,
+    and missing options, configuration keys, and edge cases (e.g. `ase-meta-config` key list).
+
 -   BUGFIX [code]: Service Shutdown and Session Id Hardening
     `stopService` of `ase-service` now guards itself against a repeated shutdown (`/stop`, signal,
     or idle tick), and `sessionState` of `ase-config-core` rejects the path-traversing session ids

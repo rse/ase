@@ -28,16 +28,25 @@ the strongest (target) scope of the chain. With `ASE_CONFIG_DIR` set,
 the read-only `override` scope of `$ASE_CONFIG_DIR/override.yaml` is
 read directly below `session`, overriding even `project` and `task`.
 
-The recognized keys are grouped under `project.*` (`project.id`,
-`project.name`, `project.boxing`, `project.task.lifecycle`,
-`project.task.idscheme`, `project.task.default.{source,changeset,target}`,
-and the `project.artifact.`*kind*`.{basedir,files}`
-globs) and `agent.*` (`agent.persona`, `agent.guidance`, and
-`agent.diagram.{format,theme,tone}`).
-Some keys are writable on selected scopes only; in particular
-the `project.artifact.*` globs are writable on the `user` and
-`project` scopes only. The internal session state, like the active
-task id (see `ase-task-id`), is not part of the configuration.
+The recognized keys are grouped under `project.*` (`project.id`, `project.name`,
+`project.boxing`, `project.users`, `project.task.lifecycle`, `project.task.idscheme`,
+`project.task.store.{url,token,crt,key}`, `project.task.default.{source,changeset,target}`,
+`project.task.effort.{scale,factor,file,line,iteration}`, `project.relay.{url,token,crt,key}`,
+`project.service.port`, the `project.artifact.`*kind*`.{basedir,files}` globs, and
+`project.artifact.spec.schema`), `agent.*` (`agent.persona`, `agent.guidance`,
+`agent.diagram.{format,theme,tone}`, and `agent.cache.{guard,threshold,soft,hard}`),
+`telemetry.*` (`telemetry.{enabled,implicit}`, `telemetry.service.{port,token,interval,idle}`,
+and `telemetry.prices.{ai,hr}`), and `board.*` (`board.{tui,web}.color.{dim,normal,accent,signal}`,
+`board.web.editor.keymap`, and `board.web.theme`); see `ase man config` for details.
+
+Some keys are writable on selected scopes only; in particular all
+`project.*` keys except `project.id`, `project.name`, and `project.boxing`,
+as well as all `telemetry.*` and `board.*` keys, are writable on the
+`user` and/or `project` scopes only. The values of the secret keys
+`project.task.store.token`, `project.relay.token`, and
+`telemetry.service.token` are reported masked as `***`. The internal
+session state, like the active task id (see `ase-task-id`), is not part
+of the configuration.
 
 The four keys steering the behaviour of the agent itself accept fixed
 value sets: `agent.persona` selects the *communication style* and is one
@@ -126,7 +135,7 @@ preset-bootstrapping operation that stays a shell concern next to
 ##  SCENARIOS
 
 -   You want the ASE configuration inspected or changed
--   You want the persona, guidance, boxing, or task lifecycle switched for a session
+-   You want the persona, guidance, diagram format, or boxing switched for a session
 -   You want a configuration value persisted at user or project scope
 -   You want to see which scope supplies each effective value
 

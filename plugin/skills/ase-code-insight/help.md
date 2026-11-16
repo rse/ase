@@ -18,6 +18,9 @@ source scanning), a *PROJECT AUTHOR* list (from `git shortlog`),
 a *SOURCE CHURN* table (most-committed files in the last year), and
 a *MODULE STRUCTURE* Mermaid diagram of modules and their imports.
 
+For a project with `black` boxing, the insight gathering is suppressed
+entirely.
+
 ##  ARGUMENTS
 
 -   *code-references*:

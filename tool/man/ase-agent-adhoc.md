@@ -1097,8 +1097,8 @@ recoveries of differently configured agents never affect each other.
   The definition files of the definition kinds of the user.
 
 - `.ase/agent/`*name*`.yaml`:
-  The process state (process id and process start time) of the agent
-  named *name*, existing while the agent runs.
+  The process state (kind, process id, and process start time) of the
+  agent named *name*, existing while the agent runs.
 
 - `.ase/agent/`*name*`.log`:
   The log of the agent named *name* run in the background.

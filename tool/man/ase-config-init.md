@@ -57,6 +57,7 @@ file lock and atomically.
       `agent.cache.guard` `true`, `agent.cache.threshold` `150k`,
       `agent.cache.soft` `4`, `agent.cache.hard` `4,8,12,16,24`,
       `project.name` `Example Project`, `project.boxing` `white`,
+      `project.users` empty,
       `project.task.lifecycle` `solo`, `project.task.idscheme` `slug`,
       `project.task.store.url` `ase:./.ase/task`,
       `project.task.default.source` `worktree`,
@@ -69,7 +70,8 @@ file lock and atomically.
       `project.artifact.*` globs, the `board.tui.color.*`,
       `board.web.color.*`, `board.web.editor.keymap`, and
       `board.web.theme` defaults, and
-      `telemetry.enabled` `false`, `telemetry.prices.ai`
+      `telemetry.enabled` `false`, `telemetry.implicit` `true`,
+      `telemetry.prices.ai`
       `*=4.00/20.00/0.20/5.00`, and `telemetry.prices.hr` `*=110`.
     - `vibe`:
       `agent.persona` `writer`, `project.name` `Example Project`, and

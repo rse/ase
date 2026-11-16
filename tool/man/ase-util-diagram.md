@@ -7,7 +7,7 @@
 \[`-i`|`--input` *file*\]
 \[`-l`|`--lang` `mermaid`|`d2`\]
 \[`-f`|`--format` `ascii`|`svg`\]
-\[`-t`|`--theme` `light`|`dark`\]
+\[`-t`|`--theme` `auto`|`light`|`dark`\]
 \[`-T`|`--tone` *tone*\]
 \[`-a`|`--ascii`\]
 \[`-c`|`--color-mode` `none`|`ansi16`|`ansi256`\]

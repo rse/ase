@@ -82,7 +82,7 @@ agents are best run together as a *fleet* (see `ase-agent-fleet`(1)),
 and each agent can pass its live presence to the task boards through
 an *agent relay* (see `ase-agent-relay`(1)).
 
-The eight built-in agents are not hard-coded, but each mode of them is a
+The nine built-in agents are not hard-coded, but each mode of them is a
 declarative *definition*, run by the same agent engine as the agents of
 the definition kinds and the `adhoc` agent. Hence, every agent accepts
 all options `--`*group*`-`*item* of the definitions (see
@@ -129,8 +129,12 @@ An agent can require a task to be already assigned to it (like
 being claimed again, while assigning it to the agent again requests
 another processing.
 
-The tag of a built-in agent is `ase-agent-`*kind*, resp. one per mode
-for `implementer` in mode `draft` (`ase-agent-implementer-draft`). The
+The tag of a built-in agent is `ase-agent-`*kind* (resp. `ase-agent-`*name*
+for `rebooter`, `condenser`, `griller`, and `researcher` in the mode
+`phase`), resp. one per mode for `implementer` in mode `draft`
+(`ase-agent-implementer-draft`), resp. the request state tag of a
+request agent (`ase-agent-editor`, `ase-agent-estimate` for
+`estimator`, resp. `ase-agent-research` for `researcher`). The
 tag of any other agent is `ase-agent-`*name* (see `--tag-name`).
 
 The agent claims each dispatchable task (in natural task id order,
@@ -224,20 +228,24 @@ Each task is processed through the headless agent tool of `--tool`,
 with the environment variable `ASE_HEADLESS=true` and without any
 standard input, i.e., via
 
-- `claude` \[`--add-dir` *dir* ...\] `--max-budget-usd` *usd* `-p
+- `claude` \[`--add-dir` *dir* ...\] \[`--model` *model*\]
+  `--max-budget-usd` *usd* `-p
   --output-format stream-json --verbose --disallowedTools AskUserQuestion
   --permission-mode auto --permission-prompts none` *prompt*,
 
-- `copilot` \[`--add-dir` *dir* ...\] `--max-ai-credits` *credits*
+- `copilot` \[`--add-dir` *dir* ...\] \[`--model` *model*\]
+  `--max-ai-credits` *credits*
   `--allow-all-tools --no-ask-user --no-color --output-format json -p`
   *prompt*, resp.
 
-- `codex exec` \[`--add-dir` *dir* ...\] `--json --approve-for-me
+- `codex exec` \[`--add-dir` *dir* ...\] \[`--model` *model*\] `--json --approve-for-me
   --color never` *prompt*,
 
 where risky actions are denied or automatically reviewed instead of
-being prompted for, where *usd* resp. *credits* (of $0.01 each) is the
-budget of `--budget`, and where each additional directory a skill needs
+being prompted for, where *model* is the model of `--model` (none for
+the default model of the agent tool), where *usd* resp. *credits* (of
+$0.01 each, rounded up) is the budget of `--budget`, and where each
+additional directory a skill needs
 access to besides its working directory is granted through an
 additional `--add-dir` *dir*. A skill *prompt* is `/`*skill* *args*
 (`claude` and `copilot`) resp. `$`*skill* *args* (`codex`), where an
