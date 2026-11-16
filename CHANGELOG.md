@@ -21,6 +21,11 @@ ChangeLog
     and asks before cold sends, configured by the new `agent.cache.*` keys and operated by the new
     command `/ase-mods-auto-warm`.
 
+-   NEW FEATURE [plugin, docs]: Readable Vertical Tables
+    The new mod `ase-mods-render-table.ts` redraws the tables which Claude Code draws vertically
+    in a too narrow terminal as records with aligned keys and hanging-indented values, while
+    wider terminals still get the regular table grids of Claude Code.
+
 -   IMPROVEMENT [code, docs, plugin]: Configuration Editor as "ase config edit"
     The terminal UI of `ase config ui` is renamed to `ase config edit`, replacing the former
     `$EDITOR`-based `ase config edit`, whose function remains as the key `e` in the scope view.

@@ -7,7 +7,7 @@
 /*  Claude Code function hooks module ("mod", EARLY ACCESS):
     Common parts, shared by the grill table, the decision matrix, the intent
     help, the synopsis form, the manual band, the manpage browser, the hint band,
-    the task band, and the image rendering: the rows of the Markdown tables, the styled characters of the terminal
+    the task band, the image rendering, and the table rendering: the rows of the Markdown tables, the styled characters of the terminal
     drawing, their Markdown conversion, wrapping, and framing, and the contract,
     keys, geometry, and drawing of the master/detail view in the band above the
     prompt.  */

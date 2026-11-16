@@ -12,7 +12,8 @@
     the manual band ("ase-mods-help-show.ts"), the manpage browser
     ("ase-mods-help-browse.ts"), the hint band ("ase-mods-help-hint.ts"),
     the task band ("ase-mods-task-edit.ts"), the image and diagram
-    rendering ("ase-mods-render-image.ts"), and the cache controller
+    rendering ("ase-mods-render-image.ts"), the table rendering
+    ("ase-mods-render-table.ts"), and the cache controller
     ("ase-mods-cache.ts").
     As the engine loads only a module spelling "on", "$", and "next" literally,
     this is the only module touching the engine, and it binds the engine
@@ -29,6 +30,7 @@ import { modHelpBrowse }      from "./ase-mods-help-browse"
 import { modHelpHint }        from "./ase-mods-help-hint"
 import { modTaskEdit, TOOL }  from "./ase-mods-task-edit"
 import { modRenderImage, TOOL as IMAGE, DIAGRAM, graphics } from "./ase-mods-render-image"
+import { modRenderTable }     from "./ase-mods-render-table"
 import { modCacheControl, type Controller, COMMAND as CACHE } from "./ase-mods-cache"
 
 /*  bind the engine services of the cache controller (at the top level of this
@@ -62,7 +64,7 @@ export const register: Register = (on, options) => {
 
     /*  the grill table, the decision matrix, the intent help, the synopsis form,
         the manual band, the manpage browser, the hint band, the task band, the
-        image rendering, and the cache controller  */
+        image rendering, the table rendering, and the cache controller  */
     const grill    = modGrill()
     const evaluate = modEvaluate()
     const intent   = modHelpFind()
@@ -72,6 +74,7 @@ export const register: Register = (on, options) => {
     const hint     = modHelpHint()
     const task     = modTaskEdit()
     const image    = modRenderImage()
+    const table    = modRenderTable()
     const cache    = modCacheControl()
 
     /*  whether the terminal can show inline images (assumed until probed),
@@ -403,8 +406,9 @@ export const register: Register = (on, options) => {
         next.called || shown() === undefined ? next(e) :
             { drop: "intent band or synopsis form failed" })
 
-    /*  redraw the replies which contain a grilling table or a decision matrix
-        (terminal only), where the chain beneath runs, although its drawing is
+    /*  redraw the replies which contain a grilling table, a decision matrix, or a
+        table the engine draws vertically for a too narrow terminal (terminal
+        only), where the chain beneath runs, although its drawing is
         replaced by us (but this at least silences a warning in the debug output
         of Claude Code)  */
     on("ui.render", { component: "AssistantMessage", surface: "terminal" }, async ($, e, next) => {
@@ -415,7 +419,7 @@ export const register: Register = (on, options) => {
             invalidate,
             prompt:     () => $.prompt.read(),
             fill:       (text) => $.prompt.fill({ text })
-        }) ?? evaluate.render(e, ui, { invalidate }) ?? drawn
+        }) ?? evaluate.render(e, ui, { invalidate }) ?? table.render(e, ui) ?? drawn
     })
 
     /*  draw the intent band resp. the synopsis form, else the manual page, else

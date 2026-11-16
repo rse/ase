@@ -96,7 +96,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         the command `/ase-mods-auto-warm` registered by the module, the escalation of a
         cooling resp. cold cache in the band above the prompt, and asking before
         a prompt is sent into a big cold cache, configured by `agent.cache.*`),
-        and `ase-mods-render-image.ts` for
+        `ase-mods-render-image.ts` for
         the image and diagram rendering (an SVG/PNG/GIF/JPEG image of the
         tool `ase_mods_render_image`, resp. a Mermaid or D2 diagram of the tool
         `ase_mods_diagram`, rendered into SVG by the MCP tool `ase_diagram`
@@ -105,7 +105,11 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         rasterized by the MCP tool `ase_rasterize`, fitted into the terminal
         width, and shown below the row of the tool call, where on terminals
         without inline images an image is shown as Unicode half-block text
-        art, while `ase_mods_diagram` is not provided, so diagrams stay ASCII)
+        art, while `ase_mods_diagram` is not provided, so diagrams stay ASCII),
+        and `ase-mods-render-table.ts` for the table rendering (the Markdown
+        tables of a reply, which Claude Code draws vertically for a too narrow
+        terminal, redrawn as records with aligned keys and hanging-indented
+        values, while the grid tables stay the ones of Claude Code)
     -   `plugin/.claude-plugin/`, `plugin/.codex-plugin/`,
         `plugin/.github/plugin/`: the per-agent-tool plugin manifests
 -   `tool/`: the `@rse/ase` CLI
