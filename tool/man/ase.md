@@ -156,6 +156,15 @@ The command-specific ones are described in their own manual pages.
 - `PAGER`:
   The pager used by `ase task view` (falling back to `more`).
 
+- `ASE_CONFIG_DIR`:
+  The *per-user configuration directory* (see **FILES**), overriding
+  its per-OS default, e.g. to run agents with their own configuration
+  inside a dedicated base directory.
+
+- `ASE_STATE_DIR`:
+  The *per-user state directory* (see **FILES**), overriding its
+  per-OS default (falling back to `ASE_CONFIG_DIR`, if set).
+
 - `XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `APPDATA`, `LOCALAPPDATA`:
   The base directories of the *per-user configuration directory* and
   the *per-user state directory* (see **FILES**).
@@ -163,8 +172,8 @@ The command-specific ones are described in their own manual pages.
 ## FILES
 
 - *per-user configuration directory*:
-  The per-user *ASE* configuration directory: `~/Library/Application
-  Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
+  The per-user *ASE* configuration directory: `$ASE_CONFIG_DIR`, if
+  set, else `~/Library/Application Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
   `$XDG_CONFIG_HOME/ase` (falling back to `~/.config/ase`) on Linux
   and other Unix systems. It holds the `user` scope configuration
   `config.yaml`, the user agent definitions `agents/`, the user skill
@@ -175,8 +184,9 @@ The command-specific ones are described in their own manual pages.
 - *per-user state directory*:
   The machine-local per-user *ASE* state (session configurations, task
   lifecycle deviation warnings, agent run records, and telemetry
-  state), never roamed or versioned: `~/Library/Application
-  Support/ase` on macOS, `%LOCALAPPDATA%\ase` on Windows, and
+  state), never roamed or versioned: `$ASE_STATE_DIR`, if set, else
+  `$ASE_CONFIG_DIR`, if set, else `~/Library/Application Support/ase`
+  on macOS, `%LOCALAPPDATA%\ase` on Windows, and
   `$XDG_STATE_HOME/ase` (falling back to `~/.local/state/ase`) on Linux
   and other Unix systems.
 

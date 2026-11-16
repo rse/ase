@@ -419,6 +419,11 @@ Task board (all writable on the `user` and `project` scopes only, see
 - `EDITOR`, `VISUAL`:
   The text editor of the key `e` of `ase config edit`.
 
+- `ASE_CONFIG_DIR`, `ASE_STATE_DIR`:
+  The *per-user configuration directory* resp. the *per-user state
+  directory* (see **FILES**), overriding their per-OS defaults, where
+  `ASE_STATE_DIR` falls back to `ASE_CONFIG_DIR`.
+
 - `XDG_CONFIG_HOME`, `XDG_STATE_HOME`, `APPDATA`, `LOCALAPPDATA`:
   The base directories of the *per-user configuration directory* and
   the *per-user state directory* (see **FILES**).
@@ -427,8 +432,8 @@ Task board (all writable on the `user` and `project` scopes only, see
 
 - *per-user configuration directory*`/config.yaml`:
   The configuration of scope `user` (with file mode `0600`). The
-  per-user configuration directory is `~/Library/Application
-  Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
+  per-user configuration directory is `$ASE_CONFIG_DIR`, if set, else
+  `~/Library/Application Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
   `$XDG_CONFIG_HOME/ase` (falling back to `~/.config/ase`) elsewhere.
 
 - `.ase/config.yaml`:
@@ -442,7 +447,8 @@ Task board (all writable on the `user` and `project` scopes only, see
 
 - *per-user state directory*`/session/`*id*`/config.yaml`:
   The configuration of scope `session:`*id*, independent of any
-  project. The per-user state directory is `~/Library/Application
+  project. The per-user state directory is `$ASE_STATE_DIR`, if set,
+  else `$ASE_CONFIG_DIR`, if set, else `~/Library/Application
   Support/ase` on macOS, `%LOCALAPPDATA%\ase` on Windows, and
   `$XDG_STATE_HOME/ase` (falling back to `~/.local/state/ase`)
   elsewhere.

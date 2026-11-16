@@ -5,6 +5,11 @@ ChangeLog
 2.0.13 (2026-11-XX)
 -------------------
 
+-   NEW FEATURE [code, docs]: Overridable Per-User Directories
+    The new environment variables `ASE_CONFIG_DIR` and `ASE_STATE_DIR` (falling back to
+    `ASE_CONFIG_DIR`) override the per-user configuration resp. state directory, e.g. to run
+    an agent fleet with its own user configuration inside a dedicated base directory.
+
 -   NEW FEATURE [plugin, docs]: Prompt Cache Controller
     The new mod `ase-mods-cache.ts` shows the prompt cache state in the footer, SOFT auto-warms
     big idle caches, escalates cooling/cold caches above the prompt with HARD auto-warm buttons,

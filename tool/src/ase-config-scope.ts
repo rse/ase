@@ -63,9 +63,19 @@ const gitToplevel = (): string | null => {
     return top === "" ? null : top
 }
 
-/*  resolve the per-OS user-scope configuration directory  */
+/*  resolve a directory override of an environment variable (or null if unset or empty)  */
+const envDir = (name: string): string | null => {
+    const value = process.env[name]
+    return value !== undefined && value !== "" ? path.resolve(value) : null
+}
+
+/*  resolve the per-OS user-scope configuration directory
+    (overridable via $ASE_CONFIG_DIR)  */
 export const userConfigDir = (): string => {
-    if (process.platform === "darwin")
+    const dir = envDir("ASE_CONFIG_DIR")
+    if (dir !== null)
+        return dir
+    else if (process.platform === "darwin")
         /*  macOS  */
         return path.join(os.homedir(), "Library", "Application Support", "ase")
     else if (process.platform === "win32")
@@ -80,9 +90,13 @@ export const userConfigDir = (): string => {
 }
 
 /*  resolve the per-OS user-scope state directory (per-session state and
-    other machine-local runtime information, never roamed or versioned)  */
+    other machine-local runtime information, never roamed or versioned;
+    overridable via $ASE_STATE_DIR, falling back to $ASE_CONFIG_DIR)  */
 export const userStateDir = (): string => {
-    if (process.platform === "darwin")
+    const dir = envDir("ASE_STATE_DIR") ?? envDir("ASE_CONFIG_DIR")
+    if (dir !== null)
+        return dir
+    else if (process.platform === "darwin")
         /*  macOS  */
         return path.join(os.homedir(), "Library", "Application Support", "ase")
     else if (process.platform === "win32")

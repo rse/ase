@@ -223,8 +223,8 @@ with status 429.
 - *per-user configuration directory*`/relay.log`:
   The log of the agent relay server run in the background.
 
-The *per-user configuration directory* is `~/Library/Application
-Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
+The *per-user configuration directory* is `$ASE_CONFIG_DIR`, if set,
+else `~/Library/Application Support/ase` on macOS, `%APPDATA%\ase` on Windows, and
 `$XDG_CONFIG_HOME/ase` (falling back to `~/.config/ase`) on Linux and
 other Unix systems.
 

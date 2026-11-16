@@ -273,6 +273,12 @@ are checked only once the corresponding member starts.
   embedded in `project.relay.url`. The fleet passes the actual token of
   its agent relay to all agents through this variable.
 
+- `ASE_CONFIG_DIR`, `ASE_STATE_DIR`:
+  The per-user configuration resp. state directory (see `ase`(1)),
+  inherited by all agents, so a fleet started with both pointing into a
+  dedicated base directory runs with its own user configuration, agent
+  definitions, agent relay, and agent run records.
+
 ## FILES
 
 - `.ase/fleet.yaml`:
