@@ -2,8 +2,13 @@
 ChangeLog
 =========
 
-2.0.13 (2026-11-XX)
--------------------
+2.1.0 (2026-11-XX)
+------------------
+
+-   NEW FEATURE [code, docs]: Agent Working Copy Option "-C|--cwd"
+    The new option `-C|--cwd <dir>` of all agents runs the agent tool in the working copy *dir*,
+    while the agent keeps its own project context, e.g., a persistent clone per agent of a fleet,
+    whose `cwd:` is relative to the fleet configuration file.
 
 -   NEW FEATURE [code, docs]: Configuration Override Scope
     A set `ASE_CONFIG_DIR` now enables the read-only configuration scope `override` of the file

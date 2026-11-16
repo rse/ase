@@ -9,6 +9,7 @@
 \[`-T`|`--timeout` *duration*\]
 \[`-o`|`--one-shot`\]
 \[`--agent-relay` *url*\]
+\[`-C`|`--cwd` *dir*\]
 \[`-r`|`--repo` *url*\]
 \[`-d`|`--tempdir` *dir*\]
 \[`-m`|`--mode` `phase`|`request`\]
@@ -183,6 +184,13 @@ All other options belong to the sub-commands (see **COMMANDS**).
       See **AGENT RELAY** in `ase-agent`(1). In the mode `request`, the
       agent is announced there as processing the `research` requests,
       which may have an empty prompt.
+
+    - \[`-C`|`--cwd` *dir*\]: The Git working copy to run the agent tool in,
+      i.e., the Git top-level of *dir* (default: the Git working copy the
+      agent is started in), while the agent itself keeps its project
+      context. Requires a task store not located in the project (i.e.,
+      not a local `ase:`*path* one), and excludes `--repo`. See **WORKING
+      COPY, CLONES, AND WORKTREES** in `ase-agent`(1).
 
     - \[`-r`|`--repo` *url*\]: The Git repository to clone once into the
       temporary directory of the agent, where every task without a

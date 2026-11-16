@@ -199,9 +199,9 @@ export const withinJobTimeout = async <T> (what: string, op: () => Promise<T>, l
     }
 }
 
-/*  whether the current working directory is inside a Git working copy  */
-export const gitInside = async (): Promise<boolean> =>
-    (await execaJob("git", [ "rev-parse", "--show-toplevel" ], { reject: false })).exitCode === 0
+/*  whether the directory <cwd> (default: the current working directory) is inside a Git working copy  */
+export const gitInside = async (cwd?: string): Promise<boolean> =>
+    (await execaJob("git", [ "rev-parse", "--show-toplevel" ], { cwd, reject: false })).exitCode === 0
 
 /*  run Git operations changing the shared state of a Git repository (its references and its
     worktrees) in mutual exclusion per repository in this process, identified by the common Git

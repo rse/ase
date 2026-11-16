@@ -176,6 +176,7 @@ const initConfig = (tool: string, lifecycle: string): string => [
     implementer:
         mode:           implement       # "implement" (into changeset) or "draft" (into attachment)
         parallel:       2               # maximum number of tasks processed in parallel
+        #cwd:           <dir>           # working copy to run the agent tool in (relative to this file)
         #params:        { effort-wait: false }  # do not wait for the effort estimation (without "estimator")
 
     #   the qualification phase agent (IMPLEMENTED > QUALIFYING > IMPLEMENTED)
@@ -426,11 +427,13 @@ export default class AgentFleetCommand extends DaemonCommand {
             validateName(name, kind, kinds)
 
             /*  the options of the definition of an agent can be nested by group, and the
-                definition file of an ad-hoc agent (but not a built-in definition) is
-                relative to the configuration file  */
+                definition file of an ad-hoc agent (but not a built-in definition) and the
+                working copy of the agent tool are relative to the configuration file  */
             const values = flattenDefinition(options, `fleet: section "${name}"`)
             if (typeof values.definition === "string" && !values.definition.startsWith("builtin:"))
                 values.definition = path.resolve(path.dirname(file), values.definition)
+            if (typeof values.cwd === "string")
+                values.cwd = path.resolve(path.dirname(file), values.cwd)
             for (const key of [ ...deniedKeys, ...(relay !== null ? [ "agent-relay" ] : []) ])
                 if (given(values, key))
                     throw new Error(`fleet: section "${name}": option "${key}" not allowed in a fleet` +

@@ -45,6 +45,7 @@ export interface AgentOpts {
     parallel:    string
     timeout:     string
     oneShot:     boolean
+    cwd?:        string
     repo?:       string
     tempdir?:    string
     name?:       string
@@ -299,6 +300,10 @@ export abstract class Agent {
     private oneShot                                      = false
     protected lifecycle: TaskFormat.TaskLifecycle | null = null
 
+    /*  the working copy of the agent: the directory of "--cwd" (resp. its Git top-level),
+        else the project root the agent is started in, where the agent tool runs  */
+    private root                                         = ""
+
     /*  the URL of the Git repository of "--repo", the directory of its
         temporary clone, and the default branch of this clone  */
     private repo                                         = ""
@@ -444,7 +449,7 @@ export abstract class Agent {
         return false
     }
 
-    /*  hold the Git working copy <root> the agent is started in exclusively for the processing
+    /*  hold the Git working copy <root> of the agent (see "root") exclusively for the processing
         of a task (from right before its claim, see "ready", until it is settled), if it is used
         directly (instead of an ASE worktree of it), i.e., if a skill changes it (e.g. implements
         into it, stages in it, or integrates from or into it), so no agent of this process using
@@ -456,7 +461,7 @@ export abstract class Agent {
         return this.hold(task, root)
     }
 
-    /*  hold the Git branch <branch> of the Git working copy <root> the agent is started in
+    /*  hold the Git branch <branch> of the Git working copy <root> of the agent (see "root")
         (or, if empty, of the temporary clone of "--repo") exclusively for the processing of a
         task (like "holdRoot"), if the task is processed in the worktree the branch is checked
         out in (e.g. into a "branch:" changeset), so no agent of this process processes another
@@ -502,10 +507,10 @@ export abstract class Agent {
         }
     }
 
-    /*  the Git working copy the agent is started in, if a task with the change set
+    /*  the Git working copy of the agent (see "root"), if a task with the change set
         flow values <values> is processed in it (see "workdir"), else empty  */
     protected localRoot (values: FlowValue[]): string {
-        return this.clone === "" || values.some((value) => value.type === "worktree") ? Task.projectRoot() : ""
+        return this.clone === "" || values.some((value) => value.type === "worktree") ? this.root : ""
     }
 
     /*  whether the working copy <root> belongs to the temporary clone of "--repo"  */
@@ -514,17 +519,17 @@ export abstract class Agent {
     }
 
     /*  the Git working copy in which a task with the change set flow values <values>
-        is processed: for any "worktree" value (or without "--repo") the one the agent
-        is started in, else a temporary worktree of the clone of "--repo" of its own,
+        is processed: for any "worktree" value (or without "--repo") the one of the agent
+        (see "root"), else a temporary worktree of the clone of "--repo" of its own,
         detached at the default branch, after refreshing the default branch and the
         branches of the values from the origin, where the Git operations on the clone
         are mutually exclusive and its own working directory is never changed or used
         by a skill (so concurrently processed tasks do not interfere)  */
     protected async workdir (task: AgentTask, values: FlowValue[]): Promise<string> {
         if (this.localRoot(values) !== "") {
-            if (!(await gitInside()))
-                throw new Error("agent: task requires the Git working copy the agent is started in, but there is none")
-            return Task.projectRoot()
+            if (!(await gitInside(this.root)))
+                throw new Error("agent: task requires the Git working copy of the agent, but there is none")
+            return this.root
         }
         const cwd = this.clone
         const dir = path.join(this.temp!.dir, "work", task.id)
@@ -639,7 +644,7 @@ export abstract class Agent {
             return this.changesetReadJob(task, suffix)
         else if (workdir === "target")
             return this.targetJob(task, suffix, options.snapshot)
-        return { cwd: Task.projectRoot(), dirs: [], sourceDir: "", changesetWorktree: "" }
+        return { cwd: this.root, dirs: [], sourceDir: "", changesetWorktree: "" }
     }
 
     /*  the change set snapshot of the working tree of the Git working copy <dir>, from the
@@ -1246,6 +1251,8 @@ export abstract class Agent {
                 .option("-o, --one-shot",           "terminate once all dispatchable incoming tasks are processed")
                 .option("--agent-relay <url>",      "agent relay to pass the live presence of the agent to, " +
                     "as \"ase[s]://<addr>:<port>[/<token>]\" (default: the configured \"project.relay.url\", else none)")
+                .option("-C, --cwd <dir>",          "working copy to run the agent tool in, while the agent itself " +
+                    "keeps its project context (default: the project root the agent is started in)")
             if (this.worktree)
                 this.cmd
                     .option("-r, --repo <url>",    "Git repository to clone temporarily for the tasks " +
@@ -1278,15 +1285,33 @@ export abstract class Agent {
             await which(cli).catch(() => {
                 throw new Error(`agent: ${this.name} requires "${cli}", which was not found in $PATH`)
             })
+
+        /*  the agent tool runs in the working copy of "--cwd" (or its Git top-level), where
+            the skills resolve their project context from it and hence can only reach a task
+            store not located inside the project the agent is started in  */
+        this.root = Task.projectRoot()
+        if (opts.cwd !== undefined) {
+            const dir = path.resolve(opts.cwd)
+            if (!(await fs.promises.stat(dir).catch(() => null))?.isDirectory())
+                throw new Error(`agent: ${this.name}: "--cwd" directory "${dir}" not found`)
+            else if (Task.isLocal(this.log))
+                throw new Error(`agent: ${this.name} with "--cwd" requires a non-local task store ` +
+                    "(project uses a local \"ase:<path>\" one)")
+            const top = await execa("git", [ "rev-parse", "--show-toplevel" ], { cwd: dir, reject: false })
+            this.root = top.exitCode === 0 && top.stdout.trim() !== "" ? top.stdout.trim() : dir
+        }
         if (this.worktree) {
             /*  the "worktree" values of the change set flow keys refer to the Git working
-                copy the agent is started in, which hence is mandatory without "--repo",
-                while with "--repo" the skills run inside its temporary clone and hence
-                can only reach a task store not located inside the working copy  */
+                copy of the agent, which hence is mandatory without "--repo", while with
+                "--repo" the skills run inside its temporary clone and hence can only
+                reach a task store not located inside the working copy  */
             this.repo    = opts.repo ?? ""
             this.tempdir = opts.tempdir ?? ""
-            if (this.repo === "" && !(await gitInside()))
-                throw new Error(`agent: ${this.name} has to be started inside a Git working copy (or be given "--repo")`)
+            if (this.repo !== "" && opts.cwd !== undefined)
+                throw new Error(`agent: ${this.name}: "--cwd" and "--repo" are mutually exclusive`)
+            else if (this.repo === "" && !(await gitInside(this.root)))
+                throw new Error(`agent: ${this.name} has to be started inside a Git working copy ` +
+                    "(or be given \"--cwd\" with one, or \"--repo\")")
             else if (this.repo !== "" && Task.isLocal(this.log))
                 throw new Error(`agent: ${this.name} with "--repo" requires a non-local task store ` +
                     "(project uses a local \"ase:<path>\" one)")

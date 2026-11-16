@@ -9,6 +9,7 @@
 \[`-T`|`--timeout` *duration*\]
 \[`-o`|`--one-shot`\]
 \[`--agent-relay` *url*\]
+\[`-C`|`--cwd` *dir*\]
 \[`-m`|`--mode` `phase`|`request`\]
 \[`-M`|`--model` *model*\]
 \[`--`*group*`-`*item* *value* \[...\]\]
@@ -158,6 +159,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
       resp. `ases://`*addr*`:`*port*\[`/`*token*\]\[`?insecure`\] for
       HTTPS (default: the configured `project.relay.url`, else none).
       See **AGENT RELAY** in `ase-agent`(1).
+
+    - \[`-C`|`--cwd` *dir*\]: The directory to run the agent tool in, i.e.,
+      its Git top-level, else *dir* itself (default: the project root),
+      while the agent itself keeps its project context. Requires a task
+      store not located in the project (i.e., not a local `ase:`*path*
+      one). See **WORKING COPY, CLONES, AND WORKTREES** in `ase-agent`(1).
 
     - \[`-m`|`--mode` *mode*\]: The mode of the agent (default:
       `phase`): `phase` estimates the unestimated tasks in `PLANNED`

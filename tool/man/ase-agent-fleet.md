@@ -227,9 +227,11 @@ value omits an option, and a list repeats an option:
   `params: { severity: high }`), which repeats the option `--params`
   *name*`=`*value* per parameter.
 
-  The `definition` of `kind: adhoc` (unless a `builtin:` one) is
-  relative to the configuration file, where hooks can be given only
-  through a TypeScript or JavaScript definition file. A section without
+  The `definition` of `kind: adhoc` (unless a `builtin:` one) and the
+  `cwd` of an agent (its own working copy to run the agent tool in,
+  e.g., a persistent clone per agent) are relative to the configuration
+  file, where hooks can be given only through a TypeScript or JavaScript
+  definition file. A section without
   any options (an empty value) runs the agent of the kind of its name
   with its defaults.
 

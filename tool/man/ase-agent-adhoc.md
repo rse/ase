@@ -9,6 +9,7 @@
 \[`-T`|`--timeout` *duration*\]
 \[`-o`|`--one-shot`\]
 \[`--agent-relay` *url*\]
+\[`-C`|`--cwd` *dir*\]
 \[`-r`|`--repo` *url*\]
 \[`-d`|`--tempdir` *dir*\]
 \[`-D`|`--definition` *file*|`builtin:`*kind*\[`-`*mode*\]\]
@@ -280,6 +281,14 @@ The following options are shared by all agents (see also
   `ases://`*addr*`:`*port*\[`/`*token*\]\[`?insecure`\] (HTTPS,
   optionally without certificate verification) (default: the
   configured `project.relay.url`, else none). See `ase-agent-relay`(1).
+
+- \[`-C`|`--cwd` *dir*\]:
+  The directory to run the agent tool in, i.e., its Git top-level, else
+  *dir* itself (default: the project root the agent is started in),
+  while the agent itself keeps its project context. Requires a task
+  store not located in the project (i.e., not a local `ase:`*path*
+  one), and excludes `--repo`. A Git working copy unless `--workdir
+  project`. See `ase-agent`(1).
 
 - \[`-r`|`--repo` *url*\]:
   The Git repository to clone temporarily into the temporary directory

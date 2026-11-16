@@ -298,7 +298,8 @@ frontmatter keys of a task (or their configured defaults
 `project.task.default.target`, see `ase-config`(1)). Their values are:
 
 - `worktree`:
-  the Git working copy the agent is started in. For it, the agents
+  the Git working copy of the agent (the one it is started in, or the
+  one of `--cwd`). For it, the agents
   create no own Git worktree, but work in the working copy directly,
   just adjusting its checked-out branch.
 
@@ -339,6 +340,20 @@ the working directory `project`, like `rebooter`, `condenser`,
 `rebooter`, `condenser`, `griller`, and `estimator` do not accept
 `--repo` and `--tempdir` at all, while any other such agent ignores
 them).
+
+With `-C`|`--cwd` *dir*, every agent instead runs the agent tool in the
+Git top-level of *dir* (or, for an agent of the working directory
+`project`, in *dir* itself outside a Git working copy), which then is
+the Git working copy of the agent, e.g., a persistent clone of its own
+per agent of a fleet. The agent itself keeps the project context it is
+started in: its configuration, its task store, its definition kinds, and
+its process files.
+
+As the skills resolve their project context from *dir*, `--cwd`
+requires a task store not located in the project (i.e., not a local
+`ase:`*path* one), and the configuration of *dir* should provide the
+same `project.id` and task store. `--cwd` and `--repo` are mutually
+exclusive.
 
 With `--repo` *url*, each agent instead clones the Git repository *url* once
 into its temporary directory (removed on termination) and processes every
