@@ -5,20 +5,21 @@ ChangeLog
 2.1.1 (2026-11-16)
 ------------------
 
--   FEATURE [code, docs]: Agent Budget Option "-B|--budget"
+-   FEATURE [code]: Agent Budget Option "-B|--budget"
     The new option `-B|--budget <usd>` of all agents (default: `20`) limits the costs of processing
     a task via the native soft cost cap of the agent tool (`--max-budget-usd` of `claude` resp.
     `--max-ai-credits` of `copilot`), where an exhausted budget fails the processing.
-
--   CLEANUP [docs]: Documentation Reconciled with Implementation
-    `README.md`, `AGENTS.md`, 21 manual pages of `tool/man/`, and 24 skill `help.md`
-    files corrected against `tool/src/` resp. `SKILL.md`: wrong defaults, examples, and behaviors,
-    and missing options, configuration keys, and edge cases (e.g. `ase-meta-config` key list).
 
 -   BUGFIX [code]: Service Shutdown and Session Id Hardening
     `stopService` of `ase-service` now guards itself against a repeated shutdown (`/stop`, signal,
     or idle tick), and `sessionState` of `ase-config-core` rejects the path-traversing session ids
     `.` and `..`.
+
+-   CLEANUP [code, docs, infr]: Documentation Reconciled with Implementation
+    `README.md`, `AGENTS.md`, 21 manual pages of `tool/man/`, and 24 skill `help.md`
+    files corrected against `tool/src/` resp. `SKILL.md`: wrong defaults, examples, and behaviors,
+    and missing options, configuration keys, and edge cases (e.g. `ase-meta-config` key list).
+    The nested list items of `AGENTS.md` are now separated by blank lines for readability.
 
 -   CLEANUP [code]: Skill Lint Corrections and Shared Diff Hunk Rendering
     About 25 lint findings fixed across the skills: stale or wrong help pages, flow and logic slips
