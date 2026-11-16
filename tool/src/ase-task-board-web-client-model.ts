@@ -16,7 +16,7 @@ export type Card    = { id: string, title: string, group: string, tone: string, 
 export type Lane    = { status: string, active: boolean, weight: number, dashed: boolean, kind: "initial" | "regular" | "terminal", cards: Card[] }
 export type Group   = { title: string, lanes: Lane[] }
 export type Surface = { view: View, minimized: string[], collapsed: string[], heights: Record<string, number>, titles: boolean, keys: boolean, standalone: boolean }
-export type Board   = { mode: string, project: string, version: string, warnings: string[], users: string[], self: string, surface: Surface, moves: Record<string, string[]>, groups: Group[] }
+export type Board   = { mode: string, project: string, version: string, warnings: string[], users: string[], self: string, moves: Record<string, string[]>, groups: Group[] }
 export type Tone    = "active" | "done" | "idle"
 export type Ref     = { id: string, tone: Tone }
 export type Task    = { id: string, title: string, tone: Tone, status: string, group: string, epic: string, doc: string, plan: { keys: [ string, string ][], body: string }, tabs: string[], pred: Ref[], succ: Ref[] }
@@ -326,8 +326,57 @@ export const selectAgent = (id: string) => {
     logStick.value   = true
 }
 
+/*  the surface state of the page, remembered per project in the browser storage, and hence
+    shared by all boards of the project in this browser only (see the "storage" event), except
+    the view, which each tab keeps on its own (in the session storage, initially the last view
+    of any tab), where an invalid or unavailable stored state falls back to the default state  */
+export const surface   = ref<Surface>({ view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
+const surfaceKey   = (project: string) => `ase-task-board:surface:${project}`
+const surfaceParse = (text: string | null): Surface => {
+    const strings = (x: unknown) => Array.isArray(x) && x.every((e) => typeof e === "string") ? x : []
+    const flag    = (x: unknown, fallback: boolean) => typeof x === "boolean" ? x : fallback
+    let s = {} as Partial<Record<keyof Surface, unknown>>
+    try {
+        const parsed: unknown = JSON.parse(text ?? "{}")
+        if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed))
+            s = parsed
+    }
+    catch (_err: unknown) {
+        /*  invalid stored state  */
+    }
+    const heights = typeof s.heights === "object" && s.heights !== null && !Array.isArray(s.heights) ? s.heights : {}
+    return {
+        view:       viewOrder(true).find((v) => v === s.view) ?? "lanes",
+        minimized:  strings(s.minimized),
+        collapsed:  strings(s.collapsed),
+        heights:    Object.fromEntries(Object.entries(heights)
+            .filter((entry): entry is [ string, number ] => typeof entry[1] === "number" && Number.isFinite(entry[1]) && entry[1] > 0)),
+        titles:     flag(s.titles, false),
+        keys:       flag(s.keys, true),
+        standalone: flag(s.standalone, true)
+    }
+}
+const surfaceLoad  = (project: string): Surface => {
+    try {
+        const s    = surfaceParse(localStorage.getItem(surfaceKey(project)))
+        const view = sessionStorage.getItem(surfaceKey(project))
+        return { ...s, view: viewOrder(true).find((v) => v === view) ?? s.view }
+    }
+    catch (_err: unknown) {
+        return surfaceParse(null)
+    }
+}
+const surfaceSave  = (s: Surface) => {
+    try {
+        localStorage.setItem(surfaceKey(board.value?.project ?? ""), JSON.stringify(s))
+        sessionStorage.setItem(surfaceKey(board.value?.project ?? ""), s.view)
+    }
+    catch (_err: unknown) {
+        /*  not remembered  */
+    }
+}
+
 /*  the derived values of the page  */
-export const surface   = computed<Surface>(() => board.value?.surface ?? { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
 export const titles    = computed(() => surface.value.titles)
 
 /*  the names of the agents busy with each task (kept as the previous value while unchanged,
@@ -476,7 +525,8 @@ watch([ board, view ], () => nextTick(updateScroll), { deep: true })
 /*  load the dependency graph (laid out by the service)  */
 export const renderGraph = async (background = false) => {
     const seq = ++graphSeq
-    const res = await api<{ svg: string, stats: GraphStats }>(`/task-board/api/graph?filter=${encodeURIComponent(query)}`, undefined, background)
+    const res = await api<{ svg: string, stats: GraphStats }>(`/task-board/api/graph?filter=${encodeURIComponent(query)}` +
+        `&titles=${surface.value.titles}&standalone=${surface.value.standalone}`, undefined, background)
     if (seq !== graphSeq)
         return
     graph.value = res.error !== undefined ? `<p class="warn">${res.error.replace(/[&<>]/g, (c) => `&#${c.charCodeAt(0)};`)}</p>` :
@@ -676,9 +726,12 @@ export const reload = async (background = false) => {
     }
     boardError.value = null
 
-    /*  start in the persisted view on the first load (the task viewer shows no view at all)  */
-    if (board.value === null && watched === null)
-        view.value = data.surface.view
+    /*  start in the remembered surface state on the first load (the task viewer shows no view at all)  */
+    if (board.value === null) {
+        surface.value = surfaceLoad(data.project)
+        if (watched === null)
+            view.value = surface.value.view
+    }
     board.value = data
     if (view.value === "graph")
         await renderGraph(background)
@@ -707,54 +760,46 @@ export const clearFilter = () => {
     filterEl.value?.blur()
 }
 
-/*  the number of view changes of this board still being persisted  */
-let viewPending = 0
-
-/*  apply a changed surface state: switch to a view changed by another board (except
-    while own view changes are pending, and in the task viewer, which shows no view),
-    and re-lay out the graph if the showing of titles or standalone tasks changed  */
-const applySurface = (s: Surface) => {
-    if (board.value === null)
-        return
-    const relayout = board.value.surface.titles !== s.titles || board.value.surface.standalone !== s.standalone
-    board.value.surface = s
-    if (viewPending === 0 && watched === null && s.view !== view.value)
-        showView(s.view)
-    else if (relayout && view.value === "graph")
+/*  apply a changed surface state: remember an own one, resp. take over one changed by another
+    board of this browser except its view (as each tab keeps its own view), and re-lay out
+    the graph if the showing of titles or standalone tasks changed  */
+const applySurface = (s: Surface, own: boolean) => {
+    const relayout = surface.value.titles !== s.titles || surface.value.standalone !== s.standalone
+    surface.value = own ? s : { ...s, view: surface.value.view }
+    if (own)
+        surfaceSave(s)
+    if (relayout && view.value === "graph")
         renderGraph()
 }
 
-/*  toggle a minimized lane, a collapsed phase (resp. multiple at once),
-    or the showing of task titles, key hints, or standalone tasks  */
-export const toggle = async (list: "minimized" | "collapsed" | "titles" | "keys" | "standalone", entry: string | string[]) => {
-    const s = await api<Surface>("/task-board/api/toggle", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ list, entry })
-    })
-    if (s.error !== undefined) {
-        actionError.value = s.error
-        return
+/*  apply the surface state changed by another board of the project in this browser  */
+const onStorage = (ev: StorageEvent) => {
+    if (board.value !== null && ev.key === surfaceKey(board.value.project))
+        applySurface(surfaceParse(ev.newValue), false)
+}
+
+/*  toggle a minimized lane, a collapsed phase (resp. multiple at once, all removed if all are
+    listed already, else all missing ones added), or the showing of task titles, key hints, or standalone tasks  */
+export const toggle = (list: "minimized" | "collapsed" | "titles" | "keys" | "standalone", entry: string | string[]) => {
+    const s = { ...surface.value }
+    if (list === "titles" || list === "keys" || list === "standalone")
+        s[list] = !s[list]
+    else {
+        const entries = Array.isArray(entry) ? entry : [ entry ]
+        const items   = s[list]
+        s[list] = entries.every((e) => items.includes(e)) ?
+            items.filter((e) => !entries.includes(e)) :
+            [ ...items, ...entries.filter((e) => !items.includes(e)) ]
     }
-    actionError.value = null
-    applySurface(s)
+    applySurface(s, true)
 }
 
 /*  set (resp. with null reset) the height weights of lanes, applied right away
-    and persisted for all open and newly opened web boards  */
-export const setHeights = async (entries: Record<string, number | null>) => {
-    if (board.value !== null) {
-        const heights = Object.fromEntries(Object.entries({ ...board.value.surface.heights, ...entries })
-            .filter((entry): entry is [ string, number ] => entry[1] !== null))
-        board.value.surface = { ...board.value.surface, heights }
-    }
-    const s = await api<Surface>("/task-board/api/height", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ heights: entries })
-    })
-    if (s.error !== undefined) {
-        actionError.value = s.error
-        return
-    }
-    actionError.value = null
-    applySurface(s)
+    and remembered for all open and newly opened web boards of this browser  */
+export const setHeights = (entries: Record<string, number | null>) => {
+    const heights = Object.fromEntries(Object.entries({ ...surface.value.heights, ...entries })
+        .filter((entry): entry is [ string, number ] => entry[1] !== null))
+    applySurface({ ...surface.value, heights }, true)
 }
 
 /*  the lane weights shown instead of the persisted ones (while dragging a grip, resp. snapping a
@@ -838,18 +883,10 @@ const showView = (v: View) => {
         loadStats(stats.value !== null)
 }
 
-/*  switch between the views, persisting it for all open and newly opened web boards  */
+/*  switch between the views, remembered for all open and newly opened web boards of this browser  */
 export const setView = (v: View) => {
     showView(v)
-    viewPending++
-    api<Surface>("/task-board/api/view", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ view: v })
-    }).then((s) => {
-        if (s.error !== undefined)
-            actionError.value = s.error
-    }).finally(() => {
-        viewPending--
-    })
+    applySurface({ ...surface.value, view: v }, true)
 }
 
 /*  the connection to the service: change event stream, keep-alive timer, and reconnect timer  */
@@ -882,7 +919,6 @@ const connect = () => {
         }
     })
     events.addEventListener("change", () => reload(true))
-    events.addEventListener("surface", (ev) => applySurface(JSON.parse((ev as MessageEvent).data)))
     events.addEventListener("store", (ev) => { store.value = JSON.parse((ev as MessageEvent).data) })
     events.addEventListener("agents", (ev) => {
         applyAgents(JSON.parse((ev as MessageEvent).data))
@@ -894,9 +930,11 @@ const connect = () => {
 }
 
 /*  start the connection to the service: the change event stream, and the
-    keep-alive, which also notices a lost service while no events arrive  */
+    keep-alive, which also notices a lost service while no events arrive
+    (plus the surface state changes of the other boards of this browser)  */
 export const startService = () => {
     connect()
+    window.addEventListener("storage", onStorage)
     ping = setInterval(async () => {
         const result = await api("/task-board/api/ping", undefined, true)
         online.value = result.error === undefined && events?.readyState === EventSource.OPEN
@@ -906,6 +944,7 @@ export const startService = () => {
 /*  stop the connection to the service and all timers of the model  */
 export const stopService = () => {
     events?.close()
+    window.removeEventListener("storage", onStorage)
     if (retry !== null)
         clearTimeout(retry)
     if (ping !== null)

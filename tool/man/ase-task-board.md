@@ -58,9 +58,12 @@ views are cycled via `v` (or a click onto the `view:` value of the
 header).
 
 The last shown view, the minimized lanes, the collapsed phases, the lane
-heights, and the shown flags are persisted in `.ase/board.yaml` (separately for the
-terminal and the web board), where each change of them in a web board
-is immediately applied to all other open web boards of the project.
+heights, and the shown flags are persisted: for the terminal board in
+`.ase/board.yaml`, and for the web board per project in the local storage
+of each browser, where each change of them in a web board is immediately
+applied to all other open web boards of the project in the same browser,
+except the shown view, which each browser tab keeps on its own (a newly
+opened tab starts in the last shown view of any tab).
 
 ### Terminal Board
 
@@ -664,16 +667,16 @@ The following configuration keys (on scope `user` or `project`, see
 ## FILES
 
 - `.ase/board.yaml`:
-  The display state of the boards in the project root: separately for
-  the terminal board (`tui`) and the web board (`web`), the shown `view`
+  The display state of the terminal board in the project root (`tui`): the shown `view`
   (`lanes`, `graph`, `stats`, `agents`, or `flow`), the `minimized` lanes, the
   `collapsed` phases, the `heights` of the resized lanes (as their weights
   within their phase), and whether the task `titles` are wrapped onto
   multiple lines, the key hint lines are shown (`keys`), and the graph
   shows the `standalone` tasks.
 
-  The web state is shared by all browsers and tabs showing the web board.
-  It never holds task content, and is covered by the self-ignoring
+  The display state of the web board is instead kept per project in the
+  local storage of each browser, shared by all its tabs showing the web board.
+  The file never holds task content, and is covered by the self-ignoring
   `.ase/.gitignore`.
 
 ## EXIT STATUS

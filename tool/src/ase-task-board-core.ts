@@ -108,8 +108,9 @@ export const viewCycleHint = (view: SurfaceView, relay: boolean): string => {
 export type SurfaceList = "minimized" | "collapsed"
 export type SurfaceFlag = "titles" | "keys" | "standalone"
 
-/*  the persisted board state of a project  */
-export type State = { tui: Surface, web: Surface }
+/*  the persisted board state of a project (the one of the TUI surface only,
+    as the web board keeps its surface state per browser)  */
+export type State = { tui: Surface }
 
 /*  shorthand for a lane specification  */
 const lane = (status: string, active: boolean, weight: number): LaneLayout =>
@@ -206,13 +207,13 @@ const surfaceSchema = v.object({
     standalone: v.optional(v.boolean(), true)
 })
 const stateSchema = v.object({
-    tui: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true }),
-    web: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
+    tui: v.optional(surfaceSchema, { view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
 })
 
 /*  reusable functionality: the persisted per-project board state in
-    ".ase/board.yaml", holding the view state of the TUI and web
-    surfaces, which is display state only and hence never written into any task  */
+    ".ase/board.yaml", holding the view state of the TUI surface (the
+    "web" section of older state files is dropped on the next update),
+    which is display state only and hence never written into any task  */
 export class BoardState {
     /*  resolve the state file of the current project  */
     static filename (): string {
@@ -265,7 +266,7 @@ export class BoardState {
 
     /*  toggle an entry of a surface list (minimized lanes or collapsed phases), resp. multiple
         entries at once (all removed if all are listed already, else all missing ones added)  */
-    static toggle (surface: "tui" | "web", list: SurfaceList, entry: string | string[]): Promise<State> {
+    static toggle (surface: keyof State, list: SurfaceList, entry: string | string[]): Promise<State> {
         return BoardState.update((state) => {
             const items = state[surface][list]
             if (Array.isArray(entry)) {
@@ -284,21 +285,21 @@ export class BoardState {
     }
 
     /*  toggle the showing of task titles, key hints, or standalone tasks  */
-    static toggleFlag (surface: "tui" | "web", flag: SurfaceFlag): Promise<State> {
+    static toggleFlag (surface: keyof State, flag: SurfaceFlag): Promise<State> {
         return BoardState.update((state) => {
             state[surface][flag] = !state[surface][flag]
         })
     }
 
     /*  set the shown view (lanes, graph, stats, agents, or flow)  */
-    static setView (surface: "tui" | "web", view: SurfaceView): Promise<State> {
+    static setView (surface: keyof State, view: SurfaceView): Promise<State> {
         return BoardState.update((state) => {
             state[surface].view = view
         })
     }
 
     /*  set the height weights of lanes, resp. reset them (with null) to the ones of their lane layout  */
-    static setHeights (surface: "tui" | "web", entries: Record<string, number | null>): Promise<State> {
+    static setHeights (surface: keyof State, entries: Record<string, number | null>): Promise<State> {
         return BoardState.update((state) => {
             state[surface].heights = Object.fromEntries(Object.entries({ ...state[surface].heights, ...entries })
                 .filter((entry): entry is [ string, number ] => entry[1] !== null))

@@ -18,7 +18,7 @@ import { Task }                  from "./ase-task.js"
 import { userId }                from "./ase-service-otel.js"
 import { Config }                from "./ase-config-core.js"
 import { configSchema, webColorDefaults, webColorNames } from "./ase-config-schema.js"
-import { buildBoard, watchTasks, toneOf, laneMoves, cardMoves, BoardState, attachmentTabs, isDiff, diffTones, dataLang, dataLoad, dataSpans, newTaskText, createTask, saveTask, TaskConflict, watchAgents } from "./ase-task-board-core.js"
+import { buildBoard, watchTasks, toneOf, laneMoves, cardMoves, attachmentTabs, isDiff, diffTones, dataLang, dataLoad, dataSpans, newTaskText, createTask, saveTask, TaskConflict, watchAgents } from "./ase-task-board-core.js"
 import { diffHunks, diffMarkdown, diffMarksToHTML } from "./ase-task-board-diff.js"
 import { layoutGraph, drawGraphSVG } from "./ase-task-board-graph.js"
 import { flowOf, layoutFlow, drawFlowSVG } from "./ase-task-board-flow.js"
@@ -287,7 +287,6 @@ const boardJSON = (board: Board, lifecycle: TaskFormat.TaskLifecycle, users: str
     warnings: board.warnings,
     users,
     self:     userId(),
-    surface:  BoardState.load().web,
     moves:    laneMoves(board, lifecycle),
     groups:   board.groups.map((g) => ({
         title: g.title,
@@ -476,15 +475,15 @@ const registerViewRoutes = (server: Hapi.Server, log: Log): void => {
 
     /*  the dependency graph as SVG, reduced onto the tasks matching the
         filter query plus their direct predecessors and successors
-        (and optionally without the standalone tasks), plus its statistics  */
+        (and without the standalone tasks for "standalone=false", and
+        with the task titles for "titles=true"), plus its statistics  */
     server.route({
         method:  "GET",
         path:    "/task-board/api/graph",
         handler: guarded(async (request, h) => {
-            const state  = BoardState.load().web
             const found  = filterBoard(await currentBoard(log), filterQuery(request), true)
-            const board  = state.standalone ? found : dropStandalone(found)
-            const svg    = board.cards.size === 0 ? "" : drawGraphSVG(board, await layoutGraph(board, "px", state.titles))
+            const board  = request.query.standalone !== "false" ? found : dropStandalone(found)
+            const svg    = board.cards.size === 0 ? "" : drawGraphSVG(board, await layoutGraph(board, "px", request.query.titles === "true"))
             const stats  = {
                 tasks:        board.cards.size,
                 dependencies: [ ...board.pred.values() ].reduce((n, ps) => n + ps.length, 0)
@@ -802,81 +801,9 @@ const registerUpdateRoutes = (server: Hapi.Server, log: Log): void => {
     })
 }
 
-/*  register the surface routes of the web board: view changes, surface toggles, lane heights, keep-alive, and change events  */
-const registerSurfaceRoutes = (server: Hapi.Server, log: Log): void => {
-    /*  set the shown view (lanes, graph, stats, agents, or flow) of the web surface, for all open and newly opened web boards  */
-    server.route({
-        method:  "POST",
-        path:    "/task-board/api/view",
-        options: { payload: { parse: true, allow: "application/json" } },
-        handler: guarded(async (request, h) => {
-            const p = request.payload as { view?: unknown } | null
-            if (p === null || (p.view !== "lanes" && p.view !== "graph" && p.view !== "stats" && p.view !== "agents" && p.view !== "flow"))
-                return h.response({ error: "invalid view request" }).code(400)
-            const surface = (await BoardState.setView("web", p.view)).web
-            emit("surface", surface)
-            return h.response(surface)
-        })
-    })
-
-    /*  toggle a minimized lane, a collapsed phase, or the showing of task titles,
-        key hints, or standalone tasks of the web surface  */
-    server.route({
-        method:  "POST",
-        path:    "/task-board/api/toggle",
-        options: { payload: { parse: true, allow: "application/json" } },
-        handler: guarded(async (request, h) => {
-            const p = request.payload as { list?: unknown, entry?: unknown } | null
-            if (p !== null && (p.list === "titles" || p.list === "keys" || p.list === "standalone")) {
-                const surface = (await BoardState.toggleFlag("web", p.list)).web
-                emit("surface", surface)
-                return h.response(surface)
-            }
-            if (p === null || (p.list !== "minimized" && p.list !== "collapsed")
-                || !(typeof p.entry === "string" || (Array.isArray(p.entry) && p.entry.every((e) => typeof e === "string"))))
-                return h.response({ error: "invalid toggle request" }).code(400)
-
-            /*  accept only lanes or groups of the current board layout  */
-            const board   = await currentBoard(log)
-            const names   = p.list === "minimized" ?
-                board.groups.flatMap((g) => g.lanes.map((l) => l.status)) :
-                board.groups.map((g) => g.title)
-            const entries = p.entry as string | string[]
-            const unknown = (Array.isArray(entries) ? entries : [ entries ]).find((e) => !names.includes(e))
-            if (unknown !== undefined)
-                return h.response({ error: `unknown ${p.list === "minimized" ? "lane" : "group"} "${unknown}"` }).code(400)
-            const surface = (await BoardState.toggle("web", p.list, entries)).web
-
-            /*  push the shared surface state into all open web boards  */
-            emit("surface", surface)
-            return h.response(surface)
-        })
-    })
-
-    /*  set (resp. with null reset) the height weights of lanes of the web surface  */
-    server.route({
-        method:  "POST",
-        path:    "/task-board/api/height",
-        options: { payload: { parse: true, allow: "application/json" } },
-        handler: guarded(async (request, h) => {
-            const p = request.payload as { heights?: unknown } | null
-            if (p === null || typeof p.heights !== "object" || p.heights === null || Array.isArray(p.heights)
-                || !Object.values(p.heights).every((w) => w === null || (typeof w === "number" && Number.isFinite(w) && w > 0)))
-                return h.response({ error: "invalid height request" }).code(400)
-
-            /*  accept only lanes of the current board layout  */
-            const board   = await currentBoard(log)
-            const names   = board.groups.flatMap((g) => g.lanes.map((l) => l.status))
-            const entries = p.heights as Record<string, number | null>
-            const unknown = Object.keys(entries).find((e) => !names.includes(e))
-            if (unknown !== undefined)
-                return h.response({ error: `unknown lane "${unknown}"` }).code(400)
-            const surface = (await BoardState.setHeights("web", entries)).web
-            emit("surface", surface)
-            return h.response(surface)
-        })
-    })
-
+/*  register the stream routes of the web board: keep-alive and change events (the surface
+    state of the web board is kept per browser by the client, and hence not by the service)  */
+const registerStreamRoutes = (server: Hapi.Server, log: Log): void => {
     /*  keep-alive of the service while a board page is open  */
     server.route({
         method:  "GET",
@@ -970,6 +897,6 @@ export const registerBoardRoutes = (server: Hapi.Server, log: Log): void => {
     registerPageRoutes(server, log)
     registerViewRoutes(server, log)
     registerUpdateRoutes(server, log)
-    registerSurfaceRoutes(server, log)
+    registerStreamRoutes(server, log)
 }
 
