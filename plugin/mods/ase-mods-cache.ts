@@ -433,6 +433,9 @@ export const modCacheControl = () => {
             if (S.softPings > 0)
                 lines.push(Text({ children: `⛁ cache: soft auto-warm: already extended by ` +
                     `${S.softPings}/${settings.soft} pings` }))
+            else if (S.ctx < settings.threshold)
+                lines.push(Text({ children: `⛁ cache: soft auto-warm: skipped, as below ` +
+                    `threshold of ${tokens(settings.threshold)} tokens` }))
         }
         const band = panel(ui, { ...layout(e, 0), body: lines.length, overflow: false },
             { top: 0, scroll: 0, page: 1, split: 0 },
