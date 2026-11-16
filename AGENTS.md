@@ -17,6 +17,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 **ASE** ships three deliverables from one repository:
 
 -   `plugin/`: the agent tool plugin
+
     -   `plugin/skills/ase-xxx-xxx/`: the 61 skills, each with a `SKILL.md`
         (agent instructions) and a `help.md` (Unix-style manual page), plus
         optional skill-specific files (like `ase-help-intent/data.md`, the
@@ -29,7 +30,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         interplay), so consult the `SKILL.md` and its referenced files for
         the latter and never add implementation details to the `help.md`
         files
+
     -   `plugin/agents/`: the sub-agent definitions leveraged by the skills
+
     -   `plugin/meta/`: the shared meta files, exposed to skills via
         `ase util meta <name>`: the constitution, tenets, persona, dialog,
         control flow, getopt, and skill output conventions
@@ -40,9 +43,12 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         models and formats description `ase-format-specbook.md` and the
         standard SpecBook schema configuration `ase-format-specbook.yaml`,
         both generated at build-time by *SpecBook* (`@rse/specbook`)
+
     -   `plugin/hooks/`: the per-agent-tool hook wiring
         (`hooks.json`, `hooks-copilot.json`, `hooks-codex.json`)
+
     -   `plugin/output-styles/`: the output style `ase-terse`
+
     -   `plugin/mods/`: the Claude Code function hooks module ("mod"),
         type-checked against the downloaded `claude-code.d.ts`:
         `ase-mods.ts` for the hooking infrastructure (the only module
@@ -110,20 +116,26 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         tables of a reply, which Claude Code draws vertically for a too narrow
         terminal, redrawn as records with aligned keys and hanging-indented
         values, while the grid tables stay the ones of Claude Code)
+
     -   `plugin/.claude-plugin/`, `plugin/.codex-plugin/`,
         `plugin/.github/plugin/`: the per-agent-tool plugin manifests
+
 -   `tool/`: the `@rse/ase` CLI
+
     -   `tool/src/ase.ts`: the entry point, wiring all top-level commands
+
     -   `tool/src/ase-<command>.ts`: one module per CLI command resp.
         command group: `setup`, `config`, `alias`, `service`, `mcp`, `hook`,
         `statusline`, `task`, `task-board`, `agent`, `artifact`, `spec`,
         `man`, `util`, and
         `util-{meta,diagram,worktree,mint,metric,rasterize,compat}`
+
     -   `tool/src/ase-alias-core.ts`: the skill command aliases of
         `ase alias` (loading, merging, and modifying the alias files of
         the user and the project, resolving the full aliases, and
         synchronizing their shim skills), applied by the option parser
         `service-getopt` and the session start hook
+
     -   `tool/src/ase-lib-*.ts`: the generic library modules (`lib-log`,
         `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`, `lib-hash`,
         `lib-color` for the confining of the SVG colors to a palette,
@@ -132,41 +144,50 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         background processes (servers, agents, and the agent fleet), and
         `lib-server-cli` and `lib-server-bind` for the CLI commands and the
         HTTP binding of the task store and agent relay servers)
+
     -   `tool/src/ase-setup-*.ts`: the parts of `ase setup`
         (`setup-common` for the shared types and sub-process runner,
         `setup-mcp` for the MCP server registry, and `setup-settings` for
         the statusline and output style settings)
+
     -   `tool/src/ase-man-*.ts`: the parts of `ase man` (`man-catalog`
         for the catalog of the manual pages of all commands and skills,
         `man-render` for their Markdown rendering, including the Shiki
         syntax highlighting of the code blocks, and `man-tui` for the
         interactive, full-screen manual page browser)
+
     -   `tool/src/ase-config-*.ts`: the parts of `ase config`
         (`config-scope` for the scope chain and directory resolution,
         `config-schema` for the schema, presets, write policies, and key
         descriptions, `config-core` for the layered `Config` class and the
         internal session state, and `config-tui` for the interactive,
         full-screen configuration editor of `ase config edit`)
+
     -   `tool/src/ase-service-*.ts`: the MCP-only tool modules of the
         service (`service-{kv,getopt,markdown,skills,sleep,state,timestamp,diff}`)
         and its AI usage accounting (`service-otel` for the OTLP ingress,
         the usage windows of the task assignments, and their bookings onto
         the usage attachments of the tasks)
+
     -   `tool/src/ase-spec-worker.ts`: the worker thread entry point, running
         the SpecBook lint and export of the MCP tools `ase_specbook_{lint,export}`
         off the event loop of the service
+
     -   `tool/src/ase-util-rasterize-worker.ts`: the persistent worker thread
         entry point, running the rasterizing of the MCP tool `ase_rasterize`
         off the event loop of the service
+
     -   `tool/src/ase-task-*.ts`: the task functionality, where `ase-task.ts`
         itself only forwards the `ase task` CLI and `ase_task_*` MCP tools to
         the task store selected by `project.task.store.url`, through the
         local or remote task store clients of `task-store-client`
         (see `docs/task-api.md`):
+
         -   `task-format` for the textual task format codec and the
             lifecycle models, and `task-request` for the codec of the agent
             requests attached to tasks, like the edit requests of the task
             boards
+
         -   the task store: `task-store-server-cli` for the `ase task store`
             CLI wrapper, `task-store-core` for the transport-agnostic REST
             API functionality, `task-store-server-bind` for its HTTP and
@@ -176,6 +197,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             plugins `task-store-plugin-{ase,github,gitlab,gitea}` (file-based
             resp. GitHub, GitLab, and Gitea Issues), and `task-store-issues`
             for the common parts of all issue tracker storage plugins
+
         -   the task board: `task-board` for the `ase task board` CLI
             command, `task-board-{core,graph,flow,filter,stats,diff}` for its
             model (where `flow` is the agent graph along the lifecycle model,
@@ -189,7 +211,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             (shared state and service access, task plan editor, and
             actions and key dispatching) and the components
             `task-board-web-client-{lanes,graph,flow,agents,stats,dialog,popup,title}`
+
     -   `tool/src/ase-agent-*.ts`: the parts of `ase agent`:
+
         -   `agent-runtime` for the runtime base of all agents,
             `agent-runtime-tool` for the headless agent tool invocation
             and the decoding of its output, `agent-runtime-exec` for the
@@ -200,6 +224,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             engine running every agent of a definition (its phase and
             request agents) and its facades: the built-in agents, the agents
             of the definition kinds, and the `adhoc` agent
+
         -   `agent-definition-api` for the public, self-contained types of
             the agent definitions and their hooks (exported as the types of
             the `@rse/ase` package), `agent-definition-core` for the
@@ -211,10 +236,12 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             `{rebooter,condenser,griller,implementer,qualifier,integrator,editor,estimator,researcher}.ts`
             for the declarative definitions of the modes of the built-in
             agents
+
         -   `agent-process` for the `ase agent <kind> start|status|log|stop`
             commands of a single agent, and `agent-fleet` for the
             `ase agent fleet` supervisor of multiple agents and the agent
             relay
+
         -   the agent relay, selected by `project.relay.url` and passing the
             live presence of the agents to the task boards:
             `agent-relay-server-cli` for the `ase agent relay` CLI wrapper,
@@ -223,7 +250,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             binding (mountable into the task store server), and
             `agent-relay-client` for the relay URL resolution, the client,
             and the presence reporter of the agents
+
     -   `tool/bin/ase`: the published shim, loading compiled output from `dst/`
+
     -   `tool/man/ase{,-xxx{,-yyy}}.md`: the Unix manual pages of all CLI
         commands (one per command and command group, where the pages of a
         group with third-level commands like `ase task store` cover them),
@@ -234,18 +263,24 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `tool/src/` (modules, classes, functions, types, and their
         interplay), so consult the source code for the latter and never
         add implementation details to the manual pages
+
     -   `tool/plugin/` and `tool/.claude-plugin/`: build-time copies of
         `plugin/` and `.claude-plugin/` -- never edit them, they are regenerated
+
 -   `pages/`: the GitHub Pages site (https://ase.tools), an *Astro* project
+
     -   `pages/src/pages/`: the pages of the site (`index.astro`, `author`,
         `design`, `highlights`, `news`, `project`, `setup`, `usage`,
         `workflows`, `typing-demo`, and `usecases/[usecase]`), all based on
         `pages/src/layouts/BaseLayout.astro`
+
     -   `pages/src/components/*.astro`: the page sections (`Section-*`),
         modals (`Modal-*`), widgets (`Widget-*`), and client-side features
         (`Feature-*`)
+
     -   `pages/src/styles/theme.css`: the global stylesheet (Tailwind CSS,
         fonts, and theme) of the site
+
     -   `pages/src/data/*.ts`: the content data, especially `skills.ts` (the
         single source of truth for skill grouping and ordering, mirrored by
         the skill groups of `tool/src/ase-man-catalog.ts`, so keep both in
@@ -362,35 +397,47 @@ Beyond `ase setup`, the CLI provides:
     configuration, where `ASE_CONFIG_DIR` and `ASE_STATE_DIR` relocate the per-user
     directories and the read-only `override` scope of `$ASE_CONFIG_DIR/override.yaml`
     exists only with `ASE_CONFIG_DIR` set
+
 -   `ase alias`: the skill command aliases of the user and the project:
     full aliases (provided as generated shim skills), option aliases, and
     option defaults of the skills, applied by the option parser `ase_getopt`
     (which also accepts the negation `--no-x` of every option `--x`)
+
 -   `ase service`: the per-project background HTTP service
+
 -   `ase mcp`: the stdio-to-service MCP bridge
+
 -   `ase hook`: the agent tool hook handlers
+
 -   `ase statusline`: the statusline renderer
+
 -   `ase task`: the persisted task plans, including `ase task board` for
     the interactive task board in terminal and browser, and `ase task
     store` for the task store server
+
 -   `ase agent`: the autonomous agents, each running in its own process,
     managed individually via `ase agent <kind> start|status|log|stop`
     (e.g. `ase agent implementer start -p 2`):
+
     -   the task lifecycle agents `implementer`, `qualifier`, and
         `integrator`, which together drive the `enterprise` task lifecycle
         model headless from the planned to the integrated tasks
+
     -   the planning agents `rebooter`, `condenser`, and `griller`, which
         re-create, condense, resp. grill (via `ase-task-grill --ground
         --auto`) the plans of the `DRAFTED` tasks of the `enterprise`
         lifecycle model explicitly assigned to them
         (`DRAFTED` > `PLANNING` > `DRAFTED`, unassigned afterwards)
+
     -   the `editor` agent, which processes the prompt-driven edit requests
         of the task boards in any lifecycle model
+
     -   the `estimator` agent, which estimates the effort (the `Effort:`
         key) of the tasks without a valid one in any lifecycle model
         (mode `phase`, intended for the final estimation), resp. of the
         tasks of the `estimate` requests of the task boards in any
         unfinished status (mode `request`, intended for dry-runs)
+
     -   the `researcher` agent, which researches the plans of the `DRAFTED`
         tasks of the `enterprise` lifecycle model explicitly assigned to
         it (mode `phase`, intended for researching and grounding the plan
@@ -399,6 +446,7 @@ Beyond `ase setup`, the CLI provides:
         topic-driven research), appending a research report (Web research
         plus source artifact grounding) to the `research` attachment of
         the tasks and refining their plans
+
     -   the agents of the definition kinds, whose entire behavior is
         configured by a definition file `<kind>.{yaml,yml,ts,mts,js,mjs,cjs}`
         of the project (`.ase/agents/`) or of the user (`agents/` of the
@@ -407,17 +455,23 @@ Beyond `ase setup`, the CLI provides:
         agent (with example definitions in `tool/man/ase-agent-adhoc.md`); the
         built-in agents are themselves declarative definitions run by the
         same agent engine
+
     -   `ase agent relay`: the per-user agent relay server, passing the
         live presence of the agents to the task boards
+
     -   `ase agent fleet start|status|log|stop`: a fleet of agents (and of
         the relay) of a YAML configuration (initially created via `ase
         agent fleet init`), run through a supervising process, restarting
         every exited member with an exponential backoff
+
 -   `ase artifact`: the artifact kind resolution
+
 -   `ase spec`: the SpecBook specification initializing, linting, exporting,
     and previewing, and the searching of shareable SpecBook schema configurations
+
 -   `ase man`: the interactive browser of the manual pages of `tool/man/`
     and of the skills shipped with the tool (plain text outside a terminal)
+
 -   `ase util`: the utility commands `ase util meta` (plugin meta file
     output), `ase util diagram` (Mermaid rendering), `ase util worktree`
     (ASE worktree path resolution), `ase util mint` (hash-derived
