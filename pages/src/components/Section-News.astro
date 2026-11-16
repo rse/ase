@@ -6,24 +6,46 @@
 */
 
 /*  "News" section: the releases of the top-level `NEWS.md`, each with its
-    optional USP rows, and its features and its incompatibilities as identical
+    optional highlights and USP rows, and its features and its incompatibilities as identical
     three-column grids of plates, where only the warning icon of the heading
     marks the latter. The plates are left-aligned, as justifying their many
     code chips leaves gaps.  */
 
-import Sparkles           from "@lucide/astro/icons/sparkles"
-import TriangleAlert      from "@lucide/astro/icons/triangle-exclamation-point"
-import GlowSide           from "./Widget-Glow-Side.astro"
-import Annotation         from "./Widget-Annotation.astro"
-import USPRow             from "./Widget-USP-Row.astro"
-import { site }           from "../data/site.ts"
-import { newsReleases }   from "../data/news.ts"
-import { usps, type USP } from "../data/usps.ts"
+import type { AstroComponent }            from "@lucide/astro"
+import Sparkles                            from "@lucide/astro/icons/sparkles"
+import TriangleAlert                       from "@lucide/astro/icons/triangle-exclamation-point"
+import MessageCircleQuestion               from "@lucide/astro/icons/message-circle-question-mark"
+import SlidersHorizontal                   from "@lucide/astro/icons/sliders-horizontal"
+import GlowSide                            from "./Widget-Glow-Side.astro"
+import Annotation                          from "./Widget-Annotation.astro"
+import USPRow                              from "./Widget-USP-Row.astro"
+import { site }                            from "../data/site.ts"
+import { newsReleases, type NewsHighlight } from "../data/news.ts"
+import { usps, type USP }                  from "../data/usps.ts"
 
 /*  the USPs showcased between the introduction and the sections of a release  */
 const releaseUSPs: Record<string, USP[]> = {
     "ase-2.0": usps.slice(0, 4)
 }
+
+/*  the icons of the highlights of the releases (default: sparkles)  */
+const highlightIcons: Record<string, AstroComponent> = {
+    "ase-2.1-smarter-grilling":     MessageCircleQuestion,
+    "ase-2.1-configuration-editor": SlidersHorizontal
+}
+
+/*  turn a highlight of a release into a USP row  */
+const highlightUSP = (highlight: NewsHighlight): USP => ({
+    id:       highlight.id,
+    icon:     highlightIcons[highlight.id] ?? Sparkles,
+    eyebrow:  highlight.eyebrow,
+    title:    highlight.title,
+    body:     highlight.body,
+    prefix:   highlight.commands.some((cmd) => cmd.startsWith("**/")) ? "Claude Code" : "Shell",
+    commands: highlight.commands,
+    cols:     1,
+    shots:    highlight.shots
+})
 ---
 <section id="news" class="mt-4 sm:mt-12 relative isolate mx-auto max-w-4xl px-6 py-8">
     <GlowSide variant="section" side="right" />
@@ -55,9 +77,10 @@ const releaseUSPs: Record<string, USP[]> = {
                     ))}
                 </div> :
                 null}
-            {(releaseUSPs[release.id] ?? []).length > 0 ?
+            {(releaseUSPs[release.id] ?? []).length + release.highlights.length > 0 ?
                 <div class="mt-12 flex flex-col gap-16">
-                    {releaseUSPs[release.id].map((usp, index) => <USPRow usp={usp} index={index}/>)}
+                    {[ ...release.highlights.map(highlightUSP), ...(releaseUSPs[release.id] ?? []) ]
+                        .map((usp, index) => <USPRow usp={usp} index={index}/>)}
                 </div> :
                 null}
             {release.sections.map((section) => (

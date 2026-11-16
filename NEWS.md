@@ -7,14 +7,9 @@ ASE 2.0 to ASE 2.1
 
 *ASE 2.1 sharpens the planning and improves the daily work with the agent tool!*
 
-The **grilling** became considerably smarter: every grilling table recommends the answer judged
-best with a `★`, reveals details and rationales of questions and answers in hover cards, can run
-fully automatically by picking all recommendations, and selects the approach as its own round.
-A new **griller agent** grills the plans of the drafted tasks headless.
-
-The new **configuration editor** `ase config edit` shows and edits all configuration keys across
-all scopes in a terminal UI. The **task boards** now keep their display state per user resp. per
-browser, and allow you to resize their lanes.
+The **grilling** became considerably smarter, by recommending the best answers and grilling even
+fully automatically, and the new **configuration editor** `ase config edit` browses and edits the
+entire configuration in a terminal UI (see the highlights below).
 
 Task plans can now be **grounded** in the project artifacts and the Internet/Web already while
 editing them, and a new skill reverse-engineers any **change set** (staged changes, a branch, or a
@@ -25,8 +20,40 @@ idle caches are kept warm automatically, and you are asked before a prompt is se
 cache. Markdown **tables**, which Claude Code draws vertically in too narrow terminals, are now
 redrawn as readable records.
 
-Finally, agent fleets can be isolated through their own per-user directories, configuration scope,
-and working copies.
+The **task boards** now keep their display state per user resp. per browser, and allow you to
+resize their lanes. Finally, agent fleets can be isolated through their own per-user directories,
+configuration scope, and working copies.
+
+#### Smarter Grilling: Get the best answers recommended and grill fully automatically
+
+The **grilling** became considerably smarter: every grilling table recommends the answer judged
+best with a `★`, besides the current decision `⚑`. Hovering over a question resp. an answer
+reveals its details and the rationale of the recommendation in a card.
+
+The grilling can also run fully automatically by picking all recommendations, show the cumulative
+change of the plan as a diff, and select the approach as its own round. A new **griller agent**
+even grills the plans of the drafted tasks headless.
+
+```text
+/ase-code-edit --grill --ground new "ase hello" CLI command which prints "Hello World" in red
+```
+
+![Grilling table: answer rationale](pages/public/assets/screenshot-grilling-2.png)
+
+#### Configuration Editor: Browse and edit the entire configuration in a terminal UI
+
+The new **configuration editor** shows all configuration keys of **ASE** across all scopes in a
+full-screen terminal UI: the *parameter view* lists all keys with their effective values and the
+scopes supplying them, while the *scope view* shows the configuration of each scope as a tree.
+
+Every key is explained in an information box, a legend explains the styles of the keys and values,
+and edited values are stored immediately on any writable scope.
+
+```text
+ase config edit
+```
+
+![Configuration editor: scope view](pages/public/assets/screenshot-config-edit-1.png)
 
 ### FEATURES
 

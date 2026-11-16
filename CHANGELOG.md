@@ -5,6 +5,11 @@ ChangeLog
 2.1.0 (2026-11-16)
 ------------------
 
+-   IMPROVEMENT [pages, docs]: ASE 2.1 News Highlights
+    The ASE 2.1 section of `NEWS.md` got `####` highlight sub-sections (text, commands, and
+    screenshots) for the grilling and the configuration editor, rendered on the News page as
+    USP rows, like the ASE 2.0 section.
+
 -   FEATURE [code, plugin, docs]: Merged Concurrent Task Plan Changes
     A conditional task plan save hit by a concurrent change now merges both changes part-wise
     (header keys, `##` body sections, attachments) and fails only on overlapping parts, while
