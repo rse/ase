@@ -92,27 +92,35 @@ Do not output anything else.
     no `Effort:` frontmatter key without <hash/> (a bare size like
     `Effort: M`, which the task store stamped or dropped on that save,
     see the plan format)
+    *and* the `text` *output* of that call carries a `<task-plan-tag>`
+    delimiter line, but no `NOTICE:` line about a merged change
 ">
     Set <text/> to the `text` *argument* of the most recent
     `ase_task_save(id: '<ase-task-id/>', ...)` tool call -- this is
     the *authoring form* of the plan and *MUST NOT* be confused
     with the `text` *output* field of that call -- *without*
-    calling `ase_task_load` again. Set <status>plan
+    calling `ase_task_load` again, and set <task-tag/> to the content
+    enclosed in the `<task-plan-tag>` delimiter line of the `text`
+    *output* field of that call. Set <status>plan
     reused</status>. Do not output anything.
 </if>
 <else>
-    Call the `ase_task_load(id: "<ase-task-id/>")` tool of the
+    Call the `ase_task_load(id: "<ase-task-id/>", tag: true)` tool of the
     `ase` MCP server to load the current task plan content in its
     *authoring form* -- the `variant` argument defaults to `source`
     -- with the payloads of all attachments *elided* to `[elided: <n/>
     lines]` markers -- the `attachments` argument defaults to `elided`
-    -- and set <text/> to the `text` output field of this
-    `ase_task_load` tool call. Do not output anything related to
+    -- and set <task-tag/> to the content enclosed in its trailing
+    `<task-plan-tag>` delimiter line (the entity tag of the loaded plan,
+    or empty if there is no such line) and <text/> to the `text` output
+    field of this `ase_task_load` tool call *without* this delimiter
+    line. Do not output anything related to
     this MCP tool call. Set <status>plan loaded</status>.
 </else>
 
 -   If <text/> starts with `ERROR:` or `WARNING:`:
-    Set <task-content></task-content> (set task content to empty).
+    Set <task-content></task-content> (set task content to empty)
+    and <task-tag></task-tag> (set task tag to empty).
 
 -   If <text/> does NOT start with `ERROR:` and NOT with `WARNING:`:
     Set <task-content><text/></task-content> (set task content to text).
@@ -212,10 +220,17 @@ refreshed <timestamp-modified/> into the frontmatter keys `Id:`,
 
 Call the `ase_task_save(id: "<ase-task-id/>", text:
 "<task-content/>", tag: true)` tool of the `ase` MCP server to save the task
-plan content in its *authoring form* -- the `tag: true` makes
+plan content in its *authoring form* -- if <task-tag/> is not empty,
+additionally with the argument `base: "<task-tag/>"`, so a change of
+the plan made meanwhile by anybody else is merged instead of silently
+overwritten (and if <task-tag/> is empty, without it, so the save is
+refused if the plan was created meanwhile by anybody else) -- the `tag: true` makes
 its output carry the `<task-plan-tag>` delimiter line, which
 lets a subsequent `ase-task-edit --int-reuse-task` reuse the
-just-saved plan instead of loading it again. This `ase_task_save` MCP
+just-saved plan instead of loading it again. Set <task-tag/> to the
+content enclosed in this `<task-plan-tag>` delimiter line. If the save
+is refused because the plan was changed meanwhile and cannot be merged,
+output the error message and stop the skill. This `ase_task_save` MCP
 tool call is the *only* permitted way to persist the task plan --
 you *MUST* *NEVER* write the plan file via `Write`/`Edit` or by
 executing a shell command. Do not output anything

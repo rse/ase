@@ -738,6 +738,149 @@ export const keepUsage = (plan: API.TaskPlan, stored: API.TaskPlan): API.TaskPla
     return { ...plan, attachment: [ ...attachment, ...kept ] }
 }
 
+/*  the three-way merge of a single value (undefined meaning absent): the value
+    of the side which changed it against the base, or null if both changed it differently  */
+const merge3 = <T>(base: T | undefined, ours: T | undefined, theirs: T | undefined): { value: T | undefined } | null => {
+    const same = (a: T | undefined, b: T | undefined): boolean => JSON.stringify(a) === JSON.stringify(b)
+    if (same(ours, base) || same(ours, theirs))
+        return { value: theirs }
+    else if (same(theirs, base))
+        return { value: ours }
+    return null
+}
+
+/*  split a body into its sections at the "##" heading lines outside of fenced
+    code blocks (the leading part, with the title, under the empty key, and every
+    further section under its heading line), without their trailing empty lines;
+    returns null on a duplicate heading line  */
+const bodySections = (body: string): Map<string, string> | null => {
+    const sections = new Map<string, string>()
+    let key   = ""
+    let lines: string[] = []
+    let fence = ""
+    const flush = (): boolean => {
+        if (sections.has(key))
+            return false
+        sections.set(key, lines.join("\n").replace(/\n+$/, ""))
+        return true
+    }
+    for (const line of body.split("\n")) {
+        fence = fenceTrack(fence, line)
+        if (fence === "" && /^##[ \t]/.test(line)) {
+            if (!flush())
+                return null
+            key   = line.trimEnd()
+            lines = []
+        }
+        lines.push(line)
+    }
+    return flush() ? sections : null
+}
+
+/*  merge the change of a task plan ("ours") and a concurrent change of it ("theirs"),
+    both based on the same plan ("base"), part-wise: per header key (the later "Modified"
+    timestamp winning), per body section (see bodySections), and per attachment (as a
+    multiset of identical attachments, where the usage attachments are the ones of
+    "theirs"); returns the merged plan, or the parts both sides changed differently  */
+export type TaskMerge = { plan: API.TaskPlan | null, conflicts: string[] }
+export const mergeTaskPlans = (base: API.TaskPlan, ours: API.TaskPlan, theirs: API.TaskPlan): TaskMerge => {
+    const conflicts: string[] = []
+
+    /*  merge the header keys  */
+    const header: API.TaskHeader = {}
+    for (const key of new Set([ ...Object.keys(ours.header), ...Object.keys(theirs.header), ...Object.keys(base.header) ])) {
+        const [ b, o, t ] = [ base.header[key], ours.header[key], theirs.header[key] ]
+        let merged = merge3(b, o, t)
+        if (merged === null && key === "Modified" && typeof o === "string" && typeof t === "string")
+            merged = { value: o > t ? o : t }
+        if (merged === null)
+            conflicts.push(`header key "${key}"`)
+        else if (merged.value !== undefined)
+            header[key] = merged.value
+    }
+
+    /*  merge the body as a whole, else section-wise in the section order of
+        "ours", with the sections added by "theirs" behind their predecessor  */
+    let body = merge3(base.body, ours.body, theirs.body)?.value
+    if (body === undefined) {
+        const [ sb, so, st ] = [ bodySections(base.body), bodySections(ours.body), bodySections(theirs.body) ]
+        if (sb === null || so === null || st === null)
+            conflicts.push("body (duplicate section headings)")
+        else {
+            const order = [ ...so.keys() ]
+            const added = [ ...st.keys() ]
+            for (let i = 0; i < added.length; i++) {
+                if (order.includes(added[i]))
+                    continue
+                const prev = added.slice(0, i).findLast((key) => order.includes(key))
+                order.splice(prev !== undefined ? order.indexOf(prev) + 1 : 0, 0, added[i])
+            }
+            const sections: string[] = []
+            for (const key of order) {
+                const merged = merge3(sb.get(key), so.get(key), st.get(key))
+                if (merged === null)
+                    conflicts.push(key === "" ? "body preamble" : `body section "${key}"`)
+                else if (merged.value !== undefined && merged.value !== "")
+                    sections.push(merged.value)
+            }
+            body = sections.length > 0 ? `${sections.join("\n\n")}\n` : ""
+        }
+    }
+
+    /*  an "Effort" key changed by "ours" is an estimation of its body, so it
+        conflicts with a body changed by "theirs" (one of "theirs" is dropped
+        on saving anyway, as its content hash then mismatches, see bindEffort)  */
+    if (body !== undefined && body !== ours.body && header.Effort !== undefined
+        && JSON.stringify(ours.header.Effort) !== JSON.stringify(base.header.Effort)
+        && JSON.stringify(header.Effort) === JSON.stringify(ours.header.Effort))
+        conflicts.push("header key \"Effort\" (estimated on a concurrently changed body)")
+
+    /*  merge the attachments as multisets (counting identical attachments), where a
+        concurrently replaced attachment, i.e., one removed by both sides, which both
+        added an attachment of its type, is a conflict, too  */
+    const sig    = (att: API.TaskAttachment): string =>
+        JSON.stringify(Object.keys(att).sort().map((key) => [ key, att[key] ]))
+    const counts = (plan: API.TaskPlan): Map<string, number> => {
+        const map = new Map<string, number>()
+        for (const att of plan.attachment.filter((att) => !isUsage(att)))
+            map.set(sig(att), (map.get(sig(att)) ?? 0) + 1)
+        return map
+    }
+    const [ cb, co, ct ] = [ counts(base), counts(ours), counts(theirs) ]
+    const remain = new Map<string, number>()
+    const typeOf = new Map<string, string>()
+    for (const att of [ ...base.attachment, ...ours.attachment, ...theirs.attachment ])
+        typeOf.set(sig(att), att.Type ?? "")
+    for (const key of new Set([ ...cb.keys(), ...co.keys(), ...ct.keys() ])) {
+        const merged = merge3(cb.get(key) ?? 0, co.get(key) ?? 0, ct.get(key) ?? 0)
+        if (merged === null)
+            conflicts.push(`attachment of type "${typeOf.get(key)}"`)
+        else
+            remain.set(key, merged.value ?? 0)
+    }
+    const addedBy = (side: Map<string, number>, type: string): boolean =>
+        [ ...side.keys() ].some((key) => typeOf.get(key) === type && (side.get(key) ?? 0) > (cb.get(key) ?? 0))
+    for (const [ key, n ] of cb) {
+        const type = typeOf.get(key) ?? ""
+        if ((co.get(key) ?? 0) < n && (ct.get(key) ?? 0) < n && addedBy(co, type) && addedBy(ct, type)
+            && !conflicts.includes(`attachment of type "${type}"`))
+            conflicts.push(`attachment of type "${type}"`)
+    }
+    const attachment: API.TaskAttachment[] = []
+    for (const att of [ ...theirs.attachment, ...ours.attachment.filter((att) => !isUsage(att)) ]) {
+        if (isUsage(att)) {
+            attachment.push(att)
+            continue
+        }
+        const n = remain.get(sig(att)) ?? 0
+        if (n > 0) {
+            attachment.push(att)
+            remain.set(sig(att), n - 1)
+        }
+    }
+    return { plan: conflicts.length === 0 ? { header, body: body ?? "", attachment } : null, conflicts }
+}
+
 /*  the amounts of the AI usage accounting of a task, as "<group>.<field>" of the YAML data of
     its usage attachment: the AI request time, the human time, and the real (wall-clock) time
     (in minutes), the cache read, cache write, (uncached) input, and output tokens, and the AI

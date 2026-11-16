@@ -77,7 +77,7 @@ export const loadTaskStoragePlugin = async (name: string | null, ctx: API.TaskSt
     for (const method of pluginMethods)
         if (typeof plugin[method] !== "function")
             throw new Error(`task store: storage plugin "${name}" lacks the "${method}" method`)
-    for (const method of [ "lock", "fileRead", "watch", "projectMark" ] as const)
+    for (const method of [ "lock", "fileRead", "watch", "projectMark", "taskRevision" ] as const)
         if (plugin[method] !== undefined && typeof plugin[method] !== "function")
             throw new Error(`task store: storage plugin "${name}" provides a non-function "${method}" property`)
     return plugin
@@ -137,9 +137,18 @@ export class TaskStore {
     /*  delegate the task plan operations  */
     taskList   (prjId: string):                                     Promise<API.TaskEntry[]>     { return this.plugin.taskList(prjId)                 }
     taskLoad   (prjId: string, taskId: string):                     Promise<API.TaskPlan | null> { return this.plugin.taskLoad(prjId, taskId)         }
-    taskSave   (prjId: string, taskId: string, plan: API.TaskPlan): Promise<API.WriteResult>     { return this.plugin.taskSave(prjId, taskId, plan)   }
     taskDelete (prjId: string, taskId: string):                     Promise<boolean>             { return this.plugin.taskDelete(prjId, taskId)       }
     taskRename (prjId: string, oldId: string, newId: string):       Promise<boolean>             { return this.plugin.taskRename(prjId, oldId, newId) }
+
+    /*  delegate the optional revision determination (undefined if unsupported), and the
+        save, conditional on a revision only if the plugin determines revisions at all  */
+    taskRevision (prjId: string, taskId: string): Promise<string | null | undefined> {
+        return this.plugin.taskRevision !== undefined ? this.plugin.taskRevision(prjId, taskId) : Promise.resolve(undefined)
+    }
+    taskSave (prjId: string, taskId: string, plan: API.TaskPlan, revision?: string | null): Promise<API.TaskWriteResult> {
+        return this.plugin.taskRevision !== undefined && typeof revision === "string" ?
+            this.plugin.taskSave(prjId, taskId, plan, revision) : this.plugin.taskSave(prjId, taskId, plan)
+    }
 
     /*  delegate the optional observation of changes made outside of the plugin (a no-op if unsupported)  */
     watch (listener: (prjId: string, change: API.TaskChange) => void): void {

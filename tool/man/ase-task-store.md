@@ -285,6 +285,13 @@ the issue state, assignees, labels, and dependencies, as detailed in
 server) for the `github:`, `gitlab:`, and `gitea+http[s]:` forms of
 `project.task.store.url` (see `ase-task`(1)).
 
+As issue trackers provide no locks and no conditional writes, these
+plugins detect a concurrent change of an issue only through its update
+time, checked right before a save modifies anything. This narrows, but
+cannot close, the window for a lost update. Hence let only a *single*
+task store server serve a repository, and let all clients access it
+through this server instead of in-process.
+
 ## ENVIRONMENT
 
 - `ASE_TASK_STORE_TOKEN`:

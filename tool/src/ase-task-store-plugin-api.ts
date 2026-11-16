@@ -44,6 +44,10 @@ export type TaskEntry = {
     newly created or an existing one updated  */
 export type WriteResult = "created" | "updated"
 
+/*  the outcome of a task plan write: additionally "changed" if a revision
+    was expected (see "taskRevision"), but the task plan no longer carries it  */
+export type TaskWriteResult = WriteResult | "changed"
+
 /*  the task plans of a project changed outside of the plugin instance
     (e.g. by another client of a remote storage), as detected by the plugin itself  */
 export type TaskChange = {
@@ -113,9 +117,17 @@ export interface TaskStoragePlugin {
     /*  load a task plan, or null if it does not exist  */
     taskLoad (prjId: string, taskId: string): Promise<TaskPlan | null>
 
-    /*  create or overwrite a task plan with the given (already
-        validated) structure and refresh its modification time  */
-    taskSave (prjId: string, taskId: string, plan: TaskPlan): Promise<WriteResult>
+    /*  optionally determine the current revision of a task plan (an opaque token,
+        changing on every change of the plan, also one made outside of the plugin
+        instance), or null if it does not exist, so a storage without locks and
+        conditional writes (e.g. an issue tracker) can detect concurrent changes  */
+    taskRevision? (prjId: string, taskId: string): Promise<string | null>
+
+    /*  create or overwrite a task plan with the given (already validated)
+        structure and refresh its modification time, where with a revision
+        (passed only if "taskRevision" is provided) it returns "changed" instead,
+        without any modification, if the plan no longer carries this revision  */
+    taskSave (prjId: string, taskId: string, plan: TaskPlan, revision?: string): Promise<TaskWriteResult>
 
     /*  delete a task plan; returns false if it did not exist  */
     taskDelete (prjId: string, taskId: string): Promise<boolean>

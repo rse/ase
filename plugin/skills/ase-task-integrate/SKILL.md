@@ -391,8 +391,11 @@ Procedure
         of the user counts as the qualification) -- and persist this
         frontmatter-only change -- without refreshing the `Modified:` key
         -- by calling the `ase_task_save(id: "<ase-task-id/>", text:
-        "<task-content/>")` tool of the `ase` MCP server. Do not output
-        anything.
+        "<task-content/>", base: "<task-tag/>")` tool of the `ase` MCP
+        server, so a change made meanwhile is merged instead of
+        overwritten, and set <task-tag/> to the content enclosed in the
+        `<task-plan-tag>` delimiter line of its `text` output field. Do
+        not output anything.
         </if>
 
     2.  Capture the outputs of the commands
@@ -471,8 +474,9 @@ Procedure
         loaded -- in particular, a *change set snapshot*, which is
         maintained by the `ase agent` agents only, is passed through
         *verbatim*. To persist the plan, call the `ase_task_save(id:
-        "<ase-task-id/>", text: "<task-content/>")` tool of the `ase`
-        MCP server. This `ase_task_save` MCP tool call is the *only*
+        "<ase-task-id/>", text: "<task-content/>", base: "<task-tag/>")`
+        tool of the `ase` MCP server, so a change made meanwhile (e.g. by
+        an agent) is merged instead of overwritten. This `ase_task_save` MCP tool call is the *only*
         permitted way to persist the plan -- *NEVER* write the plan file
         via `Write`/`Edit` or by executing a shell command. Do not
         output anything in this sub-step.

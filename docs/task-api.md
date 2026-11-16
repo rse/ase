@@ -211,11 +211,24 @@ deliberately agnostic of them:
 
 - **Conditional saving**: the `tag` option of `ase_task_load` returns the
   entity tag of the loaded plan, which the `base` option of `ase_task_save`
-  passes as `If-Match`, so the save fails instead of overwriting a plan
+  passes as `If-Match`, so the save never overwrites a plan
   changed meanwhile; the `tag` option of `ase_task_save` (implied by
   `base`) returns the entity tag of the just-saved plan, as reported by
   the store atomically with the save, for the next save, as used by
   `ase-task-edit` (which saves a not yet existing plan with `create`).
+  Without `base`, `ase_task_save` refuses to overwrite an existing plan,
+  unless `force` explicitly requests it.
+
+- **Merging**: a conditional save refused by `412` is merged by the client:
+  the change of the saved plan against its base (a recently loaded or
+  saved plan of the client, remembered by its entity tag) is applied
+  part-wise to the changed plan -- per header key (the later `Modified`
+  winning), per `##` body section, and per attachment -- and saved again,
+  conditionally on the changed plan. It still fails with `412`, naming
+  the parts, only if both changed the same part (or an `Effort` was set on a
+  concurrently changed body). After a merge, `ase_task_save` reports a
+  `NOTICE:` and the entity tag of the plan *as sent*, so a next save based
+  on it is merged again instead of reverting the merged change.
 
 - **Active task id**: the session-scoped active task id
   (`ase_task_id`) is kept in the internal session state of the client.
@@ -816,6 +829,11 @@ entity tag, i.e., was neither changed nor deleted in the meantime; the
 check and the save happen atomically. With the request header
 `If-None-Match: *`, the plan is saved only if no plan *taskId* exists
 yet (atomically, too), e.g. for the first save of a newly allocated id.
+For a storage plugin without the `lock` method, but with the
+`taskRevision` method (like the issue tracker plugins), the plan is
+additionally saved only if its revision did not change since the entity
+tag check, which narrows (but cannot close) the window for a change
+made outside of the server.
 
 The usage attachment (of type `application/yaml; kind="usage"`) of the
 plan is owned by the task store: an overwrite keeps the stored usage
@@ -1514,6 +1532,22 @@ partially written file. The very same guarantees hold for the
 `ase:`*path* form of `project.task.store.url`, as it runs the same
 functionality in-process.
 
+A storage without locks and conditional writes (like an issue tracker)
+can provide the optional `taskRevision` method instead: an opaque token
+changing on every change of a plan (the issue trackers use the update time
+of the issue). The server then determines the revision *before* loading a
+plan for a conditional `PUT`, a status `PATCH`, or a part endpoint, and
+passes it to `taskSave`, which saves only if the plan still carries it
+(checked before any modification) and else returns `changed`: a
+conditional `PUT` and a status `PATCH` then fail with `412`, while a
+part endpoint repeats its read-modify-write cycle (at most three times).
+This narrows the window for a lost update to the duration of the issue
+tracker requests of a single save, but cannot close it, as the issue
+tracker APIs provide no conditional writes. Hence only a *single* task
+store server (or in-process client of a `github:`, `gitlab:`, or
+`gitea+http[s]:` store URL) should serve a repository, as only its queue
+serializes the saves of all its clients.
+
 The plugin module has to *default export* a `TaskStoragePluginFactory`
 and to conform to the following TypeScript definition:
 
@@ -1557,6 +1591,10 @@ export type TaskEntry = {
 /*  the outcome of an idempotent write: whether the entity was
     newly created or an existing one updated  */
 export type WriteResult = "created" | "updated"
+
+/*  the outcome of a task plan write: additionally "changed" if a revision
+    was expected (see "taskRevision"), but the task plan no longer carries it  */
+export type TaskWriteResult = WriteResult | "changed"
 
 /*  the task plans of a project changed outside of the plugin instance
     (e.g. by another client of a remote storage), as detected by the plugin itself  */
@@ -1626,9 +1664,17 @@ export interface TaskStoragePlugin {
     /*  load a task plan, or null if it does not exist  */
     taskLoad (prjId: string, taskId: string): Promise<TaskPlan | null>
 
-    /*  create or overwrite a task plan with the given (already
-        validated) structure and refresh its modification time  */
-    taskSave (prjId: string, taskId: string, plan: TaskPlan): Promise<WriteResult>
+    /*  optionally determine the current revision of a task plan (an opaque token,
+        changing on every change of the plan, also one made outside of the plugin
+        instance), or null if it does not exist, so a storage without locks and
+        conditional writes (e.g. an issue tracker) can detect concurrent changes  */
+    taskRevision? (prjId: string, taskId: string): Promise<string | null>
+
+    /*  create or overwrite a task plan with the given (already validated)
+        structure and refresh its modification time, where with a revision
+        (passed only if "taskRevision" is provided) it returns "changed" instead,
+        without any modification, if the plan no longer carries this revision  */
+    taskSave (prjId: string, taskId: string, plan: TaskPlan, revision?: string): Promise<TaskWriteResult>
 
     /*  delete a task plan; returns false if it did not exist  */
     taskDelete (prjId: string, taskId: string): Promise<boolean>
@@ -1667,6 +1713,7 @@ The division of labor between server and plugin is:
 | Part endpoints (read-modify-write cycles)         | ✓      |        |
 | Request serialization (per-project queue)         | ✓      |        |
 | Cross-process locking (optional `lock` method)    |        | ✓      |
+| Revision check (optional `taskRevision` method)   |        | ✓      |
 | Referenced file content (optional `fileRead`)     |        | ✓      |
 | External change detection (optional `watch`)      |        | ✓      |
 | Sequence number high-water mark calculation       | ✓      |        |

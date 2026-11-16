@@ -51,6 +51,9 @@ export type TaskUsage = TaskFormat.TaskUsage
     not be retried, as it would then be booked twice  */
 export class UsageUncertain extends Error {}
 
+/*  the result of a task plan save (see Task.save)  */
+export type TaskSaved = { warning: string, tag: string, text: string, merged: boolean }
+
 /*  reusable functionality: the task plans of the current project,
     forwarded to the task store selected by the "project.task.store.url"
     configuration URL  */
@@ -493,30 +496,74 @@ export class Task {
         const plan = await Task.with(log, (client) => client.load(id))
         return plan === null ? null : {
             text: TaskFormat.formatTaskText(elided ? TaskFormat.elideAttachments(plan) : plan),
-            tag:  Core.taskTag(plan)
+            tag:  Task.remember(plan)
         }
+    }
+
+    /*  the recently loaded or saved plans by their entity tags (of a bounded number),
+        as the bases of the merges of conditional saves refused on a concurrent change  */
+    private static bases = new Map<string, API.TaskPlan>()
+    private static remember (plan: API.TaskPlan): string {
+        const tag = Core.taskTag(plan)
+        Task.bases.delete(tag)
+        Task.bases.set(tag, TaskFormat.withoutUsage(plan))
+        if (Task.bases.size > 64)
+            Task.bases.delete(Task.bases.keys().next().value!)
+        return tag
     }
 
     /*  save a task as text under the given id, throwing on a "Status:" unknown to or not
         reachable in the task lifecycle model, on a conditional save (with an entity tag) a
-        problem 412 on a concurrent change, and on a create-only save an error if the task
-        exists; elided attachment payloads are restored from the stored plan; returns the
-        id scheme warning (else empty), the entity tag of the saved plan (as reported by the
-        task store, else of the plan as sent), and the text of the plan as sent  */
-    static async save (log: Log, id: string, text: string, tag?: string, create = false): Promise<{ warning: string, tag: string, text: string }> {
+        problem 412 on a concurrent change which cannot be merged (see below), and on a
+        create-only save an error if the task exists; elided attachment payloads are restored
+        from the stored plan; returns the id scheme warning (else empty), the entity tag of
+        the saved plan (as reported by the task store, else of the plan as sent), the text of
+        the plan as sent, and whether the plan was merged with a concurrent change  */
+    static async save (log: Log, id: string, text: string, tag?: string, create = false): Promise<TaskSaved> {
         if (typeof text !== "string")
             throw new Error("task: text must be a string")
         Task.validateId(id)
         try {
             return await Task.with(log, async (client) => {
                 const sent  = TaskFormat.parseTaskText(id, text, client.lifecycle)
-                const plan  = sent.attachment.some((att) => TaskFormat.isElided(att.Data)) ?
+                const ours  = sent.attachment.some((att) => TaskFormat.isElided(att.Data)) ?
                     TaskFormat.restoreAttachments(sent, await client.load(id)) : sent
-                const saved = await client.save(id, plan, tag, create)
-                return {
-                    warning: TaskFormat.idWarning(client.idscheme, id),
-                    tag:     saved ?? Core.taskTag(plan),
-                    text:    TaskFormat.formatTaskText(sent)
+                const base  = tag !== undefined ? Task.bases.get(tag) : undefined
+                let plan    = ours
+                let current = tag
+                for (let attempt = 1; ; attempt++) {
+                    let saved: string | undefined
+                    try {
+                        saved = await client.save(id, plan, current, create)
+                    }
+                    catch (err: unknown) {
+                        /*  on a concurrent change, merge the change of the plan as sent (against its
+                            base) into the changed plan and retry, conditionally on the changed plan  */
+                        if (!(err instanceof Core.Problem && err.status === 412) || create || base === undefined || attempt >= 3)
+                            throw err
+                        const theirs = await client.load(id)
+                        if (theirs === null)
+                            throw err
+                        const result = TaskFormat.mergeTaskPlans(base, ours, theirs)
+                        if (result.plan === null)
+                            throw new Core.Problem(412, `${err.message} (and both changed: ${result.conflicts.join(", ")})`)
+                        plan    = result.plan
+                        current = Core.taskTag(theirs)
+                        continue
+                    }
+
+                    /*  remember the saved plan as the base of a next merge, but after a merge
+                        report the entity tag of the plan as sent, so a next save based on it
+                        is merged again, instead of reverting the merged concurrent change  */
+                    const merged = plan !== ours
+                    if (saved === undefined || saved === Core.taskTag(plan))
+                        Task.remember(plan)
+                    return {
+                        warning: TaskFormat.idWarning(client.idscheme, id),
+                        tag:     merged ? Task.remember(ours) : saved ?? Core.taskTag(plan),
+                        text:    TaskFormat.formatTaskText(sent),
+                        merged
+                    }
                 }
             })
         }
@@ -941,7 +988,8 @@ export default class TaskCommand {
             the temporary file is kept if the user declines re-editing, and
             the save is conditional on the plan as loaded (or create-only, if
             it did not exist), so changes of the task in the meantime (e.g. by
-            the agents) are never overwritten, but keep the edits unsaved instead  */
+            the agents) are never overwritten, but merged with the edits, or, if
+            both changed the same part, keep the edits unsaved instead  */
         let next     = id
         let tag      = source?.tag
         let conflict = false
@@ -960,7 +1008,10 @@ export default class TaskCommand {
                     }
                     let warning: string
                     try {
-                        ({ warning, tag } = await Task.save(this.log, id, after, tag, tag === undefined))
+                        let merged: boolean
+                        ({ warning, tag, merged } = await Task.save(this.log, id, after, tag, tag === undefined))
+                        if (merged)
+                            this.log.write("info", `task: "${id}" was changed in the meantime -- edits merged`)
                     }
                     catch (err: unknown) {
                         const problem = err instanceof Core.Problem ? err :
@@ -1480,9 +1531,10 @@ export class TaskMCP {
                 "Persist a task as `text` under `id`. " +
                 "The `text` MUST be the *authoring* form of the plan (as returned by the " +
                 "`source` variant of `ase_task_load`) and hence MUST NOT carry any rendering " +
-                "artifacts. Overwrites any existing task for the same `id`, unless `create` is `true`, " +
-                "in which case the save fails if a task with this `id` already exists (to be used on the " +
-                "first save of a task whose `id` was allocated via `ase_task_newid`). " +
+                "artifacts. Overwrites an existing task for the same `id` only with `base` (conditionally, " +
+                "see below) or with `force` (unconditionally, for a deliberate overwrite only), and otherwise " +
+                "fails if a task with this `id` already exists (as it does with `create` being `true`, to be used " +
+                "on the first save of a task whose `id` was allocated via `ase_task_newid`). " +
                 "Returns a status `text` by default, or, if `render` is `true`, the " +
                 "*rendering-prepared* form of the just-saved plan (with its attachment payloads elided), " +
                 "for display purposes only. " +
@@ -1496,11 +1548,13 @@ export class TaskMCP {
                 "If `id` does not conform to the task id scheme of the project, the returned `text` " +
                 "additionally carries a trailing `NOTICE: <info>` line. " +
                 "With `base` (the entity tag of the plan the `text` is based on, as returned by `ase_task_load` " +
-                "with `tag` or by a previous `ase_task_save` with `tag` or `base`), the save is conditional: it fails with " +
-                "an error if the plan was changed meanwhile (by anybody else). " +
+                "with `tag` or by a previous `ase_task_save` with `tag` or `base`), the save is conditional: if the " +
+                "plan was changed meanwhile (by anybody else), the change of `text` is merged part-wise (per frontmatter " +
+                "key, per `##` body section, and per attachment) into the changed plan, reported by a trailing " +
+                "`NOTICE:` line, and the save fails with an error only if both changed the same part. " +
                 "If `tag` is `true` or `base` is given, the returned `text` additionally carries the entity tag " +
-                "of the just-saved plan in a trailing `<task-plan-tag>` delimiter line, to be passed as `base` " +
-                "into the next `ase_task_save` of this plan.",
+                "of the just-saved plan (after a merge, the one of `text`, so a next save is merged again) in a " +
+                "trailing `<task-plan-tag>` delimiter line, to be passed as `base` into the next `ase_task_save` of this plan.",
             inputSchema: {
                 id: z.string()
                     .describe("task identifier (allowed characters: A-Z, a-z, 0-9, '#', '_', '-')"),
@@ -1512,23 +1566,31 @@ export class TaskMCP {
                     .describe("if true, return the rendering-prepared form of the just-saved " +
                         "plan instead of a status message (default: false)"),
                 base: z.string().optional()
-                    .describe("entity tag of the plan the text is based on, for a conditional save " +
-                        "failing if the plan was changed meanwhile (default: unconditional save)"),
+                    .describe("entity tag of the plan the text is based on, for a conditional save, " +
+                        "merging a change made meanwhile (default: no overwrite of an existing task, unless `force`)"),
+                force: z.boolean().optional()
+                    .describe("if true and without `base`, unconditionally overwrite an existing task, " +
+                        "discarding any change made meanwhile (default: false)"),
                 tag: z.boolean().optional()
                     .describe("if true, additionally return the entity tag of the just-saved plan in a trailing " +
                         "`<task-plan-tag>` delimiter line (default: false, but implied by `base`)")
             }
         }, async (args) => {
             try {
-                const base = args.base !== undefined && args.base !== "" ? args.base : undefined
-                let result: { warning: string, tag: string, text: string }
+                /*  without "base" and "force", never overwrite an existing task (i.e., save create-only)  */
+                const base     = args.base !== undefined && args.base !== "" ? args.base : undefined
+                const implicit = base === undefined && args.create !== true && args.force !== true
+                let result: TaskSaved
                 try {
-                    result = await Task.save(this.log, args.id, args.text, base, args.create ?? false)
+                    result = await Task.save(this.log, args.id, args.text, base, args.create === true || implicit)
                 }
                 catch (err: unknown) {
                     if (base !== undefined && err instanceof Core.Problem && err.status === 412)
-                        throw new Error(`task: task "${args.id}" was changed meanwhile -- save refused ` +
-                            "(reload the task and apply the change again)", { cause: err })
+                        throw new Error(`task: task "${args.id}" was changed meanwhile and cannot be merged -- ` +
+                            `save refused (reload the task and apply the change again): ${err.message}`, { cause: err })
+                    if (implicit && err instanceof Error && err.cause instanceof Core.Problem && err.cause.status === 412)
+                        throw new Error(`task: task "${args.id}" already exists -- save refused ` +
+                            "(pass its entity tag as `base` for a conditional save, or `force` for an overwrite)", { cause: err })
                     throw err
                 }
 
@@ -1541,9 +1603,11 @@ export class TaskMCP {
                     itself, so it never is the one of a subsequent save of somebody else)  */
                 const render = args.render ?? false
                 const stored = render ? await Task.source(this.log, args.id, true) : null
-                const source = stored !== null && stored.tag === result.tag ? stored.text : result.text
+                const source = stored !== null && (stored.tag === result.tag || result.merged) ? stored.text : result.text
                 const text   = (render ? Markdown.prepare(source) : `OK: saved task "${args.id}"`) +
                     notice(result.warning) +
+                    notice(result.merged ? `task "${args.id}" was changed meanwhile and the change was merged ` +
+                        "into it -- load it again before showing or further changing its content" : "") +
                     (base !== undefined || args.tag === true ? `\n<task-plan-tag>${result.tag}</task-plan-tag>\n` : "")
                 return mcpText(text)
             }

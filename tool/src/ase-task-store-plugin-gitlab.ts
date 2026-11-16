@@ -578,15 +578,24 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
         }
     }
 
+    /*  the revision of a task plan: the update time of its live issue  */
+    async taskRevision (prjId: string, taskId: string): Promise<string | null> {
+        const { path, scheme } = await this.context(prjId)
+        return (await this.fetch(path, numberOf(scheme, taskId)))?.updated_at ?? null
+    }
+
     /*  create or update the issue of a task plan: all references are resolved
         upfront, a new task can only be the next issue number, and the issue itself
-        is updated last, so its update time covers the link and note changes  */
-    async taskSave (prjId: string, taskId: string, plan: API.TaskPlan): Promise<API.WriteResult> {
+        is updated last, so its update time covers the link and note changes,
+        where an expected revision is checked before any modification  */
+    async taskSave (prjId: string, taskId: string, plan: API.TaskPlan, revision?: string): Promise<API.TaskWriteResult> {
         const { path, lifecycle, scheme } = await this.context(prjId)
         const number = numberOf(scheme, taskId)
         if (number === 0)
             throw new Error(`task id "${taskId}" is no issue number rendered through the "seq" task id scheme of the project`)
         let issue    = await this.fetch(path, number)
+        if (revision !== undefined && issue?.updated_at !== revision)
+            return "changed"
         const result: API.WriteResult = issue !== null ? "updated" : "created"
         const group  = plan.header.Group
         if (typeof group === "string" && group !== "")

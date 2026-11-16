@@ -629,10 +629,11 @@ Procedure
 
         Finally call the `ase_task_save(id: "<ase-task-id/>", text:
         "<task-content/>", base: "<task-tag/>")` tool of the `ase` MCP
-        server to persist the updated task plan. If the save is refused
-        because the plan was *changed* meanwhile, repeat the take-over
-        above and the save, at most *three* times in total, and then
-        save once more *without* the `base` argument. This `ase_task_save` MCP tool call is the
+        server to persist the updated task plan (merging a change made
+        meanwhile). If the save is refused because the plan was *changed*
+        meanwhile in the same parts, repeat the take-over above and the
+        save, at most *three* times in total, and then save once more
+        with the argument `force: true` instead of `base`. This `ase_task_save` MCP tool call is the
         *only* permitted way to persist the plan -- *NEVER* write the
         plan file via `Write`/`Edit` or by executing a shell command.
         Do not output anything in this sub-step.

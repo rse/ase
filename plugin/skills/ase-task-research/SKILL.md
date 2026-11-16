@@ -315,8 +315,9 @@ Procedure
             their elided `Data` markers).
 
         5.  Call the `ase_task_save(id: "<ase-task-id/>", text: "<plan/>",
-            base: "<tag/>")` tool of the `ase` MCP server, so the save is
-            refused if the plan was changed meanwhile by anybody else.
+            base: "<tag/>")` tool of the `ase` MCP server, so a change of
+            the plan made meanwhile by anybody else is merged, and the save
+            is refused only if that change touched the same parts.
             This `ase_task_save` MCP tool call is the *only* permitted way
             to persist the plan -- *NEVER* write the plan file via
             `Write`/`Edit` or by executing a shell command.

@@ -5,6 +5,15 @@ ChangeLog
 2.1.0 (2026-11-XX)
 ------------------
 
+-   NEW FEATURE [code, plugin, docs]: Merged Concurrent Task Plan Changes
+    A conditional task plan save hit by a concurrent change now merges both changes part-wise
+    (header keys, `##` body sections, attachments) and fails only on overlapping parts, while
+    `ase_task_save` without `base` no longer overwrites an existing plan unless `force` is given.
+
+-   IMPROVEMENT [code, docs]: Revision Check for Issue Tracker Stores
+    The new optional storage plugin method `taskRevision` lets the GitHub, GitLab, and Gitea
+    plugins refuse a conditional save (resp. retry a part update) of an issue changed meanwhile.
+
 -   NEW FEATURE [code, docs]: Agent Working Copy Option "-C|--cwd"
     The new option `-C|--cwd <dir>` of all agents runs the agent tool in the working copy *dir*,
     while the agent keeps its own project context, e.g., a persistent clone per agent of a fleet,

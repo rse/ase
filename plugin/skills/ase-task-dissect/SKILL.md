@@ -307,7 +307,8 @@ Procedure
 
         2.  Call the `ase_task_save(id: "<part-id/>", text:
             "<part-content/>", create: true)` tool of the `ase` MCP server -- for
-            a part of <collisions/> *without* the `create` argument -- to persist
+            a part of <collisions/> with the argument `force: true` instead of
+            `create`, as `--force` explicitly requested its overwrite -- to persist
             the sub-task plan -- this MCP tool call is the *only*
             permitted way to persist it, *NEVER* write the plan file
             via `Write`/`Edit` or by executing a shell command. If this

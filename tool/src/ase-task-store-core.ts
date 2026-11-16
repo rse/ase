@@ -356,16 +356,25 @@ export class TaskStoreCore {
     }
 
     /*  run a read-modify-write cycle on an existing plan as a serialized operation,
-        re-binding its "Effort" key to its possibly changed body before saving  */
+        re-binding its "Effort" key to its possibly changed body before saving, and
+        repeating the cycle on a plan changed meanwhile outside of this core (as
+        detected through the revisions of a storage without locks, like an issue tracker)  */
     private async modify<T> (prjId: string, taskId: string, part: string,
         op: (plan: API.TaskPlan, lifecycle: TaskFormat.TaskLifecycle) => T): Promise<T> {
         return this.serialize(prjId, async () => {
-            const { lifecycle, plan } = await this.plan(prjId, taskId)
-            const result = op(plan, lifecycle)
-            TaskFormat.bindEffort(plan)
-            await this.store.taskSave(prjId, taskId, plan)
-            this.emitUpdated(prjId, taskId, plan, lifecycle, [ part ])
-            return result
+            for (let attempt = 1; ; attempt++) {
+                const revision = await this.store.taskRevision(prjId, taskId)
+                const { lifecycle, plan } = await this.plan(prjId, taskId)
+                const result = op(plan, lifecycle)
+                TaskFormat.bindEffort(plan)
+                if (await this.store.taskSave(prjId, taskId, plan, revision) === "changed") {
+                    if (attempt >= 3)
+                        throw problem(412, `task "${taskId}" was changed meanwhile in project "${prjId}"`)
+                    continue
+                }
+                this.emitUpdated(prjId, taskId, plan, lifecycle, [ part ])
+                return result
+            }
         })
     }
 
@@ -546,11 +555,14 @@ export class TaskStoreCore {
         where an overwrite keeps the stored usage attachments, unless it is
         conditional on the entity tag of the complete plan (i.e., a booking),
         and a create drops any usage attachments, and where the "Effort" key is
-        bound to the body (see bindEffort) before determining any entity tag  */
+        bound to the body (see bindEffort) before determining any entity tag,
+        and a conditional save also detects a change made after the entity tag
+        check through the revisions of a storage without locks (see modify)  */
     async taskSave (prjId: string, taskId: string, raw: unknown, ifMatch?: string, createOnly = false): Promise<TaskSaveResult> {
         return this.serialize(prjId, async () => {
             const { lifecycle } = await this.project(prjId)
             this.validateId("task", taskId)
+            const revision = ifMatch !== undefined ? await this.store.taskRevision(prjId, taskId) : undefined
             const prev   = await this.load(prjId, taskId)
             const full   = ifMatch !== undefined && prev !== null && taskTagFull(prev) === ifMatch
             if (ifMatch !== undefined && !full && (prev === null || taskTag(prev) !== ifMatch))
@@ -563,7 +575,9 @@ export class TaskStoreCore {
             const from   = prev !== null ? TaskFormat.taskStatus(prev.header, lifecycle) : lifecycle.initial
             const status = TaskFormat.taskStatus(plan.header, lifecycle)
             this.checkStatus(lifecycle, from, status)
-            const result = await this.store.taskSave(prjId, taskId, plan)
+            const result = await this.store.taskSave(prjId, taskId, plan, revision)
+            if (result === "changed")
+                throw problem(412, `task "${taskId}" was changed meanwhile in project "${prjId}"`)
             if (result === "created")
                 this.listener(prjId, { added: { [taskId]: this.entry(plan, lifecycle) } })
             else
@@ -598,6 +612,7 @@ export class TaskStoreCore {
                 if (raw.id !== taskId)
                     newId = raw.id
             }
+            const revision = await this.store.taskRevision(prjId, taskId)
             const plan = await this.load(prjId, taskId)
             if (plan === null)
                 throw problem(404, `no task "${taskId}" in project "${prjId}"`)
@@ -672,7 +687,8 @@ export class TaskStoreCore {
                     references: referrers.length
                 }
             }
-            await this.store.taskSave(prjId, taskId, plan)
+            if (await this.store.taskSave(prjId, taskId, plan, revision) === "changed")
+                throw problem(412, `task "${taskId}" was changed meanwhile in project "${prjId}"`)
             this.emitUpdated(prjId, taskId, plan, lifecycle, [ "header" ])
             return {
                 id:     taskId,

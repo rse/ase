@@ -470,7 +470,7 @@ Set <args></args> (set args to empty).
             exists earlier in the current session
             *and* the `text` *output* field of the most recent such
             `ase_task_save` tool call carries a `<task-plan-tag>`
-            delimiter line
+            delimiter line, but no `NOTICE:` line about a merged change
             *and* the `text` *argument* of that call carries no `Effort:`
             frontmatter key without <hash/> (a bare size like `Effort: M`,
             which the task store stamped or dropped on that save, see the
@@ -681,9 +681,10 @@ Set <args></args> (set args to empty).
         Call the `ase_task_save(id: "<ase-task-id/>", text:
         "<task-content/>", render: true, tag: true)` tool of the `ase` MCP server --
         if <task-tag/> is not empty, additionally with the argument
-        `base: "<task-tag/>"`, so the save is refused if the plan was
-        changed meanwhile by anybody else (instead of silently
-        overwriting that change), and if <task-tag/> is empty (no plan
+        `base: "<task-tag/>"`, so a change of the plan made meanwhile by
+        anybody else is merged (instead of silently overwritten), and the
+        save is refused only if that change touched the same parts (then
+        output the error message and stop), and if <task-tag/> is empty (no plan
         existed yet), additionally with the argument `create: true`, so
         the save is refused if the plan was created meanwhile by anybody
         else -- to
@@ -715,8 +716,13 @@ Set <args></args> (set args to empty).
         plan) -- *replacing* it, *creating* it at its position in the key
         order of the plan <format/>, or *removing* it if <task-render/>
         carries none -- changing *nothing else* of <task-content/> and
-        leaving <task-content-dirty/> untouched. Do not output anything
-        related to this MCP tool call except the following <template/>:
+        leaving <task-content-dirty/> untouched. But if the `text` *output*
+        field carries a `NOTICE:` line about a merged change, instead
+        re-load the merged plan exactly as in the `<else>` branch of step
+        2.1, i.e., set <task-content/>, <task-render/>, and <task-tag/>
+        from a new `ase_task_load(id: "<ase-task-id/>", variant: "both",
+        tag: true)` tool call. Do not output anything
+        related to these MCP tool calls except the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan saved**
