@@ -6,13 +6,15 @@
 */
 
 /*  reusable terminal-style box: a titled "window" listing one or more shell
-    commands, each on a "❯" prompt row with a copy button (copy behaviour wired
-    globally by the Clipboard-Copy component in BaseLayout). The mono styling
-    mirrors the hero prompt for a consistent command-line look.
+    commands, each on a "❯" prompt row, optionally with a copy button (copy
+    behaviour wired globally by the Clipboard-Copy component in BaseLayout).
+    The mono styling mirrors the hero prompt for a consistent command-line look.
 
-    `commands` is the list of command strings (one prompt row each); `title` is
-    the title-bar label; `class` is forwarded to the outer wrapper so callers
-    set their own margin/width (e.g. "mx-auto mt-12 max-w-2xl").
+    `commands` is the list of command strings (one prompt row each); `prefix`
+    and `title` form the title-bar label; `copy` enables the copy buttons;
+    `helpPage` links highlighted ASE commands to their man pages; `class` is
+    forwarded to the outer wrapper so callers set their own margin/width
+    (e.g. "mx-auto mt-12 max-w-2xl").
 
     As an alternative to `commands`, the `tabs` prop accepts a list of labeled
     command lists. A tab bar is then rendered below the title bar and clicking

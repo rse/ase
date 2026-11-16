@@ -319,6 +319,7 @@ orderedDocs.push(...cliDocs)
             helpCopy.setAttribute("data-copy", location.origin + location.pathname + "#help/" + id)
         }
 
+        /*  show the man-page of a page id and mark it active in the sidebar  */
         const select = (id: string) => {
             const target = document.getElementById("help-" + id)
             if (!target) return

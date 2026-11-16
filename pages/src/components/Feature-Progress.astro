@@ -31,6 +31,8 @@
             const rect = el.getBoundingClientRect()
             return rect.top < window.innerHeight && rect.bottom > 0
         }
+
+        /*  apply the current scroll progress to all present elements  */
         function update() {
             ticking = false
             const doc = document.documentElement
@@ -60,6 +62,8 @@
                 cta.style.pointerEvents = show ? "auto" : "none"
             }
         }
+
+        /*  throttle the updates to at most one per animation frame  */
         function onScroll() {
             if (!ticking) { ticking = true; requestAnimationFrame(update) }
         }
