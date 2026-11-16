@@ -103,14 +103,16 @@ export const modCacheControl = () => {
 
     /*  this session: its identity, its context, its detected TTL, its cold restarts
         (with their rewritten tokens), its turn state, its auto-warm (none, SOFT, or
-        HARD until a time, with its pings), whether SOFT already ran while idle, and
-        whether the band stays shown for a HARD auto-warm (until the next interaction)  */
+        HARD until a time, with its pings), whether SOFT already ran while idle (with
+        its pings), and whether the band stays shown for a HARD auto-warm (until the
+        next interaction)  */
     const S = {
         id: "", activity: 0, ctx: 0,
         ttl: TTL_LONG, ttlSource: "default",
         colds: [] as { tokens: number }[],
         working: false, compacted: false,
-        warm: "" as "" | "soft" | "hard", until: 0, pings: 0, softUsed: false, held: false
+        warm: "" as "" | "soft" | "hard", until: 0, pings: 0,
+        softUsed: false, softPings: 0, held: false
     }
 
     /*  the time of the latest event, the heartbeat timer, whether the settings
@@ -205,6 +207,8 @@ export const modCacheControl = () => {
             return warmOff()
         const u = reply.usage
         S.pings++
+        if (S.warm === "soft")
+            S.softPings++
         if (u.cache_creation_input_tokens > 0.1 * Math.max(1, u.cache_read_input_tokens))
             return warmOff()
         now        = await k.now()
@@ -241,8 +245,9 @@ export const modCacheControl = () => {
         whose cache state is unknown  */
     const restart = (id: string) => {
         S.id       = id
-        S.activity = 0
-        S.softUsed = false
+        S.activity  = 0
+        S.softUsed  = false
+        S.softPings = 0
         warmOff()
     }
 
@@ -258,10 +263,11 @@ export const modCacheControl = () => {
     /*  track a main-loop turn starting, as a new interaction ending a SOFT
         auto-warm (re-arming it for the next idle period) and the band of a HARD one  */
     const turnStart = async (k: Controller) => {
-        now        = await k.now()
-        S.working  = true
-        S.softUsed = false
-        S.held     = false
+        now         = await k.now()
+        S.working   = true
+        S.softUsed  = false
+        S.softPings = 0
+        S.held      = false
         if (S.warm === "soft")
             warmOff()
     }
@@ -424,6 +430,9 @@ export const modCacheControl = () => {
             ] }))
             lines.push(Text({ children: `⛁ cache: cold restarts so far: ${S.colds.length} ` +
                 `(${tokens(coldTokens())} tokens rewritten)` }))
+            if (S.softPings > 0)
+                lines.push(Text({ children: `⛁ cache: soft auto-warm: already extended by ` +
+                    `${S.softPings}/${settings.soft} pings` }))
         }
         const band = panel(ui, { ...layout(e, 0), body: lines.length, overflow: false },
             { top: 0, scroll: 0, page: 1, split: 0 },
