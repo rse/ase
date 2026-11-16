@@ -5,18 +5,10 @@ ChangeLog
 2.1.0 (2026-11-XX)
 ------------------
 
--   IMPROVEMENT [build]: Quiet Plugin Validation
-    The `claude plugin validate` step of the plugin linting, now a portable JavaScript-based
-    task `lint-claude` (working also under Windows), shows its output only on failure.
-
 -   NEW FEATURE [code, plugin, docs]: Merged Concurrent Task Plan Changes
     A conditional task plan save hit by a concurrent change now merges both changes part-wise
     (header keys, `##` body sections, attachments) and fails only on overlapping parts, while
     `ase_task_save` without `base` no longer overwrites an existing plan unless `force` is given.
-
--   IMPROVEMENT [code, docs]: Revision Check for Issue Tracker Stores
-    The new optional storage plugin method `taskRevision` lets the GitHub, GitLab, and Gitea
-    plugins refuse a conditional save (resp. retry a part update) of an issue changed meanwhile.
 
 -   NEW FEATURE [code, docs]: Agent Working Copy Option "-C|--cwd"
     The new option `-C|--cwd <dir>` of all agents runs the agent tool in the working copy *dir*,
@@ -96,6 +88,14 @@ ChangeLog
     out diagrams and overlong cells, all `ase spec` sub-commands (and `ase_specbook_*`) gained
     `-F|--fetch never|auto|always` for the remote schemas, and the new `ase spec search [<term> ...]`
     (and `ase_specbook_search`) finds shareable schemas.
+
+-   IMPROVEMENT [build]: Quiet Plugin Validation
+    The `claude plugin validate` step of the plugin linting, now a portable JavaScript-based
+    task `lint-claude` (working also under Windows), shows its output only on failure.
+
+-   IMPROVEMENT [code, docs]: Revision Check for Issue Tracker Stores
+    The new optional storage plugin method `taskRevision` lets the GitHub, GitLab, and Gitea
+    plugins refuse a conditional save (resp. retry a part update) of an issue changed meanwhile.
 
 -   IMPROVEMENT [code, docs, plugin]: Configuration Editor as "ase config edit"
     The terminal UI of `ase config ui` is renamed to `ase config edit`, replacing the former
