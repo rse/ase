@@ -2,83 +2,83 @@
 ChangeLog
 =========
 
-2.1.0 (2026-11-XX)
+2.1.0 (2026-11-16)
 ------------------
 
--   NEW FEATURE [code, plugin, docs]: Merged Concurrent Task Plan Changes
+-   FEATURE [code, plugin, docs]: Merged Concurrent Task Plan Changes
     A conditional task plan save hit by a concurrent change now merges both changes part-wise
     (header keys, `##` body sections, attachments) and fails only on overlapping parts, while
     `ase_task_save` without `base` no longer overwrites an existing plan unless `force` is given.
 
--   NEW FEATURE [code, docs]: Agent Working Copy Option "-C|--cwd"
+-   FEATURE [code, docs]: Agent Working Copy Option "-C|--cwd"
     The new option `-C|--cwd <dir>` of all agents runs the agent tool in the working copy *dir*,
     while the agent keeps its own project context, e.g., a persistent clone per agent of a fleet,
     whose `cwd:` is relative to the fleet configuration file.
 
--   NEW FEATURE [code, docs]: Configuration Override Scope
+-   FEATURE [code, docs]: Configuration Override Scope
     A set `ASE_CONFIG_DIR` now enables the read-only configuration scope `override` of the file
     `$ASE_CONFIG_DIR/override.yaml`, read above `project` and `task` (but below `session`), e.g.
     for an agent fleet with its own `project.task.default.*` values.
 
--   NEW FEATURE [code, docs]: Overridable Per-User Directories
+-   FEATURE [code, docs]: Overridable Per-User Directories
     The new environment variables `ASE_CONFIG_DIR` and `ASE_STATE_DIR` (falling back to
     `ASE_CONFIG_DIR`) override the per-user configuration resp. state directory, e.g. to run
     an agent fleet with its own user configuration inside a dedicated base directory.
 
--   NEW FEATURE [plugin, docs]: Prompt Cache Controller
+-   FEATURE [plugin, docs]: Prompt Cache Controller
     The new mod `ase-mods-cache.ts` shows the prompt cache state in the footer, SOFT auto-warms
     big idle caches, escalates cooling/cold caches above the prompt with HARD auto-warm buttons,
     and asks before cold sends, configured by the new `agent.cache.*` keys and operated by the new
     command `/ase-mods-auto-warm`.
 
--   NEW FEATURE [plugin, docs]: Readable Vertical Tables
+-   FEATURE [plugin, docs]: Readable Vertical Tables
     The new mod `ase-mods-render-table.ts` redraws the tables which Claude Code draws vertically
     in a too narrow terminal as records with aligned keys and hanging-indented values, while
     wider terminals still get the regular table grids of Claude Code.
 
--   NEW FEATURE [plugin]: Grounded Plan Editing
+-   FEATURE [plugin]: Grounded Plan Editing
     The new option `--ground|-G` of `ase-task-edit` grounds the plan once per run in the project
     artifacts and the Internet/Web, serving its generation, its refinements, and the approach round
     of `--approach`, and is forwarded between `ase-task-edit` and `ase-task-grill` on their hand-offs.
 
--   NEW FEATURE [code, docs]: Plan Grilling Agent
+-   FEATURE [code, docs]: Plan Grilling Agent
     The new built-in agent `ase agent griller` grills the plans of the `DRAFTED` tasks explicitly
     assigned to it via `ase-task-grill --ground --auto` (up to 3 rounds, stopping early on `MUST`,
     with `--diff`), and puts them back into `DRAFTED`, unassigned (`DRAFTED` > `PLANNING` > `DRAFTED`).
 
--   NEW FEATURE [code, docs]: Resizable Task Board Lanes
+-   FEATURE [code, docs]: Resizable Task Board Lanes
     In the task lanes view of both boards, `+`/`-` resize the selected lane against its neighbor lane
     and `0` resets the lane heights of its phase, while the web board additionally offers a grip bar
     between the lanes for resizing by dragging (persisted in `.ase/board.yaml`).
 
--   NEW FEATURE [plugin, docs]: Change Set to Task
+-   FEATURE [plugin, docs]: Change Set to Task
     The new `ase-repo-task` skill reverse-engineers a change set (staged, unstaged, `--branch`, or
     `--commit`), optionally narrowed to a scope topic, into a new task plan (or only its `--focus`
     sections), precise enough for a re-implementation yielding a similar change set.
 
--   NEW FEATURE [plugin, code]: Plan Diff after Grilling
+-   FEATURE [plugin, code]: Plan Diff after Grilling
     The new option `--diff|-d` of `ase-task-grill` shows, before the next-step dialog, the cumulative
     change of the plan body by all rounds as a unified diff (e.g. to review `--auto` answers),
     computed deterministically by the new MCP tool `ase_text_diff`.
 
--   NEW FEATURE [plugin]: Automatic Grilling
+-   FEATURE [plugin]: Automatic Grilling
     The new options `--grill-auto|-a` of `ase-code-edit` and `ase-spec-edit` (implying `--grill`) and
     `--auto|-a` of `ase-task-grill` pick every `★` answer instead of asking, leaving questions without a
     recommendation unanswered. The short option of `--approach` in both edit skills moves to `-A`.
 
--   NEW FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
+-   FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
     Besides the `⚑` current decision state, grilling tables now mark the answer critically judged best
     (judge-first, context before world knowledge) with `★`, if any. Unaddressed `ase-task-grill`
     questions accept it, and the blue hover cards show `WHAT:` details and `WHY ★:`/`WHY NOT ★:`
     rationales.
 
--   NEW FEATURE [plugin, docs]: Answer Details in Grilling Tables
+-   FEATURE [plugin, docs]: Answer Details in Grilling Tables
     The grilling skills optionally pass a 3-4 sentence detail per question and answer to the new mod
     tool `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled
     with the number, focus, and topic of the question resp. the short response and label of the
     answer, while the pointer hovers over the question resp. answer.
 
--   NEW FEATURE [code, docs]: Interactive Configuration Editor
+-   FEATURE [code, docs]: Interactive Configuration Editor
     The new `ase config ui` opens a terminal UI with a parameter view (all keys, values, and scopes)
     and a scope view (per-scope YAML), toggled by `v`, where a modal edits a value on any writable
     scope (toggle, pull-down, or input field) and stores it immediately, and `e` edits a scope file.
