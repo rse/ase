@@ -136,8 +136,9 @@ plan, unless `--next` pre-selects this choice.
     skill. Recognized tokens at this skill: `none` (default,
     interactive answer required), `DONE` (preserve task plan and stop),
     `EDIT` (hand off to `ase-task-edit`), `INTEGRATE` (hand off to
-    `ase-task-integrate`, forwarding `--worktree`, `--changeset`, and
-    `--stateless`), or `DELETE` (hand off to `ase-task-delete`).
+    `ase-task-integrate`, forwarding `--worktree`, `--changeset`,
+    `--stateless`, and `--source` as `--target` for a `source` target),
+    or `DELETE` (hand off to `ase-task-delete`).
 
 -   `--worktree`|`-w` *name*:
     Operate in the *context worktree* `.ase/worktree/<name>` instead

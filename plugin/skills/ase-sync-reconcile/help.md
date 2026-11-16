@@ -30,15 +30,13 @@ requirements and architecture), `CODE` (Source Code), `DOCS`
 kinds *minus* the kinds listed in *target*. Unless `--bidirectional` is
 given, a kind present in *target* is never used as its own source.
 
-The file lists for all involved kinds are resolved via the
-`ase_artifact_list` MCP tool of the `ase` MCP server. While reconciling,
-the skill honors the artifact-format conventions of `ase-format-meta.md`,
-`ase-format-spec.md` (the *SpecBook* models and formats plus the
-SpecBook schema configuration), and `ase-format-task.md`; the kinds
-`CODE`, `DOCS`, `INFR`, and `OTHR` have no dedicated format contract and
-are treated as free-form. Changed `SPEC` artifacts are validated via
-the `ase_specbook_lint` MCP tool and the reported diagnostics are fixed
-in at most three rounds; any remaining diagnostics are surfaced.
+While reconciling, the skill honors the artifact formats of `SPEC` (the
+*SpecBook* models and formats plus the *SpecBook* schema configuration)
+and `TASK`; the kinds `CODE`, `DOCS`, `INFR`, and `OTHR` have no
+dedicated format contract and are treated as free-form. Changed `SPEC`
+artifacts are validated via *SpecBook* linting and the reported
+diagnostics are fixed in at most three rounds; any remaining diagnostics
+are surfaced.
 
 The changes on the *target* side are the three *operations* `add`
 (create content and files the source warrants but the target lacks),

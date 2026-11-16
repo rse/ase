@@ -87,10 +87,12 @@ processing the entire current skill:
 
         <expand name="merge-fail" arg1="no target branch determinable"></expand>
 
-    4.  For each of the branches <source/> and <target/>, run the command
-        `git rev-parse --verify --quiet "refs/heads/<branch/>"` (with
-        <branch/> substituted). If it fails for a branch, expand the
-        following:
+    4.  For each of the branches <source/> and <target/>, first check
+        that it matches the regexp `^[A-Za-z0-9._/+@-]+$`, which keeps it
+        safe for being passed quoted to the `git` commands, and only then
+        run the command `git rev-parse --verify --quiet "refs/heads/<branch/>"`
+        (with <branch/> substituted). If the check or the command fails
+        for a branch, expand the following:
 
         <expand name="merge-fail" arg1="branch **<branch/>** does not exist"></expand>
 

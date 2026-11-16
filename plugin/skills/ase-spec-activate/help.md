@@ -34,10 +34,10 @@ artifacts; substantial changes are deferred to `ase-spec-edit`.
 The skill is both user-callable and model-callable: the model invokes it
 *automatically* whenever the user wants to work with the specification
 files without invoking a dedicated specification skill. It works in
-tandem with `ase-spec-edit`, `ase-sync-import`, `ase-sync-reconcile`, and
-`ase-sync-export`, which include the format contract themselves and hence
-activate the know-how implicitly -- their own procedures take precedence
-whenever they run.
+tandem with `ase-spec-edit`, `ase-sync-import`, and `ase-sync-reconcile`,
+which include the format contract themselves and hence activate the
+know-how implicitly, and with `ase-sync-export`, which needs no know-how
+at all -- their own procedures take precedence whenever they run.
 
 ##  ARGUMENTS
 

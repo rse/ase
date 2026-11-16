@@ -20,9 +20,8 @@
 
 The `ase-code-lint` skill lints the source code of the referenced
 location for *potential code quality problems* related to a fixed set
-of code quality aspects. The investigation is dispatched to a
-sub-agent (`ase:ase-code-lint`) so that scanning details do not leak
-into the user-visible transcript.
+of code quality aspects. The investigation runs silently, so that
+scanning details do not leak into the user-visible transcript.
 
 For each detected problem, the skill renders a unified-diff *SOLUTION*
 preview and either asks the user to `ACCEPT` or `REJECT` the proposed

@@ -15,6 +15,7 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-dialog.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-diff.md
 
 <purpose name="ase-docs-shorten">
 Shorten a Document to a Target Length
@@ -170,13 +171,21 @@ than the user asked for.
     <length-projected/> to its `length_projected` field, and <blocks/>
     to its `blocks` array, ordered by ascending `line`.
 
+    Then *verify the Ground Rule* for each block of <blocks/>: compare
+    its `new_text` against its `old_text` and *drop* the block from
+    <blocks/> whenever a fact, number, technical term, qualifier, or
+    negation which *survives* into its `new_text` was altered, whenever
+    its `new_text` states something its `old_text` did not, or whenever
+    a fenced code block, an inline code span, a link target, or a
+    heading was touched.
+
     You *MUST* *NOT* output anything at all in this STEP 2 beyond the
     above hint template and the `Agent` tool invocation.
     </step>
 
 3.  <step id="STEP 3: Summary">
 
-    <if condition="<blocks/> is empty">
+    <if condition="<length-before/> is less than or equal to <target/>">
 
     The document already meets the target, so nothing is shortened.
     Only output the following <template/> and then *SKIP* the remaining
@@ -243,15 +252,6 @@ than the user asked for.
             Set <new-text/>      to the `new_text` field of <item/>.
             Set <block-before/>  to the `length_before` field of <item/>.
             Set <block-after/>   to the `length_after` field of <item/>.
-
-            Then *verify the Ground Rule* for this <item/>: compare
-            <new-text/> against <old-text/> and *drop* the <item/>
-            entirely -- continuing with the next <item/> without any
-            output -- whenever a fact, number, technical term,
-            qualifier, or negation which *survives* into <new-text/> was
-            altered, whenever <new-text/> states something <old-text/>
-            did not, or whenever a fenced code block, an inline code
-            span, a link target, or a heading was touched.
 
             Then set <block-delta/> to (<block-before/> -
             <block-after/>) and <block-percent/> to that difference
@@ -333,55 +333,9 @@ than the user asked for.
             </if>
             <elseif condition="<getopt-option-auto/> is not equal `true`">
 
-            Determine the hunk *body* as an ordered list of lines, each
-            carrying a one-character prefix (` ` for context, `-` for
-            old-side, `+` for new-side). Build it by concatenating, in
-            order and *skipping any part that is empty*:
-
-            - one ` `-prefixed line for *each* line of <context-before/>
-              (if non-empty),
-            - one `-`-prefixed line for *each* line of <old-text/>
-              (if non-empty; split <old-text/> on newlines),
-            - one `+`-prefixed line for *each* line of <new-text/>
-              (if non-empty; split <new-text/> on newlines),
-            - one ` `-prefixed line for *each* line of <context-after/>
-              (if non-empty).
-
-            Set <hunk-body/> to those prefixed lines joined by newlines.
-
-            Set <old-count/> to the number of old-side hunk lines, i.e.,
-            the combined line count of <context-before/>, <old-text/>, and
-            <context-after/> (each empty part counts as `0`).
-            Set <new-count/> to the number of new-side hunk lines, i.e.,
-            the combined line count of <context-before/>, <new-text/>, and
-            <context-after/> (each empty part counts as `0`).
-
-            Set <old-start/> to the 1-based line number of the *first*
-            old-side hunk line: if <context-before/> is non-empty, that is
-            the line of its *first* context line, i.e., <line/> minus the
-            number of lines in <context-before/>; otherwise it is <line/> itself
-            (the first line of <old-text/>).
-            Set <new-start/> to the same value as <old-start/>, but clamped
-            to a minimum of `1` whenever <new-count/> is greater than `0`
-            (the shortened side then has a real first line).
-
-            Render the proposed shortening as a *unified diff* with *up to
-            two* lines of context in a fenced block based on the following
-            <template/>, emitting <hunk-body/> verbatim (one already-prefixed
-            line per line, with no extra blank or space-only lines):
-
-            <template>
-
-            <ase-tpl-bullet-normal/> **<stage/> SHORTENING** (**<block-before/>** → **<block-after/>** <unit/>, **-<block-percent/>%**):
-
-            ```diff
-            --- <file/> (original)
-            +++ <file/> (shortened)
-            @@ -<old-start/>,<old-count/> +<new-start/>,<new-count/> @@
-            <hunk-body/>
-            ```
-
-            </template>
+            <expand name="diff-hunk"
+                arg1="shortened"
+                arg2="**<stage/> SHORTENING** (**<block-before/>** → **<block-after/>** <unit/>, **-<block-percent/>%**)"></expand>
 
             </elseif>
 
@@ -495,10 +449,12 @@ than the user asked for.
         </if>
         <else>
 
-        Set <missed/> to (<length-after/> - <target/>).
+        Set <missed/> to (<length-after/> - <target/>) and <cause/> to
+        `target unreachable` if <length-projected/> is greater than
+        <target/>, else to `rejected or dropped shortenings`.
 
         <template>
-        <ase-tpl-bullet-signal/> **TARGET MISSED** by **<missed/>** <unit/> (rejected shortenings)
+        <ase-tpl-bullet-signal/> **TARGET MISSED** by **<missed/>** <unit/> (<cause/>)
         </template>
 
         </else>

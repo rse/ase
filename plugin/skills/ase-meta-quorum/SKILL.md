@@ -111,9 +111,9 @@ by querying *multiple* AIs for an *optimal consensus*.
     </define>
 
     Query only those foreign models whose token is contained in
-    <getopt-option-models/> (where `all` selects every model); silently
-    skip all others. Emit *all* these `Agent` tool invocations *in one
-    single message* so they run in *parallel*:
+    <getopt-option-models/> (where `all` selects every API-based
+    model); silently skip all others. Emit *all* these `Agent` tool
+    invocations *in one single message* so they run in *parallel*:
 
     <if condition="<getopt-option-models/> contains `all` OR <getopt-option-models/> contains `chatgpt`">
     <expand name="agent" arg1="OpenAI ChatGPT" arg2="chatgpt"></expand>

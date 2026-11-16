@@ -12,7 +12,7 @@ description: >
     "explain" specification content, or wants a small ad-hoc change to
     it -- and no dedicated specification skill (`ase-spec-edit`,
     `ase-sync-import`, `ase-sync-reconcile`, `ase-sync-export`) is
-    invoked, as those activate the know-how implicitly.
+    invoked, as those activate the know-how implicitly or need none.
 user-invocable: true
 disable-model-invocation: false
 effort: medium
@@ -199,10 +199,10 @@ of any dedicated specification skill:
     user to `/ase-spec-edit` instead of applying it ad-hoc.
 
 -   **Tandem**: The dedicated specification skills `ase-spec-edit`,
-    `ase-sync-import`, `ase-sync-reconcile`, and `ase-sync-export`
-    include the format contract themselves and activate the know-how
-    *implicitly*. Whenever one of them is invoked, its own procedure
-    takes *precedence* over these rules, and this skill *MUST* *NOT* be
-    invoked from within it. Conversely, a run of this skill *never*
-    replaces such a dedicated skill when the user explicitly asks for
-    it.
+    `ase-sync-import`, and `ase-sync-reconcile` include the format
+    contract themselves and activate the know-how *implicitly*, while
+    `ase-sync-export` needs no know-how at all. Whenever one of them is
+    invoked, its own procedure takes *precedence* over these rules, and
+    this skill *MUST* *NOT* be invoked from within it. Conversely, a run
+    of this skill *never* replaces such a dedicated skill when the user
+    explicitly asks for it.

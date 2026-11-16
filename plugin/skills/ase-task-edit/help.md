@@ -176,7 +176,7 @@ stale draft.
     of this skill). *option* is a single token or a *comma-separated
     chronological list* of tokens; each iteration of the planning
     loop consumes the *first* token of the list, and on hand-off
-    (`IMPLEMENT` / `DRAFT`) any remaining tokens are *forwarded*
+    (`GRILL`, `DRAFT`, or `IMPLEMENT`) any remaining tokens are *forwarded*
     (via `--next`) to the downstream skill so an entire pipeline can
     be pre-scripted in one shot. Recognized tokens at this skill:
     `none` (default, interactive answer required), `DONE` (no next

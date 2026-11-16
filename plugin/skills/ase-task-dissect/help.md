@@ -44,8 +44,9 @@ The derived parts are first reported as a *dissection table* (part
 number, sub-task id, scope, and rationale). Then -- unless `--dry` is
 given -- each part is materialized as its own *complete* sub-task plan
 (with its own `##  SPECIFICATION (WHAT)`, `##  DESIGN (HOW)`, and
-`##  VERIFICATION (WHEN)` sections) and persisted under the task id
-`<task-id>-<feature-slug>`.
+`##  VERIFICATION (WHEN)` sections) and persisted under a task id
+derived from `<task-id>-<feature-slug>` according to the task id scheme
+of the project.
 
 The parts are placed via their `Group:` and `After:` frontmatter keys.
 If the task already is a *member* of an epic (its `Group:` names another

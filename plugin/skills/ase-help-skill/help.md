@@ -54,10 +54,10 @@ The skill exposes *no* option flags beyond `--help`/`-h`.
 
 ##  EXAMPLES
 
-Show the manual page of `ase-code-lint` via its shortest abbreviation:
+Show the manual page of `ase-code-lint` via an unambiguous abbreviation:
 
 ```text
-❯ /ase-help-skill lint
+❯ /ase-help-skill code-lint
 ```
 
 Show the same manual page via its full, plugin-qualified name:

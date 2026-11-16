@@ -213,16 +213,16 @@ Procedure
 
     3.  Run the command
         `git -C "<repo-root/>" apply <strip/> --numstat -z "<patch/>"`.
-        If it fails (no valid patch) or reports nothing (an empty change
-        set, e.g., of an already merged pull request), expand the
+        If <source-kind/> is `file` and the command fails or none of the
+        reported paths exists below <repo-root/>, while with `-p0`
+        instead it succeeds and at least one of the reported paths
+        exists, set <strip>-p0</strip> and re-run the command.
+
+        If it still fails (no valid patch) or reports nothing (an empty
+        change set, e.g., of an already merged pull request), expand the
         following:
 
         <expand name="import-fail" arg1="**<source/>** carries no applicable change set"></expand>
-
-        If <source-kind/> is `file`, none of the reported paths exists
-        below <repo-root/>, and at least one of them does when running
-        the command with `-p0` instead, set <strip>-p0</strip> and
-        re-run the command.
 
     4.  Only output the following <template/>:
 

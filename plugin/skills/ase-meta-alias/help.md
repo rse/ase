@@ -105,13 +105,13 @@ List all effective aliases:
 Define a full alias for a security-focused linting:
 
 ```text
-❯ /ase-meta-alias set lint-sec /ase-code-lint --include=A05,A06 -S HIGH
+❯ /ase-meta-alias set lint-sec /ase-code-lint --include=A16 -S HIGH
 ```
 
 Define an option alias of the linting skill:
 
 ```text
-❯ /ase-meta-alias set --option ase-code-lint --sec --include=A05,A06 -S HIGH
+❯ /ase-meta-alias set --option ase-code-lint --sec --include=A16 -S HIGH
 ```
 
 Always grill a task plan after editing it, for yourself only:

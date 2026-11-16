@@ -18,7 +18,7 @@ understand it. The explanation uses simple, jargon-free wording --
 short sentences, everyday words, and familiar images -- and is
 structured into three labeled blocks: *WHAT* (a plain-words summary),
 *ANALOGY* (a concrete everyday-life comparison), and *WHY* (why the
-topic matters), each kept brief with 1-3 bullet points.
+topic matters), each kept to a single brief paragraph.
 
 By default the explanation is derived from model knowledge only. With
 the `--ground`/`-G` option, the skill first searches the Internet/Web

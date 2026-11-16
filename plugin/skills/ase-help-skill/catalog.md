@@ -1,7 +1,7 @@
 
 ⎈   **HELP**
 ○   `ase-help-skill`:      Show the Manual Page of an ASE Skill
-○   `ase-help-intent`:     Match an Intent to an ASE Command
+○   `ase-help-intent`:     Match an Intent to ASE Commands
 
 ⎈   **RESEARCH**
 ○   `ase-meta-search`:     Search the Internet/Web
@@ -33,7 +33,7 @@
 ○   `ase-code-edit`:       Edit Source Code
 ○   `ase-sync-import`:     Import Foreign Sources into Artifact Set
 ○   `ase-sync-reconcile`:  Reconcile Artifact Set to Artifact Set
-○   `ase-sync-export`:     Export Artifact Set to Side-by-Side Files
+○   `ase-sync-export`:     Export Specification into Rendered Files
 
 ⎈   **DOCUMENTATION**
 ○   `ase-docs-shorten`:    Shorten a Document to a Target Length

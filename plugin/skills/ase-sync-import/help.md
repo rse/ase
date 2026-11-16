@@ -21,27 +21,24 @@ that live outside the ASE artifact sets.
 
 The *foreign sources* are named by the free-form *hint* argument and may
 be local files or directories, remote URLs, pasted text passages, or
-references to other documents. Local files are read via the `Read` tool
-and remote URLs are fetched via the available web tools.
+references to other documents.
 
 The *target* is a comma-separated list over the six recognized
 artifact kinds `SPEC` (Specification, covering both requirements and
 architecture), `CODE` (Source Code), `DOCS` (Documentation), `TASK`
 (Task Plans), `INFR` (Infrastructure), and `OTHR` (catch-all). It
-defaults to `SPEC`. The file lists for the involved kinds are resolved
-via the `ase_artifact_list` MCP tool of the `ase` MCP server.
+defaults to `SPEC`.
 
-While importing, the skill honors the artifact-format conventions of
-`ase-format-meta.md`, `ase-format-spec.md` (the *SpecBook* models and
-formats plus the SpecBook schema configuration), and
-`ase-format-task.md`; the kinds `CODE`, `DOCS`, `INFR`, and `OTHR` have
+While importing, the skill honors the artifact formats of `SPEC` (the
+*SpecBook* models and formats plus the *SpecBook* schema configuration)
+and `TASK`; the kinds `CODE`, `DOCS`, `INFR`, and `OTHR` have
 no dedicated format contract and are treated as free-form. A target
 artifact that does not yet exist but is warranted by the imported
 information is *generated* from scratch, while an existing target
 artifact is *surgically updated* to reflect the imported information.
-Generated or updated `SPEC` artifacts are validated via the
-`ase_specbook_lint` MCP tool and the reported diagnostics are fixed in
-at most three rounds; any remaining diagnostics are surfaced.
+Generated or updated `SPEC` artifacts are validated via *SpecBook*
+linting and the reported diagnostics are fixed in at most three rounds;
+any remaining diagnostics are surfaced.
 
 ##  OPTIONS
 

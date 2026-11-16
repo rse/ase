@@ -42,11 +42,11 @@ expected one. Per-category pass-rates are combined into the overall rating
 via the `ase_decision_matrix` MCP tool as a *weighted average*, with
 *XML Placeholders* weighted `4.00` (the backbone of every skill),
 *Control Flow* weighted `3.00`, *Regex Matching* weighted `2.00`, and
-*Arithmetic* weighted `1.00`. The
-result is a boxed per-category table (passes and percentage per category),
-a final *OVERALL COMPATIBILITY* percentage, and a one-line *VERDICT*
-(`✓ fully compatible` at `≥ 90%`, `⚠ partially compatible` at `60–89%`,
-`✘ incompatible` below `60%`) that names any failed probes.
+*Arithmetic* weighted `1.00`. The result is a per-category table
+(passes and percentage per category) with a final *OVERALL* percentage
+row, and a one-line *VERDICT* (`✓ FULLY COMPATIBLE` at `≥ 90%`,
+`⚠ PARTIALLY COMPATIBLE` at `60–89%`, `✘ INCOMPATIBLE` below `60%`)
+that names any failed probes.
 
 ##  ARGUMENTS
 

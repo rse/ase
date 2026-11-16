@@ -22,7 +22,7 @@ The skill determines the project's technology stack (TypeScript,
 JavaScript, Kotlin, or Java), derives essential keywords from the
 requested functionality, queries the corresponding package registry
 (NPM or Maven Central), retrieves metadata (version, downloads,
-stars, dates, dependency count) via the `ase_component_info` MCP tool,
+stars, dates, dependency count) of the candidate components,
 and reports the top-ranked components as a Markdown table together with
 a single distinguishing hint (USP, Crux, or Gotcha) per component.
 

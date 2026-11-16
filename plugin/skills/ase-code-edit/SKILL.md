@@ -70,7 +70,8 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
     1.  Set <query><getopt-arguments/></query> (with any leading and
         trailing whitespace stripped), set <todo-what></todo-what> and
         <todo-how></todo-how> (both empty), and set
-        <worktree-dir></worktree-dir> (empty). If
+        <worktree-dir></worktree-dir> and <issue-id></issue-id> (both
+        empty). If
         <getopt-option-grill-auto/> is `true`, set
         <getopt-option-grill>true</getopt-option-grill>, as
         `--grill-auto` implies `--grill`. Do not output anything.

@@ -15,11 +15,10 @@ The `ase-sync-export` skill exports the `SPEC` artifact set -- the
 *SpecBook*-based specification of the project, located via the
 `project.artifact.spec.basedir` configuration -- into *derived*,
 ready-to-consume renderings. The specification is first validated
-against the SpecBook schema configuration via the `ase_specbook_lint`
-MCP tool of the `ase` MCP server; on any diagnostic the skill errors out
-and exports nothing, as a partial or invalid specification must never be
-rendered. Otherwise every requested *output* is rendered via the
-`ase_specbook_export` MCP tool.
+against the *SpecBook* schema configuration; on any error diagnostic
+the skill errors out and exports nothing, as a partial or invalid
+specification must never be rendered. Otherwise every requested
+*output* is rendered via the *SpecBook* export.
 
 Each *output* is an `[<format>:]<file>` entry, where the format is one
 of `json`, `json5`, `yaml`, `toon` (the specification object model),

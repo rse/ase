@@ -12,8 +12,8 @@
 ##  DESCRIPTION
 
 The `ase-task-assign` skill assigns a *task plan* to an *assignee*, i.e.
-sets its `Assignee:` frontmatter key, via the `ase_task_assign` MCP tool,
-leaving its `Modified:` key alone, as that key tracks changes of the plan
+sets its `Assignee:` frontmatter key, leaving its `Modified:` key alone,
+as that key tracks changes of the plan
 body only. Additionally, it *accounts* the *AI usage* of the session onto
 the task:
 

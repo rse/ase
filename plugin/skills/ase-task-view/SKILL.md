@@ -103,6 +103,7 @@ Procedure
         ◷   **Phase:**     <task-phase/>
         ⇢   **After:**     <task-after/>
         ◐   **Status:**    <task-status/>
+        ☺   **Assignee:**  <task-assignee/>
         ☯   **Kind:**      <task-kind/>
         ⚖   **Effort:**    <task-effort/>
         ⚑   **Tags:**      <task-tags/>

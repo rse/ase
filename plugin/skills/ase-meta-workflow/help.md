@@ -85,7 +85,7 @@ agent tool:
 ##  ARGUMENTS
 
 -   *skill-name*:
-    Name of the skill to generate, matching `^[a-zA-Z][a-zA-Z0-9_-]*$`.
+    Name of the skill to generate, matching `^[a-z][a-z0-9-]*$`.
     It is used as the directory name, as the frontmatter `name`, and as
     the resulting `/`*skill-name* command (respectively the
     `$`*skill-name* mention under *OpenAI Codex*).

@@ -270,11 +270,12 @@ Honor the following tenets throughout the brainstorming:
         <ase-tpl-bullet-normal/> **DISTILLED IDEA**: <option-N/>
         </template>
 
-    4.  Finally, derive a single *recommended idea* - the highest-ranked
-        option, or a principled synthesis of the option shortlist that preserves
-        what is strongest in each - store its one-sentence rationale (not
-        more than 40 words) in <recommendation/>, and output the following
-        <template/>:
+    4.  Derive a single *recommended idea* - the highest-ranked option,
+        or a principled synthesis of the option shortlist that preserves
+        what is strongest in each - store it in <recommendation/> with
+        the format `**<recommendation-name/>**: <recommendation-rationale/>`
+        (where the rationale is a single sentence of not more than 40
+        words), and output the following <template/>:
 
         <template>
         <ase-tpl-bullet-signal/> **RECOMMENDED IDEA**: <recommendation/>

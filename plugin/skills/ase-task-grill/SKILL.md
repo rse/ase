@@ -480,23 +480,11 @@ Set <args>--int-reuse-task</args>.
             </template>
 
         -   If <result/> is `DRAFT`:
-            <expand name="handoff-args"/>
-            Set <args><args/> --draft</args>. Only output the following
-            <template/> and then call the
-            `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
-            to *draft* the implementation of the plan.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan updated -- hand-off to implementation draft**
-            </template>
+            <expand name="task-next-handoff" arg1="ase-task-implement"
+                arg2="plan updated -- hand-off to implementation draft"
+                arg3="--draft"></expand>
 
         -   If <result/> is `IMPLEMENT`:
-            <expand name="handoff-args"/>
-            Only output the following <template/> and then call the
-            `Skill(skill: "ase:ase-task-implement", args: "<args/>")` tool
-            to *apply* the plan.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan updated -- hand-off to implementation**
-            </template>
+            <expand name="task-next-handoff" arg1="ase-task-implement"
+                arg2="plan updated -- hand-off to implementation"></expand>
 

@@ -13,6 +13,7 @@ allowed-tools:
     - "Glob"
     - "Bash(git rev-parse *)"
     - "Bash(git -C *)"
+    - "Bash(find *)"
 ---
 
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
@@ -119,8 +120,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
     `<repo-root/>/`. If `<getopt-arguments/>` is not empty, keep only
     those files which lie within the source code referenced by it,
     expanding any directory or wildcard references with the `Glob`
-    tool. Set <sources/> to the resulting list of individual source
-    code files, preserving order.
+    tool (or, if the `Glob` tool is not available, with the `find`
+    command via the `Bash` tool). Set <sources/> to the resulting list
+    of individual source code files, preserving order.
 
     If <sources/> is empty, only output the following <template/>
     and then *SKIP* the rest of this STEP 2 and the remaining step
@@ -135,7 +137,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     Then *silently* resolve `<getopt-arguments/>` to the list
     <sources/> of individual source code files, expanding any
-    directory or wildcard references with the `Glob` tool.
+    directory or wildcard references with the `Glob` tool (or, if the
+    `Glob` tool is not available, with the `find` command via the
+    `Bash` tool).
 
     If <sources/> is empty (no *source-reference* given or none of it
     resolvable), only output the following <template/> and then *STOP*

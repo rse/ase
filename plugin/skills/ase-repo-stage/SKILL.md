@@ -54,7 +54,7 @@ only the chained `ase-repo-changelog` skill of STEP 5 may edit a file.
 Whenever this skill *stops early* after STEP 1.5, first *undo* the
 intent-to-add marks of all files of <intent-files/> which carry no
 staged content by running the corresponding command (taken exactly as
-given) per file: `git reset -q -- "<file/>"`.
+given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
 
 <flow>
 

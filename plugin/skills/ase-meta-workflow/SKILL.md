@@ -178,7 +178,7 @@ Procedure
         <getopt-arguments/> and <workflow-description/> to the *entire
         remainder*. Do not output anything.
 
-    2.  <if condition="<new-skill-name/> does not match the regexp `^[a-zA-Z][a-zA-Z0-9_-]*$`">
+    2.  <if condition="<new-skill-name/> does not match the regexp `^[a-z][a-z0-9-]*$`">
         Ask the user interactively, without a special tool, for the skill
         name with a single question:
 
@@ -188,7 +188,7 @@ Procedure
         <workflow-description/> to the *entire* original
         <getopt-arguments/>.
         Repeat this question until the response matches the regexp
-        `^[a-zA-Z][a-zA-Z0-9_-]*$`, so that no path separator or traversal
+        `^[a-z][a-z0-9-]*$`, so that no path separator or traversal
         segment can ever reach <target-skill/>.
         </if>
 
