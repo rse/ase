@@ -2,13 +2,18 @@
 ChangeLog
 =========
 
-2.1.1 (2026-11-XX)
+2.1.1 (2026-11-16)
 ------------------
 
 -   FEATURE [code, docs]: Agent Budget Option "-B|--budget"
     The new option `-B|--budget <usd>` of all agents (default: `20`) limits the costs of processing
     a task via the native soft cost cap of the agent tool (`--max-budget-usd` of `claude` resp.
     `--max-ai-credits` of `copilot`), where an exhausted budget fails the processing.
+
+-   BUGFIX [code]: Service Shutdown and Session Id Hardening
+    `stopService` of `ase-service` now guards itself against a repeated shutdown (`/stop`, signal,
+    or idle tick), and `sessionState` of `ase-config-core` rejects the path-traversing session ids
+    `.` and `..`.
 
 -   CLEANUP [code]: Skill Lint Corrections and Shared Diff Hunk Rendering
     About 25 lint findings fixed across the skills: stale or wrong help pages, flow and logic slips
@@ -24,6 +29,11 @@ ChangeLog
 -   CLEANUP [docs]: Website Cache Options and Comment Cleanups
     The configuration table of the website lists the new `agent.cache.*` keys, and the terminal
     widget, progress feature, and title section got clarified comments and formatting.
+
+-   REFACTOR [code]: Tool Lint Cleanups
+    Long functions split (`resolveModel`, `probeConfig`, `infoBox`, `renderField`), the task rename
+    loads only the referring plans, `onTaskKey` of the web board dispatches via `dialogKeys`, and
+    the comments of `ase-lib-table` and `TaskStoreClient` were corrected resp. completed.
 
 2.1.0 (2026-11-16)
 ------------------
