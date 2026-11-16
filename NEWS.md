@@ -2,6 +2,18 @@
 NEWS
 ====
 
+ASE 2.0 to ASE 2.1
+------------------
+
+- Context Cache Auto-Warm
+- Configuration Editor TUI
+- Enhanced Grilling (Recommendations, Details, Auto-Mode, Approach)
+- Table Rendering Enhancement
+- Per-User/Per-Browser Task Board Display State
+- Grounded Plan Editing
+- Resizable Task Board Lanes
+- Change Set to Task (ase-repo-task)
+
 ASE 1.0 to ASE 2.0
 ------------------
 
