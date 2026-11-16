@@ -5,6 +5,10 @@ ChangeLog
 2.1.0 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [build]: Quiet Plugin Validation
+    The `claude plugin validate` step of the plugin linting, now a portable JavaScript-based
+    task `lint-claude` (working also under Windows), shows its output only on failure.
+
 -   NEW FEATURE [code, plugin, docs]: Merged Concurrent Task Plan Changes
     A conditional task plan save hit by a concurrent change now merges both changes part-wise
     (header keys, `##` body sections, attachments) and fails only on overlapping parts, while
