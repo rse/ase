@@ -12,7 +12,7 @@ import { Diagram } from "./ase-util-diagram.js"
 const termWidthFallback = 80
 
 /*  content width a column is at most shrunk down to, unless its own
-    content or its column head already is narrower anyway  */
+    content is narrower anyway or its column head is wider  */
 const colWidthMinimum = 8
 
 /*  measure the visible width of a cell content, ignoring ANSI escape

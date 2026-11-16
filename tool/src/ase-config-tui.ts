@@ -133,6 +133,46 @@ const dimTree = (node: React.ReactNode): React.ReactNode => {
 const follow = (off: number, top: number, idx: number, height: number, total: number): number =>
     Math.max(0, Math.min(Math.max(0, total - height), top < off ? top : idx >= off + height ? idx - height + 1 : off))
 
+/*  render the information box of a key (its key on the first line, and its description
+    on the following lines, both labeled, with the wrapped lines indented like the labels),
+    and right of it the legend box (of a fixed width) of the key and value styles, in two
+    columns with headings, both boxes with their titles in the color of their borders  */
+const infoBox = (cur: string, columns: number, ks: Record<KeyTone, TextProps>, vs: Record<ValueTone, TextProps>) => {
+    const legend = [
+        [ [ "KEY:",   cx("normal", "bold") ] as Seg, ...Object.entries(ks) as Seg[] ],
+        [ [ "VALUE:", cx("normal", "bold") ] as Seg, ...Object.entries(vs) as Seg[] ]
+    ]
+    const legC  = legend.map((col) => Math.max(...col.map(([ text ]) => text.length)))
+    const legW  = legC[0] + 2 + legC[1]
+    const descO = columns - 2 - (legW + 4) - 1
+    const descW = descO - 4
+    const infoW = Math.max(1, descW - 7)
+    const desc  = wrapText(configDescriptions[cur] ?? "", infoW, DESC - 1)
+    const info  = [
+        [ [ "KEY:   ", cx("normal", "bold") ], [ fit(cur, infoW), cx("normal", "bold") ] ],
+        ...Array.from({ length: DESC - 1 }, (_, i) =>
+            [ [ i === 0 ? "VALUE: " : "       ", cx("normal", "bold") ], [ fit(desc[i] ?? "", infoW), cx("normal") ] ])
+    ] as Seg[][]
+    return h(Box, { flexDirection: "row", marginX: 1 },
+        h(Box, { flexDirection: "column", width: descO },
+            h(Text, cx("dim"), "╭─[ parameter information ]" + "─".repeat(Math.max(0, descO - 28)) + "╮"),
+            ...info.map((segs, i) => h(Text, { key: `desc-${i}`, wrap: "truncate" },
+                h(Text, cx("dim"), "│ "),
+                ...segs.map(([ text, props ], j) => h(Text, { key: j, ...(props ?? {}) }, text)),
+                h(Text, cx("dim"), " │"))),
+            h(Text, cx("dim"), `╰${"─".repeat(Math.max(0, descO - 2))}╯`)),
+        h(Box, { flexDirection: "column", width: legW + 4, marginLeft: 1 },
+            h(Text, cx("dim"), "╭─[ legend ]" + "─".repeat(legW + 4 - 13) + "╮"),
+            ...Array.from({ length: DESC }, (_, r) => h(Text, { key: `legend-${r}` },
+                h(Text, cx("dim"), "│ "),
+                ...[ 0, 1 ].flatMap((c) => {
+                    const [ text, props ] = legend[c][r] ?? [ "" ]
+                    return [ h(Text, { key: c, ...(props ?? {}) }, text), " ".repeat(legC[c] - text.length + (c === 0 ? 2 : 0)) ]
+                }),
+                h(Text, cx("dim"), " │"))),
+            h(Text, cx("dim"), `╰${"─".repeat(legW + 2)}╯`)))
+}
+
 /*  the root component of the configuration editor  */
 const App = ({ log, chain }: { log: Log, chain: Scope }) => {
     const { exit, suspendTerminal } = useApp()
@@ -787,44 +827,8 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         ]
     }
 
-    /*  the information box of the selected key (its key on the first line, and its
-        description on the following lines, both labeled, with the wrapped lines indented
-        like the labels), and right of it the legend box (of a fixed width) of the key
-        styles and value styles, in two columns with headings, both boxes with their
-        titles in the color of their borders  */
-    const legend = [
-        [ [ "KEY:",   cx("normal", "bold") ] as Seg, ...Object.entries(ks) as Seg[] ],
-        [ [ "VALUE:", cx("normal", "bold") ] as Seg, ...Object.entries(vs) as Seg[] ]
-    ]
-    const legC  = legend.map((col) => Math.max(...col.map(([ text ]) => text.length)))
-    const legW  = legC[0] + 2 + legC[1]
-    const descO = columns - 2 - (legW + 4) - 1
-    const descW = descO - 4
-    const infoW = Math.max(1, descW - 7)
-    const desc  = wrapText(configDescriptions[cur] ?? "", infoW, DESC - 1)
-    const info  = [
-        [ [ "KEY:   ", cx("normal", "bold") ], [ fit(cur, infoW), cx("normal", "bold") ] ],
-        ...Array.from({ length: DESC - 1 }, (_, i) =>
-            [ [ i === 0 ? "VALUE: " : "       ", cx("normal", "bold") ], [ fit(desc[i] ?? "", infoW), cx("normal") ] ])
-    ] as Seg[][]
-    const descBox = h(Box, { flexDirection: "row", marginX: 1 },
-        h(Box, { flexDirection: "column", width: descO },
-            h(Text, cx("dim"), "╭─[ parameter information ]" + "─".repeat(Math.max(0, descO - 28)) + "╮"),
-            ...info.map((segs, i) => h(Text, { key: `desc-${i}`, wrap: "truncate" },
-                h(Text, cx("dim"), "│ "),
-                ...segs.map(([ text, props ], j) => h(Text, { key: j, ...(props ?? {}) }, text)),
-                h(Text, cx("dim"), " │"))),
-            h(Text, cx("dim"), `╰${"─".repeat(Math.max(0, descO - 2))}╯`)),
-        h(Box, { flexDirection: "column", width: legW + 4, marginLeft: 1 },
-            h(Text, cx("dim"), "╭─[ legend ]" + "─".repeat(legW + 4 - 13) + "╮"),
-            ...Array.from({ length: DESC }, (_, r) => h(Text, { key: `legend-${r}` },
-                h(Text, cx("dim"), "│ "),
-                ...[ 0, 1 ].flatMap((c) => {
-                    const [ text, props ] = legend[c][r] ?? [ "" ]
-                    return [ h(Text, { key: c, ...(props ?? {}) }, text), " ".repeat(legC[c] - text.length + (c === 0 ? 2 : 0)) ]
-                }),
-                h(Text, cx("dim"), " │"))),
-            h(Text, cx("dim"), `╰${"─".repeat(legW + 2)}╯`)))
+    /*  the information and legend boxes of the selected key (see "infoBox")  */
+    const descBox = infoBox(cur, columns, ks, vs)
 
     /*  the key hints (toggled by "?", like in the task board) and the status line in
         the last line of the screen, enclosed on its left and right side by the downward

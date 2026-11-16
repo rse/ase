@@ -373,6 +373,38 @@ const fetchCodexLimits = async (): Promise<RateLimits | undefined> => {
 /*  type of the configuration values shown in the statusline  */
 type StatuslineCfg = { taskId: string, persona: string, guidance: string, boxing: string, lifecycle: string }
 
+/*  probe the configuration values shown in the statusline from the configuration
+    and the state of a session, falling back to the environment variables  */
+const probeConfig = (log: Log, session: string): StatuslineCfg => {
+    let taskId    = process.env.ASE_TASK_ID                ?? "default"
+    let persona   = process.env.ASE_PERSONA_STYLE          ?? ""
+    let guidance  = process.env.ASE_GUIDANCE_LEVEL         ?? ""
+    let boxing    = process.env.ASE_PROJECT_BOXING         ?? ""
+    let lifecycle = process.env.ASE_PROJECT_TASK_LIFECYCLE ?? ""
+    try {
+        const cfg = new Config("config", configSchema, log, parseScope(`session:${session}`))
+        cfg.read("lenient")
+        const get = (key: string, fallback: string): string =>
+            String(cfg.get(key) ?? "").trim() || fallback
+        persona   = get("agent.persona",          persona)
+        guidance  = get("agent.guidance",         guidance)
+        boxing    = get("project.boxing",         boxing)
+        lifecycle = get("project.task.lifecycle", lifecycle)
+    }
+    catch {
+        /*  cascade unavailable; keep env-var fallbacks  */
+    }
+    try {
+        const state = sessionState(log, session)
+        state.read("lenient")
+        taskId = String(state.get("task") ?? "").trim() || taskId
+    }
+    catch {
+        /*  session state unavailable; keep env-var fallback  */
+    }
+    return { taskId, persona, guidance, boxing, lifecycle }
+}
+
 /*  type of the context of the placeholder renderers: the input data, the target tool,
     the rate-limit windows, the output helpers, and the lazy memoized probes  */
 type RenderCtx = {
@@ -666,36 +698,7 @@ export default class StatuslineCommand {
                     once per run and only when first requested by a renderer (or by the
                     post-loop tmux publish for the Config cascade)  */
                 const getSession = memoize((): string => data.session_id ?? "unknown")
-                const getCfg = memoize((): StatuslineCfg => {
-                    let taskId    = process.env.ASE_TASK_ID                ?? "default"
-                    let persona   = process.env.ASE_PERSONA_STYLE          ?? ""
-                    let guidance  = process.env.ASE_GUIDANCE_LEVEL         ?? ""
-                    let boxing    = process.env.ASE_PROJECT_BOXING         ?? ""
-                    let lifecycle = process.env.ASE_PROJECT_TASK_LIFECYCLE ?? ""
-                    try {
-                        const cfg = new Config("config", configSchema, this.log,
-                            parseScope(`session:${getSession()}`))
-                        cfg.read("lenient")
-                        const get = (key: string, fallback: string): string =>
-                            String(cfg.get(key) ?? "").trim() || fallback
-                        persona   = get("agent.persona",          persona)
-                        guidance  = get("agent.guidance",         guidance)
-                        boxing    = get("project.boxing",         boxing)
-                        lifecycle = get("project.task.lifecycle", lifecycle)
-                    }
-                    catch {
-                        /*  cascade unavailable; keep env-var fallbacks  */
-                    }
-                    try {
-                        const state = sessionState(this.log, getSession())
-                        state.read("lenient")
-                        taskId = String(state.get("task") ?? "").trim() || taskId
-                    }
-                    catch {
-                        /*  session state unavailable; keep env-var fallback  */
-                    }
-                    return { taskId, persona, guidance, boxing, lifecycle }
-                })
+                const getCfg = memoize((): StatuslineCfg => probeConfig(this.log, getSession()))
                 const getModel = memoize((): { name: string, effort: string } => {
                     const display = data.model?.display_name ?? ""
 

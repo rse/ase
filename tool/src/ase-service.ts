@@ -369,6 +369,9 @@ export default class ServiceCommand {
 
         /*  stop the HTTP server and the usage tracker, clear the persisted port, and exit  */
         const stopService = async (): Promise<void> => {
+            if (stopping)
+                return
+            stopping = true
             try {
                 await server.stop({ timeout: 1000 })
             }
@@ -503,7 +506,6 @@ export default class ServiceCommand {
             const shutdown = async (signal: string) => {
                 if (stopping)
                     return
-                stopping = true
                 this.log.write("info", `service: received ${signal}, stopping`)
                 await stopService()
             }
@@ -525,7 +527,6 @@ export default class ServiceCommand {
             if (usage.active())
                 return
             if (Date.now() - lastActivity > IDLE_MS) {
-                stopping = true
                 this.log.write("info", "service: idle timeout reached, stopping")
                 await stopService()
             }

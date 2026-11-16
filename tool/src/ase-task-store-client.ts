@@ -28,12 +28,19 @@ import * as TaskFormat                                    from "./ase-task-forma
     "ase[s]://<addr>:<port>[/<token>]" store); a missing task plan is reported as null resp. false; the
     effective lifecycle model and task id scheme are known after the opening only  */
 export interface TaskStoreClient {
+    /*  the effective lifecycle model and task id scheme of the project, and their switching  */
     lifecycle: TaskFormat.TaskLifecycle
     idscheme:  string
     setLifecycle (name: string): Promise<void>
     setIdScheme  (spec: string): Promise<void>
+
+    /*  open resp. close the task store  */
     open   (): Promise<void>
     close  (): Promise<void>
+
+    /*  allocate a task id, list the task plans (optionally with their header resp. usage), and
+        load, save (conditionally on an entity tag resp. create-only, yielding the new entity tag),
+        patch (status and/or id), delete, and purge (by age) task plans  */
     newId  (title: string, proposal: string, taken: string[]): Promise<{ scheme: string, id: string }>
     list   (fields?: "header" | "usage"): Promise<Core.TaskListEntry[]>
     load   (id: string): Promise<API.TaskPlan | null>
@@ -41,8 +48,12 @@ export interface TaskStoreClient {
     patch  (id: string, change: { status?: string, id?: string }): Promise<Core.TaskPatchResult | null>
     delete (id: string): Promise<boolean>
     purge  (age: string): Promise<string[]>
+
+    /*  get the raw content of an attachment, resp. add (or append to) an attachment  */
     content (id: string, index: number): Promise<{ type: string, content: Buffer } | null>
     attach (id: string, attachment: API.TaskAttachment, append?: boolean): Promise<boolean>
+
+    /*  subscribe to the changes (and the connection state), yielding the unsubscriber  */
     subscribe (onChange: () => void, onState?: (connected: boolean) => void): () => void
 }
 

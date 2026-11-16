@@ -827,6 +827,28 @@ const resolveAttach = (
     return { expect, skip: attachSpec("attach-skip") }
 }
 
+/*  resolve the model of the agent tool from its option value <value>: a plain model
+    (for all tasks, as size "*"), or the models per "Effort:" size, where none means
+    the default of the tool  */
+const resolveModel = (value: string): ResolvedDefinition["model"] => {
+    const spec = value.trim()
+    const sizes: Record<string, string> = {}
+    if (spec !== "" && !spec.includes("="))
+        sizes["*"] = spec
+    else if (spec !== "") {
+        for (const pair of spec.split(",").map((item) => item.trim())) {
+            const m = /^(XS|S|M|L|XL|\*)=(\S+)$/.exec(pair)
+            if (m === null)
+                failOption("model", `invalid pair "${pair}" (expected "<size>=<model>" with size "XS", "S", "M", "L", "XL", or "*")`)
+            else if (Object.hasOwn(sizes, m[1]))
+                failOption("model", `size "${m[1]}" given twice`)
+            else
+                sizes[m[1]] = m[2]
+        }
+    }
+    return { spec, sizes }
+}
+
 /*  resolve the definition of the agent named <name> from its (camel-cased) command-line
     options <opts>: the defaults, overridden by the definition of "--definition" (if any),
     overridden by the given options, validated against the task lifecycle models  */
@@ -896,24 +918,8 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
             fail("definition", "hook \"passes\" is not for \"--unclaimed\" (as an unclaimed task never waits for its predecessors)")
     }
 
-    /*  the model of the agent tool: a plain model (for all tasks, as size "*"),
-        or the models per "Effort:" size, where none means the default of the tool  */
-    const modelSpec = str("model").trim()
-    const sizes: Record<string, string> = {}
-    if (modelSpec !== "" && !modelSpec.includes("="))
-        sizes["*"] = modelSpec
-    else if (modelSpec !== "") {
-        for (const pair of modelSpec.split(",").map((item) => item.trim())) {
-            const m = /^(XS|S|M|L|XL|\*)=(\S+)$/.exec(pair)
-            if (m === null)
-                fail("model", `invalid pair "${pair}" (expected "<size>=<model>" with size "XS", "S", "M", "L", "XL", or "*")`)
-            else if (Object.hasOwn(sizes, m[1]))
-                fail("model", `size "${m[1]}" given twice`)
-            else
-                sizes[m[1]] = m[2]
-        }
-    }
-    const model = { spec: modelSpec, sizes }
+    /*  the model of the agent tool (see "resolveModel")  */
+    const model = resolveModel(str("model"))
 
     /*  whether a verdict is determined (by "--verdict-label" or the hook "verdict")  */
     const verdicting = has("verdict-label") || loaded.hooks.verdict !== undefined

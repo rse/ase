@@ -400,7 +400,7 @@ watch([ sel, graph, view, task, grown ], () => {
         d.over = group === undefined || surface.value.collapsed.includes(group.title) ? null : group.lanes[sel.value.l]?.status ?? null
 })
 
-/*  the single-key actions of the task dialog on its task  */
+/*  the single-key actions on a task (of the task dialog and of the board)  */
 const dialogKeys: Record<string, (id: string) => void> = {
     E: openPrompt, R: openRequest, T: openTransfer, A: openAssign,
     D: (id) => { confirmDel.value = id }
@@ -535,25 +535,10 @@ const onTaskKey = (ev: KeyboardEvent, id: string, carrying: boolean): boolean =>
     }
     else if (ev.key === "N")
         startNew()
-    else if (ev.key === "E") {
-        if (id !== "" && !carrying)
-            openPrompt(id)
-    }
-    else if (ev.key === "R") {
-        if (id !== "" && !carrying)
-            openRequest(id)
-    }
-    else if (ev.key === "D") {
-        if (id !== "")
-            confirmDel.value = id
-    }
-    else if (ev.key === "T") {
-        if (id !== "" && !carrying)
-            openTransfer(id)
-    }
-    else if (ev.key === "A") {
-        if (id !== "" && !carrying)
-            openAssign(id)
+    else if (Object.hasOwn(dialogKeys, ev.key)) {
+        /*  only the deletion is also offered while carrying a task  */
+        if (id !== "" && (ev.key === "D" || !carrying))
+            dialogKeys[ev.key](id)
     }
     else
         return false

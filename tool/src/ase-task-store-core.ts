@@ -637,21 +637,19 @@ export class TaskStoreCore {
                     in their "Group" keys, rewritten to the new id (header only, so
                     their "Modified" key stays untouched)  */
                 const referrers: { id: string, plan: API.TaskPlan }[] = []
-                for (const { id } of await this.store.taskList(prjId)) {
-                    if (id === taskId)
+                for (const { id, header } of await this.store.taskList(prjId)) {
+                    const inGroup = epic && header.Group === taskId
+                    const inAfter = Array.isArray(header.After) && header.After.includes(taskId)
+                    if (id === taskId || (!inGroup && !inAfter))
                         continue
                     const other = await this.load(prjId, id)
                     if (other === null)
                         continue
-                    const { Group: group, After: after } = other.header
-                    const inGroup = epic && group === taskId
-                    const inAfter = Array.isArray(after) && after.includes(taskId)
-                    if (!inGroup && !inAfter)
-                        continue
+                    const after = other.header.After
                     if (inGroup)
                         other.header.Group = newId
-                    if (inAfter)
-                        other.header.After = (after as string[]).map((ref) => ref === taskId ? newId : ref)
+                    if (inAfter && Array.isArray(after))
+                        other.header.After = after.map((ref) => ref === taskId ? newId : ref)
                     referrers.push({ id, plan: other })
                 }
 

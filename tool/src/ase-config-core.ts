@@ -531,7 +531,7 @@ export class Config {
 /*  access the internal "state.yaml" of a session, which, unlike the
     configuration, does not cascade through any weaker scope  */
 export const sessionState = (log: Log, sessionId: string): Config => {
-    if (!/^[A-Za-z0-9._-]+$/.test(sessionId))
+    if (!/^[A-Za-z0-9._-]+$/.test(sessionId) || sessionId === "." || sessionId === "..")
         throw new Error(`invalid session id "${sessionId}"`)
     return new Config("state", sessionStateSchema, log, [ { kind: "session", id: sessionId } ])
 }

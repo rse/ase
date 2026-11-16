@@ -233,6 +233,38 @@ const renderLine = (line: Line, refSel: number) =>
         ...(span.ref !== undefined && span.ref === refSel ? { color: palette.signal, inverse: true } : {})
     }, sanitize(span.text))))
 
+/*  render the search field in the frame of an input box (like the input boxes of the
+    task board, in accent color, resp. in signal color while typing): the part
+    of the query around the cursor (with an inverse cursor cell at the cursor,
+    resp. behind its end) while typing, else its tail, or a placeholder,
+    followed by a clickable clear symbol for a non-empty query  */
+const renderField = (query: string, cur: number, typing: boolean, fieldW: number) => {
+    const textW  = Math.max(1, fieldW - 8)
+    const tone   = typing ? "signal" : "accent"
+    const shown  = sanitize(query)
+    const hint   = "search manpages… (/)".slice(0, textW)
+    const cells  = shown.length + (typing && cur >= shown.length ? 1 : 0)
+    const fieldX = Math.max(0, typing ? cur + 1 - textW : shown.length - textW)
+    const used   = typing || query !== "" ? Math.min(cells, fieldX + textW) - fieldX : hint.length
+    const text   = typing ? [
+        h(Text, { key: "pre",  ...cx(tone, "bold") }, shown.slice(fieldX, cur)),
+        h(Text, { key: "cur",  ...cx(tone, "bold", "inverse") }, shown[cur] ?? " "),
+        h(Text, { key: "post", ...cx(tone, "bold") }, shown.slice(cur + 1, fieldX + textW))
+    ] : query !== "" ?
+        [ h(Text, { key: "text", ...cx(tone, "bold") }, shown.slice(fieldX)) ] :
+        [ h(Text, { key: "hint", ...cx("dim") }, hint) ]
+    return h(Box, { flexDirection: "column", width: fieldW },
+        h(Text, cx(tone), `╭${"─".repeat(fieldW - 2)}╮`),
+        h(Text, {},
+            h(Text, cx(tone), "│ "),
+            h(Text, cx(typing ? "signal" : "dim"), "⌕ "),
+            ...text,
+            " ".repeat(Math.max(0, textW - used)),
+            h(Text, cx(tone, "bold"), query !== "" ? " ✕" : "  "),
+            h(Text, cx(tone), " │")),
+        h(Text, cx(tone), `╰${"─".repeat(fieldW - 2)}╯`))
+}
+
 /*  the initial state of the browser page: the selected page, or the search query  */
 type Initial = { id: string | null, query: string }
 
@@ -606,36 +638,8 @@ const App = ({ catalog, initial }: { catalog: Catalog, initial: Initial | null }
                 " · commands: ", h(Text, counts, count(catalog.commands)))),
         h(Box, cx("fixed"), h(Text, cx("dim"), "│")))
 
-    /*  the search field in the frame of an input box (like the input boxes of the
-        task board, in accent color, resp. in signal color while typing): the part
-        of the query around the cursor (with an inverse cursor cell at the cursor,
-        resp. behind its end) while typing, else its tail, or a placeholder,
-        followed by a clickable clear symbol for a non-empty query  */
-    const fieldW = FW
-    const textW  = Math.max(1, fieldW - 8)
-    const tone   = typing ? "signal" : "accent"
-    const shown  = sanitize(query)
-    const hint   = "search manpages… (/)".slice(0, textW)
-    const cells  = shown.length + (typing && cur >= shown.length ? 1 : 0)
-    const fieldX = Math.max(0, typing ? cur + 1 - textW : shown.length - textW)
-    const used   = typing || query !== "" ? Math.min(cells, fieldX + textW) - fieldX : hint.length
-    const text   = typing ? [
-        h(Text, { key: "pre",  ...cx(tone, "bold") }, shown.slice(fieldX, cur)),
-        h(Text, { key: "cur",  ...cx(tone, "bold", "inverse") }, shown[cur] ?? " "),
-        h(Text, { key: "post", ...cx(tone, "bold") }, shown.slice(cur + 1, fieldX + textW))
-    ] : query !== "" ?
-        [ h(Text, { key: "text", ...cx(tone, "bold") }, shown.slice(fieldX)) ] :
-        [ h(Text, { key: "hint", ...cx("dim") }, hint) ]
-    const field  = h(Box, { flexDirection: "column", width: fieldW },
-        h(Text, cx(tone), `╭${"─".repeat(fieldW - 2)}╮`),
-        h(Text, {},
-            h(Text, cx(tone), "│ "),
-            h(Text, cx(typing ? "signal" : "dim"), "⌕ "),
-            ...text,
-            " ".repeat(Math.max(0, textW - used)),
-            h(Text, cx(tone, "bold"), query !== "" ? " ✕" : "  "),
-            h(Text, cx(tone), " │")),
-        h(Text, cx(tone), `╰${"─".repeat(fieldW - 2)}╯`))
+    /*  the search field (see "renderField")  */
+    const field = renderField(query, cur, typing, FW)
 
     /*  the content of the start page: the search field, a blank line, and the
         catalog grid (reduced to the matching pages of a search, and laid out
