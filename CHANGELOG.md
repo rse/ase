@@ -31,33 +31,6 @@ ChangeLog
     in a too narrow terminal as records with aligned keys and hanging-indented values, while
     wider terminals still get the regular table grids of Claude Code.
 
--   IMPROVEMENT [code, docs, plugin]: Configuration Editor as "ase config edit"
-    The terminal UI of `ase config ui` is renamed to `ase config edit`, replacing the former
-    `$EDITOR`-based `ase config edit`, whose function remains as the key `e` in the scope view.
-
--   IMPROVEMENT [code, docs]: Context Tokens in Statusline Context Bar
-    The statusline placeholder `%c` now appends the current context tokens to its progress bar and
-    percentage.
-
--   IMPROVEMENT [code, docs]: Per-User/Per-Browser Task Board Display State
-    The display state of the task boards now moves from `.ase/board.yaml` per project into the
-    per-user state directory (terminal board) resp. the local storage of each browser (web board),
-    applied live to all other open boards of the user resp. browser, except their own view.
-
--   BUGFIX [plugin]: Grilling of Design/Verification Only
-    The skill `ase-task-grill` now lowers `--until MUST` to `SHOULD` when `SPECIFICATION` is not
-    in focus, so `--focus HOW|WHEN` no longer stops before asking anything, and no longer saves
-    (and bumps `Modified:` of) an unchanged plan.
-
--   BUGFIX [code]: Textual Numbers in Configuration Editor
-    The configuration editor of `ase config edit` now edits number keys whose schema carries the
-    metadata `text` as free text, so values like `150k` or `4,8,12` can be typed in.
-
--   BUGFIX [plugin]: Inline Image Rendering on Image-Dropping Engines (#127)
-    The mod `ase-mods-render-image.ts` now always takes the PNG of `ase_rasterize` from a temporary
-    file, as some Claude Code versions drop the image blocks of `$.mcp.call`, which yielded
-    `ERROR: [Cells: WxH]` instead of the image.
-
 -   NEW FEATURE [plugin]: Grounded Plan Editing
     The new option `--ground|-G` of `ase-task-edit` grounds the plan once per run in the project
     artifacts and the Internet/Web, serving its generation, its refinements, and the approach round
@@ -73,25 +46,61 @@ ChangeLog
     and `0` resets the lane heights of its phase, while the web board additionally offers a grip bar
     between the lanes for resizing by dragging (persisted in `.ase/board.yaml`).
 
--   BUGFIX [code]: Web Board Drag & Drop in Off-Screen Web Views
-    The web board now drags task boxes onto lanes through pointer events instead of HTML5 drag & drop,
-    which off-screen rendering web views (like the one of the Herdr desktop app) do not support,
-    with a floating clone of the task box following the pointer (ESC cancels).
-
 -   NEW FEATURE [plugin, docs]: Change Set to Task
     The new `ase-repo-task` skill reverse-engineers a change set (staged, unstaged, `--branch`, or
     `--commit`), optionally narrowed to a scope topic, into a new task plan (or only its `--focus`
     sections), precise enough for a re-implementation yielding a similar change set.
 
--   IMPROVEMENT [plugin]: Focused Grounding
-    `--ground` of `ase-code-edit`, `ase-spec-edit`, `ase-task-implement`, and `ase-task-grill` now
-    focuses especially on special, less known terms and on potentially outdated aspects: explicit
-    search targets, Web facts judged by date or version, and `TERM`/`CURRENT`/`OUTDATED` labels.
-
 -   NEW FEATURE [plugin, code]: Plan Diff after Grilling
     The new option `--diff|-d` of `ase-task-grill` shows, before the next-step dialog, the cumulative
     change of the plan body by all rounds as a unified diff (e.g. to review `--auto` answers),
     computed deterministically by the new MCP tool `ase_text_diff`.
+
+-   NEW FEATURE [plugin]: Automatic Grilling
+    The new options `--grill-auto|-a` of `ase-code-edit` and `ase-spec-edit` (implying `--grill`) and
+    `--auto|-a` of `ase-task-grill` pick every `★` answer instead of asking, leaving questions without a
+    recommendation unanswered. The short option of `--approach` in both edit skills moves to `-A`.
+
+-   NEW FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
+    Besides the `⚑` current decision state, grilling tables now mark the answer critically judged best
+    (judge-first, context before world knowledge) with `★`, if any. Unaddressed `ase-task-grill`
+    questions accept it, and the blue hover cards show `WHAT:` details and `WHY ★:`/`WHY NOT ★:`
+    rationales.
+
+-   NEW FEATURE [plugin, docs]: Answer Details in Grilling Tables
+    The grilling skills optionally pass a 3-4 sentence detail per question and answer to the new mod
+    tool `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled
+    with the number, focus, and topic of the question resp. the short response and label of the
+    answer, while the pointer hovers over the question resp. answer.
+
+-   NEW FEATURE [code, docs]: Interactive Configuration Editor
+    The new `ase config ui` opens a terminal UI with a parameter view (all keys, values, and scopes)
+    and a scope view (per-scope YAML), toggled by `v`, where a modal edits a value on any writable
+    scope (toggle, pull-down, or input field) and stores it immediately, and `e` edits a scope file.
+
+-   FEATURE [code, docs]: SpecBook Omit, Fetch, and Search
+    `ase spec export|preview` (and `ase_specbook_export`) gained `-O|--omit <aspect>[,...]` to leave
+    out diagrams and overlong cells, all `ase spec` sub-commands (and `ase_specbook_*`) gained
+    `-F|--fetch never|auto|always` for the remote schemas, and the new `ase spec search [<term> ...]`
+    (and `ase_specbook_search`) finds shareable schemas.
+
+-   IMPROVEMENT [code, docs, plugin]: Configuration Editor as "ase config edit"
+    The terminal UI of `ase config ui` is renamed to `ase config edit`, replacing the former
+    `$EDITOR`-based `ase config edit`, whose function remains as the key `e` in the scope view.
+
+-   IMPROVEMENT [code, docs]: Context Tokens in Statusline Context Bar
+    The statusline placeholder `%c` now appends the current context tokens to its progress bar and
+    percentage.
+
+-   IMPROVEMENT [code, docs]: Per-User/Per-Browser Task Board Display State
+    The display state of the task boards now moves from `.ase/board.yaml` per project into the
+    per-user state directory (terminal board) resp. the local storage of each browser (web board),
+    applied live to all other open boards of the user resp. browser, except their own view.
+
+-   IMPROVEMENT [plugin]: Focused Grounding
+    `--ground` of `ase-code-edit`, `ase-spec-edit`, `ase-task-implement`, and `ase-task-grill` now
+    focuses especially on special, less known terms and on potentially outdated aspects: explicit
+    search targets, Web facts judged by date or version, and `TERM`/`CURRENT`/`OUTDATED` labels.
 
 -   IMPROVEMENT [plugin]: Highlighted Grilling Markers
     The function hooks module now renders the `★` (recommendation) and `⚑` (current decision)
@@ -107,20 +116,9 @@ ChangeLog
     The summary in front of the grilling tables is now prefixed with a bold `SUMMARY:` and states
     only the facts, without any lead-in like "The edit adds" or "The task does".
 
--   NEW FEATURE [plugin]: Automatic Grilling
-    The new options `--grill-auto|-a` of `ase-code-edit` and `ase-spec-edit` (implying `--grill`) and
-    `--auto|-a` of `ase-task-grill` pick every `★` answer instead of asking, leaving questions without a
-    recommendation unanswered. The short option of `--approach` in both edit skills moves to `-A`.
-
 -   IMPROVEMENT [plugin]: Consistent Approach Short Option
     The short option of `--approach` of `ase-task-edit` moves from `-a` to `-A`, too,
     aligning it with `ase-code-edit` and `ase-spec-edit`.
-
--   NEW FEATURE [plugin, docs]: Recommended Answers in Grilling Tables
-    Besides the `⚑` current decision state, grilling tables now mark the answer critically judged best
-    (judge-first, context before world knowledge) with `★`, if any. Unaddressed `ase-task-grill`
-    questions accept it, and the blue hover cards show `WHAT:` details and `WHY ★:`/`WHY NOT ★:`
-    rationales.
 
 -   IMPROVEMENT [plugin]: Dimension-Wise Grounding Beyond Grilling
     Grounding (`ase-common-ground.md`) now runs per dimension `WHAT`, `HOW`, `WHEN` in parallel
@@ -128,33 +126,9 @@ ChangeLog
     `--ground` (formerly `--grill-ground`) grounds the entire `ase-code-edit`, `ase-spec-edit`, and
     `ase-task-implement` operation, not only the grilling.
 
--   NEW FEATURE [plugin, docs]: Answer Details in Grilling Tables
-    The grilling skills optionally pass a 3-4 sentence detail per question and answer to the new mod
-    tool `ase_mods_grill_details`, and the latest grilling table reveals it in a framed card, titled
-    with the number, focus, and topic of the question resp. the short response and label of the
-    answer, while the pointer hovers over the question resp. answer.
-
 -   IMPROVEMENT [plugin]: Subject Summary Above Grilling Tables
     Every grilling table is now preceded by a short paragraph, which briefly summarizes what the
     grilled subject is about (the what only, not the why).
-
--   NEW FEATURE [code, docs]: Interactive Configuration Editor
-    The new `ase config ui` opens a terminal UI with a parameter view (all keys, values, and scopes)
-    and a scope view (per-scope YAML), toggled by `v`, where a modal edits a value on any writable
-    scope (toggle, pull-down, or input field) and stores it immediately, and `e` edits a scope file.
-
--   BUGFIX [code, docs]: View Changes Not Shared Across Web Boards
-    Switching the view of a web task board via `v` now immediately switches all other open web
-    boards of the project, too, like the toggling of the titles via `t` already did.
-
--   BUGFIX [code]: Task Board Header Damaged in Ghostty
-    `ase task board` now enters raw mode before Ink queries the kitty keyboard protocol, so the
-    echoed response of terminals like Ghostty no longer shifts the first frame and blanks the header.
-
--   BUGFIX [plugin]: Mod Validation Against Claude Code 2.1.325
-    The mod modules now import each other without the `.ts` suffix, which `claude plugin validate`
-    refuses without `allowImportingTsExtensions`, and type the new result objects of
-    `$.model.complete` and `$.model.fork` (instead of a string resp. `null`).
 
 -   IMPROVEMENT [code, docs]: Untracked Usage Hint in Statistics View
     Without any usage attachment within the time range, the `Usage` and `Top-5 Tasks` frames of the
@@ -169,11 +143,33 @@ ChangeLog
     `ase setup statusline activate` now adds `"refreshInterval": 10` for Claude Code, so the
     statusline also catches up with changes raising no event-driven update (like native commands).
 
--   FEATURE [code, docs]: SpecBook Omit, Fetch, and Search
-    `ase spec export|preview` (and `ase_specbook_export`) gained `-O|--omit <aspect>[,...]` to leave
-    out diagrams and overlong cells, all `ase spec` sub-commands (and `ase_specbook_*`) gained
-    `-F|--fetch never|auto|always` for the remote schemas, and the new `ase spec search [<term> ...]`
-    (and `ase_specbook_search`) finds shareable schemas.
+-   BUGFIX [plugin]: Grilling of Design/Verification Only
+    The skill `ase-task-grill` now lowers `--until MUST` to `SHOULD` when `SPECIFICATION` is not
+    in focus, so `--focus HOW|WHEN` no longer stops before asking anything, and no longer saves
+    (and bumps `Modified:` of) an unchanged plan.
+
+-   BUGFIX [plugin]: Inline Image Rendering on Image-Dropping Engines (#127)
+    The mod `ase-mods-render-image.ts` now always takes the PNG of `ase_rasterize` from a temporary
+    file, as some Claude Code versions drop the image blocks of `$.mcp.call`, which yielded
+    `ERROR: [Cells: WxH]` instead of the image.
+
+-   BUGFIX [code]: Web Board Drag & Drop in Off-Screen Web Views
+    The web board now drags task boxes onto lanes through pointer events instead of HTML5 drag & drop,
+    which off-screen rendering web views (like the one of the Herdr desktop app) do not support,
+    with a floating clone of the task box following the pointer (ESC cancels).
+
+-   BUGFIX [code, docs]: View Changes Not Shared Across Web Boards
+    Switching the view of a web task board via `v` now immediately switches all other open web
+    boards of the project, too, like the toggling of the titles via `t` already did.
+
+-   BUGFIX [code]: Task Board Header Damaged in Ghostty
+    `ase task board` now enters raw mode before Ink queries the kitty keyboard protocol, so the
+    echoed response of terminals like Ghostty no longer shifts the first frame and blanks the header.
+
+-   BUGFIX [plugin]: Mod Validation Against Claude Code 2.1.325
+    The mod modules now import each other without the `.ts` suffix, which `claude plugin validate`
+    refuses without `allowImportingTsExtensions`, and type the new result objects of
+    `$.model.complete` and `$.model.fork` (instead of a string resp. `null`).
 
 2.0.12 (2026-11-09)
 -------------------
