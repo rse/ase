@@ -5,18 +5,107 @@ NEWS
 ASE 2.0 to ASE 2.1
 ------------------
 
-- Change Set to Task (ase-repo-task)
-- Context Cache Auto-Warm
-- Configuration Editor TUI
-- Table Rendering Enhancement
-- Enhanced Grilling (Recommendations, Details, Auto-Mode, Approach)
-- Per-User/Per-Browser Task Board Display State
-- Resizable Task Board Lanes
+*ASE 2.1 sharpens the planning and improves the daily work with the agent tool!*
+
+The **grilling** became considerably smarter: every grilling table recommends the answer judged
+best with a `★`, reveals details and rationales of questions and answers in hover cards, can run
+fully automatically by picking all recommendations, and selects the approach as its own round.
+A new **griller agent** grills the plans of the drafted tasks headless.
+
+The new **configuration editor** `ase config edit` shows and edits all configuration keys across
+all scopes in a terminal UI. The **task boards** now keep their display state per user resp. per
+browser, and allow you to resize their lanes.
+
+Task plans can now be **grounded** in the project artifacts and the Internet/Web already while
+editing them, and a new skill reverse-engineers any **change set** (staged changes, a branch, or a
+commit) into a task plan, precise enough for a re-implementation.
+
+The **prompt cache** of Claude Code is now under control: its state is shown in the footer, big
+idle caches are kept warm automatically, and you are asked before a prompt is sent into a big cold
+cache. Markdown **tables**, which Claude Code draws vertically in too narrow terminals, are now
+redrawn as readable records.
+
+Finally, agent fleets can be isolated through their own per-user directories, configuration scope,
+and working copies.
+
+### FEATURES
+
+-   **Prompt Cache Controller**: the cache state is shown in the footer, big idle caches are
+    auto-warmed, and cold sends are confirmed (`agent.cache.*`, `/ase-mods-auto-warm`).
+
+-   **Readable Vertical Tables**: tables drawn vertically by Claude Code in too narrow
+    terminals are redrawn as records with aligned keys and hanging-indented values.
+
+-   **Grounded Plan Editing**: `ase-task-edit --ground` grounds the plan in the project
+    artifacts and the Internet/Web, for its generation, its refinements, and its approach round.
+
+-   **Change Set to Task**: `ase-repo-task` reverse-engineers the staged or unstaged changes,
+    a branch (`--branch`), or a commit (`--commit`) into a new task plan.
+
+-   **Configuration Editor**: `ase config edit` opens a terminal UI with a parameter view
+    and a scope view, storing edited values immediately on any writable scope.
+
+-   **Recommended Answers**: grilling tables mark the answer judged best with `★`, besides
+    the current decision `⚑`, and unaddressed `ase-task-grill` questions accept it.
+
+-   **Answer Details**: hovering over a question resp. answer of a grilling table reveals
+    its `WHAT:` details and `WHY ★:`/`WHY NOT ★:` rationales in a card.
+
+-   **Automatic Grilling**: `ase-task-grill --auto` and `ase-{code,spec}-edit --grill-auto`
+    pick every `★` answer instead of asking.
+
+-   **Grilling Diff**: `ase-task-grill --diff` shows the cumulative change of the plan by
+    all grilling rounds as a unified diff, e.g. to review the `--auto` answers.
+
+-   **Approach Round**: `--approach` of `ase-{task,code,spec}-edit` now runs as a grilling
+    round of 1-4 approach questions, standalone or in front of the regular rounds.
+
+-   **Focused Grounding**: `--ground` of `ase-{code,spec}-edit` and `ase-task-implement` grounds
+    the entire operation per `WHAT`/`HOW`/`WHEN` dimension, focused on rare and outdated terms.
+
+-   **Plan Grilling Agent**: `ase agent griller` grills the plans of the `DRAFTED` tasks
+    assigned to it via `ase-task-grill --ground --auto`, and puts them back unassigned.
+
+-   **Per-User Directories**: `ASE_CONFIG_DIR` and `ASE_STATE_DIR` relocate the per-user
+    configuration resp. state directory, e.g. for an agent fleet.
+
+-   **Override Scope**: with `ASE_CONFIG_DIR` set, `$ASE_CONFIG_DIR/override.yaml` provides the
+    read-only configuration scope `override` between the `task` and `session` scopes.
+
+-   **Agent Working Copy**: `-C|--cwd <dir>` of all agents runs the agent tool in another
+    working copy, e.g. a persistent clone per agent of a fleet.
+
+-   **Board Display State**: the task boards keep their display state per user (terminal)
+    resp. per browser (web), applied live to all other open boards.
+
+-   **Resizable Board Lanes**: `+`/`-` resize and `0` resets the task board lanes, while the
+    web board additionally offers grip bars for resizing by dragging.
+
+-   **SpecBook Omit, Fetch, Search**: `ase spec export|preview --omit` leaves out aspects,
+    `--fetch` controls the fetching of remote schemas, and `ase spec search` finds schemas.
+
+-   **Statusline Context Tokens**: the placeholder `%c` now appends the current context
+    tokens, and the statusline refreshes periodically (`ase setup statusline activate`).
+
+### INCOMPATIBILITIES
+
+-   **Configuration Editor**: `ase config edit` now opens the terminal UI, while the former
+    `$EDITOR`-based editing of a scope file moved to the key `e` of its scope view.
+
+-   **Ground Option**: `--grill-ground` of `ase-{code,spec}-edit` is now `--ground` (still
+    `-G`), and the short option of `--ground` of `ase-meta-{eli5,proximity,quotes}` is now `-G`
+    (instead of `-g`).
+
+-   **Approach Option**: the short option of `--approach` of `ase-{task,code,spec}-edit` is
+    now `-A` (instead of `-a`), as `-a` now selects `--grill-auto` in `ase-{code,spec}-edit`.
+
+-   **Board Display State**: a `.ase/board.yaml` of the project is no longer used and can be
+    removed, as the display state is now kept per user resp. per browser.
 
 ASE 1.0 to ASE 2.0
 ------------------
 
-**ASE 2.0 is a major step forward!**
+*ASE 2.0 is a major step forward!*
 
 The essential ad-hoc prompt and task plan **grilling** became an all-in-one compact view, with
 numbered questions and lettered answers, replied to with short responses like `1A 2c`, and
