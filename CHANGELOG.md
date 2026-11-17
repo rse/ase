@@ -10,6 +10,11 @@ ChangeLog
     revealing the expected values, and rejects an incomplete submission, so an eager early call of
     the skill can no longer contaminate the blind self-test (see issue #128).
 
+-   BUGFIX [code]: Finish Tasks Already Claimed by an Agent
+    The skills `ase-task-implement` and `ase-task-integrate` now also set the final `Status:` of a
+    task already put into `IMPLEMENTING` resp. `INTEGRATING` by its claiming agent, so the
+    `implementer` agent no longer stalls successfully implemented tasks (see PR #125).
+
 2.1.1 (2026-11-16)
 ------------------
 
