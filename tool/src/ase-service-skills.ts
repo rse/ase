@@ -243,10 +243,86 @@ export class Skills {
         }
     }
 
+    /*  normalize a Python distribution name (PEP 503)  */
+    private static pypiName (name: string): string {
+        return name.trim().replace(/[-_.]+/g, "-").toLowerCase()
+    }
+
+    /*  fetch PyPI metadata for a single distribution via the JSON API: the latest
+        version, the earliest upload of its files ("updated") resp. of all release
+        files ("created"), the repository from the project URLs (preferring the
+        source/repository/code keys), and the direct, non-extra `requires_dist`  */
+    private static async fetchPyPIInfo (name: string): Promise<{
+        version: string, created: string, updated: string, repository: string, deps: number | "N.A."
+    }> {
+        try {
+            type PyPIFile = { upload_time_iso_8601?: string }
+            const pkg = await Skills.httpLimit(() => ofetch<{
+                info?: {
+                    version?:       string
+                    home_page?:     string | null
+                    project_urls?:  Record<string, string> | null
+                    requires_dist?: string[] | null
+                }
+                releases?: Record<string, PyPIFile[]>
+                urls?:     PyPIFile[]
+            }>(
+                `https://pypi.org/pypi/${encodeURIComponent(Skills.pypiName(name))}/json`,
+                { timeout: Skills.HTTP_TIMEOUT_MS, ignoreResponseError: true }
+            ))
+            const info    = pkg?.info
+            const version = info?.version ?? ""
+            if (version === "")
+                return { version: "", created: "", updated: "", repository: "", deps: "N.A." }
+            const earliest = (files: PyPIFile[]) => {
+                let min = ""
+                for (const f of files) {
+                    const t = f.upload_time_iso_8601 ?? ""
+                    if (t !== "" && (min === "" || Date.parse(t) < Date.parse(min)))
+                        min = t
+                }
+                return min
+            }
+            const updated = earliest(pkg?.urls ?? [])
+            const first   = earliest(Object.values(pkg?.releases ?? {}).flat())
+            const created = first !== "" ? first : updated
+            const projectUrls = info?.project_urls ?? {}
+            const urls = [
+                ...Object.entries(projectUrls).filter(([ k ]) => /source|repo|code/i.test(k)).map(([ , u ]) => u),
+                ...Object.values(projectUrls),
+                info?.home_page ?? ""
+            ].filter((u) => u !== "")
+            const repository = urls.find((u) => /github\.com[:/](?!sponsors\/)[^/]+\/[^/#?]+/.test(u)) ?? urls[0] ?? ""
+
+            /*  an absent `requires_dist` denotes a distribution without dependencies  */
+            const deps = (info?.requires_dist ?? []).filter((r) => !/;.*\bextra\s*==/.test(r)).length
+            return { version, created, updated, repository, deps }
+        }
+        catch {
+            return { version: "", created: "", updated: "", repository: "", deps: "N.A." }
+        }
+    }
+
+    /*  fetch last-month PyPI downloads for a single distribution from `pypistats.org`  */
+    private static async fetchPyPIDownloads (name: string): Promise<number | "N.A."> {
+        try {
+            const data = await Skills.httpLimit(() => ofetch<{ data?: { last_month?: number } }>(
+                `https://pypistats.org/api/packages/${encodeURIComponent(Skills.pypiName(name))}/recent?period=month`,
+                { timeout: Skills.HTTP_TIMEOUT_MS, ignoreResponseError: true }
+            ))
+            const n = data?.data?.last_month
+            return typeof n === "number" ? n : "N.A."
+        }
+        catch {
+            return "N.A."
+        }
+    }
+
     /*  gather metadata for all given components with maximum parallelism,
         dispatching on the technology stack:
         -   "JavaScript"/"TypeScript": NPM registry (pacote) + GitHub stars + npm-downloads
         -   "Java"/"Kotlin":           Maven Central + GitHub stars + mvnrepository.com "Used By"
+        -   "Python":                  PyPI JSON API + GitHub stars + pypistats.org downloads
         -   "Unknown":                 not supported -- return empty result  */
     static async info (
         stack:      string,
@@ -260,7 +336,9 @@ export class Skills {
                 { meta: Skills.fetchPackument, downloads: Skills.fetchDownloads } :
                 stack === "Java" || stack === "Kotlin" ?
                     { meta: Skills.fetchMavenInfo, downloads: Skills.fetchMavenDownloads } :
-                    null
+                    stack === "Python" ?
+                        { meta: Skills.fetchPyPIInfo, downloads: Skills.fetchPyPIDownloads } :
+                        null
         if (fetchers === null)
             return []
 
@@ -395,9 +473,13 @@ export class SkillsMCP {
                 "version + earliest/latest release timestamps from the Maven Central Solr " +
                 "search endpoint, the SCM/project URL from the latest POM at `repo1.maven.org`, " +
                 "GitHub stars (if applicable), and the \"Used By\" count from `mvnrepository.com` " +
-                "as the `downloads` proxy. The number of *direct* dependencies is read as `deps` " +
-                "(from the packument version entry for NPM, or the latest POM's `<dependencies>` " +
-                "block for Maven). Returns a JSON `text` array of " +
+                "as the `downloads` proxy. For `Python`, components are PyPI distribution names: " +
+                "fetches the latest version, release timestamps, project URLs, and `requires_dist` " +
+                "from the PyPI JSON API at `pypi.org`, GitHub stars (if applicable), and the " +
+                "last-month downloads from `pypistats.org`. The number of *direct* dependencies " +
+                "is read as `deps` (from the packument version entry for NPM, the latest POM's " +
+                "`<dependencies>` block for Maven, or the non-extra `requires_dist` entries for " +
+                "PyPI). Returns a JSON `text` array of " +
                 "`{ name, version, created, updated, repository, stars, downloads, deps, rank }` " +
                 "objects, sorted in descending order by `rank`. The `rank` applies a two-tier hard " +
                 "staleness penalty keyed off `staleMonths` (0.3x past the threshold, 0.1x past twice " +
@@ -406,9 +488,10 @@ export class SkillsMCP {
                 "and reported as `\"N.A.\"` or empty string so every entry has the full shape.",
             inputSchema: {
                 stack: z.string()
-                    .describe("Technology stack: \"JavaScript\", \"TypeScript\", \"Java\", \"Kotlin\", or \"Unknown\""),
+                    .describe("Technology stack: \"JavaScript\", \"TypeScript\", \"Java\", \"Kotlin\", \"Python\", or \"Unknown\""),
                 components: z.array(z.string())
-                    .describe("List of package names (NPM) or Maven coordinates `groupId:artifactId` (Java/Kotlin)"),
+                    .describe("List of package names (NPM), Maven coordinates `groupId:artifactId` (Java/Kotlin), " +
+                        "or distribution names (PyPI)"),
                 staleMonths: z.number().optional()
                     .describe("Staleness threshold in months (default 18); a release older than this is rank-penalized"),
                 smallScope: z.boolean().optional()

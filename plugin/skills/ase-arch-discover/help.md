@@ -19,12 +19,14 @@ components* (libraries/frameworks) for the technology stack that
 provide the needed *functionality*.
 
 The skill determines the project's technology stack (TypeScript,
-JavaScript, Kotlin, or Java), derives essential keywords from the
-requested functionality, queries the corresponding package registry
-(NPM or Maven Central), retrieves metadata (version, downloads,
-stars, dates, dependency count) of the candidate components,
-and reports the top-ranked components as a Markdown table together with
-a single distinguishing hint (USP, Crux, or Gotcha) per component.
+JavaScript, Kotlin, Java, or Python with `pip` or `uv`), derives
+essential keywords from the requested functionality, queries the
+corresponding package registry (NPM, Maven Central, or PyPI, the
+latter supplemented by GitHub, as PyPI has no search), retrieves
+metadata (version, downloads, stars, dates, dependency count) of the
+candidate components, and reports the top-ranked components as a
+Markdown table together with a single distinguishing hint (USP, Crux,
+or Gotcha) per component.
 
 The ranking penalizes *stale* components (last release older than the
 `--staleness` threshold) and, when the `--small-scope` option is given,
@@ -60,7 +62,7 @@ demotes dependency-heavy components.
 ##  SCENARIOS
 
 -   You want a third-party library or framework for a needed functionality
--   You want a ranked survey of candidate components from NPM or Maven Central
+-   You want a ranked survey of candidate components from NPM, Maven Central, or PyPI
 -   You want to know whether a package is healthy or stale and abandoned
 -   You want to decide between a dependency and hand-rolling a small feature
 

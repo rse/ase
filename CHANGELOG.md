@@ -5,6 +5,11 @@ ChangeLog
 2.1.2 (2026-11-XX)
 ------------------
 
+-   FEATURE [code]: Python Support for "ase-arch-discover"
+    The skill `ase-arch-discover` now detects Python projects of the packaging tools `pip` and `uv`,
+    discovers PyPI packages via Web and GitHub search, and the MCP tool `ase_component_info`
+    fetches their metadata from the PyPI JSON API and their downloads from `pypistats.org`.
+
 -   BUGFIX [code]: Blind Grading of "ase-meta-compat" Probes
     The MCP tool `ase_compat` now grades all submitted actual probe results as pass/fail, never
     revealing the expected values, and rejects an incomplete submission, so an eager early call of

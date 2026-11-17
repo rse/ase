@@ -93,7 +93,12 @@ for the technology stack to *provide* the *needed functionality*
         6.  Else, if a file `pom.xml`, `build.gradle`, or `build.gradle.kts` is found
             in the top-level directory of the project, then <stack>Java</stack>.
 
-        7.  Else, use <stack>Unknown</stack>.
+        7.  Else, if a file of the packaging tools `uv` (`uv.lock` or
+            `pyproject.toml`) or `pip` (`requirements.txt`, `pylock.toml`,
+            `setup.py`, `setup.cfg`, or `pyproject.toml`) is found in the
+            top-level directory of the project, then <stack>Python</stack>.
+
+        8.  Else, use <stack>Unknown</stack>.
 
     2.  Display the determined final technology stack with just the
         following <template/>:
@@ -110,7 +115,7 @@ for the technology stack to *provide* the *needed functionality*
         *STOP* the entire flow (do not perform any further steps):
 
         <template>
-        <ase-tpl-bullet-normal/> **RESULT**: technology stack could not be determined -- component discovery is only supported for JavaScript, TypeScript, Java, and Kotlin projects.
+        <ase-tpl-bullet-normal/> **RESULT**: technology stack could not be determined -- component discovery is only supported for JavaScript, TypeScript, Java, Kotlin, and Python projects.
         </template>
 
     2.  From <stack/> and <functionality/>, derive essential keywords
@@ -166,7 +171,26 @@ for the technology stack to *provide* the *needed functionality*
             into the already existing result set, but deduplicate
             entries by Maven coordinate.
 
-    6.  Call the `ase_component_info(stack: "<stack/>", components:
+    6.  If <stack/> is "Python":
+
+        1.  Based on the essential keywords <keyword-L/> (L=1-M),
+            use the `ase-meta-search` skill in a sub-agent to *generally*
+            discover an initial set of a maximum of <pool/> *PyPI packages*
+            <component-K/> and at least their real name <name-K/> and
+            their unique distribution names <package-K/> (as used by
+            `pip install` resp. `uv add`).
+
+        2.  As PyPI provides no search API (and neither `pip` nor `uv`
+            can search), use the shell command `curl -s 'https://api.github.com/search/repositories?q=<keyword-1/>+[...]+<keyword-M/>+language:python&sort=stars&per_page=<pool/>'`
+            to *specifically* discover an additional set of a maximum of
+            <pool/> *Python repositories*, based on the essential keywords
+            <keyword-L/> (L=1-M), and derive from each result item (its
+            `name`, `full_name`, and `description` fields) the PyPI
+            distribution name <package-K/> of the component. Merge the
+            results into the already existing result set, but deduplicate
+            entries by their distribution name.
+
+    7.  Call the `ase_component_info(stack: "<stack/>", components:
         [ "<package-1/>", ..., "<package-C/>" ], staleMonths:
         <getopt-option-staleness/>, smallScope: <getopt-option-small-scope/>)`
         tool of the `ase` MCP server *once* for the entire candidate set of
@@ -187,15 +211,17 @@ for the technology stack to *provide* the *needed functionality*
         (numeric or `N.A.`), <deps-K/> from `deps` (numeric or `N.A.`)
         and <rank-K/> from `rank` (numeric). The returned `rank` already
         reflects the staleness and small-scope dependency penalties.
+        If <stack/> is "Python", drop every candidate with an empty
+        `version`, as it is not published on PyPI.
 
-    7.  Sort, in descending order, the discovered candidate components
+    8.  Sort, in descending order, the discovered candidate components
         <component-K/> (K=1-C) by their `rank` field and trim the result
         list to just a maximum of <getopt-option-limit/> total components,
         which establishes the final retained set <component-K/> (K=1-N,
         where N is at most <getopt-option-limit/>). All subsequent steps
         operate solely on this retained set.
 
-    8.  For each component <component-K/> (K=1-N), research and then
+    9.  For each component <component-K/> (K=1-N), research and then
         decide which *one* of *USP* (Unique Selling Point -- what makes
         it unique), *Crux* (what you should notice), or *Gotcha* (what
         you should not stumble over) is its single most distinguishing
