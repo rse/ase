@@ -15,7 +15,7 @@ About
 -----
 
 **Agentic Software Engineering (ASE)** is the
-opinionated [Open Source](https://github.com/rse/ase/blob/master/LICENSE.txt) companion
+extensive [Open Source](https://github.com/rse/ase/blob/master/LICENSE.txt) companion
 toolkit of [*Dr. Ralf S. Engelschall*](https://ase.tools/#author)
 for fusing the concept of *Agentic AI Coding* and traditional *Software Engineering*
 in the software development tool [Anthropic Claude
