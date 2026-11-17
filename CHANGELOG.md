@@ -5,6 +5,11 @@ ChangeLog
 2.1.2 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Blind Grading of "ase-meta-compat" Probes
+    The MCP tool `ase_compat` now grades all submitted actual probe results as pass/fail, never
+    revealing the expected values, and rejects an incomplete submission, so an eager early call of
+    the skill can no longer contaminate the blind self-test (see issue #128).
+
 2.1.1 (2026-11-16)
 ------------------
 

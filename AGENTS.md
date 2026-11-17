@@ -478,8 +478,8 @@ Beyond `ase setup`, the CLI provides:
     identifier minting), `ase util metric` (text length metrics),
     `ase util rasterize` (SVG/PNG/GIF/JPEG rasterizing into PNG, Kitty, iTerm2 IIP,
     SIXEL, or text art, with bundled fonts copied into `dst/font/` at build-time), and
-    `ase util compat` (probe values for the `ase-meta-compat` self-test
-    skill)
+    `ase util compat` (expected probe values of the `ase-meta-compat`
+    self-test skill, for inspection by humans)
 
 See the manual pages `tool/man/*.md` (e.g. `ase man ase`) for the full details.
 

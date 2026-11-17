@@ -35,9 +35,10 @@ on -- *control flow*, *XML placeholders*, *regex matching*, and
 
 This skill is unusual: it is both the *test definition* and the *system
 under test*. Each *probe* is a pure ASE construct that you execute,
-recording its *actual* result. You *MUST NOT* compare against any expected
-value until STEP 6. Do not fabricate passes: a probe whose actual result
-differs from its expected result *MUST* be recorded as a *fail*.
+recording its *actual* result. The expected values are *never* shown to
+you: only STEP 6 submits *all* actual results to the `ase_compat` MCP
+tool, which grades them. Do not fabricate passes: the grading of the tool
+is final.
 
 Notice that this skill intentionally does not strictly follow the ASE
 skill format; in particular, it does not include the usual meta skill
@@ -53,8 +54,12 @@ Procedure
     a `<category/>/<probe-name/>` entry with its *actual* computed value.
 
     Initialize the running list of failed probes <failures></failures>
-    (set to empty) -- this is populated only in STEP 6 after comparing
-    actuals against the expected values.
+    (set to empty) -- this is populated only in STEP 6 from the grading
+    of the actuals.
+
+    *IMPORTANT*: Do *NOT* call the `ase_compat` MCP tool now. It is
+    called exactly once, in STEP 6, after *all* probes of STEPs 2-5 have
+    been executed and recorded in <actuals/>.
 
 2.  STEP 2: Probe XML Placeholders
 
@@ -188,24 +193,34 @@ Procedure
 
     Set <arith-total/> to the number of arithmetic probes above.
 
-6.  STEP 6: Fetch Expected Values and Score
+6.  STEP 6: Grade Actual Results and Score
 
-    Call the `ase_compat()` tool of the `ase` MCP server with an
-    *internal* *programmatic* MCP tool call (and *NOT* with an external
-    shell command) and set <compat-output/> to the `text` content of the
-    response.
+    *Precondition*: <actuals/> holds the actual results of *all* 25
+    probes of STEPs 2-5. If any probe is still missing, first execute it
+    and record its actual result.
 
-    Parse <compat-output/> into a map <expected/> by splitting on
-    newlines; for each non-empty line of the form `<id/>: <value/>`, set
-    `<expected[<id/>]>` to `<value/>` (value may be empty for probes
-    whose correct answer is an empty string).
+    Call...
 
-    For each probe in <actuals/>, compare the actual result to
-    `<expected[<id/>]>` using an exact-match comparison:
+    `ase_compat(actuals: {
+        "<category/>/<probe-name/>": "<actual/>",
+        [...]
+    })`
 
-    -   If they match, count the probe as *pass*.
-    -   If they differ, count the probe as *fail* and append `<id/>`
-        to <failures/>.
+    ...of the `ase` MCP server, passing *all* entries of <actuals/>, with
+    an *internal* *programmatic* MCP tool call (and *NOT* with an
+    external shell command) and set <compat-output/> to the `text`
+    content of the response.
+
+    If the tool responds with an error listing missing probes, execute
+    exactly these probes, record their actual results in <actuals/>,
+    and call the tool again with *all* entries of <actuals/>.
+
+    Parse <compat-output/> by splitting on newlines; for each non-empty
+    line of the form `<id/>: <grade/>`:
+
+    -   If <grade/> is `pass`, count the probe as *pass*.
+    -   Else (<grade/> is `fail`), count the probe as *fail* and append
+        `<id/>` to <failures/>.
 
     Tally pass counts per category:
 

@@ -52,7 +52,7 @@ with status `1`.
 
 - `ase util compat`:
   Output the expected probe values of the `ase-meta-compat` self-test
-  skill. See `ase-util-compat`(1).
+  skill for inspection by humans. See `ase-util-compat`(1).
 
 - `ase util diagram` \[*options*\]:
   Render a *Mermaid* or *D2* diagram specification as Unicode/ASCII art

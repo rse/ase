@@ -15,10 +15,11 @@ per line as *id*`: `*value*, where *id* is
 model of the agent tool correctly interprets the pseudo-code
 constructs the *ASE* skills are written in.
 
-This command is intended to be invoked by the skill only after it has
-recorded all actual probe results (so the model cannot see the
-expected values beforehand), and not directly by end users. The MCP
-tool `ase_compat` provides the same.
+This command is intended for inspecting the expected values by humans
+only. The skill itself instead submits all its actual probe results to
+the MCP tool `ase_compat`, which grades them as *id*`: pass` resp.
+*id*`: fail` lines and rejects an incomplete submission, so the model
+never sees the expected values.
 
 ## OPTIONS
 

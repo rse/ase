@@ -5,6 +5,7 @@
 */
 
 import { Command }          from "commander"
+import { z }                from "zod"
 import type { McpServer }   from "@modelcontextprotocol/sdk/server/mcp.js"
 
 import { writeStdout }      from "./ase-lib-stdio.js"
@@ -55,27 +56,44 @@ export default class CompatCommand {
     register (program: Command): void {
         program
             .command("compat")
-            .description("Output expected probe values for the ase-meta-compat self-test skill")
+            .description("Output expected probe values of the ase-meta-compat self-test skill for inspection by humans")
             .action(async () => {
                 await writeStdout(formatExpected())
             })
     }
 }
 
-/*  MCP tool "ase_compat" -- lets the skill call this without a Bash tool  */
+/*  MCP tool "ase_compat" -- grades the actual probe results of the skill,
+    never revealing the expected values  */
 export class CompatMCP {
     register (mcp: McpServer): void {
         mcp.registerTool("ase_compat", {
-            title:       "ASE compat expected values",
+            title:       "ASE compat probe grading",
             description:
-                "Return the canonical expected probe values for the ase-meta-compat " +
-                "self-test skill as \"<id>: <value>\" lines, one per probe. " +
-                "Call this AFTER recording all actual probe results so the LLM " +
-                "cannot see the expected values before running the probes.",
-            inputSchema: {}
-        }, async () => {
+                "Grade the actual probe results of the ase-meta-compat self-test skill " +
+                "against the canonical expected values. Call this only AFTER having executed " +
+                "ALL probes, passing ALL actual results, keyed by \"<category>/<probe-name>\". " +
+                "Returns one \"<id>: pass\" resp. \"<id>: fail\" line per probe (never the expected values), " +
+                "or an error listing the missing probes, if not all of them were submitted.",
+            inputSchema: {
+                actuals: z.record(z.string(), z.string())
+                    .describe("map of all actual probe results, keyed by \"<category>/<probe-name>\"")
+            }
+        }, async (args) => {
+            const missing = Object.keys(EXPECTED).filter((id) => !Object.hasOwn(args.actuals, id))
+            if (missing.length > 0) {
+                const text = "ERROR: not all probes were submitted -- first execute the missing probes, " +
+                    "then call this tool again with ALL actual results (missing: " + missing.join(", ") + ")\n"
+                return {
+                    isError: true,
+                    content: [ { type: "text", text } ]
+                }
+            }
+            const text = Object.entries(EXPECTED).map(([ id, value ]) =>
+                `${id}: ${args.actuals[id].trim() === value ? "pass" : "fail"}`
+            ).join("\n") + "\n"
             return {
-                content: [ { type: "text", text: formatExpected() } ]
+                content: [ { type: "text", text } ]
             }
         })
     }

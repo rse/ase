@@ -37,8 +37,9 @@ probes four capability categories:
   percentage rounding, and bar-width computations.
 
 Each *probe* embeds a construct with a *known expected result*; the model
-executes it and honestly self-checks its actual result against the
-expected one. Per-category pass-rates are combined into the overall rating
+executes it *blind* and records its actual result. Only then are all
+actual results graded against the expected ones, which the model never
+sees. Per-category pass-rates are combined into the overall rating
 via the `ase_decision_matrix` MCP tool as a *weighted average*, with
 *XML Placeholders* weighted `4.00` (the backbone of every skill),
 *Control Flow* weighted `3.00`, *Regex Matching* weighted `2.00`, and
