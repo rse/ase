@@ -5,6 +5,21 @@ ChangeLog
 2.1.2 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Latest Maven Version in "ase-arch-discover"
+    The MCP tool `ase_component_info` now takes the most recently released stable version of a
+    Maven package instead of the highest version number of Maven Central, which can be an old
+    pre-release (like a milestone), so actively maintained packages are no longer ranked as stale.
+
+-   FEATURE [code]: Scala, Rust, Go, and C#/.NET Support for "ase-arch-discover"
+    The skill `ase-arch-discover` now detects Scala, Rust, Go, and C#/F# projects, discovers their
+    packages via Web search plus Scaladex, crates.io, pkg.go.dev, resp. NuGet search, and the MCP
+    tool `ase_component_info` fetches their metadata from Maven Central, crates.io and its sparse
+    index, the Go module proxy, deps.dev, and pkg.go.dev, resp. the NuGet APIs.
+
+-   IMPROVEMENT [code]: Portable URL Fetching in "ase-arch-discover"
+    The skill `ase-arch-discover` now fetches the Maven Central and GitHub search URLs with the
+    built-in web fetch tool of the agent tool instead of the less portable `curl` command.
+
 -   FEATURE [code]: Python Support for "ase-arch-discover"
     The skill `ase-arch-discover` now detects Python projects of the packaging tools `pip` and `uv`,
     discovers PyPI packages via Web and GitHub search, and the MCP tool `ase_component_info`
