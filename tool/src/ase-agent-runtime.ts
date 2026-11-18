@@ -122,11 +122,13 @@ const parseDuration = (spec: string): number => {
     return ms
 }
 
-/*  parse a budget "<number>" in USD for the agent tool <tool>,
+/*  parse a budget "<number>" in USD for the agent tool <tool> ("none" or zero for no cost cap),
     where Copilot requires at least 30 of its AI credits of $0.01 each  */
 const parseBudget = (spec: string, tool: Tool): string => {
-    if (!/^\d+(\.\d+)?$/.test(spec) || Number.parseFloat(spec) <= 0)
-        throw new Error(`agent: invalid budget "${spec}" (expected a positive number of USD)`)
+    if (!/^(none|\d+(\.\d+)?)$/.test(spec))
+        throw new Error(`agent: invalid budget "${spec}" (expected a non-negative number of USD or "none")`)
+    else if (spec === "none" || Number.parseFloat(spec) === 0)
+        return ""
     else if (tool === "copilot" && budgetCredits(spec) < 30)
         throw new Error(`agent: budget "${spec}" too small for agent tool "copilot" (expected at least 0.30 USD)`)
     return spec
@@ -1261,7 +1263,7 @@ export abstract class Agent {
                 .option("-T, --timeout <duration>", "maximum duration of processing a task " +
                     "as <number><unit> with unit s, m, or h (default: 60m)")
                 .option("-B, --budget <usd>",       "maximum costs of processing a task in USD, as a soft cap " +
-                    "(default: 20, unsupported by agent tool \"codex\")")
+                    "(\"none\" or 0 for no cap; default: 20, unsupported by agent tool \"codex\")")
                 .option("-o, --one-shot",           "terminate once all dispatchable incoming tasks are processed")
                 .option("--agent-relay <url>",      "agent relay to pass the live presence of the agent to, " +
                     "as \"ase[s]://<addr>:<port>[/<token>]\" (default: the configured \"project.relay.url\", else none)")

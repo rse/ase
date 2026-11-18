@@ -269,8 +269,9 @@ The following options are shared by all agents (see also
   are each limited to a fixed duration of 240 seconds in addition.
 
 - \[`-B`|`--budget` *usd*\]:
-  The maximum costs of processing a task in USD, as a positive number
-  (default: `20`), passed to the agent tool as its native cost cap
+  The maximum costs of processing a task in USD, as a positive number,
+  or `none` resp. `0` for no cost cap (default: `20`), passed to the
+  agent tool as its native cost cap
   (`--max-budget-usd` of `claude` resp. `--max-ai-credits` of `copilot`,
   requiring at least `0.30` USD), where a processing exhausting it fails.
   It is a soft cap, checked by the agent tool only after each model
