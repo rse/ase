@@ -5,6 +5,12 @@ ChangeLog
 2.1.2 (2026-11-XX)
 ------------------
 
+-   BUGFIX [tool]: Non-Blocking MCP Handshake of "ase mcp"
+    The MCP bridge `ase mcp` now answers the MCP handshake and tool listing in-process and starts
+    the service in the background, so a slow service start no longer exceeds the connect timeout.
+    Tool calls fail at once if the service cannot start (else after 120 seconds), and the tools
+    are re-announced once connected, so a running service of another version is re-listed.
+
 -   BUGFIX [plugin]: More Robust Skill Interpretation by Weaker Models
     The `--help` option of all skills now reads and outputs `help.md` explicitly instead of relying
     on a nested `@` include, which is not expanded inside meta files. Setting placeholders (also in

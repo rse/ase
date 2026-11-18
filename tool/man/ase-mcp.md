@@ -18,14 +18,28 @@ the agent tool and is not intended to be invoked directly by end users.
 All log messages go to standard error (or to the file of the global
 `--log-file` option), as standard output carries the MCP protocol.
 
-On start, the service of the project is probed and auto-started (via
-`ase service start`) if it is not running yet. The bridge then lives as
-long as its standard input is open, and is robust against a vanishing
-service:
+On start, the bridge answers all MCP messages except the tool calls
+in-process through the same set of MCP tools the service provides
+(covering the MCP handshake and the tool listing), so a slow service
+start never exceeds the MCP connect timeout of the agent tool, while it
+holds back the tool calls. In
+the background, the service of the project is probed and auto-started
+(via `ase service start`) if it is not running yet. Once the service is
+connected, the held tool calls are forwarded, all further messages go
+to the service, and a tool listing answered in-process is announced as
+changed (`notifications/tools/list_changed`), so the agent tool re-lists
+the tools of the actually running service.
+
+The bridge then lives as long as its standard input is open, and is
+robust against a vanishing service:
 
 - Messages arriving while no service connection exists are buffered
   (up to 100 messages, dropping the oldest ones on overflow) and sent
-  once the connection is (re-)established.
+  once the connection is (re-)established. A request dropped on
+  overflow or still buffered after 120 seconds is answered with a
+  JSON-RPC error (`ase service unavailable`), and while the service
+  cannot be started, all buffered and further requests are answered
+  with this error at once.
 
 - A message whose connection breaks before the service responds is sent
   once more, and a request still failing is answered with a JSON-RPC
@@ -45,12 +59,11 @@ service:
 
 Under *GitHub Copilot CLI* (detected by the environment variable
 `COPILOT_PLUGIN_ROOT`), the MCP server is started in the plugin
-installation directory instead of the project. Hence, the bridge first
-answers all MCP messages in-process through the same set of MCP tools
-the service provides (covering the MCP handshake and the tool listing),
-holds back all tool calls, and waits until the `SessionStart` hook (see
+installation directory instead of the project. Hence, the bridge
+defers the start of the service until the `SessionStart` hook (see
 `ase-hook`(1)) recorded the project directory of the session (with id
-`COPILOT_AGENT_SESSION_ID`).
+`COPILOT_AGENT_SESSION_ID`), while it keeps answering in-process and
+holding back the tool calls.
 
 It then switches into this directory, starts or connects the service
 of the project there, and forwards the held tool calls. If no project
@@ -93,8 +106,10 @@ The service provides the `ase_*` MCP tools of the skills, e.g.,
 
 ## EXIT STATUS
 
-`0` once standard input is closed, `1` if the service cannot be
-started initially.
+`0` once standard input is closed, `1` on an internal error of the
+bridge itself. A service which cannot be started does not terminate
+the bridge, but is retried, while its requests are answered with
+JSON-RPC errors.
 
 ## EXAMPLES
 
