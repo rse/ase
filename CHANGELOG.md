@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.1.2 (2026-11-XX)
+2.1.2 (2026-11-19)
 ------------------
 
 -   IMPROVEMENT [plugin]: Own Decisions Report of Artifact-Changing Skills
