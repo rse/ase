@@ -280,6 +280,25 @@ lines carry their name. If the AI usage accounting is enabled
 attachment of the task (without any human time and costs, as the agent
 runs unattended).
 
+After the finishing of the job (also of a failed skill, but not on an
+interrupt), the agent tool resumes the session of the last invocation
+of the job in its working directory with a fixed prompt, letting the
+agent report the decisions it made, each with its impact (`HIGH`,
+`MEDIUM`, or `LOW`), its reason, and its rejected alternatives, grouped
+by the focus areas `DOMAIN`, `INTERFACE`, `ARCHITECTURE`,
+`IMPLEMENTATION`, `REGRESSION`, and `CONFIRMATION` of the grilling (see
+`ase-task-grill`) and ordered by impact. This report costs an
+additional request of the agent tool (answered mostly from its prompt
+cache), is limited to `--timeout`, but at most 240 seconds, and by
+`--budget` like a follow-up, is kept from using tools by its prompt
+only (as restricting the tools would invalidate the prompt cache), and
+is logged and booked like the skill, where an interrupt of it does not
+affect the settling of the task. Unless it fails or reports none, the
+decisions are appended, under a heading with the agent name and the
+time, to the attachment of the task with the type
+`text/markdown; charset=utf-8; kind="decisions"` (created if not
+existing yet), which is shared by all agents.
+
 ## INTERRUPTS AND RECOVERY
 
 On an interrupt (`SIGINT`, `SIGTERM`, `SIGHUP`, or `SIGQUIT`, e.g., by
