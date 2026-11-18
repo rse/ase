@@ -108,10 +108,10 @@ export const exclusive = async <T> (key: string, op: () => Promise<T>): Promise<
     }
 }
 
-/*  the fixed maximum duration of the preparing and the finishing of a job,
-    and of each Git command run by them, so a hanging one (e.g. a "git push"
-    waiting for credentials) is killed instead of left behind  */
-const jobTimeout = 240 * 1000
+/*  the fixed maximum duration of the preparing and the finishing of a job (and of the
+    report of its decisions), and of each Git command run by them, so a hanging one
+    (e.g. a "git push" waiting for credentials) is killed instead of left behind  */
+export const jobTimeout = 240 * 1000
 
 /*  the cancellation of the operation of a job currently run (see "withinJobTimeout"),
     implicitly passed to every command run within it, so a timed out operation
