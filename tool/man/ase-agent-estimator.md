@@ -149,8 +149,9 @@ All other options belong to the sub-commands (see **COMMANDS**).
       counts as failed.
 
     - \[`-B`|`--budget` *usd*\]: The maximum costs of processing a task
-      (the run of the agent tool) in USD, as a positive number (default:
-      `20`), passed to the agent tool as its native cost cap, i.e., as
+      (the run of the agent tool) in USD, as a positive number, or `none`
+      resp. `0` for no cost cap (default: `20`), passed to the agent tool
+      as its native cost cap, i.e., as
       `--max-budget-usd` to `claude` resp. as `--max-ai-credits` (of
       $0.01 each, at least `0.30` USD) to `copilot`. A processing
       exhausting it is aborted and counts as failed. It is a soft cap, as
