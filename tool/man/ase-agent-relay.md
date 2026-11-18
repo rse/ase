@@ -18,6 +18,9 @@
 
 `ase agent relay stop`
 
+`ase agent relay restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 `ase agent relay` manages the per-user *agent relay* server, which
@@ -114,9 +117,15 @@ repository-supplied scope is warned about.
   to 5 seconds) until it is gone, closing all subscriptions of the task
   boards. A not running server is reported as such, without an error.
 
+- `ase agent relay restart` \[*options of* `start`\]:
+  Restart the agent relay server: stop it like `ase agent relay stop`
+  and then start it like `ase agent relay start` with the given
+  options.
+
 ## OPTIONS
 
-The following options exist for `ase agent relay start`:
+The following options exist for `ase agent relay start` and
+`ase agent relay restart`:
 
 - \[`-a`|`--address` *host*\]:
   The address to bind to (default: the configured `address` of
@@ -230,10 +239,10 @@ other Unix systems.
 
 ## EXIT STATUS
 
-`start` and `stop` exit with status 0 on success (also for a server
-already running resp. not running) and 1 on any error. `status` exits
-with status 1 if the server is not running or rejects the configured
-token. `log` exits with status 0.
+`start`, `stop`, and `restart` exit with status 0 on success (also for
+a server already running resp. not running) and 1 on any error.
+`status` exits with status 1 if the server is not running or rejects
+the configured token. `log` exits with status 0.
 
 ## EXAMPLES
 

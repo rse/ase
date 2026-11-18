@@ -20,6 +20,10 @@
 
 `ase agent fleet stop`
 
+`ase agent fleet restart`
+\[`-c`|`--config` *file*\]
+\[`-f`|`--foreground`\]
+
 ## DESCRIPTION
 
 `ase agent fleet` manages a *fleet* of agents (see `ase-agent`(1)),
@@ -170,6 +174,11 @@ members) or `ase agent fleet stop`.
   instead (see **DESCRIPTION**). A not running fleet is reported as
   such, without an error.
 
+- `ase agent fleet restart` \[`-c`|`--config` *file*\] \[`-f`|`--foreground`\]:
+  Restart the fleet with all its members: stop it like
+  `ase agent fleet stop` and then start it like `ase agent fleet start`
+  with the given options.
+
 ## CONFIGURATION
 
 The YAML configuration file of a fleet consists of the following
@@ -308,10 +317,10 @@ are checked only once the corresponding member starts.
 
 ## EXIT STATUS
 
-`init`, `start`, and `stop` exit with status 0 on success (also for a
-fleet already running resp. not running) and 1 on any error. `status`
-exits with status 1 if the fleet is not running. `log` exits with
-status 0.
+`init`, `start`, `stop`, and `restart` exit with status 0 on success
+(also for a fleet already running resp. not running) and 1 on any
+error. `status` exits with status 1 if the fleet is not running. `log`
+exits with status 0.
 
 ## EXAMPLES
 

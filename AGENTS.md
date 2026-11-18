@@ -140,7 +140,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `lib-stdio`, `lib-table`, `lib-ignore`, `lib-version`, `lib-hash`,
         `lib-color` for the confining of the SVG colors to a palette,
         `lib-fetch` for the HTTP requests through an `undici` dispatcher,
-        `lib-daemon-cli` for the start/status/log/stop CLI commands of all
+        `lib-daemon-cli` for the start/status/log/stop/restart CLI commands of all
         background processes (servers, agents, and the agent fleet), and
         `lib-server-cli` and `lib-server-bind` for the CLI commands and the
         HTTP binding of the task store and agent relay servers)
@@ -237,7 +237,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             for the declarative definitions of the modes of the built-in
             agents
 
-        -   `agent-process` for the `ase agent <kind> start|status|log|stop`
+        -   `agent-process` for the `ase agent <kind> start|status|log|stop|restart`
             commands of a single agent, and `agent-fleet` for the
             `ase agent fleet` supervisor of multiple agents and the agent
             relay
@@ -416,7 +416,7 @@ Beyond `ase setup`, the CLI provides:
     store` for the task store server
 
 -   `ase agent`: the autonomous agents, each running in its own process,
-    managed individually via `ase agent <kind> start|status|log|stop`
+    managed individually via `ase agent <kind> start|status|log|stop|restart`
     (e.g. `ase agent implementer start -p 2`):
 
     -   the task lifecycle agents `implementer`, `qualifier`, and
@@ -459,7 +459,7 @@ Beyond `ase setup`, the CLI provides:
     -   `ase agent relay`: the per-user agent relay server, passing the
         live presence of the agents to the task boards
 
-    -   `ase agent fleet start|status|log|stop`: a fleet of agents (and of
+    -   `ase agent fleet start|status|log|stop|restart`: a fleet of agents (and of
         the relay) of a YAML configuration (initially created via `ase
         agent fleet init`), run through a supervising process, restarting
         every exited member with an exponential backoff

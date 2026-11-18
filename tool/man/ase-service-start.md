@@ -86,7 +86,8 @@ $ ase --log-level debug service start --foreground
 ## SEE ALSO
 
 `ase`(1), `ase-service`(1), `ase-service-status`(1),
-`ase-service-stop`(1), `ase-service-log`(1), `ase-config`(1).
+`ase-service-stop`(1), `ase-service-restart`(1), `ase-service-log`(1),
+`ase-config`(1).
 
 ## AUTHOR
 

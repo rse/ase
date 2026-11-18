@@ -791,5 +791,17 @@ export default class ServiceCommand {
             .action(async () => {
                 process.exit(await this.doStop())
             })
+
+        /*  register CLI sub-command "ase service restart"  */
+        service
+            .command("restart")
+            .description("Restart the background service by stopping it and starting it again " +
+                "(or running it in the foreground)")
+            .option("-f, --foreground", "run the service in the foreground, logging to the terminal, " +
+                "until it is interrupted or stopped (without idle timeout)")
+            .action(async (opts: { foreground?: boolean }) => {
+                const code = await this.doStop()
+                process.exit(code !== 0 ? code : await this.doStart(opts))
+            })
     }
 }

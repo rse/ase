@@ -45,7 +45,7 @@ $ ase service stop
 ## SEE ALSO
 
 `ase`(1), `ase-service`(1), `ase-service-start`(1),
-`ase-service-status`(1).
+`ase-service-status`(1), `ase-service-restart`(1).
 
 ## AUTHOR
 

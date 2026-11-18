@@ -29,6 +29,9 @@
 `ase agent researcher stop`
 \[`-n`|`--name` *name*\]
 
+`ase agent researcher restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 **ase agent researcher** researches for the plans of tasks, combining
@@ -455,6 +458,13 @@ All other options belong to the sub-commands (see **COMMANDS**).
   `SIGTERM`, waiting (up to 5 minutes) until it aborted its running
   processings and put their tasks back. An agent not running is reported
   informationally only.
+
+- `ase agent researcher restart` \[*options of* `start`\]: Restart the
+  researcher agent of the name *name* of `--name` (default:
+  `researcher`): stop it like `ase agent researcher stop` and then start
+  it like `ase agent researcher start` with the given options (so the
+  options of the stopped agent are not carried over), exiting like
+  `start`.
 
 ## ENVIRONMENT
 

@@ -221,7 +221,7 @@ export default class AgentProcessCommand extends DaemonCommand {
     }
 
     /*  register the CLI sub-command group and its commands
-        "start", "status", "log", and "stop" below the CLI command <parent>  */
+        "start", "status", "log", "stop", and "restart" below the CLI command <parent>  */
     register (parent: Command): void {
         const kind  = this.agent.kind
         const group = this.group(parent)
@@ -264,6 +264,18 @@ export default class AgentProcessCommand extends DaemonCommand {
             .action(async (opts: { name?: string }) => {
                 process.exitCode = await this.doStop(opts.name ?? kind)
             })
+
+        /*  register CLI sub-command "restart" (with the options of "start", whose
+            option definitions can be shared, as their values are kept per command)  */
+        const restart = group
+            .command("restart")
+            .description(`Restart the ${kind} agent by stopping it and starting it again`)
+        for (const option of start.options)
+            restart.addOption(option)
+        restart.action(async (opts: AgentOpts & { foreground?: boolean }) => {
+            const code = await this.doStop(opts.name ?? kind)
+            process.exitCode = code !== 0 ? code : await this.doStart(restart, opts)
+        })
     }
 }
 

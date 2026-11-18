@@ -27,6 +27,9 @@
 
 `ase task store stop`
 
+`ase task store restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 **ase task store** manages the *task store server*: a per-user (not
@@ -225,6 +228,14 @@ and awaited for up to 5 seconds until it is gone, and finally its
 not configured at all) is reported informationally with exit status
 `0`. A responding server whose process id is unknown, resp. a server
 not stopping within the timeout, is an error.
+
+### ase task store restart
+
+`ase task store restart` \[*options of* `start`\]
+
+Restart the task store server: stop it like `ase task store stop` and
+then start it like `ase task store start` with the given options,
+which are the same as those of `ase task store start`.
 
 ## STORAGE PLUGINS
 

@@ -46,7 +46,10 @@
 `ase agent adhoc stop`
 \[`-n`|`--name` *name*\]
 
-`ase agent` *kind* `start`|`status`|`log`|`stop` \[...\]
+`ase agent adhoc restart`
+\[*options of* `start`\]
+
+`ase agent` *kind* `start`|`status`|`log`|`stop`|`restart` \[...\]
 
 ## DESCRIPTION
 
@@ -87,7 +90,7 @@ agent engine:
   same name (whose `--mode` then no longer exists).
 
   For example, `.ase/agents/reviewer.mts` yields the commands
-  `ase agent reviewer start|status|log|stop`, which take exactly the same
+  `ase agent reviewer start|status|log|stop|restart`, which take exactly the same
   options as `ase agent adhoc` described here, except `--definition` (as
   the definition file of the kind takes its place), and where the given
   options override the definition file.
@@ -226,7 +229,13 @@ where an error names the offending option.
   processings and put their tasks back. A not running agent is reported
   as such, without an error.
 
-- `ase agent` *kind* `start`|`status`|`log`|`stop` \[...\]:
+- `ase agent adhoc restart` \[*options of* `start`\]:
+  Restart the agent named *name* of `--name` (default: `adhoc`): stop
+  it like `ase agent adhoc stop` and then start it like
+  `ase agent adhoc start` with the given options (so the options of the
+  stopped agent are not carried over).
+
+- `ase agent` *kind* `start`|`status`|`log`|`stop`|`restart` \[...\]:
   The same commands for an agent of the definition kind *kind* (see
   **DESCRIPTION**), with the same options (except `--definition`),
   where the name defaults to *kind*.
@@ -1111,8 +1120,8 @@ recoveries of differently configured agents never affect each other.
 
 ## EXIT STATUS
 
-`start` and `stop` exit with status 0 on success (also for an agent
-already running resp. not running) and 1 on any error. `status` exits
+`start`, `stop`, and `restart` exit with status 0 on success (also for
+an agent already running resp. not running) and 1 on any error. `status` exits
 with status 1 if the agent is not running. `log` exits with status 0.
 
 ## EXAMPLES

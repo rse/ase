@@ -25,12 +25,18 @@
 `stop`
 \[`-n`|`--name` *name*\]
 
+`ase agent`
+*agent*
+`restart`
+\[*agent-options*\]
+\[`-f`|`--foreground`\]
+
 `ase agent relay`
-`start`|`status`|`log`|`stop`
+`start`|`status`|`log`|`stop`|`restart`
 \[*options*\]
 
 `ase agent fleet`
-`init`|`start`|`status`|`log`|`stop`
+`init`|`start`|`status`|`log`|`stop`|`restart`
 \[*options*\]
 
 ## DESCRIPTION
@@ -468,52 +474,52 @@ manual pages of the agent kinds).
 
 The following sub-command groups exist:
 
-- `ase agent rebooter` `start`|`status`|`log`|`stop`:
+- `ase agent rebooter` `start`|`status`|`log`|`stop`|`restart`:
   The agent re-creating the plans of the `DRAFTED` tasks of the
   `enterprise` task lifecycle model explicitly assigned to it from
   scratch, putting them back into `DRAFTED` afterwards. See
   `ase-agent-rebooter`(1).
 
-- `ase agent condenser` `start`|`status`|`log`|`stop`:
+- `ase agent condenser` `start`|`status`|`log`|`stop`|`restart`:
   The agent compressing the wording of the plans of the `DRAFTED` tasks
   of the `enterprise` task lifecycle model explicitly assigned to it,
   putting them back into `DRAFTED` afterwards. See
   `ase-agent-condenser`(1).
 
-- `ase agent griller` `start`|`status`|`log`|`stop`:
+- `ase agent griller` `start`|`status`|`log`|`stop`|`restart`:
   The agent grilling the plans of the `DRAFTED` tasks of the
   `enterprise` task lifecycle model explicitly assigned to it, with
   grounded and automatically chosen answers, putting them back into
   `DRAFTED` afterwards. See `ase-agent-griller`(1).
 
-- `ase agent implementer` `start`|`status`|`log`|`stop`:
+- `ase agent implementer` `start`|`status`|`log`|`stop`|`restart`:
   The agent of the `Implementation` phase of the `enterprise` task
   lifecycle model, implementing the tasks from their `Source:` into
   their `Changeset:`, resp. drafting their implementation. See
   `ase-agent-implementer`(1).
 
-- `ase agent qualifier` `start`|`status`|`log`|`stop`:
+- `ase agent qualifier` `start`|`status`|`log`|`stop`|`restart`:
   The agent of the `Qualification` phase of the `enterprise` task
   lifecycle model, reviewing the `Changeset:` of the tasks. See
   `ase-agent-qualifier`(1).
 
-- `ase agent integrator` `start`|`status`|`log`|`stop`:
+- `ase agent integrator` `start`|`status`|`log`|`stop`|`restart`:
   The agent of the `Integration` phase of the `enterprise` task
   lifecycle model, integrating the `Changeset:` of the tasks into their
   `Target:`. See `ase-agent-integrator`(1).
 
-- `ase agent editor` `start`|`status`|`log`|`stop`:
+- `ase agent editor` `start`|`status`|`log`|`stop`|`restart`:
   The agent processing the edit requests of tasks in any task lifecycle
   model. See `ase-agent-editor`(1).
 
-- `ase agent estimator` `start`|`status`|`log`|`stop`:
+- `ase agent estimator` `start`|`status`|`log`|`stop`|`restart`:
   The agent estimating the effort of the tasks without a valid
   `Effort:` key in any task lifecycle model, without claiming them
   (mode `phase`, intended for the final estimation), resp. of the tasks
   of the `estimate` requests (mode `request`, intended for dry-runs).
   See `ase-agent-estimator`(1).
 
-- `ase agent researcher` `start`|`status`|`log`|`stop`:
+- `ase agent researcher` `start`|`status`|`log`|`stop`|`restart`:
   The agent researching the plans of the `DRAFTED` tasks of the
   `enterprise` task lifecycle model explicitly assigned to it
   (mode `phase`, intended for researching and grounding the plan
@@ -523,20 +529,20 @@ The following sub-command groups exist:
   artifacts of the project, to the `research` attachment of the tasks.
   See `ase-agent-researcher`(1).
 
-- `ase agent` *kind* `start`|`status`|`log`|`stop`:
+- `ase agent` *kind* `start`|`status`|`log`|`stop`|`restart`:
   The agent of the definition kind *kind* (see **DEFINITION KINDS**),
   with the same sub-commands and options as `ase agent adhoc`, except
   `--definition`. See `ase-agent-adhoc`(1).
 
-- `ase agent adhoc` `start`|`status`|`log`|`stop`:
+- `ase agent adhoc` `start`|`status`|`log`|`stop`|`restart`:
   An ad-hoc agent, whose entire behavior is given by its options. See
   `ase-agent-adhoc`(1).
 
-- `ase agent relay` `start`|`status`|`log`|`stop`:
+- `ase agent relay` `start`|`status`|`log`|`stop`|`restart`:
   The per-user agent relay server, passing the live presence of the
   agents to the task boards. See `ase-agent-relay`(1).
 
-- `ase agent fleet` `init`|`start`|`status`|`log`|`stop`:
+- `ase agent fleet` `init`|`start`|`status`|`log`|`stop`|`restart`:
   A fleet of agents (and of the agent relay they report to), running
   each in its own process and restarting it whenever it exits. See
   `ase-agent-fleet`(1).
@@ -572,6 +578,13 @@ The sub-commands of every agent kind *agent* are:
   Stop the agent of the name *name* (default: its kind) by `SIGTERM`,
   waiting (up to 5 minutes) until it aborted its running processings
   and put their tasks back.
+
+- `ase agent` *agent* `restart` \[*agent-options*\] \[`-f`|`--foreground`\]:
+  Restart the agent of the name *name* of `--name` (default: its kind):
+  stop it like `ase agent` *agent* `stop` and then start it like
+  `ase agent` *agent* `start` with the given options, which are the
+  same as those of `start` (so the options of the stopped agent are not
+  carried over). A failing stop leaves the agent not started again.
 
 ## ENVIRONMENT
 
@@ -620,9 +633,9 @@ The sub-commands of every agent kind *agent* are:
 
 ## EXIT STATUS
 
-`ase agent` *agent* `start` exits with status `0` once the agent
-started (or was already running), resp. once a foreground agent
-terminated regularly, and with status `1` on any error (e.g., an
+`ase agent` *agent* `start` (and `restart`) exits with status `0` once
+the agent started (or was already running), resp. once a foreground
+agent terminated regularly, and with status `1` on any error (e.g., an
 invalid option, a missing agent tool, an unsupported task lifecycle
 model, or, with `--one-shot`, a task store failing three checks in a
 row). `ase agent` *agent* `status` exits with status `1` if the agent is
@@ -645,8 +658,9 @@ $ ase agent integrator start -m squash
 $ ase agent implementer start -n impl-claude -t claude
 $ ase agent implementer start -n impl-codex -t codex
 
-# follow the log of an agent and stop it again
+# follow the log of an agent, restart it with other options, and stop it again
 $ ase agent implementer log -f --name impl-codex
+$ ase agent implementer restart -n impl-codex -t codex -p 2
 $ ase agent implementer stop -n impl-codex
 ```
 

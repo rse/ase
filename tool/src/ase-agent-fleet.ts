@@ -840,7 +840,7 @@ export default class AgentFleetCommand extends DaemonCommand {
     }
 
     /*  register the CLI sub-command group and its commands
-        "init", "start", "status", "log", and "stop" below the CLI command <parent>  */
+        "init", "start", "status", "log", "stop", and "restart" below the CLI command <parent>  */
     register (parent: Command): void {
         const group = this.group(parent)
 
@@ -902,6 +902,19 @@ export default class AgentFleetCommand extends DaemonCommand {
             .description("Stop the fleet with all its members")
             .action(async () => {
                 process.exitCode = await this.doStop()
+            })
+
+        /*  register CLI sub-command "restart"  */
+        group
+            .command("restart")
+            .description("Restart the fleet with all its members by stopping it and starting it again")
+            .option("-c, --config <file>", "YAML configuration file of the fleet to start (see \"start\") " +
+                "(default: \".ase/fleet.yaml\")")
+            .option("-f, --foreground", "run the fleet in the foreground, logging to the terminal, " +
+                "until it is interrupted or stopped (default: option \"foreground\" of section \"fleet\")")
+            .action(async (opts: { config?: string, foreground?: boolean }) => {
+                const code = await this.doStop()
+                process.exitCode = code !== 0 ? code : await this.doStart(opts)
             })
     }
 }

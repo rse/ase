@@ -28,6 +28,9 @@
 `ase agent editor stop`
 \[`-n`|`--name` *name*\]
 
+`ase agent editor restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 **ase agent editor** processes the edit requests of tasks. Unlike the
@@ -408,6 +411,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
   agent of the name *name* (default: `editor`) by `SIGTERM`, waiting (up
   to 5 minutes) until it aborted its running processings and put their
   tasks back. An agent not running is reported informationally only.
+
+- `ase agent editor restart` \[*options of* `start`\]: Restart the
+  editor agent of the name *name* of `--name` (default: `editor`): stop
+  it like `ase agent editor stop` and then start it like
+  `ase agent editor start` with the given options (so the options of
+  the stopped agent are not carried over), exiting like `start`.
 
 ## ENVIRONMENT
 

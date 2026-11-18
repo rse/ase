@@ -59,6 +59,9 @@ wiring is proposed as:
 - `ase task store stop`:
   Stop the server.
 
+- `ase task store restart` \[*options of* `start`\]:
+  Stop the server and start it again with the options of `ase task store start`.
+
 Every request has to carry a *bearer token* in the `Authorization`
 header:
 

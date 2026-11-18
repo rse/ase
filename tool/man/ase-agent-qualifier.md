@@ -29,6 +29,9 @@
 `ase agent qualifier stop`
 \[`-n`|`--name` *name*\]
 
+`ase agent qualifier restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 **ase agent qualifier** drives the `Qualification` phase of the
@@ -396,6 +399,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
   (up to 5 minutes) until it aborted its running processings and put
   their tasks back. An agent not running is reported informationally
   only.
+
+- `ase agent qualifier restart` \[*options of* `start`\]: Restart the
+  qualifier agent of the name *name* of `--name` (default: `qualifier`):
+  stop it like `ase agent qualifier stop` and then start it like
+  `ase agent qualifier start` with the given options (so the options of
+  the stopped agent are not carried over), exiting like `start`.
 
 ## ENVIRONMENT
 

@@ -29,6 +29,9 @@
 `ase agent integrator stop`
 \[`-n`|`--name` *name*\]
 
+`ase agent integrator restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 **ase agent integrator** drives the `Integration` phase of the
@@ -419,6 +422,13 @@ All other options belong to the sub-commands (see **COMMANDS**).
   `SIGTERM`, waiting (up to 5 minutes) until it aborted its running
   processings and put their tasks back. An agent not running is reported
   informationally only.
+
+- `ase agent integrator restart` \[*options of* `start`\]: Restart the
+  integrator agent of the name *name* of `--name` (default:
+  `integrator`): stop it like `ase agent integrator stop` and then start
+  it like `ase agent integrator start` with the given options (so the
+  options of the stopped agent are not carried over), exiting like
+  `start`.
 
 ## ENVIRONMENT
 

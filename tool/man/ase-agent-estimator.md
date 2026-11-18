@@ -27,6 +27,9 @@
 `ase agent estimator stop`
 \[`-n`|`--name` *name*\]
 
+`ase agent estimator restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 **ase agent estimator** estimates the effort of tasks, i.e., it stores
@@ -435,6 +438,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
   estimator agent of the name *name* (default: `estimator`) by
   `SIGTERM`, waiting (up to 5 minutes) until it aborted its running
   processings. An agent not running is reported informationally only.
+
+- `ase agent estimator restart` \[*options of* `start`\]: Restart the
+  estimator agent of the name *name* of `--name` (default: `estimator`):
+  stop it like `ase agent estimator stop` and then start it like
+  `ase agent estimator start` with the given options (so the options of
+  the stopped agent are not carried over), exiting like `start`.
 
 ## CONFIGURATION
 

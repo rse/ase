@@ -530,30 +530,35 @@ export abstract class ServerCommand<C extends ServerContext, O extends ServerSta
     }
 
     /*  register the CLI sub-command group and its commands
-        "start", "status", "log", and "stop" below the CLI command <parent>  */
+        "start", "status", "log", "stop", and "restart" below the CLI command <parent>  */
     register (parent: Command): void {
         /*  register CLI sub-command group  */
         const group = this.group(parent)
 
+        /*  the options of the CLI sub-commands "start" and "restart"  */
+        const startOptions = (cmd: Command): Command => {
+            cmd
+                .option("-a, --address <host>", `address to bind to (default: ${DEFAULT_ADDRESS}, or the configured one)`)
+                .option("-p, --port <port>", "port to bind to (default: the configured one, else allocated randomly)")
+                .option("-t, --token <token>", `bearer token to expect (default: $${this.env("TOKEN")}, the configured one, ` +
+                    "else generated)")
+                .option("-c, --cors <origin>", "allow cross-origin browser requests from <origin> " +
+                    "(repeatable, \"*\" for any origin; default: the configured ones)",
+                (value: string, previous: string[]) => [ ...previous, value ], [] as string[])
+            this.options(cmd)
+            return cmd
+                .option("--tls-cert <file>", "serve HTTPS with the PEM certificate (chain) in <file>, requires \"--tls-key\" " +
+                    "(default: the configured \"tls.cert\", else plain HTTP)")
+                .option("--tls-key <file>", "serve HTTPS with the PEM private key in <file>, requires \"--tls-cert\" " +
+                    "(default: the configured \"tls.key\")")
+                .option("-f, --foreground", "run the server in the foreground, logging to the terminal, " +
+                    "until it is interrupted or stopped")
+        }
+
         /*  register CLI sub-command "start"  */
-        const start = group
+        startOptions(group
             .command("start")
-            .description(`Start the ${this.label} server in the background (idempotent if already running) or in the foreground`)
-            .option("-a, --address <host>", `address to bind to (default: ${DEFAULT_ADDRESS}, or the configured one)`)
-            .option("-p, --port <port>", "port to bind to (default: the configured one, else allocated randomly)")
-            .option("-t, --token <token>", `bearer token to expect (default: $${this.env("TOKEN")}, the configured one, ` +
-                "else generated)")
-            .option("-c, --cors <origin>", "allow cross-origin browser requests from <origin> " +
-                "(repeatable, \"*\" for any origin; default: the configured ones)",
-            (value: string, previous: string[]) => [ ...previous, value ], [] as string[])
-        this.options(start)
-        start
-            .option("--tls-cert <file>", "serve HTTPS with the PEM certificate (chain) in <file>, requires \"--tls-key\" " +
-                "(default: the configured \"tls.cert\", else plain HTTP)")
-            .option("--tls-key <file>", "serve HTTPS with the PEM private key in <file>, requires \"--tls-cert\" " +
-                "(default: the configured \"tls.key\")")
-            .option("-f, --foreground", "run the server in the foreground, logging to the terminal, " +
-                "until it is interrupted or stopped")
+            .description(`Start the ${this.label} server in the background (idempotent if already running) or in the foreground`))
             .action(async (opts: O) => {
                 process.exit(await this.doStart(opts))
             })
@@ -575,6 +580,15 @@ export abstract class ServerCommand<C extends ServerContext, O extends ServerSta
             .description(`Stop the ${this.label} server`)
             .action(async () => {
                 process.exit(await this.doStop())
+            })
+
+        /*  register CLI sub-command "restart"  */
+        startOptions(group
+            .command("restart")
+            .description(`Restart the ${this.label} server by stopping it and starting it again`))
+            .action(async (opts: O) => {
+                const code = await this.doStop()
+                process.exit(code !== 0 ? code : await this.doStart(opts))
             })
     }
 }

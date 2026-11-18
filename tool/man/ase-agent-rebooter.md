@@ -26,6 +26,9 @@
 `ase agent rebooter stop`
 \[`-n`|`--name` *name*\]
 
+`ase agent rebooter restart`
+\[*options of* `start`\]
+
 ## DESCRIPTION
 
 **ase agent rebooter** re-creates the plans of tasks in the `Planning`
@@ -352,6 +355,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
   (up to 5 minutes) until it aborted its running processings and put
   their tasks back. An agent not running is reported informationally
   only.
+
+- `ase agent rebooter restart` \[*options of* `start`\]: Restart the
+  rebooter agent of the name *name* of `--name` (default: `rebooter`):
+  stop it like `ase agent rebooter stop` and then start it like
+  `ase agent rebooter start` with the given options (so the options of
+  the stopped agent are not carried over), exiting like `start`.
 
 ## ENVIRONMENT
 

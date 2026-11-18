@@ -5,6 +5,11 @@ ChangeLog
 2.1.2 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [tool]: Convenience "restart" Commands
+    All CLI command groups with `start` and `stop` (`ase service`, `ase task store`,
+    `ase agent <kind>`, `ase agent relay`, and `ase agent fleet`) now also provide `restart`,
+    which stops and then starts again, taking the same options as `start`.
+
 -   BUGFIX [tool]: Non-Blocking MCP Handshake of "ase mcp"
     The MCP bridge `ase mcp` now answers the MCP handshake and tool listing in-process and starts
     the service in the background, so a slow service start no longer exceeds the connect timeout.

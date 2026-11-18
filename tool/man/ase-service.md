@@ -18,6 +18,8 @@
 
 `ase service stop`
 
+`ase service restart` \[`-f`|`--foreground`\]
+
 ## DESCRIPTION
 
 **ase service** manages the per-project background HTTP service of
@@ -76,6 +78,9 @@ exits with status `1`.
 - `stop`:
   Stop the service. See `ase-service-stop`(1).
 
+- `restart` \[`-f`|`--foreground`\]:
+  Stop the service and start it again. See `ase-service-restart`(1).
+
 ## FILES
 
 - `.ase/service.yaml`:
@@ -117,7 +122,7 @@ $ ase service log -f
 
 `ase`(1), `ase-service-start`(1), `ase-service-status`(1),
 `ase-service-send`(1), `ase-service-log`(1), `ase-service-stop`(1),
-`ase-mcp`(1).
+`ase-service-restart`(1), `ase-mcp`(1).
 
 ## AUTHOR
 
