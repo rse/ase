@@ -5,6 +5,12 @@ ChangeLog
 2.1.2 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [plugin]: Own Decisions Report of Artifact-Changing Skills
+    The skills `ase-task-implement`, `ase-code-edit`, and `ase-spec-edit` now close with a
+    `WHAT`/`WHY` table of the decisions taken on their own (neither in query/plan nor during
+    grilling), limited to the focus areas `DOM`, `IFC`, and `ARC`, ranked by them and numbered
+    `D01`, `D02`, etc., via the new shared meta file `ase-common-decision.md`.
+
 -   IMPROVEMENT [tool]: Convenience "restart" Commands
     All CLI command groups with `start` and `stop` (`ase service`, `ase task store`,
     `ase agent <kind>`, `ase agent relay`, and `ase agent fleet`) now also provide `restart`,

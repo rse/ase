@@ -39,6 +39,7 @@ pruning its statements in one shot -- through the states *querying*,
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-grill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-changeset.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-approach.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-decision.md
 
 Procedure
 ---------
@@ -93,13 +94,22 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         <expand name="changeset-ambiguity"
             arg1="✪ skill: **ase-spec-edit**"></expand>
 
+    4.  Start collecting the decisions taken on your own during the
+        *entire* skill run, i.e. across all `--loop` iterations:
+
+        <expand name="decision-collect" arg1="the query"></expand>
+
 2.  **Iterate:**
 
     Perform the states (1) *querying*, (2) *discovering*, (3) *grilling*,
     (4) *implementing*, and (5) *verifying* below as one *iteration*.
     Without `--loop` perform exactly *one* iteration. Under `--loop`
     *repeat* the iteration until the *querying* state receives a
-    `STOP SKILL` result. Do not output anything in this item.
+    `STOP SKILL` result. The collected decisions are reported *once*,
+    when the skill ends: right *before* the final status line of a
+    `STOP SKILL` or `CANCEL` result in the *querying* or *grilling*
+    state, or in the *Loop or Finish* item below. Do not output anything
+    in this item.
 
 3.  **State: querying:**
 
@@ -118,9 +128,14 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 STOP SKILL: stop the entire skill immediately
             </expand>
 
-        2.  If <result/> is `STOP SKILL` or `CANCEL`, only output the
-            following <template/> and then immediately *STOP* processing
-            the entire current skill:
+        2.  If <result/> is `STOP SKILL` or `CANCEL`, first report the
+            decisions of the previous `--loop` iterations:
+
+            <expand name="decision-report"
+                arg1="✪ skill: **ase-spec-edit**"></expand>
+
+            Then only output the following <template/> and then
+            immediately *STOP* processing the entire current skill:
 
             <template>
             ⧉ **ASE**: ✪ skill: **ase-spec-edit**, ▶ status: **editing finished**
@@ -487,6 +502,11 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
     (item 3 above). Do not output anything in this item.
     </if>
     <else>
+    Report the collected decisions:
+
+    <expand name="decision-report"
+        arg1="✪ skill: **ase-spec-edit**"></expand>
+
     Finish the skill processing, but first give the closing hints by
     expanding the following (which, depending on the configured
     <ase-guidance-level/>, may each expand into nothing and hence emit

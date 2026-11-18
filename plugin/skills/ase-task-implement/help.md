@@ -112,15 +112,18 @@ change set grew large nor because an open question stands in the way.
 Undecided details and defensible alternatives are therefore *decided by
 the skill itself*, guided by the surrounding artifacts and the
 internalized tenets, instead of interrupting the run with a question.
-Once the change set is applied, the run closes with up to two boxed
-summaries: `OPEN POINTS` lists everything now waiting for the user --
+Once the change set is applied, the run closes with up to two summaries:
+the `OPEN POINTS` box lists everything now waiting for the user --
 points left unimplemented on a *genuine blocker* no assumption can
 bridge, follow-ups deliberately left out of scope with their reason,
-and results needing review -- and `DECISIONS` lists each decision the
-skill took on its own together with its rationale, so it can be
-revisited or overruled. Either box is omitted entirely when it has no
-content; a run which implemented every point and decided nothing on its
-own emits no box at all.
+and results needing review -- and a `WHAT`/`WHY` table lists the
+*own decisions* of the skill, i.e. those neither made in the plan nor
+during grilling, so they can be revisited or overruled.
+
+The table covers only decisions of the focus areas `DOM` (domain), `IFC`
+(interface), and `ARC` (architecture), ranked in this order and numbered
+`D01`, `D02`, etc., each with a brief, keyword-prefixed decision and
+rationale. Either summary is omitted entirely when it has no content.
 
 After implementation, the user is asked whether to stop, hand off to
 `ase-task-edit`, hand off to `ase-task-integrate`, or delete the task

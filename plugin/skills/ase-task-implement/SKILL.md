@@ -37,6 +37,7 @@ Implement a Task Plan
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-code.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-changeset.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-decision.md
 
 Procedure
 ---------
@@ -422,10 +423,13 @@ Procedure
         here. Do not output anything.
         </if>
 
-        Set <decisions></decisions> (empty) and
-        <open-points></open-points> (empty). They collect, one entry
-        each, the decisions you take on your own while implementing and
-        whatever ends up waiting for the *user*.
+        Start collecting the decisions you take on your own while
+        implementing:
+
+        <expand name="decision-collect" arg1="the task plan"></expand>
+
+        Set <open-points></open-points> (empty). It collects, one entry
+        each, whatever ends up waiting for the *user*.
 
         The implementation is *complete or it is not done*: you *MUST*
         *NEVER* conclude this step while any point of the task plan is
@@ -437,8 +441,8 @@ Procedure
         Open questions therefore *MUST* *NOT* end the run: whenever the
         plan leaves a detail undecided or admits several defensible
         alternatives, *decide it yourself* -- picking what best fits the
-        surrounding artifacts and the internalized tenets -- and append
-        the decision plus a half-sentence rationale to <decisions/>,
+        surrounding artifacts and the internalized tenets -- and collect
+        the decision in <decisions/> as defined by `decision-collect`,
         instead of asking the user and stopping. Only a *genuine
         blocker*, which no defensible assumption can bridge (a missing
         credential, an inaccessible external system), may leave a point
@@ -644,12 +648,12 @@ Procedure
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇢ changeset: **<task-changeset/>**, ▶ status: **plan implemented**
         </template>
 
-    7.  Close the implementation with the boxed summary of what this run
-        left open and what it decided on its own. Both boxes are written
-        in the conversation language and the active persona style, list
-        *one entry per line*, and are *omitted entirely* when they carry
-        no content -- a run which implemented every point and took no
-        decision of its own outputs no box at all.
+    7.  Close the implementation with the summary of what this run left
+        open and what it decided on its own. Both the box and the table
+        are written in the conversation language and the active persona
+        style, list *one entry per line* resp. *row*, and are *omitted
+        entirely* when they carry no content -- a run which implemented
+        every point and took no decision of its own outputs neither.
 
         <if condition="<open-points/> is not empty">
         Output everything which now waits for the *user* with the
@@ -662,18 +666,12 @@ Procedure
         </template>
         </if>
 
-        <if condition="<decisions/> is not empty">
         The run decided open questions *on the user's behalf*, so they
-        *MUST* be able to revisit or overrule each of them. Output the
-        collected decisions -- each naming the chosen option and its
-        rationale -- directly below, with the following <template/>:
+        *MUST* be able to revisit or overrule each of them. Report the
+        collected decisions directly below:
 
-        <template>
-        <ase-tpl-boxed title="DECISIONS">
-        ○   <decision/> -- <rationale/>
-        </ase-tpl-boxed>
-        </template>
-        </if>
+        <expand name="decision-report"
+            arg1="◉ task: **<ase-task-id/>**"></expand>
 
     8.  Give the closing hint by expanding the following (which,
         depending on the configured <ase-guidance-level/>, may expand

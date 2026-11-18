@@ -43,6 +43,14 @@ passes, unless disabled via `--verify none`). The *querying* state, the approach
 every *grilling* round close with an `EDIT TODO` box showing the established
 `WHAT` and `HOW` information.
 
+Once at its end (after all `--loop` iterations), the skill reports its
+*own decisions* -- those neither made in the query nor during grilling,
+including the answers auto-chosen by `--grill-auto` -- as a `WHAT`/`WHY`
+table for review. It covers only decisions of the focus areas `DOM`
+(domain), `IFC` (interface), and `ARC` (architecture), ranked in this
+order and numbered `D01`, `D02`, etc., and is skipped without any own
+decision.
+
 The change set stays strictly restricted to the `SPEC` artifacts -- the
 artifact kinds `CODE`, `DOCS`, `TASK`, `INFR`, and `OTHR` are never
 touched, except for an entry in an already existing `CHANGELOG.md`
