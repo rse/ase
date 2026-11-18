@@ -5,28 +5,52 @@ ChangeLog
 2.1.2 (2026-11-19)
 ------------------
 
--   IMPROVEMENT [plugin]: Own Decisions Report of Artifact-Changing Skills
+-   FEATURE [code]: Scala, Rust, Go, and C#/.NET Support for "ase-arch-discover"
+    The skill `ase-arch-discover` now detects Scala, Rust, Go, and C#/F# projects, discovers their
+    packages via Web search plus Scaladex, crates.io, pkg.go.dev, resp. NuGet search, and the MCP
+    tool `ase_component_info` fetches their metadata from Maven Central, crates.io and its sparse
+    index, the Go module proxy, deps.dev, and pkg.go.dev, resp. the NuGet APIs.
+
+-   FEATURE [code]: Python Support for "ase-arch-discover"
+    The skill `ase-arch-discover` now detects Python projects of the packaging tools `pip` and `uv`,
+    discovers PyPI packages via Web and GitHub search, and the MCP tool `ase_component_info`
+    fetches their metadata from the PyPI JSON API and their downloads from `pypistats.org`.
+
+-   IMPROVEMENT [code]: Own Decisions Report of Artifact-Changing Skills
     The skills `ase-task-implement`, `ase-code-edit`, and `ase-spec-edit` now close with a
     `WHAT`/`WHY` table of the decisions taken on their own (neither in query/plan nor during
     grilling), limited to the focus areas `DOM`, `IFC`, and `ARC`, ranked by them and numbered
     `D01`, `D02`, etc., via the new shared meta file `ase-common-decision.md`.
 
--   IMPROVEMENT [tool]: Convenience "--statusline" Option of "ase setup install"
+-   IMPROVEMENT [code, docs, infr]: Convenience "--statusline" Option of "ase setup install"
     The command `ase setup install` now accepts `--statusline`, which additionally activates the
     ASE statusline after the installation, like a subsequent `ase setup statusline activate`.
 
--   IMPROVEMENT [tool]: Convenience "restart" Commands
+-   IMPROVEMENT [code, docs, infr]: Convenience "restart" Commands
     All CLI command groups with `start` and `stop` (`ase service`, `ase task store`,
     `ase agent <kind>`, `ase agent relay`, and `ase agent fleet`) now also provide `restart`,
     which stops and then starts again, taking the same options as `start`.
 
--   BUGFIX [tool]: Non-Blocking MCP Handshake of "ase mcp"
+-   IMPROVEMENT [code]: Agent Budget "none" or 0 as No Cost Cap
+    The option `-B|--budget` (and `budget` of the fleet configuration) of all agents now accepts
+    `none` or a zero amount, which passes no cost cap to the agent tool, instead of rejecting it
+    as a non-positive number (see issue #130).
+
+-   IMPROVEMENT [code]: Portable URL Fetching in "ase-arch-discover"
+    The skill `ase-arch-discover` now fetches the Maven Central and GitHub search URLs with the
+    built-in web fetch tool of the agent tool instead of the less portable `curl` command.
+
+-   IMPROVEMENT [docs]: Website Credits and Wording
+    Added two contributors to the thanks section of the website and changed the adjective
+    "opinionated" to "extensive" in the project description of `README.md` and the website title.
+
+-   BUGFIX [code]: Non-Blocking MCP Handshake of "ase mcp"
     The MCP bridge `ase mcp` now answers the MCP handshake and tool listing in-process and starts
     the service in the background, so a slow service start no longer exceeds the connect timeout.
     Tool calls fail at once if the service cannot start (else after 120 seconds), and the tools
     are re-announced once connected, so a running service of another version is re-listed.
 
--   BUGFIX [plugin]: More Robust Skill Interpretation by Weaker Models
+-   BUGFIX [code]: More Robust Skill Interpretation by Weaker Models
     The `--help` option of all skills now reads and outputs `help.md` explicitly instead of relying
     on a nested `@` include, which is not expanded inside meta files. Setting placeholders (also in
     `ase-meta-compat`) is now explicitly silent internal state, and option parsing via `ase_getopt`
@@ -37,22 +61,7 @@ ChangeLog
     Maven package instead of the highest version number of Maven Central, which can be an old
     pre-release (like a milestone), so actively maintained packages are no longer ranked as stale.
 
--   FEATURE [code]: Scala, Rust, Go, and C#/.NET Support for "ase-arch-discover"
-    The skill `ase-arch-discover` now detects Scala, Rust, Go, and C#/F# projects, discovers their
-    packages via Web search plus Scaladex, crates.io, pkg.go.dev, resp. NuGet search, and the MCP
-    tool `ase_component_info` fetches their metadata from Maven Central, crates.io and its sparse
-    index, the Go module proxy, deps.dev, and pkg.go.dev, resp. the NuGet APIs.
-
--   IMPROVEMENT [code]: Portable URL Fetching in "ase-arch-discover"
-    The skill `ase-arch-discover` now fetches the Maven Central and GitHub search URLs with the
-    built-in web fetch tool of the agent tool instead of the less portable `curl` command.
-
--   FEATURE [code]: Python Support for "ase-arch-discover"
-    The skill `ase-arch-discover` now detects Python projects of the packaging tools `pip` and `uv`,
-    discovers PyPI packages via Web and GitHub search, and the MCP tool `ase_component_info`
-    fetches their metadata from the PyPI JSON API and their downloads from `pypistats.org`.
-
--   BUGFIX [code]: Blind Grading of "ase-meta-compat" Probes
+-   BUGFIX [code, infr]: Blind Grading of "ase-meta-compat" Probes
     The MCP tool `ase_compat` now grades all submitted actual probe results as pass/fail, never
     revealing the expected values, and rejects an incomplete submission, so an eager early call of
     the skill can no longer contaminate the blind self-test (see issue #128).
@@ -61,6 +70,10 @@ ChangeLog
     The skills `ase-task-implement` and `ase-task-integrate` now also set the final `Status:` of a
     task already put into `IMPLEMENTING` resp. `INTEGRATING` by its claiming agent, so the
     `implementer` agent no longer stalls successfully implemented tasks (see PR #125).
+
+-   UPDATE [infr]: Upgraded NPM Dependencies
+    Upgraded the dependencies of `pages/`, `plugin/`, and `tool/`, among them `markdownlint`,
+    `@eslint/markdown`, and `eslint-markdown` of the plugin lint toolchain.
 
 2.1.1 (2026-11-16)
 ------------------
