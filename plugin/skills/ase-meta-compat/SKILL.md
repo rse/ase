@@ -47,6 +47,9 @@ information.
 Procedure
 ---------
 
+*IMPORTANT*: Execute all of the following steps in one go: you *MUST*
+*NOT* end your turn before the final verdict of STEP 7 is output.
+
 1.  STEP 1: Initialize Self-Test
 
     Initialize the running map of actual probe results <actuals></actuals>
@@ -60,6 +63,10 @@ Procedure
     *IMPORTANT*: Do *NOT* call the `ase_compat` MCP tool now. It is
     called exactly once, in STEP 6, after *all* probes of STEPs 2-5 have
     been executed and recorded in <actuals/>.
+
+    *IMPORTANT*: Do *NOT* output anything in this step: <actuals/> and
+    <failures/> are *internal state* only. Continue directly with STEP 2
+    without ending your turn.
 
 2.  STEP 2: Probe XML Placeholders
 

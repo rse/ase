@@ -5,6 +5,12 @@ ChangeLog
 2.1.2 (2026-11-XX)
 ------------------
 
+-   BUGFIX [plugin]: More Robust Skill Interpretation by Weaker Models
+    The `--help` option of all skills now reads and outputs `help.md` explicitly instead of relying
+    on a nested `@` include, which is not expanded inside meta files. Setting placeholders (also in
+    `ase-meta-compat`) is now explicitly silent internal state, and option parsing via `ase_getopt`
+    is now explicitly mandatory whenever options are given.
+
 -   BUGFIX [code]: Latest Maven Version in "ase-arch-discover"
     The MCP tool `ase_component_info` now takes the most recently released stable version of a
     Maven package instead of the highest version number of Maven Central, which can be an old
