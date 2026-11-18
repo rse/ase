@@ -117,14 +117,10 @@ export default class MCPCommand {
         const sessionId = this.sessionIdFromEnv()
         const deferred  = sessionId !== ""
 
-        /*  ensure the service is running (unless deferred)  */
+        /*  the service is started in the background (or, if deferred, later),
+            so the MCP handshake is never blocked by a slow service start  */
         let projectId = ""
         let port: number | null = null
-        if (!deferred) {
-            const ctx = await this.ensureService()
-            projectId = ctx.projectId
-            port      = ctx.port
-        }
 
         /*  create MCP STDIO server (lives for the entire bridge lifetime)  */
         const server = new StdioServerTransport()
@@ -216,6 +212,12 @@ export default class MCPCommand {
             client = next
             for (const msg of pending.splice(0, pending.length))
                 sendToClient(msg)
+
+            /*  stop answering in-process, as the service is connected now  */
+            if (local !== null) {
+                local.close().catch(() => {})
+                local = null
+            }
         }
 
         /*  reconnect loop: restart service if needed, then reconnect client  */
@@ -297,23 +299,23 @@ export default class MCPCommand {
             })
         }
 
-        /*  while deferred, answer all messages in-process through the same MCP
-            server the service would use -- this covers the MCP handshake and
-            the tool listing, which GitHub Copilot CLI insists on before it even
-            runs the session-start hook -- except the tool calls, which are held
-            back in the pending buffer until the service is connected  */
+        /*  until the service is connected, answer all messages in-process through
+            the same MCP server the service would use -- this covers the MCP
+            handshake and the tool listing, which the agent tools time out on resp.
+            GitHub Copilot CLI insists on before it even runs the session-start
+            hook -- except the tool calls, which are held back in the pending
+            buffer until the service is connected  */
         let local: InMemoryTransport | null = null
-        if (deferred) {
-            const [ localClient, localServer ] = InMemoryTransport.createLinkedPair()
-            await ServiceCommand.buildMcpServer(this.log, { projectId: "", port: 0 }, Date.now()).connect(localServer)
-            localClient.onmessage = (msg: JSONRPCMessage) => {
-                server.send(msg).catch((err: unknown) => {
-                    this.log.write("error", `mcp: stdout send: ${this.asError(err).message}`)
-                })
-            }
-            await localClient.start()
-            local = localClient
+        const [ localClient, localServer ] = InMemoryTransport.createLinkedPair()
+        await ServiceCommand.buildMcpServer(this.log, { projectId: "", port: 0 }, Date.now()).connect(localServer)
+        localClient.onmessage = (msg: JSONRPCMessage) => {
+            server.send(msg).catch((err: unknown) => {
+                this.log.write("error", `mcp: stdout send: ${this.asError(err).message}`)
+            })
         }
+        await localClient.start()
+        local = localClient
+        let deferring = deferred
 
         /*  stop deferring: switch into the recorded project directory (if any),
             so the service is looked up -- and if needed started -- inside the
@@ -323,10 +325,9 @@ export default class MCPCommand {
         let pollTimer:     ReturnType<typeof setInterval> | null = null
         let fallbackTimer: ReturnType<typeof setTimeout>  | null = null
         const undefer = (dir: string | null) => {
-            if (local === null)
+            if (!deferring)
                 return
-            local.close().catch(() => {})
-            local = null
+            deferring = false
             if (pollTimer !== null)
                 clearInterval(pollTimer)
             if (fallbackTimer !== null)
@@ -343,7 +344,6 @@ export default class MCPCommand {
                         `${this.asError(err).message} -- falling back to the current directory`)
                 }
             }
-            server.onmessage = sendToClient
             const run = async () => {
                 const ctx = await this.ensureService()
                 port      = ctx.port
@@ -364,28 +364,27 @@ export default class MCPCommand {
         }
 
         /*  wire stdio server  */
-        if (!deferred)
-            server.onmessage = sendToClient
-        else
-            server.onmessage = (msg: JSONRPCMessage) => {
-                if (local === null)
-                    sendToClient(msg)
-                else if ("method" in msg && msg.method === "tools/call") {
-                    /*  hold back tool calls, and in case the session-start hook
-                        never records a project directory, do not hold them back
-                        forever (measured from the first held call and not from
-                        the start, as an interactive session can idle arbitrarily
-                        long before the hook runs with its first prompt)  */
-                    sendToClient(msg)
+        server.onmessage = (msg: JSONRPCMessage) => {
+            if (local === null)
+                sendToClient(msg)
+            else if ("method" in msg && msg.method === "tools/call") {
+                /*  hold back tool calls, and in case the session-start hook
+                    never records a project directory, do not hold them back
+                    forever (measured from the first held call and not from
+                    the start, as an interactive session can idle arbitrarily
+                    long before the hook runs with its first prompt)  */
+                sendToClient(msg)
+                if (deferring) {
                     if (fallbackTimer === null)
                         fallbackTimer = setTimeout(() => { undefer(null) }, FALLBACK_MS)
                     checkProjectDir()
                 }
-                else
-                    local.send(msg).catch((err: unknown) => {
-                        this.log.write("error", `mcp: local send: ${this.asError(err).message}`)
-                    })
             }
+            else
+                local.send(msg).catch((err: unknown) => {
+                    this.log.write("error", `mcp: local send: ${this.asError(err).message}`)
+                })
+        }
         server.onerror = (err: Error) => {
             this.log.write("error", `mcp: stdio: ${err.message}`)
         }
@@ -396,13 +395,16 @@ export default class MCPCommand {
         /*  start server and initial client (or the polling for the recorded project directory)  */
         await server.start()
         if (!deferred) {
-            try {
+            const run = async () => {
+                const ctx = await this.ensureService()
+                port      = ctx.port
+                projectId = ctx.projectId
                 await connectClient()
             }
-            catch (err: unknown) {
-                /*  service vanished between probe and connect -- recover instead of crashing  */
+            run().catch((err: unknown) => {
+                /*  service failed to start or vanished between probe and connect -- recover instead of crashing  */
                 triggerReconnect(`initial connect failed: ${this.asError(err).message}`)
-            }
+            })
         }
         else {
             pollTimer = setInterval(checkProjectDir, POLL_INTERVAL_MS)

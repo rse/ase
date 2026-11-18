@@ -43,6 +43,12 @@ set placeholders into the context as a side-effect.
         You then *MUST* silently *SKIP* the steps 3-6 below
         and proceed directly to step 7 to display the results.
     </if>
+    <else>
+        The steps 3-6 below are *mandatory*: you *MUST* call the
+        `ase_getopt` MCP tool and *MUST* *NEVER* interpret, drop, or
+        guess any option yourself -- in particular, an *unknown* option
+        is rejected *only* by the `ERROR:` result of step 4.
+    </else>
 
 3.  **MCP Call**:
     Call the `ase_getopt(name: "<getopt-skill/>", spec:

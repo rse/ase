@@ -10,7 +10,9 @@ Skill Output
 
 -   *IMPORTANT*: The syntax `<xxx>[...]</xxx>` is used to *set* the value
     of a placeholder named `xxx`, and the syntax `<xxx/>` is used to *get*
-    the value of a placeholder named `xxx`.
+    the value of a placeholder named `xxx`. Setting a placeholder is
+    *silent internal state*: you *MUST* *NEVER* output it, and setting
+    it *NEVER* ends your turn.
 
 -   *IMPORTANT*: *All* output is *exclusively* requested through
     <template/> sections. You *MUST* *NOT* output anything *UNLESS* it
@@ -285,12 +287,10 @@ Skill Identification
 
 -   *IMPORTANT*:
     If `$1` (the first token of the skill arguments) is equal to `-h` or
-    `--help`, you *MUST* once output the following output <template/> and
-    then *IMMEDIATELY* *STOP* the further skill processing:
-
-    <template>
-    @${CLAUDE_SKILL_DIR}/help.md
-    </template>
+    `--help`, you *MUST* read the file `${CLAUDE_SKILL_DIR}/help.md` with
+    the `Read` tool, once output its *entire* content *verbatim* (never
+    the file path, an `@` directive, or a summary of it), and then
+    *IMMEDIATELY* *STOP* the further skill processing.
 
 -   *IMPORTANT*:
     You *MUST* *NOT* output any summaries, explanations, or next
