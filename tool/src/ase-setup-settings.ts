@@ -47,7 +47,7 @@ export class SetupSettings {
 
     /*  reject the statusline operation for tools without a scriptable
         statusline mechanism (only the OpenAI Codex CLI lacks one)  */
-    private requireStatuslineTool (tool: Tool): void {
+    requireStatuslineTool (tool: Tool): void {
         if (tool === "codex")
             throw new Error("statusline configuration is not supported for --tool codex " +
                 `(the ${toolSpecs[tool].label} has no scriptable statusline mechanism)`)

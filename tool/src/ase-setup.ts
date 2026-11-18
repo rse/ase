@@ -31,8 +31,10 @@ export default class SetupCommand {
     }
 
     /*  handler for "ase setup install" (all tools)  */
-    private async doInstall (tool: Tool, dev: boolean, scope: Scope): Promise<number> {
+    private async doInstall (tool: Tool, dev: boolean, scope: Scope, statusline: boolean): Promise<number> {
         requireClaudeScope(tool, scope)
+        if (statusline)
+            this.settings.requireStatuslineTool(tool)
         const spec = toolSpecs[tool]
         await this.runner.ensureTool("npm")
         await this.runner.ensureTool(spec.cli)
@@ -52,6 +54,11 @@ export default class SetupCommand {
             await this.settings.outputStyleActivate(`install${dev ? "[dev]" : ""}`, scope)
             await this.settings.functionHooksActivate(`install${dev ? "[dev]" : ""}`, scope)
         }
+
+        /*  optionally activate the ASE statusline, with the defaults of "ase setup statusline activate"  */
+        if (statusline)
+            return this.settings.doStatuslineActivate(tool, scope,
+                { width: 0, margin: 2, padding: 0, icons: true, labels: true }, [])
         return 0
     }
 
@@ -309,8 +316,9 @@ export default class SetupCommand {
             .option("-t, --tool <tool>",   "target tool (\"claude\", \"copilot\", or \"codex\")", toolDflt)
             .option("-s, --scope <scope>", "target scope (\"user\", \"project\", or \"local\")", "user")
             .option("-d, --dev",           "use local working copy instead of remote/bundled repository", devDflt)
-            .action(async (opts: { tool: string, scope: string, dev: boolean }) => {
-                process.exit(await this.doInstall(parseTool(opts.tool), opts.dev, parseScope(opts.scope)))
+            .option("--statusline",        "additionally activate the ASE statusline (like \"ase setup statusline activate\")", false)
+            .action(async (opts: { tool: string, scope: string, dev: boolean, statusline: boolean }) => {
+                process.exit(await this.doInstall(parseTool(opts.tool), opts.dev, parseScope(opts.scope), opts.statusline))
             })
 
         /*  register CLI sub-command "ase setup update"  */

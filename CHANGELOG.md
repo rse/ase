@@ -11,6 +11,10 @@ ChangeLog
     grilling), limited to the focus areas `DOM`, `IFC`, and `ARC`, ranked by them and numbered
     `D01`, `D02`, etc., via the new shared meta file `ase-common-decision.md`.
 
+-   IMPROVEMENT [tool]: Convenience "--statusline" Option of "ase setup install"
+    The command `ase setup install` now accepts `--statusline`, which additionally activates the
+    ASE statusline after the installation, like a subsequent `ase setup statusline activate`.
+
 -   IMPROVEMENT [tool]: Convenience "restart" Commands
     All CLI command groups with `start` and `stop` (`ase service`, `ase task store`,
     `ase agent <kind>`, `ase agent relay`, and `ase agent fleet`) now also provide `restart`,

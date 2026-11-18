@@ -58,7 +58,7 @@ individual manual pages for the exact applicability):
 
 ## COMMANDS
 
-- `ase setup install` \[`-t`|`--tool` *tool*\] \[`-s`|`--scope` *scope*\] \[`-d`|`--dev`\]:
+- `ase setup install` \[`-t`|`--tool` *tool*\] \[`-s`|`--scope` *scope*\] \[`-d`|`--dev`\] \[`--statusline`\]:
   Install the *ASE* plugin into the agent tool. See
   `ase-setup-install`(1).
 

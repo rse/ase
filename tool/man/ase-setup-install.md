@@ -7,6 +7,7 @@
 \[`-t`|`--tool` *tool*\]
 \[`-s`|`--scope` *scope*\]
 \[`-d`|`--dev`\]
+\[`--statusline`\]
 
 ## DESCRIPTION
 
@@ -42,6 +43,11 @@ bands above the prompt) are additionally enabled by writing
 already present there: an *ASE* one (value `1`) is left as is, and a
 foreign one (any other value) is preserved with a warning.
 
+With `--statusline`, the *ASE* statusline is additionally activated
+after the installation, exactly like a subsequent `ase setup
+statusline activate` with the same `--tool` and `--scope` and its
+default options (see `ase-setup-statusline`(1)).
+
 The *ASE* tool itself is not installed by this command, as it is
 already installed when running it (e.g., via `npm install -g
 @rse/ase`).
@@ -74,6 +80,11 @@ already installed when running it (e.g., via `npm install -g
   bundled plugin of the installed package (default:
   `$ASE_SETUP_DEV`).
 
+- \[`--statusline`\]:
+  Additionally activate the *ASE* statusline after the installation
+  (default: off). Not supported for `--tool codex`, which is then
+  rejected with an error before anything is installed.
+
 ## ENVIRONMENT
 
 - `ASE_TOOL`:
@@ -91,7 +102,8 @@ already installed when running it (e.g., via `npm install -g
 - `~/.claude/settings.json`, `.claude/settings.json`, `.claude/settings.local.json`:
   The settings file of the `user`, `project`, resp. `local` scope,
   receiving the `outputStyle` selection and the
-  `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` variable for `--tool claude`.
+  `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` variable for `--tool claude`,
+  and the `statusLine` entry for `--statusline`.
 
 ## EXIT STATUS
 
@@ -113,12 +125,16 @@ $ ase setup install --tool copilot
 
 # install from the local working copy
 $ ase setup install --dev
+
+# install and additionally activate the ASE statusline
+$ ase setup install --statusline
 ```
 
 ## SEE ALSO
 
 `ase`(1), `ase-setup`(1), `ase-setup-update`(1),
-`ase-setup-uninstall`(1), `ase-setup-status`(1), `ase-hook`(1).
+`ase-setup-uninstall`(1), `ase-setup-status`(1),
+`ase-setup-statusline`(1), `ase-hook`(1).
 
 ## AUTHOR
 

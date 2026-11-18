@@ -502,7 +502,7 @@ User Setup
 npm install -g @rse/ase
 
 #   install ASE plugin into agent tool
-ase setup install [--tool claude|copilot|codex] [--scope user|project|local]
+ase setup install [--tool claude|copilot|codex] [--scope user|project|local] [--statusline]
 ```
 
 ### Updating

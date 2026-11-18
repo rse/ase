@@ -386,8 +386,9 @@ which reports *all* scopes at once, and `ase setup telemetry
 activate|deactivate`, which always writes user-level configuration, and
 hence both take no `--scope`. Additionally, `install`, `update`, and
 `uninstall` accept `--dev` (default: `$ASE_SETUP_DEV`) to use the local
-working copy instead of the remote or bundled repository, and `update`
-accepts `--force` to update even if already at the latest version.
+working copy instead of the remote or bundled repository, `update`
+accepts `--force` to update even if already at the latest version, and
+`install` accepts `--statusline` to additionally activate the statusline.
 
 ## CLI Commands
 
