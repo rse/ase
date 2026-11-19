@@ -9,6 +9,10 @@ ChangeLog
     The final hints of `ase-code-analyze` and `ase-arch-analyze` now lead the near-identical
     `/ase-task-edit` and `/ase-code-edit` commands with distinct wording, as the model confused them.
 
+-   BUGFIX [code]: Realize Draft-Only Bullet-Points When Ignoring a Draft
+    `ase-task-implement` now resets the `[x]` and `[/]` checkboxes when a non-draft run ignores an
+    undelivered implementation draft, as it otherwise skipped the points realized in the draft only.
+
 -   IMPROVEMENT [code]: Quote Placeholder Names in Code Spans
     `ase-skill.md` now requires quoted markup, code, and placeholder names in authored text to be
     enclosed in backtick code spans, so the `Stop` hook no longer mistakes them for unfilled placeholders.

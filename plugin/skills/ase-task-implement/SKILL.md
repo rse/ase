@@ -460,6 +460,13 @@ Procedure
         Its <text/> stays *context only*, e.g. to understand the other
         bullet-points.
 
+        <if condition="step 3.2 above ignored an undelivered implementation draft">
+        The draft run may have resolved the `[x]` and `[/]` bullet-points
+        in the ignored draft only, so you *MUST* first reset the checkbox
+        of every such bullet-point of <task-content/> to `[ ]`, so this
+        run realizes them from scratch, too.
+        </if>
+
         You *MUST* also *skip* every bullet-point of <task-content/> in
         checkbox state `[x]` (done), as it was already fully resolved by
         a previous run: neither realize its <text/> again nor perform its
