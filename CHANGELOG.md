@@ -5,6 +5,10 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Disambiguate Edit Commands in Analyzer Hints
+    The final hints of `ase-code-analyze` and `ase-arch-analyze` now lead the near-identical
+    `/ase-task-edit` and `/ase-code-edit` commands with distinct wording, as the model confused them.
+
 -   IMPROVEMENT [code]: Quote Placeholder Names in Code Spans
     `ase-skill.md` now requires quoted markup, code, and placeholder names in authored text to be
     enclosed in backtick code spans, so the `Stop` hook no longer mistakes them for unfilled placeholders.

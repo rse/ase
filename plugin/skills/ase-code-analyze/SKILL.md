@@ -289,7 +289,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
     nothing and hence emit no output at all):
 
     <ase-tpl-hint level="minimal">
-    For deeper analysis, suggestions on solution approaches and then final problem resolution, use `/ase-task-edit <id-prefix/>P{n}`, or for a direct one-shot fix use `/ase-code-edit <id-prefix/>P{n}`, in the same or even a different session.
+    For deeper analysis and suggested solution approaches, plan the resolution via `/ase-task-edit <id-prefix/>P{n}`, or fix it directly in one shot via `/ase-code-edit <id-prefix/>P{n}`, in the same or even a different session.
     </ase-tpl-hint>
 
     You *MUST* not output anything else in this STEP 3,
