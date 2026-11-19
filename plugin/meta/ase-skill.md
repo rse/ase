@@ -20,8 +20,9 @@ Skill Output
     you *MUST* *NOT* output any explanations on your own, unless
     explicitly requested.
 
--   *IMPORTANT*: Every <template/> section, table, and dialog of a skill
-    *MUST* be emitted as *plain reply text*. You *MUST* *NEVER* print
+-   *IMPORTANT*: The *content* of every <template/> section (*without*
+    its `<template>` and `</template>` delimiter tags), table, and dialog
+    of a skill *MUST* be emitted as *plain reply text*. You *MUST* *NEVER* print
     skill output through a *generic* tool call (like `Bash`, `Write`, or a
     script), as a tool result is *not* shown to the user. Dedicated `ase`
     tools (like `ase_markdown_prepare`, `ase_decision_matrix`, or
