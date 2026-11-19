@@ -67,7 +67,10 @@ format is read and written:
 
 - `ase hook stop`:
   Handle the `Stop` (resp. `agentStop`) event: mark the agent as
-  ready. See `ase-hook-stop`(1).
+  ready. For Anthropic Claude Code CLI, once per turn, re-prompt the
+  model instead if its reply text of the turn (outside code blocks and
+  spans) still carries unfilled template placeholders like
+  `<ase-task-id/>`. See `ase-hook-stop`(1).
 
 ## ENVIRONMENT
 

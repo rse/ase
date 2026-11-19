@@ -25,7 +25,9 @@ Skill Output
     trailing spaces, replacing the placeholders `<xxx/>` and `[...]`,
     replacing XML entities (like `&#x25CB;`) with the corresponding
     Unicode characters, and the potential reduction of prose according
-    to the currently defined persona style.
+    to the currently defined persona style. A placeholder `<xxx/>` (or
+    `<xxx .../>`) *MUST* *NEVER* appear literally in your output: always
+    replace it by its current (possibly empty) value.
 
 -   *IMPORTANT*: The tags `<template>` and `</template>` are just the
     delimiters of a <template/> section and *NOT* part of its content.

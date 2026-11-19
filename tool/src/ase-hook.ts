@@ -109,6 +109,27 @@ type ToolInput = v.InferOutput<typeof toolInputSchema>
     forever, so orphans are garbage-collected once they exceed this age  */
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
 
+/*  maximum number of trailing transcript bytes scanned by the stop hook
+    for the assistant text of the current turn  */
+const TRANSCRIPT_TAIL_BYTES = 4 * 1024 * 1024
+
+/*  the HTML void elements, whose self-closing tags are no template placeholders  */
+const htmlVoidElements = new Set([ "area", "base", "br", "col", "embed", "hr", "img",
+    "input", "link", "meta", "param", "source", "track", "wbr" ])
+
+/*  schema of the transcript entries inspected by the stop hook  */
+const transcriptEntrySchema = v.object({
+    type:        v.optional(v.string()),
+    isMeta:      v.optional(v.boolean()),
+    isSidechain: v.optional(v.boolean()),
+    message:     v.optional(v.object({
+        content: v.optional(v.union([ v.string(), v.array(v.looseObject({
+            type: v.optional(v.string()),
+            text: v.optional(v.string())
+        })) ]))
+    }))
+})
+
 /*  the ASE session information determined by the session-start hook  */
 type SessionInfo = Record<"version" | "versionHint" | "pluginRoot" | "persona" | "guidance" | "diagram" |
     "diagramProbe" | "userId" | "projectId" | "boxing" | "lifecycle" | "defaultSource" | "defaultChangeset" |
@@ -634,10 +655,89 @@ export default class HookCommand {
     }
 
     /*  handler for "ase hook stop" (all tools)  */
-    private async doStop (_tool: Tool): Promise<number> {
-        await this.drainStdin()
+    private async doStop (tool: Tool): Promise<number> {
+        const stdin = await readStdin().catch(() => "")
+
+        /*  safety net (Anthropic Claude Code CLI only): once per turn, re-prompt the
+            model if its visible reply text of the turn still carries unfilled template
+            placeholders (as weaker models tend to output them literally)  */
+        if (tool === "claude") {
+            const input = this.parseJSON(stdin, v.object({
+                stop_hook_active:       v.optional(v.boolean()),
+                transcript_path:        v.optional(v.string()),
+                last_assistant_message: v.optional(v.string())
+            }))
+            if (input.stop_hook_active !== true) {
+                const text = this.readTurnText(input.transcript_path ?? "") ?? input.last_assistant_message ?? ""
+                const placeholders = this.findPlaceholders(text)
+                if (placeholders.length > 0) {
+                    await writeStdout(JSON.stringify({
+                        decision: "block",
+                        reason:   "ASE: the reply contains unfilled template placeholders " +
+                            `(${placeholders.join(", ")}) -- output the affected lines again, ` +
+                            "with each placeholder replaced by its actual value"
+                    }))
+                    return 0
+                }
+            }
+        }
         this.writeAgentStatus("ready")
         return 0
+    }
+
+    /*  read the assistant text of the current turn (back to the last genuine
+        user prompt) from the tail of a transcript, or undefined if unreadable  */
+    private readTurnText (file: string): string | undefined {
+        if (file === "")
+            return undefined
+        let data: string
+        try {
+            const fd = fs.openSync(file, "r")
+            try {
+                const size = fs.fstatSync(fd).size
+                const len  = Math.min(size, TRANSCRIPT_TAIL_BYTES)
+                const buf  = Buffer.alloc(len)
+                fs.readSync(fd, buf, 0, len, size - len)
+                data = buf.toString("utf8")
+            }
+            finally {
+                fs.closeSync(fd)
+            }
+        }
+        catch {
+            return undefined
+        }
+
+        /*  scan backwards (where a truncated first line simply fails to parse)  */
+        const texts: string[] = []
+        const lines = data.split("\n")
+        for (let i = lines.length - 1; i >= 0; i--) {
+            const entry   = this.parseJSON(lines[i], transcriptEntrySchema)
+            const content = entry.message?.content
+            if (entry.isSidechain === true || content === undefined)
+                continue
+            if (entry.type === "assistant" && Array.isArray(content))
+                texts.unshift(...content.flatMap((block) =>
+                    block.type === "text" && block.text !== undefined ? [ block.text ] : []))
+            else if (entry.type === "user" && entry.isMeta !== true
+                && (typeof content === "string" || content.some((block) => block.type === "text")))
+                break
+        }
+        return texts.join("\n")
+    }
+
+    /*  find the distinct template placeholders (like "<ase-task-id/>") and
+        template delimiters in a text, outside of its code blocks and spans  */
+    private findPlaceholders (text: string): string[] {
+        const prose = text
+            .replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm, "")
+            .replace(/(`+)[\s\S]*?\1/g, "")
+        const found = new Set<string>()
+        const re = /<\/?template>|<([a-z][a-z0-9]*(?:-[a-z0-9]+)*)(?:\s+[a-z][a-z0-9-]*="[^"]*")*\s*\/>/g
+        for (const m of prose.matchAll(re))
+            if (m[1] === undefined || !htmlVoidElements.has(m[1]))
+                found.add(m[1] !== undefined ? `<${m[1]}/>` : m[0])
+        return Array.from(found).slice(0, 10)
     }
 
     /*  handler for "ase hook session-end" (all tools)  */
