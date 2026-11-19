@@ -134,7 +134,8 @@ or delete the task plan, unless `--next` pre-selects this choice.
     again. Without this option, a delivered branch is removed only if
     Git considers it merged (always for `--mode squash`) and its
     worktree has no uncommitted changes. A temporary branch of an
-    attachment is always removed.
+    attachment is always removed, while the origin working copy and
+    the branch checked out in it are never removed.
 
 -   `--stateless`|`-S`:
     Leave the plan's `Status:` key untouched.

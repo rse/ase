@@ -5,6 +5,11 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Never Clean Up the Origin Working Copy in `ase-task-integrate`
+    `ase-task-integrate` now requests no `--cleanup` for a change set in the origin working copy, as
+    on another target branch `ase-repo-merge` removed the session's own working copy and its branch,
+    or warned spuriously on the main working copy.
+
 -   BUGFIX [code]: Refuse Unready Plans in `ase-task-integrate` and `ase-task-implement`
     Both skills now pre-check the `Status:` of `enterprise` (and, for implementing, `team`) plans and
     stop early, as their "reachable" guard held for almost every state, so e.g. `DRAFTED` plans were

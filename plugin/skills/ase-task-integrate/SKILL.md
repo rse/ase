@@ -426,9 +426,11 @@ Procedure
     3.  Set <merge-args>--target "<target-branch/>" --mode "<getopt-option-mode/>"</merge-args>,
         which passes the merge mode (`merge`, `rebase`, or `squash`)
         through. If <changeset-type/> is `attachment`, or
-        <getopt-option-no-cleanup/> is not equal `true`, append
-        ` --cleanup` to <merge-args/>, so the merged source branch (and
-        its worktree) is removed afterwards. Then merge the change set by
+        <getopt-option-no-cleanup/> is not equal `true` and <merge-dir/>
+        differs from <origin-dir/>, append ` --cleanup` to <merge-args/>,
+        so the merged source branch (and its worktree) is removed
+        afterwards -- but never the origin working copy the skill runs
+        in, nor the branch checked out in it. Then merge the change set by
         invoking the `ase-repo-merge` skill, which commits still
         uncommitted changes of the source branch, resolves merge
         conflicts semantically, and checks that the source branch landed:
