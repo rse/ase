@@ -138,10 +138,11 @@ Control Flow Constructs
     <agent <attr/>="<value/>" [...]><agent-body/></agent>:
 
     This specifies the *invocation* of a *sub-agent* through the
-    `Agent` tool. Every XML attribute is passed *verbatim* as the
-    identically named parameter of the `Agent` tool (e.g. `description`,
-    `subagent_type`, `run_in_background`, `isolation`, `model`), and
-    <agent-body/> is passed as its `prompt` parameter.
+    `Agent` tool (or a designated delegation skill, see below). Every
+    XML attribute is passed *verbatim* as the identically named
+    parameter of the `Agent` tool (e.g. `description`, `subagent_type`,
+    `run_in_background`, `isolation`, `model`), and <agent-body/> is
+    passed as its `prompt` parameter.
 
     The *sole exception* is the *reserved* attribute `result="<var/>"`,
     which is *not* passed on but instead *binds* the result returned
@@ -149,6 +150,41 @@ Control Flow Constructs
     expanded to the result returned by the sub-agent if `result` is
     *absent*, or into nothing if `result` is *present*. Do not output
     anything else.
+
+-   *IMPORTANT*: For *Sub-Agent Delegation*: the <agent/> construct and
+    every `Agent` tool invocation prescribed by an ASE skill, agent, or
+    meta file specify a *sub-agent dispatch*, not a particular
+    mechanism. If the user's instructions designate a dedicated skill
+    for delegating work to sub-agents *and* this skill is installed, you
+    *MUST* route every such dispatch -- except the delegation skill's
+    own -- through it instead: hand over the `prompt` plus, for
+    `subagent_type: "ase:<name>"`, the instructions of the plugin's
+    sub-agent definition `agents/<name>.md` with its includes resolved,
+    preserve the requested `model`, parallelism, and isolation, as well
+    as the definition's `effort` and `tools` settings, where a permitted
+    `Agent` tool also permits the designated skill, and treat the final
+    result of the delegate exactly like the result of the `Agent` tool.
+    Otherwise, use the `Agent` tool as prescribed. Unless a user sets
+    this up, nothing changes.
+
+    For such delegation, if a dispatch without `isolation` goes to a
+    delegate that does not share your working tree or index, you
+    *MUST* hand over your `HEAD` commit and your staged, unstaged, and
+    untracked changes, and instruct the delegate in its prompt to
+    reproduce this state in its own working tree and index before it
+    follows its instructions, and to fail if it cannot; afterwards,
+    carry the delegate's changes over into your working tree and
+    index. For a dispatch with `isolation`, keep the delegate's
+    worktree and return its path and branch with the result, as the
+    `Agent` tool does, so <agent-consolidation/> can merge it. Treat a
+    failed delegate, or changes that cannot be carried over, like a
+    failed `Agent` tool invocation, never as an empty successful
+    result.
+
+    For every such delegation, also name the designated skill in the
+    delegate's prompt and instruct the delegate to route its own
+    sub-agent dispatches through it as far as that skill permits
+    nested delegation, and otherwise through the `Agent` tool.
 
 -   *IMPORTANT*: You *MUST* honor the following control flow construct:
     <agent-consolidation [group=<agent-group/>]/>:
