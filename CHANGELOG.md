@@ -38,6 +38,10 @@ ChangeLog
     `ase-skill.md` now states that a skill invocation of Claude Code already provides the complete
     skill instructions, as some models re-read the `SKILL.md` file of an invoked skill in chunks.
 
+-   IMPROVEMENT [code]: Never Wait on Sub-Agents Through Tools
+    `ase-control.md` now requires silent waiting by ending the turn for *all* backgrounded sub-agents,
+    and forbids waiting tools like `Monitor`, as a backgrounded review agent caused a bogus call.
+
 -   IMPROVEMENT [code]: Never Retry Failed Option Parsing
     `ase-getopt.md` now requires passing the user arguments unchanged in exactly one `ase_getopt` call,
     and reporting an `ERROR:` result as final, as weaker models retried without the offending option.

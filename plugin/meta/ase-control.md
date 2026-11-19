@@ -188,9 +188,9 @@ Control Flow Constructs
     expanded to its <parallel-body/>. Do not output anything else.
 
 -   *IMPORTANT*: You *MUST* honor the following rule for *all*
-    concurrently dispatched sub-agents -- whether invoked through
-    <parallel/> or through multiple `Agent` tool invocations emitted in
-    one single message:
+    dispatched sub-agents -- whether a single one, or concurrent ones
+    invoked through <parallel/> or through multiple `Agent` tool
+    invocations emitted in one single message:
 
     The agent tool may run sub-agents in the *background* (e.g.
     *Anthropic Claude Code CLI* ignores `run_in_background: false`) and
@@ -198,6 +198,9 @@ Control Flow Constructs
     these notifications arrive, you *MUST* *NOT* output anything -- no
     progress messages (like `Batch 3 of 8 is back, 5 still running`),
     no intermediate results, and no waiting notices -- but silently wait
-    for the remaining sub-agents. Only once *all* of them have returned,
-    continue with the processing which consumes their results.
+    for the remaining sub-agents. To wait, just end your turn: you *MUST*
+    *NOT* invoke any tool (like `Monitor`, `ase_sleep`, or a `sleep` of
+    `Bash`) for waiting on or polling of the sub-agents. Only once *all*
+    of them have returned, continue with the processing which consumes
+    their results.
 
