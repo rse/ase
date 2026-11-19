@@ -1471,7 +1471,8 @@ export class TaskMCP {
             description:
                 "Load a previously persisted task by `id`. " +
                 "Returns the task as `text`, normalized into the current Markdown frontmatter shape; " +
-                "returns an empty string if no task exists for the `id`. " +
+                "returns a `WARNING: no task plan \"<id>\" exists yet (a new task)` line instead " +
+                "(without any delimiter or tag lines) if no task exists for the `id`. " +
                 "The `variant` argument selects the returned form of the plan: " +
                 "`source` (the default) is the *authoring* form and the *only* form which may be " +
                 "edited and passed back into `ase_task_save`; " +
@@ -1503,17 +1504,21 @@ export class TaskMCP {
             }
         }, async (args) => {
             try {
-                const loaded  = await Task.source(this.log, args.id, args.attachments !== "full")
-                const source  = loaded?.text ?? ""
+                const loaded = await Task.source(this.log, args.id, args.attachments !== "full")
+
+                /*  explicitly report a missing task, as an empty result looks like a tool failure  */
+                if (loaded === null)
+                    return mcpText(`WARNING: no task plan "${args.id}" exists yet (a new task)`)
+                const source  = loaded.text
                 const variant = args.variant ?? "source"
                 let text = source
-                if (source !== "" && variant === "render")
+                if (variant === "render")
                     text = Markdown.prepare(source)
-                else if (source !== "" && variant === "both")
+                else if (variant === "both")
                     text =
                         `<task-plan-source>\n${source}\n</task-plan-source>\n\n` +
                         `<task-plan-render>\n${Markdown.prepare(source)}\n</task-plan-render>\n`
-                if (loaded !== null && args.tag === true)
+                if (args.tag === true)
                     text += `\n<task-plan-tag>${loaded.tag}</task-plan-tag>\n`
                 return mcpText(text)
             }

@@ -208,7 +208,8 @@ anything.
             output field without the trailing `<task-plan-tag>`
             delimiter line, and <tag/> to the content of that line.
 
-            -   If <plan/> is empty, set <status>skipped: no plan</status>
+            -   If <plan/> is empty or starts with `ERROR:` or `WARNING:`,
+                set <status>skipped: no plan</status>
                 and continue with sub-step 5.
 
             -   If the `Group:` frontmatter key of <plan/> equals its

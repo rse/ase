@@ -504,7 +504,10 @@ Set <args></args> (set args to empty).
             <task-tag/> to the content enclosed in the `<task-plan-tag>`
             delimiter line (the *entity tag* of the loaded plan, or empty
             if absent, as no plan exists yet). The delimiter lines themselves are *never* part of
-            any form. Do not output anything related to this MCP tool call. Set
+            any form. If the `text` output field instead starts with
+            `WARNING:` (as no plan exists yet), set <text/> to it and
+            both <task-render/> and <task-tag/> to empty.
+            Do not output anything related to this MCP tool call. Set
             <status>plan loaded</status>.
         </else>
 
