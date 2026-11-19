@@ -28,7 +28,10 @@ state of the task lifecycle model, all of its bullet points start in
 the `[ ]` todo state, all `grilled:` tags are dropped
 from its `Tags:` key, and its `Source:`, `Changeset:`, and `Target:`
 keys are dropped, so they read as their configured defaults
-`project.task.default.{source,changeset,target}`.
+`project.task.default.{source,changeset,target}`. A plan in a finished
+state of the task lifecycle model (like `CLOSED`, `INTEGRATED`, or
+`CANCELLED`) cannot start its lifecycle anew and hence is refused
+upfront, leaving it untouched.
 
 A plan which does *not* follow the task format (or carries no `DOM` or
 `IFC` bullet point) is rebooted from its entire body instead: all of

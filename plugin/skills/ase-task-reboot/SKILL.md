@@ -64,6 +64,25 @@ Procedure
         this skill.
         </if>
 
+    3.  <if condition="the `Status:` frontmatter key of <task-content/> is present and one of the *finished* states of the task lifecycle model <ase-project-task-lifecycle/>: `CLOSED` and `CANCELLED` for `solo` (or absent), `IMPLEMENTED` and `CANCELLED` for `team`, resp. `INTEGRATED` and `CANCELLED` for `enterprise`">
+        A finished plan cannot start its lifecycle anew, as no
+        transition leads from a finished state back to the default
+        state the reboot resets the `Status:` key to, so the save would
+        be refused only after the entire re-creation work. Set <status/>
+        to the value of this key. Only output the following <template/>,
+        directly followed by the hint, and then immediately *STOP*
+        processing the entire current skill, leaving the plan
+        *untouched*:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ ERROR: plan with finished status **<status/>** cannot be rebooted
+        </template>
+
+        <ase-tpl-hint level="minimal">
+        Run `/ase-task-edit` with a new task id to create a new task plan instead.
+        </ase-tpl-hint>
+        </if>
+
 3.  **Reboot Task Plan:**
 
     1.  Start with <instruction></instruction> (set instruction to empty).

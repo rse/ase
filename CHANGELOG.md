@@ -10,6 +10,11 @@ ChangeLog
     `ase alias edit` checks all tuned skills of both scopes, as a still referenced option alias
     was deletable, breaking every `ase_getopt` and `ase alias expand` of the skill.
 
+-   BUGFIX [code]: Refuse Finished Plans Upfront in `ase-task-reboot`
+    `ase-task-reboot` now stops early on a plan in a finished lifecycle state, as its `Status:`
+    reset to the default state is unreachable from there and the save failed with a raw task store
+    error only after the entire grounding and re-creation work.
+
 -   BUGFIX [code]: Never Clean Up the Origin Working Copy in `ase-task-integrate`
     `ase-task-integrate` now requests no `--cleanup` for a change set in the origin working copy, as
     on another target branch `ase-repo-merge` removed the session's own working copy and its branch,
