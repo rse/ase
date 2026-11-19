@@ -5,6 +5,10 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Record Skipped Grilling Questions as Open in `ase-task-grill`
+    `SKIP GRILLING` now leaves all questions of the round unanswered and records them as `[?]`,
+    as the merge step accepted all `★` recommendations, so the questions were never re-asked.
+
 -   BUGFIX [code]: Reserve Recommendation and Decision Markers in Grilling
     The grilling rounds now use `★` and `⚑` only as the markers of at most one answer per question,
     as a grilled subject about them showed the glyphs in other answers, misread as recommendations.

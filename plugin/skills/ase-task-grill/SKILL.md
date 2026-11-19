@@ -284,7 +284,9 @@ Set <args>--int-reuse-task</args>.
 
             A question *not* addressed by the combined reply accepts its
             answer marked with `★` (the recommendation) if one exists, and
-            otherwise stays *unanswered*. Additionally, record the
+            otherwise stays *unanswered*. On `SKIP GRILLING`, *no* `★`
+            answer is accepted, so *all* questions of the round stay
+            *unanswered*. Additionally, record the
             *open* questions in the checkboxes of the body
             bullet-points, changing *only* checkboxes in state `[ ]` or
             `[?]` and leaving every `[/]`, `[x]`, `[-]`, and `[>]`
