@@ -5,6 +5,10 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code]: Quote Placeholder Names in Code Spans
+    `ase-skill.md` now requires quoted markup, code, and placeholder names in authored text to be
+    enclosed in backtick code spans, so the `Stop` hook no longer mistakes them for unfilled placeholders.
+
 -   IMPROVEMENT [code]: Load Core ASE MCP Tools Upfront
     The MCP tools `ase_getopt`, `ase_task_{id,load,save}`, `ase_timestamp`, and `ase_artifact_list`
     are now marked `anthropic/alwaysLoad`, so Claude Code no longer defers them behind `ToolSearch`,

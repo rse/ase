@@ -38,6 +38,12 @@ Skill Output
     `<xxx .../>`) *MUST* *NEVER* appear literally in your output: always
     replace it by its current (possibly empty) value.
 
+-   *IMPORTANT*: Whenever your *authored* text (a free-text placeholder
+    value, a finding, or an explanation) *quotes* markup, code, or a
+    placeholder name like `<xxx/>` from a file or a skill, you *MUST*
+    enclose the quoted part in a backtick code span, so it is rendered
+    as code and never mistaken for an unfilled placeholder.
+
 -   *IMPORTANT*: The tags `<template>` and `</template>` are just the
     delimiters of a <template/> section and *NOT* part of its content.
     You *MUST* *NEVER* output these tags themselves, only the content
