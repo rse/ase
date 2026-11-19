@@ -186,6 +186,25 @@ const skillHint = (skill: string): string => {
     return typeof hint === "string" ? hint : ""
 }
 
+/*  the manual page ("help.md") of a bundled ASE skill, preferring the working copy
+    of a development setup (as "ase setup --dev" does), or empty if not available  */
+export const skillHelp = (skill: string): string => {
+    if (!skillNameRe.test(skill))
+        return ""
+    const dirs = [ skillsDir() ]
+    if (process.env.ASE_SETUP_DEV !== undefined) {
+        const basedir = process.env.ASE_SETUP_DEV_BASEDIR ??
+            path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..")
+        dirs.unshift(path.join(basedir, "plugin", "skills"))
+    }
+    for (const dir of dirs) {
+        const md = readText(path.join(dir, skill, "help.md"))
+        if (md !== null)
+            return md
+    }
+    return ""
+}
+
 /*  write a file, but only if its content changed, and report the change  */
 const writeChanged = (file: string, text: string): string[] => {
     if (readText(file) === text)

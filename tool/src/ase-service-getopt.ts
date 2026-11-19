@@ -13,6 +13,7 @@ import type Log               from "./ase-lib-log.js"
 import {
     Aliases,
     isGetoptTaskPrefix,
+    skillHelp,
     splitArgs,
     type AliasTuning,
     type GetoptTaskPrefix
@@ -218,6 +219,7 @@ export type GetoptResult = {
     info:      string
     task?:     string
     taskOnly?: boolean
+    help?:     string
 }
 
 /*  parse the arguments (a raw string or a token vector) against the options specification,
@@ -376,7 +378,9 @@ export class GetoptMCP {
                 "applied, too. With `taskPrefix`, a leading task id is split off " +
                 "the remaining arguments and returned as `task` (empty if none): " +
                 "a first token `<id>:` (mode `colon`), or additionally a sole " +
-                "token `<id>` (mode `colon-or-bare`, then also `taskOnly: true`).",
+                "token `<id>` (mode `colon-or-bare`, then also `taskOnly: true`). " +
+                "With the parsed option `help` being `true`, the manual page of the " +
+                "skill `name` is additionally returned as `help` (empty if not available).",
             inputSchema: {
                 name: z.string()
                     .describe("Name of the caller (e.g. skill name), used in error messages"),
@@ -410,6 +414,11 @@ export class GetoptMCP {
 
                 /*  parse args with the option aliases and option defaults of the caller  */
                 const result = getopt(args.name, args.spec, args.args, tuning, taskPrefix)
+
+                /*  serve the manual page of the skill on request, so the
+                    agent never has to read (or invent) it on its own  */
+                if (result.opts.help === true)
+                    result.help = skillHelp(args.name.replace(/^ase:/, ""))
                 return {
                     content: [ { type: "text", text: JSON.stringify(result) } ]
                 }

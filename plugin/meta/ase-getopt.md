@@ -1,7 +1,7 @@
 
 <define name="getopt">
 
-For parsing the command/skill options, perform the following seven steps
+For parsing the command/skill options, perform the following eight steps
 and then continue processing the remaining skill.
 
 Do not output anything in the following steps. The entire purpose is to
@@ -24,10 +24,15 @@ set placeholders into the context as a side-effect.
 2.  **Short-Circuit Processing**:
     You *MUST* decide here, via the following *mandatory* <if/> control
     construct, whether the options are parsed *locally* (no MCP call) or
-    *remotely* (via the MCP call in steps 3-6). This is a *hard branch*,
+    *remotely* (via the MCP call in steps 3-7). This is a *hard branch*,
     not an optional optimization: when the <if/> branch is taken, steps
-    3-6 are *structurally unreachable* and you *MUST NOT* call the
+    3-7 are *structurally unreachable* and you *MUST NOT* call the
     `ase_getopt` MCP tool under any circumstances.
+
+    In particular, a <getopt-args/> containing `-h` or `--help` always
+    matches the regexp `(^|\s)-` below, so the <if/> branch is *never*
+    taken for it: the manual page of the skill is served *only* by the
+    `ase_getopt` MCP tool (see step 6).
 
     Conversely, whenever <getopt-task-prefix/> is *not* empty and
     <getopt-args/> is *not* empty, the <if/> branch is *never* taken,
@@ -57,11 +62,11 @@ set placeholders into the context as a side-effect.
         excluding the `help` option and any *internal* option whose long
         name starts with `int-`).
 
-        You then *MUST* silently *SKIP* the steps 3-6 below
-        and proceed directly to step 7 to display the results.
+        You then *MUST* silently *SKIP* the steps 3-7 below
+        and proceed directly to step 8 to display the results.
     </if>
     <else>
-        The steps 3-6 below are *mandatory*: you *MUST* call the
+        The steps 3-7 below are *mandatory*: you *MUST* call the
         `ase_getopt` MCP tool and *MUST* *NEVER* interpret, drop, or
         guess any option yourself -- in particular, an *unknown* option
         is rejected *only* by the `ERROR:` result of step 4.
@@ -136,13 +141,32 @@ set placeholders into the context as a side-effect.
         "args": "...",
         "info": "...",
         "task": "...",
-        "taskOnly": false
+        "taskOnly": false,
+        "help": "..."
     }
     ```
 
-    The fields `task` and `taskOnly` exist only with `taskPrefix`.
+    The fields `task` and `taskOnly` exist only with `taskPrefix`, and
+    the field `help` exists only if `<getopt-result/>.opts.help` is `true`.
 
-6.  **Materializing into Context**:
+6.  **Short-Circuit for Help**:
+    If `<getopt-result/>.opts.help` is `true`:
+    If `<getopt-result/>.help` is *not* empty, output its content
+    *verbatim* and *completely* as your *entire* reply (no option line,
+    no file path, no summary, and no paraphrase), and then immediately
+    *STOP* processing the entire current skill. Otherwise, only output
+    the following <template/> and then immediately *STOP* processing
+    the entire current skill:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **<getopt-skill/>**, ▶ ERROR: manual page not available
+    </template>
+
+    You *MUST* *NEVER* read the manual page from a file yourself, write
+    it from memory, or describe a tool call in text instead of performing
+    it.
+
+7.  **Materializing into Context**:
     For each *key* `<longN/>` in <getopt-result/>`.opts`:
     Set <getopt-option-<longN/>/> to the corresponding value
     `<getopt-result/>.opts[<longN/>]`.
@@ -154,7 +178,7 @@ set placeholders into the context as a side-effect.
     information about the `help` option and any *internal* option
     whose long name starts with `int-`.
 
-7.  **Display Results**:
+8.  **Display Results**:
     If <ase-guidance-level/> is equal to `normal` or `verbose`,
     output the following <template/>:
 

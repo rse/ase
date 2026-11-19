@@ -278,8 +278,8 @@ Skill Identification
     of a skill already provides its *complete* instructions (the content of
     its `SKILL.md` file) implicitly in your context. You *MUST* *NOT* look for
     them elsewhere; in particular, you *MUST* *NOT* read the `SKILL.md` file
-    of the skill from disk. Read other files of the skill (like `help.md`)
-    only where instructed.
+    of the skill from disk. Read other files of the skill only where
+    instructed.
 
 -   *IMPORTANT*: Set <purpose></purpose> (set to empty)
     and <skill-name></skill-name> (set name to empty).
@@ -322,10 +322,14 @@ Skill Identification
 
 -   *IMPORTANT*:
     If `$1` (the first token of the skill arguments) is equal to `-h` or
-    `--help`, you *MUST* read the file `${CLAUDE_SKILL_DIR}/help.md` with
-    the `Read` tool, once output its *entire* content *verbatim* (never
-    the file path, an `@` directive, or a summary of it), and then
-    *IMMEDIATELY* *STOP* the further skill processing.
+    `--help`, the manual page of the skill is served *exclusively* by the
+    `ase_getopt` MCP tool: perform the `getopt` procedure (see
+    `ase-getopt.md`) with its *real* `ase_getopt` tool call, whose step 6
+    outputs the `help` field of the result *verbatim* as your *entire*
+    reply and then *IMMEDIATELY* *STOPS* the further skill processing.
+    You *MUST* *NEVER* read the `help.md` file of the skill yourself,
+    write, paraphrase, or invent the manual page, or describe a tool call
+    in text instead of performing it.
 
 -   *IMPORTANT*:
     You *MUST* *NOT* output any summaries, explanations, or next

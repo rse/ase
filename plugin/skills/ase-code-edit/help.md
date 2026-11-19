@@ -136,7 +136,8 @@ decision.
     (`IMPLEMENTATION`). Independent of this, every open point is rated
     with an individual impact (`HIGH`, `MEDIUM`, or `LOW`), which
     decides which points are raised as questions and in which order
-    within a focus area. Only effective together with `--grill` or `--grill-auto`.
+    within a focus area. Only effective together with `--grill`
+    or `--grill-auto`.
 
 -   `--grill-perspective`|`-p` *perspective*:
     Grill exclusively from the logical *perspective* -- a keyword or
@@ -145,8 +146,8 @@ decision.
     this perspective are raised as questions, while every question still
     carries its focus area, severity, and impact. The active perspective
     is shown in the announcement line, like `GRILLING (security)`.
-    Without a perspective, the grilling is holistic. Only effective together with `--grill`,
-    `--grill-auto`, or `--approach`.
+    Without a perspective, the grilling is holistic. Only effective
+    together with `--grill`, `--grill-auto`, or `--approach`.
 
 -   `--ground`|`-G`:
     Ground the edit in facts instead of the world knowledge of the

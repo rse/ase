@@ -5,6 +5,11 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code]: Serve Skill Manual Pages via `ase_getopt` for `--help`
+    `ase_getopt` now returns the `help.md` of the skill as `help` on `-h`/`--help`, which the skill
+    outputs verbatim, as weaker models skipped the `Read` of the file and fabricated, paraphrased,
+    or pseudo-called the manual page instead
+
 -   BUGFIX [code]: Check Option Alias Deletions in `ase alias delete` and `ase alias edit`
     `ase alias delete --option|--default` now checks the remaining tuning of the skill, and
     `ase alias edit` checks all tuned skills of both scopes, as a still referenced option alias
