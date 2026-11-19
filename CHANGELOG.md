@@ -27,7 +27,58 @@ ChangeLog
 -   IMPROVEMENT [code]: Serve Skill Manual Pages via `ase_getopt` for `--help`
     `ase_getopt` now returns the `help.md` of the skill as `help` on `-h`/`--help`, which the skill
     outputs verbatim, as weaker models skipped the `Read` of the file and fabricated, paraphrased,
-    or pseudo-called the manual page instead
+    or pseudo-called the manual page instead.
+
+-   IMPROVEMENT [code]: Quote Placeholder Names in Code Spans
+    `ase-skill.md` now requires quoted markup, code, and placeholder names in authored text to be
+    enclosed in backtick code spans, so the `Stop` hook no longer mistakes them for unfilled placeholders.
+
+-   IMPROVEMENT [code]: Load Core ASE MCP Tools Upfront
+    The MCP tools `ase_getopt`, `ase_task_{id,load,save}`, `ase_timestamp`, and `ase_artifact_list`
+    are now marked `anthropic/alwaysLoad`, so Claude Code no longer defers them behind `ToolSearch`,
+    whose schema-less results broke non-Anthropic models behind gateways.
+
+-   IMPROVEMENT [code]: Report Missing Task in `ase_task_load`
+    The MCP tool `ase_task_load` now returns a `WARNING:` line instead of an empty text for a
+    not yet existing task, as weaker models read an empty result as a tool failure.
+
+-   IMPROVEMENT [code]: Re-Prompt on Leaked Template Placeholders
+    The `Stop` hook of Claude Code now re-prompts the model once per turn, if its reply text still carries
+    unfilled template placeholders like `<ase-task-id/>`, and `ase-skill.md` forbids them explicitly.
+
+-   IMPROVEMENT [code]: Never Produce Skill Output Through a Tool Call
+    `ase-skill.md` and `ase-dialog.md` now require skill output as plain reply text, and the `PreToolUse`
+    hook denies shell commands printing ASE templates, as tool results are not shown.
+
+-   IMPROVEMENT [code]: Block Skill Self-Invocation
+    The `PreToolUse` hook of Claude Code now denies a `Skill` call re-invoking the ASE skill already
+    loaded in the current turn with identical arguments and no file/task changes since, as it reloads the workflow.
+
+-   IMPROVEMENT [code]: Forbid Project File Changes in Planning Skills
+    `ase-common-task.md` now provides a plan-only rule, expanded by `ase-task-{edit,grill,condense,reboot}`,
+    which forbids any project file change, as weaker models implemented plain plan requests.
+
+-   IMPROVEMENT [code]: Skip Function Hooks Tools When Absent
+    The skills no longer search via `ToolSearch` for the tools of the function hooks module (`ase_mods_*`,
+    `ase_task_band`) in headless sessions or when not listed among the tools, as such searches were futile.
+
+-   IMPROVEMENT [code]: Forbid Reading the Skill Definition From Disk
+    `ase-skill.md` now states that a skill invocation of Claude Code already provides the complete
+    skill instructions, as some models re-read the `SKILL.md` file of an invoked skill in chunks.
+
+-   IMPROVEMENT [code]: Never Wait on Sub-Agents Through Tools
+    `ase-control.md` now requires silent waiting by ending the turn for *all* backgrounded sub-agents,
+    and forbids waiting tools like `Monitor`, as a backgrounded review agent caused a bogus call.
+
+-   IMPROVEMENT [code]: Never Retry Failed Option Parsing
+    `ase-getopt.md` now requires passing the user arguments unchanged in exactly one `ase_getopt` call,
+    and reporting an `ERROR:` result as final, as weaker models retried without the offending option.
+
+-   IMPROVEMENT [code]: Split Off Task Id Prefix in Option Parsing
+    `ase_getopt` now optionally splits off a leading `<id>:` (or sole `<id>`) into `task`,
+    consumed by `ase-task-{edit,status,assign,research,dissect}`, `ase-repo-task`, and the
+    `task-react-id` macro of `ase-task-{grill,condense,reboot,implement,integrate}`,
+    as weaker models ignored the prefix, and `ase alias expand` shows the split off task id.
 
 -   BUGFIX [code]: Check Option Alias Deletions in `ase alias delete` and `ase alias edit`
     `ase alias delete --option|--default` now checks the remaining tuning of the skill, and
@@ -81,57 +132,6 @@ ChangeLog
 -   BUGFIX [code]: Realize Draft-Only Bullet-Points When Ignoring a Draft
     `ase-task-implement` now resets the `[x]` and `[/]` checkboxes when a non-draft run ignores an
     undelivered implementation draft, as it otherwise skipped the points realized in the draft only.
-
--   IMPROVEMENT [code]: Quote Placeholder Names in Code Spans
-    `ase-skill.md` now requires quoted markup, code, and placeholder names in authored text to be
-    enclosed in backtick code spans, so the `Stop` hook no longer mistakes them for unfilled placeholders.
-
--   IMPROVEMENT [code]: Load Core ASE MCP Tools Upfront
-    The MCP tools `ase_getopt`, `ase_task_{id,load,save}`, `ase_timestamp`, and `ase_artifact_list`
-    are now marked `anthropic/alwaysLoad`, so Claude Code no longer defers them behind `ToolSearch`,
-    whose schema-less results broke non-Anthropic models behind gateways.
-
--   IMPROVEMENT [code]: Report Missing Task in `ase_task_load`
-    The MCP tool `ase_task_load` now returns a `WARNING:` line instead of an empty text for a
-    not yet existing task, as weaker models read an empty result as a tool failure.
-
--   IMPROVEMENT [code]: Re-Prompt on Leaked Template Placeholders
-    The `Stop` hook of Claude Code now re-prompts the model once per turn, if its reply text still carries
-    unfilled template placeholders like `<ase-task-id/>`, and `ase-skill.md` forbids them explicitly.
-
--   IMPROVEMENT [code]: Never Produce Skill Output Through a Tool Call
-    `ase-skill.md` and `ase-dialog.md` now require skill output as plain reply text, and the `PreToolUse`
-    hook denies shell commands printing ASE templates, as tool results are not shown.
-
--   IMPROVEMENT [code]: Block Skill Self-Invocation
-    The `PreToolUse` hook of Claude Code now denies a `Skill` call re-invoking the ASE skill already
-    loaded in the current turn with identical arguments and no file/task changes since, as it reloads the workflow.
-
--   IMPROVEMENT [code]: Forbid Project File Changes in Planning Skills
-    `ase-common-task.md` now provides a plan-only rule, expanded by `ase-task-{edit,grill,condense,reboot}`,
-    which forbids any project file change, as weaker models implemented plain plan requests.
-
--   IMPROVEMENT [code]: Skip Function Hooks Tools When Absent
-    The skills no longer search via `ToolSearch` for the tools of the function hooks module (`ase_mods_*`,
-    `ase_task_band`) in headless sessions or when not listed among the tools, as such searches were futile.
-
--   IMPROVEMENT [code]: Forbid Reading the Skill Definition From Disk
-    `ase-skill.md` now states that a skill invocation of Claude Code already provides the complete
-    skill instructions, as some models re-read the `SKILL.md` file of an invoked skill in chunks.
-
--   IMPROVEMENT [code]: Never Wait on Sub-Agents Through Tools
-    `ase-control.md` now requires silent waiting by ending the turn for *all* backgrounded sub-agents,
-    and forbids waiting tools like `Monitor`, as a backgrounded review agent caused a bogus call.
-
--   IMPROVEMENT [code]: Never Retry Failed Option Parsing
-    `ase-getopt.md` now requires passing the user arguments unchanged in exactly one `ase_getopt` call,
-    and reporting an `ERROR:` result as final, as weaker models retried without the offending option.
-
--   IMPROVEMENT [code]: Split Off Task Id Prefix in Option Parsing
-    `ase_getopt` now optionally splits off a leading `<id>:` (or sole `<id>`) into `task`,
-    consumed by `ase-task-{edit,status,assign,research,dissect}`, `ase-repo-task`, and the
-    `task-react-id` macro of `ase-task-{grill,condense,reboot,implement,integrate}`,
-    as weaker models ignored the prefix, and `ase alias expand` shows the split off task id.
 
 -   BUGFIX [code]: SOFT Auto-Warm Across Compactions
     The cache controller of the function hooks no longer stops a SOFT auto-warm, when the first ping
