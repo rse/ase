@@ -8,15 +8,15 @@ ChangeLog
 -   IMPROVEMENT [code]: Load Core ASE MCP Tools Upfront
     The MCP tools `ase_getopt`, `ase_task_{id,load,save}`, `ase_timestamp`, and `ase_artifact_list`
     are now marked `anthropic/alwaysLoad`, so Claude Code no longer defers them behind `ToolSearch`,
-    whose schema-less results broke non-Anthropic models behind gateways (issue #134, A1).
+    whose schema-less results broke non-Anthropic models behind gateways.
 
 -   IMPROVEMENT [code]: Report Missing Task in "ase_task_load"
     The MCP tool `ase_task_load` now returns a `WARNING:` line instead of an empty text for a
-    not yet existing task, as weaker models read an empty result as a tool failure (issue #134, A2).
+    not yet existing task, as weaker models read an empty result as a tool failure.
 
 -   IMPROVEMENT [code]: Re-Prompt on Leaked Template Placeholders
     The `Stop` hook of Claude Code now re-prompts the model once per turn, if its reply text still carries
-    unfilled template placeholders like `<ase-task-id/>`, and `ase-skill.md` forbids them explicitly (issue #134, A3).
+    unfilled template placeholders like `<ase-task-id/>`, and `ase-skill.md` forbids them explicitly.
 
 2.1.2 (2026-11-19)
 ------------------
