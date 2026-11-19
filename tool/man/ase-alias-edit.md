@@ -11,9 +11,11 @@
 
 **ase alias edit** edits the alias file of the scope with the text
 editor, creating the file if it does not exist yet. Afterwards, the
-alias file is validated (and on failure, re-edited on request), and the
-shim skills of the scope are synchronized (see `ase-alias-sync`(1)). See
-`ase-alias`(1) for the format of the alias file.
+alias file is validated, the option aliases and option defaults of all
+skills (of both scopes) are checked against the options of the skills
+(and on failure, re-edited on request), and the shim skills of the scope
+are synchronized (see `ase-alias-sync`(1)). See `ase-alias`(1) for the
+format of the alias file.
 
 ## OPTIONS
 

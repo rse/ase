@@ -170,11 +170,16 @@ export default class AliasCommand {
                     throw new Error("alias: missing option alias")
                 const keys = opts.option === true ? [ "option", skill, option ] :
                     opts.default === true ? [ "default", skill ] : [ "alias", name ]
+
+                /*  check the remaining tuning of the skill for references to a deleted
+                    option alias (full alias chains are already checked by the sync)  */
+                const check = opts.option === true || opts.default === true ?
+                    (aliases: Aliases) => this.checkTuning(aliases, skill) : undefined
                 this.report(Aliases.modify(scope, tool, (doc) => {
                     if (!doc.hasIn(keys))
                         throw new Error(`alias: no entry "${keys.join(" ")}" in the scope "${scope}"`)
                     doc.deleteIn(keys)
-                }))
+                }, check))
             })
 
         /*  register CLI sub-command "ase alias edit"  */
@@ -201,8 +206,7 @@ export default class AliasCommand {
                         execaSync(editorCmd, [ ...editorArgs, file ], { stdio: "inherit" })
                         try {
                             const aliases = Aliases.load()
-                            for (const skill of new Set(aliases.entries(scope)
-                                .filter((entry) => entry.kind !== "alias").map((entry) => entry.name)))
+                            for (const skill of aliases.tuned())
                                 this.checkTuning(aliases, skill)
                             this.report(aliases.sync(scope, tool))
                             break

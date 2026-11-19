@@ -5,6 +5,11 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Check Option Alias Deletions in `ase alias delete` and `ase alias edit`
+    `ase alias delete --option|--default` now checks the remaining tuning of the skill, and
+    `ase alias edit` checks all tuned skills of both scopes, as a still referenced option alias
+    was deletable, breaking every `ase_getopt` and `ase alias expand` of the skill.
+
 -   BUGFIX [code]: Never Clean Up the Origin Working Copy in `ase-task-integrate`
     `ase-task-integrate` now requests no `--cleanup` for a change set in the origin working copy, as
     on another target branch `ase-repo-merge` removed the session's own working copy and its branch,

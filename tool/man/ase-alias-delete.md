@@ -15,8 +15,13 @@
 **ase alias delete** deletes an entry from the alias file of the scope:
 without option the full alias *name*, with `--option` the option alias
 *option* of the skill *name*, and with `--default` the option defaults
-of the skill *name*. Afterwards, the shim skills of the scope are
-synchronized (see `ase-alias-sync`(1)).
+of the skill *name*.
+
+With `--option` or `--default`, the remaining option aliases and option
+defaults of the skill (of both scopes) are checked against the options
+of the skill, so a still referenced option alias cannot be deleted. On
+any failure, the previous alias file is kept. Afterwards, the shim
+skills of the scope are synchronized (see `ase-alias-sync`(1)).
 
 ## OPTIONS
 
@@ -48,8 +53,8 @@ synchronized (see `ase-alias-sync`(1)).
 
 ## EXIT STATUS
 
-`0` on success, `1` on any error, like a missing *option* or an entry
-not existing in the scope.
+`0` on success, `1` on any error, like a missing *option*, an entry
+not existing in the scope, or an option alias still referenced.
 
 ## EXAMPLES
 
