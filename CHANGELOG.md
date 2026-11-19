@@ -38,6 +38,10 @@ ChangeLog
     `ase-skill.md` now states that a skill invocation of Claude Code already provides the complete
     skill instructions, as some models re-read the `SKILL.md` file of an invoked skill in chunks.
 
+-   IMPROVEMENT [code]: Never Retry Failed Option Parsing
+    `ase-getopt.md` now requires passing the user arguments unchanged in exactly one `ase_getopt` call,
+    and reporting an `ERROR:` result as final, as weaker models retried without the offending option.
+
 -   BUGFIX [code]: SOFT Auto-Warm Across Compactions
     The cache controller of the function hooks no longer stops a SOFT auto-warm, when the first ping
     after a compaction (e.g. the idle compaction of Claude Code) writes the cache of the compacted

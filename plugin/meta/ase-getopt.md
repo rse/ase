@@ -71,6 +71,11 @@ set placeholders into the context as a side-effect.
     option and applies the option aliases and option defaults configured
     for <getopt-skill/> (see `ase alias`).
 
+    You *MUST* pass <getopt-args/> *exactly* as given by the user, i.e.,
+    *never* add, drop, reorder, rename, or "fix" any option or argument,
+    and *never* probe options by trial calls. You *MUST* call `ase_getopt`
+    *exactly once* per skill invocation.
+
 4.  **Short-Circuit for Error**:
     This step is the *sole* and *authoritative* handler for an
     `ERROR:`-prefixed `ase_getopt` response; the generic MCP-Tool-Calls
@@ -79,7 +84,11 @@ set placeholders into the context as a side-effect.
     If <text/> starts with `ERROR:`:
     Remove all `ERROR:` or `error:` prefixes from <text/>.
     Then only output the following <template/> and
-    then immediately *STOP* processing the entire current skill:
+    then immediately *STOP* processing the entire current skill.
+    An `ERROR:` result is *final*: you *MUST* *NEVER* call `ase_getopt`
+    again with modified arguments (e.g., without the offending option)
+    or work around the error in any other way, but report it as such
+    and leave its correction to the user:
 
     <template>
     ⧉ **ASE**: ✪ skill: **<getopt-skill/>**, ▶ ERROR: option parsing failed: **<text/>**
