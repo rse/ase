@@ -22,6 +22,10 @@ ChangeLog
     `ase-skill.md` and `ase-dialog.md` now require skill output as plain reply text, and the `PreToolUse`
     hook denies shell commands printing ASE templates, as tool results are not shown.
 
+-   IMPROVEMENT [code]: Block Skill Self-Invocation
+    The `PreToolUse` hook of Claude Code now denies a `Skill` call re-invoking the ASE skill already
+    loaded in the current turn with identical arguments and no file/task changes since, as it reloads the workflow.
+
 2.1.2 (2026-11-19)
 ------------------
 

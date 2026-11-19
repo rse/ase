@@ -100,6 +100,7 @@ const toolSpecs: Record<Tool, ToolSpec> = {
 const toolInputSchema = v.object({
     command:   v.optional(v.string()),
     skill:     v.optional(v.string()),
+    args:      v.optional(v.string()),
     file_path: v.optional(v.string())
 })
 type ToolInput = v.InferOutput<typeof toolInputSchema>
@@ -124,11 +125,18 @@ const transcriptEntrySchema = v.object({
     isSidechain: v.optional(v.boolean()),
     message:     v.optional(v.object({
         content: v.optional(v.union([ v.string(), v.array(v.looseObject({
-            type: v.optional(v.string()),
-            text: v.optional(v.string())
+            type:  v.optional(v.string()),
+            text:  v.optional(v.string()),
+            id:    v.optional(v.string()),
+            name:  v.optional(v.string()),
+            input: v.optional(v.looseObject({
+                skill: v.optional(v.string()),
+                args:  v.optional(v.string())
+            }))
         })) ]))
     }))
 })
+type TranscriptEntry = v.InferOutput<typeof transcriptEntrySchema>
 
 /*  the ASE session information determined by the session-start hook  */
 type SessionInfo = Record<"version" | "versionHint" | "pluginRoot" | "persona" | "guidance" | "diagram" |
@@ -685,9 +693,9 @@ export default class HookCommand {
         return 0
     }
 
-    /*  read the assistant text of the current turn (back to the last genuine
-        user prompt) from the tail of a transcript, or undefined if unreadable  */
-    private readTurnText (file: string): string | undefined {
+    /*  read the current turn from the tail of a transcript: its genuine user prompt
+        and its subsequent assistant entries (in order), or undefined if unreadable  */
+    private readTurn (file: string): { prompt: string, entries: TranscriptEntry[] } | undefined {
         if (file === "")
             return undefined
         let data: string
@@ -709,7 +717,8 @@ export default class HookCommand {
         }
 
         /*  scan backwards (where a truncated first line simply fails to parse)  */
-        const texts: string[] = []
+        const entries: TranscriptEntry[] = []
+        let prompt = ""
         const lines = data.split("\n")
         for (let i = lines.length - 1; i >= 0; i--) {
             const entry   = this.parseJSON(lines[i], transcriptEntrySchema)
@@ -717,13 +726,53 @@ export default class HookCommand {
             if (entry.isSidechain === true || content === undefined)
                 continue
             if (entry.type === "assistant" && Array.isArray(content))
-                texts.unshift(...content.flatMap((block) =>
-                    block.type === "text" && block.text !== undefined ? [ block.text ] : []))
+                entries.unshift(entry)
             else if (entry.type === "user" && entry.isMeta !== true
-                && (typeof content === "string" || content.some((block) => block.type === "text")))
+                && (typeof content === "string" || content.some((block) => block.type === "text"))) {
+                prompt = typeof content === "string" ? content :
+                    content.map((block) => block.type === "text" ? block.text ?? "" : "").join("\n")
                 break
+            }
         }
-        return texts.join("\n")
+        return { prompt, entries }
+    }
+
+    /*  read the assistant text of the current turn from a transcript, or undefined if unreadable  */
+    private readTurnText (file: string): string | undefined {
+        const turn = this.readTurn(file)
+        if (turn === undefined)
+            return undefined
+        return turn.entries.flatMap((entry) => Array.isArray(entry.message?.content) ?
+            entry.message.content.flatMap((block) =>
+                block.type === "text" && block.text !== undefined ? [ block.text ] : []) : []).join("\n")
+    }
+
+    /*  read the most recent skill load of the current turn from a transcript (a "Skill"
+        tool use other than the one of "toolUseId", or else a skill command as the user
+        prompt of the turn), or undefined if there is none or files or tasks were changed since it  */
+    private readTurnSkill (file: string, toolUseId: string): { skill: string, args: string } | undefined {
+        const turn = this.readTurn(file)
+        if (turn === undefined)
+            return undefined
+        const editTools = /^(?:Edit|Write|NotebookEdit|MultiEdit|mcp__.+__ase_task_(?:save|status))$/
+        for (const entry of turn.entries.toReversed()) {
+            const content = entry.message?.content
+            if (!Array.isArray(content))
+                continue
+            for (const block of content.toReversed()) {
+                if (block.type !== "tool_use" || block.id === toolUseId)
+                    continue
+                if (block.name === "Skill")
+                    return { skill: block.input?.skill ?? "", args: block.input?.args ?? "" }
+                else if (editTools.test(block.name ?? ""))
+                    return undefined
+            }
+        }
+        const m = turn.prompt.match(/<command-name>\/?([^<]+)<\/command-name>/)
+        if (m === null)
+            return undefined
+        const a = turn.prompt.match(/<command-args>([\s\S]*?)<\/command-args>/)
+        return { skill: m[1], args: a !== null ? a[1] : "" }
     }
 
     /*  find the distinct template placeholders (like "<ase-task-id/>") and
@@ -846,13 +895,32 @@ export default class HookCommand {
         return { toolName, toolInput }
     }
 
-    /*  determine whether a tool invocation should be denied, as it produces skill
-        output (an ASE template printed by a shell command), which, as a tool result,
-        is never shown to the user, and (if so) the reason fed back to the model  */
-    private decideDenial (spec: ToolSpec, input: Record<string, unknown>): { deny: boolean, reason: string } {
+    /*  determine whether a tool invocation should be denied, as it either produces skill
+        output (an ASE template printed by a shell command), which, as a tool result, is
+        never shown to the user, or re-invokes the ASE skill just loaded in the current turn
+        of the main agent with identical arguments and without file or task changes since its load
+        (except for the hand-offs with internal "--int-*" options), and (if so) the reason
+        fed back to the model  */
+    private decideDenial (tool: Tool, spec: ToolSpec, input: Record<string, unknown>): { deny: boolean, reason: string } {
         const { toolName, toolInput } = this.parseToolCall(spec, input)
         const command = toolInput.command ?? ""
-        if (toolName === spec.bashToolName
+        const skill   = (toolInput.skill ?? "").replace(/^\//, "").replace(/^ase:/, "")
+        const args    = (toolInput.args  ?? "").trim().replace(/\s+/g, " ")
+        if (tool === "claude" && toolName === "Skill" && /^ase-.+/.test(skill) && !/(?:^|\s)--int-/.test(args)
+            && input.agent_id === undefined) {
+            const loaded = this.readTurnSkill(
+                typeof input.transcript_path === "string" ? input.transcript_path : "",
+                typeof input.tool_use_id     === "string" ? input.tool_use_id     : "")
+            if (loaded !== undefined
+                && loaded.skill.replace(/^\//, "").replace(/^ase:/, "") === skill
+                && loaded.args.trim().replace(/\s+/g, " ") === args)
+                return {
+                    deny:   true,
+                    reason: `ASE: the skill "${skill}" is already running (its workflow is already loaded) -- ` +
+                        "continue its workflow instead of invoking it again"
+                }
+        }
+        else if (toolName === spec.bashToolName
             && /⧉ (?:\*\*)?ASE(?:\*\*)?:/.test(command)
             && /<<|\b(?:echo|printf|print|puts)\b|console\.log/.test(command))
             return {
@@ -921,7 +989,7 @@ export default class HookCommand {
             return 0
 
         /*  determine whether to deny or auto-approve the tool invocation  */
-        const denial   = this.decideDenial(spec, input)
+        const denial   = this.decideDenial(tool, spec, input)
         const approval = denial.deny ? { approve: false, reason: "" } : this.decideApproval(tool, spec, input)
         const decision = denial.deny ? "deny" : "allow"
         const reason   = denial.deny ? denial.reason : approval.reason
