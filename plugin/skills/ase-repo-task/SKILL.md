@@ -41,7 +41,8 @@ Derive a Task from a Change Set
 
 <expand name="getopt"
     arg1="ase-repo-task"
-    arg2="--focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --staged --unstaged --branch|-b= --commit|-c=">
+    arg2="--focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --staged --unstaged --branch|-b= --commit|-c="
+    arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
 
@@ -75,21 +76,12 @@ plan exclusively via the `ase_task_save` MCP tool.
 
     2.  React on the task id and the scope:
 
-        <if condition="
-            <instruction/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*:?$`
-        ">
-        The lone token is the *task id* (with an optional and ignored
-        trailing `:`), never a scope. Set <new-task-id/> to
-        <instruction/>, with any trailing `:` stripped.
+        <if condition="<getopt-task/> is not empty">
+        The option parser has already split off the task id prefix
+        `<id>:` resp. the sole task id `<id>` (never a scope) from
+        <instruction/>. Set <new-task-id><getopt-task/></new-task-id>
+        and <scope><instruction/></scope>.
         </if>
-        <elseif condition="
-            <instruction/> has the format `<id/>: <text/>` where
-            <id/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`
-        ">
-        Set <new-task-id><id/></new-task-id> and
-        <scope><text/></scope>, with any leading and trailing whitespace
-        stripped.
-        </elseif>
         <else>
         No task id was given, so a new one is allocated in step 5. Set
         <scope><instruction/></scope>.

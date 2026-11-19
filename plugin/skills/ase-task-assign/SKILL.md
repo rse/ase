@@ -21,7 +21,7 @@ effort: high
 Assign a Task Plan
 </purpose>
 
-<expand name="getopt" arg1="ase-task-assign">
+<expand name="getopt" arg1="ase-task-assign" arg2="" arg3="colon">
     $ARGUMENTS
 </expand>
 
@@ -42,16 +42,22 @@ Procedure
         <id><ase-task-id/></id> and <assignee></assignee> (empty).
         Do not output anything.
 
-    2.  <if condition="<arguments/> contains two tokens and the first token ends with `:`">
-        Set <id/> to the first token with the trailing `:` removed and
-        <assignee/> to the second token. Do not output anything.
+    2.  <if condition="<getopt-task/> is not empty and <arguments/> contains exactly one token">
+        Set <id><getopt-task/></id>, as the option parser has already
+        split off the task id prefix `<id>:` from <arguments/>, and set
+        <assignee/> to the token. Do not output anything.
         </if>
 
-    3.  <elseif condition="<arguments/> contains exactly one token which does NOT end with `:`">
+    3.  <elseif condition="<getopt-task/> is empty and <arguments/> contains two tokens and the first token ends with `:`">
+        Set <id/> to the first token with the trailing `:` removed and
+        <assignee/> to the second token. Do not output anything.
+        </elseif>
+
+    4.  <elseif condition="<getopt-task/> is empty and <arguments/> contains exactly one token which does NOT end with `:`">
         Set <assignee/> to the token. Do not output anything.
         </elseif>
 
-    4.  <else>
+    5.  <else>
         Only output the following <template/> and then immediately
         *STOP* processing the entire current skill:
 
@@ -60,7 +66,7 @@ Procedure
         </template>
         </else>
 
-    5.  <if condition="<id/> does NOT match the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`">
+    6.  <if condition="<id/> does NOT match the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`">
         Only output the following <template/> and then immediately
         *STOP* processing the entire current skill:
 

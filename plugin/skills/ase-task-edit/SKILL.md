@@ -27,7 +27,8 @@ Iteratively Edit a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-edit"
-    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-A --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --ground|-G --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir=">
+    arg2="--plan|-p=(none|OVERWRITE|REFINE|PRESERVE) --mode|-m=(auto|craft|refactor|resolve|specify) --approach|-A --unverified|-u --focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --ground|-G --quiet|-q --interactive|-i --next|-n=(none|DONE|GRILL|DRAFT|IMPLEMENT)... --int-reuse-task --int-source-dir="
+    arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
 
@@ -361,9 +362,14 @@ Set <args></args> (set args to empty).
 
     2.  Resolve a potential analyzer issue:
 
+        The option parser has already split off a task id prefix
+        `<id>:` resp. a sole task id `<id>` from <instruction/> into
+        <getopt-task/> (with <getopt-task-only/> being `true` for the
+        latter). Set <candidate/> to <getopt-task/> if
+        <getopt-task-only/> is `true`, else to <instruction/>.
+        Do not output anything.
+
         <if condition="
-            <instruction/> has the format `[<id/>:] <candidate/>` where
-            the optional <id/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$` and
             <candidate/> matches the regexp `^([a-zA-Z][a-zA-Z0-9_]*-)?[PT]\d+$`
         ">
         The <candidate/> may be a bare issue identifier (like `P1`,
@@ -374,9 +380,12 @@ Set <args></args> (set args to empty).
         returned `text` is non-empty:
 
         1.  Set <issue-id><candidate/></issue-id> and
-            <instruction><text/></instruction>.
+            <instruction><text/></instruction>. If <getopt-task-only/>
+            is `true`, set <getopt-task></getopt-task> (empty), as the
+            sole token is the issue and not a task id.
 
-        2.  If <id/> is given, set <ase-task-id><id/></ase-task-id> and
+        2.  If <getopt-task/> is not empty, set
+            <ase-task-id><getopt-task/></ase-task-id> and
             <task-origin>task given</task-origin>, and call the
             `ase_task_id(id: "<ase-task-id/>", session:
             "<ase-session-id/>")` tool from the `ase` MCP server to
@@ -388,22 +397,23 @@ Set <args></args> (set args to empty).
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ issue: **<issue-id/>**, ▶ status: **issue retrieved**
             </template>
 
-        Otherwise, keep <instruction/> unchanged, so it is treated as a
-        task id resp. as an instruction below. Do not output anything.
+        Otherwise, keep <instruction/> and <getopt-task/> unchanged, so
+        they are treated as an instruction resp. as a task id below.
+        Do not output anything.
         </if>
 
     3.  React on task and/or instruction:
 
         1.  <if condition="
                 <issue-id/> is empty and
-                <instruction/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`
+                <getopt-task/> is not empty and
+                <instruction/> is empty
             ">
-            Set <ase-task-id><instruction/></ase-task-id> (set task
-            id to instruction) and <instruction></instruction> (set
-            instruction empty), call the `ase_task_id(id: "<ase-task-id/>",
-            session: "<ase-session-id/>")` tool from the `ase` MCP
-            server to switch the task, and then only output the
-            following <template/>:
+            Set <ase-task-id><getopt-task/></ase-task-id> (set task id
+            to the split-off task id), call the `ase_task_id(id:
+            "<ase-task-id/>", session: "<ase-session-id/>")` tool from
+            the `ase` MCP server to switch the task, and then only
+            output the following <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
@@ -412,34 +422,14 @@ Set <args></args> (set args to empty).
 
         2.  <elseif condition="
                 <issue-id/> is empty and
-                <instruction/> has the format `<id/>: <text/>` where
-                <id/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$` and
-                <text/> is *empty*
+                <getopt-task/> is not empty and
+                <instruction/> is not empty
             ">
-            Set <instruction></instruction> (set instruction to empty)
-            and <ase-task-id><id/></ase-task-id> (set task id to
-            id) and call the `ase_task_id(id: "<ase-task-id/>", session:
-            "<ase-session-id/>")` tool from the `ase` MCP server to
-            switch the task, and then only output the following
-            <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-            </template>
-            </elseif>
-
-        3.  <elseif condition="
-                <issue-id/> is empty and
-                <instruction/> has the format `<id/>: <text/>` where
-                <id/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$` and
-                <text/> is *not empty*
-            ">
-            Set <instruction><text/></instruction> (set instruction to
-            text) and <ase-task-id><id/></ase-task-id> (set task id
-            to id) and call the `ase_task_id(id: "<ase-task-id/>", session:
-            "<ase-session-id/>")` tool from the `ase` MCP server to
-            switch the task, and then only output the following
-            <template/>:
+            Set <ase-task-id><getopt-task/></ase-task-id> (set task id
+            to the split-off task id), call the `ase_task_id(id:
+            "<ase-task-id/>", session: "<ase-session-id/>")` tool from
+            the `ase` MCP server to switch the task, and then only
+            output the following <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
@@ -447,7 +437,7 @@ Set <args></args> (set args to empty).
             </template>
             </elseif>
 
-        4.  <elseif condition="
+        3.  <elseif condition="
                 <instruction/> is not empty
             ">
             Only output the following <template/>, where <task-origin/>
@@ -459,7 +449,7 @@ Set <args></args> (set args to empty).
             </template>
             </elseif>
 
-        5.  <elseif condition="
+        4.  <elseif condition="
                 <instruction/> is empty
             ">
             Only output the following <template/>:

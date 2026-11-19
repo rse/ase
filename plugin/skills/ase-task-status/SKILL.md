@@ -19,7 +19,7 @@ effort: high
 Configure Task Status
 </purpose>
 
-<expand name="getopt" arg1="ase-task-status">
+<expand name="getopt" arg1="ase-task-status" arg2="" arg3="colon">
     $ARGUMENTS
 </expand>
 
@@ -55,12 +55,19 @@ Procedure
 
         Do not output anything.
 
-    2.  <if condition="<arguments/> contains two tokens">
-        Set <id/> to the first token with a trailing `:` removed and
-        <status/> to the second token. Do not output anything.
+    2.  <if condition="<getopt-task/> is not empty">
+        Set <id><getopt-task/></id>, as the option parser has already
+        split off the task id prefix `<id>:` from <arguments/>. If
+        <arguments/> contains exactly one token, set <status/> to it.
+        Do not output anything.
         </if>
 
-    3.  <if condition="<arguments/> contains exactly one token">
+    3.  <elseif condition="<arguments/> contains two tokens">
+        Set <id/> to the first token with a trailing `:` removed and
+        <status/> to the second token. Do not output anything.
+        </elseif>
+
+    4.  <elseif condition="<arguments/> contains exactly one token">
         -   If the token ends with `:`:
             Set <id/> to the token with the trailing `:` removed.
         -   Else if the token, upper-cased, is one of <states/>:
@@ -69,9 +76,9 @@ Procedure
             Set <id/> to the token.
 
         Do not output anything.
-        </if>
+        </elseif>
 
-    4.  <if condition="<arguments/> contains more than two tokens">
+    5.  <if condition="<arguments/> contains more than two tokens, or <getopt-task/> is not empty and <arguments/> contains more than one token">
         Only output the following <template/> and then immediately
         *STOP* processing the entire current skill:
 
@@ -80,7 +87,7 @@ Procedure
         </template>
         </if>
 
-    5.  <if condition="<id/> does NOT match the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`">
+    6.  <if condition="<id/> does NOT match the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`">
         Only output the following <template/> and then immediately
         *STOP* processing the entire current skill:
 

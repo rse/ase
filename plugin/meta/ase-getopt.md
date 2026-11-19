@@ -11,6 +11,15 @@ set placeholders into the context as a side-effect.
     Set <getopt-skill><arg1/></getopt-skill>
     Set <getopt-spec>--help|-h <arg2/></getopt-spec>
     Set <getopt-args><content/></getopt-args>
+    Set <getopt-task-prefix><arg3/></getopt-task-prefix>
+    Set <getopt-task></getopt-task> (empty)
+    Set <getopt-task-only>false</getopt-task-only>
+
+    The optional <arg3/> declares the splitting of a leading task id
+    off the arguments: `colon` for a first token `<id>:`, and
+    `colon-or-bare` for additionally a sole token `<id>`. If the `arg3`
+    attribute is absent, <getopt-task-prefix/> is *empty* (never the
+    literal text `<arg3/>`).
 
 2.  **Short-Circuit Processing**:
     You *MUST* decide here, via the following *mandatory* <if/> control
@@ -20,8 +29,16 @@ set placeholders into the context as a side-effect.
     3-6 are *structurally unreachable* and you *MUST NOT* call the
     `ase_getopt` MCP tool under any circumstances.
 
-    <if condition="<getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e. it does not contain an option) *AND* <getopt-skill/> is *NOT* one of the space-separated skill names of <ase-getopt-tuned/> (i.e. it has no option aliases or option defaults)">
-        Parse the options *locally*, without any MCP call:
+    Conversely, whenever <getopt-task-prefix/> is *not* empty and
+    <getopt-args/> is *not* empty, the <if/> branch is *never* taken,
+    even if <getopt-args/> contains no option at all (like `foo: text`):
+    a leading task id is split off *only* by the `ase_getopt` MCP tool,
+    *never* by a local parsing or by you.
+
+    <if condition="<getopt-args/> does *NOT* match the regexp `(^|\s)-` (i.e. it does not contain an option) *AND* <getopt-skill/> is *NOT* one of the space-separated skill names of <ase-getopt-tuned/> (i.e. it has no option aliases or option defaults) *AND* (<getopt-task-prefix/> is empty *OR* <getopt-args/> is empty) (i.e. no task id has to be split off)">
+        Parse the options *locally*, without any MCP call (with empty
+        <getopt-args/>, <getopt-task/> stays empty and
+        <getopt-task-only/> stays `false`):
 
         For each option token in <getopt-spec/> of the form
         `--<long/>[|-<short/>][=<default/>|=(<c1/>|<c2/>|...)[...]]`, set
@@ -51,10 +68,14 @@ set placeholders into the context as a side-effect.
     </else>
 
 3.  **MCP Call**:
-    Call the `ase_getopt(name: "<getopt-skill/>", spec:
-    "<getopt-spec/>", args: "<getopt-args/>")` tool of the `ase`
-    MCP server and set <text/> to the `text` output field of
-    this tool call. The `spec` syntax for each option token is
+    If <getopt-task-prefix/> is empty, call the `ase_getopt(name:
+    "<getopt-skill/>", spec: "<getopt-spec/>", args: "<getopt-args/>")`
+    tool of the `ase` MCP server. Otherwise, you *MUST* call the
+    `ase_getopt(name: "<getopt-skill/>", spec: "<getopt-spec/>", args:
+    "<getopt-args/>", taskPrefix: "<getopt-task-prefix/>")` tool of the
+    `ase` MCP server instead, so the tool (and *never* you) splits off a
+    leading task id of the arguments. Then set <text/> to the `text`
+    output field of this tool call. The `spec` syntax for each option token is
     `--<long>[|-<short>][=<default>|=(<c1>|<c2>|...)[...]]`, where
     `=<default>` declares a value-taking option with a default,
     `=(<c1>|<c2>|...)` declares a value-taking option restricted to the
@@ -113,15 +134,22 @@ set placeholders into the context as a side-effect.
         "opts": { "<long1/>": <value1/>, "<long2/>": <value2/>, ... },
         "argv": [ "<arg1/>", "<arg2/>", ... ],
         "args": "...",
-        "info": "..."
+        "info": "...",
+        "task": "...",
+        "taskOnly": false
     }
     ```
+
+    The fields `task` and `taskOnly` exist only with `taskPrefix`.
 
 6.  **Materializing into Context**:
     For each *key* `<longN/>` in <getopt-result/>`.opts`:
     Set <getopt-option-<longN/>/> to the corresponding value
     `<getopt-result/>.opts[<longN/>]`.
     Set <getopt-arguments/> to the value of `<getopt-result/>.args`.
+    If `<getopt-result/>.task` exists, set <getopt-task/> to its value
+    and <getopt-task-only/> to the value of `<getopt-result/>.taskOnly`
+    (the task id prefix is then *no* longer part of <getopt-arguments/>).
     Set <getopt-info/> to `<getopt-result/>.info`, but remove
     information about the `help` option and any *internal* option
     whose long name starts with `int-`.

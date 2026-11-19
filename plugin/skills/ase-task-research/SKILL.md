@@ -23,7 +23,8 @@ Research a Topic for a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-research"
-    arg2="--services|-s=(all|perplexity|brave|exa|websearch)... --refine|-r --dry-run|-d --int-source-dir=">
+    arg2="--services|-s=(all|perplexity|brave|exa|websearch)... --refine|-r --dry-run|-d --int-source-dir="
+    arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
 
@@ -59,14 +60,12 @@ Procedure
 
     2.  React on task and/or topic:
 
-        -   If <topic/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`,
-            or has the format `<id/>:` or `<id/>: <text/>` where <id/>
-            matches this regexp: set <ase-task-id><id/></ase-task-id> (or
-            to <topic/> itself for the first form) and <topic/> to <text/>
-            (or to empty for the first two forms), call the
-            `ase_task_id(id: "<ase-task-id/>", session: "<ase-session-id/>")`
-            tool of the `ase` MCP server to switch the task, and then only
-            output the following <template/>:
+        -   If <getopt-task/> is not empty (the option parser has
+            already split off the task id `<id>` resp. `<id>:` from
+            <topic/>): set <ase-task-id><getopt-task/></ase-task-id>,
+            call the `ase_task_id(id: "<ase-task-id/>", session:
+            "<ase-session-id/>")` tool of the `ase` MCP server to switch
+            the task, and then only output the following <template/>:
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**

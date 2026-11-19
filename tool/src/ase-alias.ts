@@ -22,6 +22,7 @@ import {
     commandName,
     joinArgs,
     skillSpec,
+    skillTaskPrefix,
     splitArgs,
     type AliasScope
 }                               from "./ase-alias-core.js"
@@ -256,12 +257,15 @@ export default class AliasCommand {
                 const spec  = skillSpec(skill)
                 if (spec !== null) {
                     const tuning = aliases.tuning(skill)
-                    const result = getopt(skill, `--help|-h ${spec}`, tokens, tuning)
+                    const prefix = skillTaskPrefix(skill) ?? undefined
+                    const result = getopt(skill, `--help|-h ${spec}`, tokens, tuning, prefix)
                     const opts   = Object.entries(result.opts)
                         .filter(([ key ]) => key !== "help" && !/^int[A-Z]/.test(key))
                         .map(([ key, value ]) => `${key}: ${String(value)}`)
                     lines.push(`defaults:  ${joinArgs(tuning.defaults)}`)
                     lines.push(`options:   ${opts.join(", ")}`)
+                    if (result.task !== undefined)
+                        lines.push(`task:      ${result.task}`)
                     lines.push(`arguments: ${result.args}`)
                 }
                 await writeStdout(`${lines.join("\n")}\n`)

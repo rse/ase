@@ -22,7 +22,8 @@ Dissect a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-dissect"
-    arg2="--max-parts|-m=8 --dry|-d --force|-f --int-reuse-task">
+    arg2="--max-parts|-m=8 --dry|-d --force|-f --int-reuse-task"
+    arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
 
@@ -49,37 +50,18 @@ Procedure
 
     2.  React on the task id:
 
-        <if condition="
-            <instruction/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*:?$`
-        ">
-        The lone token is the *task id* (with an optional and ignored
-        trailing `:`), never a hint. Set
-        <ase-task-id><instruction/></ase-task-id> (set task id to
-        instruction, with any trailing `:` stripped) and
-        <instruction></instruction> (set instruction empty), call the
-        `ase_task_id(id: "<ase-task-id/>", session: "<ase-session-id/>")`
-        tool from the `ase` MCP server to switch the task, and then only
-        output the following <template/>:
-
-        <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-        </template>
-        </if>
-
-        <elseif condition="
-            <instruction/> has the format `<id/>: <text/>` where
-            <id/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`
-        ">
-        Set <instruction><text/></instruction> (set instruction to
-        text) and <ase-task-id><id/></ase-task-id> (set task id to
-        id), call the `ase_task_id(id: "<ase-task-id/>", session:
+        <if condition="<getopt-task/> is not empty">
+        The option parser has already split off the task id prefix
+        `<id>:` resp. the sole task id `<id>` (never a hint) from
+        <instruction/>. Set <ase-task-id><getopt-task/></ase-task-id>,
+        call the `ase_task_id(id: "<ase-task-id/>", session:
         "<ase-session-id/>")` tool from the `ase` MCP server to switch
         the task, and then only output the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
         </template>
-        </elseif>
+        </if>
 
     3.  React on the dissection hint:
 

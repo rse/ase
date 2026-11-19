@@ -20,39 +20,11 @@ an explicit `IMPLEMENT` or `DRAFT` next step.
 
 <define name="task-react-id">
 
-1.  <if condition="
-        <instruction/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$`
-    ">
-    Set <ase-task-id><instruction/></ase-task-id> (set task
-    id to instruction) and <instruction></instruction> (set
-    instruction empty), call the `ase_task_id(id: "<ase-task-id/>",
-    session: "<ase-session-id/>")` tool from the `ase` MCP
-    server to switch the task, and then only output the
-    following <template/>:
+The option parser of the skill (`getopt` with `arg3="colon-or-bare"`)
+has already split off a task id prefix `<id>:` resp. a sole task id
+`<id>` from <instruction/> into <getopt-task/>.
 
-    <template>
-    ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-    </template>
-    </if>
-
-2.  <elseif condition="
-        <instruction/> has the format `<id/>: <text/>` where
-        <id/> matches the regexp `^[a-zA-Z0-9#][a-zA-Z0-9#_-]*$` and
-        <text/> is *empty*
-    ">
-    Set <instruction></instruction> (set instruction to empty)
-    and <ase-task-id><id/></ase-task-id> (set task id to
-    id) and call the `ase_task_id(id: "<ase-task-id/>", session:
-    "<ase-session-id/>")` tool from the `ase` MCP server to
-    switch the task, and then only output the following
-    <template/>:
-
-    <template>
-    ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-    </template>
-    </elseif>
-
-3.  <elseif condition="<instruction/> is NOT empty">
+1.  <if condition="<instruction/> is NOT empty">
     The argument is neither empty nor a valid task id. As this
     skill only accepts an optional `[<id>]` argument and *never*
     a free-text instruction, only output the following <template/>
@@ -70,6 +42,18 @@ an explicit `IMPLEMENT` or `DRAFT` next step.
     <ase-tpl-hint level="verbose">
     Run `/<arg1/> --help` for the accepted arguments of this skill, or use `/ase-help-intent` to have a fitting command proposed for a free-text intent.
     </ase-tpl-hint>
+    </if>
+
+2.  <elseif condition="<getopt-task/> is NOT empty">
+    Set <ase-task-id><getopt-task/></ase-task-id> (set task id
+    to the split-off task id), call the `ase_task_id(id:
+    "<ase-task-id/>", session: "<ase-session-id/>")` tool from the
+    `ase` MCP server to switch the task, and then only output the
+    following <template/>:
+
+    <template>
+    ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
+    </template>
     </elseif>
 
 </define>

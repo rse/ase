@@ -50,6 +50,12 @@ ChangeLog
     `ase-getopt.md` now requires passing the user arguments unchanged in exactly one `ase_getopt` call,
     and reporting an `ERROR:` result as final, as weaker models retried without the offending option.
 
+-   IMPROVEMENT [code]: Split Off Task Id Prefix in Option Parsing
+    `ase_getopt` now optionally splits off a leading `<id>:` (or sole `<id>`) into `task`,
+    consumed by `ase-task-{edit,status,assign,research,dissect}`, `ase-repo-task`, and the
+    `task-react-id` macro of `ase-task-{grill,condense,reboot,implement,integrate}`,
+    as weaker models ignored the prefix, and `ase alias expand` shows the split off task id.
+
 -   BUGFIX [code]: SOFT Auto-Warm Across Compactions
     The cache controller of the function hooks no longer stops a SOFT auto-warm, when the first ping
     after a compaction (e.g. the idle compaction of Claude Code) writes the cache of the compacted

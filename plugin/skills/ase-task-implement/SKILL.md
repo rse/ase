@@ -22,7 +22,8 @@ Implement a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-implement"
-    arg2="--next|-n=(none|DONE|EDIT|INTEGRATE|DELETE)... --worktree|-w= --source|-s= --changeset|-c= --draft|-d --no-cleanup|-K --stateless|-S --ground|-G --int-reuse-task">
+    arg2="--next|-n=(none|DONE|EDIT|INTEGRATE|DELETE)... --worktree|-w= --source|-s= --changeset|-c= --draft|-d --no-cleanup|-K --stateless|-S --ground|-G --int-reuse-task"
+    arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
 

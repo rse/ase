@@ -22,7 +22,8 @@ Integrate a Task Change Set
 
 <expand name="getopt"
     arg1="ase-task-integrate"
-    arg2="--next|-n=(none|DONE|DELETE)... --worktree|-w= --changeset|-c= --draft|-d --target|-t= --mode|-m=(merge|rebase|squash) --no-cleanup|-K --stateless|-S --int-reuse-task">
+    arg2="--next|-n=(none|DONE|DELETE)... --worktree|-w= --changeset|-c= --draft|-d --target|-t= --mode|-m=(merge|rebase|squash) --no-cleanup|-K --stateless|-S --int-reuse-task"
+    arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
 

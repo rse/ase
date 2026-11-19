@@ -157,6 +157,24 @@ export const skillSpec = (skill: string): string | null => {
     return m !== null && m[1] === skill ? m[2] : null
 }
 
+/*  the splitting modes of a leading task id: only a prefix "<id>:",
+    or additionally a sole "<id>" as the entire remaining arguments  */
+export type GetoptTaskPrefix = "colon" | "colon-or-bare"
+
+/*  check whether a value is a known task id splitting mode  */
+export const isGetoptTaskPrefix = (mode: unknown): mode is GetoptTaskPrefix =>
+    mode === "colon" || mode === "colon-or-bare"
+
+/*  the task id splitting mode of a bundled ASE skill (the third argument of the
+    expansion of its "getopt" definition, in any attribute order), or null if not given  */
+export const skillTaskPrefix = (skill: string): GetoptTaskPrefix | null => {
+    const md    = readText(path.join(skillsDir(), skill, "SKILL.md"))
+    const attrs = md !== null ? /<expand\s+name="getopt"((?:\s+[a-zA-Z0-9]+="[^"]*")*)\s*>/.exec(md)?.[1] : undefined
+    const arg1  = attrs !== undefined ? /\barg1="([^"]*)"/.exec(attrs)?.[1] : undefined
+    const arg3  = attrs !== undefined ? /\barg3="([^"]*)"/.exec(attrs)?.[1] : undefined
+    return arg1 === skill && isGetoptTaskPrefix(arg3) ? arg3 : null
+}
+
 /*  the argument hint of a bundled ASE skill (the "argument-hint" of its frontmatter), or empty  */
 const skillHint = (skill: string): string => {
     const md = readText(path.join(skillsDir(), skill, "SKILL.md"))

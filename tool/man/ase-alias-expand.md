@@ -11,7 +11,8 @@
 **ase alias expand** expands the skill *command-line* through the full
 aliases, the option aliases, and the option defaults of both scopes, and
 prints the expanded command line, the option defaults, the resulting
-options, and the resulting arguments of the skill. This is intended for
+options, the split off leading task id (for the skills addressing a
+task), and the resulting arguments of the skill. This is intended for
 testing aliases. See `ase-alias`(1) for the expansion order.
 
 ## OPTIONS

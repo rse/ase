@@ -10,7 +10,13 @@ import { Command, Option }    from "commander"
 import { quote as shQuote }   from "shell-quote"
 
 import type Log               from "./ase-lib-log.js"
-import { Aliases, splitArgs, type AliasTuning } from "./ase-alias-core.js"
+import {
+    Aliases,
+    isGetoptTaskPrefix,
+    splitArgs,
+    type AliasTuning,
+    type GetoptTaskPrefix
+}                               from "./ase-alias-core.js"
 
 /*  tokenize a raw input string into [start,end) token ranges, preserving
     the quoting and escaping so the original text can later be sliced verbatim  */
@@ -201,10 +207,12 @@ const expandAliases = (tokens: string[], aliases: Record<string, string>, flagTa
 
 /*  the result of parsing the options  */
 export type GetoptResult = {
-    opts: Record<string, unknown>
-    argv: string[]
-    args: string
-    info: string
+    opts:      Record<string, unknown>
+    argv:      string[]
+    args:      string
+    info:      string
+    task?:     string
+    taskOnly?: boolean
 }
 
 /*  parse the arguments (a raw string or a token vector) against the options specification,
@@ -212,7 +220,7 @@ export type GetoptResult = {
     where the option defaults are merged on the level of the parsed options (an explicitly
     given option wins), and a negated value-taking option is reset to its spec default  */
 export const getopt = (name: string, spec: string, args: string | string[],
-    tuning: AliasTuning = { options: {}, defaults: [] }): GetoptResult => {
+    tuning: AliasTuning = { options: {}, defaults: [] }, taskPrefix?: GetoptTaskPrefix): GetoptResult => {
     const { internals, flagTakesValue, valueDefaults, listOpts } = parseSpec(spec)
 
     /*  reject option aliases shadowing a real or a negating option  */
@@ -296,7 +304,8 @@ export const getopt = (name: string, spec: string, args: string | string[],
     }
 
     /*  compute verbatim trailing argument string  */
-    const argsVerbatim = argsRaw !== null ?
+    let argv         = cmd.args
+    let argsVerbatim = argsRaw !== null ?
         verbatimArgs(argsRaw, flagTakesValue) :
         shQuote(cmd.args)
 
@@ -306,7 +315,35 @@ export const getopt = (name: string, spec: string, args: string | string[],
         .map(([ k, v ]) => `${k}: **${shQuote([ String(v) ])}**`)
         .join(", ")
 
-    return { opts, argv: cmd.args, args: argsVerbatim, info }
+    /*  optionally split off a leading task id from the remaining arguments,
+        either as a first token "<id>:" or (on request) as a sole token "<id>",
+        where the parsed tokens of the verbatim first token (more than one for an
+        inner "#", parsed as a comment) have to agree with it, so an attached
+        shell operator (like "<id>:(x)") is never split off  */
+    if (taskPrefix !== undefined) {
+        let task     = ""
+        let taskOnly = false
+        const ranges = tokenizeRanges(argsVerbatim)
+        const raw    = ranges.length > 0 ? argsVerbatim.slice(ranges[0].start, ranges[0].end) : ""
+        const first  = unquote(raw)
+        const m      = /^([a-zA-Z0-9#][a-zA-Z0-9#_-]*)(:?)$/.exec(first)
+        const count  = m !== null ? splitArgs(raw).length : 0
+        const agrees = count > 0 && argv.slice(0, count).join("") === first
+        if (m !== null && agrees && m[2] === ":") {
+            task         = m[1]
+            argv         = argv.slice(count)
+            argsVerbatim = ranges.length > 1 ? argsVerbatim.slice(ranges[1].start) : ""
+        }
+        else if (m !== null && agrees && taskPrefix === "colon-or-bare" && argv.length === count && ranges.length === 1) {
+            task         = m[1]
+            taskOnly     = true
+            argv         = []
+            argsVerbatim = ""
+        }
+        return { opts, argv, args: argsVerbatim, info, task, taskOnly }
+    }
+
+    return { opts, argv, args: argsVerbatim, info }
 }
 
 /*  MCP registration entry point for the option-parser tool  */
@@ -331,14 +368,20 @@ export class GetoptMCP {
                 "the usage help and the `info` rendering. Every option `--x` " +
                 "can be negated by `--no-x`, and the option aliases and option " +
                 "defaults configured via `ase alias` for the skill `name` are " +
-                "applied, too.",
+                "applied, too. With `taskPrefix`, a leading task id is split off " +
+                "the remaining arguments and returned as `task` (empty if none): " +
+                "a first token `<id>:` (mode `colon`), or additionally a sole " +
+                "token `<id>` (mode `colon-or-bare`, then also `taskOnly: true`).",
             inputSchema: {
                 name: z.string()
                     .describe("Name of the caller (e.g. skill name), used in error messages"),
                 spec: z.string()
                     .describe("Whitespace-separated option spec, e.g. `--foo|-f --bar --baz|-b=BAZ`"),
                 args: z.union([ z.string(), z.array(z.string()) ])
-                    .describe("Arguments to parse (string is split shell-like, honoring quotes)")
+                    .describe("Arguments to parse (string is split shell-like, honoring quotes)"),
+                taskPrefix: z.string().optional()
+                    .describe("Split off a leading task id `<id>:` (`colon`), or also a sole `<id>` (`colon-or-bare`), " +
+                        "where any other value is ignored")
             }
         }, async (args) => {
             try {
@@ -352,8 +395,16 @@ export class GetoptMCP {
                     this.log.write("warning", `getopt: ignoring aliases: ${err instanceof Error ? err.message : String(err)}`)
                 }
 
+                /*  determine the task id splitting mode, where an unknown mode (like an
+                    unsubstituted placeholder of a skill) is ignored with a warning only  */
+                let taskPrefix: GetoptTaskPrefix | undefined
+                if (isGetoptTaskPrefix(args.taskPrefix))
+                    taskPrefix = args.taskPrefix
+                else if (args.taskPrefix !== undefined && args.taskPrefix !== "")
+                    this.log.write("warning", `getopt: ignoring unknown task prefix mode "${args.taskPrefix}"`)
+
                 /*  parse args with the option aliases and option defaults of the caller  */
-                const result = getopt(args.name, args.spec, args.args, tuning)
+                const result = getopt(args.name, args.spec, args.args, tuning, taskPrefix)
                 return {
                     content: [ { type: "text", text: JSON.stringify(result) } ]
                 }
