@@ -1541,7 +1541,8 @@ export class TaskMCP {
                 "artifacts. Overwrites an existing task for the same `id` only with `base` (conditionally, " +
                 "see below) or with `force` (unconditionally, for a deliberate overwrite only), and otherwise " +
                 "fails if a task with this `id` already exists (as it does with `create` being `true`, to be used " +
-                "on the first save of a task whose `id` was allocated via `ase_task_newid`). " +
+                "on the first save of a task whose `id` was allocated via `ase_task_newid`), where the error of a save " +
+                "without `create` carries the current entity tag of the stored plan, to be passed as `base`. " +
                 "Returns a status `text` by default, or, if `render` is `true`, the " +
                 "*rendering-prepared* form of the just-saved plan (with its attachment payloads elided), " +
                 "for display purposes only. " +
@@ -1595,9 +1596,16 @@ export class TaskMCP {
                     if (base !== undefined && err instanceof Core.Problem && err.status === 412)
                         throw new Error(`task: task "${args.id}" was changed meanwhile and cannot be merged -- ` +
                             `save refused (reload the task and apply the change again): ${err.message}`, { cause: err })
-                    if (implicit && err instanceof Error && err.cause instanceof Core.Problem && err.cause.status === 412)
-                        throw new Error(`task: task "${args.id}" already exists -- save refused ` +
-                            "(pass its entity tag as `base` for a conditional save, or `force` for an overwrite)", { cause: err })
+                    if (implicit && err instanceof Error && err.cause instanceof Core.Problem && err.cause.status === 412) {
+                        /*  report the current entity tag, so a single follow-up save succeeds without a re-load  */
+                        const stored = await Task.source(this.log, args.id).catch(() => null)
+                        if (stored === null)
+                            throw new Error(`task: task "${args.id}" already exists -- save refused ` +
+                                "(pass its entity tag as `base` for a conditional save, or `force` for an overwrite)", { cause: err })
+                        throw new Error(`task: task "${args.id}" already exists -- save refused -- ` +
+                            `current entity tag: ${stored.tag} (pass it as \`base\` for a conditional save ` +
+                            "of your text over the stored plan, or `force` for an overwrite)", { cause: err })
+                    }
                     throw err
                 }
 

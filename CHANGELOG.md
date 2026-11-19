@@ -5,6 +5,11 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code]: Report Current Entity Tag on Refused `ase_task_save`
+    A plain `ase_task_save` of an existing task (without `base`, `force`, or `create`) now reports
+    the current entity tag of the stored plan in its refusal, so a single follow-up save with it as
+    `base` succeeds, as weaker models looped through re-loads and re-saves instead.
+
 -   IMPROVEMENT [code]: Silent Probes and Call First in `ase-meta-compat`
     `ase-meta-compat` now computes all probes silently without a running `<actuals>` map, lists
     them as compact `<id>: <instruction>` pairs, and makes the `ase_compat` call its first visible
