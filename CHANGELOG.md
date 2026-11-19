@@ -9,6 +9,11 @@ ChangeLog
     `ase-task-dissect` now also detects existing parts by their title within the epic, as the
     proposal ids matched real ids under scheme `any` only and re-runs silently duplicated parts.
 
+-   BUGFIX [code]: Tag Only Clear Sections on Early Stop in `ase-task-grill`
+    `ase-task-grill` now tags only the sections without any open point on an early stop, as it
+    otherwise tagged `DESIGN` and `VERIFICATION` under `--until MUST` without asking their
+    questions, so every later run skipped them, even with `--until SHOULD`.
+
 -   BUGFIX [code]: Stop on Every Failed Task Saving in `ase-repo-task`
     `ase-repo-task` now stops with an error on every failure of `ase_task_save`, not only on an
     existing task, as it otherwise switched to a non-persisted task id and reported "task derived".

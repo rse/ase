@@ -220,9 +220,9 @@ Set <args>--int-reuse-task</args>.
             </expand>
 
             If <grill-stop/> is `true`, skip the items 3, 4, and 6 of
-            this round, perform item 5 of this round (as the focused
-            sections are clear, they are tagged as grilled), then skip
-            all remaining rounds and continue with step 4.
+            this round, perform item 5 of this round (tagging only the
+            focused sections without any open point as grilled), then
+            skip all remaining rounds and continue with step 4.
 
         3.  INTERACTIVE DIALOG:
 
@@ -332,6 +332,13 @@ Set <args>--int-reuse-task</args>.
             fully grilled plan hence carries the tags
             `grilled:specification, grilled:design,
             grilled:verification`.
+
+            If <grill-stop/> is `true`, set the tag *only* for the
+            sections of <sections/> for which item 2 determined *no*
+            question of their focus areas at all, as the questions of a
+            severity below <grill-until/> stay unasked and unrecorded,
+            and a tag would make every later run skip their section
+            (see step 2.3), even with a lower `--until` severity.
 
             <if condition="neither the body nor the `Tags:` key of <task-content/> changed in this round">
             Skip the saving, as there is nothing to persist, and only

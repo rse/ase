@@ -82,6 +82,10 @@ section without any `[?]` bullet-point is skipped entirely, unless
 `--force` is given. Bullet-points
 in state `[-]` (cancelled) or `[>]` (deferred) are never questioned.
 
+A round which stops early tags only the sections without any open
+point as grilled, so a section with open points below the `--until`
+severity is still grilled by a later run with a lower severity.
+
 ##  OPTIONS
 
 -   `--rounds`|`-r` *n*:
