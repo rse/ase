@@ -49,6 +49,13 @@ Skill Output
     `<xxx .../>`) *MUST* *NEVER* appear literally in your output: always
     replace it by its current (possibly empty) value.
 
+-   *IMPORTANT*: The *bullet* template patterns (see `Template Patterns`
+    below) expand into exactly *one* glyph each, and *nothing* else:
+    `<ase-tpl-bullet-secondary/>` into `⚪`, `<ase-tpl-bullet-normal/>`
+    into `🔵`, and `<ase-tpl-bullet-signal/>` into `🟠`. You *MUST*
+    *NEVER* output such a tag literally, *NEVER* output both the tag and
+    its glyph, and *NEVER* substitute another glyph (like `○` or `●`).
+
 -   *IMPORTANT*: Whenever your *authored* text (a free-text placeholder
     value, a finding, or an explanation) *quotes* markup, code, or a
     placeholder name like `<xxx/>` from a file or a skill, you *MUST*
