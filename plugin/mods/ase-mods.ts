@@ -141,7 +141,8 @@ export const register: Register = (on, options) => {
     })
     on("session.compact", async ($, e, next) => {
         const result = await next(e)
-        cache.compacted()
+        if (e.agentId === undefined && e.trigger !== "precompute" && result.skip === undefined)
+            cache.compacted(result.tokensAfter)
         return result
     })
     on("session.measure", ($, e, next) => {

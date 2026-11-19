@@ -104,13 +104,14 @@ export const modCacheControl = () => {
     /*  this session: its identity, its context, its detected TTL, its cold restarts
         (with their rewritten tokens), its turn state, its auto-warm (none, SOFT, or
         HARD until a time, with its pings), whether SOFT already ran while idle (with
-        its pings), and whether the band stays shown for a HARD auto-warm (until the
-        next interaction)  */
+        its pings), whether the band stays shown for a HARD auto-warm (until the
+        next interaction), and whether a compaction left the next ping to write
+        the cache of the compacted conversation  */
     const S = {
         id: "", activity: 0, ctx: 0,
         ttl: TTL_LONG, ttlSource: "default",
         colds: [] as { tokens: number }[],
-        working: false, compacted: false,
+        working: false, compacted: false, rebased: false,
         warm: "" as "" | "soft" | "hard", until: 0, pings: 0,
         softUsed: false, softPings: 0, held: false
     }
@@ -201,6 +202,7 @@ export const modCacheControl = () => {
             in the prompt (instead of an "effort", which would cost the cache)  */
         pinging  = true
         const id = S.id
+        const rebased = S.rebased
         const reply = await k.fork("ASE cache controller keep-alive ping. You have no tools. " +
             "Answer straight away without thinking it over. Reply with only: ok")
             .catch(() => undefined).finally(() => { pinging = false })
@@ -214,7 +216,10 @@ export const modCacheControl = () => {
         S.pings++
         if (S.warm === "soft")
             S.softPings++
-        if (u.cache_creation_input_tokens > 0.1 * Math.max(1, u.cache_read_input_tokens))
+
+        /*  stop on a ping which wrote the cache, unless a compaction changed the conversation  */
+        S.rebased = false
+        if (!rebased && u.cache_creation_input_tokens > 0.1 * Math.max(1, u.cache_read_input_tokens))
             return warmOff()
         now        = await k.now()
         S.activity = now
@@ -251,9 +256,22 @@ export const modCacheControl = () => {
     const restart = (id: string) => {
         S.id       = id
         S.activity  = 0
+        S.rebased   = false
         S.softUsed  = false
         S.softPings = 0
         warmOff()
+    }
+
+    /*  track a compaction of the main conversation: take over its new size, let
+        the next ping write the cache of the compacted conversation without
+        stopping, and stop a SOFT auto-warm of a cache no longer big  */
+    const compacted = (tokensAfter: number | undefined) => {
+        S.compacted = true
+        S.rebased   = true
+        if (tokensAfter !== undefined)
+            S.ctx = tokensAfter
+        if (S.warm === "soft" && S.ctx < settings.threshold)
+            warmOff()
     }
 
     /*  end with the session: stop the heartbeat timer unless the process continues
@@ -298,8 +316,10 @@ export const modCacheControl = () => {
             S.ttl       = TTL_SHORT
             S.ttlSource = "detected"
         }
-        if (S.compacted)
+        if (S.compacted) {
             S.compacted = false
+            S.rebased   = false
+        }
         else if (S.activity > 0 && total > 30000 && written / total > 0.5) {
             if (S.ttlSource !== "detected" && gap > TTL_SHORT * 1.1 && gap < S.ttl) {
                 S.ttl       = TTL_SHORT
@@ -467,6 +487,6 @@ export const modCacheControl = () => {
     }
 
     return { start, restart, end, turnStart, step, figures, complete,
-        compacted: () => { S.compacted = true }, guard, command, render, footer }
+        compacted, guard, command, render, footer }
 }
 

@@ -38,6 +38,11 @@ ChangeLog
     `ase-skill.md` now states that a skill invocation of Claude Code already provides the complete
     skill instructions, as some models re-read the `SKILL.md` file of an invoked skill in chunks.
 
+-   BUGFIX [code]: SOFT Auto-Warm Across Compactions
+    The cache controller of the function hooks no longer stops a SOFT auto-warm, when the first ping
+    after a compaction (e.g. the idle compaction of Claude Code) writes the cache of the compacted
+    conversation, and takes over its new size for the escalation and the auto-warm threshold.
+
 2.1.2 (2026-11-19)
 ------------------
 
