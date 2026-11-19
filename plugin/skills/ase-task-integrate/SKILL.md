@@ -101,6 +101,26 @@ Procedure
         </ase-tpl-hint>
         </if>
 
+    4.  <if condition="<getopt-option-stateless/> is not equal `true`, the task lifecycle model <ase-project-task-lifecycle/> is `enterprise`, and the `Status:` frontmatter key of <task-content/> is absent or not one of `QUALIFIED`, `DEFERRED`, `IMPLEMENTED`, and `INTEGRATING`">
+        Only an implemented plan can be integrated in the `enterprise`
+        model: a `QUALIFIED` or `DEFERRED` one, an `IMPLEMENTED` one (as
+        the explicit integration request of the user counts as the
+        qualification), or an `INTEGRATING` one (set by the agent which
+        claimed the task). Set <status/> to the value of this key, or to
+        `DRAFTED` (the initial state an absent key reads as) if absent.
+        Only output the following <template/>, directly followed by the
+        hint, and then immediately *STOP* processing the entire current
+        skill, leaving the plan and the artifacts *untouched*:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ ERROR: plan with status **<status/>** cannot be integrated (expected **QUALIFIED**, **DEFERRED**, or **IMPLEMENTED**)
+        </template>
+
+        <ase-tpl-hint level="minimal">
+        Run `/ase-task-integrate --stateless` to integrate the change set regardless of the plan status.
+        </ase-tpl-hint>
+        </if>
+
 3.  **Prepare Changeset and Target:**
 
     The *changeset* (location of the change set) and the *target*
@@ -382,14 +402,12 @@ Procedure
 4.  **Integrate Change Set:**
 
     1.  <if condition="<getopt-option-stateless/> is not equal `true` and the task lifecycle model <ase-project-task-lifecycle/> defines the state `INTEGRATING` (i.e. `enterprise`)">
-        Mark the plan as being integrated: set the `Status:` key of
-        <task-content/> to `INTEGRATING` (*creating* the key at its
-        position in the key order of the plan <format/> if absent), but
-        *only* if `INTEGRATING` is reachable from the current state along
-        the transitions of the task lifecycle model -- from `QUALIFIED`
-        or `DEFERRED` (via `QUALIFIED`), or from `IMPLEMENTED` (via
-        `QUALIFYING` and `QUALIFIED`, as the explicit integration request
-        of the user counts as the qualification) -- and persist this
+        Mark the plan as being integrated: unless the `Status:` key of
+        <task-content/> is already `INTEGRATING` (set by the agent which
+        claimed the task), set it to `INTEGRATING` -- from `QUALIFIED`,
+        from `DEFERRED` (via `QUALIFIED`), or from `IMPLEMENTED` (via
+        `QUALIFYING` and `QUALIFIED`), the only states which pass the
+        pre-check of step 2.4 above -- and persist this
         frontmatter-only change -- without refreshing the `Modified:` key
         -- by calling the `ase_task_save(id: "<ase-task-id/>", text:
         "<task-content/>", base: "<task-tag/>")` tool of the `ase` MCP

@@ -79,7 +79,26 @@ Procedure
         use the `ase-task-edit` skill first to create a task plan. Then
         immediately stop processing this skill.
 
-    3.  Internalize the tenets stated by the plan:
+    3.  <if condition="<getopt-option-stateless/> is not equal `true`, <ase-project-task-lifecycle/> is `team` or `enterprise`, and the effective status of <task-content/> -- the value of its `Status:` frontmatter key, or the initial state of the model (`PLANNING` for `team`, `DRAFTED` for `enterprise`) if absent -- is not one of the *implementable* states: `PLANNING`, `STALLED`, and `IMPLEMENTING` for `team`, resp. `DRAFTED`, `PLANNED`, `STALLED`, and `IMPLEMENTING` for `enterprise`">
+        Only a not yet implemented plan can be implemented, where an
+        `IMPLEMENTING` one was set by the agent which claimed the task.
+        Set <status/> to the effective status and <expected/> to the
+        implementable states of the model other than `IMPLEMENTING`,
+        each in bold and joined with `, ` and a final `, or `. Only
+        output the following <template/>, directly followed by the hint,
+        and then immediately *STOP* processing the entire current skill,
+        leaving the plan and the artifacts *untouched*:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ ERROR: plan with status **<status/>** cannot be implemented (expected <expected/>)
+        </template>
+
+        <ase-tpl-hint level="minimal">
+        Run `/ase-task-implement --stateless` to implement the plan regardless of its status.
+        </ase-tpl-hint>
+        </if>
+
+    4.  Internalize the tenets stated by the plan:
 
         <expand name="code-tenets-from-plan"></expand>
 
@@ -377,15 +396,15 @@ Procedure
 4.  **Create Implementation:**
 
     1.  <if condition="<getopt-option-stateless/> is not equal `true` and <ase-project-task-lifecycle/> is `team` or `enterprise`">
-        Mark the plan as being implemented: set the `Status:` key of
-        <task-content/> to `IMPLEMENTING` (*creating* the key at its
-        position in the key order of the plan <format/> if absent), but
-        *only* if `IMPLEMENTING` is reachable from the current state
-        along the transitions of the task lifecycle model (for the
-        `team` model from `PLANNING` or `STALLED`, for the `enterprise`
-        model from `DRAFTED` via `PLANNING` and `PLANNED`, or from
-        `PLANNED` or `STALLED`), and persist this frontmatter-only change
-        -- without refreshing the `Modified:` key -- by taking over the
+        Mark the plan as being implemented: unless the `Status:` key of
+        <task-content/> is already `IMPLEMENTING` (set by the agent which
+        claimed the task), set it to `IMPLEMENTING` (*creating* the key at
+        its position in the key order of the plan <format/> if absent) --
+        for the `team` model from `PLANNING` or `STALLED`, for the
+        `enterprise` model from `DRAFTED` via `PLANNING` and `PLANNED`, or
+        from `PLANNED` or `STALLED`, the only states which pass the
+        pre-check of step 2.3 above -- and persist this frontmatter-only
+        change -- without refreshing the `Modified:` key -- by taking over the
         stored `Effort:` key and calling the `ase_task_save` tool of the
         `ase` MCP server *exactly* as described for the final save in
         sub-step 5 below. Do not output anything.

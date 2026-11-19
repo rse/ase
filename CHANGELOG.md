@@ -5,6 +5,11 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Refuse Unready Plans in `ase-task-integrate` and `ase-task-implement`
+    Both skills now pre-check the `Status:` of `enterprise` (and, for implementing, `team`) plans and
+    stop early, as their "reachable" guard held for almost every state, so e.g. `DRAFTED` plans were
+    integrated and `INTEGRATED` or `CANCELLED` ones merged again with an untouched `Status:`.
+
 -   BUGFIX [code]: Record Skipped Grilling Questions as Open in `ase-task-grill`
     `SKIP GRILLING` now leaves all questions of the round unanswered and records them as `[?]`,
     as the merge step accepted all `★` recommendations, so the questions were never re-asked.

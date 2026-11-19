@@ -79,8 +79,10 @@ reports a success without having delivered anything.
 Unless `--stateless` is given, the plan's `Status:` key follows the
 task lifecycle model: for `solo` the plan has to be `OPEN` (otherwise
 the integration is refused) and it becomes `CLOSED` on a successful
-integration and stays `OPEN` otherwise, for `enterprise` it becomes
-`INTEGRATING` before and `INTEGRATED` (on success), `QUALIFIED` (on
+integration and stays `OPEN` otherwise, for `enterprise` the plan has
+to be `QUALIFIED`, `DEFERRED`, or `IMPLEMENTED` (otherwise the
+integration is refused) and it becomes `INTEGRATING` before and
+`INTEGRATED` (on success), `QUALIFIED` (on
 nothing delivered), or `DEFERRED` (otherwise) after the integration,
 and for `team`, which defines no integration states, it stays
 untouched.

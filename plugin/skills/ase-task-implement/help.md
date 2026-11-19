@@ -88,10 +88,12 @@ unchanged.
 
 Unless `--stateless` is given, the plan's `Status:` key follows the
 task lifecycle model: for `solo` it stays untouched (as the task is
-closed by `ase-task-integrate`), and for `team` and `enterprise` it
-becomes `IMPLEMENTING` before and `IMPLEMENTED` (if the change set was
-applied completely and successfully) or `STALLED` (otherwise) after
-the implementation.
+closed by `ase-task-integrate`), and for `team` and `enterprise` the
+plan has to be not yet implemented (`PLANNING` or `STALLED` resp.
+`DRAFTED`, `PLANNED`, or `STALLED`, otherwise the implementation is
+refused) and it becomes `IMPLEMENTING` before and `IMPLEMENTED` (if
+the change set was applied completely and successfully) or `STALLED`
+(otherwise) after the implementation.
 
 The *kind of change* stated by the plan's `Kind:` frontmatter key
 (`SPECIFYING`, `CRAFTING`, `REFACTORING`, or `RESOLVING`) selects which
