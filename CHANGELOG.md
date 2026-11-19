@@ -5,6 +5,10 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Detect Dissection Collisions Under Every Task Id Scheme
+    `ase-task-dissect` now also detects existing parts by their title within the epic, as the
+    proposal ids matched real ids under scheme `any` only and re-runs silently duplicated parts.
+
 -   BUGFIX [code]: Stop on Every Failed Task Saving in `ase-repo-task`
     `ase-repo-task` now stops with an error on every failure of `ase_task_save`, not only on an
     existing task, as it otherwise switched to a non-persisted task id and reported "task derived".

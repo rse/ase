@@ -70,8 +70,9 @@ predecessors of the task. The body of the task is never edited.
 
 -   `--force`|`-f`:
     Overwrite already existing sub-task plans. Without this option, the
-    skill detects colliding sub-task ids *before* writing anything,
-    reports them, and stops with status *targets exist*.
+    skill detects colliding sub-task plans *before* writing anything --
+    by their id, or, under every task id scheme, by their title within
+    the epic --, reports them, and stops with status *targets exist*.
 
 ##  ARGUMENTS
 

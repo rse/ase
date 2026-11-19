@@ -152,6 +152,8 @@ Procedure
 
     2.  *Identify the parts* according to the task id scheme of the
         project: for *every* part in <parts/>, in their derived order,
+        derive its <part-title/> from its <scope/> according to the
+        <task-title/> rules of the plan <format/>,
         remember its <part-id/> as its <part-proposal/> and call the
         `ase_task_newid(title: "<scope/>", proposal:
         "<part-id/>", taken: [ <previous/> ])` tool of the `ase` MCP
@@ -159,7 +161,8 @@ Procedure
         <part-id/> of all preceding parts (as the tool reserves ids for
         scheme `seq` only), and replace the <part-id/> of the part with the `id` field
         of its response -- you *MUST* *NEVER* assemble such an id
-        yourself. Do not output anything related to these MCP tool calls.
+        yourself. Set <id-scheme/> to the `scheme` field of the responses.
+        Do not output anything related to these MCP tool calls.
 
         Then *derive the dependencies* of the parts: for *every* part,
         set <part-after/> to the <part-id/> of exactly those *earlier*
@@ -194,11 +197,20 @@ Procedure
     2.  *Detect target collisions*, strictly *before* writing anything:
 
         Call the `ase_task_list(verbose: false)` tool of the `ase` MCP
-        server and set <existing/> to the `id` fields of the returned
-        `tasks` array. Do not output anything related to this MCP tool
-        call. Set <collisions/> to all <part-proposal/> of <parts/> which
-        are already present in <existing/> (as each <part-id/> itself was
-        re-identified to a free id in step 3.2).
+        server and set <existing/> to the returned `tasks` array. A part
+        *collides* with an existing task -- like a sub-task plan of a
+        previous dissection -- if its <part-proposal/> is the `id` of a
+        task in <existing/> and <id-scheme/> is `any` (as only this
+        scheme takes over the proposal as the id), or else if its
+        <part-title/> is the `title` of a task in <existing/> other than
+        <ase-task-id/> whose `Group:` frontmatter key is <part-group/>
+        (checked via the `ase_task_load(id: "<id/>")` tool of the `ase`
+        MCP server for these title matches only, as the ids of the other
+        schemes derive from the title or a counter). Set the
+        <part-collision/> of every colliding part to the `id` of this
+        task, and set <collisions/> to all <part-collision/> (as each
+        <part-id/> itself was re-identified to a free id in step 3.2).
+        Do not output anything related to these MCP tool calls.
 
         <if condition="<collisions/> is not empty AND <getopt-option-force/> is not equal `true`">
         Only output the following <template/> -- with <collisions/>
@@ -222,8 +234,8 @@ Procedure
         </if>
 
         <if condition="<collisions/> is not empty AND <getopt-option-force/> is equal `true`">
-        Set the <part-id/> of every colliding part back to its
-        <part-proposal/>, so the colliding sub-task plans are
+        Set the <part-id/> of every colliding part to its
+        <part-collision/>, so the colliding sub-task plans are
         *overwritten* in sub-step 4.3 below. Do not output anything.
         </if>
 
@@ -253,7 +265,7 @@ Procedure
                 *verbatim* (the kind being
                 inferred from the part content if the task carries no
                 `Kind:` key),
-            -   the <task-title/> is derived from the part's <scope/>,
+            -   the <task-title/> is the <part-title/> of the part,
             -   the `##  SPECIFICATION (WHAT)` section carries *exactly*
                 the `DOM` and `IFC` bullet points assigned to this part,
             -   the `##  DESIGN (HOW)` section carries *exactly* the
@@ -289,7 +301,7 @@ Procedure
 
         2.  Call the `ase_task_save(id: "<part-id/>", text:
             "<part-content/>", create: true)` tool of the `ase` MCP server -- for
-            a part of <collisions/> with the argument `force: true` instead of
+            a colliding part with the argument `force: true` instead of
             `create`, as `--force` explicitly requested its overwrite -- to persist
             the sub-task plan -- this MCP tool call is the *only*
             permitted way to persist it, *NEVER* write the plan file
