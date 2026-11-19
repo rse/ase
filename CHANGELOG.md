@@ -5,6 +5,14 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Stop on Every Failed Task Saving in `ase-repo-task`
+    `ase-repo-task` now stops with an error on every failure of `ase_task_save`, not only on an
+    existing task, as it otherwise switched to a non-persisted task id and reported "task derived".
+
+-   BUGFIX [code]: Parse Spec Options Named `--no-<x>` as Regular Options
+    The MCP tool `ase_getopt` now returns a spec option like `--no-cleanup` under key `noCleanup` and
+    as `true` when given, as commander treated it as a negation which was `false` also when given.
+
 -   BUGFIX [code]: Disambiguate Edit Commands in Analyzer Hints
     The final hints of `ase-code-analyze` and `ase-arch-analyze` now lead the near-identical
     `/ase-task-edit` and `/ase-code-edit` commands with distinct wording, as the model confused them.

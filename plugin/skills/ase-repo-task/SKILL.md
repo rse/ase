@@ -416,6 +416,17 @@ plan exclusively via the `ase_task_save` MCP tool.
         ⧉ **ASE**: ◉ task: **<new-task-id/>**, ▶ status: **target exists**
         </template>
 
+        If this call fails for *any other* reason (like a `Status:`
+        refused by the lifecycle check or an unreachable task store),
+        set <info/> to its error message, only output the following
+        <template/>, and then immediately *STOP* processing the entire
+        current skill, so the session is *never* switched to a
+        non-persisted task id:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<new-task-id/>**, ▶ ERROR: task plan not persisted: **<info/>**
+        </template>
+
     4.  Set <ase-task-id><new-task-id/></ase-task-id> and call the
         `ase_task_id(id: "<ase-task-id/>", session: "<ase-session-id/>")`
         tool of the `ase` MCP server to switch the current task of the

@@ -141,6 +141,11 @@ const parseSpec = (spec: string) => {
         const head       = short !== null ? `-${short}, --${long}` : `--${long}`
         const flags      = takesValue ? `${head} <value>` : head
         const opt        = new Option(flags)
+
+        /*  keep a spec option named "--no-<x>" a regular option under key "noX", as a
+            commander negation of "--<x>" is false both with and without the option  */
+        if (long.startsWith("no-"))
+            opt.negate = false
         if (takesValue) {
             if (choices !== null && !isList)
                 opt.choices(choices)
