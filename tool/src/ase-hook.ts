@@ -829,16 +829,13 @@ export default class HookCommand {
         hook auto-approve subsequent "Edit" invocations  */
     private editCapableSkills = [ "ase-code-lint", "ase-spec-lint", "ase-docs-shorten", "ase-docs-refine", "ase-docs-proofread" ]
 
-    /*  determine whether an ASE tool invocation described by the parsed
-        hook input should be auto-approved, and (if so) the human-readable
-        reason. The input field names and value shapes differ between
-        tools, but the decision logic is shared by the "pre-tool-use" and
-        "permission-request" handlers.  */
-    private decideApproval (tool: Tool, spec: ToolSpec, input: Record<string, unknown>): { approve: boolean, reason: string } {
-        const rawName   = input[spec.toolNameField]
-        const rawInput  = input[spec.toolInputField]
-        const toolName  = typeof rawName === "string" ? rawName : ""
-        let   toolInput: ToolInput = {}
+    /*  pick the tool name and the inspected tool input fields from the parsed hook
+        input (whose field names and value shapes differ between the tools)  */
+    private parseToolCall (spec: ToolSpec, input: Record<string, unknown>): { toolName: string, toolInput: ToolInput } {
+        const rawName  = input[spec.toolNameField]
+        const rawInput = input[spec.toolInputField]
+        const toolName = typeof rawName === "string" ? rawName : ""
+        let toolInput: ToolInput = {}
         if (typeof rawInput === "string")
             toolInput = this.parseJSON(rawInput, toolInputSchema)
         else if (typeof rawInput === "object" && rawInput !== null) {
@@ -846,6 +843,34 @@ export default class HookCommand {
             if (result.success)
                 toolInput = result.output
         }
+        return { toolName, toolInput }
+    }
+
+    /*  determine whether a tool invocation should be denied, as it produces skill
+        output (an ASE template printed by a shell command), which, as a tool result,
+        is never shown to the user, and (if so) the reason fed back to the model  */
+    private decideDenial (spec: ToolSpec, input: Record<string, unknown>): { deny: boolean, reason: string } {
+        const { toolName, toolInput } = this.parseToolCall(spec, input)
+        const command = toolInput.command ?? ""
+        if (toolName === spec.bashToolName
+            && /⧉ (?:\*\*)?ASE(?:\*\*)?:/.test(command)
+            && /<<|\b(?:echo|printf|print|puts)\b|console\.log/.test(command))
+            return {
+                deny:   true,
+                reason: "ASE: skill output (templates, tables, and dialogs) MUST be emitted as plain reply " +
+                    "text and NEVER through a tool call, as a tool result is not shown to the user -- " +
+                    "output it directly in your reply instead"
+            }
+        return { deny: false, reason: "" }
+    }
+
+    /*  determine whether an ASE tool invocation described by the parsed
+        hook input should be auto-approved, and (if so) the human-readable
+        reason. The input field names and value shapes differ between
+        tools, but the decision logic is shared by the "pre-tool-use" and
+        "permission-request" handlers.  */
+    private decideApproval (tool: Tool, spec: ToolSpec, input: Record<string, unknown>): { approve: boolean, reason: string } {
+        const { toolName, toolInput } = this.parseToolCall(spec, input)
         const command = toolInput.command ?? ""
         if (toolName === spec.bashToolName && /^ase(\s|$)/.test(command)
             && !/[;&|<>`\n]|\$\(/.test(command))
@@ -895,21 +920,24 @@ export default class HookCommand {
         if (spec.approvalEvent !== "PreToolUse")
             return 0
 
-        /*  determine whether to auto-approve the tool invocation  */
-        const { approve, reason } = this.decideApproval(tool, spec, input)
+        /*  determine whether to deny or auto-approve the tool invocation  */
+        const denial   = this.decideDenial(spec, input)
+        const approval = denial.deny ? { approve: false, reason: "" } : this.decideApproval(tool, spec, input)
+        const decision = denial.deny ? "deny" : "allow"
+        const reason   = denial.deny ? denial.reason : approval.reason
 
         /*  emit permission decision (or stay silent to defer to default flow).
             Anthropic Claude Code CLI expects the decision nested in "hookSpecificOutput";
             GitHub Copilot CLI expects flat top-level fields.  */
-        if (approve) {
+        if (denial.deny || approval.approve) {
             const payload = spec.preToolUseWrapped ? {
                 "hookSpecificOutput": {
                     "hookEventName":            spec.preToolUseEvent,
-                    "permissionDecision":       "allow",
+                    "permissionDecision":       decision,
                     "permissionDecisionReason": reason
                 }
             } : {
-                "permissionDecision":       "allow",
+                "permissionDecision":       decision,
                 "permissionDecisionReason": reason
             }
             await writeStdout(JSON.stringify(payload))

@@ -54,7 +54,9 @@ format is read and written:
 
 - `ase hook pre-tool-use`:
   Handle the `PreToolUse` (resp. `preToolUse`) event: auto-approve the
-  invocations of *ASE* tools. See `ase-hook-pre-tool-use`(1).
+  invocations of *ASE* tools, and deny a shell command printing *ASE*
+  skill output (like `echo '⧉ **ASE**: ...'`), as a tool result is not
+  shown to the user. See `ase-hook-pre-tool-use`(1).
 
 - `ase hook permission-request`:
   Handle the `PermissionRequest` event of *OpenAI Codex CLI*:

@@ -114,9 +114,10 @@ following procedure:
         Set <result>ERROR: custom-dialog requires 2-9 (with free-text: 1-9) answer lines, got <n/></result>
         and *SKIP* the following step 2.2 and continue with step 2.3 dispatch.
 
-    2.  Output the following <template/>, end the current turn, wait for the
-        user input, store the user input in <result/> and then continue with
-        step 2.3 below:
+    2.  Output the following <template/> as *plain reply text* (*NEVER*
+        through a tool call, like `Bash`, as a tool result is *not* shown
+        to the user), end the current turn, wait for the user input, store
+        the user input in <result/> and then continue with step 2.3 below:
 
         <template>
         <text/>
