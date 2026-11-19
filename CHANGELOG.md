@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.1.3 (2026-11-XX)
+2.1.3 (2026-11-20)
 ------------------
 
 -   IMPROVEMENT [code]: Report Current Entity Tag on Refused `ase_task_save`
