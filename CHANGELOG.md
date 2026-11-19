@@ -5,6 +5,11 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code]: Silent Probes and Call First in `ase-meta-compat`
+    `ase-meta-compat` now computes all probes silently without a running `<actuals>` map, lists
+    them as compact `<id>: <instruction>` pairs, and makes the `ase_compat` call its first visible
+    action, as weaker models echoed the placeholder state as reply and ended the turn early.
+
 -   IMPROVEMENT [code]: Bind Status Lines of Skills to Tool Evidence
     Plan-saving status lines now carry the short entity tag (`⌗ tag:`), and `changes applied` of
     `ase-code-edit` and `ase-spec-edit` the count of the edited files (`✎ files:`) resp. `no changes`,

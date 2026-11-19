@@ -34,8 +34,8 @@ on -- *control flow*, *XML placeholders*, *regex matching*, and
 *arithmetic* -- and report an overall **0%…100% compatibility** rating.
 
 This skill is unusual: it is both the *test definition* and the *system
-under test*. Each *probe* is a pure ASE construct that you execute,
-recording its *actual* result. The expected values are *never* shown to
+under test*. Each *probe* is a pure ASE construct that you execute
+*silently*, keeping its *actual* result internal. The expected values are *never* shown to
 you: only STEP 6 submits *all* actual results to the `ase_compat` MCP
 tool, which grades them. Do not fabricate passes: the grading of the tool
 is final.
@@ -50,161 +50,122 @@ Procedure
 *IMPORTANT*: Execute all of the following steps in one go: you *MUST*
 *NOT* end your turn before the final verdict of STEP 7 is output.
 
-1.  STEP 1: Initialize Self-Test
+1.  STEP 1: Compute Probes Silently
 
-    Initialize the running map of actual probe results <actuals></actuals>
-    (set to empty) -- every probe in STEPs 2-5 stores its result here as
-    a `<category/>/<probe-name/>` entry with its *actual* computed value.
+    Compute the actual results of all probes of STEPs 2-5 *silently*:
+    each probe yields exactly one actual result string under its id
+    `<category/>/<probe-name/>`. Do *not* compare it to any expected
+    value.
 
-    Initialize the running list of failed probes <failures></failures>
-    (set to empty) -- this is populated only in STEP 6 from the grading
-    of the actuals.
-
-    *IMPORTANT*: Do *NOT* call the `ase_compat` MCP tool now. It is
-    called exactly once, in STEP 6, after *all* probes of STEPs 2-5 have
-    been executed and recorded in <actuals/>.
-
-    *IMPORTANT*: Do *NOT* output anything in this step: <actuals/> and
-    <failures/> are *internal state* only. Continue directly with STEP 2
-    without ending your turn.
+    *IMPORTANT*: Your *first visible action* after computing all probes
+    of STEPs 2-5 is the `ase_compat` tool call of STEP 6, whose `actuals`
+    argument is the JSON object of all results. Output *nothing* before
+    this call: no probe, no result, no placeholder, and no state. Continue
+    directly with STEP 2 without ending your turn.
 
 2.  STEP 2: Probe XML Placeholders
 
-    Execute *all* of the following XML-placeholder probes (in the given
-    order). For each probe, record the *actual* result in <actuals/>
-    under the key `xml-placeholders/<probe-name/>`. Do *not* compare to
-    any expected value here.
+    Compute the actual result of each of the following probes (in the
+    given order), listed as `<id/>: <instruction/>`:
 
-    1.  *get-and-set*: Set <v>42</v>, then get <v/>.
-        Record actual result for `xml-placeholders/get-and-set`.
+    -   `xml-placeholders/get-and-set`: Set <v>42</v>, then get <v/>.
 
-    2.  *self-ref*: Set <v>42</v>, then set `<v>pre_<v/></v>`, then get <v/>.
-        Record actual result for `xml-placeholders/self-ref`.
+    -   `xml-placeholders/self-ref`: Set <v>42</v>, then set `<v>pre_<v/></v>`, then get <v/>.
 
-    3.  *overwrite*: Set <v>42</v>, then set `<v>99</v>`, then get <v/>.
-        Record actual result for `xml-placeholders/overwrite`.
+    -   `xml-placeholders/overwrite`: Set <v>42</v>, then set `<v>99</v>`, then get <v/>.
 
-    4.  *indexed*: Set `<eval-1-2>+1</eval-1-2>` and `<eval-2-1>-1</eval-2-1>`,
+    -   `xml-placeholders/indexed`: Set `<eval-1-2>+1</eval-1-2>` and `<eval-2-1>-1</eval-2-1>`,
         then get <eval-1-2/> and <eval-2-1/> via `<eval-1-2/>,<eval-2-1/>`.
-        Record actual result for `xml-placeholders/indexed`.
 
-    5.  *nested-attr*: With <w>20</w>, build the value of an XML attribute
+    -   `xml-placeholders/nested-attr`: With <w>20</w>, build the value of an XML attribute
         `width="<w/>"` and read the attribute `width` back.
-        Record actual result for `xml-placeholders/nested-attr`.
 
-    6.  *entity*: Evaluate the XML entity `&#x29BF;` and get the rendered
+    -   `xml-placeholders/entity`: Evaluate the XML entity `&#x29BF;` and get the rendered
         Unicode character.
-        Record actual result for `xml-placeholders/entity`.
-
-    Set <xml-total/> to the number of XML-placeholder probes above.
 
 3.  STEP 3: Probe Control Flow
 
-    Execute *all* of the following control-flow probes (in the given
-    order). For each probe, record the *actual* result in <actuals/>
-    under the key `control-flow/<probe-name/>`. Do *not* compare to any
-    expected value here.
+    Compute the actual result of each of the following probes (in the
+    given order), listed as `<id/>: <instruction/>`:
 
-    1.  *branch*: Set <a>3</a>, then evaluate
+    -   `control-flow/branch`: Set <a>3</a>, then evaluate
         `<if condition="<a/> is greater than 5">big</if>
         <elseif condition="<a/> is greater than 2">mid</elseif>
         <else>small</else>`.
-        Record actual result for `control-flow/branch`.
 
-    2.  *while-sum*: Set <s>0</s> and <i>1</i>, then evaluate
+    -   `control-flow/while-sum`: Set <s>0</s> and <i>1</i>, then evaluate
         `<while condition="<i/> is less than or equal to 5">
         set <s/> to <s/> + <i/>,
         set <i/> to <i/> + 1
-        </while>`.
-        Record <s/> as actual result for `control-flow/while-sum`.
+        </while>`. The result is <s/>.
 
-    3.  *for-order*: Set <s></s>, then evaluate
-        `<for items="x y z"><s><s/>-<item/></s></for>`.
-        Record <s/> as actual result for `control-flow/for-order`.
+    -   `control-flow/for-order`: Set <s></s>, then evaluate
+        `<for items="x y z"><s><s/>-<item/></s></for>`. The result is <s/>.
 
-    4.  *while-break*: Set <i>1</i> and <hit></hit>, then evaluate
+    -   `control-flow/while-break`: Set <i>1</i> and <hit></hit>, then evaluate
         `<while condition="<i/> is less than or equal to 9">
         if <i/> equals 4 set <hit/> to <i/> and <break/>,
         else set <i/> to <i/> + 1
-        </while>`.
-        Record <hit/> as actual result for `control-flow/while-break`.
+        </while>`. The result is <hit/>.
 
-    5.  *step-skip*: A `<step condition="[...]">[...]</step>` either expands
+    -   `control-flow/step-skip`: A `<step condition="[...]">[...]</step>` either expands
         to its body (if condition evaluates to true) or to the empty string,
         so what does `<step condition="42 is greater than 7">X</step>` expand into?
-        Record the result of this construct for `control-flow/step-skip`.
 
-    6.  *expand-subst*: With `<define name="foo">[<arg1/>:<content/>]</define>`,
+    -   `control-flow/expand-subst`: With `<define name="foo">[<arg1/>:<content/>]</define>`,
         evaluate `<expand name="foo" arg1="K">V</expand>`.
-        Record actual result for `control-flow/expand-subst`.
-
-    Set <cf-total/> to the number of control-flow probes above.
 
 4.  STEP 4: Probe Regex Matching
 
-    Execute *all* of the following regex probes (in the given order).
-    For each probe, record the *actual* result in <actuals/> under the
-    key `regex/<probe-name/>`. Do *not* compare to any expected value
-    here.
+    Compute the actual result of each of the following probes (in the
+    given order), listed as `<id/>: <instruction/>`:
 
-    1.  *getopt-dash*: Does the string `-l foo` match the regexp `(^|\s)-`?
-        Record `yes` or `no` as actual result for `regex/getopt-dash`.
+    -   `regex/getopt-dash`: Does the string `-l foo` match the regexp `(^|\s)-`?
+        The result is `yes` or `no`.
 
-    2.  *getopt-nodash*: Does the string `foo` match the regexp `(^|\s)-`?
-        Record `yes` or `no` as actual result for `regex/getopt-nodash`.
+    -   `regex/getopt-nodash`: Does the string `foo` match the regexp `(^|\s)-`?
+        The result is `yes` or `no`.
 
-    3.  *anchored-int*: Does `123` fully match `^\d+$`, and does `12a` fully
-        match `^\d+$`? Report as `<yes-or-no/>,<yes-or-no/>`.
-        Record actual result for `regex/anchored-int`.
+    -   `regex/anchored-int`: Does `123` fully match `^\d+$`, and does `12a` fully
+        match `^\d+$`? The result is `<yes-or-no/>,<yes-or-no/>`.
 
-    4.  *alternation*: Does `thorough` match `^(basic|standard|thorough)$`?
-        Record `yes` or `no` as actual result for `regex/alternation`.
+    -   `regex/alternation`: Does `thorough` match `^(basic|standard|thorough)$`?
+        The result is `yes` or `no`.
 
-    5.  *capture*: Apply `^--(\w+).+` to `--foo-bar-quux`.
-        Record the first capture group as actual result for `regex/capture`.
+    -   `regex/capture`: Apply `^--(\w+).+` to `--foo-bar-quux`.
+        The result is the first capture group.
 
-    6.  *whitespace*: Does ` -x` (leading space then dash) match `(^|\s)-`
-        (the `\s` alternative)?
-        Record `yes` or `no` as actual result for `regex/whitespace`.
+    -   `regex/whitespace`: Does ` -x` (leading space then dash) match `(^|\s)-`
+        (the `\s` alternative)? The result is `yes` or `no`.
 
-    7.  *complex*: Does `--level=(low|high)...` match
+    -   `regex/complex`: Does `--level=(low|high)...` match
         `^--([A-Za-z][A-Za-z0-9-]*)(?:\|-([A-Za-z]))?(?:=(\((.*)\)(\.\.\.)?|.*))?$`?
-        Record `yes` or `no` as actual result for `regex/complex`.
-
-    Set <re-total/> to the number of regex probes above.
+        The result is `yes` or `no`.
 
 5.  STEP 5: Probe Arithmetic
 
-    Execute *all* of the following arithmetic probes (in the given
-    order). For each probe, record the *actual* result in <actuals/>
-    under the key `arithmetic/<probe-name/>`. Do *not* compare to any
-    expected value here.
+    Compute the actual result of each of the following probes (in the
+    given order), listed as `<id/>: <instruction/>`:
 
-    1.  *increment*: With <n>7</n>, compute <n/> + 2.
-        Record actual result for `arithmetic/increment`.
+    -   `arithmetic/increment`: With <n>7</n>, compute <n/> + 2.
 
-    2.  *product-sum*: Compute `4.00 * 1.00 + 2.00 * 0.50`.
-        Record actual result (as `X.XX`) for `arithmetic/product-sum`.
+    -   `arithmetic/product-sum`: Compute `4.00 * 1.00 + 2.00 * 0.50`.
+        The result is formatted as `X.XX`.
 
-    3.  *percentage*: Compute `3 / 7` rounded to 2 decimal places.
-        Record actual result (as `0.XX`) for `arithmetic/percentage`.
+    -   `arithmetic/percentage`: Compute `3 / 7` rounded to 2 decimal places.
+        The result is formatted as `0.XX`.
 
-    4.  *bar-width*: With <title-len>13</title-len>, compute `67 - <title-len/>`.
-        Record actual result for `arithmetic/bar-width`.
+    -   `arithmetic/bar-width`: With <title-len>13</title-len>, compute `67 - <title-len/>`.
 
-    5.  *threshold*: Is `0.095` less than `0.10`?
-        Record `yes` or `no` as actual result for `arithmetic/threshold`.
+    -   `arithmetic/threshold`: Is `0.095` less than `0.10`?
+        The result is `yes` or `no`.
 
-    6.  *round-half*: Round `2.5` to the nearest integer (round half up).
-        Record actual result for `arithmetic/round-half`.
-
-    Set <arith-total/> to the number of arithmetic probes above.
+    -   `arithmetic/round-half`: Round `2.5` to the nearest integer (round half up).
 
 6.  STEP 6: Grade Actual Results and Score
 
-    *Precondition*: <actuals/> holds the actual results of *all* 25
-    probes of STEPs 2-5. If any probe is still missing, first execute it
-    and record its actual result.
+    *Precondition*: you have computed the actual results of *all*
+    probes of STEPs 2-5. If any probe is still missing, first compute it.
 
     Call...
 
@@ -213,14 +174,17 @@ Procedure
         [...]
     })`
 
-    ...of the `ase` MCP server, passing *all* entries of <actuals/>, with
+    ...of the `ase` MCP server, passing *all* actual results, with
     an *internal* *programmatic* MCP tool call (and *NOT* with an
     external shell command) and set <compat-output/> to the `text`
     content of the response.
 
-    If the tool responds with an error listing missing probes, execute
-    exactly these probes, record their actual results in <actuals/>,
-    and call the tool again with *all* entries of <actuals/>.
+    If the tool responds with an error listing missing probes, compute
+    exactly these probes and call the tool again with *all* actual
+    results: the previously passed ones plus the missing ones.
+
+    Initialize the list of failed probes <failures></failures> (set to
+    empty).
 
     Parse <compat-output/> by splitting on newlines; for each non-empty
     line of the form `<id/>: <grade/>`:
@@ -229,12 +193,17 @@ Procedure
     -   Else (<grade/> is `fail`), count the probe as *fail* and append
         `<id/>` to <failures/>.
 
-    Tally pass counts per category:
+    Tally pass counts and totals per category, where a total is the
+    number of graded `<id/>` lines of the category in <compat-output/>:
 
     -   Set <xml-pass/>   to the number of `xml-placeholders/*` probes that passed.
     -   Set <cf-pass/>    to the number of `control-flow/*`     probes that passed.
     -   Set <re-pass/>    to the number of `regex/*`            probes that passed.
     -   Set <arith-pass/> to the number of `arithmetic/*`       probes that passed.
+    -   Set <xml-total/>   to the number of `xml-placeholders/*` probes graded.
+    -   Set <cf-total/>    to the number of `control-flow/*`     probes graded.
+    -   Set <re-total/>    to the number of `regex/*`            probes graded.
+    -   Set <arith-total/> to the number of `arithmetic/*`       probes graded.
 
 7.  STEP 7: Compute and Report Compatibility
 
