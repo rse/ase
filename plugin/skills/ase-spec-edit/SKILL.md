@@ -432,15 +432,37 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         <expand name="changeset-land" arg1="<worktree-dir/>"></expand>
         </if>
 
-    4.  Output only the following <template/>. You *MUST* *NOT* output a
+    4.  Determine the evidence of the change set: if no file was edited,
+        set <files>0</files>. Otherwise, run the command
+        `git status --porcelain -- <paths/>`, where <paths/> are the
+        quoted paths of all files edited in item 3 above
+        <if condition="<worktree-dir/> is not empty">
+        , with <worktree-dir/> as its working directory
+        </if>, and set <files/> to the number of its output lines, or to
+        empty if the command fails (no Git working copy). Do not output
+        anything.
+
+    5.  Output only the following <template/>. You *MUST* *NOT* output a
         change summary, a list of modified artifacts, a rationale, or a
         unified diff of the changes -- *independent* of
         <ase-project-boxing/>, whose exposure rules are explicitly
         *overridden* here:
 
+        <if condition="<files/> is `0`">
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-spec-edit**, ▶ status: **no changes**
+        </template>
+        </if>
+        <elseif condition="<files/> is empty">
         <template>
         ⧉ **ASE**: ✪ skill: **ase-spec-edit**, ▶ status: **changes applied**
         </template>
+        </elseif>
+        <else>
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-spec-edit**, ✎ files: **<files/>**, ▶ status: **changes applied**
+        </template>
+        </else>
 
 7.  **State: verifying:**
 

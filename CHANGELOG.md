@@ -5,6 +5,12 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   IMPROVEMENT [code]: Bind Status Lines of Skills to Tool Evidence
+    Plan-saving status lines now carry the short entity tag (`⌗ tag:`), and `changes applied` of
+    `ase-code-edit` and `ase-spec-edit` the count of the edited files (`✎ files:`) resp. `no changes`,
+    plus rules against status lines and narrated tool calls without real tool calls, as weaker
+    models printed successful runs without any tool call.
+
 -   IMPROVEMENT [code]: Serve Skill Manual Pages via `ase_getopt` for `--help`
     `ase_getopt` now returns the `help.md` of the skill as `help` on `-h`/`--help`, which the skill
     outputs verbatim, as weaker models skipped the `Read` of the file and fabricated, paraphrased,

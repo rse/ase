@@ -228,16 +228,17 @@ refused if the plan was created meanwhile by anybody else) -- the `tag: true` ma
 its output carry the `<task-plan-tag>` delimiter line, which
 lets a subsequent `ase-task-edit --int-reuse-task` reuse the
 just-saved plan instead of loading it again. Set <task-tag/> to the
-content enclosed in this `<task-plan-tag>` delimiter line. If the save
-is refused because the plan was changed meanwhile and cannot be merged,
-output the error message and stop the skill. This `ase_task_save` MCP
-tool call is the *only* permitted way to persist the task plan --
-you *MUST* *NEVER* write the plan file via `Write`/`Edit` or by
-executing a shell command. Do not output anything
-related to this MCP call except the following <template/>:
+content enclosed in this `<task-plan-tag>` delimiter line, and set
+<short-tag/> to its first 8 characters, as the evidence of the save. If
+the save is refused because the plan was changed meanwhile and cannot
+be merged, output the error message and stop the skill. This
+`ase_task_save` MCP tool call is the *only* permitted way to persist the
+task plan -- you *MUST* *NEVER* write the plan file via `Write`/`Edit` or
+by executing a shell command. Do not output anything related to this MCP
+call except the following <template/>:
 
 <template>
-⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **<arg1/>**
+⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⌗ tag: **<short-tag/>**, ▶ status: **<arg1/>**
 </template>
 
 </define>

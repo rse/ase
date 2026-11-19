@@ -723,11 +723,13 @@ Set <args></args> (set args to empty).
         re-load the merged plan exactly as in the `<else>` branch of step
         2.1, i.e., set <task-content/>, <task-render/>, and <task-tag/>
         from a new `ase_task_load(id: "<ase-task-id/>", variant: "both",
-        tag: true)` tool call. Do not output anything
-        related to these MCP tool calls except the following <template/>:
+        tag: true)` tool call. Set <short-tag/> to the first 8 characters
+        of the resulting <task-tag/>, as the evidence of the save. Do not
+        output anything related to these MCP tool calls except the
+        following <template/>:
 
         <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan saved**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⌗ tag: **<short-tag/>**, ▶ status: **plan saved**
         </template>
 
         Then set <task-allocated>false</task-allocated>, as the

@@ -29,6 +29,17 @@ Skill Output
     `ase_mods_*`) are still called exactly where a skill instructs it,
     and their results are handled as instructed there.
 
+-   *IMPORTANT*: A status <template/> stating the *result* of a tool call
+    (like a plan saved, changes applied, or a status set) *MUST* *only* be
+    output *after* that tool call *actually* returned successfully in the
+    current turn. Where such a template carries *evidence* taken from the
+    tool result (like `⌗ tag:` or `✎ files:`), you *MUST* take it
+    *verbatim* from that result and *NEVER* invent it.
+
+-   *IMPORTANT*: You *MUST* *NEVER* describe, simulate, or narrate a tool
+    call in text (like "Called the X tool with ..."), but *always* perform
+    it as a *real* tool call.
+
 -   *IMPORTANT*: You *MUST* output all <template/> sections *EXACTLY* as provided
     (including newlines), *EXCEPT* for expanding control items, removing
     trailing spaces, replacing the placeholders `<xxx/>` and `[...]`,
