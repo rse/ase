@@ -5,6 +5,10 @@ ChangeLog
 2.1.3 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Reserve Recommendation and Decision Markers in Grilling
+    The grilling rounds now use `★` and `⚑` only as the markers of at most one answer per question,
+    as a grilled subject about them showed the glyphs in other answers, misread as recommendations.
+
 -   BUGFIX [code]: Detect Dissection Collisions Under Every Task Id Scheme
     `ase-task-dissect` now also detects existing parts by their title within the epic, as the
     proposal ids matched real ids under scheme `any` only and re-runs silently duplicated parts.

@@ -295,6 +295,15 @@ questions:
     For the recommended answer, append ` ★` to its
     <answer-N-K-label/>, after a potential ` ⚑` (like `label ⚑ ★`).
 
+    Hence, per question, *at most one* answer carries `★`, and
+    *at most one* answer carries `⚑`. Both glyphs are *reserved*
+    markers: *never* use `★` or `⚑` anywhere else in
+    <question-N-text/>, <answer-N-K-label/>, or
+    <answer-N-K-description/>, not even when the grilled
+    subject is about them, but refer to them in words (like
+    "recommendation" resp. "current decision"), as every
+    further glyph is misread as an additional marker.
+
     Assemble an <answer-N/> out of `**<answer-N-1-id/>**
     ▶ **<answer-N-1-label/>**: <answer-N-1-description/>,
     **<answer-N-2-id/>** ▶ **<answer-N-2-label/>**:
