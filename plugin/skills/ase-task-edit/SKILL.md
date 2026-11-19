@@ -46,6 +46,8 @@ draft.
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-tenets.md
 
+<expand name="task-plan-only"/>
+
 Procedure
 ---------
 
@@ -98,7 +100,8 @@ refinement of the plan. Do not output anything.
 
 Treat the <instruction/> as a *refinement instruction* for
 the plan, and update <task-content/> in-place by *applying* the
-requested <instruction/> to the *plan*, preferring the grounding facts
+requested <instruction/> to the *plan* (and *never* to the project
+files), preferring the grounding facts
 <ground-facts/> (if any) over the world knowledge of the model.
 
 When refining the plan this way, preserve the overall structure of the
@@ -157,6 +160,9 @@ Set <task-content-dirty>true</task-content-dirty>.
 
 <expand name="ground-plan"
     arg1="the <instruction/> for a new task plan"></expand>
+
+The <instruction/> describes the change the new plan has to *plan* --
+do *not* perform it on the project files.
 
 Determine the *kind of change* of the new plan:
 

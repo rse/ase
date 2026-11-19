@@ -33,6 +33,8 @@ semantics exactly.
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 
+<expand name="task-plan-only"/>
+
 Procedure
 ---------
 

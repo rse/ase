@@ -26,6 +26,10 @@ ChangeLog
     The `PreToolUse` hook of Claude Code now denies a `Skill` call re-invoking the ASE skill already
     loaded in the current turn with identical arguments and no file/task changes since, as it reloads the workflow.
 
+-   IMPROVEMENT [code]: Forbid Project File Changes in Planning Skills
+    `ase-common-task.md` now provides a plan-only rule, expanded by `ase-task-{edit,grill,condense,reboot}`,
+    which forbids any project file change, as weaker models implemented plain plan requests.
+
 2.1.2 (2026-11-19)
 ------------------
 

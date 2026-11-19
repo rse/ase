@@ -36,6 +36,8 @@ task plan until reaching a shared understanding.
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-grill.md
 
+<expand name="task-plan-only"/>
+
 Procedure
 ---------
 

@@ -2,6 +2,22 @@
 Task Skill Common Steps
 =======================
 
+<define name="task-plan-only">
+
+This skill is a *planning* skill: it changes *only* the task plan, and
+the plan *only* through the `ase_task_save` tool of the `ase` MCP server.
+Even when an instruction is phrased as a direct request to change the
+project (e.g. "add option X to file Y"), treat it as a change to be
+*planned*, never as a change to be *performed*, and record it in the
+plan only. While this skill runs, you *MUST* *NEVER* create, change, or
+delete any project file -- neither via `Write`, `Edit`, `MultiEdit`, or
+`NotebookEdit`, nor by executing a shell command -- but only read the
+project files the plan requires. The plan is implemented *exclusively*
+by the hand-off to the `ase-task-implement` skill via the `Skill` tool on
+an explicit `IMPLEMENT` or `DRAFT` next step.
+
+</define>
+
 <define name="task-react-id">
 
 1.  <if condition="

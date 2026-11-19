@@ -34,6 +34,8 @@ based on the existing `SPECIFICATION (WHAT)`.
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
 
+<expand name="task-plan-only"/>
+
 Procedure
 ---------
 
