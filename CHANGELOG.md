@@ -2,6 +2,14 @@
 ChangeLog
 =========
 
+2.1.3 (2026-11-XX)
+------------------
+
+-   IMPROVEMENT [code]: Load Core ASE MCP Tools Upfront
+    The MCP tools `ase_getopt`, `ase_task_{id,load,save}`, `ase_timestamp`, and `ase_artifact_list`
+    are now marked `anthropic/alwaysLoad`, so Claude Code no longer defers them behind `ToolSearch`,
+    whose schema-less results broke non-Anthropic models behind gateways (issue #134, A1).
+
 2.1.2 (2026-11-19)
 ------------------
 

@@ -263,6 +263,7 @@ export class ArtifactMCP {
     register (mcp: McpServer): void {
         mcp.registerTool("ase_artifact_list", {
             title: "ASE artifact list",
+            _meta: { "anthropic/alwaysLoad": true },
             description:
                 "Resolve one or more artifact `kind`s to project-relative file lists. " +
                 "Recognized kinds are `spec`, `code`, `docs`, `infr`, and `othr`. " +

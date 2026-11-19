@@ -13,6 +13,7 @@ export class TimestampMCP {
     register (mcp: McpServer): void {
         mcp.registerTool("ase_timestamp", {
             title: "ASE timestamp",
+            _meta: { "anthropic/alwaysLoad": true },
             description:
                 "Return the current local date/time formatted via a Luxon format string. " +
                 "Pass the Luxon format tokens as `format` (default: `yyyy-LL-dd HH:mm`). " +

@@ -210,6 +210,14 @@ Skill Sequential Processing
 MCP Tool Calls
 --------------
 
+-   *IMPORTANT*: The core tools `ase_getopt`, `ase_task_id`,
+    `ase_task_load`, `ase_task_save`, `ase_timestamp`, and
+    `ase_artifact_list` of the `ase` MCP server are loaded upfront:
+    call them directly and do *not* search for them first (e.g. via
+    `ToolSearch`). Only if one of them, or any other tool of the `ase`
+    MCP server, is actually listed as deferred, load it once before its
+    first call.
+
 -   *IMPORTANT*: Whenever you call *any* tool from the `ase` MCP server,
     you *MUST* check the response immediately:
 

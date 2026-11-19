@@ -1467,6 +1467,7 @@ export class TaskMCP {
         /*  task load  */
         mcp.registerTool("ase_task_load", {
             title: "ASE task load",
+            _meta: { "anthropic/alwaysLoad": true },
             description:
                 "Load a previously persisted task by `id`. " +
                 "Returns the task as `text`, normalized into the current Markdown frontmatter shape; " +
@@ -1527,6 +1528,7 @@ export class TaskMCP {
         /*  task save  */
         mcp.registerTool("ase_task_save", {
             title: "ASE task save",
+            _meta: { "anthropic/alwaysLoad": true },
             description:
                 "Persist a task as `text` under `id`. " +
                 "The `text` MUST be the *authoring* form of the plan (as returned by the " +
@@ -1865,6 +1867,7 @@ export class TaskMCP {
         /*  task id get/set  */
         mcp.registerTool("ase_task_id", {
             title: "ASE task id get/set",
+            _meta: { "anthropic/alwaysLoad": true },
             description:
                 "Get or set the active ASE task `id` for a given `session`. " +
                 "If `id` is provided, it sets the task id in the given `session`, " +

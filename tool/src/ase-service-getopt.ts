@@ -316,6 +316,7 @@ export class GetoptMCP {
     register (mcp: McpServer): void {
         mcp.registerTool("ase_getopt", {
             title: "ASE option parser",
+            _meta: { "anthropic/alwaysLoad": true },
             description:
                 "Parse `args` against the options specification in " +
                 "`spec` of the form `--<long>[|-<short>][=<default>] ...` " +
