@@ -267,6 +267,13 @@ MCP Tool Calls
 Skill Identification
 --------------------
 
+-   *IMPORTANT*: If <ase-agent-tool/> is equal to `claude`, the invocation
+    of a skill already provides its *complete* instructions (the content of
+    its `SKILL.md` file) implicitly in your context. You *MUST* *NOT* look for
+    them elsewhere; in particular, you *MUST* *NOT* read the `SKILL.md` file
+    of the skill from disk. Read other files of the skill (like `help.md`)
+    only where instructed.
+
 -   *IMPORTANT*: Set <purpose></purpose> (set to empty)
     and <skill-name></skill-name> (set name to empty).
 

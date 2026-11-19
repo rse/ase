@@ -34,6 +34,10 @@ ChangeLog
     The skills no longer search via `ToolSearch` for the tools of the function hooks module (`ase_mods_*`,
     `ase_task_band`) in headless sessions or when not listed among the tools, as such searches were futile.
 
+-   IMPROVEMENT [code]: Forbid Reading the Skill Definition From Disk
+    `ase-skill.md` now states that a skill invocation of Claude Code already provides the complete
+    skill instructions, as some models re-read the `SKILL.md` file of an invoked skill in chunks.
+
 2.1.2 (2026-11-19)
 ------------------
 
