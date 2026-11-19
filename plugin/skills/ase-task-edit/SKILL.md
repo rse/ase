@@ -345,8 +345,11 @@ Set <args></args> (set args to empty).
         <if condition="<getopt-option-interactive/> is `true`">
         The band of `--interactive` is drawn by the function hooks module
         of the plugin, which provides the `mcp__ase__ase_task_band` tool
-        in an interactive terminal only. Load the schema of this tool (if
-        deferred, via `ToolSearch` with the query
+        in an interactive terminal only. If <ase-headless/> is `true`, or
+        this tool is listed neither among your tools nor among your
+        deferred tools (then do *not* search for it via `ToolSearch`),
+        this tool does not exist. Otherwise, load the schema of this tool
+        (if deferred, via `ToolSearch` with the query
         `select:mcp__ase__ase_task_band`). If this tool does not exist,
         only output the following <template/> and then immediately *STOP*
         processing the entire current skill:

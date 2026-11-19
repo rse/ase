@@ -67,9 +67,12 @@ Skill Output
     specification <mermaid-spec/> and render it at the position of
     the diagram in the response as follows:
 
-    -   *Inline Image*: If <ase-diagram-format/> is not equal `text` and
-        the tool `ase_mods_diagram` of the `ase` MCP server is available
-        (if deferred, first load it via `ToolSearch`), emit the response
+    -   *Inline Image*: If <ase-diagram-format/> is not equal `text`,
+        <ase-headless/> is not equal `true`, and the tool
+        `mcp__ase__ase_mods_diagram` (provided by the ASE function hooks
+        module in interactive terminals only) is listed among your tools
+        or deferred tools (if deferred, first load it via `ToolSearch`;
+        if not listed, do *not* search for it), emit the response
         text up to the diagram, call
         this tool with `diagram: <mermaid-spec/>`, and continue with the
         remaining response text. On `OK: ...` the user already sees the

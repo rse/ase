@@ -30,6 +30,10 @@ ChangeLog
     `ase-common-task.md` now provides a plan-only rule, expanded by `ase-task-{edit,grill,condense,reboot}`,
     which forbids any project file change, as weaker models implemented plain plan requests.
 
+-   IMPROVEMENT [code]: Skip Function Hooks Tools When Absent
+    The skills no longer search via `ToolSearch` for the tools of the function hooks module (`ase_mods_*`,
+    `ase_task_band`) in headless sessions or when not listed among the tools, as such searches were futile.
+
 2.1.2 (2026-11-19)
 ------------------
 

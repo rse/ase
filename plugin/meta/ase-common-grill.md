@@ -308,9 +308,13 @@ questions:
 
 5.  PROVIDE DETAILS:
 
-    Check whether the tool `ase_mods_grill_details` of the `ase` MCP
-    server is available (if deferred, first load it via `ToolSearch`
-    with the query `select:mcp__ase__ase_mods_grill_details`). If it is
+    The tool `mcp__ase__ase_mods_grill_details` is provided by the ASE
+    function hooks module in interactive terminals only. If
+    <ase-headless/> is `true`, or this tool is listed neither among
+    your tools nor among your deferred tools, silently *skip* this item
+    entirely -- do *not* search for the tool via `ToolSearch`. If it is
+    listed as deferred, first load it via `ToolSearch` with the query
+    `select:mcp__ase__ase_mods_grill_details`. If the tool is then still
     *not* available, silently *skip* this item.
 
     Otherwise, *before* showing the questions in item 6 below, determine for
