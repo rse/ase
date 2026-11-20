@@ -20,6 +20,10 @@ ChangeLog
     report (and correct) only the problems within the changed hunks of the Git changeset (from `git
     diff -U0`), instead of all problems of the touched files, where untracked files count entirely.
 
+-   IMPROVEMENT [code]: No Attachments in `ase-task-edit` Rendering
+    The plan printed by `ase-task-edit` now omits the attachment blocks of its backmatter, as they
+    are irrelevant to refining the plan and are shown by `ase-task-view` instead.
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

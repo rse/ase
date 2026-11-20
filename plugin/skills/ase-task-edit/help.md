@@ -48,7 +48,8 @@ If the current task is `default` and a new plan is generated from an
 according to the task id scheme of the project, so the plan does not
 end up under `default`.
 
-Attachments in the plan's backmatter are never removed by a refinement.
+Attachments in the plan's backmatter are never removed by a refinement,
+and are not shown in the printed plan (use `ase-task-view` to see them).
 A refinement which changes an attachment refreshes the attachment's
 `Modified:` key; a refinement which changes the plan body refreshes the
 `Modified:` key of the frontmatter (which tracks body changes only, so

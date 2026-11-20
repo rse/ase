@@ -783,13 +783,18 @@ Set <args></args> (set args to empty).
         ⇥   **Target:**    <task-target/>
         </format>
 
+        For the *rendering only*, additionally drop the entire
+        "backmatter" -- the `---` line starting it and all attachment
+        blocks -- as the attachments are irrelevant to refining the plan
+        and are shown by `ase-task-view` instead.
+
         Set <focus-label></focus-label> (empty).
         <if condition="<getopt-option-focus/> is not equal `all`">
         For the *rendering only*, overriding the above, additionally drop
-        the glyph lines, the `#   TASK: <title/>` heading, every `##`
-        section whose name is *not* in <sections/>, and the entire
-        "backmatter", keeping the remaining sections, including their
-        `##` headings, in their plan order, and set <focus-label/> to
+        the glyph lines, the `#   TASK: <title/>` heading, and every `##`
+        section whose name is *not* in <sections/>, keeping the remaining
+        sections, including their `##` headings, in their plan order, and
+        set <focus-label/> to
         ` (<names/>)`, with <names/> being the comma-separated names of
         these remaining sections.
         </if>
