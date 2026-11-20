@@ -132,6 +132,30 @@ problems in *performance* and *efficiency*, or problems in *security*.
     <ase-tpl-bullet-normal/> **CODE ANALYSIS**: *no <changes/> source files to analyze*
     </template>
 
+    Otherwise, *silently* determine the *changed line ranges* <ranges/>
+    of every file in <sources/>, i.e. the lines of its working copy
+    state which belong to the <changes/> changeset. An *untracked* file
+    is changed *entirely*. For all other files, run the corresponding
+    command (taken exactly as given), which also covers the *unstaged*
+    changes of a *staged* file as a superset in working copy line
+    numbers:
+
+    <if condition="<getopt-option-staged/> is equal `true`">
+    `git -C "<repo-root/>" -c core.quotepath=off diff HEAD -U0 --no-prefix --no-color --no-ext-diff --diff-filter=d`
+    </if>
+    <else>
+    `git -C "<repo-root/>" -c core.quotepath=off diff -U0 --no-prefix --no-color --no-ext-diff --diff-filter=d`
+    </else>
+
+    Attribute every hunk header `@@ -<a/>[,<b/>] +<c/>[,<d/>] @@` of its
+    output to the file `<repo-root/>/<path/>` of the preceding
+    `+++ <path/>` line, where an omitted <d/> means `1`. A hunk with
+    <d/> greater than `0` covers the lines <c/> to <c/> + <d/> - 1, and
+    a *pure deletion* hunk with <d/> equal `0` covers the two lines <c/>
+    and <c/> + 1 adjacent to the deletion point. If the command fails
+    (e.g. a repository without any commit), treat every file in
+    <sources/> as changed entirely.
+
     </if>
     <else>
 
@@ -179,6 +203,13 @@ problems in *performance* and *efficiency*, or problems in *security*.
     overlapping *related* files for comprehension). Finally sort the
     list by `file` and then numerically by `line`, and set <problems/>
     to that list.
+
+    <if condition="<getopt-option-staged/> is equal `true` or <getopt-option-unstaged/> is equal `true`">
+    Then *restrict* <problems/> to the changeset: *keep* a problem if
+    and only if its `line` lies within a changed line range in <ranges/>
+    of its `file` (resolving a relative `file` against the current
+    working directory), and *silently drop* all other problems.
+    </if>
 
     You *MUST* *NOT* output anything at all in this STEP 2 beyond the
     `Bash`, `Glob`, and `Agent` tool invocations and the templates above.

@@ -57,12 +57,16 @@ covers the *entire* `ase-issue-*` space, including any prefixed results.
 The `--staged` option restricts the analysis to the source files with
 *staged* Git changes, and the `--unstaged` option restricts it to the
 source files with *unstaged* Git changes plus the *untracked* source
-files. Deleted files are skipped, and the files are analyzed in their
-current working copy state. With a *source-reference*, only the changed
-files within it are analyzed; without one, all changed files of the
-repository are analyzed. If no such file exists, nothing is analyzed.
-Both options can be combined to analyze the source files with *any*
-uncommitted Git changes.
+files, and both report only the problems located within the changed
+hunks, where an untracked file counts as changed entirely. Deleted
+files are skipped, and the files are analyzed in their current working
+copy state, so for a staged file with additional unstaged changes,
+these hunks count as changed, too. With a *source-reference*, only the
+changed files within it are analyzed; without one, all changed files of
+the repository are analyzed. If no such file exists, nothing is
+analyzed. Both options can be combined to analyze the hunks of *any*
+uncommitted Git changes. To analyze changed files entirely instead of
+their hunks only, give them without these options.
 
 The skill investigates the code base silently, reports each detected
 problem as a `PROBLEM` entry with severity (`LOW`, `MEDIUM`, `HIGH`) and
@@ -125,13 +129,13 @@ Analyze a directory under its own id namespace, yielding `auth-P1`, `auth-P2`, .
 ❯ /ase-code-analyze --prefix auth src/auth/
 ```
 
-Analyze only the source files with staged Git changes:
+Analyze only the hunks of the staged Git changes:
 
 ```text
 ❯ /ase-code-analyze --staged
 ```
 
-Analyze only the unstaged and untracked source files below a directory:
+Analyze only the hunks of the unstaged changes and the untracked source files below a directory:
 
 ```text
 ❯ /ase-code-analyze --unstaged src/handlers/
