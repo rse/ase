@@ -5,6 +5,10 @@ ChangeLog
 2.1.4 (2026-11-XX)
 ------------------
 
+-   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
+    The hover cards of the grilling table are now drawn after the text following the table, so a
+    card extending below the table paints over the legend instead of being overlapped by it.
+
 2.1.3 (2026-11-20)
 ------------------
 

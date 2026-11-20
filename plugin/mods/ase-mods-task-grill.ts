@@ -343,8 +343,8 @@ export const modGrill = () => {
             the grid (or no previous table row exists), else ending at the last grid row
             of the previous table row (so the hovered table row stays visible and
             reachable), and revealed while any line of the question
-            resp. answer is hovered (appended after all grid rows, as an absolute box
-            paints over the boxes before it only)  */
+            resp. answer is hovered (appended after all grid rows and the text after the
+            table, as an absolute box paints over the boxes before it only)  */
         const card = (group: string, title: Char[], detail: string, reason: Char[] | undefined,
             first: number, last: number, question: boolean, rowsTotal: number): RenderElement => {
             const span  = question ? w1 : w2
@@ -432,8 +432,9 @@ export const modGrill = () => {
             Box({ flexShrink: 0, minWidth: 2, children: Text({ children: e.props.isFirstOfReply ? "⏺" : " " }) }),
             Box({ flexDirection: "column", flexGrow: 1, flexShrink: 1, children: [
                 ...(table.before !== "" ? [ Markdown({ text: table.before }) ] : []),
-                Box({ flexDirection: "column", marginTop: table.before !== "" ? 1 : 0, children: [ ...grid, ...cards ] }),
-                ...(table.after !== "" ? [ Box({ marginTop: 1, children: Markdown({ text: table.after }) }) ] : [])
+                Box({ flexDirection: "column", marginTop: table.before !== "" ? 1 : 0, children: [ ...grid,
+                    ...(table.after !== "" ? [ Box({ marginTop: 1, children: Markdown({ text: table.after }) }) ] : []),
+                    ...cards ] })
             ] })
         ] })
     }
