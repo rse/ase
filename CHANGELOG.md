@@ -15,6 +15,11 @@ ChangeLog
     `ase-task-reboot`, grounding them once in the project artifacts and the Internet/Web, with causes
     resp. arguments tagged by evidence or as unverified, and let the `rebooter` agent pass it.
 
+-   IMPROVEMENT [code]: Hunk-Only Linting for `ase-code-lint --staged`/`--unstaged`
+    Under `--staged` and `--unstaged`, `ase-code-lint` now reports and corrects only the problems
+    within the changed hunks of the Git changeset (from `git diff -U0`), instead of all problems of
+    the touched files, where untracked files count as changed entirely.
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

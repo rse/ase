@@ -90,16 +90,19 @@ the code, and comments contradicting the code.
     `-i A01,A02 -e A02` checks `A01` only.
 
 -   `--staged`:
-    Restrict the linting to the source files with *staged* Git changes.
-    Deleted files are skipped, and the files are linted in their current
-    working copy state. Combined with `--unstaged`, lint the source
-    files with *any* uncommitted Git changes.
+    Restrict the linting to the source files with *staged* Git changes,
+    and report (resp. correct) only the problems within their changed
+    hunks. Deleted files are skipped, and the files are linted in their
+    current working copy state, so for a file with additional unstaged
+    changes, these hunks count as changed, too. Combined with
+    `--unstaged`, lint the hunks of *any* uncommitted Git changes.
 
 -   `--unstaged`:
     Restrict the linting to the source files with *unstaged* Git changes
-    plus the *untracked* source files. Deleted files are skipped.
-    Combined with `--staged`, lint the source files with *any*
-    uncommitted Git changes.
+    plus the *untracked* source files, and report (resp. correct) only
+    the problems within their changed hunks, where an untracked file
+    counts as changed entirely. Deleted files are skipped. Combined
+    with `--staged`, lint the hunks of *any* uncommitted Git changes.
 
 ##  ARGUMENTS
 
@@ -107,7 +110,8 @@ the code, and comments contradicting the code.
     A file, directory, or other reference to the source code to lint.
     Optional only under `--staged` or `--unstaged`: with it, only the
     changed files within it are linted; without it, all changed files
-    of the repository are linted.
+    of the repository are linted. To lint changed files entirely
+    instead of their hunks only, give them without these options.
 
 ##  SCENARIOS
 
@@ -162,13 +166,13 @@ Lint a directory for the documentation aspect only:
 ❯ /ase-code-lint -i A21 src/handlers/
 ```
 
-Lint only the source files with staged Git changes:
+Lint only the hunks of the staged Git changes:
 
 ```text
 ❯ /ase-code-lint --staged
 ```
 
-Lint only the unstaged and untracked source files and apply all corrections:
+Lint only the hunks of the unstaged changes and the untracked source files and apply all corrections:
 
 ```text
 ❯ /ase-code-lint --auto --unstaged
