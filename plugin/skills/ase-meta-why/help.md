@@ -9,6 +9,7 @@
     [`--help`|`-h`]
     [`--depth`|`-d` *N*]
     [`--width`|`-w` *M*]
+    [`--ground`|`-G`]
     *fact*
 
 ##  DESCRIPTION
@@ -28,6 +29,11 @@ guarding against the classic Five-Whys failure of committing early to the
 wrong sub-cause. After identifying (and validating) the root cause it
 proposes a *SOLUTION* that addresses it, optionally including concrete
 source code changes.
+
+By default, the causes are derived from model knowledge only. With the
+`--ground`/`-G` option, the skill first gathers facts on the *fact* from
+the project artifacts and the Internet/Web, prefers causes backed by
+them, and tags every cause with its evidence or as unverified.
 
 ##  OPTIONS
 
@@ -49,6 +55,19 @@ source code changes.
     single, but better-justified, root cause. A non-numeric or non-positive
     value falls back to the default.
 
+-   `--ground`|`-G`:
+    Ground the analysis in facts instead of the world knowledge of the
+    model alone: once before the first "why", the requirements, the
+    realization, and the verification of the project (its specification,
+    documentation, code, infrastructure, test, and CI files) are scanned
+    for the facts relevant to the *fact*, and the Internet/Web is searched
+    for known causes, practices, and pitfalls. Every cause is tagged with
+    its evidence (file path or source URL) or as `[unverified]`, a cause
+    contradicted by the facts fails the backward validation, and with
+    `--width` > 1 an unverified cause is backtracked into an
+    evidence-backed fallback. If no usable facts are found, a warning is
+    shown and the analysis falls back to model knowledge.
+
 ##  ARGUMENTS
 
 -   *fact*:
@@ -61,6 +80,7 @@ source code changes.
 -   You want the root cause of a problem, not just its symptom
 -   You want a Five-Whys causality chain walked for an observed fact
 -   You want candidate causes weighed with backtracking
+-   You want each cause backed by evidence from the project and the Web
 -   You want a solution proposed which addresses the root cause
 
 ##  EXAMPLES
@@ -82,6 +102,13 @@ committing early to the wrong root cause:
 
 ```text
 ❯ /ase-meta-why -w 3 the release was delayed by two weeks
+```
+
+Back every cause with evidence from the project artifacts and the
+Internet/Web:
+
+```text
+❯ /ase-meta-why -G -w 2 the CI build is intermittently failing on macOS runners
 ```
 
 ##  SEE ALSO
