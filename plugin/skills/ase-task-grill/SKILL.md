@@ -179,6 +179,12 @@ Set <args>--int-reuse-task</args>.
         a *maximum* only, as every round can *stop* the grilling *early*
         in its item 2 below.
 
+        Set <grill-auto/> to <getopt-option-auto/>, so a dialog answer
+        `AUTO GRILLING` (see item 3 below) switches only the remaining
+        rounds of the *current* grilling to automatic answering, and is
+        *not* forwarded on a re-grilling in step 5. Do not output
+        anything.
+
         For each round:
 
         1.  INITIALIZE ROUND:
@@ -226,7 +232,7 @@ Set <args>--int-reuse-task</args>.
 
         3.  INTERACTIVE DIALOG:
 
-            <if condition="<getopt-option-auto/> is equal `true`">
+            <if condition="<grill-auto/> is equal `true`">
             Answer the questions without any dialog:
 
             <expand name="grill-auto"
@@ -240,8 +246,19 @@ Set <args>--int-reuse-task</args>.
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
             custom dialog according to the expanded `custom-dialog`
             definition. You *MUST* closely follow this definition. The
-            dialog below carries the fixed answer option
-            `SKIP GRILLING`, dispatched as follows:
+            dialog below carries the two fixed answer options
+            `AUTO GRILLING` and `SKIP GRILLING`, dispatched as follows:
+
+            -   If a <result/> is `AUTO GRILLING`, set
+                <grill-auto>true</grill-auto>, so all remaining rounds
+                are answered without any dialog, too, and answer the
+                questions of this round like under `--auto`:
+
+                <expand name="grill-auto"
+                    arg1="◉ task: **<ase-task-id/>**"></expand>
+
+                Treat <result/> as the combined free-text answers to all
+                questions of the round and continue with item 4 below.
 
             -   If a <result/> is `SKIP GRILLING`, ask no further
                 questions -- *all* questions of this round stay
@@ -260,16 +277,18 @@ Set <args>--int-reuse-task</args>.
                 ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **grilling stopped**
                 </template>
 
-            Show a custom dialog. Its only answer option is the fixed
-            one, so the user normally answers all aspects in *one*
-            free-text reply:
+            Show a custom dialog. Its only answer options are the two
+            fixed ones, so the user normally answers all aspects in
+            *one* free-text reply:
 
             <expand name="custom-dialog" arg1="--other">
                 <round-id/>: What is your (combined) answer to all (or a subset) of the above questions? (keywords or `nX` short responses are sufficient)
+                AUTO GRILLING: auto-choose the recommended answers of this and all remaining rounds
                 SKIP GRILLING: skip all remaining grilling and continue with the plan update
             </expand>
 
-            Dispatch `SKIP GRILLING` and `CANCEL` as defined above.
+            Dispatch `AUTO GRILLING`, `SKIP GRILLING`, and `CANCEL` as
+            defined above.
             Otherwise, strip any leading `OTHER: ` prefix from
             <result/> and treat the remainder as the combined free-text
             answers to all questions of the round.

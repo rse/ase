@@ -101,9 +101,10 @@ decision.
     interactive dialog titled `GRILLING ROUND K/L` (or plain `GRILLING`
     for a single round), whose question asks for the combined answer to
     all (or a subset) of the listed aspect questions and whose only
-    answer options are the fixed `STOP SKILL` (stop the skill) and
-    `SKIP GRILLING` (skip the remaining grilling) ones, plus free-text
-    input. The questions are numbered `1`, `2`, etc. and their answer
+    answer options are the fixed `AUTO GRILLING` (answer this and all
+    remaining rounds of the current iteration like `--grill-auto`),
+    `SKIP GRILLING` (skip the remaining grilling), and `STOP SKILL`
+    (stop the skill) ones, plus free-text input. The questions are numbered `1`, `2`, etc. and their answer
     alternatives are lettered `A`, `B`, etc., so the free-text input can
     cherry-pick answers with short responses matching `\d+[a-zA-Z]`
     (like `1A 2c`), freely mixed with keyword text. The answers are

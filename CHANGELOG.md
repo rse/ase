@@ -5,6 +5,11 @@ ChangeLog
 2.1.4 (2026-11-XX)
 ------------------
 
+-   FEATURE [code]: Interactive `AUTO GRILLING` Answer
+    The grilling dialog of `ase-task-grill`, `ase-code-edit -g`, and `ase-spec-edit -g` offers a new
+    fixed answer `AUTO GRILLING`, which auto-chooses the recommended answers of the current and all
+    remaining rounds like `--auto` resp. `--grill-auto`, without forwarding it to later grillings.
+
 -   FEATURE [code]: Grounding Option for `ase-meta-why`
     Add a `--ground`/`-G` option to `ase-meta-why`, which grounds the Five-Whys chain once in the
     project artifacts and the Internet/Web, tags every cause with its evidence or as unverified,

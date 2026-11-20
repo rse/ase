@@ -53,9 +53,10 @@ question, each row carrying two to three *grounded* answer alternatives
 critically judged best, if any, marked with `★` as the recommendation,
 whose rationale shows up in the hover card of every answer). They are then
 asked in *one* batch via a single interactive dialog, whose only answer
-option is the fixed `SKIP GRILLING` (skip the remaining grilling, but
-still update the plan with the answers of the previous rounds), plus
-free-text input. The questions are numbered `1`, `2`, etc. and their
+options are the fixed `AUTO GRILLING` (answer this and all remaining
+rounds like `--auto`, which is not forwarded on a re-grilling) and
+`SKIP GRILLING` (skip the remaining grilling, but still update the plan
+with the answers of the previous rounds), plus free-text input. The questions are numbered `1`, `2`, etc. and their
 answer alternatives are lettered `A`, `B`, etc., so the free-text input
 can cherry-pick answers with short responses matching `\d+[a-zA-Z]`
 (like `1A 2c`), freely mixed with keyword text. A question not

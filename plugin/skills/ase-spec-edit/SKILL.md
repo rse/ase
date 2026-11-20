@@ -282,6 +282,12 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         the round count is a *maximum* only, as every round can
         *stop* the grilling *early* in its item 2 below.
 
+        Set <grill-auto/> to <getopt-option-grill-auto/>, so a dialog
+        answer `AUTO GRILLING` (see item 3 below) switches only the
+        rounds of the *current* grilling to automatic answering, and
+        every further `--loop` iteration starts from the option again.
+        Do not output anything.
+
         For each round:
 
         1.  INITIALIZE TODO:
@@ -323,7 +329,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
 
         3.  INTERACTIVE DIALOG:
 
-            <if condition="<getopt-option-grill-auto/> is equal `true`">
+            <if condition="<grill-auto/> is equal `true`">
             Answer the questions without any dialog:
 
             <expand name="grill-auto"
@@ -337,8 +343,20 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
             custom dialog according to the expanded `custom-dialog`
             definition. You *MUST* closely follow this definition. The
-            dialog below carries the two fixed answer options
-            `SKIP GRILLING` and `STOP SKILL`, dispatched as follows:
+            dialog below carries the three fixed answer options
+            `AUTO GRILLING`, `SKIP GRILLING`, and `STOP SKILL`,
+            dispatched as follows:
+
+            -   If a <result/> is `AUTO GRILLING`, set
+                <grill-auto>true</grill-auto>, so all remaining rounds
+                are answered without any dialog, too, and answer the
+                questions of this round like under `--grill-auto`:
+
+                <expand name="grill-auto"
+                    arg1="✪ skill: **ase-spec-edit**"></expand>
+
+                Treat <result/> as the combined free-text answers to all
+                questions of the round and continue with item 4 below.
 
             -   If a <result/> is `SKIP GRILLING` or `CANCEL`, ask no
                 further questions, continue with item 4 below (merging
@@ -355,19 +373,20 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 </template>
 
             Show a custom dialog. Its only answer options are the
-            two fixed ones, so the user normally answers all aspects in
-            *one* free-text reply:
+            three fixed ones, so the user normally answers all aspects
+            in *one* free-text reply:
 
             <expand name="custom-dialog" arg1="--other">
                 <round-id/>: What is your (combined) answer to all (or a subset) of the above questions? (keywords or `nX` short responses are sufficient)
+                AUTO GRILLING: auto-choose the recommended answers of this and all remaining rounds
                 SKIP GRILLING: skip all remaining grilling and continue with the implementation
                 STOP SKILL: stop the entire skill immediately
             </expand>
 
-            Dispatch `SKIP GRILLING`, `STOP SKILL`, and `CANCEL` as
-            defined above. Otherwise, strip any leading `OTHER: `
-            prefix from <result/> and treat the remainder as the
-            combined free-text answers to all questions of the
+            Dispatch `AUTO GRILLING`, `SKIP GRILLING`, `STOP SKILL`,
+            and `CANCEL` as defined above. Otherwise, strip any leading
+            `OTHER: ` prefix from <result/> and treat the remainder as
+            the combined free-text answers to all questions of the
             round.
             </else>
 
