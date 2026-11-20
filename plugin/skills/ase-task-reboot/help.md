@@ -8,6 +8,7 @@
 `ase-task-reboot`
     [`--help`|`-h`]
     [`--next`|`-n` *option*[,...]]
+    [`--ground`|`-G`]
     [*id*]
 
 ##  DESCRIPTION
@@ -60,6 +61,20 @@ unless `--next` pre-selects this choice.
     `--next EDIT,DONE` reboots, hands off to editing, and the editing
     loop will exit immediately.
 
+-   `--ground`|`-G`:
+    Ground the re-created plan in facts instead of the world knowledge
+    of the model alone: once before the re-creation, the sections
+    re-derived from scratch -- `HOW` (`DESIGN`) and `WHEN`
+    (`VERIFICATION`), plus `WHAT` (`SPECIFICATION`) for a plan without
+    `DOM` or `IFC` bullet points -- are grounded in parallel. Their
+    artifacts (`SPEC` and `DOCS` for `WHAT`, `CODE` and `INFR` for
+    `HOW`, and the test and CI files for `WHEN`) are scanned for the
+    project facts relevant to the plan, and the Internet/Web is searched
+    for the established practices, standards, patterns, and pitfalls
+    about it. If no usable facts are found, a warning is shown and the
+    reboot falls back to model knowledge. It is forwarded on a hand-off
+    to `ase-task-edit`, but not on a hand-off to `ase-task-implement`.
+
 ##  ARGUMENTS
 
 -   *id*:
@@ -72,6 +87,7 @@ unless `--next` pre-selects this choice.
 -   You want a fresh plan from the original specification
 -   You want planning restarted after a plan degraded
 -   You want a free-form or legacy plan filed into the task format
+-   You want a fresh plan grounded in project and Web facts
 
 ##  EXAMPLES
 
@@ -85,6 +101,13 @@ Reboot a specific task and hand off to editing:
 
 ```text
 ❯ /ase-task-reboot --next EDIT hello
+```
+
+Reboot the current task plan grounded in the project artifacts and the
+Internet/Web:
+
+```text
+❯ /ase-task-reboot --ground
 ```
 
 ##  SEE ALSO

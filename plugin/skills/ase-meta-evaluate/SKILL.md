@@ -1,6 +1,6 @@
 ---
 name: ase-meta-evaluate
-argument-hint: "[--help|-h] <request>"
+argument-hint: "[--help|-h] [--ground|-G] <request>"
 description: >
     Evaluate alternatives through a weighted multi-criteria decision
     matrix. Use when the user calls for the *evaluation* of
@@ -19,9 +19,13 @@ effort: high
 Evaluate Alternatives
 </purpose>
 
-<expand name="getopt" arg1="ase-meta-evaluate">
+<expand name="getopt"
+    arg1="ase-meta-evaluate"
+    arg2="--ground|-G">
     $ARGUMENTS
 </expand>
+
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 
 <objective>
 *Evaluate* *alternatives* through a weighted
@@ -141,12 +145,28 @@ multi-*criteria* decision matrix.
         anything.
     </step>
 
-4.  <step id="STEP 4: Evaluate Alternatives against Criteria">
+4.  <step id="STEP 4: Ground Evaluation" condition="<getopt-option-ground/> is equal `true`">
+    -   Ground the evaluation of STEP 5 in the requirements and the
+        realization, as the alternatives and criteria may relate to the
+        project, too (the `ase-meta-search` budget of STEP 2 and STEP 3
+        stays untouched by this grounding):
+
+        <expand name="ground"
+            arg1="the evaluation of the alternatives <alternative-1/> to <alternative-N/> against the criteria <criteria-1/> to <criteria-M/> for the reason <reason/>"
+            arg2=""
+            arg3="WHAT HOW"></expand>
+    </step>
+
+5.  <step id="STEP 5: Evaluate Alternatives against Criteria">
     -   For each alternative <alternative-K/> (K=1-N) and each criterion
         <criteria-L/> (L=1-M), decide on the evaluation <eval-K-L/>, which
         means how well the alternative meets the criterion on a Likert-scale
-        from { -2, -1, 0, +1, +2 } (from worst, via neutral, to best). Do
-        not output anything.
+        from { -2, -1, 0, +1, +2 } (from worst, via neutral, to best).
+        <if condition="<getopt-option-ground/> is equal `true` and <ground-facts/> is not empty">
+        Decide each <eval-K-L/> primarily from the facts of
+        <ground-facts/>, using your world knowledge only to fill their gaps.
+        </if>
+        Do not output anything.
 
     -   Then, calculate the ratings <rating-K/> (K=1-N) for all
         alternatives in a single call by invoking the `ase_decision_matrix(matrix:
@@ -155,7 +175,7 @@ multi-*criteria* decision matrix.
         The tool returns an array of N numerical values, where the K-th
         entry is the product-sum of all weights <weight-L/> (L=1-M) and
         the evaluation <eval-K-L/> (L=1-M) for alternative <alternative-K/>.
-        Retain the *raw, unrounded* <rating-K/> for use in STEP 5, but
+        Retain the *raw, unrounded* <rating-K/> for use in STEP 6, but
         round <rating-K/> to 2 decimal places *for display only* when
         emitting it in the table below. Do not output anything.
 
@@ -176,10 +196,10 @@ multi-*criteria* decision matrix.
         </template>
     </step>
 
-5.  <step id="STEP 5: Report Best Alternative">
+6.  <step id="STEP 6: Report Best Alternative">
     -   The best alternative <alternative-K/> (K=1-N) is the alternative
         whose *raw, unrounded* <rating-K/> (i.e. the product-sum from STEP
-        4, *before* the display-only rounding) is the maximum rating value
+        5, *before* the display-only rounding) is the maximum rating value
         across all alternatives. Do not output anything.
 
     -   The second best alternative <alternative-X/> (X=1-N, X != K) is

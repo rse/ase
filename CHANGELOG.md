@@ -10,10 +10,10 @@ ChangeLog
     fixed answer `AUTO GRILLING`, which auto-chooses the recommended answers of the current and all
     remaining rounds like `--auto` resp. `--grill-auto`, without forwarding it to later grillings.
 
--   FEATURE [code]: Grounding Option for `ase-meta-why`
-    Add a `--ground`/`-G` option to `ase-meta-why`, which grounds the Five-Whys chain once in the
-    project artifacts and the Internet/Web, tags every cause with its evidence or as unverified,
-    and fails the backward validation on contradicted resp. unverified causes.
+-   FEATURE [code]: Grounding Option for More Skills
+    Add a `--ground`/`-G` option to `ase-meta-{why,evaluate,diaboli,steelman,brainstorm}` and
+    `ase-task-reboot`, grounding them once in the project artifacts and the Internet/Web, with causes
+    resp. arguments tagged by evidence or as unverified, and let the `rebooter` agent pass it.
 
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a

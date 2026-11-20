@@ -425,8 +425,9 @@ Beyond `ase setup`, the CLI provides:
         model headless from the planned to the integrated tasks
 
     -   the planning agents `rebooter`, `condenser`, and `griller`, which
-        re-create, condense, resp. grill (via `ase-task-grill --ground
-        --auto`) the plans of the `DRAFTED` tasks of the `enterprise`
+        re-create (via `ase-task-reboot --ground`), condense, resp. grill
+        (via `ase-task-grill --ground --auto`) the plans of the `DRAFTED`
+        tasks of the `enterprise`
         lifecycle model explicitly assigned to them
         (`DRAFTED` > `PLANNING` > `DRAFTED`, unassigned afterwards)
 

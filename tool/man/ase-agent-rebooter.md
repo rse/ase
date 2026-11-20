@@ -45,7 +45,8 @@ processed by a rebooter or a cancelled `After:` predecessor.
 
 The rebooter moves each claimed task into `PLANNING`, tags it with
 `ase-agent-rebooter:active`, and reboots its plan via the skill
-invocation `ase-task-reboot --next DONE` *id*. The skill itself resets a
+invocation `ase-task-reboot --ground --next DONE` *id*, i.e., grounded
+in the project artifacts and the Internet/Web. The skill itself resets a
 successfully rebooted plan into `DRAFTED` (the processing succeeds only
 then). Afterwards, on success as well as on failure, the rebooter puts
 the task back into `DRAFTED` (for its review and its promotion into
@@ -260,7 +261,7 @@ All other options belong to the sub-commands (see **COMMANDS**).
 
     - \[`--prompt-args` *template*\]: The argument template of the
       skill. Generic default: `{id}` for `phase`, `{id}: {prompt}` for
-      `request`. Built-in: `--next DONE {id}`.
+      `request`. Built-in: `--ground --next DONE {id}`.
 
     - \[`--prompt-text` *template*\]: The prompt text template to invoke
       instead of a skill. Built-in: not set.

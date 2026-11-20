@@ -14,8 +14,8 @@ export default {
         "Reboot the plans of tasks in the \"Planning\" phase of the \"enterprise\" task lifecycle " +
         "model on explicit request: claim every \"DRAFTED\" task explicitly assigned to the " +
         "rebooter (by its name) into \"PLANNING\", " +
-        "re-create its plan from scratch via the headless agent tool and the \"ase-task-reboot\" " +
-        "skill, and put it back into \"DRAFTED\" and unassign it (or put it back into \"DRAFTED\" " +
+        "re-create its plan from scratch, grounded in the project artifacts and the Internet/Web, " +
+        "via the headless agent tool and the \"ase-task-reboot\" skill, and put it back into \"DRAFTED\" and unassign it (or put it back into \"DRAFTED\" " +
         "with its previous assignee on interrupt), logging to stdout and to the \"agent\" " +
         "attachment of the task",
     modeDesc: "",
@@ -39,7 +39,7 @@ export default {
             state:     { incoming: "DRAFTED", activity: "PLANNING", success: "DRAFTED", failure: "DRAFTED" },
             tag:       { success: "none", failure: "none" },
             assign:    { required: true },
-            prompt:    { skill: "ase-task-reboot", args: "--next DONE {id}" },
+            prompt:    { skill: "ase-task-reboot", args: "--ground --next DONE {id}" },
             success:   { criterion: [ "status" ] }
         }
     }

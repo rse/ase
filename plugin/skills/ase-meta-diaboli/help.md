@@ -8,6 +8,7 @@
 `ase-meta-diaboli`
     [`--help`|`-h`]
     [`--count`|`-c` *count*]
+    [`--ground`|`-G`]
     *thesis*
 
 ##  DESCRIPTION
@@ -36,6 +37,12 @@ counter-arguments hunted for, sorted, and reported in the single
 challenge pass. A `0`, negative, or non-numeric value falls back to the
 default *10*.
 
+By default, the anti-theses are derived from model knowledge only. With
+the `--ground`/`-G` option, the skill first gathers facts on the
+*thesis* from the project artifacts and the Internet/Web, prefers
+anti-theses backed by them, and tags every anti-thesis with its
+evidence or as unverified.
+
 The intent is constructive: stress-testing the thesis in good faith to
 arrive at a better final decision, not obstructing or merely being
 contrarian.
@@ -46,6 +53,18 @@ contrarian.
     Surface at least *count* strong anti-theses (default *10*) before
     sorting and reporting the top *count* and deriving the *SYNTHESIS*. An
     invalid or non-positive *count* reverts to the default *10*.
+
+-   `--ground`|`-G`:
+    Ground the challenge in facts instead of the world knowledge of the
+    model alone: once before the challenge, the requirements and the
+    realization of the project (its specification, documentation, code,
+    and infrastructure files) are scanned for the facts relevant to the
+    *thesis*, and the Internet/Web is searched for them. Anti-theses
+    backed by these facts are preferred, contradicted ones are
+    discarded, and every anti-thesis is tagged with its evidence (file
+    path or source URL) or as `[unverified]`. If no usable facts are
+    found, a warning is shown and the challenge falls back to model
+    knowledge.
 
 ##  ARGUMENTS
 
@@ -60,6 +79,7 @@ contrarian.
 -   You want a decision stress-tested before you commit to it
 -   You want the strongest anti-theses ranked plus a synthesis
 -   You want a devil's advocate against a claim or plan
+-   You want counter-arguments backed by evidence from the project and the Web
 
 ##  EXAMPLES
 
@@ -79,6 +99,13 @@ Surface at least fifteen anti-theses:
 
 ```text
 ❯ /ase-meta-diaboli --count 15 We should rewrite the service in Rust.
+```
+
+Challenge a claim with evidence from the project artifacts and the
+Internet/Web:
+
+```text
+❯ /ase-meta-diaboli --ground Our task store scales to thousands of tasks.
 ```
 
 ##  SEE ALSO

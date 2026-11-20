@@ -1,6 +1,6 @@
 ---
 name: ase-task-reboot
-argument-hint: "[--help|-h] [--next|-n <option>[,...]] [<id>]"
+argument-hint: "[--help|-h] [--next|-n <option>[,...]] [--ground|-G] [<id>]"
 description: >
     Reboot the current or given task plan by re-creating it from scratch.
     Use when the user calls to "reboot", "recreate" or "refresh"
@@ -21,7 +21,7 @@ Reboot a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-reboot"
-    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT|DRAFT)... --int-reuse-task"
+    arg2="--next|-n=(none|DONE|EDIT|IMPLEMENT|DRAFT)... --ground|-G --int-reuse-task"
     arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
@@ -34,6 +34,7 @@ based on the existing `SPECIFICATION (WHAT)`.
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-task.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-format-meta.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-task.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 
 <expand name="task-plan-only"/>
 
@@ -132,11 +133,25 @@ Procedure
 
     7.  <expand name="task-ground-plan" arg1=""/>
 
+        <if condition="<getopt-option-ground/> is equal `true`">
+        Ground the plan in the sections re-derived from scratch, where
+        <dimensions/> is `HOW WHEN` if <mode/> is `structured` (as the
+        `##  SPECIFICATION (WHAT)` section is seeded verbatim), or
+        `WHAT HOW WHEN` if <mode/> is `unstructured`:
+
+        <expand name="ground"
+            arg1="the instruction in <instruction/>"
+            arg2=""
+            arg3="<dimensions/>"></expand>
+        </if>
+
         Create a new plan from scratch and store the result as
         <task-content/> by closely following the defined plan format
         <format/> and injecting into it all the information from
         the <instruction/>, all decisions you derived from the
-        <instruction/>, and the grounding in the project, where:
+        <instruction/>, the grounding in the project, and the grounding
+        facts <ground-facts/> (if any, preferred over the world knowledge
+        of the model), where:
 
         -   <if condition="<mode/> is `structured`">
             the `##  SPECIFICATION (WHAT)` section is *seeded* by the
@@ -205,8 +220,11 @@ Procedure
             </template>
 
         -   If <result/> is `EDIT`:
+            Set <edit-args>--ground</edit-args> if <getopt-option-ground/>
+            is `true`, or set <edit-args></edit-args> (empty) otherwise.
             <expand name="task-next-handoff" arg1="ase-task-edit"
-                arg2="plan rebooted -- hand-off to edit"></expand>
+                arg2="plan rebooted -- hand-off to edit"
+                arg3="<edit-args/>"></expand>
 
         -   If <result/> is `IMPLEMENT`:
             <expand name="task-next-handoff" arg1="ase-task-implement"

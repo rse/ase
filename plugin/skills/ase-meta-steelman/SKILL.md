@@ -1,6 +1,6 @@
 ---
 name: ase-meta-steelman
-argument-hint: "[--help|-h] [--count|-c <count>] [--rounds|-r <rounds>] <thesis>"
+argument-hint: "[--help|-h] [--count|-c <count>] [--rounds|-r <rounds>] [--ground|-G] <thesis>"
 description: >
     Build the strongest possible case for a thesis by playing
     "Steelman" (Latin spirit: "Advocatus Dei"). Use when the user
@@ -20,9 +20,11 @@ Build the "Steelman" Argument
 
 <expand name="getopt"
     arg1="ase-meta-steelman"
-    arg2="--count|-c=10 --rounds|-r=1">
+    arg2="--count|-c=10 --rounds|-r=1 --ground|-G">
     $ARGUMENTS
 </expand>
+
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 
 <objective>
 Build the "Steelman" argument by constructing the strongest
@@ -71,7 +73,21 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
 
     </step>
 
-2.  <step id="STEP 2: Determine Pro-Theses">
+2.  <step id="STEP 2: Ground Thesis" condition="<getopt-option-ground/> is equal `true` and <i/> is equal 1">
+
+    Ground the defense *once*, in the first round only, in the
+    requirements and the realization, as the thesis may relate to the
+    project, too -- the grounding facts serve *all* rounds, as the
+    fortifications stay on the topic of the original thesis:
+
+    <expand name="ground"
+        arg1="the thesis in <thesis/>"
+        arg2=""
+        arg3="WHAT HOW"></expand>
+
+    </step>
+
+3.  <step id="STEP 3: Determine Pro-Theses">
 
     Reason on the thesis in <thesis/> by playing *Steelman* (Latin
     spirit: "Advocatus Dei") - building the strongest possible case
@@ -157,21 +173,30 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     surface the <count/> highest-ranked ones found so far, because
     <count/> is the *minimum* number of Pro-Theses to surface.
 
+    Set <evidence-N/> to empty for every Pro-Thesis.
+    <if condition="<getopt-option-ground/> is equal `true` and <ground-facts/> is not empty">
+    *Prefer* Pro-Theses backed by <ground-facts/> over merely plausible
+    ones, and *discard* every Pro-Thesis contradicted by them. Set
+    <evidence-N/> to ` [evidence: <refs/>]`, where <refs/> lists the
+    project-relative file paths resp. source URLs of the backing facts,
+    or to ` [unverified]` if no fact backs it.
+    </if>
+
     Then, for the top-<count/> highest-ranked Pro-Theses or
     Supporting-Arguments, sort them by their rank from highest to lowest,
     store each in <prothesis-N/> with the format `**<aspect-N/>**
-    (rank: <rank-N/>/10): <statement-N/>` (where <aspect-N/> is a short
-    1-3 word summary of <statement-N/>, <rank-N/> is the determined
-    rank on the Likert scale, and <statement-N/> is a single-sentence
-    statement of not more than 40 words), and then output the following
-    <template/>:
+    (rank: <rank-N/>/10): <statement-N/><evidence-N/>` (where <aspect-N/>
+    is a short 1-3 word summary of <statement-N/>, <rank-N/> is the
+    determined rank on the Likert scale, and <statement-N/> is a
+    single-sentence statement of not more than 40 words), and then output
+    the following <template/>:
 
     <template>
     <ase-tpl-bullet-signal/> **PRO-THESIS**: <prothesis-N/>
     </template>
     </step>
 
-3.  <step id="STEP 3: Consolidating Reasoning">
+4.  <step id="STEP 4: Consolidating Reasoning">
 
     Following the consolidation of...
 

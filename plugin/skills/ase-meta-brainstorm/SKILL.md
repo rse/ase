@@ -1,6 +1,6 @@
 ---
 name: ase-meta-brainstorm
-argument-hint: "[--help|-h] [--max-clarify|-c <num>] [--min-ideas|-i <num>] [--min-rank|-r <num>] [--max-shortlist|-s <num>] <topic>"
+argument-hint: "[--help|-h] [--max-clarify|-c <num>] [--min-ideas|-i <num>] [--min-rank|-r <num>] [--max-shortlist|-s <num>] [--ground|-G] <topic>"
 description: >
     Collaboratively brainstorm a topic by diverging on ideas, converging
     through clustering and scoring, and distilling a shortlist with
@@ -23,9 +23,11 @@ Collaboratively Brainstorm a Topic
 
 <expand name="getopt"
     arg1="ase-meta-brainstorm"
-    arg2="--max-clarify|-c=3 --min-ideas|-i=12 --min-rank|-r=7 --max-shortlist|-s=4">
+    arg2="--max-clarify|-c=3 --min-ideas|-i=12 --min-rank|-r=7 --max-shortlist|-s=4 --ground|-G">
     $ARGUMENTS
 </expand>
+
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-ground.md
 
 <objective>
 Collaboratively brainstorm the topic <topic><getopt-arguments/></topic>
@@ -95,7 +97,20 @@ Honor the following tenets throughout the brainstorming:
 
     </step>
 
-2.  <step id="STEP 2: Clarify Intent">
+2.  <step id="STEP 2: Ground Topic" condition="<getopt-option-ground/> is equal `true`">
+
+    Ground the brainstorming *once* in the requirements and the
+    realization, so the facts serve the clarification of the intent and
+    the converging of the idea space, but *not* the diverging:
+
+    <expand name="ground"
+        arg1="the topic in <topic/>"
+        arg2=""
+        arg3="WHAT HOW"></expand>
+
+    </step>
+
+3.  <step id="STEP 3: Clarify Intent">
 
     Before generating any ideas, *explore the project context* (review
     relevant existing files, documentation, and recent changes) and
@@ -124,7 +139,8 @@ Honor the following tenets throughout the brainstorming:
 
         2.  Determine *2 to 4* grounded candidate answers
             <answer-M-K/> (K={1,2,3,4}) from the code base, the documented
-            context, and your world knowledge.
+            context, the grounding facts <ground-facts/> (if any, preferred
+            over your world knowledge), and your world knowledge.
 
         3.  In the following, you *MUST* *NOT* use your built-in
             <user-dialog-tool/> tool! Instead, you *MUST* just show a
@@ -151,7 +167,7 @@ Honor the following tenets throughout the brainstorming:
                 out of the iteration cycle entirely, and continue directly
                 with the outer item `2.` (cancellation handling) that
                 immediately follows this iteration cycle `1.` within this
-                STEP 2.
+                STEP 3.
 
             -   If <result/> starts with `ERROR:`:
                 Ask the user interactively, without a special tool, the
@@ -182,11 +198,12 @@ Honor the following tenets throughout the brainstorming:
 
     </step>
 
-3.  <step id="STEP 3: Diverge Idea Space">
+4.  <step id="STEP 4: Diverge Idea Space">
 
     Generate a *broad* space of candidate ideas that address the
     <topic/> within the constraints established by the answers
-    <answer-M/>.
+    <answer-M/>. Do *not* draw on the grounding facts <ground-facts/>
+    (if any) here, as known solutions would anchor the diverging.
 
     Deliberately pursue *diverse angles* - e.g. the minimal/MVP-first
     angle, the robustness/risk-first angle, the user-experience-first
@@ -211,10 +228,15 @@ Honor the following tenets throughout the brainstorming:
 
     </step>
 
-4.  <step id="STEP 4: Converge Idea Space">
+5.  <step id="STEP 5: Converge Idea Space">
 
     Converge the candidate ideas <idea-N/> into a smaller, structured
     set and finally into a recommendation.
+    <if condition="<getopt-option-ground/> is equal `true` and <ground-facts/> is not empty">
+    In clustering and scoring, draw on the grounding facts <ground-facts/>,
+    preferred over your world knowledge: prune the ideas they contradict,
+    and rank the fit of the ideas they back higher.
+    </if>
 
     1.  *Cluster*: group the candidate ideas into <c/> coherent clusters
         <cluster-C/> (a short 1-4 word label, C=1...<c/>), collapsing

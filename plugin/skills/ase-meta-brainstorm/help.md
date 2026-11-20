@@ -11,6 +11,7 @@
     [`--min-ideas`|`-i=12`]
     [`--min-rank`|`-r=7`]
     [`--max-shortlist`|`-s=4`]
+    [`--ground`|`-G`]
     *topic*
 
 ##  DESCRIPTION
@@ -56,6 +57,19 @@ the highest-ranked option or a principled synthesis of the shortlist.
     (default: 4). Lower it for a sharper focus, raise it for more
     finalists.
 
+-   `--ground`|`-G`:
+    Ground the brainstorming in facts instead of the world knowledge of
+    the model alone: once before the *clarify intent* phase, the
+    requirements and the realization of the project (its specification,
+    documentation, code, and infrastructure files) are scanned for the
+    facts relevant to the *topic*, and the Internet/Web is searched for
+    them. These facts serve the candidate answers of the clarification
+    and the clustering and scoring of the *converge* phase, which prunes
+    the ideas they contradict, but deliberately *not* the *diverge*
+    phase, so known solutions do not anchor the idea generation. If no
+    usable facts are found, a warning is shown and the brainstorming
+    falls back to model knowledge.
+
 ##  ARGUMENTS
 
 -   *topic*:
@@ -69,6 +83,7 @@ the highest-ranked option or a principled synthesis of the shortlist.
 -   You want to widen a solution space that holds a single candidate
 -   You want to get a shortlist of distinct directions with a recommendation
 -   You want to ideate on a feature, component, or design question
+-   You want the constraints and scores grounded in project and Web facts
 
 ##  EXAMPLES
 
@@ -89,6 +104,13 @@ and a tighter shortlist:
 
 ```text
 ❯ /ase-meta-brainstorm --max-clarify 1 --min-rank 8 --max-shortlist 3 an offline-first sync layer
+```
+
+Brainstorm with the constraints and scores grounded in the project
+artifacts and the Internet/Web:
+
+```text
+❯ /ase-meta-brainstorm --ground an offline-first sync layer
 ```
 
 ##  SEE ALSO

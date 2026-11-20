@@ -7,6 +7,7 @@
 
 `ase-meta-evaluate`
     [`--help`|`-h`]
+    [`--ground`|`-G`]
     *request*
 
 ##  DESCRIPTION
@@ -27,6 +28,19 @@ all alternatives rate negatively. The skill stops with an error if
 fewer than two alternatives are given, or if the alternatives are not
 members of a single, mutually comparable class.
 
+##  OPTIONS
+
+-   `--ground`|`-G`:
+    Ground the evaluation in facts instead of the world knowledge of
+    the model alone: once the alternatives and criteria are known, the
+    requirements and the realization of the project (its specification,
+    documentation, code, and infrastructure files) are scanned for the
+    facts relevant to the evaluation, and the Internet/Web is searched
+    for them. Every Likert evaluation is then decided primarily from
+    these facts, while the decision matrix itself stays unchanged. If no
+    usable facts are found, a warning is shown and the evaluation falls
+    back to model knowledge.
+
 ##  ARGUMENTS
 
 -   *request*:
@@ -39,6 +53,7 @@ members of a single, mutually comparable class.
 -   You want a weighted multi-criteria decision matrix
 -   You want a defensible, criteria-based technology choice
 -   You want to know which option out of a list wins and by how much
+-   You want the evaluations based on project and Web facts
 
 ##  EXAMPLES
 
@@ -53,6 +68,13 @@ Evaluate database options with hinted criteria:
 ```text
 ❯ /ase-meta-evaluate Compare PostgreSQL, MySQL, and SQLite for an
   embedded use case; criteria include footprint and write throughput.
+```
+
+Evaluate alternatives grounded in the project artifacts and the
+Internet/Web:
+
+```text
+❯ /ase-meta-evaluate --ground Compare Vite and esbuild for bundling our web client.
 ```
 
 ##  SEE ALSO
