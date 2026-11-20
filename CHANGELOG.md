@@ -19,6 +19,10 @@ ChangeLog
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.
 
+-   BUGFIX [code]: No Digit Hotkeys for HARD Auto-Warm Buttons
+    The HARD auto-warm buttons of the cache band no longer carry the digit hotkeys `0`-`5`, as a
+    digit typed into the empty prompt (e.g. a grilling answer) accidentally pressed them.
+
 2.1.3 (2026-11-20)
 ------------------
 

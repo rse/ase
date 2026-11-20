@@ -415,13 +415,13 @@ export const modCacheControl = () => {
             ] }))
             lines.push(Box({ flexDirection: "row", columnGap: 1, children: [
                 Text({ children: "⛁ cache: hard auto-warm:" }),
-                Button({ key: "warm-stop", label: "STOP", hotkey: "0", plain: true,
+                Button({ key: "warm-stop", label: "STOP", plain: true,
                     children: Text({ bold: true, children: "STOP" }), onPress: () => {
                     warmOff()
                     k.invalidate()
                 } })
             ] }))
-            hints = `0: stop HARD auto-warm · ${hints}`
+            hints = `click/ctrl+x tab: stop HARD auto-warm · ${hints}`
         }
         else if (st === "cooling") {
             lines.push(Box({ flexDirection: "row", children: [
@@ -435,15 +435,14 @@ export const modCacheControl = () => {
                 Text({ children: "⛁ cache: hard auto-warm:" }),
                 ...settings.hard.flatMap((hours, i) => [
                     ...(i > 0 ? [ Text({ children: "|" }) ] : []),
-                    Button({ key: `warm-${hours}`, label: `${hours}h`,
-                        hotkey: String(i + 1), plain: true,
+                    Button({ key: `warm-${hours}`, label: `${hours}h`, plain: true,
                         children: Text({ bold: true, children: `${hours}h` }), onPress: () => {
                             warmOn("hard", hours)
                             k.invalidate()
                         } })
                 ])
             ] }))
-            hints = `1-${settings.hard.length}: start standard HARD auto-warm · ${hints}`
+            hints = `click/ctrl+x tab: start standard HARD auto-warm · ${hints}`
         }
         else {
             lines.push(Box({ flexDirection: "row", children: [
