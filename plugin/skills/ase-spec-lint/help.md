@@ -108,15 +108,19 @@ are *never* applied under `--auto`.
 
 -   `--staged`:
     Restrict the linting to the specification files with *staged* Git
-    changes. Deleted files are skipped, and the files are linted in
-    their current working copy state. Combined with `--unstaged`, lint
-    the specification files with *any* uncommitted Git changes.
+    changes, and report (resp. correct) only the problems within their
+    changed hunks. Deleted files are skipped, and the files are linted
+    in their current working copy state, so for a file with additional
+    unstaged changes, these hunks count as changed, too. Combined with
+    `--unstaged`, lint the hunks of *any* uncommitted Git changes.
 
 -   `--unstaged`:
     Restrict the linting to the specification files with *unstaged* Git
-    changes plus the *untracked* specification files. Deleted files are
-    skipped. Combined with `--staged`, lint the specification files with
-    *any* uncommitted Git changes.
+    changes plus the *untracked* specification files, and report (resp.
+    correct) only the problems within their changed hunks, where an
+    untracked file counts as changed entirely. Deleted files are
+    skipped. Combined with `--staged`, lint the hunks of *any*
+    uncommitted Git changes.
 
 ##  ARGUMENTS
 
@@ -124,6 +128,8 @@ are *never* applied under `--auto`.
     A file, directory, or wildcard reference to the specification files
     to lint. Without it, the *entire* specification is linted, resp.
     under `--staged` or `--unstaged` all changed specification files.
+    To lint changed files entirely instead of their hunks only, give
+    them without these options.
 
 ##  SCENARIOS
 
@@ -172,7 +178,7 @@ Lint the specification regardless of the project boxing:
 ❯ /ase-spec-lint --force
 ```
 
-Lint only the specification files with staged Git changes:
+Lint only the hunks of the staged specification changes:
 
 ```text
 ❯ /ase-spec-lint --staged
