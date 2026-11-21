@@ -14,8 +14,8 @@ Workflow
 
 1.  Set the requested context: <context>$ARGUMENTS</context>.
     The *first* whitespace-separated token of <context/> is the
-    *analysis lens* <lens/> (one of `logic`, `performance`, or
-    `security`). The *remaining* tokens are the source code files
+    *analysis lens* <lens/> (one of `logic`, `performance`, `security`,
+    or `tests`). The *remaining* tokens are the source code files
     to analyze.
 
 2.  Use the `Read` tool to read all source code files referenced by
@@ -174,6 +174,60 @@ Workflow
         -   business-logic flaws (bypassable workflows, negative quantities, replay)
         -   [...]
 
+    -   If <lens/> is `tests`:
+
+        Focus on the *evidentiary quality* of the tests only -- whether
+        the tests would actually *notice* a wrong implementation -- and
+        do *not* investigate logic, performance, or security problems
+        of the production code itself.
+
+        For this, pair every referenced file with its counterpart (its
+        tests resp. its code under test), which then counts as
+        *referenced*, too. Then locate the *implementation-independent
+        sources* of the expected behavior: the specification (e.g. below
+        `docs/specbook/`), the task plans, interface contracts, and the
+        external standards the code implements (verified via web search
+        when a finding hinges on them). Your *own* domain knowledge
+        shares its mistakes with the code under test: use it for
+        suspicion only, never as proof.
+
+        Analysis Hints (not exhaustive, just indicators):
+        -   *contradicting oracle*: an expected value contradicting its
+            source (e.g. the specified tax rate, status code, rounding
+            mode, or ordering) -- test and code are then *both* wrong
+        -   *unsourced oracle*: a decisive expected value with no
+            traceable source at all (magic constant, fixture of unknown
+            genesis, snapshot recorded from the implementation)
+        -   *insensitive test*: a self-confirming oracle, a mock echo,
+            or a missing or weak assertion -- name the mutation of the
+            code which would go undetected
+        -   *missing claim*: a specified or externally observable
+            behavior of the code under test (public function, branch,
+            rejection or error path, state transition) which no running
+            test decides -- including a skipped test and the missing
+            regression reproducer of a bug fix
+        -   *missing edge case*: untested boundaries of the input
+            domain where defects concentrate: empty, zero, one,
+            negative, maximum, overflow, absent/null, duplicate,
+            Unicode, time zone and daylight saving, concurrency, and
+            failure of dependencies
+        -   *scope mismatch*: a test so broad that its failure would not
+            localize the defect, or so mocked that it exercises no real
+            behavior
+        -   *missing invariant*: a fixed example where a property
+            holding for *all* inputs (round-trip, idempotence,
+            monotonicity, conservation) would decide the claim without
+            any expected value to be sourced
+        -   [...]
+
+        Report a *missing claim* or a *missing edge case* at the line
+        of the *production code* whose behavior is untested, and all
+        other problems at the line of the affected *test*. Rate a
+        contradicting oracle and a test which cannot fail at all as
+        `HIGH`, an unsourced oracle and a missing claim of a specified
+        behavior as `MEDIUM`, and a domain suspicion without any source
+        as `LOW`.
+
     Be practically relevant - focus on *practically relevant* cases
     only and especially do *not* investigate theoretical or fictive
     cases.
@@ -228,6 +282,14 @@ Workflow
         readability, additional memory for speed, added complexity), so
         the user can make an informed decision; use *none* if there is
         no meaningful trade-off.
+
+        If <lens/> is `tests`:
+
+        Set <evidence/> to the *source* the finding is judged against,
+        with an inline reference (e.g. `docs/specbook/tax.md#rates`, an
+        RFC section, or a task plan claim), or to `none found` for an
+        unsourced oracle or a mere domain suspicion. Set <trade-off/>
+        to an empty string.
 
         Otherwise (for the other lenses), set both <evidence/> and
         <trade-off/> to empty strings.
