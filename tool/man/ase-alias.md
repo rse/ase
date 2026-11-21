@@ -173,6 +173,8 @@ alias:
 option:
     ase-code-lint:
         --sec:    --include=A05,A06 -S HIGH
+    ase-code-edit:
+        --well-done: --ground --approach --grill --grill-rounds=3
 default:
     ase-task-edit: --approach
 ```
@@ -193,6 +195,9 @@ $ ase alias set lint-sec /ase-code-lint --include=A05,A06 -S HIGH
 
 # check its expansion
 $ ase alias expand /lint-sec src/
+
+# define an option alias, invoked as "/ase-code-edit --well-done"
+$ ase alias set --option ase-code-edit --well-done --ground --approach --grill --grill-rounds=3
 
 # list the effective aliases
 $ ase alias list

@@ -37,6 +37,9 @@ testing aliases. See `ase-alias`(1) for the expansion order.
 # expand a full alias, followed by an argument
 $ ase alias expand /lint-sec src/
 
+# expand an option alias in place
+$ ase alias expand /ase-code-edit --well-done "fix the off-by-one"
+
 # check the expansion, where "--no-approach" drops the option default again
 $ ase alias expand /ase-task-edit --no-approach foo
 ```

@@ -114,6 +114,13 @@ Define an option alias of the linting skill:
 ❯ /ase-meta-alias set --option ase-code-lint --sec --include=A16 -S HIGH
 ```
 
+Define an option alias `--well-done` for a grounded, approached, and grilled editing,
+invoked as `/ase-code-edit --well-done`:
+
+```text
+❯ /ase-meta-alias set --option ase-code-edit --well-done --ground --approach --grill --grill-rounds=3
+```
+
 Always grill a task plan after editing it, for yourself only:
 
 ```text

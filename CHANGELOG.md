@@ -21,6 +21,10 @@ ChangeLog
     The skill detects upfront a most recent section already released via a Git tag `N.M.K` resp.
     `vN.M.K`, leaves it untouched, and inserts a new section for the next patch version instead.
 
+-   IMPROVEMENT [docs]: Option Alias Example `--well-done`
+    The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
+    `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.
+
 -   BUGFIX [code]: Various Skill Corrections
     `ase-repo-dissect` diffs against `HEAD`, `ase-sync-reconcile` loads `TASK` via the task tools,
     `ase-task-implement` and `ase-task-dissect` keep their merge base resp. part ids, and

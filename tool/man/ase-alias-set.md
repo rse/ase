@@ -101,6 +101,9 @@ $ ase alias set lint-sec /ase-code-lint --include=A05,A06 -S HIGH
 # define an option alias "--sec" of a skill
 $ ase alias set --option ase-code-lint --sec --include=A05,A06 -S HIGH
 
+# define an option alias "--well-done" for a grounded, approached, and grilled editing
+$ ase alias set --option ase-code-edit --well-done --ground --approach --grill --grill-rounds=3
+
 # always compose new task plans along proposed approaches (for yourself only)
 $ ase alias set --scope user --default ase-task-edit --approach
 ```
