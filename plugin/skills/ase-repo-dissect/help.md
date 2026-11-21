@@ -21,7 +21,7 @@ parts*. Each part is a self-contained unit of change with a single
 coherent purpose, so it can be reviewed and committed *atomically* and
 *independently* of the others.
 
-The change set is captured from the working copy (`git diff`), with
+The change set is captured from the working copy (`git diff HEAD`), with
 untracked files folded in *read-only*, or -- under `--staged`/`-s` --
 from the Git index (`git diff --cached HEAD`). The dissection follows a
 strict ruleset: at least *2* and at most *count* parts are derived,
@@ -50,12 +50,6 @@ added *inside* the worktree.
 Every part stays *uncommitted*, a failing `git apply` is reported for
 that part while the remaining parts continue, and the *original working
 copy is never mutated*.
-
-Note that the working-copy patch (without `--staged`) is taken relative
-to the Git *index* while the worktrees are created from `HEAD`. So if
-changes are *also* staged, the affected part patches may not apply
-cleanly and are then reported as failed; stage everything and use
-`--staged` in that situation.
 
 ##  OPTIONS
 

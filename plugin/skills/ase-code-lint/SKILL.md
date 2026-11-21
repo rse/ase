@@ -283,8 +283,8 @@ related to a set of code quality aspects.
     <template>
     ⧉ **ASE**: **LINT SUMMARY**:
 
-    ⧉ **ASE**: **AX - XXX**: N issues
-    ⧉ **ASE**: **AX - XXX**: N issues
+    -   **AX - XXX**: N issues
+    -   **AX - XXX**: N issues
     [...]
     </template>
 
@@ -472,7 +472,7 @@ related to a set of code quality aspects.
                     <diff-condensed/> as a new line:
 
                     <template>
-                    ⧉ **ASE**: `<file/>`:<line/>: `<old-snippet/>` → `<new-snippet/>`
+                    -   `<file/>`:<line/>: `<old-snippet/>` → `<new-snippet/>`
                     </template>
 
                     </if>

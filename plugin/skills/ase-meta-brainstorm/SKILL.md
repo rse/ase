@@ -72,8 +72,8 @@ Honor the following tenets throughout the brainstorming:
     what already exists is a defect, not an option.
 
 -   **Incremental Validation**:
-    Seek the user's confirmation at each phase boundary before
-    advancing, because converging on a misunderstanding wastes the
+    Confirm the understanding of the intent with the user before
+    diverging, because converging on a misunderstanding wastes the
     entire downstream effort.
 
 <flow>

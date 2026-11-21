@@ -236,7 +236,9 @@ Procedure
         <if condition="<collisions/> is not empty AND <getopt-option-force/> is equal `true`">
         Set the <part-id/> of every colliding part to its
         <part-collision/>, so the colliding sub-task plans are
-        *overwritten* in sub-step 4.3 below. Do not output anything.
+        *overwritten* in sub-step 4.3 below, and replace its previous
+        <part-id/> by it in the <part-after/> of all parts and in
+        <terminal-parts/>. Do not output anything.
         </if>
 
     3.  *Compose and persist one sub-task plan per part*:
@@ -308,7 +310,9 @@ Procedure
             via `Write`/`Edit` or by executing a shell command. If this
             call fails because the task already exists (a concurrent
             session took the same id), re-identify this part as in step
-            3.2, replace its <part-id/> in <part-content/>, and save
+            3.2, replace its <part-id/> in <part-content/>, in the
+            <part-after/> of all later parts, and in <terminal-parts/>,
+            and save
             again. Do not
             output anything related to this MCP tool call except the
             following <template/>:

@@ -259,35 +259,10 @@ than the user asked for.
             expressed as a *rounded* percentage of <block-before/>, so
             the reviewer sees what the block actually saves.
 
-            Then set <context-before/> and <context-after/> to empty and
-            *normalize* the change to its *minimal* form, so that the
-            proposed diff shows exactly the lines the later `Edit` will
-            actually change: while the *first* line of <old-text/> is
-            identical to the *first* line of <new-text/>, *move* that
-            line from both to the end of <context-before/> and increment
-            <line/> by one; likewise, while the *last* line of
-            <old-text/> is identical to the *last* line of <new-text/>,
-            *move* that line from both to the front of <context-after/>.
-            Finally, *trim* <context-before/> to its *last* two lines and
-            <context-after/> to its *first* two lines.
+            Then set <context-before/> and <context-after/> to empty,
+            *normalize* the change, and derive its context:
 
-            Then, unless <ase-project-boxing/> is equal `grey` (where
-            the full unified diff is suppressed and no context lines are
-            rendered at all), *silently* read the current content of
-            <file/> with the `Read` tool - reusing the content read
-            earlier in this iteration, unless an `Edit` was applied in
-            between - and set <file-lines/> to its lines, *stripped* of
-            the line-number prefixes the tool adds. Set <file-lines/> to
-            empty if the file cannot be read.
-
-            Whenever <file-lines/> is non-empty, *re-derive* both
-            context parts from it, so the rendered diff shows real
-            context: set <context-before/> to the *up to two* lines of
-            <file-lines/> directly *before* line <line/> (empty if
-            <line/> is `1`) and <context-after/> to the *up to two*
-            lines of <file-lines/> starting at line (<line/> + <n/>),
-            where <n/> is the number of lines in <old-text/> (empty if
-            that line is beyond the end of the document).
+            <expand name="diff-normalize"></expand>
 
         2.  Report the proposed block with the following <template/>:
 

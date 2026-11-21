@@ -77,14 +77,14 @@ Procedure
         capturing their full outputs into <diff/> and <stat/>:
 
         <if condition="<getopt-option-staged/> is equal `true`">
-        `git diff --cached HEAD`
+        `git diff --cached --binary HEAD`
 
         `git diff --cached --numstat HEAD`
         </if>
         <else>
-        `git diff`
+        `git diff --binary HEAD`
 
-        `git diff --numstat`
+        `git diff --numstat HEAD`
         </else>
 
     4.  <if condition="<getopt-option-staged/> is not equal `true`">

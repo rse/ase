@@ -133,6 +133,13 @@ Processing
     second level-2 header exists (very first, still untagged release),
     skip the baseline tag and check *all* Git commits with the command
     `git log HEAD --numstat --pretty=format:'%h: %s'` instead.
+    If the `N.M.K` of the *second* level-2 header has no corresponding
+    Git tag either (i.e. `git tag --list N.M.K` produces no output for
+    it), use the commit which introduced the `N.M.K` of the *first*
+    level-2 header instead, determined with the command
+    `git log -1 --format=%h -S 'N.M.K (' -- CHANGELOG.md`, and check all
+    Git commits from it on with the command
+    `git log <commit/>^..HEAD --numstat --pretty=format:'%h: %s'`.
 
     For finding the corresponding staged Git *changes* in the Git
     *index*, use the command `git diff --cached --numstat`, but silently

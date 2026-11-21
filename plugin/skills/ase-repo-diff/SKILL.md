@@ -112,7 +112,7 @@ Procedure
             | **<intent/>** | <changes/> | <files/>: <description/> |
             </template>
 
-            In the <files/> part of the second column, mark up all file
+            In the <files/> part of the third column, mark up all file
             references as code (with backticks), prepend them with `▢ `,
             append ` [+N/-M]` (based on the information in <stat/>) to them,
             and separate them with `, ` (a comma and space). Do *not* repeat

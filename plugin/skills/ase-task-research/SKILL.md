@@ -163,7 +163,8 @@ Procedure
         (or, if it is not available, the tool `web_search`) is available:
 
         <expand name="search-agent" arg1="websearch">
-            Call the tool `WebSearch(query: "<query/>")`.
+            Call the tool `WebSearch(query: "<query/>")` (or, if it
+            is not available, the tool `web_search(query: "<query/>")`).
         </expand>
 
         If the `other` backend is *selected* and an MCP tool <tool/> is

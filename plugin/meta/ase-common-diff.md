@@ -61,3 +61,37 @@ with no extra blank or space-only lines):
 
 </define>
 
+<define name="diff-normalize">
+
+Normalize the change of <old-text/> and <new-text/> and derive its context.
+
+*Normalize* it to its *minimal* form, so that the proposed diff shows
+exactly the lines the later `Edit` will actually change: while the
+*first* line of <old-text/> is identical to the *first* line of
+<new-text/>, *move* that line from both to the end of
+<context-before/> and increment <line/> by one; likewise, while the
+*last* line of <old-text/> is identical to the *last* line of
+<new-text/>, *move* that line from both to the front of
+<context-after/>. Finally, *trim* <context-before/> to its *last*
+two lines and <context-after/> to its *first* two lines.
+
+Then, unless <ase-project-boxing/> is equal `grey` (where the full
+unified diff is suppressed and no context lines are rendered at all),
+*silently* read the current content of <file/> with the `Read` tool -
+reusing the content read for the same <file/> earlier, unless an
+`Edit` was applied to it in between - and set <file-lines/> to its
+lines, *stripped* of the line-number prefixes the tool adds. Set
+<file-lines/> to empty if the file cannot be read.
+
+Whenever <file-lines/> is non-empty, *re-derive* both context parts
+from it, *overriding* any previously supplied values, so the rendered
+diff shows real context even when none was supplied: set
+<context-before/> to the *up to two* lines of <file-lines/> directly
+*before* line <line/> (empty if <line/> is `1`) and <context-after/>
+to the *up to two* lines of <file-lines/> starting at line (<line/> +
+<n/>), where <n/> is the number of lines in <old-text/> (empty if that
+line is beyond the end of the document). Keep the previously supplied
+values only when <file-lines/> is empty.
+
+</define>
+

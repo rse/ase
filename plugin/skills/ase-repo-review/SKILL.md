@@ -77,11 +77,13 @@ Procedure
         </template>
         </if>
 
-        Set <worktree-dir></worktree-dir> (empty). If
-        <getopt-option-worktree/> is not empty, determine the directory
-        of this existing ASE worktree: if <getopt-option-worktree/>
-        consists of other characters than `A-Z`, `a-z`, `0-9`, `_`, and
-        `-`, keep <worktree-dir/> empty, else call the
+        Set <worktree-dir></worktree-dir> (empty).
+
+        <if condition="<getopt-option-worktree/> is not empty">
+        Determine the directory of this existing ASE worktree: if
+        <getopt-option-worktree/> consists of other characters than
+        `A-Z`, `a-z`, `0-9`, `_`, and `-`, keep <worktree-dir/> empty,
+        else call the
         `ase_worktree_path(id: "<getopt-option-worktree/>", create: false)`
         tool of the `ase` MCP server (you *MUST* *NEVER* assemble this
         path yourself), capture its result into <worktree-dir/>, and run
@@ -94,6 +96,7 @@ Procedure
         <template>
         ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: no worktree **<getopt-option-worktree/>** to review
         </template>
+        </if>
 
         Set <changes/> to the *uncommitted* changes to review: to
         `staged and unstaged` if both <getopt-option-staged/> and

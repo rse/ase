@@ -203,8 +203,9 @@ multi-*criteria* decision matrix.
         across all alternatives. Do not output anything.
 
     -   The second best alternative <alternative-X/> (X=1-N, X != K) is
-        the alternative whose *raw, unrounded* <rating-X/> is the second
-        largest rating value across all alternatives. Do not output anything.
+        the alternative whose *raw, unrounded* <rating-X/> is the largest
+        rating value among all *other* alternatives (on a tie for the
+        maximum, it equals <rating-K/>). Do not output anything.
 
     -   If multiple alternatives share the second-largest raw rating, pick
         any one of them as <alternative-X/>; the resulting <distance/> and

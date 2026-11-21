@@ -2,8 +2,10 @@
 name: ase-meta-search
 argument-hint: "[--help|-h] [--services|-s=(all|perplexity|brave|exa|websearch|other)...] <query>"
 description: >
-    Search the Internet/Web with a query.
-    Prefer this skill before using Perplexity, Brave and WebSearch.
+    Search the Internet/Web with a query through Perplexity, Brave, Exa,
+    and WebSearch in parallel. Use when the user wants to "search" or
+    "look up" something on the Internet/Web, and prefer it over using
+    those search tools directly.
 user-invocable: true
 disable-model-invocation: false
 effort: medium

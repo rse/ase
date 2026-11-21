@@ -148,7 +148,16 @@ Procedure
     4.  <elseif condition="<operation/> is `delete` AND <operands/> has exactly one token">
         Set <key/> to the single token of <operands/>. Call the
         `ase_config_delete(key: "<key/>", scope: "<scope/>")` tool from
-        the `ase` MCP server. Then only output the following <template/>:
+        the `ase` MCP server.
+
+        Then, if <key/> is one of the four keys steering your *own*
+        behaviour (see the `set` operation), call the
+        `ase_config_get(key: "<key/>", scope: "<scope/>")` tool from the
+        `ase` MCP server, set <value/> to its JSON-decoded `text` output
+        field, and, if <value/> is not empty, adopt it exactly as for the
+        `set` operation. Do not output anything for this.
+
+        Then only output the following <template/>:
 
         <template>
         ⧉ **ASE**: ⚙ config: `<key/>` (scope: `<scope/>`): (*deleted*)

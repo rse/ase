@@ -127,8 +127,9 @@ Set <args></args> (set args to empty).
             longer wording*.
 
     2.  *Persist only if smaller*: call the `ase_text_metric(text:
-        "<text/>")` tool of the `ase` MCP server once for the condensed
-        <task-content/> and once for <content-before/>, and take the
+        "<metric-text/>")` tool of the `ase` MCP server once with
+        <metric-text/> set to the condensed <task-content/> and once
+        with <metric-text/> set to <content-before/>, and take the
         `chars` field of each result, so the comparison rests on a
         *measured* length instead of an estimate.
 

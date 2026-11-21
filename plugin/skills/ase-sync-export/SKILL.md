@@ -93,7 +93,7 @@ Procedure
         </template>
 
         <ase-tpl-hint level="minimal">
-        Fix the reported diagnostics in the `SPEC` artifacts (e.g. via `/ase-sync-reconcile -t SPEC`), then re-run this skill.
+        Fix the reported diagnostics in the `SPEC` artifacts (e.g. via `/ase-spec-lint -i S01`), then re-run this skill.
         </ase-tpl-hint>
 
         </if>

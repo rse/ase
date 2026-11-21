@@ -650,20 +650,23 @@ Procedure
         skill can set the `Effort:` key while the task is implemented
         (and the checkbox changes above keep it valid): call the
         `ase_task_load(id: "<ase-task-id/>", tag: true)` tool of the
-        `ase` MCP server, set <task-tag/> to the content of the trailing
-        `<task-plan-tag>` delimiter line of its `text` output field, and
-        set the `Effort:` frontmatter key of <task-content/> to the one
+        `ase` MCP server -- keeping <task-tag/> as the entity tag of the
+        plan <task-content/> is based on, so the save below still merges
+        all other changes made meanwhile -- and set the `Effort:` frontmatter key of <task-content/> to the one
         of the loaded plan -- *replacing* it, *creating* it at its
         position in the key order of the plan <format/>, or *removing*
         it if the loaded plan carries none -- changing *nothing else* of
         <task-content/>.
 
         Finally call the `ase_task_save(id: "<ase-task-id/>", text:
-        "<task-content/>", base: "<task-tag/>")` tool of the `ase` MCP
-        server to persist the updated task plan (merging a change made
-        meanwhile). If the save is refused because the plan was *changed*
-        meanwhile in the same parts, repeat the take-over above and the
-        save, at most *three* times in total, and then save once more
+        "<task-content/>", base: "<task-tag/>", tag: true)` tool of the
+        `ase` MCP server to persist the updated task plan (merging a
+        change made meanwhile), and set <task-tag/> to the content of the
+        `<task-plan-tag>` delimiter line of its `text` output field. If
+        the save is refused because the plan was *changed* meanwhile in
+        the same parts, repeat the take-over above -- now also setting
+        <task-tag/> to the one of the reload -- and the save, at most
+        *three* times in total, and then save once more
         with the argument `force: true` instead of `base`. This `ase_task_save` MCP tool call is the
         *only* permitted way to persist the plan -- *NEVER* write the
         plan file via `Write`/`Edit` or by executing a shell command.
