@@ -328,6 +328,12 @@ const App = ({ log, chain }: { log: Log, chain: Scope }) => {
         return { text, pos: text.length, own: v !== undefined }
     }
 
+    /*  refresh a shown inherited value of the modal from the re-read scopes, as a scope
+        switch computes it before the flushed pending text input is re-read  */
+    React.useEffect(() => {
+        setModal((m) => m === null || m.own ? m : { ...m, ...editState(m.key, m.idx) })
+    }, [ data ])
+
     /*  open the modal of a key on a preferred scope, resp. on its strongest writable
         scope (or read-only on the preferred scope if the key is writable on none)  */
     const openModal = (key: string, prefer: number) => {

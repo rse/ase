@@ -46,6 +46,10 @@ ChangeLog
     Concurrent starts serialize through the lock `.ase/service.start.lock` and re-probe under it,
     so parallel callers no longer spawn orphaned services which overwrite the usage windows.
 
+-   BUGFIX [code]: No Stale Inherited Values after Scope Switches in `ase config edit`
+    The modal refreshes a shown inherited value once the scopes are re-read, so RETURN after a scope
+    switch no longer writes the old value over the just typed one onto the stronger scope.
+
 -   IMPROVEMENT [docs]: Option Alias Example `--well-done`
     The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
     `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.
