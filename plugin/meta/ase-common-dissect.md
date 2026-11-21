@@ -94,7 +94,12 @@ immediately *STOP* processing the entire current skill:
 Report the derived <parts/> with the following <template/>, emitting
 *one* table row per part in <parts/>, in their derived order. Keep
 <scope/> and <rationale/> each to *one* ultra brief sentence, align all
-column edges of the table, and do *not* output any further explanation:
+column edges of the table, and do *not* output any further explanation.
+
+Output this <template/> as *plain reply text* (*NEVER* through a tool
+call, like a `printf` or `echo` via `Bash`, as a tool result is *not*
+shown to the user), and output it *before* any tool call of the next
+step, so the report is visible ahead of the actions it announces:
 
 <template>
 <ase-tpl-head title="DISSECTION" subtitle="<arg1/>"/>

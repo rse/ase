@@ -47,6 +47,10 @@ ChangeLog
     asking to run `ase-repo-changelog` again, and `ase-repo-changelog` hints that its update is
     still unstaged, which it deliberately keeps, as the file may carry further unrelated changes.
 
+-   BUGFIX [code]: Visible Parts Report in `ase-{repo,task}-dissect`
+    The `DISSECTION` parts report is now explicitly emitted as plain reply text before the next
+    step's tool calls, never through a tool call like a `printf` via `Bash`, so it stays visible.
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.
