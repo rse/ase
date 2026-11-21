@@ -1,10 +1,10 @@
 ---
 name: ase-code-analyze
-argument-hint: "[--help|-h] [--performance|-p] [--security|-s] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] [--staged] [--unstaged] [<source-reference>]"
+argument-hint: "[--help|-h] [--auto|-a] [--performance|-p] [--security|-s] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] [--staged] [--unstaged] [<source-reference>]"
 description: >
     Analyze the source code for problems in either the logic and
     semantics and its related control flow, performance and efficiency,
-    or security.
+    or security (with `--auto` fixed automatically).
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -26,14 +26,15 @@ Analyze Source Code
 
 <expand name="getopt"
     arg1="ase-code-analyze"
-    arg2="--performance|-p --security|-s --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --prefix|-P= --staged --unstaged">
+    arg2="--auto|-a --performance|-p --security|-s --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --prefix|-P= --staged --unstaged">
     $ARGUMENTS
 </expand>
 
 <objective>
 *Analyze* the source code of <getopt-arguments/>, and its directly
 related source code, for problems - read-only, *without* applying any
-changes. The *analysis lens* depends on the selected options: problems
+changes, unless `--auto` requests to fix the reported problems
+automatically. The *analysis lens* depends on the selected options: problems
 in its *logic* and *semantics* and its related *control flow*, or
 problems in *performance* and *efficiency*, or problems in *security*.
 </objective>
@@ -75,8 +76,8 @@ problems in *performance* and *efficiency*, or problems in *security*.
     (an *explicitly* given severity floor lifts this skip).
     *Skip* the entire investigation and analysis: do *not* invoke any
     `Bash`, `Glob`, or `Agent` tool and do *not* read any source, only
-    output the following <template/> and then *SKIP* the remaining step
-    STEP 3:
+    output the following <template/> and then *SKIP* the remaining steps
+    STEP 3 and STEP 4:
 
     <template>
     ⧉ **ASE**: **CODE ANALYSIS**: *suppressed* (`project.boxing` is `black`)
@@ -136,8 +137,8 @@ problems in *performance* and *efficiency*, or problems in *security*.
     of individual source code files, preserving order.
 
     If <sources/> is empty, only output the following <template/>
-    and then *SKIP* the rest of this STEP 2 and the remaining step
-    STEP 3:
+    and then *SKIP* the rest of this STEP 2 and the remaining steps
+    STEP 3 and STEP 4:
 
     <template>
     ⧉ **ASE**: **CODE ANALYSIS**: *no <changes/> source files to analyze*
@@ -331,6 +332,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
         followed by one `{ command: "set", key: "ase-issue-<id-prefix/>P<n/>",
         val: "<title/>: <description/>" }` entry per reported problem.
 
+    <if condition="<getopt-option-auto/> is not equal `true`">
     Finally, give a final hint by expanding the following (which,
     depending on the configured <ase-guidance-level/>, may expand into
     nothing and hence emit no output at all):
@@ -338,8 +340,99 @@ problems in *performance* and *efficiency*, or problems in *security*.
     <ase-tpl-hint level="minimal">
     For deeper analysis and suggested solution approaches, plan the resolution via `/ase-task-edit <id-prefix/>P{n}`, or fix it directly in one shot via `/ase-code-edit <id-prefix/>P{n}`, in the same or even a different session.
     </ase-tpl-hint>
+    </if>
 
     You *MUST* not output anything else in this STEP 3,
+    especially not any further explanations.
+
+    </step>
+
+4.  <step id="STEP 4: Fix Problems">
+
+    <if condition="<getopt-option-auto/> is not equal `true` or <problems/> contains no surviving problem of a `severity` other than `ACCEPTED`">
+    Do not output anything and *SKIP* this entire STEP 4, as there is
+    nothing to fix automatically.
+    </if>
+
+    1.  You *MUST* first forget all previous internalized tenets. Then
+        use the `Read` tool to read the file `meta/ase-tenets.md` and
+        freshly internalize and strictly honor its **GENERIC TENETS**
+        and **RESOLVING TENETS** in the following fixing of the
+        problems. Additionally, determine the *repository root*
+        <repo-root/> by running the command `git rev-parse --show-toplevel`
+        (taken exactly as given), and if the file
+        `<repo-root/>/CHANGELOG.md` exists, use the `Read` tool to read the
+        file `meta/ase-format-changelog.md`, too. Form each of these file
+        paths by joining <ase-plugin-root/> and the file name with
+        exactly *one* `/` separator. Do not output anything.
+
+    2.  Set <outcomes/> to an empty list. Then, for each surviving
+        problem `<id-prefix/>P<n/>` of <problems/> of a `severity` other
+        than `ACCEPTED`, in the reported order, read its cited `file`
+        (a relative `file` resolved against the current working
+        directory) and the code around its cited `line` -- freshly, as
+        the fixes of previous problems may have shifted the lines --,
+        determine the *root cause* of the problem, and apply a
+        *minimal*, *focused* correction which resolves exactly this
+        problem via the `Edit` tool (resp. the `Write` tool for a file
+        to be created), without any unrelated change, and without
+        staging or committing anything. If `<repo-root/>/CHANGELOG.md`
+        exists, add *one* entry for each applied correction there, in the
+        format detected by the *Format Detection* rules and according to
+        the *Entry Quality* rules of `meta/ase-format-changelog.md`.
+
+        Record the outcome of each problem in <outcomes/>: `APPLIED` if
+        the correction was applied, `FAILED` if an `Edit` or `Write`
+        reported an error, or `SKIPPED` if the problem cannot be resolved
+        by a local correction (e.g. a design decision or a questioned
+        intent demanding a human), in which case nothing is changed for
+        it. Do not output anything beyond the tool invocations.
+
+    3.  <if condition="<outcomes/> contains at least one `APPLIED` outcome">
+        Remove the persisted problems of all applied corrections, so
+        only the unfixed problems stay addressable by their id, with a
+        *single* `ase_kv_batch` call to the `ase` MCP server with
+        `transactional` set to `true` and a `commands` parameter array
+        holding one `{ command: "delete", key: "ase-issue-<id-prefix/>P<n/>" }`
+        entry per problem with outcome `APPLIED`. Do not output anything.
+        </if>
+
+    4.  As the fixing is interleaved with the tool calls (and a headless
+        run shows only the final reply text), recap the outcomes with
+        the following <template/>, emitted *after* the last tool call:
+
+        <template>
+        ⧉ **ASE**: **ANALYSIS FIXES**:
+
+        | *Id* | *Severity* | *Location* | *Summary* | *Status* |
+        | ---- | ---------- | ---------- | --------- | -------- |
+        <rows/>
+        </template>
+
+        Hints:
+
+        -   <rows/> has one row `| **<id-prefix/>P<n/>** | `<severity/>` | <location/> | <summary/> | **<status/>** |` per fixed problem, in order
+        -   <location/> is the `` `<file/>`:<line/> `` of the problem
+        -   <summary/> is a one-line summary of the `title` of the problem, at most 60 characters long, with every `|` escaped as `\|`
+        -   <status/> is the outcome of the problem in <outcomes/>
+
+    5.  Finally, give the closing hints by expanding the following
+        (which, depending on the configured <ase-guidance-level/>, may
+        each expand into nothing and hence emit no output at all):
+
+        <if condition="<outcomes/> contains at least one `SKIPPED` or `FAILED` outcome">
+        <ase-tpl-hint level="minimal">
+        For the unfixed problems, plan the resolution via `/ase-task-edit <id-prefix/>P{n}`, or fix it directly in one shot via `/ase-code-edit <id-prefix/>P{n}`, in the same or even a different session.
+        </ase-tpl-hint>
+        </if>
+
+        <if condition="<outcomes/> contains at least one `APPLIED` outcome">
+        <ase-tpl-hint level="normal">
+        The fixes are applied, but not staged -- review them, and re-run the analysis resp. the build to verify them.
+        </ase-tpl-hint>
+        </if>
+
+    You *MUST* not output anything else in this STEP 4,
     especially not any further explanations.
 
     </step>

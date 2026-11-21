@@ -34,6 +34,10 @@ ChangeLog
     The skill operates on an explicitly given ChangeLog file instead of the nearest `CHANGELOG.md`
     up the directory tree, e.g. on the `CHANGELOG.md` of a sub-project in a monorepo.
 
+-   IMPROVEMENT [code, docs]: Option `--auto` for `ase-code-analyze`
+    The skill fixes all reported problems automatically by minimal root-cause corrections, honoring
+    the RESOLVING tenets, skips problems demanding a human decision, and drops fixed `ase-issue-*`.
+
 -   BUGFIX [code, docs]: No Duplicate Services on Concurrent `ase service start`
     Concurrent starts serialize through the lock `.ase/service.start.lock` and re-probe under it,
     so parallel callers no longer spawn orphaned services which overwrite the usage windows.
