@@ -10,6 +10,7 @@
     [`--staged`|`-s`]
     [`--unstaged`|`-u`]
     [`--file`|`-f` *path*]
+    [`--format`|`-F` `AUTO`|`RSE`|`KAC`|`CCL`]
 
 ##  DESCRIPTION
 
@@ -34,13 +35,27 @@ If the most recent section is already released, i.e., a Git tag
 a new section for the next patch version is inserted above it instead,
 which then receives the new entries.
 
-Each entry starts with `<change-type> [<artifact-kind>]: <summary>`
-where *change-type* is one of `FEATURE`, `IMPROVEMENT`, `BUGFIX`,
-`UPDATE`, `CLEANUP`, or `REFACTOR`, and *artifact-kind* is one or more
-comma-separated *artifact class* tags out of `spec`, `code`, `docs`,
-`infr`, or `othr`. Entries are grouped and sorted by this
-prefix. The date in the section header is also updated to the current
-date.
+The skill knows the following *ChangeLog formats*, guesses the format
+of the file from its content, and writes the entries in its vocabulary:
+
+-   `RSE`: the own format of *ASE*, where each entry starts with
+    `<change-type> [<artifact-kind>]: <summary>`, *change-type* is one of
+    `FEATURE`, `IMPROVEMENT`, `BUGFIX`, `UPDATE`, `CLEANUP`, or
+    `REFACTOR`, and *artifact-kind* is one or more comma-separated
+    *artifact class* tags out of `spec`, `code`, `docs`, `infr`, or
+    `othr`. Entries are grouped and sorted by this prefix.
+
+-   `KAC`: *Keep a Changelog*, where the entries are collected in a
+    `## [Unreleased]` section, below the headers `### Added`,
+    `### Changed`, `### Deprecated`, `### Removed`, `### Fixed`, and
+    `### Security`.
+
+-   `CCL`: *Conventional Changelog*, where the entries are placed below
+    headers like `### Features` and `### Bug Fixes`.
+
+An empty file gets the `RSE` format, while the style of a file in an
+unrecognized format is mimicked. The date in a dated section header is
+also updated to the current date.
 
 The layout of the entries follows the style of the existing entries
 of the file (e.g. a single line, a title line plus an explaining body,
@@ -73,6 +88,12 @@ with a selection of changes.
     `CHANGELOG.md` of a sub-project like `tool/` or `pages/` in a
     monorepo.
 
+-   `--format`|`-F` `AUTO`|`RSE`|`KAC`|`CCL`:
+    Use the given *ChangeLog* format instead of guessing it from the
+    file content (`AUTO`, the default), e.g. to start an empty
+    `CHANGELOG.md` of a foreign repository in the *Keep a Changelog*
+    format `KAC`.
+
 ##  SCENARIOS
 
 -   You want the `CHANGELOG.md` brought up to date with recent commits
@@ -80,6 +101,7 @@ with a selection of changes.
 -   You want a tidy changelog section before a release
 -   You want an entry just for the staged changes before committing them
 -   You want the changelog of a particular sub-project of a monorepo updated
+-   You want the changelog of a foreign repository updated in its own format
 
 ##  EXAMPLES
 
@@ -105,6 +127,12 @@ Create entries for the staged changes in the ChangeLog of a sub-project:
 
 ```text
 ❯ /ase-repo-changelog --staged --file tool/CHANGELOG.md
+```
+
+Create entries in the *Keep a Changelog* format:
+
+```text
+❯ /ase-repo-changelog --format KAC
 ```
 
 ##  SEE ALSO

@@ -5,6 +5,11 @@ ChangeLog
 2.1.5 (2026-11-21)
 ------------------
 
+-   FEATURE [code, docs]: ChangeLog Formats via `ase-format-changelog.md`
+    New meta file defining the own format `RSE`, *Keep a Changelog* `KAC`, and *Conventional Changelog*
+    `CCL`. `ase-repo-changelog` detects the format or takes it from `--format|-F`, and the entries of
+    `ase-{code,spec}-edit`, `ase-repo-dissect`, and task plans follow it, too.
+
 -   IMPROVEMENT [code]: Plain `⧉ ASE` Prefixes Instead of Bullet Tags
     The skills prefix their output lines with a plain `⧉ **ASE**:` instead of the often unexpanded
     `<ase-tpl-bullet-{normal,secondary,signal}/>` template tags, which are dropped entirely.

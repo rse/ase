@@ -38,7 +38,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         control flow, getopt, and skill output conventions
         (`ase-{constitution,tenets,persona,dialog,control,getopt,skill}.md`),
         the common steps shared by groups of skills (`ase-common-*.md`),
-        and the artifact formats (`ase-format-{meta,task,spec}.md`), where
+        and the artifact formats (`ase-format-{meta,task,spec,changelog}.md`), where
         the specification format `ase-format-spec.md` includes the SpecBook
         models and formats description `ase-format-specbook.md` and the
         standard SpecBook schema configuration `ase-format-specbook.yaml`,

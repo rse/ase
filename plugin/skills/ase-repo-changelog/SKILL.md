@@ -1,9 +1,10 @@
 ---
 name: ase-repo-changelog
-argument-hint: "[--help|-h] [--staged|-s] [--unstaged|-u] [--file|-f <path>]"
+argument-hint: "[--help|-h] [--staged|-s] [--unstaged|-u] [--file|-f <path>] [--format|-F AUTO|RSE|KAC|CCL]"
 description: >
     Update ChangeLog entries in CHANGELOG.md files, optionally just for the
-    staged and/or unstaged changes. Use when the user wants to
+    staged and/or unstaged changes, in the own ASE format or in foreign
+    formats like Keep a Changelog. Use when the user wants to
     "add a changelog entry", or to "update", "complete", or "consolidate" the
     "changelog", "ChangeLog", or "CHANGELOG.md", e.g. before committing or releasing.
 user-invocable: true
@@ -24,6 +25,7 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-format-changelog.md
 
 <purpose name="ase-repo-changelog">
 Update ChangeLog Entries
@@ -31,7 +33,7 @@ Update ChangeLog Entries
 
 <expand name="getopt"
     arg1="ase-repo-changelog"
-    arg2="--staged|-s --unstaged|-u --file|-f=">
+    arg2="--staged|-s --unstaged|-u --file|-f= --format|-F=(AUTO|RSE|KAC|CCL)">
     $ARGUMENTS
 </expand>
 
@@ -46,47 +48,13 @@ the uncommitted change set.
 Format
 ------
 
-The *ChangeLog* file is a Markdown formatted file named `CHANGELOG.md`,
-and contains sections with headers in the style `N.M.K (YYYY-MM-DD)`.
-
-Each *ChangeLog* entry always starts with a line formatted as...
-
-    `<change-type/> [<artifact-kind/>]: <summary/>`
-
-...where the <change-type/> is one of the following tags and their usual
-related changes:
-
-    -   `FEATURE`:     new        functionality or configuration
-    -   `IMPROVEMENT`: improved   functionality or configuration
-    -   `BUGFIX`:      corrected  functionality or configuration
-    -   `UPDATE`:      updated    functionality or configuration
-    -   `CLEANUP`:     cleaned up functionality or configuration
-    -   `REFACTOR`:    refactored functionality or configuration
-
-The <artifact-kind/> is one or more of the following *artifact* tags,
-classifying which kind of artifact the change primarily touches. If
-multiple artifact kinds apply, comma-separate them
-(e.g. `[code, docs]`):
-
-    -   `spec`:  requirement/specification artifacts
-    -   `code`:  source code artifacts
-    -   `docs`:  documentation artifacts
-    -   `infr`:  infrastructure/build/tooling artifacts
-    -   `othr`:  any other artifacts
-
-The *layout* of the entries *MUST* follow the *style* of the existing
-entries of the *ChangeLog* file, especially its list item marker and
-indentation, its blank lines between entries, its line width, and its
-entry shape, e.g. a single-line <summary/>, a short <summary/> title
-line followed by an indented body of explaining sentences, or a
-<summary/> sentence wrapped over multiple indented lines. Only if the
-file contains no entries yet, use a single-line <summary/> of about
-60-80 characters.
-
-Each entry, including all its title and body lines, *MUST* be kept
-within about *5 lines* in total. The *ChangeLog* entries for a single
-product release version are also always grouped and sorted according
-to the above <change-type/> list.
+The *ChangeLog* formats (`RSE`, `KAC`, `CCL`, and the unrecognized
+`OTHER`), their detection, and the *Entry Quality* rules of their
+entries are defined by the *ChangeLog Format* above, which you *MUST*
+strictly honor for the format <format/> determined in STEP 1. In the
+following, a *change type* is the <change-type/> tag of `RSE`, resp. the
+level-3 change type header of `KAC` and `CCL`, resp. the change type
+vocabulary of `OTHER`.
 
 Processing
 ----------
@@ -124,15 +92,31 @@ Processing
     </if>
     </else>
 
-    Then determine the *release state* of the *first* (most recent)
-    level-2 section: take its `N.M.K` and check whether a corresponding
-    Git tag already exists with the command `git tag --list N.M.K vN.M.K`.
+    Then determine the *ChangeLog* format: if <getopt-option-format/> is
+    equal `AUTO`, *detect* it from the file content according to the
+    *Format Detection* rules of the *ChangeLog Format* above and store
+    it in <format/>. Otherwise, store <getopt-option-format/> in
+    <format/>, as the format is explicitly forced.
+
+    <if condition="<format/> is equal `KAC`">
+    The *current section* all subsequent steps operate on is the
+    `## [Unreleased]` section: store `Unreleased` in <version/>. If this
+    section exists, leave <baseline/> empty. Otherwise, a *new*
+    `## [Unreleased]` section has to be inserted *above* the first
+    released section, and, for the `N.M.K` of this released section,
+    store the output of the command `git tag --list N.M.K vN.M.K` in
+    <baseline/> (empty if there is no such tag).
+    </if>
+    <else>
+    Determine the *release state* of the *first* (most recent) version
+    section: take its `N.M.K` and check whether a corresponding Git tag
+    already exists with the command `git tag --list N.M.K vN.M.K`.
 
     <if condition="this command produces output">
     The first section is already *released*: it *MUST* *NOT* be
     modified at all. Store the output tag name in <baseline/>, and
     store the next patch version (`N.M.K` with `K` incremented by one)
-    in <version/>. A *new*, still-unreleased level-2 section for
+    in <version/>. A *new*, still-unreleased version section for
     <version/>, with the current date and in the header style of the
     existing sections, has to be inserted *above* the released one, and
     becomes the *current section* all subsequent steps operate on.
@@ -142,16 +126,18 @@ Processing
     <version/> and leave <baseline/> empty. This first section is the
     *current section* all subsequent steps operate on.
     </else>
+    </else>
 
     You *MUST* *NOT* output anything, except the result with the
     following <template/>:
 
     <template>
-    ⧉ **ASE**: **CHANGELOG FILE:** `<filename/>`, **SECTION:** `<version/>` (<state/>)
+    ⧉ **ASE**: **CHANGELOG FILE:** `<filename/>`, **FORMAT:** `<format/>`, **SECTION:** `<version/>` (<state/>)
     </template>
 
     ...where <state/> is `new, as <baseline/> is already released` for
-    a new section, or `unreleased` otherwise.
+    a new section with a non-empty <baseline/>, `new` for a new section
+    with an empty <baseline/>, or `unreleased` otherwise.
 
     </step>
 
@@ -210,23 +196,26 @@ Processing
     -   If <baseline/> is not empty (new section), use it as the
         baseline tag.
 
-    -   Otherwise (unreleased first section), take the `N.M.K` from the
-        *second* level-2 header and check for its Git tag with the
+    -   Otherwise, take the `N.M.K` from the *version section* directly
+        *below* the current section (for a new section, the first
+        existing version section) and check for its Git tag with the
         command `git tag --list N.M.K vN.M.K`, and use the output tag
         name as the baseline tag.
 
     Then check all Git commits between `HEAD` and this baseline tag with
     the command `git log <baseline/>..HEAD --numstat --pretty=format:'%h: %s'`.
 
-    If *no* second level-2 header exists (very first, still untagged
+    If *no* such version section exists (very first, still untagged
     release), skip the baseline tag and check *all* Git commits with the
     command `git log HEAD --numstat --pretty=format:'%h: %s'` instead.
-    If the second level-2 header has no corresponding Git tag either,
-    use the commit which introduced the `N.M.K` of the *first* level-2
-    header instead, determined with the command
-    `git log -1 --format=%h -S 'N.M.K (' -- "<filename/>"`, and check all
-    Git commits from it on with the command
-    `git log <commit/>^..HEAD --numstat --pretty=format:'%h: %s'`.
+    If this version section has no corresponding Git tag either,
+    use the commit which introduced the header text <header/> of the
+    *first* section instead (like `N.M.K (` for `RSE`, or
+    `## [Unreleased]` for `KAC`), determined with the command
+    `git log -1 --format=%h -S '<header/>' -- "<filename/>"`, and check
+    all Git commits from it on with the command
+    `git log <commit/>^..HEAD --numstat --pretty=format:'%h: %s'`, resp.
+    *all* Git commits if no such commit exists.
 
     For finding the corresponding staged Git *changes* in the Git
     *index*, use the command `git diff --cached --numstat`, but silently
@@ -263,9 +252,10 @@ Processing
     resp. just the <changes/> changes if <changes/> is not empty.
 
     For each Git commit, reduce the Git commit messages to an entry in
-    the *style* of the existing entries, kept within about *5 lines*
-    (see section *Format* above).
+    the format <format/>, following the *Entry Quality* rules of the
+    *ChangeLog Format* above, and determine its *change type*.
 
+    <if condition="<format/> is equal `RSE`">
     For each entry, also determine the <artifact-kind/> *artifact kind*
     tag(s) from the paths of the changed files. To classify a changed
     file to its artifact class, call the `ase_artifact_list(kind: [
@@ -275,6 +265,7 @@ Processing
     each changed file to its kind. Use the matched lower-cased kind
     directly as its <artifact-kind/> tag, and comma-separate multiple
     tags when more than one artifact class applies.
+    </if>
 
     If a <summary/> is too short or especially is not comprehensible
     enough because of too little context information, add some essential
@@ -297,17 +288,19 @@ Processing
     Without immediately modifying the `CHANGELOG.md` file, *consolidate*
     the entries in the current section only, by summarizing
     and merging closely related entries. Perform the entry consolidation
-    per <change-type/> group only. Also condense any entry of this
+    per *change type* group only. Also condense any entry of this
     section, which exceeds about *5 lines*, by compressing its wording.
 
     Without immediately modifying the `CHANGELOG.md` file, *sort* the
     entries in the current section only. Instead of the
-    chronological commit order, group the entries by the <change-type/>s.
+    chronological commit order, group the entries by their *change
+    types*, in the order and with the grouping of the format <format/>
+    (e.g. below the level-3 change type headers for `KAC` and `CCL`).
 
     <if condition="<changes/> is not empty">
     Restrict the consolidation and sorting to the entries added or
     updated in STEP 3: merge them only into closely related existing
-    entries, insert them into their <change-type/> group, and leave all
+    entries, insert them into their *change type* group, and leave all
     other entries of the current section unchanged, so the resulting
     diff carries just the entries of the change set.
     </if>
@@ -324,9 +317,10 @@ Processing
     </template>
 
     Finally, *update* the `CHANGELOG.md` file with the completed,
-    consolidated and sorted *ChangeLog* entries. Also, update the date
-    `YYYY-MM-DD` in the `N.M.K (YYYY-MM-DD)` header of the current
-    section to the current date.
+    consolidated and sorted *ChangeLog* entries. Also, if the header of
+    the current section carries a date `YYYY-MM-DD` (like the
+    `N.M.K (YYYY-MM-DD)` header of `RSE`, but unlike the
+    `## [Unreleased]` header of `KAC`), update it to the current date.
 
     For this, you *MUST* use the `Edit` tool, replacing just the current
     section, resp. for a new section, inserting it *above* the header of

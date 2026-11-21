@@ -455,7 +455,13 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         corresponding, complete *change set*, honoring *only*
         <todo-what/> and <todo-how/> plus the information gathered in
         the *discovering* state. Also, if a `CHANGELOG.md` file exists,
-        make an appropriate entry there, too.
+        make an appropriate entry there, too: for this, unless already
+        done earlier in the current skill run, use the `Read` tool to
+        read the file `meta/ase-format-changelog.md`, with its file path
+        formed by joining <ase-plugin-root/> and the file name with
+        exactly *one* `/` separator, and write the entry in the format
+        detected by its *Format Detection* rules and according to its
+        *Entry Quality* rules.
 
         <if condition="<worktree-dir/> is not empty">
         <expand name="changeset-land" arg1="<worktree-dir/>"></expand>

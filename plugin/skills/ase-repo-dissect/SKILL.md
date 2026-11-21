@@ -307,9 +307,13 @@ Procedure
         5.  <if condition="a `CHANGELOG.md` file exists in the created worktree">
             Add *one* new entry to the *first* (most recent) section of
             that `CHANGELOG.md` *inside the worktree*, summarizing
-            *this part's* change set only, and strictly aligned with the
-            established style and conventions of the project (usually
-            `- <change-type/> [<artifact-kind/>]: <summary/>`).
+            *this part's* change set only. For this, unless already done
+            earlier in the current skill run, use the `Read` tool to
+            read the file `meta/ase-format-changelog.md`, with its file
+            path formed by joining <ase-plugin-root/> and the file name
+            with exactly *one* `/` separator, and write the entry in the
+            format detected by its *Format Detection* rules and
+            according to its *Entry Quality* rules.
 
             The *existing* `CHANGELOG.md` is *changed*, never replaced:
             you *MUST* use the `Read` tool to read it and the `Edit` tool

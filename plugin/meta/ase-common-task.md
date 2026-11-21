@@ -185,8 +185,12 @@ Then derive the plan from this grounding, where:
 -   if a `CHANGELOG.md` file exists in the project (or in any affected
     sub-package), the `##  DESIGN (HOW)` section *MUST* include an
     explicit `IMP` bullet-point describing the addition of a
-    corresponding new entry to that `CHANGELOG.md` file, aligned with
-    its existing style and conventions.
+    corresponding new entry to that `CHANGELOG.md` file, in its format
+    as defined by the file `meta/ase-format-changelog.md` (read via the
+    `Read` tool, with its file path formed by joining
+    <ase-plugin-root/> and the file name with exactly *one* `/`
+    separator), detected by its *Format Detection* rules and following
+    its *Entry Quality* rules.
 
 </define>
 
