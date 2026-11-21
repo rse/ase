@@ -4,7 +4,7 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import type { Command }             from "commander"
+import { Option, type Command }     from "commander"
 
 import type Log                     from "./ase-lib-log.js"
 import { Task }                     from "./ase-task.js"
@@ -1094,6 +1094,14 @@ class DefinedRequestAgent extends RequestAgent {
     }
 }
 
+/*  a follow-up option ("--followup-<field>"), whose values of all fields are collected into the
+    single option value "followup" of the parsing command (so it can be shared by commands)  */
+class FollowupOption extends Option {
+    attributeName (): string {
+        return "followup"
+    }
+}
+
 /*  the agent of a definition: a facade to the phase or request agent of its definition,
     created on its setup (as the definition decides on the type of the agent), where
     the concrete facade resolves the definition and the identity of the agent  */
@@ -1125,11 +1133,8 @@ export abstract class DefinedAgent extends Agent {
                 cmd.option(flags, option.desc, (value: string, prev?: string[]) => [ ...(prev ?? []), value ])
             else if (option.kind === "followup") {
                 const field = option.key.replace(/^followup-/, "")
-                cmd.option(flags, option.desc, (value: string) => {
-                    const prev = cmd.getOptionValue("followup") as string[] | undefined
-                    cmd.setOptionValue("followup", [ ...(prev ?? []), `${field}=${value}` ])
-                    return value
-                })
+                cmd.addOption(new FollowupOption(flags, option.desc)
+                    .argParser((value: string, prev?: string[]) => [ ...(prev ?? []), `${field}=${value}` ]))
             }
             else
                 cmd.option(flags, option.desc)

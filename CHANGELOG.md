@@ -65,6 +65,10 @@ ChangeLog
     `ase_specbook_query` runs in the SpecBook worker thread like lint and export, and the `ase` task
     store plugin no longer reports its own writes during a rescan as external changes.
 
+-   BUGFIX [code]: Follow-Up Options of `ase agent <kind> restart`
+    The `--followup-*` options collect their values into the command actually parsing them, so
+    `ase agent <kind> restart` no longer silently drops them and restarts the agent without them.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.
