@@ -13,6 +13,15 @@ ChangeLog
     The `stop` hook lists the lines with unfilled template placeholders and asks to repeat only them,
     and the focus mode rule of the skills applies only if the harness states this mode explicitly.
 
+-   BUGFIX [code]: Various Skill Corrections
+    `ase-repo-dissect` diffs against `HEAD`, `ase-sync-reconcile` loads `TASK` via the task tools,
+    `ase-task-implement` and `ase-task-dissect` keep their merge base resp. part ids, and
+    `ase-repo-review`, `ase-meta-config`, and `ase-repo-changelog` fix guards and fallbacks.
+
+-   REFACTOR [code]: Shared Diff Normalization
+    The identical change normalization of `ase-docs-{proofread,refine,shorten}` moves into the new
+    `diff-normalize` definition of `ase-common-diff.md`.
+
 2.1.4 (2026-11-21)
 ------------------
 
