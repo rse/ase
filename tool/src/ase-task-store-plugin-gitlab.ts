@@ -591,7 +591,7 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
             return "changed"
         const result: API.WriteResult = issue !== null ? "updated" : "created"
         const group  = plan.header.Group
-        if (typeof group === "string" && group !== "")
+        if (typeof group === "string" && group !== "" && group !== taskId)
             await this.target(path, scheme, "Group", group)
         const after  = await Promise.all((Array.isArray(plan.header.After) ? plan.header.After : [])
             .map((id) => this.target(path, scheme, "After", id)))

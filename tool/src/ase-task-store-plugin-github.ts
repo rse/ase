@@ -120,7 +120,7 @@ const inRepo = (loc: Repo, issue: Issue): boolean => {
     onto the issue timestamps, any other key onto "ase:<key>:<value>" labels, and
     the attachments onto the issue comments (where "Group" and "After" fall back
     onto "ase:Group:<id>" resp. "ase:After:<ids>" labels on instances without
-    sub-issues resp. issue dependencies)  */
+    sub-issues resp. issue dependencies, and for "Group" of an explicit epic)  */
 class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> implements API.TaskStoragePlugin {
     readonly name = "github"
     private gh:         Client
@@ -607,7 +607,8 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
             return "changed"
         const result: API.WriteResult = issue !== null ? "updated" : "created"
         const group  = plan.header.Group
-        const parent = typeof group === "string" && group !== "" ? await this.target(loc, scheme, "Group", group) : null
+        const epic   = group === taskId
+        const parent = typeof group === "string" && group !== "" && !epic ? await this.target(loc, scheme, "Group", group) : null
         const after  = await Promise.all((Array.isArray(plan.header.After) ? plan.header.After : [])
             .map((id) => this.target(loc, scheme, "After", id)))
         const phase  = plan.header.Phase
@@ -632,10 +633,13 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
                 throw new Error(`task "${taskId}" cannot be created, as issue "${idOf(scheme, number)}" was created concurrently`)
             }
         }
-        /*  fall back onto the labels of the relations not carried natively  */
+        /*  fall back onto the labels of the relations not carried natively, where the
+            "Group" of an explicit epic (referencing the issue itself) is never native  */
         const fallback: string[] = []
         if (!await this.syncParent(loc, issue, parent) && parent !== null)
             fallback.push(`ase:Group:${idOf(scheme, parent.number)}`)
+        else if (epic)
+            fallback.push(`ase:Group:${taskId}`)
         if (!await this.syncBlockers(loc, issue, after))
             fallback.push(`ase:After:${after.map((blocker) => idOf(scheme, blocker.number)).join(" ")}`)
         for (const name of fallback)

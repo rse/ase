@@ -93,6 +93,11 @@ ChangeLog
     label, so a rejected one (like an `ase:<key>:<value>` label over 50 characters) is reported
     with its reason before any relation or comment of the issue is modified.
 
+-   BUGFIX [code]: Explicit Epics in the GitHub, GitLab, and Gitea Task Store Plugins
+    A task whose `Group` equals its own `Id` can be saved again: the `github` plugin carries it by
+    an `ase:Group:<id>` label instead of making the issue its own sub-issue, and all three plugins
+    no longer reject a new explicit epic for referencing a not yet existing issue.
+
 -   BUGFIX [code, docs]: No Overwrite of Concurrent Issue Changes via Stale Cached Loads
     The `github`, `gitlab`, and `gitea` task store plugins drop the cached load of an issue when
     determining its revision, so a conditional save or a part endpoint retry no longer pairs the
