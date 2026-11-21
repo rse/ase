@@ -58,7 +58,8 @@ the code, and comments contradicting the code.
 
 -   `--auto`|`-a`:
     Automatically apply every proposed correction without asking the
-    user via the interactive dialog.
+    user via the interactive dialog. A closing *LINT RESULT* table
+    lists every problem with its outcome (`APPLIED` or `FAILED`).
 
 -   `--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`):
     Set the *severity floor* (default `AUTO`): findings below the chosen

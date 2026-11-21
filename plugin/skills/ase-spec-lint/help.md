@@ -75,7 +75,8 @@ are *never* applied under `--auto`.
     Automatically apply every proposed correction without asking the
     user via the interactive dialog, except for the best-guess
     corrections of the aspects `S09 LOGIC` and `S10 COMPLETENESS`,
-    which are only reported.
+    which are only reported. A closing *LINT RESULT* table lists every
+    problem with its outcome (`APPLIED`, `SKIPPED`, or `FAILED`).
 
 -   `--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`):
     Set the *severity floor* (default `AUTO`): findings below the chosen

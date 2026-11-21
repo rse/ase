@@ -70,7 +70,8 @@ one-line form instead of the full unified diff, and for a project with
 
 -   `--auto`|`-a`:
     Automatically apply every proposed refinement without asking the
-    user via the interactive dialog.
+    user via the interactive dialog. A closing *REFINE RESULT* table
+    lists every refinement with its outcome (`APPLIED` or `FAILED`).
 
 ##  ARGUMENTS
 

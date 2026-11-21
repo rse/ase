@@ -238,8 +238,9 @@ than the user asked for.
         still perform substep 3 first. Never leave this marker active
         for a later, unrelated `Edit`.
 
-    2.  Set <total/> to the number of blocks in <blocks/> and <index/>
-        to `0`. Then iterate over all blocks:
+    2.  Set <total/> to the number of blocks in <blocks/>, <index/>
+        to `0`, and <outcomes/> to an empty list.
+        Then iterate over all blocks:
 
         <for items="<blocks/>">
 
@@ -368,7 +369,9 @@ than the user asked for.
                 <old-text/> with <new-text/> at <file/>:<line/>. The operation
                 will be auto-approved by the ASE `pre-tool-use` hook (which
                 tracks the active skill), so *no* interactive permission
-                prompt will appear. Then continue with the next <item/>.
+                prompt will appear. Then record `APPLIED` (or `FAILED`,
+                if the `Edit` reported an error) as the outcome of
+                <index/> in <outcomes/> and continue with the next <item/>.
 
                 </if>
 
@@ -399,8 +402,9 @@ than the user asked for.
                     <result/> starts with 'ERROR'
                 ">
 
-                Skip this <item/> without any `Edit` call and continue
-                with the next <item/>.
+                Skip this <item/> without any `Edit` call, record
+                `SKIPPED` as the outcome of <index/> in <outcomes/>, and
+                continue with the next <item/>.
 
                 </if>
 
@@ -426,7 +430,31 @@ than the user asked for.
         percentage of <length-before/>. Do not output anything in this
         substep.
 
-    2.  Report the achieved length with the following <template/>:
+    2.  <if condition="<getopt-option-auto/> is equal `true` and <total/> is greater than `0`">
+
+        Under `--auto`, the block reports are interleaved with the
+        `Edit` invocations (and a headless run shows only the final
+        reply text), so recap the outcome of all blocks with the
+        following <template/>, emitted *after* the last tool call and
+        *together* with the templates of the remaining substeps:
+
+        <template>
+        <ase-tpl-bullet-secondary/> **SHORTEN RESULT**:
+
+        | *#* | *Stage* | *Location* | *Summary* | *Saving* | *Status* |
+        | --: | ------- | ---------- | --------- | -------- | -------- |
+        <rows/>
+        </template>
+
+        Hints:
+
+        -   <rows/> has one row `| <index/> | **<stage/>** | `<file/>`:<line/> | <summary/> | <block-before/> → <block-after/> <unit/> (-<block-percent/>%) | **<status/>** |` per block of <blocks/>, in order
+        -   <summary/> is a one-line summary of the <description/> of the block, at most 60 characters long, with every `|` escaped as `\|`
+        -   <status/> is the outcome of the block in <outcomes/>
+
+        </if>
+
+    3.  Report the achieved length with the following <template/>:
 
         <template>
         <ase-tpl-bullet-secondary/> **LENGTH REPORT**: `<file/>`
@@ -440,7 +468,7 @@ than the user asked for.
 
         </template>
 
-    3.  <if condition="<length-after/> is less than or equal to <target/>">
+    4.  <if condition="<length-after/> is less than or equal to <target/>">
 
         <template>
         <ase-tpl-bullet-normal/> **TARGET MET**
@@ -459,7 +487,7 @@ than the user asked for.
 
         </else>
 
-    4.  You *MUST* *NOT* output any further additional explanations or
+    5.  You *MUST* *NOT* output any further additional explanations or
         summaries at the end of this skill processing, except for the
         following final <template/>:
 
@@ -467,7 +495,7 @@ than the user asked for.
         <ase-tpl-bullet-secondary/> **SHORTEN FINISHED**
         </template>
 
-    5.  Finally, give the closing hint by expanding the following
+    6.  Finally, give the closing hint by expanding the following
         (which, depending on the configured <ase-guidance-level/>, may
         expand into nothing and hence emit no output at all):
 

@@ -300,8 +300,9 @@ related to a set of code quality aspects.
         still perform substep 3 first. Never leave this marker active
         for a later, unrelated `Edit`.
 
-    2.  Set <total/> to the number of problems in <problems/> and
-        <index/> to `0`. Then iterate over all problems:
+    2.  Set <total/> to the number of problems in <problems/>,
+        <index/> to `0`, and <outcomes/> to an empty list.
+        Then iterate over all problems:
 
         <for items="<problems/>">
 
@@ -563,8 +564,10 @@ related to a set of code quality aspects.
                 report). The operation will be auto-approved by the ASE
                 `pre-tool-use` hook (which tracks the active skill),
                 so *no* interactive permission prompt will appear.
-                After applying the changes, just continue with the next
-                <item/>.
+                After applying the changes, record `APPLIED` (or
+                `FAILED`, if an `Edit` reported an error) as the outcome
+                of <index/> in <outcomes/> and just continue with the
+                next <item/>.
                 </if>
 
             -   <if condition="<result/> starts with 'OTHER'">
@@ -586,8 +589,9 @@ related to a set of code quality aspects.
                     <result/> is 'CANCEL' or
                     <result/> starts with 'ERROR'
                 ">
-                Skip this <item/> without any `Edit` call and continue
-                with the next <item/>.
+                Skip this <item/> without any `Edit` call, record
+                `SKIPPED` as the outcome of <index/> in <outcomes/>, and
+                continue with the next <item/>.
                 </if>
 
         </for>
@@ -598,15 +602,40 @@ related to a set of code quality aspects.
         session: "<ase-session-id/>")` tool from the `ase` MCP
         server. Do not output anything in this substep.
 
-    4.  You *MUST* *NOT* output any further additional explanations or
+    4.  <if condition="<getopt-option-auto/> is equal `true` and <total/> is greater than `0`">
+
+        Under `--auto`, the problem reports are interleaved with the
+        `Edit` invocations (and a headless run shows only the final
+        reply text), so recap the outcome of all problems with the
+        following <template/>, emitted *after* the last tool call and
+        *together* with the final template of substep 5:
+
+        <template>
+        <ase-tpl-bullet-secondary/> **LINT RESULT**:
+
+        | *#* | *Aspect* | *Severity* | *Location* | *Summary* | *Status* |
+        | --: | -------- | ---------- | ---------- | --------- | -------- |
+        <rows/>
+        </template>
+
+        Hints:
+
+        -   <rows/> has one row `| <index/> | **<aspect/>** | `<severity/>` | <location/> | <summary/> | **<status/>** |` per problem of <problems/>, in order
+        -   <location/> is the first `` `<file/>`:<line/> `` of the change set of the problem, suffixed with ` (+<n/>)` for <n/> further change hunks
+        -   <summary/> is a one-line summary of the <description/> of the problem, at most 60 characters long, with every `|` escaped as `\|`
+        -   <status/> is the outcome of the problem in <outcomes/>
+
+        </if>
+
+    5.  You *MUST* *NOT* output any further additional explanations or
         summaries at the end of this skill processing, except for the
-        following final <template/>:
+        result of substep 4 and the following final <template/>:
 
         <template>
         <ase-tpl-bullet-secondary/> **LINT FINISHED**
         </template>
 
-    5.  Finally, give the closing hints by expanding the following
+    6.  Finally, give the closing hints by expanding the following
         (which, depending on the configured <ase-guidance-level/>, may
         each expand into nothing and hence emit no output at all):
 

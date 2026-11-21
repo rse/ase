@@ -37,6 +37,11 @@ ChangeLog
     `ase-code-insight` now gathers abstract, authors, and churn first and then displays all three
     sections together, so a model batching their commands no longer drops them from the output.
 
+-   BUGFIX [code]: Result Table for `--auto` Corrections
+    `ase-{code,spec}-lint` and `ase-docs-{proofread,refine,shorten}` now close an `--auto` run with a
+    result table listing every problem with its outcome (`APPLIED`, `SKIPPED`, or `FAILED`), so the
+    applied changes stay visible also when only the final reply text is shown (e.g. headless).
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

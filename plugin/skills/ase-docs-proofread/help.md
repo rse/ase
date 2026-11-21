@@ -38,7 +38,8 @@ correction effort is spent on text which is later dropped.
 
 -   `--auto`|`-a`:
     Automatically apply every proposed correction without asking the
-    user via the interactive dialog.
+    user via the interactive dialog. A closing *PROOFREAD RESULT* table
+    lists every correction with its outcome (`APPLIED` or `FAILED`).
 
 ##  ARGUMENTS
 

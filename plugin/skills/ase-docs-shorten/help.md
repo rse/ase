@@ -87,7 +87,8 @@ pass), so no polishing effort is spent on text which is later dropped.
 
 -   `--auto`|`-a`:
     Automatically apply every proposed shortening without asking the
-    user via the interactive dialog.
+    user via the interactive dialog. A closing *SHORTEN RESULT* table
+    lists every block with its saving and outcome (`APPLIED` or `FAILED`).
 
 ##  ARGUMENTS
 
