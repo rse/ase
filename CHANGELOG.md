@@ -112,6 +112,11 @@ ChangeLog
     of a poll were loaded, so a failed load (like of the issue links) no longer silently swallows the
     detected changes, but lets the next poll report them again.
 
+-   BUGFIX [code]: No Lost Changes on Failed Polls in the Gitea Task Store Plugin
+    The `gitea` task store plugin advances its change detection state only after all changed issues
+    of a poll were loaded, so a failed load (like of the blocking issues) no longer silently swallows
+    the detected changes, and a newer own write of an issue is no longer overwritten by the poll.
+
 -   BUGFIX [code]: No-Op Config Deletes Below Missing Maps
     `ase config delete`, `ase_config_delete`, and emptying a never-set value in `ase config edit`
     no longer fail with `Expected YAML collection at <seg>` when a parent map of the key is missing.

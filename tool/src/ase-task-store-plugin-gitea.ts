@@ -665,20 +665,31 @@ class GiteaTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> imp
         const issues = await this.all(loc, (query) =>
             this.gt.repos.issueListIssues(loc.owner, loc.repo, { state: "all", type: "issues", since: state.since, ...query })) as Issue[]
         const change = { added: [] as API.TaskEntry[], updated: [] as API.TaskEntry[] }
+        const seen   = new Map<number, string>()
+        let   since  = state.since
         for (const issue of issues.reverse()) {
             if (!live(issue))
                 continue
-            if (iso(issue.updated_at) > state.since)
-                state.since = iso(issue.updated_at)
-            if (state.seen.get(issue.number) === issue.updated_at)
+            if (iso(issue.updated_at) > since)
+                since = iso(issue.updated_at)
+            const last = seen.get(issue.number) ?? state.seen.get(issue.number)
+            if (last === issue.updated_at)
                 continue
-            const known = state.seen.has(issue.number)
-            state.seen.set(issue.number, issue.updated_at)
+            seen.set(issue.number, issue.updated_at)
             this.loads.delete(`${prjId}#${issue.number}`)
-            if (!known && iso(issue.created_at) >= this.opened)
+            if (last === undefined && iso(issue.created_at) >= this.opened)
                 change.added.push(await this.entry(loc, lifecycle, scheme, issue))
             else
                 change.updated.push(await this.entry(loc, lifecycle, scheme, issue))
+        }
+
+        /*  advance the state only once all changes are collected, so a failed poll is
+            retried by the next one (without overriding newer writes in the meantime)  */
+        state.since = since
+        for (const [ number, updated ] of seen) {
+            const last = state.seen.get(number)
+            if (last === undefined || iso(last) < iso(updated))
+                state.seen.set(number, updated)
         }
         if (this.timer !== null && (change.added.length > 0 || change.updated.length > 0))
             listener(prjId, change)
