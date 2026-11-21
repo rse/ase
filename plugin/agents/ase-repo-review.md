@@ -12,12 +12,13 @@ Your objective is to *reconstruct the change's intent* and *critique the
 diff as a whole* against a fixed set of reviewer dimensions, producing
 *prioritized*, *severity-tagged*, *line-cited* findings.
 
-The prompt gives the *scope* (`staged`, `unstaged`, `staged and
-unstaged`, `branch <branch/> since base commit <base-commit/>`
-optionally followed by `plus the <changes/> changes in worktree
-<worktree-dir/>`, where <changes/> is one of `staged`, `unstaged`, or
-`staged and unstaged`, or `commit <commit-id/>`) and the reporting
-*mode* (`focused` or `thorough`) of the review.
+The prompt gives the *scope* (`staged`, `unstaged`, or `staged and
+unstaged`, each optionally followed by `in worktree <worktree-dir/>`,
+`branch <branch/> since base commit <base-commit/>` optionally followed
+by `plus the <changes/> changes in worktree <worktree-dir/>`, where
+<changes/> is one of `staged`, `unstaged`, or `staged and unstaged`, or
+`commit <commit-id/>`) and the reporting *mode* (`focused` or
+`thorough`) of the review.
 
 Workflow
 --------
@@ -51,6 +52,12 @@ Workflow
         `git diff HEAD`
 
         `git ls-files --others --exclude-standard`
+
+    -   For a `staged`, `unstaged`, or `staged and unstaged` scope
+        followed by `in worktree <worktree-dir/>`, run the commands of
+        that scope above with `git -C "<worktree-dir/>"` instead of
+        `git` (e.g. `git -C "<worktree-dir/>" diff --cached HEAD`), as
+        the changes are located in that worktree.
 
     -   For the `branch` scope, capture the commits of the branch since
         its base commit:

@@ -7,10 +7,12 @@
 
 `ase-repo-review`
     [`--help`|`-h`]
+    [`--auto`|`-a`]
     [`--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`)]
     [`--thorough`|`-t`]
     [`--staged`]
     [`--unstaged`]
+    [`--worktree`|`-w` *name*]
     [`--branch`|`-b` *branch*]
     [`--commit`|`-c` *commit*]
 
@@ -70,6 +72,18 @@ before it is committed or merged.
 
 ##  OPTIONS
 
+-   `--auto`|`-a`:
+    Automatically *fix* the rendered findings (except the `ACCEPTED`
+    ones) after the review, with a minimal correction per finding
+    applied to the reviewed files on disk, but neither staged nor
+    committed. A finding which demands a human decision (e.g. a
+    questioned intent) is skipped. A closing *REVIEW FIXES* table lists
+    every finding with its outcome (`APPLIED`, `SKIPPED`, or `FAILED`),
+    while the verdict stays the one of the reviewed state. Requires the
+    reviewed state on disk, i.e., not with `--commit`, and with
+    `--branch` only together with `--staged` or `--unstaged` of the
+    worktree where the *branch* is checked out.
+
 -   `--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`):
     Set the *severity floor* (default `AUTO`): findings below the chosen
     threshold are suppressed, ordered `LOW` < `MEDIUM` < `HIGH`. The
@@ -105,6 +119,13 @@ before it is committed or merged.
     changes and untracked files of the worktree where the *branch* is
     checked out.
 
+-   `--worktree`|`-w` *name*:
+    Review the *staged* resp. *unstaged* changes of the existing ASE
+    worktree `.ase/worktree/`*name* instead of those of the current
+    working copy. A missing worktree aborts the skill with an error.
+    This option cannot be combined with `--branch` (which locates the
+    worktree of its branch itself) or `--commit`.
+
 -   `--branch`|`-b` *branch*:
     Review the commits of *branch* (any Git revision) since its fork
     point from its *base*, instead of the *staged* changes. The base is
@@ -137,6 +158,7 @@ single commit.
 -   You want an exhaustive review of all uncommitted changes
 -   You want a feature branch reviewed before merging it
 -   You want a single, already committed change reviewed
+-   You want the findings of a review fixed automatically
 
 ##  EXAMPLES
 
@@ -169,6 +191,13 @@ changes of its worktree:
 
 ```text
 ❯ /ase-repo-review -b feature --staged --unstaged
+```
+
+Review all uncommitted changes of the ASE worktree `feature` and fix
+the findings automatically:
+
+```text
+❯ /ase-repo-review --auto --staged --unstaged -w feature
 ```
 
 Review the last commit:

@@ -1,12 +1,13 @@
 ---
 name: ase-repo-review
-argument-hint: "[--help|-h] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--thorough|-t] [--staged] [--unstaged] [--branch|-b <branch>] [--commit|-c <commit>]"
+argument-hint: "[--help|-h] [--auto|-a] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--thorough|-t] [--staged] [--unstaged] [--worktree|-w <name>] [--branch|-b <branch>] [--commit|-c <commit>]"
 description: >
     Perform a holistic, human-reviewer-style critique of the currently
     staged Git changes (or, with `--unstaged`, of the unstaged and
     untracked changes, with `--branch`, of a branch against its base,
     or, with `--commit`, of a single commit) and emit an approve/reject verdict
-    with prioritized, severity-tagged, line-cited findings. Use when the
+    with prioritized, severity-tagged, line-cited findings (with `--auto`
+    fixed automatically). Use when the
     user wants the staged diff, a branch, or a commit "reviewed",
     "critiqued", or "code-reviewed".
 user-invocable: true
@@ -36,7 +37,7 @@ Review Changes
 
 <expand name="getopt"
     arg1="ase-repo-review"
-    arg2="--severity|-S=(AUTO|LOW|MEDIUM|HIGH) --thorough|-t --staged --unstaged --branch|-b= --commit|-c=">
+    arg2="--auto|-a --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --thorough|-t --staged --unstaged --worktree|-w= --branch|-b= --commit|-c=">
     $ARGUMENTS
 </expand>
 
@@ -67,6 +68,32 @@ Procedure
         ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: option `--commit` cannot be combined with `--branch`, `--staged`, or `--unstaged`
         </template>
         </if>
+
+        <if condition="<getopt-option-worktree/> is not empty and (<getopt-option-branch/> is not empty or <getopt-option-commit/> is not empty)">
+        Only output the following <template/> and then *STOP* immediately:
+
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: option `--worktree` cannot be combined with `--branch` or `--commit`
+        </template>
+        </if>
+
+        Set <worktree-dir></worktree-dir> (empty). If
+        <getopt-option-worktree/> is not empty, determine the directory
+        of this existing ASE worktree: if <getopt-option-worktree/>
+        consists of other characters than `A-Z`, `a-z`, `0-9`, `_`, and
+        `-`, keep <worktree-dir/> empty, else call the
+        `ase_worktree_path(id: "<getopt-option-worktree/>", create: false)`
+        tool of the `ase` MCP server (you *MUST* *NEVER* assemble this
+        path yourself), capture its result into <worktree-dir/>, and run
+        the command `git -C "<worktree-dir/>" rev-parse --show-toplevel`
+        (taken exactly as given). If <worktree-dir/> is empty, the tool
+        call failed, or the command failed (i.e., the worktree does not
+        exist), only output the following <template/> and then *STOP*
+        immediately:
+
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: no worktree **<getopt-option-worktree/>** to review
+        </template>
 
         Set <changes/> to the *uncommitted* changes to review: to
         `staged and unstaged` if both <getopt-option-staged/> and
@@ -184,6 +211,16 @@ Procedure
 
         `git show --format= --name-only --diff-merges=first-parent "<commit-id/>"`
         </elseif>
+        <elseif condition="<worktree-dir/> is not empty">
+        Set <scope/> and run the command(s) exactly like for the
+        uncommitted changes of the current working copy below (by
+        <changes/>, i.e. `staged` if it is empty), but with each command
+        prefixed by `git -C "<worktree-dir/>"` instead of `git`, and with
+        ` in worktree <worktree-dir/>` appended to <scope/> (e.g.
+        <scope>unstaged in worktree <worktree-dir/></scope> and the
+        commands `git -C "<worktree-dir/>" diff --name-only` and
+        `git -C "<worktree-dir/>" ls-files --others --exclude-standard`).
+        </elseif>
         <elseif condition="<changes/> is equal `staged and unstaged`">
         Set <scope>staged and unstaged</scope> and run:
 
@@ -217,6 +254,16 @@ Procedure
 
         <template>
         ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ status: **no changes to review**
+        </template>
+        </if>
+
+    5.  <if condition="<getopt-option-auto/> is equal `true` and (<getopt-option-commit/> is not empty or (<getopt-option-branch/> is not empty and (<worktree-dir/> is empty or <changes/> is empty)))">
+        The automatic fixing edits the reviewed files on disk, so it
+        requires the reviewed state to *be* on disk. Only output the
+        following <template/> and then *STOP* immediately:
+
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: option `--auto` requires uncommitted changes on disk (not `--commit`, and `--branch` only with `--staged`/`--unstaged` of its checked out worktree)
         </template>
         </if>
 
@@ -376,21 +423,66 @@ Procedure
         </template>
         </if>
 
-    5.  Finally, give the closing hints by expanding the following
+    5.  <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
+        *Automatically fix* the rendered findings: for each finding of
+        <findings/> of a `severity` other than `ACCEPTED`, in the
+        rendered order, read the cited file of its `location` (a
+        relative file resolved against <worktree-dir/> if this is not
+        empty, else against the output of the command
+        `git rev-parse --show-toplevel`) and the code around the cited
+        lines, and apply a *minimal*, *focused* correction which
+        resolves exactly this finding via the `Edit` tool (resp. the
+        `Write` tool for a file to be created), without any unrelated
+        change, and without staging or committing anything. Record the
+        outcome of each finding: `APPLIED` if the correction was applied,
+        `FAILED` if an `Edit` or `Write` reported an error, or `SKIPPED`
+        if the finding cannot be resolved by a local correction (e.g. a
+        questioned intent or a design decision demanding a human), in
+        which case nothing is changed for it.
+
+        As the fixing is interleaved with the tool calls (and a headless
+        run shows only the final reply text), recap the outcomes with
+        the following <template/>, emitted *after* the last tool call:
+
+        <template>
+        <ase-tpl-bullet-secondary/> **REVIEW FIXES**:
+
+        | *#* | *Severity* | *Location* | *Summary* | *Status* |
+        | --: | ---------- | ---------- | --------- | -------- |
+        <rows/>
+        </template>
+
+        Hints:
+
+        -   <rows/> has one row `| <index/> | **<severity/>** | <location/> | <summary/> | **<status/>** |` per fixed finding, in order
+        -   <location/> is the `location` of the finding, marked up as code (with backticks)
+        -   <summary/> is a one-line summary of the `finding` text, at most 60 characters long, with every `|` escaped as `\|`
+
+        The <verdict/> above stays the verdict of the *reviewed* state,
+        i.e., before the fixing.
+        </if>
+
+    6.  Finally, give the closing hints by expanding the following
         (which, depending on the configured <ase-guidance-level/>, may
         expand into nothing and hence emit no output at all):
 
-        <if condition="<verdict/> starts with `REJECT`">
+        <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
+        <ase-tpl-hint level="normal">
+        The fixes are applied, but not staged -- review them, and re-run the review to verify them.
+        </ase-tpl-hint>
+        </if>
+        <elseif condition="<verdict/> starts with `REJECT`">
         <ase-tpl-hint level="normal">
         Use `/ase-task-edit` to derive a solution approach and plan for the findings which demand changes.
         </ase-tpl-hint>
-        </if>
+        </elseif>
 
         <if condition="<hidden/> is greater than `0`">
         Set <rerun>/ase-repo-review -S LOW</rerun>, append ` --staged`
         to <rerun/> if <getopt-option-staged/> is equal `true`, append
         ` --unstaged` to <rerun/> if <getopt-option-unstaged/> is equal
-        `true`, append
+        `true`, append ` -w <getopt-option-worktree/>` to <rerun/> if
+        <getopt-option-worktree/> is not empty, append
         ` -b <getopt-option-branch/>` to <rerun/> if
         <getopt-option-branch/> is not empty, append
         ` -c <getopt-option-commit/>` to <rerun/> if
