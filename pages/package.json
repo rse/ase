@@ -28,14 +28,14 @@
         "@astro-community/astro-embed-youtube":   "0.5.10",
         "astro-robots-txt":                       "1.0.0",
         "astro-swiper":                           "2.11.0",
-        "@lucide/astro":                          "1.75.0",
+        "@lucide/astro":                          "1.77.0",
         "tailwindcss":                            "4.3.5",
         "@tailwindcss/vite":                      "4.3.5",
         "typopro-web":                            "4.2.9",
         "marked":                                 "18.2.1",
         "dice-coefficient":                       "2.1.1",
         "fast-levenshtein":                       "3.0.0",
-        "@videojs/html":                          "10.5.0",
+        "@videojs/html":                          "10.6.0",
         "typed.js":                               "3.0.0"
     },
     "engines": {

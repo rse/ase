@@ -17,7 +17,7 @@
         "@rse/stx":                         "1.1.7",
         "@rse/specbook":                    "1.6.3",
         "markdownlint":                     "0.42.2",
-        "markdownlint-cli2":                "0.24.1",
+        "markdownlint-cli2":                "0.24.2",
         "eslint":                           "10.15.0",
         "@eslint/markdown":                 "9.0.0",
         "eslint-markdown":                  "0.23.0",
