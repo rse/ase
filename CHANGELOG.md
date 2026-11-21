@@ -54,6 +54,10 @@ ChangeLog
     The `session-start` hook keeps the task id set earlier in the session on a `compact` or `resume`
     source, instead of resetting it to `$ASE_TASK_ID` resp. `default`.
 
+-   BUGFIX [code]: No Transfers into Unreachable States in the TUI Task Board
+    RETURN in the transfer popup ignores a state no longer reachable after a concurrent status change,
+    like a mouse click does, so it can no longer bypass the lifecycle model.
+
 -   IMPROVEMENT [docs]: Option Alias Example `--well-done`
     The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
     `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.

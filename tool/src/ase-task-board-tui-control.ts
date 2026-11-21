@@ -446,7 +446,7 @@ const handlePopupKey = (ctx: BoardCtx, input: string, key: Key): void => {
                     break
                 }
         }
-        else if (key.return)
+        else if (key.return && transferList.find((e) => e.status === transfer.at)?.ok)
             transferTo(transfer.id, transfer.at)
         else if (key.escape) {
             setNotice(`transferring task "${transfer.id}" cancelled`)
