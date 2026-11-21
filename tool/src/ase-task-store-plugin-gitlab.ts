@@ -530,8 +530,8 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
 
     /*  load a live issue together with its blocking issues and notes (the issue and
         its notes in parallel), reusing a load of the last 2 seconds (dropped on any
-        own write or detected change of the issue), as e.g. the boards load the plan
-        and its attachments in separate operations  */
+        own write, revision determination, or detected change of the issue), as e.g. the
+        boards load the plan and its attachments in separate operations  */
     private load (prjId: string, path: string, n: number): Promise<{ issue: Issue, after: Link[], notes: Note[] } | null> {
         return TaskIssues.memoize(this.loads, `${prjId}#${n}`, async () => {
             const [ issue, notes ] = await Promise.all([
@@ -567,10 +567,14 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
         }
     }
 
-    /*  the revision of a task plan: the update time of its live issue  */
+    /*  the revision of a task plan: the update time of its live issue, dropping its
+        cached load, so a subsequent load is never older than this revision  */
     async taskRevision (prjId: string, taskId: string): Promise<string | null> {
         const { path, scheme } = await this.context(prjId)
-        return (await this.fetch(path, numberOf(scheme, taskId)))?.updated_at ?? null
+        const number   = numberOf(scheme, taskId)
+        const revision = (await this.fetch(path, number))?.updated_at ?? null
+        this.loads.delete(`${prjId}#${number}`)
+        return revision
     }
 
     /*  create or update the issue of a task plan: all references are resolved

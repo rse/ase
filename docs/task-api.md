@@ -1668,9 +1668,9 @@ export interface TaskStoragePlugin {
     taskLoad (prjId: string, taskId: string): Promise<TaskPlan | null>
 
     /*  optionally determine the current revision of a task plan (an opaque token,
-        changing on every change of the plan, also one made outside of the plugin
-        instance), or null if it does not exist, so a storage without locks and
-        conditional writes (e.g. an issue tracker) can detect concurrent changes  */
+        changing on every change, also outside of the plugin instance), or null if
+        none, so a storage without locks and conditional writes (e.g. an issue tracker)
+        detects concurrent changes, where a later "taskLoad" never yields an older plan  */
     taskRevision? (prjId: string, taskId: string): Promise<string | null>
 
     /*  create or overwrite a task plan with the given (already validated)

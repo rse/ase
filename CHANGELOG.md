@@ -83,6 +83,11 @@ ChangeLog
     The `--followup-*` options collect their values into the command actually parsing them, so
     `ase agent <kind> restart` no longer silently drops them and restarts the agent without them.
 
+-   BUGFIX [code, docs]: No Overwrite of Concurrent Issue Changes via Stale Cached Loads
+    The `github`, `gitlab`, and `gitea` task store plugins drop the cached load of an issue when
+    determining its revision, so a conditional save or a part endpoint retry no longer pairs the
+    fresh revision with a stale plan and silently overwrites a concurrent external change.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.

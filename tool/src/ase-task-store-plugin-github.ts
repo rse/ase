@@ -544,8 +544,8 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
 
     /*  load a live issue together with its blocking issues and comments (the issue and
         its comments in parallel), reusing a load of the last 2 seconds (dropped on any
-        own write or detected change of the issue), as e.g. the boards load the plan
-        and its attachments in separate operations  */
+        own write, revision determination, or detected change of the issue), as e.g. the
+        boards load the plan and its attachments in separate operations  */
     private load (prjId: string, loc: Repo, n: number): Promise<{ issue: Issue, after: Issue[], comments: Comment[] } | null> {
         return TaskIssues.memoize(this.loads, `${prjId}#${n}`, async () => {
             const [ issue, comments ] = await Promise.all([
@@ -581,10 +581,14 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
         }
     }
 
-    /*  the revision of a task plan: the update time of its live issue  */
+    /*  the revision of a task plan: the update time of its live issue, dropping its
+        cached load, so a subsequent load is never older than this revision  */
     async taskRevision (prjId: string, taskId: string): Promise<string | null> {
         const { loc, scheme } = await this.context(prjId)
-        return (await this.fetch(loc, numberOf(scheme, taskId)))?.updated_at ?? null
+        const number   = numberOf(scheme, taskId)
+        const revision = (await this.fetch(loc, number))?.updated_at ?? null
+        this.loads.delete(`${prjId}#${number}`)
+        return revision
     }
 
     /*  create or update the issue of a task plan: all references are resolved
