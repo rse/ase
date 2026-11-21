@@ -110,9 +110,10 @@ Procedure
 
 3.  <step id="STEP 3: Generate or Update Artifacts">
 
-    1.  For all kinds in <target/> except `TASK`, call the
+    1.  For all kinds in <target/> except `TASK`, if any, call the
         `ase_artifact_list(kind: [ ... ])` tool of the `ase` MCP server
-        *once*, passing the lower-cased `kind` tokens, and read the
+        *once*, passing the lower-cased `kind` tokens (*never* an empty
+        list, as this resolves *all* kinds), and read the
         returned `artifacts` array of `{ kind, files }` objects to
         obtain the project-relative file list per kind. The `TASK` kind
         is *not* resolvable via `ase_artifact_list` (task plans are

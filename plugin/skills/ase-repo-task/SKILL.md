@@ -294,8 +294,14 @@ plan exclusively via the `ase_task_save` MCP tool.
             *related* files needed to comprehend the change: callers,
             implemented interfaces and contracts, registries, catalogs,
             and documentation. If <revision/> is empty, use the `Read`
-            tool for the resulting form; otherwise read every file at
-            <revision/> via the command `git show "<revision/>:<path/>"`.
+            tool for the resulting form (below <worktree-dir/> in the
+            worktree cases), except when *only* staged changes are
+            derived (<changes/> is `staged` or empty), whose resulting
+            form is the index version, read via the command
+            `git show ":<path/>"` (resp. via the command
+            `git -C "<worktree-dir/>" show ":<path/>"` in the worktree
+            case); otherwise read every file at <revision/> via the
+            command `git show "<revision/>:<path/>"`.
             Do *not* read binary, generated, or build output files.
 
         -   Read the project's documented conventions (`AGENTS.md` or

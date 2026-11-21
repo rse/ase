@@ -140,7 +140,9 @@ related to a set of code quality aspects.
     *ASE*'s own state) and every path which is not a source code file
     (e.g. a binary file), and prefix every remaining path with
     `<repo-root/>/`. If `<getopt-arguments/>` is not empty, keep only
-    those files which lie within the source code referenced by it,
+    those files which lie within the source code referenced by it (with
+    relative references resolved against <work-dir/> if this is not
+    empty),
     expanding any directory or wildcard references with the `Glob`
     tool (or, if the `Glob` tool is not available, with the `find`
     command via the `Bash` tool). Set <sources/> to the resulting list

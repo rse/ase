@@ -175,9 +175,10 @@ than the user asked for.
     its `new_text` against its `old_text` and *drop* the block from
     <blocks/> whenever a fact, number, technical term, qualifier, or
     negation which *survives* into its `new_text` was altered, whenever
-    its `new_text` states something its `old_text` did not, or whenever
-    a fenced code block, an inline code span, a link target, or a
-    heading was touched.
+    its `new_text` states something its `old_text` did not, whenever
+    the order of the surviving argument changed, or whenever a fenced
+    code block, an inline code span, a link target, the Markdown
+    frontmatter, or a heading was touched.
 
     You *MUST* *NOT* output anything at all in this STEP 2 beyond the
     above hint template and the `Agent` tool invocation.

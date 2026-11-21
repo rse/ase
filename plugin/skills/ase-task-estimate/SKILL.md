@@ -72,8 +72,8 @@ anything.
     to the estimated number of changed lines, sizing new files after
     comparable existing ones and changes after the code they touch, and
     <new-lines/> to the part of <lines/> in newly created files. Set
-    <minutes-volume/> to <files/> times <file-minutes/> plus <lines/>
-    plus twice <new-lines/> times <line-minutes/>, so a newly written
+    <minutes-volume/> to (<files/> × <file-minutes/>) + ((<lines/> + 2
+    × <new-lines/>) × <line-minutes/>), so a newly written
     line weighs *three* times a changed one. As a plan describes the
     straightforward path only, while the edge cases, the error
     handling, and the polishing of the realization regularly multiply

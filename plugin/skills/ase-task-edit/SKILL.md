@@ -406,58 +406,23 @@ Set <args></args> (set args to empty).
 
         1.  <if condition="
                 <issue-id/> is empty and
-                <getopt-task/> is not empty and
-                <instruction/> is empty
+                <getopt-task/> is not empty
             ">
             Set <ase-task-id><getopt-task/></ase-task-id> (set task id
-            to the split-off task id), call the `ase_task_id(id:
+            to the split-off task id) and <task-origin>task
+            given</task-origin>, and call the `ase_task_id(id:
             "<ase-task-id/>", session: "<ase-session-id/>")` tool from
-            the `ase` MCP server to switch the task, and then only
-            output the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-            </template>
+            the `ase` MCP server to switch the task. Do not output
+            anything.
             </if>
 
-        2.  <elseif condition="
-                <issue-id/> is empty and
-                <getopt-task/> is not empty and
-                <instruction/> is not empty
-            ">
-            Set <ase-task-id><getopt-task/></ase-task-id> (set task id
-            to the split-off task id), call the `ase_task_id(id:
-            "<ase-task-id/>", session: "<ase-session-id/>")` tool from
-            the `ase` MCP server to switch the task, and then only
-            output the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task given**
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
-            </template>
-            </elseif>
-
-        3.  <elseif condition="
-                <instruction/> is not empty
-            ">
-            Only output the following <template/>, where <task-origin/>
-            is `task given` if step 1.2 switched the task:
+        2.  Only output the following <template/>, omitting its second
+            line if <instruction/> is empty:
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **<task-origin/>**
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
             </template>
-            </elseif>
-
-        4.  <elseif condition="
-                <instruction/> is empty
-            ">
-            Only output the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **task inherited**
-            </template>
-            </elseif>
 
 2.  **Determine Plan:**
 

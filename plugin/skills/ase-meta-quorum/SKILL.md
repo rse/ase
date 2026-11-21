@@ -201,45 +201,13 @@ by querying *multiple* AIs for an *optimal consensus*.
 
     **CONSENSUS RATE**: **<c/>/<n/>** <disagreement/>
 
-    &#x25CB; **Anthropic Claude**:
+    &#x25CB; **<ai/>**:
     - [...]
     - [...]
 
-    &#x25CB; **OpenAI ChatGPT**:
-    - [...]
-    - [...]
-
-    &#x25CB; **Google Gemini**:
-    - [...]
-    - [...]
-
-    &#x25CB; **DeepSeek**:
-    - [...]
-    - [...]
-
-    &#x25CB; **xAI Grok**:
-    - [...]
-    - [...]
-
-    &#x25CB; **Z.AI GLM**:
-    - [...]
-    - [...]
-
-    &#x25CB; **Alibaba Qwen**:
-    - [...]
-    - [...]
-
-    &#x25CB; **Anthropic Claude (harness)**:
-    - [...]
-    - [...]
-
-    &#x25CB; **OpenAI Codex**:
-    - [...]
-    - [...]
-
-    &#x25CB; **GitHub Copilot**:
-    - [...]
-    - [...]
+    [...one such section per responding AI <ai/>, in the order: Anthropic
+    Claude, OpenAI ChatGPT, Google Gemini, DeepSeek, xAI Grok, Z.AI GLM,
+    Alibaba Qwen, Anthropic Claude (harness), OpenAI Codex, GitHub Copilot...]
     </template>
 
     In this output, when a quorum was *not* possible (see STEP 4),

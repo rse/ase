@@ -148,7 +148,6 @@ catalog you match <intent/> against:
         <expand name="custom-dialog" arg1="--other">
             Dispatch: What would you like to do with the unmatched intent?
             REFINE: Refine or clarify the intent.
-            CANCEL: Cancel this dialog.
         </expand>
         </if>
         <else>
@@ -156,7 +155,6 @@ catalog you match <intent/> against:
             Dispatch: Which of the proposed commands would you like to execute?
             C1: Execute: `<command1/>`
             [...]
-            CANCEL: Cancel this dialog.
         </expand>
 
         The `[...]` line stands for one further answer line
