@@ -25,6 +25,10 @@ ChangeLog
     The skill creates entries just for the staged resp. unstaged and untracked changes (with both,
     for all uncommitted ones), skipping the scan of the Git commits since the last released tag.
 
+-   IMPROVEMENT [code, docs]: Option `--file` for `ase-repo-changelog`
+    The skill operates on an explicitly given ChangeLog file instead of the nearest `CHANGELOG.md`
+    up the directory tree, e.g. on the `CHANGELOG.md` of a sub-project in a monorepo.
+
 -   IMPROVEMENT [docs]: Option Alias Example `--well-done`
     The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
     `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.

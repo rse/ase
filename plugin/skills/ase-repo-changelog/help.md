@@ -9,6 +9,7 @@
     [`--help`|`-h`]
     [`--staged`|`-s`]
     [`--unstaged`|`-u`]
+    [`--file`|`-f` *path*]
 
 ##  DESCRIPTION
 
@@ -16,6 +17,11 @@ The `ase-repo-changelog` skill helps to *complete*, *consolidate*, and
 *sort* the entries of the most recent section of a `CHANGELOG.md`
 file, based on the underlying *Git* commits and the currently staged
 changes in the Git *index*.
+
+By default, the skill operates on the nearest `CHANGELOG.md` file in
+the current directory or one of its parent directories. With `--file`,
+it operates on an explicitly given file instead, e.g. on the
+`CHANGELOG.md` of a sub-project in a monorepo.
 
 With `--staged` and/or `--unstaged`, the skill instead creates entries
 just for the current, *uncommitted* change set: it skips the scan of
@@ -60,12 +66,20 @@ with a selection of changes.
     changes. Combined with `--staged`, create entries for *all*
     uncommitted changes.
 
+-   `--file`|`-f` *path*:
+    Operate on the given *ChangeLog* file *path* (relative to the
+    current directory) instead of the nearest `CHANGELOG.md` in the
+    current directory or one of its parent directories, e.g. on the
+    `CHANGELOG.md` of a sub-project like `tool/` or `pages/` in a
+    monorepo.
+
 ##  SCENARIOS
 
 -   You want the `CHANGELOG.md` brought up to date with recent commits
 -   You want changelog entries completed, consolidated, and sorted
 -   You want a tidy changelog section before a release
 -   You want an entry just for the staged changes before committing them
+-   You want the changelog of a particular sub-project of a monorepo updated
 
 ##  EXAMPLES
 
@@ -85,6 +99,12 @@ Create entries for all uncommitted changes:
 
 ```text
 ❯ /ase-repo-changelog -s -u
+```
+
+Create entries for the staged changes in the ChangeLog of a sub-project:
+
+```text
+❯ /ase-repo-changelog --staged --file tool/CHANGELOG.md
 ```
 
 ##  SEE ALSO

@@ -1,6 +1,6 @@
 ---
 name: ase-repo-changelog
-argument-hint: "[--help|-h] [--staged|-s] [--unstaged|-u]"
+argument-hint: "[--help|-h] [--staged|-s] [--unstaged|-u] [--file|-f <path>]"
 description: >
     Update ChangeLog entries in CHANGELOG.md files, optionally just for the
     staged and/or unstaged changes. Use when the user wants to
@@ -31,7 +31,7 @@ Update ChangeLog Entries
 
 <expand name="getopt"
     arg1="ase-repo-changelog"
-    arg2="--staged|-s --unstaged|-u">
+    arg2="--staged|-s --unstaged|-u --file|-f=">
     $ARGUMENTS
 </expand>
 
@@ -95,6 +95,21 @@ Processing
 
 1.  <step id="STEP 1: Locate and read ChangeLog entries">
 
+    <if condition="<getopt-option-file/> is not empty">
+    The *ChangeLog* file is explicitly given as <getopt-option-file/>,
+    relative to the current directory. Read this file and store
+    <getopt-option-file/> in <filename/>.
+
+    <if condition="this file cannot be read">
+    Only output the following <template/> and then immediately *STOP*
+    processing the entire current skill:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-repo-changelog**, ▶ ERROR: ChangeLog file **<getopt-option-file/>** not found
+    </template>
+    </if>
+    </if>
+    <else>
     The *ChangeLog* file `CHANGELOG.md` is located in the *current*
     directory or one of the *parent* directories of the current project.
     Locate and read this file. Store its relative path in <filename/>.
@@ -107,6 +122,7 @@ Processing
     ⧉ **ASE**: ✪ skill: **ase-repo-changelog**, ▶ ERROR: no `CHANGELOG.md` file found
     </template>
     </if>
+    </else>
 
     Then determine the *release state* of the *first* (most recent)
     level-2 section: take its `N.M.K` and check whether a corresponding
@@ -208,7 +224,7 @@ Processing
     If the second level-2 header has no corresponding Git tag either,
     use the commit which introduced the `N.M.K` of the *first* level-2
     header instead, determined with the command
-    `git log -1 --format=%h -S 'N.M.K (' -- <filename/>`, and check all
+    `git log -1 --format=%h -S 'N.M.K (' -- "<filename/>"`, and check all
     Git commits from it on with the command
     `git log <commit/>^..HEAD --numstat --pretty=format:'%h: %s'`.
 
