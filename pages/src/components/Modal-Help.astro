@@ -330,6 +330,7 @@ orderedDocs.push(...cliDocs)
                 leaves search mode first.  */
             if (helpPane.classList.contains("searching")) {
                 if (!target.classList.contains("hidden")) {
+                    restore = id
                     markActive(id)
                     target.scrollIntoView({ block: "start" })
                     return

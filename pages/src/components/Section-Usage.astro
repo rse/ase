@@ -32,7 +32,7 @@ const columns = [
     [ "DOCS", "SPEC", "CODE" ],
     [ "REPO", "SYNC", "TASK: MANAGE" ],
     [ "TASK: HANDLE", "TASK: EDIT", "TASK: EXECUTE" ]
-].map((labels) => labels.map((label) => skillPrefixGroups.find((group) => group.label === label)!))
+].map((labels) => labels.flatMap((label) => skillPrefixGroups.filter((group) => group.label === label)))
 const placed = new Set(columns.flat())
 columns[columns.length - 1].push(...skillPrefixGroups.filter((group) => !placed.has(group)))
 ---

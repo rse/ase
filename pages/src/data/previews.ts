@@ -16,9 +16,7 @@
     so the order below is also the visual top-to-bottom order on the page.
 
     Each entry also carries the Lucide icon `Widget-Video-Row.astro` renders
-    in front of the headline. Where the showcased skill has an icon elsewhere on
-    the page -- in the methodology strip --
-    the very same icon is reused, so one skill reads as one symbol throughout.  */
+    in front of the headline, partly reusing the icons of the methodology strip.  */
 
 import type { AstroComponent } from "@lucide/astro"
 import VenetianMask            from "@lucide/astro/icons/venetian-mask"
