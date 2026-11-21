@@ -17,6 +17,10 @@ ChangeLog
     `ase-mods-task-edit` skips the word emphasis of the last-change diff if more than 1,000,000
     word pairs would have to be compared, so very large task changes no longer stall the band.
 
+-   IMPROVEMENT [code, docs]: New ChangeLog Section after Release in `ase-repo-changelog`
+    The skill detects upfront a most recent section already released via a Git tag `N.M.K` resp.
+    `vN.M.K`, leaves it untouched, and inserts a new section for the next patch version instead.
+
 -   BUGFIX [code]: Various Skill Corrections
     `ase-repo-dissect` diffs against `HEAD`, `ase-sync-reconcile` loads `TASK` via the task tools,
     `ase-task-implement` and `ase-task-dissect` keep their merge base resp. part ids, and

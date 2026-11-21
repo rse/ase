@@ -33,8 +33,9 @@ Update ChangeLog Entries
 
 <objective>
 Help to complete, consolidate and sort *ChangeLog* entries of the most
-recent *ChangeLog* section, based on underlying *Git* commits and staged
-changes.
+recent, still unreleased *ChangeLog* section (created anew if the most
+recent one is already released), based on underlying *Git* commits and
+staged changes.
 </objective>
 
 Format
@@ -102,12 +103,34 @@ Processing
     </template>
     </if>
 
+    Then determine the *release state* of the *first* (most recent)
+    level-2 section: take its `N.M.K` and check whether a corresponding
+    Git tag already exists with the command `git tag --list N.M.K vN.M.K`.
+
+    <if condition="this command produces output">
+    The first section is already *released*: it *MUST* *NOT* be
+    modified at all. Store the output tag name in <baseline/>, and
+    store the next patch version (`N.M.K` with `K` incremented by one)
+    in <version/>. A *new*, still-unreleased level-2 section for
+    <version/>, with the current date and in the header style of the
+    existing sections, has to be inserted *above* the released one, and
+    becomes the *current section* all subsequent steps operate on.
+    </if>
+    <else>
+    The first section is still *unreleased*: store its `N.M.K` in
+    <version/> and leave <baseline/> empty. This first section is the
+    *current section* all subsequent steps operate on.
+    </else>
+
     You *MUST* *NOT* output anything, except the result with the
     following <template/>:
 
     <template>
-    ⧉ **ASE**: **CHANGELOG FILE:** `<filename/>`
+    ⧉ **ASE**: **CHANGELOG FILE:** `<filename/>`, **SECTION:** `<version/>` (<state/>)
     </template>
+
+    ...where <state/> is `new, as <baseline/> is already released` for
+    a new section, or `unreleased` otherwise.
 
     </step>
 
@@ -120,32 +143,30 @@ Processing
     ⧉ **ASE**: **DETERMINE ARTIFACT CHANGES:**
     </template>
 
-    To update the entries of the most recent *ChangeLog* section, consult
-    the Git *commits* plus the currently already staged changes in the Git
+    To update the entries of the current section, consult the Git
+    *commits* plus the currently already staged changes in the Git
     *index*, but *ignore* the Git *stash* and still unstaged changes.
 
     For finding the corresponding Git *commits*, first determine the
-    correct baseline Git tag. Take the `N.M.K` from the *first* (most
-    recent) level-2 header in the *ChangeLog* file and check whether a
-    corresponding Git tag already exists with the command `git tag --list
-    N.M.K`. If this command *does* produce output, the first section is
-    already released/tagged, so use the `N.M.K` from the *first* level-2
-    header as the baseline tag and *insert* a new, still-unreleased
-    level-2 section (next patch version, current date) *above* it, which
-    then becomes the *first* (most recent) section all subsequent steps
-    operate on - the already released section *MUST* *NOT* be modified.
-    If this command produces *no* output, the first section is still
-    in-progress/untagged, so use the `N.M.K` from the *second* level-2
-    header as the baseline tag instead. Then check all Git commits
-    between `HEAD` and this baseline tag with the command
-    `git log N.M.K..HEAD --numstat --pretty=format:'%h: %s'`. If *no*
-    second level-2 header exists (very first, still untagged release),
-    skip the baseline tag and check *all* Git commits with the command
-    `git log HEAD --numstat --pretty=format:'%h: %s'` instead.
-    If the `N.M.K` of the *second* level-2 header has no corresponding
-    Git tag either (i.e. `git tag --list N.M.K` produces no output for
-    it), use the commit which introduced the `N.M.K` of the *first*
-    level-2 header instead, determined with the command
+    correct baseline Git tag:
+
+    -   If <baseline/> is not empty (new section), use it as the
+        baseline tag.
+
+    -   Otherwise (unreleased first section), take the `N.M.K` from the
+        *second* level-2 header and check for its Git tag with the
+        command `git tag --list N.M.K vN.M.K`, and use the output tag
+        name as the baseline tag.
+
+    Then check all Git commits between `HEAD` and this baseline tag with
+    the command `git log <baseline/>..HEAD --numstat --pretty=format:'%h: %s'`.
+
+    If *no* second level-2 header exists (very first, still untagged
+    release), skip the baseline tag and check *all* Git commits with the
+    command `git log HEAD --numstat --pretty=format:'%h: %s'` instead.
+    If the second level-2 header has no corresponding Git tag either,
+    use the commit which introduced the `N.M.K` of the *first* level-2
+    header instead, determined with the command
     `git log -1 --format=%h -S 'N.M.K (' -- <filename/>`, and check all
     Git commits from it on with the command
     `git log <commit/>^..HEAD --numstat --pretty=format:'%h: %s'`.
@@ -156,6 +177,16 @@ Processing
     still no corresponding *ChangeLog* entry exists for these staged
     Git *changes*, derive a meaningful one from a `git diff --cached`
     command.
+
+    <if condition="<baseline/> is not empty, and there are neither Git commits nor staged changes">
+    Do not insert an empty new section. Only output the following
+    <template/> and then immediately *STOP* processing the entire
+    current skill:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-repo-changelog**, ▶ NOTICE: no changes since released `<baseline/>`
+    </template>
+    </if>
 
     </step>
 
@@ -169,7 +200,7 @@ Processing
     </template>
 
     Without immediately modifying the `CHANGELOG.md` file, *complete*
-    the entries in the first (most recent) section only, by adding the
+    the entries in the current section only, by adding the
     corresponding (most recent) Git *commits* and *staged* changes only.
 
     For each Git commit, reduce the Git commit messages to an entry in
@@ -205,13 +236,13 @@ Processing
     </template>
 
     Without immediately modifying the `CHANGELOG.md` file, *consolidate*
-    the entries in the first (most recent) section only, by summarizing
+    the entries in the current section only, by summarizing
     and merging closely related entries. Perform the entry consolidation
     per <change-type/> group only. Also condense any entry of this
     section, which exceeds about *5 lines*, by compressing its wording.
 
     Without immediately modifying the `CHANGELOG.md` file, *sort* the
-    entries in the first (most recent) section only. Instead of the
+    entries in the current section only. Instead of the
     chronological commit order, group the entries by the <change-type/>s.
 
     </step>
@@ -227,13 +258,15 @@ Processing
 
     Finally, *update* the `CHANGELOG.md` file with the completed,
     consolidated and sorted *ChangeLog* entries. Also, update the date
-    `YYYY-MM-DD` in the `N.M.K (YYYY-MM-DD)` header of the *first* (most
-    recent) section.
+    `YYYY-MM-DD` in the `N.M.K (YYYY-MM-DD)` header of the current
+    section to the current date.
 
-    For this, you *MUST* use the `Edit` tool, replacing just the *first*
-    (most recent) section, instead of re-writing the entire file with
-    the `Write` tool, so that the resulting changes are shown to the
-    user as a diff by the agent tool itself.
+    For this, you *MUST* use the `Edit` tool, replacing just the current
+    section, resp. for a new section, inserting it *above* the header of
+    the released section (keeping the released section unchanged),
+    instead of re-writing the entire file with the `Write` tool, so that
+    the resulting changes are shown to the user as a diff by the agent
+    tool itself.
 
     You *MUST* *NOT* output the resulting entries a second time, any
     further summary, or any further explanations.

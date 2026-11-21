@@ -15,6 +15,11 @@ The `ase-repo-changelog` skill helps to *complete*, *consolidate*, and
 file, based on the underlying *Git* commits and the currently staged
 changes in the Git *index*.
 
+If the most recent section is already released, i.e., a Git tag
+`N.M.K` (or `vN.M.K`) of its version exists, it is left untouched and
+a new section for the next patch version is inserted above it instead,
+which then receives the new entries.
+
 Each entry starts with `<change-type> [<artifact-kind>]: <summary>`
 where *change-type* is one of `FEATURE`, `IMPROVEMENT`, `BUGFIX`,
 `UPDATE`, `CLEANUP`, or `REFACTOR`, and *artifact-kind* is one or more
