@@ -138,17 +138,7 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
         const token   = options.token ?? (process.env.GITHUB_TOKEN || process.env.GH_TOKEN) ?? ""
         if (typeof token !== "string" || token === "")
             throw new Error("task store: plugin \"github\" requires the \"token\" option (or $GITHUB_TOKEN resp. $GH_TOKEN)")
-        const url = options.url ?? "https://github.com"
-        let base: URL | null = null
-        try {
-            base = new URL(typeof url === "string" && !/^[a-z][a-z0-9+.-]*:\/\//i.test(url) ? `https://${url}` : url)
-        }
-        catch {
-            /*  reported below  */
-        }
-        if (base === null || !/^https?:$/.test(base.protocol) || base.search !== "" || base.hash !== "")
-            throw new Error(`task store: plugin "github" received invalid URL "${String(url)}" of the GitHub instance`)
-        this.url = base.href.replace(/\/+$/, "")
+        const base = this.configure("github", "GitHub", options.url ?? "https://github.com", options.poll)
         const apiBase = apiBaseOf(base)
         if (typeof options.repos !== "object" || options.repos === null || Array.isArray(options.repos))
             throw new Error("task store: plugin \"github\" requires the \"repos\" option (mapping project ids onto \"<owner>/<repo>\")")
@@ -158,9 +148,6 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
                 throw new Error(`task store: plugin "github" received invalid repository mapping "${prjId}: ${String(spec)}"`)
             this.repos.set(prjId, { owner: m[1], repo: m[2] })
         }
-        this.poll = options.poll ?? 60
-        if (typeof this.poll !== "number" || !Number.isFinite(this.poll) || (this.poll !== 0 && (this.poll < 1 || this.poll > 86400)))
-            throw new Error("task store: plugin \"github\" requires a \"poll\" interval of 0 (disabled) resp. 1 to 86400 seconds")
 
         /*  route the diagnostics of Octokit into the log, as the standard
             output may carry a protocol (like the one of an MCP server)  */

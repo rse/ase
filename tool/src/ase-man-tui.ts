@@ -265,6 +265,38 @@ const renderField = (query: string, cur: number, typing: boolean, fieldW: number
         h(Text, cx(tone), `╰${"─".repeat(fieldW - 2)}╯`))
 }
 
+/*  render the header, enclosed on its left and right side by the upward lines of the rule below it,
+    with the page counts (as matching/total counts during a search, in signal color without any match)  */
+const renderHeader = (catalog: Catalog, hits: Map<string, RegExp> | null) => {
+    const count  = (groups: ManGroup[]) => {
+        const pages = groups.flatMap((group) => group.pages)
+        return hits === null ? String(pages.length) : `${pages.filter((p) => hits.has(p.id)).length}/${pages.length}`
+    }
+    const counts = cx("bold", hits !== null && hits.size === 0 && "signal")
+    return h(Box, { paddingX: 1 },
+        h(Box, cx("fixed"), h(Text, cx("dim"), "│")),
+        h(Box, cx("grow", "bar"),
+            h(Text, cx("normal", "truncate"),
+                "⧉ ASE: ", h(Text, cx("bold"), "Manpage Browser"),
+                " · skills: ", h(Text, counts, count(catalog.skills)),
+                " · commands: ", h(Text, counts, count(catalog.commands)))),
+        h(Box, cx("fixed"), h(Text, cx("dim"), "│")))
+}
+
+/*  the key hints of the start resp. browser page, depending on the typing into
+    the search field, the search query, and the selected reference of the detail  */
+const keyHints = (page: "start" | "browse", typing: boolean, query: string, ref: number): string[] => page === "start" ? [
+    "↑/↓/←/→/Wheel: select manpage · ⏎/Left-Click: open manpage · ⇤/⇥: first/last manpage",
+    typing ? "⏎: search manpages · ESC: leave search field · ←/→/⇤/⇥: move cursor · ⌫/DEL: delete character" :
+        `/: search manpages${query !== "" ? " · ESC: clear search" : ""} · q: quit`
+] : [
+    ref >= 0 ?
+        "↑/↓/TAB/⇧TAB: select previous/next reference · ←: select side-bar · ⇈/⇊/SPACE/⇤/⇥/Wheel: scroll manpage" :
+        "↑/↓/Wheel: select manpage · →/TAB/⇧TAB: select first reference · ⇈/⇊/SPACE/⇤/⇥/Wheel: scroll manpage",
+    typing ? "ESC: clear search, leave search field · ⏎: leave search field · ←/→/⇤/⇥: move cursor · ⌫/DEL: delete character" :
+        `⏎/Left-Click: follow reference · /: search manpages · ESC: ${query !== "" ? "clear search" : "back to catalog"} · q: quit`
+]
+
 /*  the initial state of the browser page: the selected page, or the search query  */
 type Initial = { id: string | null, query: string }
 
@@ -622,21 +654,8 @@ const App = ({ catalog, initial }: { catalog: Catalog, initial: Initial | null }
         return h(Box, { width: columns, height: rows, justifyContent: "center", alignItems: "center" },
             h(Text, cx("signal"), `window too small (${columns}×${rows}) — needs at least ${MIN_W}×${MIN_H}`))
 
-    /*  the header, enclosed on its left and right side by the upward lines of the rule below it,
-        with the page counts (as matching/total counts during a search, in signal color without any match)  */
-    const count  = (groups: ManGroup[]) => {
-        const pages = groups.flatMap((group) => group.pages)
-        return hits === null ? String(pages.length) : `${pages.filter((p) => hits.has(p.id)).length}/${pages.length}`
-    }
-    const counts = cx("bold", hits !== null && hits.size === 0 && "signal")
-    const header = h(Box, { paddingX: 1 },
-        h(Box, cx("fixed"), h(Text, cx("dim"), "│")),
-        h(Box, cx("grow", "bar"),
-            h(Text, cx("normal", "truncate"),
-                "⧉ ASE: ", h(Text, cx("bold"), "Manpage Browser"),
-                " · skills: ", h(Text, counts, count(catalog.skills)),
-                " · commands: ", h(Text, counts, count(catalog.commands)))),
-        h(Box, cx("fixed"), h(Text, cx("dim"), "│")))
+    /*  the header (see "renderHeader")  */
+    const header = renderHeader(catalog, hits)
 
     /*  the search field (see "renderField")  */
     const field = renderField(query, cur, typing, FW)
@@ -706,17 +725,7 @@ const App = ({ catalog, initial }: { catalog: Catalog, initial: Initial | null }
 
     /*  the key hints and the status line in the last line of the screen, enclosed
         on its left and right side by the downward lines of the rule above it  */
-    const hints = page === "start" ? [
-        "↑/↓/←/→/Wheel: select manpage · ⏎/Left-Click: open manpage · ⇤/⇥: first/last manpage",
-        typing ? "⏎: search manpages · ESC: leave search field · ←/→/⇤/⇥: move cursor · ⌫/DEL: delete character" :
-            `/: search manpages${query !== "" ? " · ESC: clear search" : ""} · q: quit`
-    ] : [
-        ref >= 0 ?
-            "↑/↓/TAB/⇧TAB: select previous/next reference · ←: select side-bar · ⇈/⇊/SPACE/⇤/⇥/Wheel: scroll manpage" :
-            "↑/↓/Wheel: select manpage · →/TAB/⇧TAB: select first reference · ⇈/⇊/SPACE/⇤/⇥/Wheel: scroll manpage",
-        typing ? "ESC: clear search, leave search field · ⏎: leave search field · ←/→/⇤/⇥: move cursor · ⌫/DEL: delete character" :
-            `⏎/Left-Click: follow reference · /: search manpages · ESC: ${query !== "" ? "clear search" : "back to catalog"} · q: quit`
-    ]
+    const hints  = keyHints(page, typing, query, ref)
     const report = typing ? "searching all manpages for all keywords (with fuzzy matching as fallback)" : null
 
     /*  the screen: the header, the content (of the start page in a panel, always

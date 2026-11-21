@@ -21,7 +21,7 @@ parentPort?.on("message", (job: RasterizeJob) => {
         const cells = image.cells !== undefined ? { cells: image.cells } : {}
         const text  = job.text ? { text: Rasterize.textify(image) } : {}
         post({ id: job.id, png: image.png, width: image.width, height: image.height, ...cells, ...text })
-    }, (err: unknown) => {
+    }).catch((err: unknown) => {
         post({ id: job.id, error: err instanceof Error ? err.message : String(err) })
     })
 })

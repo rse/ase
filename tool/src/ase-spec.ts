@@ -687,7 +687,7 @@ export class SpecMCP {
                 "`project.artifact.spec.basedir` configuration) as JSON, JSON5, YAML, TOON, HTML, PDF, " +
                 "or normalized Markdown. The result is written to the `output` file (a relative path " +
                 "resolves against the project root) if given, else it is returned directly " +
-                "(PDF as a base64-encoded resource). The export fails on any lint diagnostic. " +
+                "(PDF as a base64-encoded resource). The export fails on any lint diagnostic of `error` severity. " +
                 "The `notices` array carries the environment notices emitted during the export " +
                 "(like a PDF rendering falling back onto a system-installed browser), which are " +
                 "worth reporting to the user verbatim. With `schema`, the effective SpecBook YAML " +

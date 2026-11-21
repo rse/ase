@@ -9,6 +9,7 @@ import {
     GitbeakerRequestError
 }                              from "@gitbeaker/rest"
 import { LRUCache }            from "lru-cache"
+import PQueue                  from "p-queue"
 
 import * as API                from "./ase-task-store-plugin-api.js"
 import * as TaskFormat         from "./ase-task-format.js"
@@ -129,17 +130,7 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
         if (typeof token !== "string" || token === "")
             throw new Error("task store: plugin \"gitlab\" requires the \"token\" option (or $GITLAB_TOKEN)")
         this.token = token
-        const url = options.url ?? process.env.GITLAB_HOST ?? "https://gitlab.com"
-        let base: URL | null = null
-        try {
-            base = new URL(typeof url === "string" && !/^[a-z][a-z0-9+.-]*:\/\//i.test(url) ? `https://${url}` : url)
-        }
-        catch {
-            /*  reported below  */
-        }
-        if (base === null || !/^https?:$/.test(base.protocol) || base.search !== "" || base.hash !== "")
-            throw new Error(`task store: plugin "gitlab" received invalid URL "${String(url)}" of the GitLab instance`)
-        this.url = base.href.replace(/\/+$/, "")
+        this.configure("gitlab", "GitLab", options.url ?? process.env.GITLAB_HOST ?? "https://gitlab.com", options.poll)
         if (typeof options.repos !== "object" || options.repos === null || Array.isArray(options.repos))
             throw new Error("task store: plugin \"gitlab\" requires the \"repos\" option (mapping project ids onto \"<namespace>/<project>\")")
         for (const [ prjId, spec ] of Object.entries(options.repos)) {
@@ -147,9 +138,6 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
                 throw new Error(`task store: plugin "gitlab" received invalid project mapping "${prjId}: ${String(spec)}"`)
             this.repos.set(prjId, spec)
         }
-        this.poll = options.poll ?? 60
-        if (typeof this.poll !== "number" || !Number.isFinite(this.poll) || (this.poll !== 0 && (this.poll < 1 || this.poll > 86400)))
-            throw new Error("task store: plugin \"gitlab\" requires a \"poll\" interval of 0 (disabled) resp. 1 to 86400 seconds")
 
         /*  create the used GitLab REST API resources, each with every request failure explained  */
         this.source = options.token !== undefined ? "the \"token\" option (resp. \"project.task.store.token\")" : "$GITLAB_TOKEN"
@@ -562,8 +550,9 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
         const { path, lifecycle, scheme } = await this.context(prjId)
         const issues = this.overlay(prjId,
             await this.issues.all({ projectId: path, scope: "all", state: "all", perPage: 100 }) as unknown as Issue[])
+        const queue = new PQueue({ concurrency: 8 })
         return Promise.all(issues.filter((issue) => live(issue))
-            .map((issue) => this.entry(path, lifecycle, scheme, issue)))
+            .map((issue) => queue.add(() => this.entry(path, lifecycle, scheme, issue))))
     }
     async taskLoad (prjId: string, taskId: string): Promise<API.TaskPlan | null> {
         const { path, lifecycle, scheme } = await this.context(prjId)

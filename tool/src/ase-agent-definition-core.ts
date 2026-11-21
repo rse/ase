@@ -960,6 +960,83 @@ const resolveModel = (value: string): ResolvedDefinition["model"] => {
     return { spec, sizes }
 }
 
+/*  resolve the tag and the assignee of the agent named <name> of the processing type <type>
+    through the option accessors <str>, <list>, <flag>, and <has>, validated against the
+    incoming states <incoming>, the success state <success>, the target states per verdict
+    <verdicts>, and whether the hook "ready" of the definition guards an untagged task <guards>  */
+const resolveTag = (
+    str:    (key: string, def?: string) => string,
+    list:   (key: string) => string[],
+    flag:   (key: string) => boolean,
+    has:    (key: string) => boolean,
+    name:   string,
+    type:   DefinitionType,
+    states: { incoming: string[], success: string, verdicts: Record<string, string> },
+    guards: boolean
+) => {
+    const fail = failOption
+    const { incoming, success, verdicts } = states
+    const assignName = str("assign-name", name)
+    if (!/^[A-Za-z0-9][A-Za-z0-9_.@-]*$/.test(assignName))
+        fail("assign-name", `invalid assignee "${assignName}"`)
+    const requestName = str("request-name", name)
+    let tagName = str("tag-name", "")
+    if (type === "request") {
+        let tag = ""
+        try {
+            tag = requestsOf(requestName).tag
+        }
+        catch (err: unknown) {
+            fail(has("request-name") ? "request-name" : "name", err instanceof Error ? err.message : String(err))
+        }
+        if (tagName !== "" && tagName !== tag)
+            fail("tag-name", `has to be "${tag}" for the requests "${requestName}" (as attached by "ase task request")`)
+        tagName = tag
+    }
+    else if (tagName === "")
+        tagName = `ase-agent-${name.toLowerCase()}`
+    if (!/^ase-agent-[a-z0-9][a-z0-9_.-]*$/.test(tagName))
+        fail("tag-name", `invalid tag "${tagName}" (expected "ase-agent-<word>" in lower-case, without ":")`)
+    const tagValue = (key: string): string | null | undefined => {
+        const spec = str(key, tagName)
+        if (spec === "none")
+            return null
+        else if (spec === tagName)
+            return undefined
+        const m = /^([^:]+):([a-z0-9][a-z0-9_.-]*)$/.exec(spec)
+        if (m === null || m[1] !== tagName)
+            fail(key, `invalid tag "${spec}" (expected "${tagName}", "${tagName}:<value>" in lower-case, or "none", ` +
+                "as a foreign tag would let the agent claim the task again)")
+        if (m![2] === "active")
+            fail(key, `invalid tag "${spec}" (the value "active" marks a claimed task)`)
+        return m![2]
+    }
+    if (flag("tag-retry") && has("tag-failure"))
+        fail("tag-retry", "not allowed together with \"--tag-failure\"")
+    const assignee = (key: string, def: string): string => {
+        const who = str(key, def)
+        if (who !== "none" && who !== "previous" && !/^[A-Za-z0-9][A-Za-z0-9_.@-]*$/.test(who))
+            fail(key, `invalid assignee "${who}" (expected a name, "none", or "previous")`)
+        return who
+    }
+    const handover      = type === "phase" ? "none" : "previous"
+    const assignSuccess = assignee("assign-success", handover)
+    const assignFailure = assignee("assign-failure", handover)
+    const tagSuccess = tagValue("tag-success")
+    const tagFailure = flag("tag-retry") ? null : tagValue("tag-failure")
+    const returning  = (state: string) => state === statePrevious || incoming.includes(state)
+    if (tagSuccess === null && type === "phase" && (returning(success) || Object.values(verdicts).some(returning))
+        && !has("attach-skip") && !guards && !unassignedFrom(flag("assign-required"), assignName, assignSuccess))
+        fail("tag-success", "\"none\" would let the agent claim a task again, which returns into an incoming state " +
+            "(unless guarded by \"--attach-skip\", by the hook \"ready\" of a definition declaring \"tag-success: none\" itself, " +
+            "or by \"--assign-required\" with \"--assign-success\" handing the task over to somebody else)")
+    for (const key of [ "tag-require", "tag-exclude" ])
+        for (const tag of list(key))
+            if (!/^[^\s,]+$/.test(tag))
+                fail(key, `invalid tag "${tag}"`)
+    return { assignName, requestName, tagName, tagSuccess, tagFailure, assignSuccess, assignFailure }
+}
+
 /*  resolve the definition of the agent named <name> from its (camel-cased) command-line
     options <opts>: the defaults, overridden by the definition of "--definition" (if any),
     overridden by the given options, validated against the task lifecycle models  */
@@ -1041,65 +1118,9 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
     const { incoming, activity, success, failure, phase, passed, verdicts, lifecycles } =
         resolveStates(str, list, has, type, unclaimed)
 
-    /*  the tag and the assignee  */
-    const assignName = str("assign-name", name)
-    if (!/^[A-Za-z0-9][A-Za-z0-9_.@-]*$/.test(assignName))
-        fail("assign-name", `invalid assignee "${assignName}"`)
-    const requestName = str("request-name", name)
-    let tagName = str("tag-name", "")
-    if (type === "request") {
-        let tag = ""
-        try {
-            tag = requestsOf(requestName).tag
-        }
-        catch (err: unknown) {
-            fail(has("request-name") ? "request-name" : "name", err instanceof Error ? err.message : String(err))
-        }
-        if (tagName !== "" && tagName !== tag)
-            fail("tag-name", `has to be "${tag}" for the requests "${requestName}" (as attached by "ase task request")`)
-        tagName = tag
-    }
-    else if (tagName === "")
-        tagName = `ase-agent-${name.toLowerCase()}`
-    if (!/^ase-agent-[a-z0-9][a-z0-9_.-]*$/.test(tagName))
-        fail("tag-name", `invalid tag "${tagName}" (expected "ase-agent-<word>" in lower-case, without ":")`)
-    const tagValue = (key: string): string | null | undefined => {
-        const spec = str(key, tagName)
-        if (spec === "none")
-            return null
-        else if (spec === tagName)
-            return undefined
-        const m = /^([^:]+):([a-z0-9][a-z0-9_.-]*)$/.exec(spec)
-        if (m === null || m[1] !== tagName)
-            fail(key, `invalid tag "${spec}" (expected "${tagName}", "${tagName}:<value>" in lower-case, or "none", ` +
-                "as a foreign tag would let the agent claim the task again)")
-        if (m![2] === "active")
-            fail(key, `invalid tag "${spec}" (the value "active" marks a claimed task)`)
-        return m![2]
-    }
-    if (flag("tag-retry") && has("tag-failure"))
-        fail("tag-retry", "not allowed together with \"--tag-failure\"")
-    const assignee = (key: string, def: string): string => {
-        const who = str(key, def)
-        if (who !== "none" && who !== "previous" && !/^[A-Za-z0-9][A-Za-z0-9_.@-]*$/.test(who))
-            fail(key, `invalid assignee "${who}" (expected a name, "none", or "previous")`)
-        return who
-    }
-    const handover      = type === "phase" ? "none" : "previous"
-    const assignSuccess = assignee("assign-success", handover)
-    const assignFailure = assignee("assign-failure", handover)
-    const tagSuccess = tagValue("tag-success")
-    const tagFailure = flag("tag-retry") ? null : tagValue("tag-failure")
-    const returning  = (state: string) => state === statePrevious || incoming.includes(state)
-    if (tagSuccess === null && type === "phase" && (returning(success) || Object.values(verdicts).some(returning))
-        && !has("attach-skip") && !loaded.guards && !unassignedFrom(flag("assign-required"), assignName, assignSuccess))
-        fail("tag-success", "\"none\" would let the agent claim a task again, which returns into an incoming state " +
-            "(unless guarded by \"--attach-skip\", by the hook \"ready\" of a definition declaring \"tag-success: none\" itself, " +
-            "or by \"--assign-required\" with \"--assign-success\" handing the task over to somebody else)")
-    for (const key of [ "tag-require", "tag-exclude" ])
-        for (const tag of list(key))
-            if (!/^[^\s,]+$/.test(tag))
-                fail(key, `invalid tag "${tag}"`)
+    /*  the tag and the assignee (see "resolveTag")  */
+    const { assignName, requestName, tagName, tagSuccess, tagFailure, assignSuccess, assignFailure } =
+        resolveTag(str, list, flag, has, name, type, { incoming, success, verdicts }, loaded.guards)
 
     /*  the parameters (see "resolveParams")  */
     const decls  = loaded.params

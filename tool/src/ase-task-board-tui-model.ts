@@ -42,6 +42,9 @@ export type Sel = { g: number, l: number, id: string }
 /*  the currently carried task (if any) and the lane states it can be moved to  */
 export type Carry = { id: string, from: string, targets: Set<string> }
 
+/*  the read dialog: its task, its selected tab, its first visible tab, and the scroll offsets of its tabs  */
+type DialogState = { id: string, tab: number, first: number, scrolls: Record<number, number> }
+
 /*  the prompt popup of a task: its prompt with the cursor position, its focused field (the
     request name, the prompt, or the request or cancel button), and, for a request by prompt
     of any name (instead of an edit request), its request name, the suggested request names,
@@ -490,10 +493,137 @@ const usePromptActions = (ctx: {
     return { startPrompt, startRequest, cancelPrompt, submitPrompt }
 }
 
+/*  the actions of the $EDITOR of the terminal board: editing an existing task and
+    creating a new one, with the drafts of the failed to be saved texts, per task  */
+const useEditorActions = (ctx: {
+    log:       Log
+    all:       Board
+    mouseOn:   React.RefObject<boolean>
+    setSel:    React.Dispatch<React.SetStateAction<Sel>>
+    setDialog: React.Dispatch<React.SetStateAction<DialogState | null>>
+    setNotice: (notice: string | null) => void
+    track:     ReturnType<typeof useBusy>["track"]
+}) => {
+    const { log, all, mouseOn, setSel, setDialog, setNotice, track } = ctx
+    const { suspendTerminal } = useApp()
+
+    /*  the drafts of the texts which failed to save, per task (under the empty id for a new task)  */
+    const drafts = React.useRef(new Map<string, string>())
+
+    /*  run $EDITOR on a text in a temporary file, handing the terminal over
+        to the editor, and return the edited text  */
+    const runEditor = async (name: string, text: string): Promise<string> => {
+        const dir  = await fs.promises.mkdtemp(path.join(os.tmpdir(), "ase-task-"))
+        const file = path.join(dir, `${name}.md`)
+        try {
+            await fs.promises.writeFile(file, text, "utf8")
+
+            /*  run $EDITOR through the shell (to support values with arguments or
+                quoting), passing the file via the environment to avoid quoting it  */
+            const editor = (process.env.EDITOR ?? "").trim() || "vi"
+            const ref    = process.platform === "win32" ? "\"%ASE_TASK_FILE%\"" : "\"$ASE_TASK_FILE\""
+            await suspendTerminal(async () => {
+                mouseReporting(false)
+
+                /*  stop the read of stdin still pending from Ink, which only removes its
+                    listener, as it else takes the next input away from the editor and
+                    passes it to the board afterwards (a pause in non-flowing mode does
+                    not emit the event on which Node stops reading, and the stop is deferred)  */
+                process.stdin.emit("pause")
+                await new Promise((resolve) => { process.nextTick(resolve) })
+                try {
+                    await execa(`${editor} ${ref}`, { shell: true, stdio: "inherit", env: { ASE_TASK_FILE: file } })
+                }
+                finally {
+                    mouseReporting(mouseOn.current)
+                }
+            })
+            return await fs.promises.readFile(file, "utf8")
+        }
+        finally {
+            await fs.promises.rm(dir, { recursive: true, force: true })
+        }
+    }
+
+    /*  edit a task with $EDITOR; a draft which failed to save is kept and
+        offered again on the next edit of the same task  */
+    const edit = async (id: string): Promise<void> => {
+        const src = await track({ text: "loading task", id }, Task.source(log, id))
+        if (src === null) {
+            setNotice(`task "${id}" no longer exists`)
+            return
+        }
+        const text = await runEditor(id, drafts.current.get(id) ?? src.text)
+        if (text === src.text) {
+            drafts.current.delete(id)
+            setNotice(`task "${id}" unchanged`)
+            return
+        }
+        try {
+            /*  conditionally save with the entity tag, to refuse overwriting changes
+                made meanwhile by others (e.g. an agent or the web board)  */
+            const { id: next, warning } = await track({ text: "saving task", id }, saveTask(log, id, text, src.tag))
+            drafts.current.delete(id)
+            if (next !== id) {
+                setSel((s) => s.id === id ? { ...s, id: next } : s)
+                setDialog((d) => d?.id === id ? { ...d, id: next } : d)
+            }
+            setNotice((next !== id ? `task "${id}" saved and renamed to "${next}"` : `task "${id}" saved`) +
+                (warning !== "" ? ` (${warning})` : ""))
+        }
+        catch (err: unknown) {
+            if (err instanceof TaskConflict) {
+                if (err.tag === null) {
+                    drafts.current.delete(id)
+                    setNotice(`task "${id}" was deleted meanwhile (edit discarded)`)
+                }
+                else {
+                    drafts.current.set(id, text)
+                    setNotice(`task "${id}" was changed meanwhile (press "e" to re-edit and overwrite)`)
+                }
+                return
+            }
+            drafts.current.set(id, text)
+            const msg = err instanceof Error ? err.message : String(err)
+            setNotice(`saving task "${id}" failed: ${msg} (press "e" to re-edit)`)
+        }
+    }
+
+    /*  create a new task with $EDITOR on its pre-filled text, under the id of
+        its "Id:" key; an unchanged pre-filled text creates no task, and a text which
+        failed to save is kept as a draft (under the empty id) for the next new task,
+        where even an unchanged draft is created again, while an emptied text
+        discards the draft (and any new task)  */
+    const create = async (): Promise<void> => {
+        const draft = drafts.current.get("")
+        const orig  = draft ?? await track<string>({ text: "preparing new task" },
+            Task.lifecycle(log).then((lifecycle) => newTaskText(log, all, lifecycle)))
+        const text  = await runEditor("new-task", orig)
+        if ((draft === undefined && text === orig) || text.trim() === "") {
+            drafts.current.delete("")
+            setNotice(draft !== undefined ? "new task draft discarded" : "new task discarded")
+            return
+        }
+        const id = TaskFormat.taskTextId(text)
+        try {
+            const warning = await track({ text: "creating task", id }, createTask(log, id, text))
+            drafts.current.delete("")
+            setSel((s) => ({ ...s, id }))
+            setNotice(`task "${id}" created` + (warning !== "" ? ` (${warning})` : ""))
+        }
+        catch (err: unknown) {
+            drafts.current.set("", text)
+            const msg = err instanceof Error ? err.message : String(err)
+            setNotice(`creating task failed: ${msg} (press "N" to re-edit, or empty it to discard)`)
+        }
+    }
+    return { edit, create }
+}
+
 /*  the state of the terminal board (resp. with a task id, of the
     task viewer): all state, the derived values, and the actions  */
 export const useBoardState = (log: Log, initial: Board, relay?: string, watched?: string) => {
-    const { exit, suspendTerminal } = useApp()
+    const { exit } = useApp()
     const { columns, rows } = useWindowSize()
     const [ all,     setBoard   ] = React.useState<Board>(initial)
     const [ surface, setSurface ] = React.useState<Surface>(() => BoardState.load().tui)
@@ -509,7 +639,7 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         return view === "graph" && !surface.standalone ? dropStandalone(found) : found
     }, [ all, filter, view, surface.standalone ])
     const [ sel,     setSel     ] = React.useState<Sel>(() => relocate(board, { g: 0, l: 0, id: "" }, surface))
-    const [ dialog,  setDialog  ] = React.useState<{ id: string, tab: number, first: number, scrolls: Record<number, number> } | null>(
+    const [ dialog,  setDialog  ] = React.useState<DialogState | null>(
         watched !== undefined ? { id: watched, tab: 0, first: 0, scrolls: {} } : null)
     const [ plan,    setPlan    ] = React.useState<{ id: string, parts: PlanParts, before?: PlanParts } | null>(null)
     const [ files,   setFiles   ] = React.useState<Map<string, Buffer | Error>>(new Map())
@@ -532,7 +662,6 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
     const [ range,   setRange   ] = React.useState<StatsRange>("total")
     const [ grow,    setGrow    ] = React.useState(false)
     const editing = React.useRef(false)
-    const drafts  = React.useRef(new Map<string, string>())
 
     /*  the busy popup of slow task store operations  */
     const { busy, busyTick, track } = useBusy()
@@ -851,113 +980,8 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         })
     }
 
-    /*  run $EDITOR on a text in a temporary file, handing the terminal over
-        to the editor, and return the edited text  */
-    const runEditor = async (name: string, text: string): Promise<string> => {
-        const dir  = await fs.promises.mkdtemp(path.join(os.tmpdir(), "ase-task-"))
-        const file = path.join(dir, `${name}.md`)
-        try {
-            await fs.promises.writeFile(file, text, "utf8")
-
-            /*  run $EDITOR through the shell (to support values with arguments or
-                quoting), passing the file via the environment to avoid quoting it  */
-            const editor = (process.env.EDITOR ?? "").trim() || "vi"
-            const ref    = process.platform === "win32" ? "\"%ASE_TASK_FILE%\"" : "\"$ASE_TASK_FILE\""
-            await suspendTerminal(async () => {
-                mouseReporting(false)
-
-                /*  stop the read of stdin still pending from Ink, which only removes its
-                    listener, as it else takes the next input away from the editor and
-                    passes it to the board afterwards (a pause in non-flowing mode does
-                    not emit the event on which Node stops reading, and the stop is deferred)  */
-                process.stdin.emit("pause")
-                await new Promise((resolve) => { process.nextTick(resolve) })
-                try {
-                    await execa(`${editor} ${ref}`, { shell: true, stdio: "inherit", env: { ASE_TASK_FILE: file } })
-                }
-                finally {
-                    mouseReporting(mouseOn.current)
-                }
-            })
-            return await fs.promises.readFile(file, "utf8")
-        }
-        finally {
-            await fs.promises.rm(dir, { recursive: true, force: true })
-        }
-    }
-
-    /*  edit a task with $EDITOR; a draft which failed to save is kept and
-        offered again on the next edit of the same task  */
-    const edit = async (id: string): Promise<void> => {
-        const src = await track({ text: "loading task", id }, Task.source(log, id))
-        if (src === null) {
-            setNotice(`task "${id}" no longer exists`)
-            return
-        }
-        const text = await runEditor(id, drafts.current.get(id) ?? src.text)
-        if (text === src.text) {
-            drafts.current.delete(id)
-            setNotice(`task "${id}" unchanged`)
-            return
-        }
-        try {
-            /*  conditionally save with the entity tag, to refuse overwriting changes
-                made meanwhile by others (e.g. an agent or the web board)  */
-            const { id: next, warning } = await track({ text: "saving task", id }, saveTask(log, id, text, src.tag))
-            drafts.current.delete(id)
-            if (next !== id) {
-                setSel((s) => s.id === id ? { ...s, id: next } : s)
-                setDialog((d) => d?.id === id ? { ...d, id: next } : d)
-            }
-            setNotice((next !== id ? `task "${id}" saved and renamed to "${next}"` : `task "${id}" saved`) +
-                (warning !== "" ? ` (${warning})` : ""))
-        }
-        catch (err: unknown) {
-            if (err instanceof TaskConflict) {
-                if (err.tag === null) {
-                    drafts.current.delete(id)
-                    setNotice(`task "${id}" was deleted meanwhile (edit discarded)`)
-                }
-                else {
-                    drafts.current.set(id, text)
-                    setNotice(`task "${id}" was changed meanwhile (press "e" to re-edit and overwrite)`)
-                }
-                return
-            }
-            drafts.current.set(id, text)
-            const msg = err instanceof Error ? err.message : String(err)
-            setNotice(`saving task "${id}" failed: ${msg} (press "e" to re-edit)`)
-        }
-    }
-
-    /*  create a new task with $EDITOR on its pre-filled text, under the id of
-        its "Id:" key; an unchanged pre-filled text creates no task, and a text which
-        failed to save is kept as a draft (under the empty id) for the next new task,
-        where even an unchanged draft is created again, while an emptied text
-        discards the draft (and any new task)  */
-    const create = async (): Promise<void> => {
-        const draft = drafts.current.get("")
-        const orig  = draft ?? await track<string>({ text: "preparing new task" },
-            Task.lifecycle(log).then((lifecycle) => newTaskText(log, all, lifecycle)))
-        const text  = await runEditor("new-task", orig)
-        if ((draft === undefined && text === orig) || text.trim() === "") {
-            drafts.current.delete("")
-            setNotice(draft !== undefined ? "new task draft discarded" : "new task discarded")
-            return
-        }
-        const id = TaskFormat.taskTextId(text)
-        try {
-            const warning = await track({ text: "creating task", id }, createTask(log, id, text))
-            drafts.current.delete("")
-            setSel((s) => ({ ...s, id }))
-            setNotice(`task "${id}" created` + (warning !== "" ? ` (${warning})` : ""))
-        }
-        catch (err: unknown) {
-            drafts.current.set("", text)
-            const msg = err instanceof Error ? err.message : String(err)
-            setNotice(`creating task failed: ${msg} (press "N" to re-edit, or empty it to discard)`)
-        }
-    }
+    /*  the actions of the $EDITOR (with the drafts of the failed to be saved texts, per task)  */
+    const { edit, create } = useEditorActions({ log, all, mouseOn, setSel, setDialog, setNotice, track })
 
     /*  delete a task (after its confirmation), closing its read dialog
         (in the task viewer only once it vanished, as closing it quits the process)  */

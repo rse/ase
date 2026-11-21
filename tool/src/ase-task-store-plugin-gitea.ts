@@ -6,6 +6,7 @@
 
 import { giteaApi, ContentType, type HttpResponse } from "gitea-js"
 import { LRUCache }                    from "lru-cache"
+import PQueue                          from "p-queue"
 
 import * as API                        from "./ase-task-store-plugin-api.js"
 import * as TaskFormat                 from "./ase-task-format.js"
@@ -123,17 +124,7 @@ class GiteaTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> imp
         const token   = options.token ?? process.env.GITEA_TOKEN ?? ""
         if (typeof token !== "string" || token === "")
             throw new Error("task store: plugin \"gitea\" requires the \"token\" option (or $GITEA_TOKEN)")
-        const url = options.url ?? "https://gitea.com"
-        let base: URL | null = null
-        try {
-            base = new URL(typeof url === "string" && !/^[a-z][a-z0-9+.-]*:\/\//i.test(url) ? `https://${url}` : url)
-        }
-        catch {
-            /*  reported below  */
-        }
-        if (base === null || !/^https?:$/.test(base.protocol) || base.search !== "" || base.hash !== "")
-            throw new Error(`task store: plugin "gitea" received invalid URL "${String(url)}" of the Gitea instance`)
-        this.url = base.href.replace(/\/+$/, "")
+        this.configure("gitea", "Gitea", options.url ?? "https://gitea.com", options.poll)
         if (typeof options.repos !== "object" || options.repos === null || Array.isArray(options.repos))
             throw new Error("task store: plugin \"gitea\" requires the \"repos\" option (mapping project ids onto \"<owner>/<repo>\")")
         for (const [ prjId, spec ] of Object.entries(options.repos)) {
@@ -142,9 +133,6 @@ class GiteaTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> imp
                 throw new Error(`task store: plugin "gitea" received invalid repository mapping "${prjId}: ${String(spec)}"`)
             this.repos.set(prjId, { owner: m[1], repo: m[2] })
         }
-        this.poll = options.poll ?? 60
-        if (typeof this.poll !== "number" || !Number.isFinite(this.poll) || (this.poll !== 0 && (this.poll < 1 || this.poll > 86400)))
-            throw new Error("task store: plugin \"gitea\" requires a \"poll\" interval of 0 (disabled) resp. 1 to 86400 seconds")
 
         /*  create the Gitea REST API client, with every request bounded in time  */
         this.source = options.token !== undefined ? "the \"token\" option (resp. \"project.task.store.token\")" : "$GITEA_TOKEN"
@@ -547,8 +535,9 @@ class GiteaTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> imp
         const { loc, lifecycle, scheme } = await this.context(prjId)
         const issues = await this.all(loc, (query) =>
             this.gt.repos.issueListIssues(loc.owner, loc.repo, { state: "all", type: "issues", ...query })) as Issue[]
+        const queue = new PQueue({ concurrency: 8 })
         return Promise.all(issues.filter((issue) => live(issue))
-            .map((issue) => this.entry(loc, lifecycle, scheme, issue)))
+            .map((issue) => queue.add(() => this.entry(loc, lifecycle, scheme, issue))))
     }
     async taskLoad (prjId: string, taskId: string): Promise<API.TaskPlan | null> {
         const { loc, lifecycle, scheme } = await this.context(prjId)

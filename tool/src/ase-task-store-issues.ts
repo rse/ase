@@ -318,6 +318,24 @@ export abstract class IssueTaskStoragePlugin<L> {
         this.opened = now()
     }
 
+    /*  take over the URL of the instance (default scheme "https") and the polling interval, else throw  */
+    protected configure (plugin: string, service: string, url: string, poll: number | undefined): URL {
+        let base: URL | null = null
+        try {
+            base = new URL(typeof url === "string" && !/^[a-z][a-z0-9+.-]*:\/\//i.test(url) ? `https://${url}` : url)
+        }
+        catch {
+            /*  reported below  */
+        }
+        if (base === null || !/^https?:$/.test(base.protocol) || base.search !== "" || base.hash !== "")
+            throw new Error(`task store: plugin "${plugin}" received invalid URL "${String(url)}" of the ${service} instance`)
+        this.url  = base.href.replace(/\/+$/, "")
+        this.poll = poll ?? 60
+        if (typeof this.poll !== "number" || !Number.isFinite(this.poll) || (this.poll !== 0 && (this.poll < 1 || this.poll > 86400)))
+            throw new Error(`task store: plugin "${plugin}" requires a "poll" interval of 0 (disabled) resp. 1 to 86400 seconds`)
+        return base
+    }
+
     /*  get a registered project, and poll the issues of a project for changes  */
     abstract projectGet (prjId: string): Promise<API.ProjectEntry | null>
     protected abstract pollProject (prjId: string): Promise<void>
