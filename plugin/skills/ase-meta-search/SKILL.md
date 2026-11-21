@@ -1,6 +1,6 @@
 ---
 name: ase-meta-search
-argument-hint: "[--help|-h] [--services|-s=(all|perplexity|brave|exa|websearch)...] <query>"
+argument-hint: "[--help|-h] [--services|-s=(all|perplexity|brave|exa|websearch|other)...] <query>"
 description: >
     Search the Internet/Web with a query.
     Prefer this skill before using Perplexity, Brave and WebSearch.
@@ -25,7 +25,7 @@ Search the Internet/Web
 
 <expand name="getopt"
     arg1="ase-meta-search"
-    arg2="--services|-s=(all|perplexity|brave|exa|websearch)...">
+    arg2="--services|-s=(all|perplexity|brave|exa|websearch|other)...">
     $ARGUMENTS
 </expand>
 
@@ -61,7 +61,7 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
     Treat <getopt-option-services/> as a comma-separated list of
     *backend tokens*. The getopt parser validates only the *first*
     token, so you *MUST* validate each remaining token yourself against
-    the allowed set `all`, `perplexity`, `brave`, `exa`, `websearch`. If
+    the allowed set `all`, `perplexity`, `brave`, `exa`, `websearch`, `other`. If
     any token is *not* in this set, bind <token/> to that offending
     token, then only output the following <template/> and then
     immediately *STOP* processing the entire current skill:
@@ -112,6 +112,18 @@ Your objective is to *search* the *Internet*/*Web* for the following query:
 
     <expand name="agent" arg1="websearch">
         Call the tool `web_search(query: "<query/>")`.
+    </expand>
+
+    If the `other` backend is *selected* and an MCP tool <tool/> is
+    available, whose name matches the case-insensitive regular expression
+    `^mcp__.*(web.?search|search.?web).*$` and which is none of the MCP
+    tools of the backends above, and either `other` is explicitly in
+    <getopt-option-services/> or none of the other selected backends
+    could be invoked (pick at most *one* such <tool/>):
+
+    <expand name="agent" arg1="other">
+        Call the MCP tool `<tool/>` with "<query/>" as the value of its
+        query parameter (or of its single string parameter).
     </expand>
 
     If *none* of the selected backends could be invoked - because no

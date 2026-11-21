@@ -1,6 +1,6 @@
 ---
 name: ase-task-research
-argument-hint: "[--help|-h] [--services|-s=(all|perplexity|brave|exa|websearch)...] [--refine|-r] [--dry-run|-d] [<id> | <id>: [<topic>] | <topic>]"
+argument-hint: "[--help|-h] [--services|-s=(all|perplexity|brave|exa|websearch|other)...] [--refine|-r] [--dry-run|-d] [<id> | <id>: [<topic>] | <topic>]"
 description: >
     Research a topic in depth for the current or given task plan, by
     combining Internet/Web search with a grounding in the source
@@ -23,7 +23,7 @@ Research a Topic for a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-research"
-    arg2="--services|-s=(all|perplexity|brave|exa|websearch)... --refine|-r --dry-run|-d --int-source-dir="
+    arg2="--services|-s=(all|perplexity|brave|exa|websearch|other)... --refine|-r --dry-run|-d --int-source-dir="
     arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
@@ -81,7 +81,7 @@ Procedure
         *backend tokens*. The getopt parser validates only the *first*
         token, so you *MUST* validate each remaining token yourself
         against the allowed set `all`, `perplexity`, `brave`, `exa`,
-        `websearch`. If any token is *not* in this set, bind <token/> to
+        `websearch`, `other`. If any token is *not* in this set, bind <token/> to
         that offending token, then only output the following <template/>
         and then immediately *STOP* processing the entire current skill:
 
@@ -164,6 +164,19 @@ Procedure
 
         <expand name="search-agent" arg1="websearch">
             Call the tool `WebSearch(query: "<query/>")`.
+        </expand>
+
+        If the `other` backend is *selected* and an MCP tool <tool/> is
+        available, whose name matches the case-insensitive regular
+        expression `^mcp__.*(web.?search|search.?web).*$` and which is
+        none of the MCP tools of the backends above, and either `other`
+        is explicitly in <getopt-option-services/> or none of the other
+        selected backends could be invoked (pick at most *one* such
+        <tool/>):
+
+        <expand name="search-agent" arg1="other">
+            Call the MCP tool `<tool/>` with "<query/>" as the value of
+            its query parameter (or of its single string parameter).
         </expand>
 
         If *none* of the selected backends could be invoked -- because no

@@ -28,6 +28,11 @@ ChangeLog
     The statistics view of the terminal and web task boards is now labeled `task-stats`, in line
     with the other views `task-lanes`, `task-graph`, `agent-logs`, and `agent-graph`.
 
+-   BUGFIX [code]: Web Search Through Any Search Tool
+    The `ase:ase-meta-search` sub-agent no longer has a fixed tool allowlist, but uses any available
+    Web search tool (e.g. of an LLM gateway), and `ase-meta-search` and `ase-task-research` provide
+    the corresponding new `--services` backend `other`
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

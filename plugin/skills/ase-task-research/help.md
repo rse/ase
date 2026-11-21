@@ -7,7 +7,7 @@
 
 `ase-task-research`
     [`--help`|`-h`]
-    [`--services`|`-s` `all`|`perplexity`|`brave`|`exa`|`websearch`[,...]]
+    [`--services`|`-s` `all`|`perplexity`|`brave`|`exa`|`websearch`|`other`[,...]]
     [`--refine`|`-r`]
     [`--dry-run`|`-d`]
     [*id* | *id*`:` [*topic*] | *topic*]
@@ -49,8 +49,10 @@ request <id> research [<topic>]` or key `R` of the task boards.
 
 ##  OPTIONS
 
--   `--services`|`-s` `all`|`perplexity`|`brave`|`exa`|`websearch`[,...]:
-    The comma-separated search services to query (default: `all`).
+-   `--services`|`-s` `all`|`perplexity`|`brave`|`exa`|`websearch`|`other`[,...]:
+    The comma-separated search services to query (default: `all`),
+    where `other` is any Web search tool of another MCP server, as
+    described for `ase-meta-search`.
 
 -   `--refine`|`-r`:
     Additionally refine the task plan by the recommendations of the
