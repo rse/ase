@@ -47,11 +47,13 @@ interface SpecExportOptions extends SpecSourceOptions {
 /*  a job of the SpecBook worker thread (see "Spec.isolated") and its replies  */
 export type SpecJob =
     { op: "lint",   markdown: boolean, fetch?: FetchMode } |
-    { op: "export", formats:  ExportFormat[], schema: boolean, omit?: string[], fetch?: FetchMode, rebase?: (string | undefined)[] }
+    { op: "export", formats:  ExportFormat[], schema: boolean, omit?: string[], fetch?: FetchMode, rebase?: (string | undefined)[] } |
+    { op: "query",  selector: string, params: Record<string, string>, format: QueryFormat, schema: boolean, fetch?: FetchMode }
 export type SpecReply =
     { type: "log",    level: LogLevel, msg: string } |
     { type: "lint",   diagnostics: Diagnostic[] } |
     { type: "export", buffers: Uint8Array[], notices: string[] } |
+    { type: "query",  text: string, notices: string[] } |
     { type: "error",  message: string }
 
 /*  reusable functionality: initialize, lint, export, query, and preview the
@@ -212,7 +214,7 @@ export class Spec {
         return markdown ? diagnostics.concat(await Spec.markdownlint(log)) : diagnostics
     }
 
-    /*  run a job like "lint" or "export", but in a worker thread, as the
+    /*  run a job like "lint", "export", or "query", but in a worker thread, as the
         SpecBook processing is CPU-bound for seconds and would otherwise
         block the event loop of the service for all parallel requests  */
     private static isolated (log: Log, job: SpecJob): Promise<SpecReply> {
@@ -256,6 +258,18 @@ export class Spec {
             throw new Error(`SpecBook worker: unexpected "${reply.type}" reply`)
         options.notices?.push(...reply.notices)
         return reply.buffers.map((data) => Buffer.from(data.buffer, data.byteOffset, data.byteLength))
+    }
+
+    /*  query like "query", but in a worker thread  */
+    static async queryIsolated (log: Log, selector: string, params: Record<string, string>, format: QueryFormat,
+        notices?: string[], options: SpecSourceOptions = {}): Promise<string> {
+        const reply = await Spec.isolated(log, {
+            op: "query", selector, params, format, schema: options.schema ?? false, fetch: options.fetch
+        })
+        if (reply.type !== "query")
+            throw new Error(`SpecBook worker: unexpected "${reply.type}" reply`)
+        notices?.push(...reply.notices)
+        return reply.text
     }
 
     /*  the markdownlint rules conflicting with the SpecBook format
@@ -793,7 +807,7 @@ export class SpecMCP {
             try {
                 const { parseQueryOutput } = await import("@rse/specbook")
                 const spec = parseQueryOutput(args.output ?? "-", args.format)
-                const text = await Spec.query(this.log, args.selector, args.params ?? {},
+                const text = await Spec.queryIsolated(this.log, args.selector, args.params ?? {},
                     spec.format, notices, { schema: args.schema ?? false, fetch: args.fetch })
                 if (spec.output !== "-") {
                     await fs.promises.writeFile(path.resolve(Task.projectRoot(), spec.output), text)

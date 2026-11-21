@@ -31,6 +31,12 @@ const job = workerData as SpecJob
 const run = async (): Promise<SpecReply> => {
     if (job.op === "lint")
         return { type: "lint", diagnostics: await Spec.lint(log, job.markdown, job.fetch) }
+    if (job.op === "query") {
+        const msgs = new Array<string>()
+        const text = await Spec.query(log, job.selector, job.params, job.format, msgs,
+            { schema: job.schema, fetch: job.fetch })
+        return { type: "query", text, notices: msgs }
+    }
     const notices = new Array<string>()
     const buffers = await Spec.export(log, job.formats,
         { notices, schema: job.schema, omit: job.omit, fetch: job.fetch, rebase: job.rebase })

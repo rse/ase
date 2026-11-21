@@ -113,7 +113,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
 
 /*  hard-coded map: which scope kinds each variable may be SET on
     (reads always cascade through the full chain; this restricts writes only);
-    keys absent from this map default to all non-"default" scope kinds  */
+    keys absent from this map default to "configWritableScopesDefault"  */
 export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"]>> = {
     "project.users":                  [ "user", "project" ],
     "project.task.store.url":         [ "user", "project" ],

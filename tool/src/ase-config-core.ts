@@ -257,7 +257,7 @@ export class Config {
             throw new Error("internal error: \"default\" scope is not lockable")
         fs.mkdirSync(path.dirname(td.filename), { recursive: true })
         if (!fs.existsSync(td.filename))
-            fs.writeFileSync(td.filename, "", { encoding: "utf8", mode: this.fileMode(td.scope, null) })
+            fs.writeFileSync(td.filename, "", { encoding: "utf8", flag: "a", mode: this.fileMode(td.scope, null) })
         const release = lockfile.lockSync(td.filename)
         this.locked = td.filename
         try {

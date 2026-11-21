@@ -715,13 +715,83 @@ const handleNavKey = (ctx: BoardCtx, input: string, key: Key): void => {
     }
 }
 
+/*  request the deletion, transfer, assignment, edit by prompt, or request by prompt of a task
+    in every view (under the kitty keyboard protocol, Shift+<letter> arrives as the lower-case
+    letter with the shift modifier), answering whether the key was such a request  */
+const handleTaskKey = (ctx: BoardCtx, input: string, key: Key, target: string): boolean => {
+    const { all, cycle, setNotice, setConfirm, setTransfer, startAssign, startPrompt, startRequest } = ctx
+    const shifted = (letter: string) => input === letter.toUpperCase() || (input === letter && key.shift)
+    if (shifted("d"))
+        setConfirm({ id: target, yes: false })
+    else if (shifted("t")) {
+        /*  the transfer starts at the current state of the task  */
+        const card = all.cards.get(target)
+        if (cycle === null)
+            setNotice("task lifecycle model not yet loaded")
+        else if (card !== undefined)
+            setTransfer({ id: card.id, at: card.status })
+    }
+    else if (shifted("a"))
+        startAssign(target)
+    else if (shifted("e"))
+        startPrompt(target)
+    else if (shifted("r"))
+        startRequest(target)
+    else
+        return false
+    return true
+}
+
+/*  handle a key press within the agents view, the statistics view, or the agent graph  */
+const handleViewKey = (ctx: BoardCtx, input: string, key: Key): void => {
+    const { view, toggleFlag, selectAgent, scrollLog, logH, stepRange, flowSel, setFlowSel, flowPlaces, scrollFlow, viewH } = ctx
+    if (view === "agents") {
+        /*  the arrows select an agent of the master list, while Shift with the arrows,
+            PgUp/PgDn, and Home/End scroll the log of the detail view  */
+        if ((key.upArrow || key.downArrow) && key.shift)
+            scrollLog(key.upArrow ? -1 : 1)
+        else if (key.upArrow || key.downArrow)
+            selectAgent(key.upArrow ? -1 : 1)
+        else if (key.pageUp || key.pageDown)
+            scrollLog((key.pageUp ? -1 : 1) * Math.max(1, logH - 1))
+        else if (key.home || key.end)
+            scrollLog(key.home ? "top" : "bottom")
+        else if (input === "?")
+            toggleFlag("keys")
+    }
+    else if (view === "stats") {
+        /*  the left/right arrows step through the time ranges of the statistics  */
+        if (key.leftArrow || key.rightArrow)
+            stepRange(key.leftArrow ? -1 : 1)
+        else if (input === "?")
+            toggleFlag("keys")
+    }
+    else if (view === "flow") {
+        /*  the arrows move spatially to the nearest agent card or state in their direction,
+            and ENTER on an agent card shows the agents view with its (first) agent selected, while
+            PgUp/PgDn and Home/End scroll the viewport  */
+        const dir = key.leftArrow ? "left" : key.rightArrow ? "right" : key.upArrow ? "up" : key.downArrow ? "down" : null
+        if (key.return)
+            showAgent(ctx, flowSel)
+        else if (key.pageUp || key.pageDown)
+            scrollFlow(0, (key.pageUp ? -1 : 1) * Math.max(1, viewH - 1))
+        else if (key.home || key.end)
+            scrollFlow(0, key.home ? -Infinity : Infinity)
+        else if (dir !== null) {
+            const next = nearestPlace(flowPlaces, flowSel, dir)
+            if (next !== undefined)
+                setFlowSel(next)
+        }
+        else if (input === "?")
+            toggleFlag("keys")
+    }
+}
+
 /*  handle a key press  */
 export const handleKey = (ctx: BoardCtx, input: string, key: Key): void => {
     const {
-        exit, all, board, surface, view, setView, typing, setTyping, sel, setSel, dialog, setDialog,
-        notice, setNotice, carry, setCarry, cycle, confirm, setConfirm, transfer, setTransfer, assign, startAssign,
-        prompt, mouse, setMouse, places, nodes, toggleFlag, startEdit, startPrompt, startRequest, cycleView, selectAgent, scrollLog, logH, stepRange,
-        flowSel, setFlowSel, flowPlaces, scrollFlow, viewH
+        exit, board, surface, view, typing, setTyping, sel, setSel, dialog, setDialog, notice, setNotice,
+        carry, setCarry, confirm, transfer, assign, prompt, mouse, setMouse, places, nodes, toggleFlag, startEdit, cycleView
     } = ctx
     if (notice !== null)
         setNotice(null)
@@ -740,46 +810,10 @@ export const handleKey = (ctx: BoardCtx, input: string, key: Key): void => {
         return
     }
 
-    /*  request the deletion of a task in every view (under the kitty keyboard
-        protocol, Shift+d arrives as "d" with the shift modifier)  */
+    /*  request an action on a task in every view (see "handleTaskKey")  */
     const target = dialog !== null ? dialog.id : view === "agents" || view === "stats" || view === "flow" ? "" : sel.id
-    if ((input === "D" || (input === "d" && key.shift)) && target !== "" && carry === null) {
-        setConfirm({ id: target, yes: false })
+    if (target !== "" && carry === null && handleTaskKey(ctx, input, key, target))
         return
-    }
-
-    /*  request the transfer of a task to another state in every view, starting
-        at its current state (under the kitty keyboard protocol, Shift+t
-        arrives as "t" with the shift modifier)  */
-    if ((input === "T" || (input === "t" && key.shift)) && target !== "" && carry === null) {
-        const card = all.cards.get(target)
-        if (cycle === null)
-            setNotice("task lifecycle model not yet loaded")
-        else if (card !== undefined)
-            setTransfer({ id: card.id, at: card.status })
-        return
-    }
-
-    /*  request the assignment of a task in every view (under the kitty keyboard
-        protocol, Shift+a arrives as "a" with the shift modifier)  */
-    if ((input === "A" || (input === "a" && key.shift)) && target !== "" && carry === null) {
-        startAssign(target)
-        return
-    }
-
-    /*  request the edit of a task by a prompt in every view (under the kitty
-        keyboard protocol, Shift+e arrives as "e" with the shift modifier)  */
-    if ((input === "E" || (input === "e" && key.shift)) && target !== "" && carry === null) {
-        startPrompt(target)
-        return
-    }
-
-    /*  request a task by a prompt of any request name in every view (under the kitty
-        keyboard protocol, Shift+r arrives as "r" with the shift modifier)  */
-    if ((input === "R" || (input === "r" && key.shift)) && target !== "" && carry === null) {
-        startRequest(target)
-        return
-    }
     if (dialog !== null) {
         handleDialogKey(ctx, dialog, input, key)
         return
@@ -800,47 +834,8 @@ export const handleKey = (ctx: BoardCtx, input: string, key: Key): void => {
         cycleView(input === "V" || key.shift)
         return
     }
-    if (view === "agents") {
-        /*  the arrows select an agent of the master list, while Shift with the arrows,
-            PgUp/PgDn, and Home/End scroll the log of the detail view  */
-        if ((key.upArrow || key.downArrow) && key.shift)
-            scrollLog(key.upArrow ? -1 : 1)
-        else if (key.upArrow || key.downArrow)
-            selectAgent(key.upArrow ? -1 : 1)
-        else if (key.pageUp || key.pageDown)
-            scrollLog((key.pageUp ? -1 : 1) * Math.max(1, logH - 1))
-        else if (key.home || key.end)
-            scrollLog(key.home ? "top" : "bottom")
-        else if (input === "?")
-            toggleFlag("keys")
-        return
-    }
-    if (view === "stats") {
-        /*  the left/right arrows step through the time ranges of the statistics  */
-        if (key.leftArrow || key.rightArrow)
-            stepRange(key.leftArrow ? -1 : 1)
-        else if (input === "?")
-            toggleFlag("keys")
-        return
-    }
-    if (view === "flow") {
-        /*  the arrows move spatially to the nearest agent card or state in their direction,
-            and ENTER on an agent card shows the agents view with its (first) agent selected, while
-            PgUp/PgDn and Home/End scroll the viewport  */
-        const dir = key.leftArrow ? "left" : key.rightArrow ? "right" : key.upArrow ? "up" : key.downArrow ? "down" : null
-        if (key.return)
-            showAgent(ctx, flowSel)
-        else if (key.pageUp || key.pageDown)
-            scrollFlow(0, (key.pageUp ? -1 : 1) * Math.max(1, viewH - 1))
-        else if (key.home || key.end)
-            scrollFlow(0, key.home ? -Infinity : Infinity)
-        else if (dir !== null) {
-            const next = nearestPlace(flowPlaces, flowSel, dir)
-            if (next !== undefined)
-                setFlowSel(next)
-        }
-        else if (input === "?")
-            toggleFlag("keys")
+    if (view === "agents" || view === "stats" || view === "flow") {
+        handleViewKey(ctx, input, key)
         return
     }
     if (key.return && sel.id !== "") {

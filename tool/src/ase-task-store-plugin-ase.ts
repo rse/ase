@@ -487,24 +487,31 @@ class FileTaskStoragePlugin implements API.TaskStoragePlugin {
                     const before = this.stamps.get(dir)
                     if (before === undefined)
                         continue
+                    const known     = new Map(before)
                     const after     = await this.scan(dir)
                     const lifecycle = await this.model(prjIds[0])
                     const change    = { added: [] as API.TaskEntry[], updated: [] as API.TaskEntry[], deleted: [] as string[] }
                     for (const [ taskId, stamp ] of after) {
-                        if (before.get(taskId) === stamp)
+                        if (known.get(taskId) === stamp)
                             continue
                         const entry = await this.entry(dir, taskId, lifecycle)
                         if (entry !== null)
-                            (before.has(taskId) ? change.updated : change.added).push(entry)
+                            (known.has(taskId) ? change.updated : change.added).push(entry)
                     }
-                    for (const taskId of before.keys())
+                    for (const taskId of known.keys())
                         if (!after.has(taskId))
                             change.deleted.push(taskId)
 
-                    /*  update the stamps in place (and only of the reported task plans),
-                        as the own writes meanwhile already recorded theirs  */
+                    /*  skip the task plans written by this plugin instance during the scan  */
                     if (!this.watching || this.stamps.get(dir) !== before)
                         continue
+                    const own = (taskId: string): boolean => before.get(taskId) !== known.get(taskId)
+                    change.added   = change.added.filter((entry) => !own(entry.id))
+                    change.updated = change.updated.filter((entry) => !own(entry.id))
+                    change.deleted = change.deleted.filter((taskId) => !own(taskId))
+
+                    /*  update the stamps in place (and only of the reported task plans),
+                        as the own writes meanwhile already recorded theirs  */
                     for (const entry of [ ...change.added, ...change.updated ])
                         before.set(entry.id, after.get(entry.id)!)
                     for (const taskId of change.deleted)

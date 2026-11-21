@@ -894,6 +894,62 @@ const statsColChart = (dim: boolean, key: string, title: string, width: number,
         foot)
 }
 
+/*  the framed bars "Usage" of the statistics view of an inner width: the total usage by times, tokens
+    (stacked by their kinds), and costs (columns), with the bars of a column scaled to its maximum, where
+    each column ends with a gap (which the last column lets run out at the frame), where the token column
+    is widened (at the expense of the time and cost columns) as far as needed to fit the two-column legend
+    of the token kinds below its bar, which is indented like the bar as far as the column keeps its gap,
+    and where the values of a column are as wide as its widest one, so the bars take all the remaining
+    width of the column and the columns are separated by a gap of two spaces  */
+const statsUsage = (stats: NonNullable<BoardCtx["stats"]>, usage: BoardCtx["usage"], dim: boolean, width: number) => {
+    const frame   = statsFrame(dim, false)
+    const u       = stats.usage
+    const nameW   = 5
+    const gapW    = 2
+    const tokens  = u.cread + u.cwrite + u.input + u.output
+    const share   = (n: number) => `${tokens > 0 ? Math.round(n / tokens * 100) : 0}%`
+    const kind    = (name: string, n: number) => ` ${name} (${share(n)})`
+    const leftL   = Math.max(kind("cread", u.cread).length, kind("cwrite", u.cwrite).length) + 1
+    const rightL  = Math.max(kind("input", u.input).length, kind("output", u.output).length)
+    const timeV   = Math.max(...[ u.timeAI, u.timeHR, u.timeReal ].map((m) => statsHours(m).length))
+    const tokenV  = statsTokens(tokens).length
+    const costV   = Math.max(...[ u.costAI, u.costHR ].map((usd) => statsCost(usd).length))
+    const usageW  = width + gapW
+    const tokenW  = Math.max(Math.floor(usageW / 3), 1 + leftL + 1 + rightL + gapW, nameW + 2 + tokenV + gapW)
+    const cellW   = Math.max(nameW + 2 + Math.max(timeV, costV) + gapW, Math.floor((usageW - tokenW) / 2))
+    const timeM   = cellW - nameW - 1 - timeV - gapW
+    const costM   = cellW - nameW - 1 - costV - gapW
+    const stackW  = tokenW - nameW - 1 - tokenV - gapW
+    const maxTime = Math.max(u.timeAI, u.timeHR, u.timeReal)
+    const maxCost = Math.max(u.costAI, u.costHR)
+    const cell    = (key: string, name: string, color: string | undefined, meter: string, value: string, valW: number, last = false) => [
+        name.padEnd(nameW), h(Text, { key, color, dimColor: dim }, meter), " ", last ? value : value.padEnd(valW + gapW) ]
+    const split   = splitCells(tokens > 0 ? stackW : 0, [ u.cread, u.cwrite, u.input, u.output ])
+    const stack   = [ "░", "▒", "▓", "█" ].map((glyph, i) => glyph.repeat(split[i])).join("")
+    const time    = (name: string, color: string | undefined, minutes: number) =>
+        cell(`time-${name}`, name, color, statsBar(minutes, maxTime, timeM), statsHours(minutes), timeV)
+    const cost    = (name: string, color: string | undefined, usd: number) =>
+        cell(`cost-${name}`, name, color, statsBar(usd, maxCost, costM), statsCost(usd), costV, true)
+    const indent  = Math.max(0, Math.min(nameW, tokenW - gapW - (1 + leftL + 1 + rightL)))
+    const legend  = (key: string, left: [ string, string, number ], right: [ string, string, number ]) => [
+        " ".repeat(indent), h(Text, { key: `${key}-l`, color: palette.accent, dimColor: dim }, left[0]),
+        kind(left[1], left[2]).padEnd(leftL),
+        h(Text, { key: `${key}-r`, color: palette.accent, dimColor: dim }, right[0]),
+        kind(right[1], right[2]).padEnd(Math.max(0, tokenW - indent - 1 - leftL - 1)) ]
+    const lines   = [
+        [ ...time("AI", palette.accent, u.timeAI), ...cell("token", "AI", palette.accent, stack.padEnd(stackW), statsTokens(tokens), tokenV),
+            ...cost("AI", palette.accent, u.costAI) ],
+        [ ...time("HR", palette.accent, u.timeHR), ...legend("legend1", [ "░", "cread", u.cread ], [ "▓", "input", u.input ]),
+            ...cost("HR", palette.accent, u.costHR) ],
+        [ ...time("real", palette.dim, u.timeReal), ...legend("legend2", [ "▒", "cwrite", u.cwrite ], [ "█", "output", u.output ]) ]
+    ].map((segs, i) => h(Text, { key: `line${i}`, ...cx("normal", "truncate", dim && "dimmed") }, ...segs))
+    const head    = h(Text, { key: "head", ...cx("normal", "bold", "truncate", dim && "dimmed") },
+        "Time:".padEnd(cellW) + "Token:".padEnd(tokenW) + "Cost:")
+    return frame("usage", USAGE_H, "Usage", 1, ...(usage === null ?
+        [ h(Text, { key: "loading", ...cx("dim", dim && "dimmed") }, "loading …") ] :
+        !stats.tracked ? [ h(Text, { key: "none", ...cx("dim", "truncate", dim && "dimmed") }, UNTRACKED) ] : [ head, ...lines ]))
+}
+
 /*  render the statistics view: the framed column chart "Tasks per State" of the numbers of tasks per
     lifecycle state (labeled by state, its effort, and phase, in the colors of their lanes, with the framed column
     chart "Throughput" of the finished tasks of the last weeks beside it), the framed stacked bar
@@ -992,60 +1048,8 @@ export const renderStats = (ctx: BoardCtx) => {
             { label: "blocked",          count: stats.readiness.blocked, glyph: "▒", color: palette.signal }
         ]), 2 * avgGrow)
 
-    /*  the bars of the total usage by times, tokens (stacked by their kinds),
-        and costs (columns), with the bars of a column scaled to its maximum, where each
-        column ends with a gap (which the last column lets run out at the frame), within
-        the frame on the left (grown like the frames "Finished Tasks" and "Efficiency"
-        together, to align with them), where the token column is widened (at the expense of
-        the time and cost columns) as far as needed to fit the two-column legend of the token
-        kinds below its bar, which is indented like the bar as far as the column keeps its gap,
-        and where the values of a column are as wide as its widest one, so the bars take all
-        the remaining width of the column and the columns are separated by a gap of two spaces  */
-    const u       = stats.usage
-    const nameW   = 5
-    const gapW    = 2
-    const tokens  = u.cread + u.cwrite + u.input + u.output
-    const share   = (n: number) => `${tokens > 0 ? Math.round(n / tokens * 100) : 0}%`
-    const kind    = (name: string, n: number) => ` ${name} (${share(n)})`
-    const leftL   = Math.max(kind("cread", u.cread).length, kind("cwrite", u.cwrite).length) + 1
-    const rightL  = Math.max(kind("input", u.input).length, kind("output", u.output).length)
-    const timeV   = Math.max(...[ u.timeAI, u.timeHR, u.timeReal ].map((m) => statsHours(m).length))
-    const tokenV  = statsTokens(tokens).length
-    const costV   = Math.max(...[ u.costAI, u.costHR ].map((usd) => statsCost(usd).length))
-    const usageW  = leftW - 2 * avgGrow - 4 + gapW
-    const tokenW  = Math.max(Math.floor(usageW / 3), 1 + leftL + 1 + rightL + gapW, nameW + 2 + tokenV + gapW)
-    const cellW   = Math.max(nameW + 2 + Math.max(timeV, costV) + gapW, Math.floor((usageW - tokenW) / 2))
-    const timeM   = cellW - nameW - 1 - timeV - gapW
-    const costM   = cellW - nameW - 1 - costV - gapW
-    const stackW  = tokenW - nameW - 1 - tokenV - gapW
-    const maxTime = Math.max(u.timeAI, u.timeHR, u.timeReal)
-    const maxCost = Math.max(u.costAI, u.costHR)
-    const cell    = (key: string, name: string, color: string | undefined, meter: string, value: string, valW: number, last = false) => [
-        name.padEnd(nameW), h(Text, { key, color, dimColor: dim }, meter), " ", last ? value : value.padEnd(valW + gapW) ]
-    const split   = splitCells(tokens > 0 ? stackW : 0, [ u.cread, u.cwrite, u.input, u.output ])
-    const stack   = [ "░", "▒", "▓", "█" ].map((glyph, i) => glyph.repeat(split[i])).join("")
-    const time    = (name: string, color: string | undefined, minutes: number) =>
-        cell(`time-${name}`, name, color, statsBar(minutes, maxTime, timeM), statsHours(minutes), timeV)
-    const cost    = (name: string, color: string | undefined, usd: number) =>
-        cell(`cost-${name}`, name, color, statsBar(usd, maxCost, costM), statsCost(usd), costV, true)
-    const indent  = Math.max(0, Math.min(nameW, tokenW - gapW - (1 + leftL + 1 + rightL)))
-    const legend  = (key: string, left: [ string, string, number ], right: [ string, string, number ]) => [
-        " ".repeat(indent), h(Text, { key: `${key}-l`, color: palette.accent, dimColor: dim }, left[0]),
-        kind(left[1], left[2]).padEnd(leftL),
-        h(Text, { key: `${key}-r`, color: palette.accent, dimColor: dim }, right[0]),
-        kind(right[1], right[2]).padEnd(Math.max(0, tokenW - indent - 1 - leftL - 1)) ]
-    const lines   = [
-        [ ...time("AI", palette.accent, u.timeAI), ...cell("token", "AI", palette.accent, stack.padEnd(stackW), statsTokens(tokens), tokenV),
-            ...cost("AI", palette.accent, u.costAI) ],
-        [ ...time("HR", palette.accent, u.timeHR), ...legend("legend1", [ "░", "cread", u.cread ], [ "▓", "input", u.input ]),
-            ...cost("HR", palette.accent, u.costHR) ],
-        [ ...time("real", palette.dim, u.timeReal), ...legend("legend2", [ "▒", "cwrite", u.cwrite ], [ "█", "output", u.output ]) ]
-    ].map((segs, i) => h(Text, { key: `line${i}`, ...cx("normal", "truncate", dim && "dimmed") }, ...segs))
-    const head    = h(Text, { key: "head", ...cx("normal", "bold", "truncate", dim && "dimmed") },
-        "Time:".padEnd(cellW) + "Token:".padEnd(tokenW) + "Cost:")
-    const matrix  = frame("usage", USAGE_H, "Usage", 1, ...(usage === null ?
-        [ h(Text, { key: "loading", ...cx("dim", dim && "dimmed") }, "loading …") ] :
-        !stats.tracked ? [ h(Text, { key: "none", ...cx("dim", "truncate", dim && "dimmed") }, UNTRACKED) ] : [ head, ...lines ]))
+    /*  the bars of the total usage (grown like the frames "Finished Tasks" and "Efficiency" together, to align with them)  */
+    const matrix  = statsUsage(stats, usage, dim, leftW - 2 * avgGrow - 4)
 
     /*  the compact column chart of the distribution of the effort sizes (the numbers of the
         estimated tasks per size, from the smallest to the largest size), with the numbers of
