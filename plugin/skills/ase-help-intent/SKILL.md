@@ -108,7 +108,7 @@ catalog you match <intent/> against:
         free-text channel (do *not* stop and do *not* render a command):
 
         <template>
-        <ase-tpl-bullet-secondary/> **WARNING**: no confident match for the intent -- please refine or clarify it.
+        ⧉ **ASE**: **WARNING**: no confident match for the intent -- please refine or clarify it.
         </template>
         </if>
 
@@ -177,7 +177,7 @@ catalog you match <intent/> against:
             to obtain a refined intent via the dialog's free-text channel:
 
             <template>
-            <ase-tpl-bullet-secondary/> **HINT**: please enter a refined or clearer intent as free text.
+            ⧉ **ASE**: **HINT**: please enter a refined or clearer intent as free text.
             </template>
 
         -   If <result/> matches `C<n/>` (which implies <matched/> is

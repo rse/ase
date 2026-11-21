@@ -64,7 +64,7 @@ for the technology stack to *provide* the *needed functionality*
         <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **FUNCTIONALITY**: <functionality/>
+        ⧉ **ASE**: **FUNCTIONALITY**: <functionality/>
         </template>
     </step>
 
@@ -127,7 +127,7 @@ for the technology stack to *provide* the *needed functionality*
         following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **TECHNOLOGY STACK**: <stack/>
+        ⧉ **ASE**: **TECHNOLOGY STACK**: <stack/>
         </template>
     </step>
 
@@ -138,7 +138,7 @@ for the technology stack to *provide* the *needed functionality*
         *STOP* the entire flow (do not perform any further steps):
 
         <template>
-        <ase-tpl-bullet-normal/> **RESULT**: technology stack could not be determined -- component discovery is only supported for JavaScript, TypeScript, Java, Kotlin, Scala, Python, Rust, Go, C#, and F# projects.
+        ⧉ **ASE**: **RESULT**: technology stack could not be determined -- component discovery is only supported for JavaScript, TypeScript, Java, Kotlin, Scala, Python, Rust, Go, C#, and F# projects.
         </template>
 
     2.  From <stack/> and <functionality/>, derive essential keywords
@@ -349,7 +349,7 @@ for the technology stack to *provide* the *needed functionality*
         anything else:
 
         <template>
-        <ase-tpl-bullet-normal/> **COMPONENT HINTS**:
+        ⧉ **ASE**: **COMPONENT HINTS**:
 
         | ⚑ *Component* | ▣ *Package*    | ⚖ *Hint*  |
         | :------------ | :------------- | :-------- |
@@ -362,7 +362,7 @@ for the technology stack to *provide* the *needed functionality*
         with just the following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **COMPONENT RANKING**:
+        ⧉ **ASE**: **COMPONENT RANKING**:
 
         | ⚑ *Component* | ▣ *Package*    | ❖ *Version*  | ↓ *Downloads*      | ⎈ *Stars*      | ⏲ *Updated*      | ☆ *Created*  | ⚭ *Dep.*   |
         | :------------ | :------------- | -----------: | -----------------: | -------------: | :--------------- | :----------- | ---------: |

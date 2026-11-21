@@ -97,7 +97,7 @@ Processing
     following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **CHANGELOG FILE:** `<filename/>`
+    ⧉ **ASE**: **CHANGELOG FILE:** `<filename/>`
     </template>
 
     </step>
@@ -108,7 +108,7 @@ Processing
     operation with an output based on the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **DETERMINE ARTIFACT CHANGES:**
+    ⧉ **ASE**: **DETERMINE ARTIFACT CHANGES:**
     </template>
 
     To update the entries of the most recent *ChangeLog* section, consult
@@ -149,7 +149,7 @@ Processing
     operation with an output based on the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **COMPLETE ENTRIES:**
+    ⧉ **ASE**: **COMPLETE ENTRIES:**
     </template>
 
     Without immediately modifying the `CHANGELOG.md` file, *complete*
@@ -185,7 +185,7 @@ Processing
     operation with an output based on the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **CONSOLIDATE ENTRIES:**
+    ⧉ **ASE**: **CONSOLIDATE ENTRIES:**
     </template>
 
     Without immediately modifying the `CHANGELOG.md` file, *consolidate*
@@ -206,7 +206,7 @@ Processing
     operation with an output based on the following <template/>:
 
     <template>
-    <ase-tpl-bullet-signal/> **UPDATING CHANGELOG:**
+    ⧉ **ASE**: **UPDATING CHANGELOG:**
     </template>
 
     Finally, *update* the `CHANGELOG.md` file with the completed,

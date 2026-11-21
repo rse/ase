@@ -54,13 +54,6 @@ Skill Output
     `<xxx .../>`) *MUST* *NEVER* appear literally in your output: always
     replace it by its current (possibly empty) value.
 
--   *IMPORTANT*: The *bullet* template patterns (see `Template Patterns`
-    below) expand into exactly *one* glyph each, and *nothing* else:
-    `<ase-tpl-bullet-secondary/>` into `⚪`, `<ase-tpl-bullet-normal/>`
-    into `🔵`, and `<ase-tpl-bullet-signal/>` into `🟠`. You *MUST*
-    *NEVER* output such a tag literally, *NEVER* output both the tag and
-    its glyph, and *NEVER* substitute another glyph (like `○` or `●`).
-
 -   *IMPORTANT*: Whenever your *authored* text (a free-text placeholder
     value, a finding, or an explanation) *quotes* markup, code, or a
     placeholder name like `<xxx/>` from a file or a skill, you *MUST*
@@ -623,18 +616,6 @@ Template Patterns
     <if condition="<digit/> is '7'"><template>➐</template></if>
     <if condition="<digit/> is '8'"><template>➑</template></if>
     <if condition="<digit/> is '9'"><template>➒</template></if>
-
--   When `<ase-tpl-bullet-secondary/>` should be expanded, use:
-
-    <template>⚪</template>
-
--   When `<ase-tpl-bullet-normal/>` should be expanded, use:
-
-    <template>🔵</template>
-
--   When `<ase-tpl-bullet-signal/>` should be expanded, use:
-
-    <template>🟠</template>
 
 -   When `<ase-tpl-pad width="<width/>" text="<text/>"/>` should be expanded, use
     (where <ws/> = ` ` x max(0, <width/> - length("<text/>")), i.e., <ws/> is

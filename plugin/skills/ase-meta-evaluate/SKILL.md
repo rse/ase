@@ -42,7 +42,7 @@ multi-*criteria* decision matrix.
         and do not output anything else:
 
         <template>
-        <ase-tpl-bullet-secondary/> **REASON**: *<reason/>*
+        ⧉ **ASE**: **REASON**: *<reason/>*
         </template>
     </step>
 
@@ -56,7 +56,7 @@ multi-*criteria* decision matrix.
         executing any further steps:
 
         <template>
-        <ase-tpl-bullet-signal/> **ERROR: INSUFFICIENT ALTERNATIVES**: at least two are required for a comparison!
+        ⧉ **ASE**: **ERROR: INSUFFICIENT ALTERNATIVES**: at least two are required for a comparison!
         </template>
 
     -   For each alternative <alternative-K/> (K=1-N), decide whether
@@ -92,7 +92,7 @@ multi-*criteria* decision matrix.
         immediately without executing any further steps:
 
         <template>
-        <ase-tpl-bullet-signal/> **ERROR: INCOMPARABLE ALTERNATIVES**: *<class-of-alternatives/>*
+        ⧉ **ASE**: **ERROR: INCOMPARABLE ALTERNATIVES**: *<class-of-alternatives/>*
 
         ⚑ **<alternative-K/>** (*member of a different class*)
         </template>
@@ -102,7 +102,7 @@ multi-*criteria* decision matrix.
         anything else:
 
         <template>
-        <ase-tpl-bullet-normal/> **ALTERNATIVES**: *<class-of-alternatives/>*
+        ⧉ **ASE**: **ALTERNATIVES**: *<class-of-alternatives/>*
 
         | ⚑ *Alternative*        | ⚖ *Hint*  |
         | :--------------------- | :-------- |
@@ -185,7 +185,7 @@ multi-*criteria* decision matrix.
         alternative* <alternative-K/> (K=1-N).
 
         <template>
-        <ase-tpl-bullet-normal/> **EVALUATION**: *Weighted Multi-Criteria Decision Matrix*
+        ⧉ **ASE**: **EVALUATION**: *Weighted Multi-Criteria Decision Matrix*
 
         | ⦿ *Criteria*  | ⚖ *Weight*  | ⚑ **<alternative-1/>** | [...alternatives 2-(N-1)...] | ⚑ **<alternative-N/>** |
         | :------------ | ----------: | ---------------------: | ---------------------------: | ---------------------: |
@@ -251,7 +251,7 @@ multi-*criteria* decision matrix.
         than being masked by the multiple-best or small-distance branches:
 
         <template>
-        <ase-tpl-bullet-signal/> **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
+        ⧉ **ASE**: **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
         ⚠ *ATTENTION: all alternatives rate negatively; this is the least-bad choice, not a strong winner!*
         </template>
 
@@ -261,7 +261,7 @@ multi-*criteria* decision matrix.
         else:
 
         <template>
-        <ase-tpl-bullet-signal/> **ERROR**: ✘ *MULTIPLE BEST ALTERNATIVES FOUND*,
+        ⧉ **ASE**: **ERROR**: ✘ *MULTIPLE BEST ALTERNATIVES FOUND*,
         ⚠ *Please give some hints on the criteria to ensure a single best alternative!*
         </template>
 
@@ -270,7 +270,7 @@ multi-*criteria* decision matrix.
         else:
 
         <template>
-        <ase-tpl-bullet-signal/> **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
+        ⧉ **ASE**: **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
         ⚠ *ATTENTION: small distance to second best alternative!*
         </template>
 
@@ -278,7 +278,7 @@ multi-*criteria* decision matrix.
         just the following <template/> and do not output anything else:
 
         <template>
-        <ase-tpl-bullet-signal/> **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
+        ⧉ **ASE**: **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**
         </template>
     </step>
 </flow>

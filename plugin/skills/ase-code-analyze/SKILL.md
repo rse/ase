@@ -68,7 +68,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
     STEP 3:
 
     <template>
-    <ase-tpl-bullet-normal/> **CODE ANALYSIS**: *suppressed* (`project.boxing` is `black`)
+    ⧉ **ASE**: **CODE ANALYSIS**: *suppressed* (`project.boxing` is `black`)
     </template>
 
     </if>
@@ -76,7 +76,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
     First, use the following <template/> to give a hint on this step:
 
     <template>
-    <ase-tpl-bullet-secondary/> **ANALYSIS INVESTIGATION**
+    ⧉ **ASE**: **ANALYSIS INVESTIGATION**
     </template>
 
     Dispatch the investigation to *sub-agents* via the `Agent`
@@ -129,7 +129,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
     STEP 3:
 
     <template>
-    <ase-tpl-bullet-normal/> **CODE ANALYSIS**: *no <changes/> source files to analyze*
+    ⧉ **ASE**: **CODE ANALYSIS**: *no <changes/> source files to analyze*
     </template>
 
     Otherwise, *silently* determine the *changed line ranges* <ranges/>
@@ -275,7 +275,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     <template>
 
-    <ase-tpl-bullet-signal/> **PROBLEM** (Severity: **<severity/>**): **<id-prefix/>P<n/>**: **<title/>**
+    ⧉ **ASE**: **PROBLEM** (Severity: **<severity/>**): **<id-prefix/>P<n/>**: **<title/>**
 
     <description/>
 
@@ -290,7 +290,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     <template>
 
-    <ase-tpl-bullet-signal/> **PROBLEM** (Severity: **<severity/>**): **<id-prefix/>P<n/>**: **<title/>**
+    ⧉ **ASE**: **PROBLEM** (Severity: **<severity/>**): **<id-prefix/>P<n/>**: **<title/>**
 
     <description/>
 

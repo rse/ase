@@ -70,7 +70,7 @@ so that even a five-year-old child could understand it:
     falls back to model knowledge, and output the following <template/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **WARNING**: grounding found no usable facts -- falling back to model knowledge.
+    ⧉ **ASE**: **WARNING**: grounding found no usable facts -- falling back to model knowledge.
     </template>
 
     </if>
@@ -102,13 +102,13 @@ so that even a five-year-old child could understand it:
     Output the result with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **TOPIC**: **<topic/>**
+    ⧉ **ASE**: **TOPIC**: **<topic/>**
 
-    <ase-tpl-bullet-normal/> **WHAT**: <what/>.
+    ⧉ **ASE**: **WHAT**: <what/>.
 
-    <ase-tpl-bullet-normal/> **ANALOGY**: <analogy/>.
+    ⧉ **ASE**: **ANALOGY**: <analogy/>.
 
-    <ase-tpl-bullet-signal/> **WHY**: <why/>.
+    ⧉ **ASE**: **WHY**: <why/>.
     </template>
 
     </step>

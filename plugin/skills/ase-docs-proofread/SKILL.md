@@ -44,7 +44,7 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
     and STEP 3:
 
     <template>
-    <ase-tpl-bullet-normal/> **PROOFREAD**: *suppressed* (`project.boxing` is `black`)
+    ⧉ **ASE**: **PROOFREAD**: *suppressed* (`project.boxing` is `black`)
     </template>
 
     </if>
@@ -52,7 +52,7 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
     First, use the following <template/> to give a hint on this step:
 
     <template>
-    <ase-tpl-bullet-secondary/> **PROOFREADING INVESTIGATION**
+    ⧉ **ASE**: **PROOFREADING INVESTIGATION**
     </template>
 
     Dispatch the investigation to *sub-agents* via the `Agent`
@@ -99,7 +99,7 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
     problems in <problems/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **PROOFREADING SUMMARY**:
+    ⧉ **ASE**: **PROOFREADING SUMMARY**:
 
     | *Proofread Type*    | *Proofread Result*      |
     | ------------------- | ----------------------- |
@@ -193,7 +193,7 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
         2.  Report the problem with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-signal/> [<index/>/<total/>]: **<type/> PROBLEM**: `<file/>`:<line/>:
+            ⧉ **ASE**: [<index/>/<total/>]: **<type/> PROBLEM**: `<file/>`:<line/>:
 
             <description/>
             </template>
@@ -212,7 +212,7 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
 
             <template>
 
-            <ase-tpl-bullet-normal/> **<type/> CORRECTION**: `<old-snippet/>` → `<new-snippet/>`
+            ⧉ **ASE**: **<type/> CORRECTION**: `<old-snippet/>` → `<new-snippet/>`
 
             </template>
 
@@ -308,7 +308,7 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
         *together* with the final template of substep 5:
 
         <template>
-        <ase-tpl-bullet-secondary/> **PROOFREAD RESULT**:
+        ⧉ **ASE**: **PROOFREAD RESULT**:
 
         | *#* | *Type* | *Location* | *Correction* | *Status* |
         | --: | ------ | ---------- | ------------ | -------- |
@@ -328,7 +328,7 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
         result of substep 4 and the following final <template/>:
 
         <template>
-        <ase-tpl-bullet-secondary/> **PROOFREAD FINISHED**
+        ⧉ **ASE**: **PROOFREAD FINISHED**
         </template>
 
     6.  Finally, give the closing hint by expanding the following

@@ -44,7 +44,7 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
     STEP 2 through STEP 3:
 
     <template>
-    <ase-tpl-bullet-normal/> **PROJECT INSIGHT**: *suppressed* (`project.boxing` is `black`)
+    ⧉ **ASE**: **PROJECT INSIGHT**: *suppressed* (`project.boxing` is `black`)
     </template>
 
     </if>
@@ -83,15 +83,15 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
     explanation of these results.
 
     <template>
-    <ase-tpl-bullet-normal/> **PROJECT ABSTRACT**:
+    ⧉ **ASE**: **PROJECT ABSTRACT**:
 
     <abstract/>
 
-    <ase-tpl-bullet-normal/> **PROJECT AUTHOR**:
+    ⧉ **ASE**: **PROJECT AUTHOR**:
 
     <author/>
 
-    <ase-tpl-bullet-normal/> **SOURCE CHURN**:
+    ⧉ **ASE**: **SOURCE CHURN**:
 
     <churn/>
     </template>
@@ -101,7 +101,7 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
     Display the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **MODULE STRUCTURE**:
+    ⧉ **ASE**: **MODULE STRUCTURE**:
     </template>
 
     Find all modules (or OOP classes) of <getopt-arguments/> and build a

@@ -51,7 +51,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     Output the thesis with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **THESIS**: <thesis/>
+    ⧉ **ASE**: **THESIS**: <thesis/>
     </template>
 
     </step>
@@ -168,7 +168,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     the following <template/>:
 
     <template>
-    <ase-tpl-bullet-signal/> **ANTITHESIS**: <antithesis-N/>
+    ⧉ **ASE**: **ANTITHESIS**: <antithesis-N/>
     </template>
 
     </step>
@@ -200,7 +200,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     in <synthesis/>, and then finally output the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **SYNTHESIS**: <synthesis/>
+    ⧉ **ASE**: **SYNTHESIS**: <synthesis/>
     </template>
 
     Do not output any further explanations.

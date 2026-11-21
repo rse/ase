@@ -88,7 +88,7 @@ Find Quotes on a Topic
         knowledge only:
 
         <template>
-        <ase-tpl-bullet-secondary/> **WARNING**: grounding found no usable quotes -- falling back to model knowledge.
+        ⧉ **ASE**: **WARNING**: grounding found no usable quotes -- falling back to model knowledge.
         </template>
         </if>
 
@@ -123,7 +123,7 @@ Find Quotes on a Topic
         only:
 
         <template>
-        <ase-tpl-bullet-secondary/> **WARNING**: proximity agent returned no usable result -- keeping the narrow topic only.
+        ⧉ **ASE**: **WARNING**: proximity agent returned no usable result -- keeping the narrow topic only.
         </template>
         </if>
 

@@ -519,7 +519,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         <template>
         ⧉ **ASE**: ✪ skill: **ase-spec-edit**, ▶ status: **verification failed**
 
-        <ase-tpl-bullet-signal/> **REMAINING DIAGNOSTICS**:
+        ⧉ **ASE**: **REMAINING DIAGNOSTICS**:
 
         -   `<file/>:<line/>:<column/>`: <message/>
         [...]

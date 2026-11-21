@@ -48,7 +48,7 @@ with no extra blank or space-only lines):
 
 <template>
 
-<ase-tpl-bullet-normal/> <arg2/>:
+⧉ **ASE**: <arg2/>:
 
 ```diff
 --- <file/> (original)

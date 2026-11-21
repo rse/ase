@@ -51,7 +51,7 @@ addressing surface-level symptoms.
     State the problem statement.
 
     <template>
-    <ase-tpl-bullet-signal/> **PROBLEM**: <problem/>
+    ⧉ **ASE**: **PROBLEM**: <problem/>
     </template>
 
     </step>
@@ -102,7 +102,7 @@ addressing surface-level symptoms.
             Consider technical, domain-specific, process-related, or organizational causes.
 
             <template>
-            <ase-tpl-bullet-secondary/> **WHY <n/>**: <answer/>
+            ⧉ **ASE**: **WHY <n/>**: <answer/>
             </template>
 
             Then, for the next iteration, set <question/> now to be the last <answer/>.
@@ -147,7 +147,7 @@ addressing surface-level symptoms.
             Start with <k>1</k> (set candidate counter to one).
             <while condition="<k/> is less than or equal to <count/>">
                 <template>
-                <ase-tpl-bullet-secondary/> **WHY <n/>.<k/>**: <answer-k/>
+                ⧉ **ASE**: **WHY <n/>.<k/>**: <answer-k/>
                 </template>
                 Set <k/> to <k/> + 1 (increment candidate counter).
             </while>
@@ -162,7 +162,7 @@ addressing surface-level symptoms.
             if no candidate clearly dominates, say so.
 
             <template>
-            <ase-tpl-bullet-secondary/> **WHY <n/> → chosen <n/>.<chosen-k/>**: <justification/>
+            ⧉ **ASE**: **WHY <n/> → chosen <n/>.<chosen-k/>**: <justification/>
             </template>
 
             Record the remaining candidates as <fallbacks/> for level <n/>.
@@ -207,7 +207,7 @@ addressing surface-level symptoms.
     based on the files referenced by <ground-facts/>, if any.
 
     <template>
-    <ase-tpl-bullet-signal/> **SOLUTION**: <solution/>
+    ⧉ **ASE**: **SOLUTION**: <solution/>
     </template>
 
     </step>

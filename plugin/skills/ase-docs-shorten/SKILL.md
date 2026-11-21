@@ -139,7 +139,7 @@ than the user asked for.
     STEP 4, and STEP 5:
 
     <template>
-    <ase-tpl-bullet-normal/> **SHORTEN**: *suppressed* (`project.boxing` is `black`)
+    ⧉ **ASE**: **SHORTEN**: *suppressed* (`project.boxing` is `black`)
     </template>
 
     </if>
@@ -147,7 +147,7 @@ than the user asked for.
     First, use the following <template/> to give a hint on this step:
 
     <template>
-    <ase-tpl-bullet-secondary/> **SHORTENING INVESTIGATION**: `<file/>` → **<target/>** <unit/>
+    ⧉ **ASE**: **SHORTENING INVESTIGATION**: `<file/>` → **<target/>** <unit/>
     </template>
 
     Dispatch the investigation to a *sub-agent* via the `Agent` tool so
@@ -192,7 +192,7 @@ than the user asked for.
     steps STEP 4 and STEP 5:
 
     <template>
-    <ase-tpl-bullet-normal/> **ALREADY SHORT ENOUGH**: **<length-before/>** <unit/> ≤ **<target/>** <unit/>
+    ⧉ **ASE**: **ALREADY SHORT ENOUGH**: **<length-before/>** <unit/> ≤ **<target/>** <unit/>
     </template>
 
     </if>
@@ -201,7 +201,7 @@ than the user asked for.
     shortenings in <blocks/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **SHORTENING SUMMARY**:
+    ⧉ **ASE**: **SHORTENING SUMMARY**:
 
     | *Shortening Stage* | *Shortening Result*      |
     | ------------------ | ------------------------ |
@@ -292,7 +292,7 @@ than the user asked for.
         2.  Report the proposed block with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-signal/> [<index/>/<total/>]: **<stage/> BLOCK**: `<file/>`:<line/>:
+            ⧉ **ASE**: [<index/>/<total/>]: **<stage/> BLOCK**: `<file/>`:<line/>:
 
             <description/>
             </template>
@@ -322,7 +322,7 @@ than the user asked for.
 
             <template>
 
-            <ase-tpl-bullet-normal/> **<stage/> SHORTENING** (**<block-before/>** → **<block-after/>** <unit/>, **-<block-percent/>%**):
+            ⧉ **ASE**: **<stage/> SHORTENING** (**<block-before/>** → **<block-after/>** <unit/>, **-<block-percent/>%**):
 
             ```diff
             - <old-snippet/>
@@ -439,7 +439,7 @@ than the user asked for.
         *together* with the templates of the remaining substeps:
 
         <template>
-        <ase-tpl-bullet-secondary/> **SHORTEN RESULT**:
+        ⧉ **ASE**: **SHORTEN RESULT**:
 
         | *#* | *Stage* | *Location* | *Summary* | *Saving* | *Status* |
         | --: | ------- | ---------- | --------- | -------- | -------- |
@@ -457,7 +457,7 @@ than the user asked for.
     3.  Report the achieved length with the following <template/>:
 
         <template>
-        <ase-tpl-bullet-secondary/> **LENGTH REPORT**: `<file/>`
+        ⧉ **ASE**: **LENGTH REPORT**: `<file/>`
 
         | *Length Metric* | *Length Value*                             |
         | --------------- | ------------------------------------------ |
@@ -471,7 +471,7 @@ than the user asked for.
     4.  <if condition="<length-after/> is less than or equal to <target/>">
 
         <template>
-        <ase-tpl-bullet-normal/> **TARGET MET**
+        ⧉ **ASE**: **TARGET MET**
         </template>
 
         </if>
@@ -482,7 +482,7 @@ than the user asked for.
         <target/>, else to `rejected or dropped shortenings`.
 
         <template>
-        <ase-tpl-bullet-signal/> **TARGET MISSED** by **<missed/>** <unit/> (<cause/>)
+        ⧉ **ASE**: **TARGET MISSED** by **<missed/>** <unit/> (<cause/>)
         </template>
 
         </else>
@@ -492,7 +492,7 @@ than the user asked for.
         following final <template/>:
 
         <template>
-        <ase-tpl-bullet-secondary/> **SHORTEN FINISHED**
+        ⧉ **ASE**: **SHORTEN FINISHED**
         </template>
 
     6.  Finally, give the closing hint by expanding the following

@@ -204,11 +204,11 @@ Investigate and *figure out details* related to the problem of the
 <instruction/> and report them with the following <template/>:
 
 <template>
-<ase-tpl-bullet-signal/> **PROBLEM CONTEXT**: *<context/>*
+⧉ **ASE**: **PROBLEM CONTEXT**: *<context/>*
 <affected-code-excerpt/>
 <optional-diagram/>
 
-<ase-tpl-bullet-signal/> **PROBLEM DETAILS**: *<summary/>*
+⧉ **ASE**: **PROBLEM DETAILS**: *<summary/>*
 ● [...]
 ● [...]
 ● [...]

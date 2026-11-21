@@ -5,6 +5,10 @@ ChangeLog
 2.1.5 (2026-11-21)
 ------------------
 
+-   IMPROVEMENT [code]: Plain `⧉ ASE` Prefixes Instead of Bullet Tags
+    The skills prefix their output lines with a plain `⧉ **ASE**:` instead of the often unexpanded
+    `<ase-tpl-bullet-{normal,secondary,signal}/>` template tags, which are dropped entirely.
+
 -   IMPROVEMENT [code]: No Repeated Step Outputs at Turn End
     The `stop` hook lists the lines with unfilled template placeholders and asks to repeat only them,
     and the focus mode rule of the skills applies only if the harness states this mode explicitly.

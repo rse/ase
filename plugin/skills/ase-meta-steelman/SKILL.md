@@ -61,14 +61,14 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     Indicate the current round with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **ROUND**: <i/>/<rounds/>
+    ⧉ **ASE**: **ROUND**: <i/>/<rounds/>
     </template>
     </if>
 
     Output the thesis with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **THESIS**: <thesis/>
+    ⧉ **ASE**: **THESIS**: <thesis/>
     </template>
 
     </step>
@@ -192,7 +192,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     the following <template/>:
 
     <template>
-    <ase-tpl-bullet-signal/> **PRO-THESIS**: <prothesis-N/>
+    ⧉ **ASE**: **PRO-THESIS**: <prothesis-N/>
     </template>
     </step>
 
@@ -226,7 +226,7 @@ to <getopt-option-count/>; if <getopt-option-count/> is *non-numeric* or
     and then finally output the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **FORTIFICATION**: <fortification/>
+    ⧉ **ASE**: **FORTIFICATION**: <fortification/>
     </template>
 
     Finally, decide whether to perform a further round:

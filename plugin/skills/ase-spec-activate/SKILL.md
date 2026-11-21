@@ -129,7 +129,7 @@ an ad-hoc change, and it *never* touches the artifact kinds `CODE`,
     resulting answer and only output the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **SPEC ANSWER**:
+    ⧉ **ASE**: **SPEC ANSWER**:
 
     <answer/>
     </template>

@@ -105,7 +105,7 @@ relevant *child* topics:
         following <template/>:
 
         <template>
-        <ase-tpl-bullet-secondary/> **WARNING**: proximity agent returned no usable result -- falling back to model knowledge.
+        ⧉ **ASE**: **WARNING**: proximity agent returned no usable result -- falling back to model knowledge.
         </template>
         </if>
 

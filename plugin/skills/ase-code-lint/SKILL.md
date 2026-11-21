@@ -48,7 +48,7 @@ related to a set of code quality aspects.
     STEP 2 and STEP 3:
 
     <template>
-    <ase-tpl-bullet-normal/> **LINT**: *suppressed* (`project.boxing` is `black`)
+    ⧉ **ASE**: **LINT**: *suppressed* (`project.boxing` is `black`)
     </template>
 
     </if>
@@ -85,7 +85,7 @@ related to a set of code quality aspects.
     Then, use the following <template/> to give a hint on this step:
 
     <template>
-    <ase-tpl-bullet-secondary/> **LINT INVESTIGATION**
+    ⧉ **ASE**: **LINT INVESTIGATION**
     </template>
 
     Dispatch the investigation to *sub-agents* via the `Agent`
@@ -151,7 +151,7 @@ related to a set of code quality aspects.
     STEP 2 and STEP 3:
 
     <template>
-    <ase-tpl-bullet-normal/> **LINT**: *no <changes/> source files to lint*
+    ⧉ **ASE**: **LINT**: *no <changes/> source files to lint*
     </template>
 
     Otherwise, *silently* determine the *changed line ranges* <ranges/>
@@ -281,10 +281,10 @@ related to a set of code quality aspects.
     ordering `A01 - XXX`...`A21 - XXX`.
 
     <template>
-    <ase-tpl-bullet-secondary/> **LINT SUMMARY**:
+    ⧉ **ASE**: **LINT SUMMARY**:
 
-    <ase-tpl-bullet-signal/> **AX - XXX**: N issues
-    <ase-tpl-bullet-signal/> **AX - XXX**: N issues
+    ⧉ **ASE**: **AX - XXX**: N issues
+    ⧉ **ASE**: **AX - XXX**: N issues
     [...]
     </template>
 
@@ -292,7 +292,7 @@ related to a set of code quality aspects.
     output the summary instead:
 
     <template>
-    <ase-tpl-bullet-secondary/> **LINT SUMMARY**:
+    ⧉ **ASE**: **LINT SUMMARY**:
 
     *(no problems detected)*
     </template>
@@ -472,7 +472,7 @@ related to a set of code quality aspects.
                     <diff-condensed/> as a new line:
 
                     <template>
-                    <ase-tpl-bullet-signal/> `<file/>`:<line/>: `<old-snippet/>` → `<new-snippet/>`
+                    ⧉ **ASE**: `<file/>`:<line/>: `<old-snippet/>` → `<new-snippet/>`
                     </template>
 
                     </if>
@@ -499,7 +499,7 @@ related to a set of code quality aspects.
         4.  Report the problem with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-signal/> [<index/>/<total/>]: **<aspect/> PROBLEM** (`<severity/>`): <context/>
+            ⧉ **ASE**: [<index/>/<total/>]: **<aspect/> PROBLEM** (`<severity/>`): <context/>
 
             <description/>
 
@@ -517,7 +517,7 @@ related to a set of code quality aspects.
             solution with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-normal/> **<aspect/> SOLUTION**:
+            ⧉ **ASE**: **<aspect/> SOLUTION**:
 
             <diff-condensed/>
 
@@ -529,7 +529,7 @@ related to a set of code quality aspects.
             Report the solution with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-normal/> **<aspect/> SOLUTION**:
+            ⧉ **ASE**: **<aspect/> SOLUTION**:
 
             ```diff
             <diff/>
@@ -545,7 +545,7 @@ related to a set of code quality aspects.
             Report the solution with the following <template/>:
 
             <template>
-            <ase-tpl-bullet-normal/> **<aspect/> SOLUTION**:
+            ⧉ **ASE**: **<aspect/> SOLUTION**:
 
             *(corresponding change automatically applied)*
 
@@ -631,7 +631,7 @@ related to a set of code quality aspects.
         *together* with the final template of substep 5:
 
         <template>
-        <ase-tpl-bullet-secondary/> **LINT RESULT**:
+        ⧉ **ASE**: **LINT RESULT**:
 
         | *#* | *Aspect* | *Severity* | *Location* | *Summary* | *Status* |
         | --: | -------- | ---------- | ---------- | --------- | -------- |
@@ -652,7 +652,7 @@ related to a set of code quality aspects.
         result of substep 4 and the following final <template/>:
 
         <template>
-        <ase-tpl-bullet-secondary/> **LINT FINISHED**
+        ⧉ **ASE**: **LINT FINISHED**
         </template>
 
     6.  Finally, give the closing hints by expanding the following

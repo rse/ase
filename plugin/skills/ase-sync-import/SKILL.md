@@ -86,8 +86,8 @@ Procedure
     5.  Report the resolved target and source hint with the following <template/>:
 
         <template>
-        <ase-tpl-bullet-signal/> **TARGET**: <target/>
-        <ase-tpl-bullet-normal/> **SOURCE**: <hint/>
+        ⧉ **ASE**: **TARGET**: <target/>
+        ⧉ **ASE**: **SOURCE**: <hint/>
         </template>
 
     </step>
@@ -184,7 +184,7 @@ Procedure
         bullet line per remaining diagnostic:
 
         <template>
-        <ase-tpl-bullet-signal/> **REMAINING DIAGNOSTICS**:
+        ⧉ **ASE**: **REMAINING DIAGNOSTICS**:
 
         -   `<file/>:<line/>:<column/>`: <message/>
         [...]
@@ -198,7 +198,7 @@ Procedure
         what was imported):
 
         <template>
-        <ase-tpl-bullet-signal/> **IMPORTED ARTIFACTS**:
+        ⧉ **ASE**: **IMPORTED ARTIFACTS**:
 
         -   `<file/>`: <note/>
         [...]
@@ -209,7 +209,7 @@ Procedure
         Only output the following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **IMPORTED ARTIFACTS**: none -- all targets already reflect the imported sources
+        ⧉ **ASE**: **IMPORTED ARTIFACTS**: none -- all targets already reflect the imported sources
         </template>
 
         </if>

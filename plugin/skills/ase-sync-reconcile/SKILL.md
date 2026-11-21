@@ -118,9 +118,9 @@ Procedure
         following <template/>:
 
         <template>
-        <ase-tpl-bullet-signal/> **TARGET**: <target/>
-        <ase-tpl-bullet-normal/> **SOURCE**: <source/>
-        <ase-tpl-bullet-normal/> **OPERATIONS**: <operations/>
+        ⧉ **ASE**: **TARGET**: <target/>
+        ⧉ **ASE**: **SOURCE**: <source/>
+        ⧉ **ASE**: **OPERATIONS**: <operations/>
         </template>
 
     </step>
@@ -245,7 +245,7 @@ Procedure
         bullet line per remaining diagnostic:
 
         <template>
-        <ase-tpl-bullet-signal/> **REMAINING DIAGNOSTICS**:
+        ⧉ **ASE**: **REMAINING DIAGNOSTICS**:
 
         -   `<file/>:<line/>:<column/>`: <message/>
         [...]
@@ -263,7 +263,7 @@ Procedure
         prematurely:
 
         <template>
-        <ase-tpl-bullet-signal/> **INTENDED CHANGES** (dry run, nothing applied):
+        ⧉ **ASE**: **INTENDED CHANGES** (dry run, nothing applied):
 
         <fence/>diff
         <unified-diff/>
@@ -275,7 +275,7 @@ Procedure
         Only output the following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **INTENDED CHANGES**: none -- all outputs already reflect source state
+        ⧉ **ASE**: **INTENDED CHANGES**: none -- all outputs already reflect source state
         </template>
 
         </if>
@@ -289,7 +289,7 @@ Procedure
         what was reconciled):
 
         <template>
-        <ase-tpl-bullet-signal/> **UPDATED ARTIFACTS**:
+        ⧉ **ASE**: **UPDATED ARTIFACTS**:
 
         -   `<file/>`: <note/>
         [...]
@@ -300,7 +300,7 @@ Procedure
         Only output the following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **UPDATED ARTIFACTS**: none -- all outputs already reflected source state
+        ⧉ **ASE**: **UPDATED ARTIFACTS**: none -- all outputs already reflected source state
         </template>
 
         </if>

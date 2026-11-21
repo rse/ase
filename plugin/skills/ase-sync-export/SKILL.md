@@ -65,7 +65,7 @@ Procedure
     4.  Report the resolved outputs with the following <template/>:
 
         <template>
-        <ase-tpl-bullet-signal/> **OUTPUTS**: <outputs/>
+        ⧉ **ASE**: **OUTPUTS**: <outputs/>
         </template>
 
     </step>
@@ -115,7 +115,7 @@ Procedure
         project-relative path and <note/> the format and the byte size):
 
         <template>
-        <ase-tpl-bullet-signal/> **EXPORTED SPECIFICATION**:
+        ⧉ **ASE**: **EXPORTED SPECIFICATION**:
 
         -   `<file/>`: <note/>
         [...]
@@ -127,7 +127,7 @@ Procedure
         <template/>, listing one bullet line per notice:
 
         <template>
-        <ase-tpl-bullet-signal/> **ENVIRONMENT NOTICES**:
+        ⧉ **ASE**: **ENVIRONMENT NOTICES**:
 
         -   <notice/>
         [...]

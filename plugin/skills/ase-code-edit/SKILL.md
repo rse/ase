@@ -527,7 +527,7 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
         <template>
         ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ status: **verification failed**
 
-        <ase-tpl-bullet-signal/> **REMAINING FAILURES**:
+        ⧉ **ASE**: **REMAINING FAILURES**:
 
         -   <failure/>
         [...]

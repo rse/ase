@@ -421,7 +421,7 @@ Procedure
         <template>
         <ase-tpl-head title="IMPORT TODO"/>
 
-        <ase-tpl-bullet-signal/> `<file/>:<lines/>` (<kind/>): <reason/>
+        ⧉ **ASE**: `<file/>:<lines/>` (<kind/>): <reason/>
             ◦ ours:   <ours-intent/>
             ◦ theirs: <theirs-intent/>
         [...]

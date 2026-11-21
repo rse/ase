@@ -132,7 +132,7 @@ Procedure
 
     <template>
 
-    <ase-tpl-bullet-normal/> **KEY POINT**: **<point/>**
+    ⧉ **ASE**: **KEY POINT**: **<point/>**
 
     ◯ LOCATION:  <location/>
     ◯ EVIDENCE:  "`<evidence/>`"

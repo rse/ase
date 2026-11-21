@@ -51,7 +51,7 @@ code, and *explain* it in a *brief*, *standardized*, and *concise* way.
     *WHAT* block (omit the *WHY* block) with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **WHAT** (You should know what):
+    ⧉ **ASE**: **WHAT** (You should know what):
     - [...]
     - [...]
     - [...]
@@ -63,12 +63,12 @@ code, and *explain* it in a *brief*, *standardized*, and *concise* way.
     Output the result with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **WHAT** (You should know what):
+    ⧉ **ASE**: **WHAT** (You should know what):
     - [...]
     - [...]
     - [...]
 
-    <ase-tpl-bullet-normal/> **WHY** (You should know why):
+    ⧉ **ASE**: **WHY** (You should know why):
     - [...]
     - [...]
     - [...]
@@ -110,12 +110,12 @@ code, and *explain* it in a *brief*, *standardized*, and *concise* way.
     Output the result with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **ANALOGY** (You should imagine):
+    ⧉ **ASE**: **ANALOGY** (You should imagine):
     - [...]
     - [...]
     - [...]
 
-    <ase-tpl-bullet-secondary/> **DIAGRAM** (You should grasp):
+    ⧉ **ASE**: **DIAGRAM** (You should grasp):
     [...]
     </template>
     </step>
@@ -133,12 +133,12 @@ code, and *explain* it in a *brief*, *standardized*, and *concise* way.
     Output the result with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-signal/> **CRUXES** (You should notice):
+    ⧉ **ASE**: **CRUXES** (You should notice):
     - [...]
     - [...]
     - [...]
 
-    <ase-tpl-bullet-signal/> **GOTCHAS** (You should not stumble over):
+    ⧉ **ASE**: **GOTCHAS** (You should not stumble over):
     - [...]
     - [...]
     - [...]

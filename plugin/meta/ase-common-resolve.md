@@ -291,7 +291,7 @@ per escalation in <resolve-escalations/>:
 <template>
 <ase-tpl-head title="ESCALATIONS" subtitle="<arg1/>"/>
 
-<ase-tpl-bullet-signal/> `<file/>:<lines/>` (<kind/>): <reason/>
+⧉ **ASE**: `<file/>:<lines/>` (<kind/>): <reason/>
     ◦ ours:   <ours-intent/>
     ◦ theirs: <theirs-intent/>
 [...]

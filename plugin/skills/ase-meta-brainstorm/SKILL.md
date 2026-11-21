@@ -92,7 +92,7 @@ Honor the following tenets throughout the brainstorming:
     Restate the topic to be brainstormed by outputting the following <template/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **TOPIC**: <topic/>
+    ⧉ **ASE**: **TOPIC**: <topic/>
     </template>
 
     </step>
@@ -134,7 +134,7 @@ Honor the following tenets throughout the brainstorming:
         1.  Output the following <template/>:
 
             <template>
-            <ase-tpl-bullet-signal/> FACET <M/>/<m/>: **<facet-M/>**, QUESTION: **<question-M/>**
+            ⧉ **ASE**: FACET <M/>/<m/>: **<facet-M/>**, QUESTION: **<question-M/>**
             </template>
 
         2.  Determine *2 to 4* grounded candidate answers
@@ -185,7 +185,7 @@ Honor the following tenets throughout the brainstorming:
         5.  Output the following <template/>:
 
             <template>
-            <ase-tpl-bullet-normal/> FACET <M/>/<m/>: **<facet-M/>**, ANSWER: **<answer-M/>**
+            ⧉ **ASE**: FACET <M/>/<m/>: **<facet-M/>**, ANSWER: **<answer-M/>**
             </template>
 
     2.  If at any point <result/> is `CANCEL`:
@@ -223,7 +223,7 @@ Honor the following tenets throughout the brainstorming:
     <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **IDEA <N/>**: <idea-N/>
+    ⧉ **ASE**: **IDEA <N/>**: <idea-N/>
     </template>
 
     </step>
@@ -249,7 +249,7 @@ Honor the following tenets throughout the brainstorming:
         statement of not more than 40 words):
 
         <template>
-        <ase-tpl-bullet-secondary/> **IDEA CLUSTER <C/>/<c/>**: <cluster-C/> - <cluster-summary-C/>,
+        ⧉ **ASE**: **IDEA CLUSTER <C/>/<c/>**: <cluster-C/> - <cluster-summary-C/>,
         **IDEAS**: <idea-index-C/>
         </template>
 
@@ -271,7 +271,7 @@ Honor the following tenets throughout the brainstorming:
         ideas fall below the bar:
 
         <template>
-        <ase-tpl-bullet-signal/> **NOTICE**: no idea reached the minimum rank of <getopt-option-min-rank/>/10 - shortlisting the highest-ranked ideas regardless.
+        ⧉ **ASE**: **NOTICE**: no idea reached the minimum rank of <getopt-option-min-rank/>/10 - shortlisting the highest-ranked ideas regardless.
         </template>
 
     3.  From the scored ideas <idea-N/>, distill a *shortlist* of the top
@@ -289,7 +289,7 @@ Honor the following tenets throughout the brainstorming:
         and its primary trade-off), and output the following <template/>:
 
         <template>
-        <ase-tpl-bullet-normal/> **DISTILLED IDEA**: <option-N/>
+        ⧉ **ASE**: **DISTILLED IDEA**: <option-N/>
         </template>
 
     4.  Derive a single *recommended idea* - the highest-ranked option,
@@ -300,7 +300,7 @@ Honor the following tenets throughout the brainstorming:
         words), and output the following <template/>:
 
         <template>
-        <ase-tpl-bullet-signal/> **RECOMMENDED IDEA**: <recommendation/>
+        ⧉ **ASE**: **RECOMMENDED IDEA**: <recommendation/>
         </template>
 
     5.  Finally, give the closing hint by expanding the following (which,

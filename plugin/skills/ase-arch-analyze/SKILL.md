@@ -133,7 +133,7 @@ interface quality, quality attributes, and architecture governance.
     and STEP 3:
 
     <template>
-    <ase-tpl-bullet-normal/> **ARCHITECTURE ANALYSIS**: *suppressed* (`project.boxing` is `black`)
+    ⧉ **ASE**: **ARCHITECTURE ANALYSIS**: *suppressed* (`project.boxing` is `black`)
     </template>
 
     </if>
@@ -384,7 +384,7 @@ interface quality, quality attributes, and architecture governance.
     Report each unpaired finding with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-signal/> **PROBLEM** <id-prefix/>P<n/> (Severity: <severity/>, Aspect: <aspect-id/>): **<title/>**
+    ⧉ **ASE**: **PROBLEM** <id-prefix/>P<n/> (Severity: <severity/>, Aspect: <aspect-id/>): **<title/>**
 
     <description/>
     </template>
@@ -392,7 +392,7 @@ interface quality, quality attributes, and architecture governance.
     Report each paired or clustered finding with the following <template/>:
 
     <template>
-    <ase-tpl-bullet-normal/> **TRADEOFF** <id-prefix/>T<n/> (Severity: <severity/>): **<title/>**
+    ⧉ **ASE**: **TRADEOFF** <id-prefix/>T<n/> (Severity: <severity/>): **<title/>**
 
     - *Focal aspect*: <focal-aspect/> - <focal-state/>
     - *In tension with*: <partner-list/>

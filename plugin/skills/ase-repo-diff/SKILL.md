@@ -88,7 +88,7 @@ Procedure
 
             <template>
 
-            <ase-tpl-bullet-normal/> **CHANGE INTENT REPORT**:
+            ⧉ **ASE**: **CHANGE INTENT REPORT**:
 
             </template>
 
@@ -137,7 +137,7 @@ Procedure
         the remaining steps STEP 3 through STEP 5:
 
         <template>
-        <ase-tpl-bullet-normal/> **DIFF SCRUTINY**: *suppressed* (`project.boxing` is `black`)
+        ⧉ **ASE**: **DIFF SCRUTINY**: *suppressed* (`project.boxing` is `black`)
         </template>
         </if>
 
@@ -187,9 +187,9 @@ Procedure
 
         <template>
 
-        <ase-tpl-bullet-normal/> **CHANGE COHERENCE THESIS**: <thesis/>
+        ⧉ **ASE**: **CHANGE COHERENCE THESIS**: <thesis/>
 
-        <ase-tpl-bullet-signal/> **CHANGE COHERENCE REPORT**: Verdict: **<verdict/>**
+        ⧉ **ASE**: **CHANGE COHERENCE REPORT**: Verdict: **<verdict/>**
 
         </template>
 
@@ -284,7 +284,7 @@ Procedure
 
         <template>
 
-        <ase-tpl-bullet-signal/> **CHANGE RISK REPORT**: Overall: **<band/>** (<aggregate/>/5)
+        ⧉ **ASE**: **CHANGE RISK REPORT**: Overall: **<band/>** (<aggregate/>/5)
 
         | Axis        | Score      | Findings                                                                                              |
         | ----------- | ---------- | ----------------------------------------------------------------------------------------------------- |
@@ -335,13 +335,13 @@ Procedure
         <template>
         <ase-tpl-head title="CHANGE BLAST RADIUS"/>
 
-        <ase-tpl-bullet-signal/> **CHANGE BLAST RADIUS MAP**:
+        ⧉ **ASE**: **CHANGE BLAST RADIUS MAP**:
 
         <diagram/>
 
-        <ase-tpl-bullet-signal/> **BLAST**: ⚑ **<module/>**: <impact/>
+        ⧉ **ASE**: **BLAST**: ⚑ **<module/>**: <impact/>
 
-        <ase-tpl-bullet-signal/> **BLAST**: ⚑ **<module/>**: <impact/>
+        ⧉ **ASE**: **BLAST**: ⚑ **<module/>**: <impact/>
 
         [...]
 

@@ -288,7 +288,7 @@ Procedure
     First, use the following <template/> to give a hint on this step:
 
     <template>
-    <ase-tpl-bullet-secondary/> **REVIEW INVESTIGATION**
+    ⧉ **ASE**: **REVIEW INVESTIGATION**
     </template>
 
     Dispatch the review investigation to a *sub-agent* via the `Agent`
@@ -359,9 +359,9 @@ Procedure
 
         <template>
 
-        <ase-tpl-bullet-signal/> **REVIEW VERDICT**: **<verdict/>**
+        ⧉ **ASE**: **REVIEW VERDICT**: **<verdict/>**
 
-        <ase-tpl-bullet-normal/> **CHANGE INTENT**: <summary/>
+        ⧉ **ASE**: **CHANGE INTENT**: <summary/>
 
         </template>
 
@@ -376,7 +376,7 @@ Procedure
 
         <template>
 
-        <ase-tpl-bullet-normal/> **NO FINDINGS**: <note/>, nothing to flag.
+        ⧉ **ASE**: **NO FINDINGS**: <note/>, nothing to flag.
 
         </template>
         </if>
@@ -418,7 +418,7 @@ Procedure
 
         <template>
 
-        <ase-tpl-bullet-normal/> **HIDDEN FINDINGS**: <hidden/> finding(s) below severity **<floor/>** suppressed (<floor-origin/>).
+        ⧉ **ASE**: **HIDDEN FINDINGS**: <hidden/> finding(s) below severity **<floor/>** suppressed (<floor-origin/>).
 
         </template>
         </if>
@@ -445,7 +445,7 @@ Procedure
         the following <template/>, emitted *after* the last tool call:
 
         <template>
-        <ase-tpl-bullet-secondary/> **REVIEW FIXES**:
+        ⧉ **ASE**: **REVIEW FIXES**:
 
         | *#* | *Severity* | *Location* | *Summary* | *Status* |
         | --: | ---------- | ---------- | --------- | -------- |

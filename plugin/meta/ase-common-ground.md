@@ -120,7 +120,7 @@ artifacts read for its *local* grounding:
     back to model knowledge, and output the following <template/>:
 
     <template>
-    <ase-tpl-bullet-secondary/> **WARNING**: grounding found no usable facts -- falling back to model knowledge.
+    ⧉ **ASE**: **WARNING**: grounding found no usable facts -- falling back to model knowledge.
     </template>
 
     </if>
