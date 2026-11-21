@@ -33,6 +33,10 @@ ChangeLog
     Web search tool (e.g. of an LLM gateway), and `ase-meta-search` and `ase-task-research` provide
     the corresponding new `--services` backend `other`
 
+-   BUGFIX [code]: All Sections in `ase-code-insight` Output
+    `ase-code-insight` now gathers abstract, authors, and churn first and then displays all three
+    sections together, so a model batching their commands no longer drops them from the output.
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

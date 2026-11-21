@@ -33,7 +33,7 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
 </objective>
 
 <flow>
-1.  <step id="STEP 1: PROJECT ABSTRACT">
+1.  <step id="STEP 1: GATHER FACTS">
 
     <if condition="<ase-project-boxing/> is equal `black`">
 
@@ -41,7 +41,7 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
     user does *not* want them inspected or their internals surfaced.
     *Skip* the entire insight gathering: do *not* read any source, only
     output the following <template/> and then *SKIP* the remaining steps
-    STEP 2 through STEP 4:
+    STEP 2 through STEP 3:
 
     <template>
     <ase-tpl-bullet-normal/> **PROJECT INSIGHT**: *suppressed* (`project.boxing` is `black`)
@@ -49,58 +49,55 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
 
     </if>
 
-    Determine an <abstract/> summary of this project.
-    For this, check a potentially existing `README.*` file
-    or scan the source files of <getopt-arguments/> and figure it out
-    indirectly.
+    Gather the following facts *without* displaying anything yet, where
+    the tool calls *MAY* be combined or batched:
 
-    Display the results with the following <template/>:
+    -   *Abstract*: Determine an <abstract/> summary of this project.
+        For this, check a potentially existing `README.*` file
+        or scan the source files of <getopt-arguments/> and figure it out
+        indirectly.
+
+    -   *Author*: Determine the <author/> of this project.
+        For this, run the following command:
+
+        ```
+        git shortlog -sn --no-merges HEAD
+        ```
+
+    -   *Churn*: Determine the source files of <getopt-arguments/> which
+        caused the most churn by figuring out which of them have the most
+        commits. For this, run the following command and format its
+        result as a Markdown table <churn/> with a table head and columns
+        named "Commits" and "Source File":
+
+        ```
+        git log --format=format: --name-only --since="1 year ago" -- <getopt-arguments/> | grep -v '^$' | sort | uniq -c | sort -nr | head -10
+        ```
+    </step>
+
+2.  <step id="STEP 2: DISPLAY FACTS">
+    After gathering, you *MUST* output *all* of the three sections of
+    the following <template/>, completely, in this order, and as plain
+    reply text, even if their commands were combined or batched, and
+    *before* any further tool call. Do not display any further
+    explanation of these results.
 
     <template>
     <ase-tpl-bullet-normal/> **PROJECT ABSTRACT**:
 
     <abstract/>
-    </template>
-    </step>
 
-2.  <step id="STEP 2: PROJECT AUTHOR">
-    Determine the <author/> of this project.
-    For this, run the following command...
-
-    ```
-    git shortlog -sn --no-merges HEAD
-    ```
-
-    ...and then display the results with the following <template/>:
-
-    <template>
     <ase-tpl-bullet-normal/> **PROJECT AUTHOR**:
 
     <author/>
-    </template>
-    </step>
 
-3.  <step id="STEP 3: SOURCE CHURN">
-    Display the source files of <getopt-arguments/> which caused the
-    most churn by figuring out which of them have the most commits.
-    Display the following <template/>:
-
-    <template>
     <ase-tpl-bullet-normal/> **SOURCE CHURN**:
+
+    <churn/>
     </template>
-
-    Then run the following command...
-
-    ```
-    git log --format=format: --name-only --since="1 year ago" -- <getopt-arguments/> | grep -v '^$' | sort | uniq -c | sort -nr | head -10
-    ```
-
-    ...and then display its result as a table with a table head and
-    columns named "Commits" and "Source File". Do not display any
-    further explanation of this result.
     </step>
 
-4.  <step id="STEP 4: MODULE STRUCTURE">
+3.  <step id="STEP 3: MODULE STRUCTURE">
     Display the following <template/>:
 
     <template>
