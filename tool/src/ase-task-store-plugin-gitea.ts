@@ -382,6 +382,10 @@ class GiteaTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> imp
     /*  the ids of labels, created on demand  */
     private async ensureLabels (loc: Repo, names: string[]): Promise<number[]> {
         const ids: number[] = []
+
+        /*  list the labels freshly once, as another writer may have deleted some of them meanwhile  */
+        if (names.length > 0)
+            await this.labelMap(loc, true)
         for (const name of names) {
             let label = (await this.labelMap(loc)).get(name.toLowerCase())
             if (label === undefined) {

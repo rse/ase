@@ -58,6 +58,10 @@ ChangeLog
     RETURN in the transfer popup ignores a state no longer reachable after a concurrent status change,
     like a mouse click does, so it can no longer bypass the lifecycle model.
 
+-   BUGFIX [code]: No Lost Labels in the Gitea and GitHub Task Store Plugins
+    Gitea saves resolve the label ids from a fresh listing instead of a never-expiring cache, and
+    GitHub judges recently written issues by themselves before deleting a seemingly unused label.
+
 -   IMPROVEMENT [docs]: Option Alias Example `--well-done`
     The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
     `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.

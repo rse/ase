@@ -388,12 +388,18 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
     }
 
     /*  delete the "ase:<key>:<value>" labels no longer used by any issue  */
-    private async collectLabels (loc: Repo, names: string[]): Promise<void> {
+    private async collectLabels (prjId: string, loc: Repo, names: string[]): Promise<void> {
         for (const name of names) {
             if (!LABEL_KEY_RE.test(name) || name.includes(","))
                 continue
-            const r = await this.gh.rest.issues.listForRepo({ ...loc, labels: name, state: "all", per_page: 1 })
-            if (r.data.length === 0) {
+
+            /*  judge the recently written issues (see "overlay") by themselves instead of by
+                their possibly lagging listing entries, which can hide as many other issues  */
+            const recent = new Map(this.overlay(prjId, []).map((issue) => [ issue.number, issue ]))
+            const r = await this.gh.rest.issues.listForRepo({ ...loc, labels: name, state: "all", per_page: Math.min(100, 1 + recent.size) })
+            const used = r.data.some((issue) => !recent.has(issue.number))
+                || [ ...recent.values() ].some((issue) => labelNames(issue).includes(name))
+            if (!used) {
                 await found(this.gh.rest.issues.deleteLabel({ ...loc, name }))
                 this.labels.get(`${loc.owner}/${loc.repo}`)?.delete(name.toLowerCase())
             }
@@ -654,7 +660,7 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
             ...(closed ? { state_reason: status === "CANCELLED" ? "not_planned" as const : "completed" as const } : {})
         })).data as Issue
         this.written(prjId, updated)
-        await this.collectLabels(loc, labelNames(issue).filter((name) => !labels.includes(name)))
+        await this.collectLabels(prjId, loc, labelNames(issue).filter((name) => !labels.includes(name)))
         return result
     }
 
