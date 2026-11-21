@@ -554,8 +554,11 @@ class DefinedCore {
         if (def.attach.output !== "")
             await this.attachOutput(task, result.output).catch((err: unknown) =>
                 log("warning", `output not attached to task: ${reason(err)}`))
+
+        /*  the snapshot is partial on a failed processing or a missed phase state (request agents have none)  */
         if (work.snapshot !== undefined)
-            await this.attachSnapshot(task, work.snapshot, !result.ok || await this.status(task) !== def.state.phase, log)
+            await this.attachSnapshot(task, work.snapshot,
+                !result.ok || (def.type === "phase" && await this.status(task) !== def.state.phase), log)
                 .catch((err: unknown) => log("warning", `change set snapshot not attached to task: ${reason(err)}`))
         try {
             await work.finish?.(log, result)

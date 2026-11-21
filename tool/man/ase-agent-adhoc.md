@@ -802,14 +802,16 @@ type exactly and, if given, its MIME type.
 
   With `--workdir changeset`, it covers the change set of a `worktree`
   or `branch:` changeset from its fork point from the `Source:` on, with
-  `base` *commit* (plus `, partial` unless the task reached
-  `--state-phase`) in its `Desc:` key, while an `attachment:` changeset
-  other than `attachment:`*kind* removes it as obsolete.
+  `base` *commit* (plus `, partial` if the processing failed or, with
+  `--type phase`, the task did not reach `--state-phase`) in its `Desc:`
+  key, while an `attachment:` changeset other than `attachment:`*kind*
+  removes it as obsolete.
 
   With `--workdir target`, it covers the change of the target branch by
   the integration of a `worktree` or `branch:` changeset, with `base`
-  *commit*`, merged` *commit* in its `Desc:` key, unless the task did
-  not reach `--state-phase` or the content of the target did not change.
+  *commit*`, merged` *commit* in its `Desc:` key, unless the processing
+  failed, with `--type phase` the task did not reach `--state-phase`, or
+  the content of the target did not change.
   Without a change set, the task stays untouched.
 
 #### Finish
