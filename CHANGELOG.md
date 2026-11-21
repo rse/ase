@@ -50,6 +50,10 @@ ChangeLog
     The modal refreshes a shown inherited value once the scopes are re-read, so RETURN after a scope
     switch no longer writes the old value over the just typed one onto the stronger scope.
 
+-   BUGFIX [code]: No Reset of the Active Task on Compaction or Resume
+    The `session-start` hook keeps the task id set earlier in the session on a `compact` or `resume`
+    source, instead of resetting it to `$ASE_TASK_ID` resp. `default`.
+
 -   IMPROVEMENT [docs]: Option Alias Example `--well-done`
     The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
     `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.

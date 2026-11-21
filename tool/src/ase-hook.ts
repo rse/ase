@@ -386,7 +386,8 @@ export default class HookCommand {
         const input = this.parseJSON(stdin, v.object({
             session_id: v.optional(v.string()),
             sessionId:  v.optional(v.string()),
-            cwd:        v.optional(v.string())
+            cwd:        v.optional(v.string()),
+            source:     v.optional(v.string())
         }))
 
         /*  determine session id  */
@@ -425,12 +426,16 @@ export default class HookCommand {
             the headless sessions of the agents, which book their usage themselves, to
             usage windows), into the internal session state (only when scoped to a real
             session), normalizing the path separators of the project directory, as Git
-            reports the top-level directory with forward slashes even on Windows  */
-        const taskId = process.env.ASE_TASK_ID ?? "default"
+            reports the top-level directory with forward slashes even on Windows, and
+            keeping the task id set earlier on a compaction or resume of the session  */
+        let taskId = process.env.ASE_TASK_ID ?? "default"
         if (hasSession) {
             const state = sessionState(this.log, sessionId)
             state.lock(() => {
                 state.read()
+                const task = state.get("task")
+                if ((input.source === "compact" || input.source === "resume") && typeof task === "string")
+                    taskId = task
                 state.set("task", taskId)
                 state.set("basedir", path.resolve(projectDir))
                 state.set("headless", headless)
