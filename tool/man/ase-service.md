@@ -31,6 +31,10 @@ of the project (`project.id`, else derived from the project root), so a
 port answered by the service of another project counts as a *foreign*
 service.
 
+Concurrent starts of the service of a project are serialized through
+the lock `.ase/service.start.lock`, so only one service is spawned and
+all other starts wait for it and reuse it.
+
 The service provides:
 
 - the MCP endpoint `/mcp` (Streamable HTTP), serving the `ase_*` MCP

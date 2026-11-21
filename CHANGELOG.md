@@ -29,6 +29,10 @@ ChangeLog
     The skill operates on an explicitly given ChangeLog file instead of the nearest `CHANGELOG.md`
     up the directory tree, e.g. on the `CHANGELOG.md` of a sub-project in a monorepo.
 
+-   BUGFIX [code, docs]: No Duplicate Services on Concurrent `ase service start`
+    Concurrent starts serialize through the lock `.ase/service.start.lock` and re-probe under it,
+    so parallel callers no longer spawn orphaned services which overwrite the usage windows.
+
 -   IMPROVEMENT [docs]: Option Alias Example `--well-done`
     The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
     `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.

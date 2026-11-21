@@ -16,6 +16,7 @@ import { ofetch, FetchError } from "ofetch"
 import { isMap }              from "yaml"
 import prettyMs               from "pretty-ms"
 import * as v                 from "valibot"
+import lockfile               from "proper-lockfile"
 
 import { McpServer }                     from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
@@ -573,74 +574,100 @@ export default class ServiceCommand {
             return await new Promise<number>(() => { /*  never resolves  */ })
         }
 
-        /*  bounded retry across the bind/start TOCTOU window: on each attempt
-            re-allocate, re-spawn; early-break on foreign listener  */
-        let lastErr: Error = new Error("service failed to start within timeout")
-        for (let attempt = 0; attempt < 3; attempt++) {
-            port = await this.allocatePort(ctx)
-            const { child, logFile } = Service.spawnDetached(ctx.aseDir, port, this.log.logLevel())
-            let exited   = false
-            let exitCode: number | null = null
-            let resolveExit: () => void = () => {}
-            const exitPromise = new Promise<void>((resolve) => {
-                resolveExit = resolve
-            })
-            const onExit = (code: number | null) => {
-                exited   = true
-                exitCode = code
-                resolveExit()
+        /*  serialize the spawning across concurrent "ase service start" processes, as each one
+            would otherwise spawn its own service on its own random port: the lock is held until
+            the spawned service answers, so the waiting processes find and reuse it  */
+        fs.mkdirSync(ctx.aseDir, { recursive: true })
+        const unlock = await lockfile.lock(path.join(ctx.aseDir, "service.start"), {
+            realpath: false,
+            retries:  { retries: 130, factor: 1.5, minTimeout: 50, maxTimeout: 500 },
+            onCompromised: (err: Error) => {
+                this.log.write("warning", `service: start lock compromised: ${err.message}`)
             }
-            child.once("exit", onExit)
-            let foreign = false
-            let success = false
-            try {
-                for (let i = 0; i < 50; i++) {
-                    await new Promise((resolve) => setTimeout(resolve, 100))
-                    if (exited)
-                        break
-                    const s = await probe(port, ctx.projectId).catch(() => null)
-                    if (s === true) {
-                        this.log.write("info", `service: started on port ${port}`)
-                        child.unref()
-                        success = true
-                        return 0
-                    }
-                    if (s === false) {
-                        foreign = true
-                        break
-                    }
+        }).catch((err: unknown) => {
+            throw (err as NodeJS.ErrnoException).code === "ELOCKED" ?
+                new Error("service: still being started concurrently") : err
+        })
+        try {
+            /*  re-probe under the lock, as a concurrent start may have won meanwhile  */
+            port = this.loadContext().port
+            if (port !== null && await probe(port, ctx.projectId).catch(() => null) === true) {
+                this.log.write("info", `service: already running on port ${port}`)
+                return 0
+            }
+
+            /*  bounded retry across the bind/start TOCTOU window: on each attempt
+                re-allocate, re-spawn; early-break on foreign listener  */
+            let lastErr: Error = new Error("service failed to start within timeout")
+            for (let attempt = 0; attempt < 3; attempt++) {
+                port = await this.allocatePort(ctx)
+                const { child, logFile } = Service.spawnDetached(ctx.aseDir, port, this.log.logLevel())
+                let exited   = false
+                let exitCode: number | null = null
+                let resolveExit: () => void = () => {}
+                const exitPromise = new Promise<void>((resolve) => {
+                    resolveExit = resolve
+                })
+                const onExit = (code: number | null) => {
+                    exited   = true
+                    exitCode = code
+                    resolveExit()
                 }
-                const tail   = Daemon.readLogTail(logFile, 20)
-                const reason = exited ?
-                    `service exited during startup (code ${exitCode})` :
-                    foreign ?
-                        `service lost port ${port} race to a foreign listener` :
-                        "service failed to start within timeout"
-                const detail = tail.length > 0 ? `\n---- ${logFile} (tail) ----\n${tail}` : ""
-                lastErr = new Error(`${reason}${detail}`)
-            }
-            finally {
-                if (!success && !exited) {
-                    child.kill("SIGTERM")
-                    await Promise.race([
-                        exitPromise,
-                        new Promise<void>((resolve) => setTimeout(resolve, 1000))
-                    ])
-                    if (!exited) {
-                        child.kill("SIGKILL")
+                child.once("exit", onExit)
+                let foreign = false
+                let success = false
+                try {
+                    for (let i = 0; i < 50; i++) {
+                        await new Promise((resolve) => setTimeout(resolve, 100))
+                        if (exited)
+                            break
+                        const s = await probe(port, ctx.projectId).catch(() => null)
+                        if (s === true) {
+                            this.log.write("info", `service: started on port ${port}`)
+                            child.unref()
+                            success = true
+                            return 0
+                        }
+                        if (s === false) {
+                            foreign = true
+                            break
+                        }
+                    }
+                    const tail   = Daemon.readLogTail(logFile, 20)
+                    const reason = exited ?
+                        `service exited during startup (code ${exitCode})` :
+                        foreign ?
+                            `service lost port ${port} race to a foreign listener` :
+                            "service failed to start within timeout"
+                    const detail = tail.length > 0 ? `\n---- ${logFile} (tail) ----\n${tail}` : ""
+                    lastErr = new Error(`${reason}${detail}`)
+                }
+                finally {
+                    if (!success && !exited) {
+                        child.kill("SIGTERM")
                         await Promise.race([
                             exitPromise,
-                            new Promise<void>((resolve) => setTimeout(resolve, 2000))
+                            new Promise<void>((resolve) => setTimeout(resolve, 1000))
                         ])
-                        child.unref()
+                        if (!exited) {
+                            child.kill("SIGKILL")
+                            await Promise.race([
+                                exitPromise,
+                                new Promise<void>((resolve) => setTimeout(resolve, 2000))
+                            ])
+                            child.unref()
+                        }
                     }
+                    child.removeListener("exit", onExit)
+                    if (!success)
+                        Service.clearPort(ctx.svc)
                 }
-                child.removeListener("exit", onExit)
-                if (!success)
-                    Service.clearPort(ctx.svc)
             }
+            throw lastErr
         }
-        throw lastErr
+        finally {
+            await unlock()
+        }
     }
 
     /*  build the JSON "POST" request options for a service endpoint  */
