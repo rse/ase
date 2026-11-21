@@ -51,6 +51,10 @@ ChangeLog
     The `DISSECTION` parts report is now explicitly emitted as plain reply text before the next
     step's tool calls, never through a tool call like a `printf` via `Bash`, so it stays visible.
 
+-   BUGFIX [code]: No Spacer Text Between Tool Calls
+    The skill output conventions now forbid filler or spacer text (like a literal `<br>`) before or
+    between tool calls, which a model emitted as a substitute for silence, e.g. in `ase-arch-discover`.
+
 -   BUGFIX [code]: Robust npm Download Counts in `ase_component_info`
     The npm downloads are now fetched through bulk requests of up to 128 unscoped packages (scoped
     ones individually), retried once on HTTP 429, HTTP 5xx, or a network error, with every failure
