@@ -267,10 +267,10 @@ You *MUST* honor the following hints on this *task* format:
     "literal block scalar" with the block header `|4+`, i.e., with an explicit
     indentation of exactly 4 spaces (which are stripped from the content) and
     with all trailing blank lines kept as part of the content -- except for
-    *one* blank line directly before the `---` line of the next block, which
-    only separates the blocks. Content without
-    a trailing newline instead uses the block header `|4-`, and empty content
-    is given as an empty `Data:` value.
+    *one* blank line directly before the `---` line of the next block (or the
+    end of the file), which only separates the blocks. Content without a
+    trailing newline instead uses the block header `|4-`, and empty content is
+    given as an empty `Data:` value.
 
     When loaded via `ase_task_load` (by default), the content of a `Data` key
     is *elided*, i.e., given as the single-line marker value
@@ -299,13 +299,15 @@ You *MUST* honor the following hints on this *task* format:
     produced for an *earlier* version of the plan "body". In particular, a
     *change set* attachment produced by the skill `ase-task-implement` for a
     `Changeset` of `attachment:<name/>` (like the *implementation draft*
-    of `--draft`) carries the `Type` key value `text/x-diff; charset=utf-8;
-    kind="<name/>"` and is delivered by the skill `ase-task-integrate` only
-    while it is *not* stale. Its `Desc` key carries `base <commit/>`, the full Git commit id the
-    unified diff is based on. Once it is delivered and kept (`ase-task-integrate --no-cleanup`),
-    its `Desc` key additionally carries `, merged <commit/>`, the full Git commit id of the target
-    branch after the integration, and the attachment is *delivered*: it is then neither delivered
-    again by `ase-task-integrate` nor re-applied by `ase-task-implement`.
+    of `--draft`) carries the `Type` key value
+    `text/x-diff; charset=utf-8; kind="<name/>"` and is delivered by the skill
+    `ase-task-integrate` only while it is *not* stale. Its `Desc` key carries
+    `base <commit/>`, the full Git commit id the unified diff is based on. Once
+    it is delivered and kept (`ase-task-integrate --no-cleanup`), its `Desc` key
+    additionally carries `, merged <commit/>`, the full Git commit id of the
+    target branch after the integration, and the attachment is *delivered*: it
+    is then neither delivered again by `ase-task-integrate` nor re-applied by
+    `ase-task-implement`.
 
     For a `Changeset` of `worktree` or `branch:<name/>`, the `ase agent`
     agents `implementer` and `integrator` (and every agent configured with

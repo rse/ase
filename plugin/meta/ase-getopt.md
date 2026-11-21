@@ -4,8 +4,9 @@
 For parsing the command/skill options, perform the following eight steps
 and then continue processing the remaining skill.
 
-Do not output anything in the following steps. The entire purpose is to
-set placeholders into the context as a side-effect.
+Do not output anything in the following steps, except for the explicitly
+requested outputs of steps 4, 6, and 8. The primary purpose is to set
+placeholders into the context as a side-effect.
 
 1.  **Determine Parameters**:
     Set <getopt-skill><arg1/></getopt-skill>
@@ -137,7 +138,7 @@ set placeholders into the context as a side-effect.
     ```json
     {
         "opts": { "<long1/>": <value1/>, "<long2/>": <value2/>, ... },
-        "argv": [ "<arg1/>", "<arg2/>", ... ],
+        "argv": [ "<argv1/>", "<argv2/>", ... ],
         "args": "...",
         "info": "...",
         "task": "...",

@@ -35,11 +35,14 @@ the line of its *first* context line, i.e., <line/> minus the
 number of lines in <context-before/>; otherwise it is <line/> itself
 (the first line of <old-text/>). For a hunk that *only inserts*
 new lines (empty <old-text/> *and* empty context), set it to the
-line *before* which the insertion happens, clamped to a minimum
-of `0`, so a top-of-file insertion yields `@@ -0,0 ... @@`.
+line *after* which the insertion happens, i.e., <line/> minus `1`,
+clamped to a minimum of `0`, so a top-of-file insertion yields
+`@@ -0,0 +1,... @@`.
 Set <new-start/> to the same value as <old-start/>, but clamped
 to a minimum of `1` whenever <new-count/> is greater than `0`
-(the <arg1/> side then has a real first line).
+(the <arg1/> side then has a real first line), and for such an
+insertion-only hunk to <old-start/> plus `1` (the <arg1/> side
+then starts with the first inserted line).
 
 Render the hunk in a fenced block with *up to two* lines of
 context based on the following <template/>, emitting
@@ -93,7 +96,10 @@ Check <result/> and dispatch accordingly:
 -   <if condition="<result/> is 'ACCEPT'">
 
     Invoke the `Edit` tool to apply the change by replacing
-    <old-text/> with <new-text/> at <file/>:<line/>. The operation
+    <old-text/> with <new-text/> at <file/>:<line/>, where both are
+    extended by the adjacent lines of <context-before/> resp.
+    <context-after/> whenever <old-text/> is empty or not unique in
+    <file/>, as `Edit` requires a non-empty and unique match. The operation
     will be auto-approved by the ASE `pre-tool-use` hook (which
     tracks the active skill), so *no* interactive permission
     prompt will appear. Then record `APPLIED` (or `FAILED`,
@@ -146,9 +152,9 @@ exactly the lines the later `Edit` will actually change: while the
 <context-after/>. Finally, *trim* <context-before/> to its *last*
 two lines and <context-after/> to its *first* two lines.
 
-Then, unless <ase-project-boxing/> is equal `grey` (where the full
-unified diff is suppressed and no context lines are rendered at all),
-*silently* read the current content of <file/> with the `Read` tool -
+Then *silently* read the current content of <file/> with the `Read`
+tool (also the precondition of a later `Edit` of <file/>, hence even
+where <ase-project-boxing/> is equal `grey` and no diff is rendered) -
 reusing the content read for the same <file/> earlier, unless an
 `Edit` was applied to it in between - and set <file-lines/> to its
 lines, *stripped* of the line-number prefixes the tool adds. Set

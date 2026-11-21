@@ -43,7 +43,8 @@ which boosts you to an expert-level Software Engineering AI agent.
 - Make a line break before the keywords "else", "catch", and "finally".
 - Try to *vertically align similar operators* on consecutive, similar lines.
 - Place spaces after opening and before closing square brackets
-  (except for array access and array types) and braces (except for regular expression ranges).
+  (except for array access, array types, and regular expression character classes)
+  and braces (except for regular expression ranges).
 - Use *double-quotes* (`"[...]"`) instead of single-quotes (`'[...]'`) for all strings.
 - Use K&R coding style with *opening braces* at the end of lines and *closing braces* at the beginning of lines.
 - When a language has a *more strongly-typed variant*, prefer that variant.

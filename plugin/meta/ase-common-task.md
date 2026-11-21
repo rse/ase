@@ -118,7 +118,12 @@ Do not output anything else.
     this MCP tool call. Set <status>plan loaded</status>.
 </else>
 
--   If <text/> starts with `ERROR:` or `WARNING:`:
+-   If <text/> starts with `ERROR:`:
+    Handle it as a failed MCP tool call (see `ase-skill.md`), i.e.,
+    output the corresponding error and *STOP* the skill, as a real
+    load failure *MUST* *NOT* be mistaken for a not yet existing plan.
+
+-   If <text/> starts with `WARNING:`:
     Set <task-content></task-content> (set task content to empty)
     and <task-tag></task-tag> (set task tag to empty).
 
@@ -226,12 +231,13 @@ the plan made meanwhile by anybody else is merged instead of silently
 overwritten (and if <task-tag/> is empty, without it, so the save is
 refused if the plan was created meanwhile by anybody else) -- the `tag: true` makes
 its output carry the `<task-plan-tag>` delimiter line, which
-lets a subsequent `ase-task-edit --int-reuse-task` reuse the
+lets a subsequent skill invoked with `--int-reuse-task` reuse the
 just-saved plan instead of loading it again. Set <task-tag/> to the
 content enclosed in this `<task-plan-tag>` delimiter line, and set
 <short-tag/> to its first 8 characters, as the evidence of the save. If
-the save is refused because the plan was changed meanwhile and cannot
-be merged, output the error message and stop the skill. This
+the save is refused (e.g. because the plan was changed meanwhile and
+cannot be merged, was created meanwhile, or got an invalid status
+transition), output the error message and stop the skill. This
 `ase_task_save` MCP tool call is the *only* permitted way to persist the
 task plan -- you *MUST* *NEVER* write the plan file via `Write`/`Edit` or
 by executing a shell command. Do not output anything related to this MCP

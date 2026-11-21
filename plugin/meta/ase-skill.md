@@ -475,14 +475,6 @@ Template Patterns
     other Unicode look-alikes, and you *MUST* *NOT* drop, add, or reorder
     any of these glyphs.
 
--   When `<ase-tpl-head/>` (no title attribute) should be expanded, use:
-
-    <template>
-
-    ╭───────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
-
-    </template>
-
 -   When `<ase-tpl-head title="<title/>"[ subtitle="<subtitle/>"]/>`
     should be expanded use the following helper placeholders and then
     the following <template/>:
@@ -499,21 +491,11 @@ Template Patterns
         un-styled text <raw-title/>.
     -   Set <bar/> to the `─` character repeated exactly max(0, 67 - <raw-title-len/>)
         times -- clamped to zero so an over-long title never yields a
-        negative count -- the very same bar-width rule as `<ase-tpl-foot/>`
-        and `<ase-tpl-boxed/>`, so equal visible text yields equal total
-        width.
+        negative count.
 
     <template>
 
     ╭────━━━━**(** <render-title/> **)**━━━━────<bar/>┈┈┈┈┈┈┈┈┈┈
-
-    </template>
-
--   When `<ase-tpl-foot/>` (no title attribute) should be expanded, use:
-
-    <template>
-
-    ╰───────────────────────────────────────────────────────────────────┈┈┈┈┈┈┈┈┈┈
 
     </template>
 

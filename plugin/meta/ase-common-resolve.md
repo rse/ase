@@ -107,6 +107,10 @@ dropped change *never* is.
     where <file-dir/> is the directory part of <file/>. If a backup of
     this file *already exists* (from an earlier, partial run), you
     *MUST* *NOT* overwrite it, as it holds the *more original* state.
+    Instead, additionally back up its current state into
+    `<resolve-backup-dir/>/<file/>.current` (overwriting an earlier one).
+    Set <file-backup/> to the backup of the *current* state of the file:
+    the `.current` one if just written, else the regular one.
     If a backup fails, you *MUST* *NOT* touch this file at all and
     escalate it with the reason `backup failed`. The backups are
     especially essential for marker files, whose sides exist *nowhere*
@@ -236,18 +240,18 @@ dropped change *never* is.
     the intent of the other side (e.g., a combined line which carries
     both modifications). Without a base, every line of both sides
     *MUST* be reflected. Additionally, compare the resolved file against
-    its backup by running the command
-    `git -C "<repo-root/>" diff --no-index -- "<resolve-backup-dir/>/<file/>" "<repo-root/>/<file/>"`
+    its backup <file-backup/> by running the command
+    `git -C "<repo-root/>" diff --no-index -- "<file-backup/>" "<repo-root/>/<file/>"`
     (which intentionally exits non-zero when the files differ) and
     verify that it changed *nothing* outside of the conflict hunks
     except for the strictly needed consequences of item 4.1.2.
 
-    If any check fails for a hunk, restore this hunk *verbatim* from the
-    backup, including its conflict markers, and escalate it with the
-    reason `change preservation check failed`. If the check cannot be
-    decided at all for a file, restore the entire file from the backup
+    If any check fails for a hunk, restore this hunk *verbatim* from
+    <file-backup/>, including its conflict markers, and escalate it with
+    the reason `change preservation check failed`. If the check cannot be
+    decided at all for a file, restore the entire file from <file-backup/>
     by running the command
-    `cp -p "<resolve-backup-dir/>/<file/>" "<repo-root/>/<file/>"`
+    `cp -p "<file-backup/>" "<repo-root/>/<file/>"`
     and escalate all its hunks.
 
 6.  STAGE RESOLVED FILES:
@@ -260,7 +264,8 @@ dropped change *never* is.
         reports lines of a file, treat the reported hunks as escalated
         with the reason `leftover conflict markers`.
 
-    2.  Stage every fully resolved *unmerged* file by running the
+    2.  Stage every fully resolved *unmerged* file and every new
+        location a modification was ported into (item 4.3) by running the
         command `git -C "<repo-root/>" add -- "<file/>"` (except for
         files already removed from the index via `git rm`, while files
         taken via `git checkout --ours`/`--theirs` do need this
@@ -272,8 +277,13 @@ dropped change *never* is.
 7.  DETERMINE VERDICT:
 
     If <resolve-escalations/> is empty, set
-    <resolve-verdict>RESOLVED</resolve-verdict> and remove the backups
-    by running the command `rm -rf "<resolve-backup-dir/>"`. Otherwise,
+    <resolve-verdict>RESOLVED</resolve-verdict> and remove the backups:
+    if <arg5/> is empty, by running the command
+    `rm -rf "<resolve-backup-dir/>"`, else only those of the files
+    resolved by this run, by running the command
+    `rm -f "<resolve-backup-dir/>/<file/>" "<resolve-backup-dir/>/<file/>.current"`
+    for each of them, as the backups of files outside of <arg5/> may
+    still hold the original conflict state of earlier escalations. Otherwise,
     set <resolve-verdict>PARTIAL</resolve-verdict> and *keep* the
     backups, as they hold the original conflict state of the escalated
     files.

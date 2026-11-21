@@ -137,13 +137,14 @@ following procedure:
             <result>CANCEL</result> and *SKIP* all remaining steps
             2.3.3 - 2.3.4 of this dispatch.
 
-        3.  Otherwise, determine the selected <label/>
-            by mapping the <result/> (usually containing one of the
-            "key" or "label" strings) to one of the answer labels in
-            <spec/>. Set <result><label/></result>.
+        3.  Otherwise, try to map the <result/> (usually containing
+            one of the "key" or "label" strings) to one of the answer
+            labels in <spec/>. If this succeeds, set <result/> to this
+            mapped answer label (*not* to any <label/> left over from
+            the entry loop of step 2.1).
 
-        4.  If <result/> is then *NEITHER* one of the "key"
-            *NOR* "label" values from <spec/>:
+        4.  If <result/> could *NOT* be mapped to one of the answer
+            labels in <spec/>:
             <if condition="<opts/> contains `--other` and does *not* contain `--no-other`">
                 Set <result>OTHER: <result/></result>
                 (prefix result with `OTHER: `).

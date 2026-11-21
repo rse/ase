@@ -122,13 +122,9 @@ Control Flow Constructs
     (default: `60`) and then *start over* by re-evaluating
     <await-condition/>.
 
-    A single wait is performed with the `ase_sleep(duration:
-    <chunk-duration/>)` tool of the `ase` MCP server. To stay safely
-    inside the tool's own duration limit, <chunk-duration/> is *never*
-    above `60`: an <await-interval/> above `60` is therefore *split* into
-    consecutive calls -- as many `60` second calls as fit, followed by
-    one final call carrying the remaining seconds -- so the calls sum up
-    to exactly <await-interval/>. You *MUST* *NOT* re-evaluate
+    A single wait is performed exactly like a <sleep/> of
+    <await-interval/> seconds, i.e., split into `ase_sleep` calls of at
+    most `60` seconds each. You *MUST* *NOT* re-evaluate
     <await-condition/> between the calls of one such wait.
 
     This construct is expanded to its <await-body/>. Do not output

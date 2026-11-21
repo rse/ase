@@ -223,8 +223,9 @@ questions:
     For each question, determine its focus area
     <context-N-focus/> from the mentioned *Focus Areas*, a 1-3
     word hint <context-N-topic/>, describing what the question
-    is about, a <context-N-severity/>, describing how
-    important this question is, and a <context-N-impact/> of
+    is about, a <context-N-severity/> of `MUST`, `SHOULD`, or
+    `MAY`, derived from <context-N-focus/> per the mentioned
+    *Severity*, and a <context-N-impact/> of
     `HIGH`, `MEDIUM`, or `LOW`, rating the individual impact
     of the question.
 
