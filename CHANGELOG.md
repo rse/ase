@@ -13,6 +13,10 @@ ChangeLog
     The `stop` hook lists the lines with unfilled template placeholders and asks to repeat only them,
     and the focus mode rule of the skills applies only if the harness states this mode explicitly.
 
+-   IMPROVEMENT [code]: Bounded Word Diff in the Task Band
+    `ase-mods-task-edit` skips the word emphasis of the last-change diff if more than 1,000,000
+    word pairs would have to be compared, so very large task changes no longer stall the band.
+
 -   BUGFIX [code]: Various Skill Corrections
     `ase-repo-dissect` diffs against `HEAD`, `ase-sync-reconcile` loads `TASK` via the task tools,
     `ase-task-implement` and `ase-task-dissect` keep their merge base resp. part ids, and
@@ -23,14 +27,41 @@ ChangeLog
     `--dry` ids in `ase-task-dissect`, pinned `git diff` formats in `ase-repo-{dissect,stage}`, the
     `SPECIFYING TENETS` of `ase-sync-{import,reconcile}`, and option validation in `ase-arch-discover`.
 
+-   BUGFIX [code]: Skill Error Reporting and Hardening
+    `ase-{arch,code}-analyze` validate `--prefix` and report no problems, `ase-docs-{proofread,refine}`
+    reject empty documents, `ase-task-{edit,integrate}` and `ase-sync-export` report failed loads,
+    saves, resp. calls, `ase-repo-{review,task}` validate `--branch`/`--commit`, and `ase-repo-{dissect,
+    stage}` use the Git directory instead of `/tmp`.
+
+-   BUGFIX [code]: Diff and Conflict Resolution Corrections
+    `ase-common-diff.md` computes the start of insertion-only hunks and extends non-unique contexts
+    for `Edit`, and `ase-common-resolve.md` keeps a `.current` backup and removes only its own backups.
+
+-   BUGFIX [code]: Rasterize Worker Error Reporting
+    The `ase_rasterize` worker now also reports errors thrown while posting a successful result.
+
 -   BUGFIX [code]: No Stale Service After `ase setup update`
     `ase setup update` stops the ASE service again at its end, so a service re-spawned with the old
     code by the MCP bridge of a still running agent tool session during the update does not survive.
+
+-   BUGFIX [docs]: Website Corrections
+    `Section-Usage` lists all skill groups of a label and `Modal-Help` restores the target of a
+    cross-link scrolled to within an active search.
+
+-   CLEANUP [code]: Skill and Meta Wording Cleanups
+    Streamline `ase-meta-{evaluate,quorum,proximity}`, `ase-task-{edit,estimate}`, `ase-help-intent`,
+    and the meta files `ase-{control,dialog,getopt,skill,format-task}.md`, and let `ase-meta-evaluate`
+    and `ase-meta-quotes` run `ase-meta-search` in (parallel) sub-agents.
 
 -   REFACTOR [code]: Shared Diff Normalization and Application
     The identical change normalization and the dialog-and-apply steps of `ase-docs-{proofread,refine,
     shorten}` move into the new `diff-normalize` and `diff-apply` definitions of `ase-common-diff.md`,
     and `ase-task-grill` reuses `task-next-handoff` for its hand-offs.
+
+-   REFACTOR [code]: Extracted Tool and Mod Helpers
+    Extract `resolveTag` of `ase-agent-definition-core`, `renderHeader` and `keyHints` of `ase-man-tui`,
+    the shared `configure` of the GitHub, GitLab, and Gitea task store plugins, and `card` of the
+    grilling mod `ase-mods-task-grill`.
 
 2.1.4 (2026-11-21)
 ------------------
