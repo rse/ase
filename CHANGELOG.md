@@ -121,6 +121,11 @@ ChangeLog
     `ase config delete`, `ase_config_delete`, and emptying a never-set value in `ase config edit`
     no longer fail with `Expected YAML collection at <seg>` when a parent map of the key is missing.
 
+-   BUGFIX [code]: No Lost Phase Claims on Request-Mode Agent Recovery
+    The recovery of a request-mode agent (like `researcher` or `estimator`) keeps the terminated
+    runs still recording claims of the phase mode, so its recovery still releases their tasks
+    instead of leaving them in the activity state with the `:active` tag forever.
+
 -   BUGFIX [code]: Idle Timeout of `ase service` Despite Aborted Requests
     The service releases its in-flight accounting of a request also when the client aborts it (like
     the 2s probe timeout, a cancelled board fetch, or an MCP disconnect during payload parsing), so

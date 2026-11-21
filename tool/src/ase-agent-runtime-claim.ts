@@ -178,6 +178,12 @@ export class AgentRun {
         this.store(run, record)
     }
 
+    /*  whether a terminated run still records claims, i.e., tasks left to be recovered
+        by an agent recording claims (like a phase agent sharing the run namespace)  */
+    recoverable (run: string): boolean {
+        return Object.keys(this.record(run).claims).length > 0
+    }
+
     /*  whether a task is claimed by this run or by another run whose process is still
         alive (independent of its run lock, which is also held while a terminated run is
         seized for its recovery), i.e., by an agent still processing it  */

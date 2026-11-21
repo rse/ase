@@ -109,7 +109,9 @@ export abstract class RequestAgent extends Agent {
     /*  recover the requests of terminated agent processes of its kind of the same user
         on this host (whose run lock is gone or stale and whose process is gone) by marking
         them as failed and restoring the previous assignee of their tasks, and remove the
-        run locks left behind by them  */
+        run locks left behind by terminated runs, except those still recording claims, as
+        these are left to the recovery of the phase agents sharing the run namespace (like
+        the phase mode of a built-in agent)  */
     protected async recover (): Promise<void> {
         const runs = await this.runLock.dead()
         const { items } = await Task.listHeaders(this.log)
@@ -136,7 +138,8 @@ export abstract class RequestAgent extends Agent {
             await this.write("warning", this.name, `task "${item.id}": ${this.requests.name} request of terminated ${this.role} marked as failed`)
         }
         for (const run of runs)
-            await this.runLock.purge(run)
+            if (!this.runLock.recoverable(run))
+                await this.runLock.purge(run)
     }
 
     /*  select every task with a request (except one whose finalization is still retried),
