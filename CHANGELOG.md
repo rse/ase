@@ -56,6 +56,10 @@ ChangeLog
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.
 
+-   UPDATE [infr]: Upgraded GitHub Actions
+    The GitHub Pages workflow uses `actions/checkout@v7` and `actions/setup-node@v7`,
+    and builds the website with the Node.js 26 LTS instead of 24.
+
 -   BUGFIX [docs]: Website Corrections
     `Section-Usage` lists all skill groups of a label and `Modal-Help` restores the target of a
     cross-link scrolled to within an active search.
