@@ -52,6 +52,11 @@ ChangeLog
     `ase setup update` stops the ASE service again at its end, so a service re-spawned with the old
     code by the MCP bridge of a still running agent tool session during the update does not survive.
 
+-   BUGFIX [code]: Config Lock, SpecBook Query, and Task Store Rescan Races
+    `Config.lock` creates a missing file in append mode, so it no longer truncates a concurrent write,
+    `ase_specbook_query` runs in the SpecBook worker thread like lint and export, and the `ase` task
+    store plugin no longer reports its own writes during a rescan as external changes.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.
@@ -78,6 +83,10 @@ ChangeLog
     Extract `resolveTag` of `ase-agent-definition-core`, `renderHeader` and `keyHints` of `ase-man-tui`,
     the shared `configure` of the GitHub, GitLab, and Gitea task store plugins, and `card` of the
     grilling mod `ase-mods-task-grill`.
+
+-   REFACTOR [code]: Split Task Board Key and Stats Functions
+    `handleKey` of `ase-task-board-tui-control` delegates to `handleTaskKey` and `handleViewKey`,
+    and `renderStats` of `ase-task-board-tui-view` extracts its usage bars into `statsUsage`.
 
 2.1.4 (2026-11-21)
 ------------------
