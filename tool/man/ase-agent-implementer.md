@@ -72,11 +72,15 @@ A task already `IMPLEMENTED`, but whose changeset branch could not be
 committed or pushed, is instead tagged `ase-agent-implementer:failed`
 and left for a manual intervention.
 
-With `--params lint=true`, a successful implementing is followed by the
-follow-up prompt `ase-code-lint --auto --unstaged`, which lints and
-auto-corrects the still uncommitted change set (in its ASE worktree, if
-any) before it is committed, where a failed linting fails the
-processing. An `attachment:` changeset is never linted, as it is
+With `--params review=true`, a successful implementing is followed by
+the follow-up prompt `ase-repo-review --auto`, which reviews the still
+uncommitted change set (in its ASE worktree, if any, and for a
+`branch:` changeset including its earlier commits) and fixes the
+findings, and with `--params lint=true` by the follow-up prompt
+`ase-code-lint --auto --unstaged`, which lints and auto-corrects it
+(after the review, so also its fixes), both before the change set is
+committed, where a failed follow-up prompt fails the processing. An
+`attachment:` changeset is never reviewed or linted, as it is
 implemented outside of the working copy.
 
 In mode `draft`, the implementer instead claims only the `PLANNED` tasks
@@ -301,9 +305,9 @@ All other options belong to the sub-commands (see **COMMANDS**).
       declared by the definition (repeatable). Built-in: `effort-wait`
       (`true` or `false`, default: `true`), whether to wait for the
       effort estimation of a task by the `estimator` agent, and, in mode
-      `implement`, `lint` (`true` or `false`, default: `false`), whether
-      to lint and auto-correct the change set after the implementing
-      (see **DESCRIPTION**).
+      `implement`, `review` and `lint` (each `true` or `false`, default:
+      `false`), whether to review resp. lint the change set after the
+      implementing, each fixing its findings (see **DESCRIPTION**).
 
     - \[`--state-incoming` *state*\]: The state of the tasks to claim
       (mandatory for `phase`, repeatable with `--unclaimed` or
@@ -405,12 +409,16 @@ All other options belong to the sub-commands (see **COMMANDS**).
 
     - \[`--followup-skill` *name*\]: The skill to invoke as a follow-up
       prompt after a successful prompt, starting a new follow-up
-      (repeatable). Built-in: `ase-code-lint` (mode `implement`).
+      (repeatable). Built-in: `ase-repo-review` (twice) and
+      `ase-code-lint` (mode `implement`).
 
     - \[`--followup-args` *template*\]: The argument template of the
-      skill of the current follow-up. Built-in: `--auto
+      skill of the current follow-up. Built-in: `--auto --branch
+      {changeset-name} --staged --unstaged` resp. `--auto --staged
       --unstaged{?changeset-worktree: --worktree {changeset-worktree}}`
-      (mode `implement`).
+      (`ase-repo-review`), and `--auto --unstaged{?changeset-worktree:
+      --worktree {changeset-worktree}}` (`ase-code-lint`) (mode
+      `implement`).
 
     - \[`--followup-text` *template*\]: The prompt text template to
       invoke as a follow-up prompt instead of a skill (repeatable).
@@ -425,9 +433,12 @@ All other options belong to the sub-commands (see **COMMANDS**).
       Built-in: not set.
 
     - \[`--followup-when` *template*\]: A condition of the current
-      follow-up (repeatable). Built-in: `{param:lint}` and
+      follow-up (repeatable). Built-in: `{param:review}` and
+      `{?changeset-type=branch:true}` resp.
+      `{?changeset-type=worktree:true}` (`ase-repo-review`), and
+      `{param:lint}` and
       `{?changeset-type=worktree:true}{?changeset-type=branch:true}`
-      (mode `implement`).
+      (`ase-code-lint`) (mode `implement`).
 
     - \[`--prepare-run` *cmd*\]: A shell command run in the working
       directory before the prompt (repeatable). Built-in: not set.
@@ -572,8 +583,8 @@ agent is not running.
 # implement up to two tasks in parallel
 $ ase agent implementer start -p 2
 
-# implement the tasks and lint and auto-correct their change sets
-$ ase agent implementer start --params lint=true
+# implement the tasks, and review and lint their change sets, fixing the findings
+$ ase agent implementer start --params review=true --params lint=true
 
 # implement the tasks in a temporary clone, pushing their branches back
 $ ase agent implementer start -r git@github.com:example/project.git

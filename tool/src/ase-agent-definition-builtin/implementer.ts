@@ -18,10 +18,16 @@ const params = {
     }
 }
 
-/*  the additional parameter of the implementing: whether the change set is linted (and
-    corrected) after a successful implementing, before it is committed (disabled by default)  */
+/*  the additional parameters of the implementing: whether the change set is reviewed resp.
+    linted (each with its findings fixed) after a successful implementing, before it is
+    committed (both disabled by default)  */
 const paramsImplement = {
     ...params,
+    "review": {
+        desc:    "whether to review and auto-fix the change set via the \"ase-repo-review\" skill after the implementing",
+        default: "false",
+        allow:   [ "true", "false" ]
+    },
     "lint": {
         desc:    "whether to lint and auto-correct the change set via the \"ase-code-lint\" skill after the implementing",
         default: "false",
@@ -111,13 +117,23 @@ export default {
                     "{?changeset-worktree: --worktree {changeset-worktree}} {id}"
             },
 
-            /*  with the parameter "lint", lint and auto-correct the uncommitted change set before its commit
-                (except an "attachment:" changeset, as it is implemented outside of the working copy)  */
-            followup:  {
+            /*  with the parameters "review" and "lint", review (a "branch:" changeset including its
+                earlier commits) and lint the uncommitted change set, each fixing its findings, before
+                its commit (except an "attachment:" changeset, as it is implemented outside of the
+                working copy), where the linting comes last, to also cover the fixes of the review  */
+            followup:  [ {
+                skill: "ase-repo-review",
+                args:  "--auto --branch {changeset-name} --staged --unstaged",
+                when:  [ "{param:review}", "{?changeset-type=branch:true}" ]
+            }, {
+                skill: "ase-repo-review",
+                args:  "--auto --staged --unstaged{?changeset-worktree: --worktree {changeset-worktree}}",
+                when:  [ "{param:review}", "{?changeset-type=worktree:true}" ]
+            }, {
                 skill: "ase-code-lint",
                 args:  "--auto --unstaged{?changeset-worktree: --worktree {changeset-worktree}}",
                 when:  [ "{param:lint}", "{?changeset-type=worktree:true}{?changeset-type=branch:true}" ]
-            },
+            } ],
             success:   { criterion: [ "status" ] },
             attach:    { changeset: "changeset" },
             finish:    { commit: true },

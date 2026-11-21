@@ -24,6 +24,10 @@ ChangeLog
     Add an `--auto`/`-a` option to `ase-repo-review`, fixing the rendered findings in the reviewed
     files on disk, and a `--worktree`/`-w` option, reviewing the uncommitted changes of an ASE worktree.
 
+-   FEATURE [code]: Review Option for the `implementer` Agent
+    With `--params review=true`, the `implementer` agent reviews its uncommitted change set via the
+    follow-up prompt `ase-repo-review --auto`, fixing the findings before the commit (and the linting).
+
 -   IMPROVEMENT [code]: Hunk-Only Checks in `ase-{code,spec}-lint` and `ase-code-analyze`
     Under `--staged` and `--unstaged`, `ase-code-lint`, `ase-spec-lint`, and `ase-code-analyze` now
     report (and correct) only the problems within the changed hunks of the Git changeset (from `git
