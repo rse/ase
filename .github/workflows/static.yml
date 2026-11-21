@@ -11,6 +11,9 @@ on:
         branches: [ "master" ]
         paths:
             -   "pages/**"
+            -   "NEWS.md"
+            -   "tool/man/**"
+            -   "plugin/skills/**"
             -   ".github/workflows/static.yml"
     workflow_dispatch:
 
@@ -29,18 +32,23 @@ jobs:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         steps:
             -   name: Checkout
                 uses: actions/checkout@v7
+                with:
+                    persist-credentials: false
             -   name: Setup Node.js
                 uses: actions/setup-node@v7
                 with:
                     node-version: "26"
+                    cache: npm
+                    cache-dependency-path: pages/package.json
             -   name: Setup Pages
                 uses: actions/configure-pages@v6
             -   name: Install dependencies
                 working-directory: pages
-                run: npm install
+                run: npm install --no-audit --no-fund
             -   name: Build website
                 working-directory: pages
                 env:
