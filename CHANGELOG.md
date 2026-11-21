@@ -164,6 +164,10 @@ ChangeLog
     the 2s probe timeout, a cancelled board fetch, or an MCP disconnect during payload parsing), so
     it no longer stays busy forever and stops again after its idle timeout.
 
+-   BUGFIX [code]: Major Version Updates of the CLI via `ase setup update`
+    The CLI is updated via `npm install -g @rse/ase@<latest>` instead of `npm update -g`, which never
+    crosses a major version, so the CLI no longer silently stays behind the updated plugin.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.

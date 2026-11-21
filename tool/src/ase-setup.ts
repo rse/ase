@@ -104,9 +104,10 @@ export default class SetupCommand {
                 return 0
             }
 
-            /*  update ASE CLI tool  */
+            /*  update ASE CLI tool (via an explicit version, as "npm update -g"
+                stays within the caret range and hence never crosses a major version)  */
             this.log.write("info", `setup: update: updating ASE CLI tool: ${current} -> ${latest}`)
-            const updateCmd = await this.runner.npmCmd([ "update", "-g", "@rse/ase" ], true)
+            const updateCmd = await this.runner.npmCmd([ "install", "-g", `@rse/ase@${latest !== "" ? latest : "latest"}` ], true)
             await this.runner.run(updateCmd.cmd, updateCmd.args)
 
             /*  update ASE plugin (refresh the marketplace snapshot, then
