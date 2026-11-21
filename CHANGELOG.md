@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.1.4 (2026-11-XX)
+2.1.4 (2026-11-21)
 ------------------
 
 -   FEATURE [code]: Interactive `AUTO GRILLING` Answer
