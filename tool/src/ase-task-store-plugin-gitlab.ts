@@ -668,30 +668,38 @@ class GitLabTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<string> 
         const r = await this.conditional(path, params, state.etag)
         if (r === null)
             return
-        state.etag = r.etag
         let issues = r.issues
         if (r.more)
             issues = await this.issues.all({
                 projectId: path, scope: "all", state: "all", orderBy: "updated_at", sort: "asc", updatedAfter: state.since, perPage: 100
             }) as unknown as Issue[]
+
+        /*  determine the changes, but advance the poll state only after all of them
+            were loaded, so a failed load lets the next poll detect them again  */
         const change = { added: [] as API.TaskEntry[], updated: [] as API.TaskEntry[], deleted: [] as string[] }
+        const seen   = new Map<number, string>()
+        let   since  = state.since
         for (const issue of issues) {
             if ((issue.issue_type ?? "issue") !== "issue")
                 continue
-            if (iso(issue.updated_at) > state.since)
-                state.since = iso(issue.updated_at)
-            if (state.seen.get(issue.iid) === issue.updated_at)
+            if (iso(issue.updated_at) > since)
+                since = iso(issue.updated_at)
+            const last = seen.get(issue.iid) ?? state.seen.get(issue.iid)
+            if (last === issue.updated_at)
                 continue
-            const known = state.seen.has(issue.iid)
-            state.seen.set(issue.iid, issue.updated_at)
+            seen.set(issue.iid, issue.updated_at)
             this.loads.delete(`${prjId}#${issue.iid}`)
             if (!live(issue))
                 change.deleted.push(idOf(scheme, issue.iid))
-            else if (!known && iso(issue.created_at) >= this.opened)
+            else if (last === undefined && iso(issue.created_at) >= this.opened)
                 change.added.push(await this.entry(path, lifecycle, scheme, issue))
             else
                 change.updated.push(await this.entry(path, lifecycle, scheme, issue))
         }
+        state.etag  = r.etag
+        state.since = since
+        for (const [ iid, updated ] of seen)
+            state.seen.set(iid, updated)
         if (this.timer !== null && (change.added.length > 0 || change.updated.length > 0 || change.deleted.length > 0))
             listener(prjId, change)
     }

@@ -93,6 +93,11 @@ ChangeLog
     determining its revision, so a conditional save or a part endpoint retry no longer pairs the
     fresh revision with a stale plan and silently overwrites a concurrent external change.
 
+-   BUGFIX [code]: No Lost Changes on Failed Polls in the GitLab Task Store Plugin
+    The `gitlab` task store plugin advances its change detection state only after all changed issues
+    of a poll were loaded, so a failed load (like of the issue links) no longer silently swallows the
+    detected changes, but lets the next poll report them again.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.
