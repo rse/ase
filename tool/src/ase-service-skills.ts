@@ -10,6 +10,8 @@ import { ofetch }         from "ofetch"
 import pacote             from "pacote"
 import PQueue             from "p-queue"
 
+import type Log           from "./ase-lib-log.js"
+
 /*  shape of a single component-info entry  */
 export interface ComponentInfo {
     name:       string
@@ -104,19 +106,66 @@ export class Skills {
         }
     }
 
-    /*  fetch last-month npm downloads for a single package  */
-    private static async fetchDownloads (name: string): Promise<number | "N.A."> {
-        try {
-            const data = await Skills.httpLimit(() => ofetch<{ downloads?: number }>(
-                `https://api.npmjs.org/downloads/point/last-month/${encodeURIComponent(name)}`,
-                { timeout: Skills.HTTP_TIMEOUT_MS, ignoreResponseError: true }
-            ))
-            const n = data?.downloads
-            return typeof n === "number" ? n : "N.A."
+    /*  fetch a last-month result of the npm downloads API, retrying once on a rate
+        limit (HTTP 429), a server error (HTTP 5xx), or a network/timeout error  */
+    private static async fetchNpmDownloadsApi<T> (path: string, log?: Log): Promise<T | null> {
+        const url = `https://api.npmjs.org/downloads/point/last-month/${path}`
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            let reason: string
+            let delay = 1000
+            try {
+                const res = await Skills.httpLimit(() => ofetch.raw<T>(url,
+                    { timeout: Skills.HTTP_TIMEOUT_MS, ignoreResponseError: true }))
+                if (res.ok)
+                    return res._data ?? null
+                reason = `HTTP ${res.status}`
+                if (res.status !== 429 && res.status < 500) {
+                    log?.write("debug", `component-info: npm downloads request "${url}" failed: ${reason}`)
+                    return null
+                }
+                const retryAfter = Number.parseInt(res.headers.get("retry-after") ?? "", 10)
+                if (!Number.isNaN(retryAfter))
+                    delay = Math.min(retryAfter * 1000, 5000)
+            }
+            catch (err: unknown) {
+                reason = err instanceof Error ? err.message : String(err)
+            }
+            log?.write("debug", `component-info: npm downloads request "${url}" failed (attempt ${attempt}/2): ${reason}`)
+            if (attempt < 2)
+                await new Promise((resolve) => setTimeout(resolve, delay))
         }
-        catch {
-            return "N.A."
-        }
+        return null
+    }
+
+    /*  fetch last-month npm downloads for all given packages: the unscoped ones through
+        bulk requests of up to 128 packages, the scoped ones (unsupported in bulk) individually  */
+    private static async fetchNpmDownloads (names: string[], log?: Log): Promise<Map<string, number | "N.A.">> {
+        const result   = new Map<string, number | "N.A.">()
+        const unique   = [ ...new Set(names) ]
+        const unscoped = unique.filter((name) => !name.startsWith("@"))
+        const chunks: string[][] = []
+        for (let i = 0; i < unscoped.length; i += 128)
+            chunks.push(unscoped.slice(i, i + 128))
+
+        /*  a bulk request of a single package yields the response of a single request  */
+        const bulks   = chunks.filter((chunk) => chunk.length > 1)
+        const singles = [ ...unique.filter((name) => name.startsWith("@")), ...chunks.filter((chunk) => chunk.length === 1).flat() ]
+        await Promise.all([
+            ...bulks.map(async (chunk) => {
+                const data = await Skills.fetchNpmDownloadsApi<Record<string, { downloads?: number } | null>>(
+                    chunk.map((name) => encodeURIComponent(name)).join(","), log)
+                for (const name of chunk) {
+                    const n = data?.[name]?.downloads
+                    result.set(name, typeof n === "number" ? n : "N.A.")
+                }
+            }),
+            ...singles.map(async (name) => {
+                const data = await Skills.fetchNpmDownloadsApi<{ downloads?: number }>(encodeURIComponent(name), log)
+                const n = data?.downloads
+                result.set(name, typeof n === "number" ? n : "N.A.")
+            })
+        ])
+        return result
     }
 
     /*  fetch Maven Central metadata for a single coordinate `groupId:artifactId`:
@@ -642,8 +691,16 @@ export class Skills {
         stack:      string,
         components: string[],
         staleMonths = 18,
-        smallScope  = false
+        smallScope  = false,
+        log?:       Log
     ): Promise<ComponentInfo[]> {
+        /*  fetch the npm downloads lazily once in bulk for all components  */
+        let npmDownloads: Promise<Map<string, number | "N.A.">> | null = null
+        const fetchNpmDownloads = (name: string) => {
+            npmDownloads ??= Skills.fetchNpmDownloads(components, log)
+            return npmDownloads.then((m) => m.get(name) ?? "N.A.")
+        }
+
         /*  select the per-stack metadata and downloads fetchers, where
             a downloads fetcher of `null` takes the downloads from the metadata  */
         const fetchers: {
@@ -651,7 +708,7 @@ export class Skills {
             downloads: ((name: string) => Promise<number | "N.A.">) | null
         } | null =
             stack === "JavaScript" || stack === "TypeScript" ?
-                { meta: Skills.fetchPackument, downloads: Skills.fetchDownloads } :
+                { meta: Skills.fetchPackument, downloads: fetchNpmDownloads } :
                 stack === "Java" || stack === "Kotlin" || stack === "Scala" ?
                     { meta: Skills.fetchMavenInfo, downloads: Skills.fetchMavenDownloads } :
                     stack === "Python" ?
@@ -784,6 +841,7 @@ const mcpJsonResult = async (fn: () => unknown) => {
 
 /*  MCP registration entry point for various skill helper tools  */
 export class SkillsMCP {
+    constructor (private log: Log) {}
     register (mcp: McpServer): void {
         mcp.registerTool("ase_component_info", {
             title: "ASE component info",
@@ -838,7 +896,7 @@ export class SkillsMCP {
                 smallScope: z.boolean().optional()
                     .describe("If true, penalize each component by its direct-dependency count (small-scope need)")
             }
-        }, async (args) => mcpJsonResult(() => Skills.info(args.stack, args.components, args.staleMonths, args.smallScope)))
+        }, async (args) => mcpJsonResult(() => Skills.info(args.stack, args.components, args.staleMonths, args.smallScope, this.log)))
         mcp.registerTool("ase_decision_matrix", {
             title: "ASE decision matrix",
             description:

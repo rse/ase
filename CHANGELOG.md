@@ -51,6 +51,11 @@ ChangeLog
     The `DISSECTION` parts report is now explicitly emitted as plain reply text before the next
     step's tool calls, never through a tool call like a `printf` via `Bash`, so it stays visible.
 
+-   BUGFIX [code]: Robust npm Download Counts in `ase_component_info`
+    The npm downloads are now fetched through bulk requests of up to 128 unscoped packages (scoped
+    ones individually), retried once on HTTP 429, HTTP 5xx, or a network error, with every failure
+    logged at debug level, instead of one silent request per package turning any failure into `N.A.`.
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

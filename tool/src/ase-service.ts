@@ -231,7 +231,7 @@ export default class ServiceCommand {
         new DiffMCP().register(mcp)
         new SleepMCP().register(mcp)
         new GetoptMCP(log).register(mcp)
-        new SkillsMCP().register(mcp)
+        new SkillsMCP(log).register(mcp)
         new WorktreeMCP().register(mcp)
         new MintMCP().register(mcp)
         new MetricMCP().register(mcp)
