@@ -69,6 +69,11 @@ ChangeLog
     `ase_specbook_query` runs in the SpecBook worker thread like lint and export, and the `ase` task
     store plugin no longer reports its own writes during a rescan as external changes.
 
+-   BUGFIX [code]: No Second Service After a Lost Port Race
+    `ase service start` treats a spawned service, which cleanly exits after losing the port race to a
+    concurrently started service of the same project, as a successful start, so it no longer clears
+    the persisted port of the winner and spawns a second service.
+
 -   BUGFIX [code]: Follow-Up Options of `ase agent <kind> restart`
     The `--followup-*` options collect their values into the command actually parsing them, so
     `ase agent <kind> restart` no longer silently drops them and restarts the agent without them.

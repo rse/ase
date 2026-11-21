@@ -619,8 +619,15 @@ export default class ServiceCommand {
                 try {
                     for (let i = 0; i < 50; i++) {
                         await new Promise((resolve) => setTimeout(resolve, 100))
-                        if (exited)
+                        if (exited) {
+                            /*  race-loser child exits cleanly, as another start won the port  */
+                            if (exitCode === 0 && await probe(port, ctx.projectId).catch(() => null) === true) {
+                                this.log.write("info", `service: already running on port ${port}`)
+                                success = true
+                                return 0
+                            }
                             break
+                        }
                         const s = await probe(port, ctx.projectId).catch(() => null)
                         if (s === true) {
                             this.log.write("info", `service: started on port ${port}`)
