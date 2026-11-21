@@ -352,14 +352,16 @@ export default class ServiceCommand {
         server.ext("onRequest", (request, h) => {
             inFlight++
             lastActivity = Date.now()
+
+            /*  undo the accounting on the raw response "close" only, as it is emitted exactly once
+                for every response, while "onPreResponse" is skipped on aborts and on "h.abandon"  */
+            request.raw.res.once("close", () => {
+                inFlight--
+                lastActivity = Date.now()
+            })
             const host = ((request.headers.host as string | undefined) ?? "").toLowerCase()
             if (!allowedHosts.has(host))
                 return h.response({ error: "invalid Host header" }).code(421).takeover()
-            return h.continue
-        })
-        server.ext("onPreResponse", (_request, h) => {
-            inFlight     = Math.max(0, inFlight - 1)
-            lastActivity = Date.now()
             return h.continue
         })
 
@@ -417,10 +419,6 @@ export default class ServiceCommand {
             const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined })
             const mcp       = ServiceCommand.buildMcpServer(this.log, ctx, startTime, usage)
             request.raw.res.on("close", () => {
-                /*  "h.abandon" (see below) bypasses "onPreResponse",
-                    so undo the "onRequest" accounting here instead  */
-                inFlight     = Math.max(0, inFlight - 1)
-                lastActivity = Date.now()
                 transport.close().catch(() => {})
                 mcp.close().catch(() => {})
             })

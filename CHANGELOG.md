@@ -116,6 +116,11 @@ ChangeLog
     `ase config delete`, `ase_config_delete`, and emptying a never-set value in `ase config edit`
     no longer fail with `Expected YAML collection at <seg>` when a parent map of the key is missing.
 
+-   BUGFIX [code]: Idle Timeout of `ase service` Despite Aborted Requests
+    The service releases its in-flight accounting of a request also when the client aborts it (like
+    the 2s probe timeout, a cancelled board fetch, or an MCP disconnect during payload parsing), so
+    it no longer stays busy forever and stops again after its idle timeout.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.
