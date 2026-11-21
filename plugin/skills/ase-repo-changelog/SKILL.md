@@ -1,8 +1,9 @@
 ---
 name: ase-repo-changelog
-argument-hint: "[--help|-h]"
+argument-hint: "[--help|-h] [--staged|-s] [--unstaged|-u]"
 description: >
-    Update ChangeLog entries in CHANGELOG.md files. Use when the user wants to
+    Update ChangeLog entries in CHANGELOG.md files, optionally just for the
+    staged and/or unstaged changes. Use when the user wants to
     "add a changelog entry", or to "update", "complete", or "consolidate" the
     "changelog", "ChangeLog", or "CHANGELOG.md", e.g. before committing or releasing.
 user-invocable: true
@@ -14,6 +15,7 @@ allowed-tools:
     - "Bash(git diff *)"
     - "Bash(git show *)"
     - "Bash(git tag --list *)"
+    - "Bash(git ls-files *)"
     - "Read"
     - "Write"
     - "Edit"
@@ -27,7 +29,9 @@ allowed-tools:
 Update ChangeLog Entries
 </purpose>
 
-<expand name="getopt" arg1="ase-repo-changelog">
+<expand name="getopt"
+    arg1="ase-repo-changelog"
+    arg2="--staged|-s --unstaged|-u">
     $ARGUMENTS
 </expand>
 
@@ -35,7 +39,8 @@ Update ChangeLog Entries
 Help to complete, consolidate and sort *ChangeLog* entries of the most
 recent, still unreleased *ChangeLog* section (created anew if the most
 recent one is already released), based on underlying *Git* commits and
-staged changes.
+staged changes, or, with `--staged` and/or `--unstaged`, based on just
+the uncommitted change set.
 </objective>
 
 Format
@@ -143,6 +148,42 @@ Processing
     ⧉ **ASE**: **DETERMINE ARTIFACT CHANGES:**
     </template>
 
+    Set <changes/> to the *uncommitted* change set to consider: to
+    `staged and unstaged` if both <getopt-option-staged/> and
+    <getopt-option-unstaged/> are equal `true`, to `staged` if only
+    <getopt-option-staged/> is equal `true`, to `unstaged` if only
+    <getopt-option-unstaged/> is equal `true`, and to empty otherwise.
+
+    <if condition="<changes/> is not empty">
+    To update the entries of the current section, consult *only* the
+    <changes/> changes, where the `unstaged` changes always include the
+    *untracked* files, and *skip* the scan of the Git *commits* entirely.
+    Find these changes with the following command(s), but silently skip
+    already existing changes to the `CHANGELOG.md` file itself and every
+    untracked entry below the `.ase/` directory (*ASE*'s own state):
+
+    -   `staged`: `git diff --cached --numstat`
+
+    -   `unstaged`: `git diff --numstat` and
+        `git ls-files --others --exclude-standard`
+
+    -   `staged and unstaged`: `git diff HEAD --numstat` and
+        `git ls-files --others --exclude-standard`
+
+    If still no corresponding *ChangeLog* entry exists for these
+    changes, derive a meaningful one from the same `git diff` command
+    without `--numstat` and from the untracked files.
+
+    <if condition="there are no such changes">
+    Only output the following <template/> and then immediately *STOP*
+    processing the entire current skill:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-repo-changelog**, ▶ NOTICE: no <changes/> changes
+    </template>
+    </if>
+    </if>
+    <else>
     To update the entries of the current section, consult the Git
     *commits* plus the currently already staged changes in the Git
     *index*, but *ignore* the Git *stash* and still unstaged changes.
@@ -187,6 +228,7 @@ Processing
     ⧉ **ASE**: ✪ skill: **ase-repo-changelog**, ▶ NOTICE: no changes since released `<baseline/>`
     </template>
     </if>
+    </else>
 
     </step>
 
@@ -201,7 +243,8 @@ Processing
 
     Without immediately modifying the `CHANGELOG.md` file, *complete*
     the entries in the current section only, by adding the
-    corresponding (most recent) Git *commits* and *staged* changes only.
+    corresponding (most recent) Git *commits* and *staged* changes only,
+    resp. just the <changes/> changes if <changes/> is not empty.
 
     For each Git commit, reduce the Git commit messages to an entry in
     the *style* of the existing entries, kept within about *5 lines*
@@ -221,8 +264,8 @@ Processing
     enough because of too little context information, add some essential
     context, especially references to the class/module/package, etc.
     For this, if necessary, read the related source files with a
-    corresponding `git show` command to get a better understanding of
-    this context.
+    corresponding `git show` command (resp. directly, for unstaged
+    changes) to get a better understanding of this context.
 
     </step>
 
@@ -244,6 +287,14 @@ Processing
     Without immediately modifying the `CHANGELOG.md` file, *sort* the
     entries in the current section only. Instead of the
     chronological commit order, group the entries by the <change-type/>s.
+
+    <if condition="<changes/> is not empty">
+    Restrict the consolidation and sorting to the entries added or
+    updated in STEP 3: merge them only into closely related existing
+    entries, insert them into their <change-type/> group, and leave all
+    other entries of the current section unchanged, so the resulting
+    diff carries just the entries of the change set.
+    </if>
 
     </step>
 

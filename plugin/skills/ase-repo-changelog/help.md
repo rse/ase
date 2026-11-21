@@ -7,6 +7,8 @@
 
 `ase-repo-changelog`
     [`--help`|`-h`]
+    [`--staged`|`-s`]
+    [`--unstaged`|`-u`]
 
 ##  DESCRIPTION
 
@@ -14,6 +16,12 @@ The `ase-repo-changelog` skill helps to *complete*, *consolidate*, and
 *sort* the entries of the most recent section of a `CHANGELOG.md`
 file, based on the underlying *Git* commits and the currently staged
 changes in the Git *index*.
+
+With `--staged` and/or `--unstaged`, the skill instead creates entries
+just for the current, *uncommitted* change set: it skips the scan of
+the Git commits since the last tag and leaves all other entries of the
+section unchanged. This is cheap and fast for the usual "stage →
+changelog → commit" flow.
 
 If the most recent section is already released, i.e., a Git tag
 `N.M.K` (or `vN.M.K`) of its version exists, it is left untouched and
@@ -37,11 +45,27 @@ unrelated changes. Stage the new entry yourself (e.g. via `git add -p`),
 or use `ase-repo-stage --changelog` to update and stage it together
 with a selection of changes.
 
+##  OPTIONS
+
+-   `--staged`|`-s`:
+    Create entries just for the *staged* changes in the Git *index*,
+    instead of for the Git commits since the last tag plus the staged
+    changes. Combined with `--unstaged`, create entries for *all*
+    uncommitted changes.
+
+-   `--unstaged`|`-u`:
+    Create entries just for the *unstaged* changes and the *untracked*
+    files of the working copy (except *ASE*'s own state below `.ase/`),
+    instead of for the Git commits since the last tag plus the staged
+    changes. Combined with `--staged`, create entries for *all*
+    uncommitted changes.
+
 ##  SCENARIOS
 
 -   You want the `CHANGELOG.md` brought up to date with recent commits
 -   You want changelog entries completed, consolidated, and sorted
 -   You want a tidy changelog section before a release
+-   You want an entry just for the staged changes before committing them
 
 ##  EXAMPLES
 
@@ -49,6 +73,18 @@ Update the most recent ChangeLog section:
 
 ```text
 ❯ /ase-repo-changelog
+```
+
+Create entries just for the staged changes:
+
+```text
+❯ /ase-repo-changelog --staged
+```
+
+Create entries for all uncommitted changes:
+
+```text
+❯ /ase-repo-changelog -s -u
 ```
 
 ##  SEE ALSO

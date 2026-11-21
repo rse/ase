@@ -21,6 +21,10 @@ ChangeLog
     The skill detects upfront a most recent section already released via a Git tag `N.M.K` resp.
     `vN.M.K`, leaves it untouched, and inserts a new section for the next patch version instead.
 
+-   IMPROVEMENT [code, docs]: Options `--staged` and `--unstaged` for `ase-repo-changelog`
+    The skill creates entries just for the staged resp. unstaged and untracked changes (with both,
+    for all uncommitted ones), skipping the scan of the Git commits since the last released tag.
+
 -   IMPROVEMENT [docs]: Option Alias Example `--well-done`
     The manual pages of `ase alias` and `ase-meta-alias` show an option alias `--well-done` of
     `ase-code-edit`, expanding to `--ground --approach --grill --grill-rounds=3`.
