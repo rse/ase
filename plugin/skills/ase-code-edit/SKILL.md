@@ -277,9 +277,14 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
             arg4="file and directory paths, identifiers, symbols, types, commands, options, configuration keys, and literal values"
             arg5="the code base"></expand>
 
-        If <approach-result/> is `STOP`, only output the following
-        <template/> and then immediately *STOP* processing the entire
-        current skill:
+        If <approach-result/> is `STOP`, first report the collected
+        decisions:
+
+        <expand name="decision-report"
+            arg1="✪ skill: **ase-code-edit**"></expand>
+
+        Then only output the following <template/> and then
+        immediately *STOP* processing the entire current skill:
 
         <template>
         ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ status: **editing stopped**
@@ -385,9 +390,14 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 remaining rounds and continue with the *implementing*
                 state.
 
-            -   If a <result/> is `STOP SKILL`, only output the
-                following <template/> and then immediately *STOP*
-                processing the entire current skill:
+            -   If a <result/> is `STOP SKILL`, first report the
+                collected decisions:
+
+                <expand name="decision-report"
+                    arg1="✪ skill: **ase-code-edit**"></expand>
+
+                Then only output the following <template/> and then
+                immediately *STOP* processing the entire current skill:
 
                 <template>
                 ⧉ **ASE**: ✪ skill: **ase-code-edit**, ▶ status: **editing stopped**

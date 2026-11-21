@@ -137,7 +137,7 @@ Processing
     Git tag either (i.e. `git tag --list N.M.K` produces no output for
     it), use the commit which introduced the `N.M.K` of the *first*
     level-2 header instead, determined with the command
-    `git log -1 --format=%h -S 'N.M.K (' -- CHANGELOG.md`, and check all
+    `git log -1 --format=%h -S 'N.M.K (' -- <filename/>`, and check all
     Git commits from it on with the command
     `git log <commit/>^..HEAD --numstat --pretty=format:'%h: %s'`.
 

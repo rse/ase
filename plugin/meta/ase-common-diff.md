@@ -61,6 +61,77 @@ with no extra blank or space-only lines):
 
 </define>
 
+<define name="diff-apply">
+
+Let the user decide on the proposed change and apply it, where <arg1/>
+names the change (like `correction`), <arg2/> is the dialog header
+(like `CORRECTION`), and <arg3/> lists the placeholders a refinement
+reassigns (like `<description/>, <old-text/>, and <new-text/>`).
+
+<if condition="<getopt-option-auto/> is not equal `true`">
+
+In the following, you *MUST* *NOT* use your built-in
+<user-dialog-tool/> tool! Instead, you *MUST* just show a
+custom dialog according to the expanded `custom-dialog`
+definition. You *MUST* closely follow this definition:
+
+<expand name="custom-dialog" arg1="--other">
+    <arg2/>: How would you like to proceed with this proposed <arg1/>?
+    ACCEPT: Apply this proposed <arg1/>.
+    REJECT: Skip this proposed <arg1/>.
+</expand>
+
+</if>
+<else>
+
+Set <result>ACCEPT</result>.
+
+</else>
+
+Check <result/> and dispatch accordingly:
+
+-   <if condition="<result/> is 'ACCEPT'">
+
+    Invoke the `Edit` tool to apply the change by replacing
+    <old-text/> with <new-text/> at <file/>:<line/>. The operation
+    will be auto-approved by the ASE `pre-tool-use` hook (which
+    tracks the active skill), so *no* interactive permission
+    prompt will appear. Then record `APPLIED` (or `FAILED`,
+    if the `Edit` reported an error) as the outcome of
+    <index/> in <outcomes/> and continue with the next <item/>.
+
+    </if>
+
+-   <if condition="<result/> starts with 'OTHER'">
+
+    Generate a *new* proposal for the *same* <item/>,
+    incorporating the user's free-text hint from <result/>
+    after the "OTHER:" prefix. *Reassign* <arg3/> to reflect
+    this refined proposal (<old-text/> stays anchored to the
+    existing text at <file/>:<line/>) so the subsequent rendering
+    and any `Edit` use the new proposal rather than the original.
+    Then *re-apply* all derivations of the first substep of this
+    `for`-iteration which follow its field assignments (including
+    the `diff-normalize` expansion) to the refined values and *go
+    back* to its second substep. There is *no* cap on refinement
+    rounds - keep refining until the user picks `ACCEPT` or `REJECT`.
+
+    </if>
+
+-   <if condition="
+        <result/> is 'REJECT' or
+        <result/> is 'CANCEL' or
+        <result/> starts with 'ERROR'
+    ">
+
+    Skip this <item/> without any `Edit` call, record
+    `SKIPPED` as the outcome of <index/> in <outcomes/>, and
+    continue with the next <item/>.
+
+    </if>
+
+</define>
+
 <define name="diff-normalize">
 
 Normalize the change of <old-text/> and <new-text/> and derive its context.

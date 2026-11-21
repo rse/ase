@@ -128,7 +128,7 @@ Procedure
     6.  Only output the following <template/> and continue processing:
 
         <template>
-        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<mode/> plan content**, ▶ status: **instruction given**
         </template>
 
     7.  <expand name="task-ground-plan" arg1=""/>

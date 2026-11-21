@@ -145,7 +145,11 @@ for the technology stack to *provide* the *needed functionality*
         <keyword-L/> (L=1-M), which allow you to search for suitable
         components.
 
-    3.  Determine the *candidate pool size* <pool/> as twice the
+    3.  If <getopt-option-limit/> is not a positive integer, use the
+        default `12` instead, and if <getopt-option-staleness/> is not a
+        positive integer, use the default `18` instead.
+
+        Determine the *candidate pool size* <pool/> as twice the
         <getopt-option-limit/> (i.e. <pool/> = 2 &times;
         <getopt-option-limit/>). Each discovery source below may fetch up
         to <pool/> candidates so that the later ranking and trimming

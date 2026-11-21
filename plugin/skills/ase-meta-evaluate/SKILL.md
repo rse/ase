@@ -243,13 +243,15 @@ multi-*criteria* decision matrix.
         appear large; the all-negative regime is surfaced as a dedicated
         warning branch below. Do not output anything.
 
-    -   If <rating-K/> is less than zero (i.e. all alternatives
-        rate negatively and the "best" is merely the least-bad), stop the
-        flow after you output just the following <template/> and do not
-        output anything else. This all-negative check is evaluated *before*
-        the small-distance checks below, so that an all-negative alternative
-        set with a small winning gap surfaces the all-negative warning rather
-        than being masked by the multiple-best or small-distance branches:
+    -   If <rating-K/> is less than zero and <percentage/> is greater than
+        or equal to 0.01 (i.e. all alternatives rate negatively and the
+        "best" is merely the unique least-bad), stop the flow after you
+        output just the following <template/> and do not output anything
+        else. This all-negative check is evaluated *before* the
+        small-distance check below, so that an all-negative alternative set
+        with a small winning gap surfaces the all-negative warning rather
+        than being masked by the small-distance branch, while a tie still
+        falls into the multiple-best branch:
 
         <template>
         ⧉ **ASE**: **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**

@@ -164,6 +164,13 @@ Procedure
         yourself. Set <id-scheme/> to the `scheme` field of the responses.
         Do not output anything related to these MCP tool calls.
 
+        <if condition="<getopt-option-dry/> is equal `true`">
+        Skip these `ase_task_newid` tool calls and keep every <part-id/>
+        as derived (the report then shows the proposed ids), as the
+        scheme `seq` permanently reserves every handed-out id, which a
+        report-only run must not consume.
+        </if>
+
         Then *derive the dependencies* of the parts: for *every* part,
         set <part-after/> to the <part-id/> of exactly those *earlier*
         parts it *directly* depends on (a part never depends on a later

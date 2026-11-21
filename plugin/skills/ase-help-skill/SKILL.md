@@ -50,12 +50,9 @@ the *sole* index <skill-ref/> is resolved against:
 
     1.  <if condition="<skill-ref/> is empty">
         No particular skill was addressed, so render the *entire*
-        <catalog/> as a browsable list with the following <template/>
-        -- one list entry per catalog entry, in catalog order, where
-        <name/> and <purpose/> are the two fields of the entry (and
-        <name-padded/> is <name/>, padded to 22 characters with
-        spaces on the right) -- and then immediately *STOP* processing
-        the entire current skill:
+        <catalog/> verbatim with the following <template/>, emit the hint
+        below, and then immediately *STOP* processing the entire current
+        skill:
 
         <template>
         <ase-tpl-head title="SKILL CATALOG"/>

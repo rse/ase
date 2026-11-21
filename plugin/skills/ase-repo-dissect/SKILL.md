@@ -77,12 +77,12 @@ Procedure
         capturing their full outputs into <diff/> and <stat/>:
 
         <if condition="<getopt-option-staged/> is equal `true`">
-        `git diff --cached --binary HEAD`
+        `git diff --cached --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/ --binary HEAD`
 
         `git diff --cached --numstat HEAD`
         </if>
         <else>
-        `git diff --binary HEAD`
+        `git diff --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/ --binary HEAD`
 
         `git diff --numstat HEAD`
         </else>
@@ -103,7 +103,7 @@ Procedure
         diff by running the corresponding command (taken exactly as
         given) and *append* its output to <diff/>:
 
-        `git -C "<repo-root/>" diff --no-index --binary /dev/null "<file/>"`
+        `git -C "<repo-root/>" diff --no-index --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/ --binary /dev/null "<file/>"`
 
         This command intentionally exits with a non-zero status,
         because the two compared paths differ; treat this exit status
@@ -284,7 +284,7 @@ Procedure
             remaining ones:
 
             <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-dissect**, ◉ part: **<part-id/>**, ▶ status: **worktree failed to create**
+            ⧉ **ASE**: ✪ skill: **ase-repo-dissect**, ◉ part: **<part-id/>**, ▶ status: **worktree failed to create**, ⊚ kept: `<tmp-dir/>/ase-dissect-<part-id/>.patch`
             </template>
             </if>
 
@@ -299,7 +299,7 @@ Procedure
             remaining ones:
 
             <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-dissect**, ◉ part: **<part-id/>**, ▶ status: **patch failed to apply**
+            ⧉ **ASE**: ✪ skill: **ase-repo-dissect**, ◉ part: **<part-id/>**, ▶ status: **patch failed to apply**, ⊚ kept: `<tmp-dir/>/ase-dissect-<part-id/>.patch`
             </template>
             </if>
 
@@ -366,10 +366,13 @@ Procedure
         </template>
         </if>
         <else>
-        Only output the following <template/>:
+        Set <status/> to `change set dissected` if the worktrees of all
+        parts were created and their patches applied, or to
+        `change set partially dissected` otherwise. Then only output
+        the following <template/>:
 
         <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-dissect**, ✪ dissection: **<n/>** parts, ▶ status: **change set dissected**
+        ⧉ **ASE**: ✪ skill: **ase-repo-dissect**, ✪ dissection: **<n/>** parts, ▶ status: **<status/>**
         </template>
         </else>
 

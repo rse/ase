@@ -42,13 +42,6 @@ task plan until reaching a shared understanding.
 Procedure
 ---------
 
-<define name="handoff-args">
-Set <args>--int-reuse-task</args>.
-<if condition="<getopt-option-next/> is not equal `none`">
-    Set <args><args/> --next <getopt-option-next/></args>
-</if>
-</define>
-
 1.  **Determine Task:**
 
     1.  Set <instruction><getopt-arguments/></instruction> initially, with any
@@ -454,61 +447,47 @@ Set <args>--int-reuse-task</args>.
             </template>
 
         -   If <result/> is `GRILL`:
-            <expand name="handoff-args"/>
-            Set <args><args/> --force --rounds <getopt-option-rounds/> --until <getopt-option-until/> --focus <getopt-option-focus/></args>.
+            Set <grill-args>--force --rounds <getopt-option-rounds/> --until <getopt-option-until/> --focus <getopt-option-focus/></grill-args>.
             <if condition="<getopt-option-perspective/> is not empty">
-                Set <args><args/> --perspective <getopt-option-perspective/></args>,
+                Set <grill-args><grill-args/> --perspective <getopt-option-perspective/></grill-args>,
                 with the value shell-quoted if it contains spaces or special characters.
             </if>
             <if condition="<getopt-option-ground/> is `true`">
-                Set <args><args/> --ground</args>.
+                Set <grill-args><grill-args/> --ground</grill-args>.
             </if>
             <if condition="<getopt-option-auto/> is `true`">
-                Set <args><args/> --auto</args>.
+                Set <grill-args><grill-args/> --auto</grill-args>.
             </if>
             <if condition="<getopt-option-quiet/> is `true`">
-                Set <args><args/> --quiet</args>.
+                Set <grill-args><grill-args/> --quiet</grill-args>.
             </if>
             <if condition="<getopt-option-diff/> is `true`">
-                Set <args><args/> --diff</args>.
+                Set <grill-args><grill-args/> --diff</grill-args>.
             </if>
             <if condition="<getopt-option-int-interactive/> is `true`">
-                Set <args><args/> --int-interactive</args>.
+                Set <grill-args><grill-args/> --int-interactive</grill-args>.
             </if>
-            Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-grill", args: "<args/>")`
-            to invoke the `ase:ase-task-grill` skill again in order to
-            *re-grill* the updated plan with the same grilling options.
-            Immediately stop processing the current skill once the
-            `Skill` tool was used.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan updated -- hand-off to re-grilling**
-            </template>
+            <expand name="task-next-handoff" arg1="ase-task-grill"
+                arg2="plan updated -- hand-off to re-grilling"
+                arg3="<grill-args/>"></expand>
 
         -   If <result/> is `EDIT`:
-            <expand name="handoff-args"/>
+            Set <edit-args></edit-args> (empty).
             <if condition="<getopt-option-quiet/> is `true`">
-                Set <args><args/> --quiet</args>.
+                Set <edit-args><edit-args/> --quiet</edit-args>.
             </if>
             <if condition="<getopt-option-int-interactive/> is `true`">
-                Set <args><args/> --interactive</args>.
+                Set <edit-args><edit-args/> --interactive</edit-args>.
             </if>
             <if condition="<getopt-option-focus/> is not equal `all`">
-                Set <args><args/> --focus <getopt-option-focus/></args>.
+                Set <edit-args><edit-args/> --focus <getopt-option-focus/></edit-args>.
             </if>
             <if condition="<getopt-option-ground/> is `true`">
-                Set <args><args/> --ground</args>.
+                Set <edit-args><edit-args/> --ground</edit-args>.
             </if>
-            Only output the following <template/> and then call the
-            tool `Skill(skill: "ase:ase-task-edit", args: "<args/>")`
-            to invoke the `ase:ase-task-edit` skill in order to *edit*
-            the updated plan. Immediately stop processing the current
-            skill once the `Skill` tool was used.
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan updated -- hand-off to edit**
-            </template>
+            <expand name="task-next-handoff" arg1="ase-task-edit"
+                arg2="plan updated -- hand-off to edit"
+                arg3="<edit-args/>"></expand>
 
         -   If <result/> is `DRAFT`:
             <expand name="task-next-handoff" arg1="ase-task-implement"

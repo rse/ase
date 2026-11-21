@@ -137,8 +137,9 @@ Procedure
 
     3.  You *MUST* internalize and strictly honor the **GENERIC TENETS**,
         the **CRAFTING TENETS**, and the **RECONCILIATION TENETS** of the
-        **ASE Tenets** when generating or updating in the following. Do
-        not output anything.
+        **ASE Tenets** when generating or updating in the following, plus
+        the **SPECIFYING TENETS** for every `SPEC` artifact. Do not output
+        anything.
 
     4.  Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
         `ase` MCP server *once* to find out the current time and store it in

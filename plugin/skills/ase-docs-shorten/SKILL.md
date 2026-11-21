@@ -315,73 +315,10 @@ than the user asked for.
 
             </elseif>
 
-        4.  <if condition="<getopt-option-auto/> is not equal `true`">
-
-            In the following, you *MUST* *NOT* use your built-in
-            <user-dialog-tool/> tool! Instead, you *MUST* just show a
-            custom dialog according to the expanded `custom-dialog`
-            definition. You *MUST* closely follow this definition:
-
-            <expand name="custom-dialog" arg1="--other">
-                SHORTENING: How would you like to proceed with this proposed shortening?
-                ACCEPT: Apply this proposed shortening.
-                REJECT: Skip this proposed shortening.
-            </expand>
-
-            </if>
-
-            <else>
-
-            Set <result>ACCEPT</result>.
-
-            </else>
-
-        5.  Check <result/> and dispatch accordingly:
-
-            -   <if condition="<result/> is 'ACCEPT'">
-
-                Invoke the `Edit` tool to apply the change by replacing
-                <old-text/> with <new-text/> at <file/>:<line/>. The operation
-                will be auto-approved by the ASE `pre-tool-use` hook (which
-                tracks the active skill), so *no* interactive permission
-                prompt will appear. Then record `APPLIED` (or `FAILED`,
-                if the `Edit` reported an error) as the outcome of
-                <index/> in <outcomes/> and continue with the next <item/>.
-
-                </if>
-
-            -   <if condition="<result/> starts with 'OTHER'">
-
-                Generate a *new* proposal for the *same* <item/>,
-                incorporating the user's free-text hint from <result/>
-                after the "OTHER:" prefix. *Reassign* <description/>,
-                <old-text/>, <new-text/>, <block-before/>, and
-                <block-after/> to reflect this refined proposal
-                (<old-text/> stays anchored to the existing text at
-                <file/>:<line/>; <new-text/> and <description/> carry the
-                new shortening) so the subsequent rendering and any `Edit`
-                use the new proposal rather than the original. Then
-                *re-apply* the minimal-form normalization and the context
-                re-derivation of substep 1 to the refined <old-text/> and
-                <new-text/> (so the re-rendered diff again shows exactly
-                the changed lines) and *go
-                back* to substep 2 of this `for`-iteration. There is *no*
-                cap on refinement rounds - keep refining until the user
-                picks `ACCEPT` or `REJECT`.
-
-                </if>
-
-            -   <if condition="
-                    <result/> is 'REJECT' or
-                    <result/> is 'CANCEL' or
-                    <result/> starts with 'ERROR'
-                ">
-
-                Skip this <item/> without any `Edit` call, record
-                `SKIPPED` as the outcome of <index/> in <outcomes/>, and
-                continue with the next <item/>.
-
-                </if>
+        4.  <expand name="diff-apply"
+                arg1="shortening"
+                arg2="SHORTENING"
+                arg3="<description/>, <old-text/>, <new-text/>, <block-before/>, and <block-after/>"></expand>
 
         </for>
 

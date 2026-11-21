@@ -97,7 +97,7 @@ Procedure
         </template>
 
         <ase-tpl-hint level="minimal">
-        Run `/ase-task-status OPEN` first to re-open the plan.
+        Run `/ase-task-status OPEN` first to re-open a shelved plan, or `/ase-task-integrate --stateless` to integrate the change set regardless of the plan status.
         </ase-tpl-hint>
         </if>
 

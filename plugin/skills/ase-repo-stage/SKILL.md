@@ -155,7 +155,7 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
         commands (taken exactly as given) and capturing their full
         outputs into <diff/> and <stat/>:
 
-        `git -C "<repo-root/>" diff --binary`
+        `git -C "<repo-root/>" diff --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/ --binary`
 
         `git -C "<repo-root/>" diff --numstat`
 
@@ -325,7 +325,7 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
 
             `git -C "<repo-root/>" worktree add --detach "<check-dir/>" HEAD`
 
-            `git -C "<repo-root/>" diff --cached --binary > "<tmp-dir/>/ase-stage-check.patch"`
+            `git -C "<repo-root/>" diff --cached --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/ --binary > "<tmp-dir/>/ase-stage-check.patch"`
 
             `git -C "<check-dir/>" apply --whitespace=nowarn "<tmp-dir/>/ase-stage-check.patch"`
 
@@ -418,8 +418,9 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
     1.  <if condition="<getopt-option-changelog/> is equal `true`">
         Capture the unstaged diff of the `CHANGELOG.md` file located by
         `ase-repo-changelog` (in the current directory or one of its
-        parents) into <before/> via `git -C "<repo-root/>" diff --
-        "<changelog/>"`. Then invoke the ChangeLog updating:
+        parents) into <before/> via the command
+        `git -C "<repo-root/>" diff --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/ -- "<changelog/>"`.
+        Then invoke the ChangeLog updating:
 
         <skill name="ase:ase-repo-changelog"/>
 

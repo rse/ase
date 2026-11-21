@@ -2,7 +2,10 @@
 name: ase-meta-why
 argument-hint: "[--help|-h] [--depth|-d <N>] [--width|-w <M>] [--ground|-G] <fact>"
 description: >
-    Five-Whys Root-Cause Analysis.
+    Perform a Five-Whys root-cause analysis of a fact by iteratively
+    asking "why" from its symptoms down to its root-cause, optionally
+    widened and grounded. Use when the user wants the "root cause" of a
+    problem, asks "why" something happens, or mentions "five whys".
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -201,6 +204,10 @@ addressing surface-level symptoms.
     that no candidate fully validated). This is the payoff of <width/> *greater
     than 1*: the enumerated alternatives let the analysis *recover* from a wrong
     turn instead of committing to a mis-rooted chain.
+
+    When <width/> is *1* and this backward validation *fails*, there are
+    no <fallbacks/> to backtrack into: report the chain nevertheless and
+    note at which level it did not validate.
 
     Propose a solution that addresses and solves the validated root-cause.
     For the proposed solution, optionally directly propose corresponding source code changes,
