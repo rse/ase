@@ -518,11 +518,14 @@ export class Config {
     /*  delete a value at a dotted key from the target scope  */
     delete (key: string): void {
         this.assertWritable(key)
-        const td   = this.docs[this.target]
-        if (td.doc.contents === null || td.doc.contents === undefined)
+        const td       = this.docs[this.target]
+        const segments = this.resolveKey(key).split(".")
+
+        /*  deleting an absent key (or one below a missing map) is a no-op  */
+        if (!td.doc.hasIn(segments))
             return
         const next = td.doc.clone()
-        next.deleteIn(this.resolveKey(key).split("."))
+        next.deleteIn(segments)
         this.validateDoc(next, td.filename, "strict")
         td.doc = next
     }

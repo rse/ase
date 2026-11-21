@@ -112,6 +112,10 @@ ChangeLog
     of a poll were loaded, so a failed load (like of the issue links) no longer silently swallows the
     detected changes, but lets the next poll report them again.
 
+-   BUGFIX [code]: No-Op Config Deletes Below Missing Maps
+    `ase config delete`, `ase_config_delete`, and emptying a never-set value in `ase config edit`
+    no longer fail with `Expected YAML collection at <seg>` when a parent map of the key is missing.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.
