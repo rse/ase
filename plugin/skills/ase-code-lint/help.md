@@ -8,6 +8,7 @@
 `ase-code-lint`
     [`--help`|`-h`]
     [`--auto`|`-a`]
+    [`--no-changelog`|`-C`]
     [`--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`)]
     [`--force`|`-f`]
     [`--include`|`-i`=*aspect*[`,`...]]
@@ -59,8 +60,14 @@ the code, and comments contradicting the code.
 
 -   `--auto`|`-a`:
     Automatically apply every proposed correction without asking the
-    user via the interactive dialog. A closing *LINT RESULT* table
-    lists every problem with its outcome (`APPLIED` or `FAILED`).
+    user via the interactive dialog. Each applied correction gets its
+    own `CHANGELOG.md` entry (if such a file exists in the repository
+    resp. worktree root). A closing *LINT RESULT* table lists every
+    problem with its outcome (`APPLIED` or `FAILED`).
+
+-   `--no-changelog`|`-C`:
+    Suppress the `CHANGELOG.md` entries of the corrections applied
+    under `--auto`.
 
 -   `--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`):
     Set the *severity floor* (default `AUTO`): findings below the chosen
@@ -179,6 +186,12 @@ Lint only the hunks of the staged Git changes:
 
 ```text
 ❯ /ase-code-lint --staged
+```
+
+Lint a directory and automatically apply all corrections, without ChangeLog entries:
+
+```text
+❯ /ase-code-lint --auto --no-changelog src/handlers/
 ```
 
 Lint only the hunks of the unstaged changes and the untracked source files and apply all corrections:

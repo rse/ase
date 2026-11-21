@@ -18,13 +18,18 @@ const params = {
     }
 }
 
-/*  the additional parameters of the implementing: whether the change set is reviewed resp.
-    linted (each with its findings fixed) after a successful implementing, before it is
-    committed (both disabled by default)  */
+/*  the additional parameters of the implementing: whether the change set is reviewed,
+    analyzed, resp. linted (each with its findings fixed) after a successful implementing,
+    before it is committed (all disabled by default)  */
 const paramsImplement = {
     ...params,
     "review": {
         desc:    "whether to review and auto-fix the change set via the \"ase-repo-review\" skill after the implementing",
+        default: "false",
+        allow:   [ "true", "false" ]
+    },
+    "analyze": {
+        desc:    "whether to analyze and auto-fix the change set via the \"ase-code-analyze\" skill after the implementing",
         default: "false",
         allow:   [ "true", "false" ]
     },
@@ -117,10 +122,11 @@ export default {
                     "{?changeset-worktree: --worktree {changeset-worktree}} {id}"
             },
 
-            /*  with the parameters "review" and "lint", review (a "branch:" changeset including its
-                earlier commits) and lint the uncommitted change set, each fixing its findings, before
-                its commit (except an "attachment:" changeset, as it is implemented outside of the
-                working copy), where the linting comes last, to also cover the fixes of the review  */
+            /*  with the parameters "review", "analyze", and "lint", review (a "branch:" changeset
+                including its earlier commits), analyze, and lint the uncommitted change set, each
+                fixing its findings, before its commit (except an "attachment:" changeset, as it is
+                implemented outside of the working copy), where the analyzing (under its own issue
+                id prefix) and linting come last, to also cover the fixes of the preceding ones  */
             followup:  [ {
                 skill: "ase-repo-review",
                 args:  "--auto --branch {changeset-name} --staged --unstaged",
@@ -130,8 +136,13 @@ export default {
                 args:  "--auto --staged --unstaged{?changeset-worktree: --worktree {changeset-worktree}}",
                 when:  [ "{param:review}", "{?changeset-type=worktree:true}" ]
             }, {
+                skill: "ase-code-analyze",
+                args:  "--auto --no-changelog -S MEDIUM --prefix implementer --unstaged" +
+                    "{?changeset-worktree: --worktree {changeset-worktree}}",
+                when:  [ "{param:analyze}", "{?changeset-type=worktree:true}{?changeset-type=branch:true}" ]
+            }, {
                 skill: "ase-code-lint",
-                args:  "--auto --unstaged{?changeset-worktree: --worktree {changeset-worktree}}",
+                args:  "--auto --no-changelog --unstaged{?changeset-worktree: --worktree {changeset-worktree}}",
                 when:  [ "{param:lint}", "{?changeset-type=worktree:true}{?changeset-type=branch:true}" ]
             } ],
             success:   { criterion: [ "status" ] },

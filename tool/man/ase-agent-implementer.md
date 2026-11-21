@@ -76,12 +76,16 @@ With `--params review=true`, a successful implementing is followed by
 the follow-up prompt `ase-repo-review --auto`, which reviews the still
 uncommitted change set (in its ASE worktree, if any, and for a
 `branch:` changeset including its earlier commits) and fixes the
-findings, and with `--params lint=true` by the follow-up prompt
-`ase-code-lint --auto --unstaged`, which lints and auto-corrects it
-(after the review, so also its fixes), both before the change set is
-committed, where a failed follow-up prompt fails the processing. An
-`attachment:` changeset is never reviewed or linted, as it is
-implemented outside of the working copy.
+findings, with `--params analyze=true` by the follow-up prompt
+`ase-code-analyze --auto --no-changelog -S MEDIUM --prefix implementer
+--unstaged`, which analyzes it and fixes its problems of at least
+`MEDIUM` severity, and with `--params lint=true` by the follow-up
+prompt `ase-code-lint --auto --no-changelog --unstaged`, which lints and
+auto-corrects it (in this order, so each covers the fixes of the
+preceding ones, and both without `CHANGELOG.md` entries), all before
+the change set is committed, where a failed follow-up prompt fails the
+processing. An `attachment:` changeset is never reviewed, analyzed, or
+linted, as it is implemented outside of the working copy.
 
 In mode `draft`, the implementer instead claims only the `PLANNED` tasks
 without an implementation draft attachment (type `text/x-diff;
@@ -305,9 +309,10 @@ All other options belong to the sub-commands (see **COMMANDS**).
       declared by the definition (repeatable). Built-in: `effort-wait`
       (`true` or `false`, default: `true`), whether to wait for the
       effort estimation of a task by the `estimator` agent, and, in mode
-      `implement`, `review` and `lint` (each `true` or `false`, default:
-      `false`), whether to review resp. lint the change set after the
-      implementing, each fixing its findings (see **DESCRIPTION**).
+      `implement`, `review`, `analyze`, and `lint` (each `true` or
+      `false`, default: `false`), whether to review, analyze, resp. lint
+      the change set after the implementing, each fixing its findings
+      (see **DESCRIPTION**).
 
     - \[`--state-incoming` *state*\]: The state of the tasks to claim
       (mandatory for `phase`, repeatable with `--unclaimed` or
@@ -409,16 +414,18 @@ All other options belong to the sub-commands (see **COMMANDS**).
 
     - \[`--followup-skill` *name*\]: The skill to invoke as a follow-up
       prompt after a successful prompt, starting a new follow-up
-      (repeatable). Built-in: `ase-repo-review` (twice) and
-      `ase-code-lint` (mode `implement`).
+      (repeatable). Built-in: `ase-repo-review` (twice),
+      `ase-code-analyze`, and `ase-code-lint` (mode `implement`).
 
     - \[`--followup-args` *template*\]: The argument template of the
       skill of the current follow-up. Built-in: `--auto --branch
       {changeset-name} --staged --unstaged` resp. `--auto --staged
       --unstaged{?changeset-worktree: --worktree {changeset-worktree}}`
-      (`ase-repo-review`), and `--auto --unstaged{?changeset-worktree:
-      --worktree {changeset-worktree}}` (`ase-code-lint`) (mode
-      `implement`).
+      (`ase-repo-review`), `--auto --no-changelog -S MEDIUM --prefix
+      implementer --unstaged{?changeset-worktree: --worktree
+      {changeset-worktree}}` (`ase-code-analyze`), and `--auto
+      --no-changelog --unstaged{?changeset-worktree: --worktree
+      {changeset-worktree}}` (`ase-code-lint`) (mode `implement`).
 
     - \[`--followup-text` *template*\]: The prompt text template to
       invoke as a follow-up prompt instead of a skill (repeatable).
@@ -435,10 +442,10 @@ All other options belong to the sub-commands (see **COMMANDS**).
     - \[`--followup-when` *template*\]: A condition of the current
       follow-up (repeatable). Built-in: `{param:review}` and
       `{?changeset-type=branch:true}` resp.
-      `{?changeset-type=worktree:true}` (`ase-repo-review`), and
-      `{param:lint}` and
+      `{?changeset-type=worktree:true}` (`ase-repo-review`),
+      `{param:analyze}` resp. `{param:lint}` and
       `{?changeset-type=worktree:true}{?changeset-type=branch:true}`
-      (`ase-code-lint`) (mode `implement`).
+      (`ase-code-analyze` resp. `ase-code-lint`) (mode `implement`).
 
     - \[`--prepare-run` *cmd*\]: A shell command run in the working
       directory before the prompt (repeatable). Built-in: not set.
@@ -583,8 +590,8 @@ agent is not running.
 # implement up to two tasks in parallel
 $ ase agent implementer start -p 2
 
-# implement the tasks, and review and lint their change sets, fixing the findings
-$ ase agent implementer start --params review=true --params lint=true
+# implement the tasks, and review, analyze, and lint their change sets, fixing the findings
+$ ase agent implementer start --params review=true --params analyze=true --params lint=true
 
 # implement the tasks in a temporary clone, pushing their branches back
 $ ase agent implementer start -r git@github.com:example/project.git

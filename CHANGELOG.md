@@ -38,6 +38,14 @@ ChangeLog
     The skill fixes all reported problems automatically by minimal root-cause corrections, honoring
     the RESOLVING tenets, skips problems demanding a human decision, and drops fixed `ase-issue-*`.
 
+-   IMPROVEMENT [code, docs]: ChangeLog Entries of `ase-code-lint --auto` and Option `--no-changelog`
+    `ase-code-lint --auto` adds a `CHANGELOG.md` entry per applied correction like `ase-code-analyze
+    --auto`, both suppressible via `--no-changelog|-C`, which the `implementer` agent uses for linting.
+
+-   IMPROVEMENT [code, docs]: Analyzing in the `implementer` Agent and `ase-code-analyze --worktree`
+    With `--params analyze=true`, the agent runs `ase-code-analyze --auto -S MEDIUM` on its change set
+    between review and lint, inside its ASE worktree via the new `--worktree|-w` option of the skill.
+
 -   BUGFIX [code, docs]: No Always-Partial Change Set Snapshots of Request Agents
     Request agents with `--attach-changeset` derive the partial state from a failed processing only,
     as they have no phase state, so `--workdir target` stores and `changeset` labels them correctly.

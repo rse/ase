@@ -1,6 +1,6 @@
 ---
 name: ase-code-lint
-argument-hint: "[--help|-h] [--auto|-a] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--force|-f] [--include|-i=<aspect>[,...]] [--exclude|-e=<aspect>[,...]] [--staged] [--unstaged] [--worktree|-w <name>] [<source-reference>]"
+argument-hint: "[--help|-h] [--auto|-a] [--no-changelog|-C] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--force|-f] [--include|-i=<aspect>[,...]] [--exclude|-e=<aspect>[,...]] [--staged] [--unstaged] [--worktree|-w <name>] [<source-reference>]"
 description: >
     Lint source code for potential code quality problems.
     Use when the user wants to "lint" or "check" source code.
@@ -24,7 +24,7 @@ Lint Source Code
 
 <expand name="getopt"
     arg1="ase-code-lint"
-    arg2="--auto|-a --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --force|-f --include|-i=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --exclude|-e=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --staged --unstaged --worktree|-w=">
+    arg2="--auto|-a --no-changelog|-C --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --force|-f --include|-i=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --exclude|-e=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --staged --unstaged --worktree|-w=">
     $ARGUMENTS
 </expand>
 
@@ -322,6 +322,19 @@ related to a set of code quality aspects.
         still perform substep 3 first. Never leave this marker active
         for a later, unrelated `Edit`.
 
+        Additionally, set <changelog></changelog> (set to empty). If
+        <getopt-option-auto/> is equal `true` and
+        <getopt-option-no-changelog/> is not equal `true`, *silently*
+        determine the *ChangeLog directory* <changelog-dir/>: set it to
+        <work-dir/> if this is not empty, else run the command
+        `git rev-parse --show-toplevel` (taken exactly as given) and
+        capture its output into <changelog-dir/>. If the file
+        `<changelog-dir/>/CHANGELOG.md` exists, set <changelog/> to this
+        file path and use the `Read` tool to read the file
+        `meta/ase-format-changelog.md`, with its path formed by joining
+        <ase-plugin-root/> and the file name with exactly *one* `/`
+        separator.
+
     2.  Set <total/> to the number of problems in <problems/>,
         <index/> to `0`, and <outcomes/> to an empty list.
         Then iterate over all problems:
@@ -592,8 +605,13 @@ related to a set of code quality aspects.
                 so *no* interactive permission prompt will appear.
                 After applying the changes, record `APPLIED` (or
                 `FAILED`, if an `Edit` reported an error) as the outcome
-                of <index/> in <outcomes/> and just continue with the
-                next <item/>.
+                of <index/> in <outcomes/>. If the outcome is `APPLIED`
+                and <changelog/> is not empty, add *one* entry for this
+                applied correction to <changelog/>, in the format
+                detected by the *Format Detection* rules and according
+                to the *Entry Quality* rules of
+                `meta/ase-format-changelog.md`. Then just continue with
+                the next <item/>.
                 </if>
 
             -   <if condition="<result/> starts with 'OTHER'">
@@ -673,7 +691,7 @@ related to a set of code quality aspects.
 
         <if condition="<getopt-option-auto/> is not equal `true`">
         <ase-tpl-hint level="verbose">
-        Use `/ase-code-lint --auto` to apply all corrections unattended, `--severity` to raise the reporting floor, `--force` to ignore the project boxing, `--include`/`--exclude` to narrow the checked aspects, `--staged`/`--unstaged` to lint only the changed hunks, and `--worktree` to lint inside an ASE worktree.
+        Use `/ase-code-lint --auto` to apply all corrections unattended (with `CHANGELOG.md` entries, unless `--no-changelog`), `--severity` to raise the reporting floor, `--force` to ignore the project boxing, `--include`/`--exclude` to narrow the checked aspects, `--staged`/`--unstaged` to lint only the changed hunks, and `--worktree` to lint inside an ASE worktree.
         </ase-tpl-hint>
         </if>
 

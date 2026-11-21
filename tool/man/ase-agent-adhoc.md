@@ -1279,7 +1279,7 @@ remaining problems after each implementing:
 definition:         builtin:implementer-implement
 followup:
     -   skill:      ase-code-lint
-        args:       "--auto --unstaged{?changeset-worktree: --worktree {changeset-worktree}}"
+        args:       "--auto --no-changelog --unstaged{?changeset-worktree: --worktree {changeset-worktree}}"
         when:       "{?changeset-type=worktree:true}{?changeset-type=branch:true}"
     -   text:       "Fix the problems the linter reported but could not correct."
         session:    resume

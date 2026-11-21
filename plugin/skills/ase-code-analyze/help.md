@@ -8,12 +8,14 @@
 `ase-code-analyze`
     [`--help`|`-h`]
     [`--auto`|`-a`]
+    [`--no-changelog`|`-C`]
     [`--performance`|`-p`]
     [`--security`|`-s`]
     [`--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`)]
     [`--prefix`|`-P` *prefix*]
     [`--staged`]
     [`--unstaged`]
+    [`--worktree`|`-w` *name*]
     [*source-reference*]
 
 ##  DESCRIPTION
@@ -70,6 +72,12 @@ analyzed. Both options can be combined to analyze the hunks of *any*
 uncommitted Git changes. To analyze changed files entirely instead of
 their hunks only, give them without these options.
 
+The `--worktree`|`-w` *name* option analyzes inside the existing ASE
+worktree `.ase/worktree/`*name* instead of the current working copy:
+`--staged` and `--unstaged` refer to the Git changes of this worktree,
+and a relative *source-reference* is resolved against it. A missing
+worktree aborts the skill with an error.
+
 The skill investigates the code base silently, reports each detected
 problem as a `PROBLEM` entry with severity (`LOW`, `MEDIUM`, `HIGH`) and
 inline file/line references (in the performance lens, each entry
@@ -84,7 +92,8 @@ focused correction of its root cause, honoring the *resolving* tenets of
 **ASE**, without any unrelated change, and without staging anything. A
 problem not resolvable by a local correction (e.g. a design decision) is
 skipped unchanged. Each applied correction gets its own `CHANGELOG.md`
-entry (if such a file exists), its persisted `ase-issue-P<n>` entry is
+entry (if such a file exists, and unless the `--no-changelog`|`-C`
+option is given), its persisted `ase-issue-P<n>` entry is
 removed, and a final table recaps the outcome (`APPLIED`, `FAILED`, or
 `SKIPPED`) of every problem. No verification is performed, so re-run the
 analysis resp. the build afterwards.
@@ -143,6 +152,12 @@ Analyze a directory and automatically fix all detected problems:
 ❯ /ase-code-analyze --auto src/handlers/
 ```
 
+Analyze a directory and automatically fix all detected problems, without ChangeLog entries:
+
+```text
+❯ /ase-code-analyze --auto -C src/handlers/
+```
+
 Analyze a directory under its own id namespace, yielding `auth-P1`, `auth-P2`, ...:
 
 ```text
@@ -159,6 +174,12 @@ Analyze only the hunks of the unstaged changes and the untracked source files be
 
 ```text
 ❯ /ase-code-analyze --unstaged src/handlers/
+```
+
+Analyze and fix the uncommitted changes of the ASE worktree `feature`:
+
+```text
+❯ /ase-code-analyze --auto --unstaged --worktree feature
 ```
 
 ##  SEE ALSO

@@ -1,6 +1,6 @@
 ---
 name: ase-code-analyze
-argument-hint: "[--help|-h] [--auto|-a] [--performance|-p] [--security|-s] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] [--staged] [--unstaged] [<source-reference>]"
+argument-hint: "[--help|-h] [--auto|-a] [--no-changelog|-C] [--performance|-p] [--security|-s] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] [--staged] [--unstaged] [--worktree|-w <name>] [<source-reference>]"
 description: >
     Analyze the source code for problems in either the logic and
     semantics and its related control flow, performance and efficiency,
@@ -26,7 +26,7 @@ Analyze Source Code
 
 <expand name="getopt"
     arg1="ase-code-analyze"
-    arg2="--auto|-a --performance|-p --security|-s --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --prefix|-P= --staged --unstaged">
+    arg2="--auto|-a --no-changelog|-C --performance|-p --security|-s --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --prefix|-P= --staged --unstaged --worktree|-w=">
     $ARGUMENTS
 </expand>
 
@@ -101,6 +101,23 @@ problems in *performance* and *efficiency*, or problems in *security*.
     `true`, set <lens>security</lens> if <getopt-option-security/> is
     equal `true`, and set <lens>logic</lens> otherwise.
 
+    Set <work-dir></work-dir> (empty). If <getopt-option-worktree/> is
+    not empty, *silently* determine the directory of this existing ASE
+    worktree: if <getopt-option-worktree/> consists of other characters
+    than `A-Z`, `a-z`, `0-9`, `_`, and `-`, set <work-dir/> to empty,
+    else call the `ase_worktree_path(id: "<getopt-option-worktree/>",
+    create: false)` tool of the `ase` MCP server (you *MUST* *NEVER*
+    assemble this path yourself), capture its result into <work-dir/>,
+    and run the command `git -C "<work-dir/>" rev-parse --show-toplevel`
+    (taken exactly as given). If <work-dir/> is empty, the tool call
+    failed, or the command failed (i.e., the worktree does not exist),
+    only output the following <template/> and then *STOP* the entire
+    flow (do not perform any further steps):
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-code-analyze**, ▶ ERROR: no worktree **<getopt-option-worktree/>** to analyze
+    </template>
+
     <if condition="<getopt-option-staged/> is equal `true` or <getopt-option-unstaged/> is equal `true`">
 
     Then *silently* restrict the analysis to the *changed* files of
@@ -109,9 +126,10 @@ problems in *performance* and *efficiency*, or problems in *security*.
     equal `true`, set <changes>staged</changes> if only
     <getopt-option-staged/> is equal `true`, and set
     <changes>unstaged</changes> otherwise. Determine the *repository
-    root* by running the command `git rev-parse --show-toplevel`
-    (taken exactly as given) and capturing its output into
-    <repo-root/>. Then determine the changed files by running the
+    root* <repo-root/>: set it to <work-dir/> if this is not empty,
+    else run the command `git rev-parse --show-toplevel` (taken exactly
+    as given) and capture its output into <repo-root/>. Then determine
+    the changed files by running the
     corresponding commands (taken exactly as given), each listing one
     path relative to <repo-root/> per line, and collect all listed
     paths, dropping duplicates:
@@ -130,7 +148,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
     *ASE*'s own state) and every path which is not a source code file
     (e.g. a binary file), and prefix every remaining path with
     `<repo-root/>/`. If `<getopt-arguments/>` is not empty, keep only
-    those files which lie within the source code referenced by it,
+    those files which lie within the source code referenced by it (with
+    relative references resolved against <work-dir/> if this is not
+    empty),
     expanding any directory or wildcard references with the `Glob`
     tool (or, if the `Glob` tool is not available, with the `find`
     command via the `Bash` tool). Set <sources/> to the resulting list
@@ -171,8 +191,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
     </if>
     <else>
 
-    Then *silently* resolve `<getopt-arguments/>` to the list
-    <sources/> of individual source code files, expanding any
+    Then *silently* resolve `<getopt-arguments/>` (with relative
+    references resolved against <work-dir/> if this is not empty) to
+    the list <sources/> of individual source code files, expanding any
     directory or wildcard references with the `Glob` tool (or, if the
     `Glob` tool is not available, with the `find` command via the
     `Bash` tool).
@@ -219,8 +240,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
     <if condition="<getopt-option-staged/> is equal `true` or <getopt-option-unstaged/> is equal `true`">
     Then *restrict* <problems/> to the changeset: *keep* a problem if
     and only if its `line` lies within a changed line range in <ranges/>
-    of its `file` (resolving a relative `file` against the current
-    working directory), and *silently drop* all other problems.
+    of its `file` (resolving a relative `file` against <work-dir/> if
+    this is not empty, else against the current working directory), and
+    *silently drop* all other problems.
     </if>
 
     You *MUST* *NOT* output anything at all in this STEP 2 beyond the
@@ -359,25 +381,29 @@ problems in *performance* and *efficiency*, or problems in *security*.
         freshly internalize and strictly honor its **GENERIC TENETS**
         and **RESOLVING TENETS** in the following fixing of the
         problems. Additionally, determine the *repository root*
-        <repo-root/> by running the command `git rev-parse --show-toplevel`
-        (taken exactly as given), and if the file
-        `<repo-root/>/CHANGELOG.md` exists, use the `Read` tool to read the
-        file `meta/ase-format-changelog.md`, too. Form each of these file
+        <repo-root/>: set it to <work-dir/> if this is not empty, else
+        run the command `git rev-parse --show-toplevel` (taken exactly as
+        given) and capture its output into <repo-root/>. If
+        <getopt-option-no-changelog/> is not equal `true` and the file
+        `<repo-root/>/CHANGELOG.md` exists, use the `Read` tool to read
+        the file `meta/ase-format-changelog.md`, too. Form each of these file
         paths by joining <ase-plugin-root/> and the file name with
         exactly *one* `/` separator. Do not output anything.
 
     2.  Set <outcomes/> to an empty list. Then, for each surviving
         problem `<id-prefix/>P<n/>` of <problems/> of a `severity` other
         than `ACCEPTED`, in the reported order, read its cited `file`
-        (a relative `file` resolved against the current working
-        directory) and the code around its cited `line` -- freshly, as
-        the fixes of previous problems may have shifted the lines --,
-        determine the *root cause* of the problem, and apply a
-        *minimal*, *focused* correction which resolves exactly this
-        problem via the `Edit` tool (resp. the `Write` tool for a file
-        to be created), without any unrelated change, and without
-        staging or committing anything. If `<repo-root/>/CHANGELOG.md`
-        exists, add *one* entry for each applied correction there, in the
+        (a relative `file` resolved against <work-dir/> if this is not
+        empty, else against the current working directory) and the code
+        around its cited `line` -- freshly, as the fixes of previous
+        problems may have shifted the lines --, determine the *root
+        cause* of the problem, and apply a *minimal*, *focused*
+        correction which resolves exactly this problem via the `Edit`
+        tool (resp. the `Write` tool for a file to be created), without
+        any unrelated change, and without staging or committing
+        anything. If <getopt-option-no-changelog/> is not equal `true`
+        and `<repo-root/>/CHANGELOG.md` exists, add *one* entry for
+        each applied correction there, in the
         format detected by the *Format Detection* rules and according to
         the *Entry Quality* rules of `meta/ase-format-changelog.md`.
 
