@@ -31,20 +31,24 @@ export const budgetCredits = (budget: string): number =>
 /*  the per-tool headless invocation of the rendered prompt <prompt> with access to the
     additional directories <add> (the "--add-dir" options), the model <model>, and the native
     cost cap of the budget <budget> in USD (none if empty, and none of Codex at all), streaming JSONL
-    events, where risky actions are denied or automatically reviewed instead of being prompted for
+    events, where risky actions are denied or automatically reviewed instead of being prompted for,
+    and where a non-empty <resume> continues the session of this id instead of starting a new one
     (the variadic "--add-dir" of Claude has to precede the other options to not consume the prompt)  */
-export const toolArgs: Record<Tool, (prompt: string, add: string[], model: string, budget: string) => string[]> = {
-    "claude":  (prompt, add, model, budget) => [
+export const toolArgs: Record<Tool, (prompt: string, add: string[], model: string, budget: string, resume: string) => string[]> = {
+    "claude":  (prompt, add, model, budget, resume) => [
         ...add, ...modelArgs(model), ...(budget !== "" ? [ "--max-budget-usd", budget ] : []),
+        ...(resume !== "" ? [ "--resume", resume ] : []),
         "-p", "--output-format", "stream-json", "--verbose", "--disallowedTools", "AskUserQuestion",
         "--permission-mode", "auto", "--permission-prompts", "none", prompt
     ],
-    "copilot": (prompt, add, model, budget) => [
+    "copilot": (prompt, add, model, budget, resume) => [
         ...add, ...modelArgs(model), ...(budget !== "" ? [ "--max-ai-credits", String(budgetCredits(budget)) ] : []),
+        ...(resume !== "" ? [ `--resume=${resume}` ] : []),
         "--allow-all-tools", "--no-ask-user", "--no-color", "--output-format", "json", "-p", prompt
     ],
-    "codex":   (prompt, add, model) => [
-        "exec", ...add, ...modelArgs(model), "--json", "--approve-for-me", "--color", "never", prompt
+    "codex":   (prompt, add, model, _budget, resume) => [
+        "exec", ...add, ...modelArgs(model), "--json", "--approve-for-me", "--color", "never",
+        ...(resume !== "" ? [ "resume", resume ] : []), prompt
     ]
 }
 
@@ -151,8 +155,17 @@ const toolEvents: Record<Tool, (ev: any) => ToolEntry[]> = {
 /*  the output tokens and the costs (in USD) of the usage of the agent tool,
     each staying null as long as the tool reports nothing about it, plus the
     cache read, cache write, and (uncached) input tokens and the AI request time
-    (in ms, null if the tool reports none), for the AI usage accounting of the task  */
-export type ToolCosts = Pick<AgentUsage, "costToken" | "costUSD"> & Omit<TokenCounts, "output"> & { apiMs: number | null }
+    (in ms, null if the tool reports none), for the AI usage accounting of the task,
+    and the id of the session of the agent tool (for resuming it, empty until reported)  */
+export type ToolCosts = Pick<AgentUsage, "costToken" | "costUSD"> & Omit<TokenCounts, "output"> &
+    { apiMs: number | null, session: string }
+
+/*  the per-tool id of the session started by a JSONL event of the agent tool, else null  */
+const toolSession: Record<Tool, (ev: any) => unknown> = {
+    "claude":  (ev) => ev.type === "system" && ev.subtype === "init" ? ev.session_id : null,
+    "copilot": (ev) => ev.type === "session.start" ? ev.data?.sessionId : null,
+    "codex":   (ev) => ev.type === "thread.started" ? ev.thread_id : null
+}
 
 /*  a reported amount (where a missing or invalid one counts as zero)  */
 const amount = (value: unknown): number =>
@@ -215,6 +228,9 @@ export const toolEntries = (tool: Tool, line: string, costs: ToolCosts): ToolEnt
         return plain.trim() !== "" ? [ text(plain) ] : []
     }
     toolCosts[tool](ev, costs)
+    const session = toolSession[tool](ev)
+    if (typeof session === "string" && session !== "")
+        costs.session = session
     return toolEvents[tool](ev).flatMap((entry) => {
         if (entry.text !== true)
             return [ { ...entry, msg: stripVTControlCharacters(entry.msg) } ]
