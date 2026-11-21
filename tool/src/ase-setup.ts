@@ -131,6 +131,13 @@ export default class SetupCommand {
             await this.settings.outputStyleActivate(`update${dev ? "[dev]" : ""}`, scope)
             await this.settings.functionHooksActivate(`update${dev ? "[dev]" : ""}`, scope)
         }
+
+        /*  best-effort stop of a service re-spawned by a live MCP bridge
+            during the update, so it gets re-spawned with the updated code  */
+        this.log.write("info", `setup: update${dev ? "[dev]" : ""}: ` +
+            "stopping potentially re-spawned ASE service")
+        await this.runner.run("ase", [ "service", "stop" ],
+            { quiet: true, ignoreError: "ASE service not running" })
         return 0
     }
 

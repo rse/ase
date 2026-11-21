@@ -18,6 +18,10 @@ ChangeLog
     `ase-task-implement` and `ase-task-dissect` keep their merge base resp. part ids, and
     `ase-repo-review`, `ase-meta-config`, and `ase-repo-changelog` fix guards and fallbacks.
 
+-   BUGFIX [code]: No Stale Service After `ase setup update`
+    `ase setup update` stops the ASE service again at its end, so a service re-spawned with the old
+    code by the MCP bridge of a still running agent tool session during the update does not survive.
+
 -   REFACTOR [code]: Shared Diff Normalization
     The identical change normalization of `ase-docs-{proofread,refine,shorten}` moves into the new
     `diff-normalize` definition of `ase-common-diff.md`.
