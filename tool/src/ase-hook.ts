@@ -677,13 +677,14 @@ export default class HookCommand {
             }))
             if (input.stop_hook_active !== true) {
                 const text = this.readTurnText(input.transcript_path ?? "") ?? input.last_assistant_message ?? ""
-                const placeholders = this.findPlaceholders(text)
+                const { placeholders, lines } = this.findPlaceholders(text)
                 if (placeholders.length > 0) {
                     await writeStdout(JSON.stringify({
                         decision: "block",
                         reason:   "ASE: the reply contains unfilled template placeholders " +
-                            `(${placeholders.join(", ")}) -- output the affected lines again, ` +
-                            "with each placeholder replaced by its actual value"
+                            `(${placeholders.join(", ")}) -- output only the following affected lines ` +
+                            "again, with each placeholder replaced by its actual value, " +
+                            "and repeat nothing else:\n" + lines.map((line) => `    ${line}`).join("\n")
                     }))
                     return 0
                 }
@@ -776,17 +777,22 @@ export default class HookCommand {
     }
 
     /*  find the distinct template placeholders (like "<ase-task-id/>") and
-        template delimiters in a text, outside of its code blocks and spans  */
-    private findPlaceholders (text: string): string[] {
-        const prose = text
-            .replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm, "")
-            .replace(/(`+)[\s\S]*?\1/g, "")
+        template delimiters in a text, outside of its code blocks and spans,
+        and the distinct lines carrying them  */
+    private findPlaceholders (text: string): { placeholders: string[], lines: string[] } {
+        const prose = text.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm, "")
         const found = new Set<string>()
+        const lines = new Set<string>()
         const re = /<\/?template>|<([a-z][a-z0-9]*(?:-[a-z0-9]+)*)(?:\s+[a-z][a-z0-9-]*="[^"]*")*\s*\/>/g
-        for (const m of prose.matchAll(re))
-            if (m[1] === undefined || !htmlVoidElements.has(m[1]))
-                found.add(m[1] !== undefined ? `<${m[1]}/>` : m[0])
-        return Array.from(found).slice(0, 10)
+        for (const line of prose.split("\n")) {
+            for (const m of line.replace(/(`+).*?\1/g, "").matchAll(re)) {
+                if (m[1] === undefined || !htmlVoidElements.has(m[1])) {
+                    found.add(m[1] !== undefined ? `<${m[1]}/>` : m[0])
+                    lines.add(line.trim())
+                }
+            }
+        }
+        return { placeholders: Array.from(found).slice(0, 10), lines: Array.from(lines).slice(0, 10) }
     }
 
     /*  handler for "ase hook session-end" (all tools)  */
