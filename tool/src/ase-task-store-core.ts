@@ -419,11 +419,13 @@ export class TaskStoreCore {
             if (error !== "")
                 throw problem(422, error)
 
-            /*  map the status of the plans before switching the model, so an
-                interrupted switch can be repeated (mapped states being foreign
-                to the old model are kept)  */
+            /*  map the status of the plans loaded under the old model, but save them only
+                under the new model, so issue trackers derive the issue state from it, where
+                a failed save switches back, so the switch can be repeated (mapped states
+                being foreign to the old model are kept)  */
             const prev = entry !== null && entry.lifecycle !== name && Object.hasOwn(TaskFormat.taskLifecycles, entry.lifecycle) ?
                 TaskFormat.taskLifecycles[entry.lifecycle] : undefined
+            const mapped: { id: string, plan: API.TaskPlan }[] = []
             if (prev !== undefined) {
                 for (const { id, header } of await this.store.taskList(prjId)) {
                     if (typeof header.Status !== "string" || header.Status.trim() === "")
@@ -436,11 +438,21 @@ export class TaskStoreCore {
                     if (plan === null)
                         continue
                     plan.header.Status = to
+                    mapped.push({ id, plan })
+                }
+            }
+            const result = await this.store.projectSet(prjId, name, idscheme)
+            try {
+                for (const { id, plan } of mapped) {
                     await this.store.taskSave(prjId, id, plan)
                     this.emitUpdated(prjId, id, plan, lifecycle, [ "header" ])
                 }
             }
-            const result = await this.store.projectSet(prjId, name, idscheme)
+            catch (err: unknown) {
+                if (entry !== null)
+                    await this.store.projectSet(prjId, entry.lifecycle, entry.idscheme ?? "slug").catch(() => {})
+                throw err
+            }
             if (entry !== null && (entry.lifecycle !== name || (entry.idscheme ?? "slug") !== idscheme))
                 this.listener(prjId, {
                     ...(entry.lifecycle !== name ? { lifecycle: name } : {}),

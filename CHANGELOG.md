@@ -117,6 +117,11 @@ ChangeLog
     of a poll were loaded, so a failed load (like of the blocking issues) no longer silently swallows
     the detected changes, and a newer own write of an issue is no longer overwritten by the poll.
 
+-   BUGFIX [code]: No Reopened Issues on Lifecycle Model Switches
+    Switching the lifecycle model of a project on the `github`, `gitlab`, or `gitea` task store
+    saves the mapped task states only under the new model, so finished tasks no longer get their
+    issues reopened and read back in the initial state (a failed save switches back for a repeat).
+
 -   BUGFIX [code]: No-Op Config Deletes Below Missing Maps
     `ase config delete`, `ase_config_delete`, and emptying a never-set value in `ase config edit`
     no longer fail with `Expected YAML collection at <seg>` when a parent map of the key is missing.
