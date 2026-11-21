@@ -16,7 +16,7 @@ effort: high
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-diff.md
 
 <purpose name="ase-docs-proofread">
-Analyze documents for spelling, capitalization, punctuation, word break, or grammar errors
+Proofread Documents
 </purpose>
 
 <expand name="getopt"
@@ -62,8 +62,18 @@ Analyze documents for spelling, capitalization, punctuation, word break, or gram
 
     For this, first *silently* resolve `<getopt-arguments/>` to the
     list <documents/> of individual document files, expanding any
-    directory or wildcard references with the `Glob` tool. Then
-    partition <documents/>, preserving order, into at most *eight*
+    directory or wildcard references with the `Glob` tool.
+
+    <if condition="<documents/> is empty">
+    Only output the following <template/> and then *IMMEDIATELY*
+    *STOP* all further skill processing:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-docs-proofread**, ▶ ERROR: no document to proofread
+    </template>
+    </if>
+
+    Then partition <documents/>, preserving order, into at most *eight*
     batches of roughly equal size (a single document yields a single
     batch), and invoke the following tool once per batch, emitting
     *all* invocations *in one single message* so they run in

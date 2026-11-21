@@ -53,6 +53,17 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     </if>
 
+    <if condition="<getopt-option-prefix/> is not empty and does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_]*$`">
+
+    Only output the following <template/> and then *STOP* the entire flow
+    (do not perform any further steps):
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-code-analyze**, ▶ ERROR: invalid `--prefix` value: **<getopt-option-prefix/>**
+    </template>
+
+    </if>
+
     </step>
 
 2.  <step id="STEP 2: Investigate Code Base">
@@ -262,7 +273,12 @@ problems in *performance* and *efficiency*, or problems in *security*.
     MCP server with `transactional` set to `true` and a `commands`
     parameter array holding exactly one `{ command: "clear", prefix:
     "ase-issue-<id-prefix/>" }` entry,
-    and still emit the final hint <template/> below.
+    and only output the following <template/> instead of the final hint
+    below, as there is no problem to plan or fix:
+
+    <template>
+    ⧉ **ASE**: **CODE ANALYSIS**: *no problems detected*
+    </template>
 
     In this STEP 3, for *EVERY* surviving problem in <problems/>, set
     <severity/> to its `severity` field, <title/> to its `title` field,

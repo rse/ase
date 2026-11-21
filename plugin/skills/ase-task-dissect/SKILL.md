@@ -155,7 +155,7 @@ Procedure
         derive its <part-title/> from its <scope/> according to the
         <task-title/> rules of the plan <format/>,
         remember its <part-id/> as its <part-proposal/> and call the
-        `ase_task_newid(title: "<scope/>", proposal:
+        `ase_task_newid(title: "<part-title/>", proposal:
         "<part-id/>", taken: [ <previous/> ])` tool of the `ase` MCP
         server, where <previous/> lists the already re-identified
         <part-id/> of all preceding parts (as the tool reserves ids for

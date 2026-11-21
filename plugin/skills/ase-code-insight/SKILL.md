@@ -7,7 +7,8 @@ user-invocable: true
 disable-model-invocation: false
 effort: high
 allowed-tools:
-    - "Bash(git *)"
+    - "Bash(git shortlog *)"
+    - "Bash(git log *)"
     - "Bash(grep *)"
     - "Bash(sort *)"
     - "Bash(uniq *)"

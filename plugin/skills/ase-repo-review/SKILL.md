@@ -108,10 +108,13 @@ Procedure
     2.  <if condition="<getopt-option-branch/> is not empty">
         Determine the *base* of the branch:
 
-        1.  Run the command
+        1.  Check that <getopt-option-branch/> matches the regexp
+            `^[A-Za-z0-9_@][A-Za-z0-9._/+@-]*$`, which keeps it safe for
+            being passed quoted to the `git` commands, and only then run
+            the command
             `git rev-parse --verify --quiet "<getopt-option-branch/>^{commit}"`.
-            If it fails, only output the following <template/> and then
-            *STOP* immediately:
+            If the check or the command fails, only output the following
+            <template/> and then *STOP* immediately:
 
             <template>
             ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: branch **<getopt-option-branch/>** does not exist
@@ -147,10 +150,14 @@ Procedure
 
         </if>
         <elseif condition="<getopt-option-commit/> is not empty">
-        Run the command
+        Check that <getopt-option-commit/> matches the regexp
+        `^[A-Za-z0-9_@][A-Za-z0-9._/+@~^-]*$`, which keeps it safe for
+        being passed quoted to the `git` commands, and only then run the
+        command
         `git rev-parse --verify --quiet "<getopt-option-commit/>^{commit}"`
-        and capture its output into <commit-id/>. If it fails, only output
-        the following <template/> and then *STOP* immediately:
+        and capture its output into <commit-id/>. If the check or the
+        command fails, only output the following <template/> and then
+        *STOP* immediately:
 
         <template>
         ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: commit **<getopt-option-commit/>** does not exist

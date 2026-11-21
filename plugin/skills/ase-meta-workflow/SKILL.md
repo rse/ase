@@ -223,7 +223,9 @@ Procedure
         </else>
 
         Expand a leading `~` in <dir/> into the absolute home
-        directory of the user, as the file tools accept absolute paths only.
+        directory of the user, resp. resolve a relative <dir/> against the
+        root directory of the current project, as the file tools accept
+        absolute paths only.
         Then set <target-skill><dir/>/<new-skill-name/>/SKILL.md</target-skill>.
         Do not output anything.
 

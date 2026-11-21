@@ -574,20 +574,10 @@ Set <args></args> (set args to empty).
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
             </template>
 
-        -   If <result/> is `REFINE`:
+        -   If <result/> is `REFINE` or matches `OTHER: <text/>`:
 
-            <expand name="apply-refinement"/>
-
-            Only output the following <template/> and continue processing:
-
-            <template>
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan refined**
-            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇌ instruction: **<instruction/>**, ▶ status: **instruction given**
-            </template>
-
-        -   If <result/> matches `OTHER: <text/>`:
-
-            Set <instruction><instruction/> <text/></instruction> (append
+            For `OTHER: <text/>`, first set
+            <instruction><instruction/> <text/></instruction> (append
             the user's free-text hint to the existing instruction).
 
             <expand name="apply-refinement"/>

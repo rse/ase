@@ -226,9 +226,10 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
 
 3.  <step id="STEP 3: Stage Changes">
 
-    1.  Set <tmp-dir/> to the value of the `TMPDIR` environment variable
-        if it is known in the current session context, and to `/tmp`
-        otherwise. Do not output anything.
+    1.  Set <tmp-dir/> to the output of the command
+        `git -C "<repo-root/>" rev-parse --absolute-git-dir` (taken
+        exactly as given), a private location which, unlike a shared
+        `/tmp`, no other user can tamper with. Do not output anything.
 
     2.  Assemble <patch/> from <diff/>: keep the complete `diff --git`
         file headers and the `@@` hunk headers of all files and hunks
@@ -328,6 +329,10 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
             `git -C "<repo-root/>" diff --cached --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/ --binary > "<tmp-dir/>/ase-stage-check.patch"`
 
             `git -C "<check-dir/>" apply --whitespace=nowarn "<tmp-dir/>/ase-stage-check.patch"`
+
+            If one of these three commands fails, do *not* run <build/>,
+            but set <build-ok/> to a failure carrying its error output and
+            directly clean up as below.
 
             Link every git-ignored *dependency* directory of the working
             copy (like each `node_modules` directory, found via `find

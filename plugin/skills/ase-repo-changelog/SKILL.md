@@ -93,6 +93,15 @@ Processing
     directory or one of the *parent* directories of the current project.
     Locate and read this file. Store its relative path in <filename/>.
 
+    <if condition="no `CHANGELOG.md` file can be located">
+    Only output the following <template/> and then immediately *STOP*
+    processing the entire current skill:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-repo-changelog**, ▶ ERROR: no `CHANGELOG.md` file found
+    </template>
+    </if>
+
     You *MUST* *NOT* output anything, except the result with the
     following <template/>:
 

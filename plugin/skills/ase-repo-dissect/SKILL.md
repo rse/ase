@@ -245,9 +245,10 @@ Procedure
     do *not* modify, stage, stash, revert, or commit anything outside of
     the freshly created worktrees.
 
-    1.  Set <tmp-dir/> to the value of the `TMPDIR` environment variable
-        if it is known in the current session context, and to `/tmp`
-        otherwise. Do not output anything.
+    1.  Set <tmp-dir/> to the output of the command
+        `git -C "<repo-root/>" rev-parse --absolute-git-dir` (taken
+        exactly as given), a private location which, unlike a shared
+        `/tmp`, no other user can tamper with. Do not output anything.
 
     2.  For *every* part in <parts/>, in their derived order:
 

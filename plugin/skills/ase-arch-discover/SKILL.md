@@ -57,8 +57,16 @@ for the technology stack to *provide* the *needed functionality*
             <answer-4/>: (grounded candidate functionality 4)
         </expand>
 
-        Then use the <result/> and its corresponding grounded candidate
-        functionality to adjust <functionality/> accordingly.
+        If <result/> is `CANCEL`, only output the following <template/>
+        and then *STOP* the entire flow (do not perform any further
+        steps):
+
+        <template>
+        ⧉ **ASE**: ✪ skill: **ase-arch-discover**, ▶ status: **discovery cancelled**
+        </template>
+
+        Otherwise, use the <result/> and its corresponding grounded
+        candidate functionality to adjust <functionality/> accordingly.
 
     3.  Display the determined final functionality with just the following
         <template/>:

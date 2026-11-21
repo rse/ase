@@ -133,9 +133,11 @@ Find Quotes on a Topic
         `CHILD:` lines (the *narrower* topics).
 
     6.  Harvest quotes for *each* topic of <neighborhood/> exactly as in
-        STEP 2 (Harvest Quotes), record the contributing neighborhood
-        topic as the *source topic* of each of those quotes, and merge
-        the results into <quotes/>.
+        STEP 2 (Harvest Quotes), emitting the `ase-meta-search` sub-agent
+        invocations of *all* topics *in one single message* so they run in
+        *parallel*, record the contributing neighborhood topic as the
+        *source topic* of each of those quotes, and merge the results into
+        <quotes/>.
 
     </step>
 

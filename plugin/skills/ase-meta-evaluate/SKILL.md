@@ -62,7 +62,8 @@ multi-*criteria* decision matrix.
     -   For each alternative <alternative-K/> (K=1-N), decide whether
         you have all necessary information at hand to give it the proper,
         unique, short, and *concise name* <alternative-K/>. If you are
-        unsure, use the `ase-meta-search` skill (at most one invocation per
+        unsure, use the `ase-meta-search` skill in a sub-agent (`Agent`
+        tool with `subagent_type: "ase:ase-meta-search"`, at most one invocation per
         alternative, drawing from the *skill-wide shared budget* of at
         most 8 `ase-meta-search` invocations in total across STEP 2 and STEP 3
         combined) to find out more and adjust the name <alternative-K/>.
@@ -124,7 +125,8 @@ multi-*criteria* decision matrix.
         minimum 8 and maximum 12: if fewer than 8 criteria were requested,
         use the set of alternatives to decide on additional criteria
         which potentially best allow triaging the alternatives, take the
-        <reason/> into account, and use the `ase-meta-search` skill (drawing from
+        <reason/> into account, and use the `ase-meta-search` skill in a
+        sub-agent (`Agent` tool with `subagent_type: "ase:ase-meta-search"`, drawing from
         the *skill-wide shared budget* of at most 8 `ase-meta-search` invocations
         in total across STEP 2 and STEP 3 combined) to find out about the
         potentially still missing criteria and assign their <weight-L/>.
@@ -205,12 +207,8 @@ multi-*criteria* decision matrix.
     -   The second best alternative <alternative-X/> (X=1-N, X != K) is
         the alternative whose *raw, unrounded* <rating-X/> is the largest
         rating value among all *other* alternatives (on a tie for the
-        maximum, it equals <rating-K/>). Do not output anything.
-
-    -   If multiple alternatives share the second-largest raw rating, pick
-        any one of them as <alternative-X/>; the resulting <distance/> and
-        <percentage/> are unaffected by the choice, so the downstream output
-        is deterministic. Do not output anything.
+        maximum, it equals <rating-K/>; on a tie for the second largest,
+        pick any one of them). Do not output anything.
 
     -   Determine rating distance <distance/> between <alternative-K/> and
         <alternative-X/> from their *raw, unrounded* ratings by calculating:
@@ -218,40 +216,18 @@ multi-*criteria* decision matrix.
 
     -   Determine rating distance percentage <percentage/> between
         <alternative-K/> and <alternative-X/> from their *raw,
-        unrounded* ratings as follows. If <rating-K/> is exactly zero,
-        skip the division entirely (it is undefined against a zero
-        anchor) and classify directly by <distance/> instead of routing a
-        raw rating magnitude through the ratio thresholds below: if
-        <distance/> is also exactly zero, both best and second best rate
-        zero, which is a genuine tie, so set <percentage/> = 0 to fall
-        into the *MULTIPLE BEST* branch below; otherwise <distance/> > 0
-        means the second best rates strictly negative (since <rating-K/>
-        is the maximum), so there is a clear positive gap to a worse
-        runner-up and <alternative-K/> is an unambiguous winner, hence set
-        <percentage/> = 1 (a sentinel exceeding all small-distance
-        thresholds) to fall through to the plain *BEST ALTERNATIVE* branch.
-        Do not output anything.
-
-    -   Otherwise (<rating-K/> is non-zero), calculate: <percentage/> =
-        <distance/> / abs(<rating-K/>). Do not output anything.
-
-    -   By construction, <rating-K/> is the maximum rating across
-        all alternatives, so <distance/> >= 0 always holds; using
-        abs(<rating-K/>) keeps <percentage/> sign-stable across all rating
-        regimes. Note that when <rating-K/> itself is negative, the
-        denominator anchors to a poor best rating and small gaps can
-        appear large; the all-negative regime is surfaced as a dedicated
-        warning branch below. Do not output anything.
+        unrounded* ratings: if <rating-K/> is non-zero, calculate
+        <percentage/> = <distance/> / abs(<rating-K/>); else, set
+        <percentage/> = 0 if <distance/> is also zero (a genuine tie), or
+        <percentage/> = 1 otherwise (a clear winner over a negative
+        runner-up, exceeding all small-distance thresholds). Do not
+        output anything.
 
     -   If <rating-K/> is less than zero and <percentage/> is greater than
         or equal to 0.01 (i.e. all alternatives rate negatively and the
         "best" is merely the unique least-bad), stop the flow after you
         output just the following <template/> and do not output anything
-        else. This all-negative check is evaluated *before* the
-        small-distance check below, so that an all-negative alternative set
-        with a small winning gap surfaces the all-negative warning rather
-        than being masked by the small-distance branch, while a tie still
-        falls into the multiple-best branch:
+        else:
 
         <template>
         ⧉ **ASE**: **BEST ALTERNATIVE**: ⚑ **<alternative-K/>**

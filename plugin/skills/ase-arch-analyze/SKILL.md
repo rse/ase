@@ -123,6 +123,17 @@ interface quality, quality attributes, and architecture governance.
 <flow>
 1.  <step id="STEP 1: Investigate Code Base">
 
+    <if condition="<getopt-option-prefix/> is not empty and does NOT match the regexp `^[a-zA-Z][a-zA-Z0-9_]*$`">
+
+    Only output the following <template/> and then *STOP* the entire flow
+    (do not perform any further steps):
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-arch-analyze**, ▶ ERROR: invalid `--prefix` value: **<getopt-option-prefix/>**
+    </template>
+
+    </if>
+
     <if condition="<ase-project-boxing/> is equal `black`">
 
     The project source artifacts are classified as a *black box*, so
@@ -380,6 +391,15 @@ interface quality, quality attributes, and architecture governance.
     │ SA06 ↔ SA10 │ single dependency direction vs. extensibility │
     └─────────────┴───────────────────────────────────────────────┘
     ```
+
+    If *no* finding was detected at all, skip the per-finding report,
+    but still purge any stale persisted findings with the `ase_kv_batch`
+    call described below (holding only its `clear` entry), and only
+    output the following <template/> instead of the final hint:
+
+    <template>
+    ⧉ **ASE**: **ARCHITECTURE ANALYSIS**: *no problems detected*
+    </template>
 
     Report each unpaired finding with the following <template/>:
 

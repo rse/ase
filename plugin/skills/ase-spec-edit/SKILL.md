@@ -321,12 +321,12 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
                 verification takes place which could honor their
                 decisions.
                 </if>
-                <elseif condition="<getopt-option-verify/> is equal `light`">
+                <else>
                 Raise *no* questions at all of focus area
-                `CONFIRMATION`, as under `--verify light` no
-                change-specific checks take place which could honor
-                their decisions.
-                </elseif></expand>
+                `CONFIRMATION`, as under `--verify light` and `full`
+                only the SpecBook validation and no change-specific
+                checks take place which could honor their decisions.
+                </else></expand>
 
             If <grill-stop/> is `true`, skip the remaining items of
             this round and all remaining rounds, and continue with

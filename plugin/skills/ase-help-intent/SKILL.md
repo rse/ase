@@ -158,7 +158,7 @@ catalog you match <intent/> against:
         </expand>
 
         The `[...]` line stands for one further answer line
-        `C<n/>: Execute `<command<n/>/>` now.` per additionally kept
+        ``C<n/>: Execute: `<command<n/>/>` `` per additionally kept
         skill <n/> from `2` to <count/>, in rank order, so the dialog
         offers exactly <count/> command options plus `CANCEL`.
         </else>

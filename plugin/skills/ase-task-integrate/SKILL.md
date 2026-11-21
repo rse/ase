@@ -414,7 +414,15 @@ Procedure
         server, so a change made meanwhile is merged instead of
         overwritten, and set <task-tag/> to the content enclosed in the
         `<task-plan-tag>` delimiter line of its `text` output field. Do
-        not output anything.
+        not output anything. If this save fails with an error <info/>,
+        expand the following, then only output the following <template/>
+        and then immediately *STOP* processing the entire current skill:
+
+        <expand name="integrate-temp-remove"></expand>
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ ERROR: plan status could not be saved: **<info/>**
+        </template>
         </if>
 
     2.  Capture the outputs of the commands
@@ -469,7 +477,7 @@ Procedure
             If <merge-verdict/> is `MERGED`, set the `Status:` key to
             `CLOSED` for the `solo` model (traversing the transition from
             `OPEN`) or to `INTEGRATED` for the `enterprise` model (if it
-            is `INTEGRATING`, set in step 1 above, or already before by
+            is `INTEGRATING`, set in step 4.1 above, or already before by
             the agent which claimed the task). Otherwise, keep the
             `Status:` key for the `solo` model (`OPEN`), and set it to
             `QUALIFIED` (for <merge-verdict/> `NOOP`) or `DEFERRED`
@@ -498,10 +506,16 @@ Procedure
         *verbatim*. To persist the plan, call the `ase_task_save(id:
         "<ase-task-id/>", text: "<task-content/>", base: "<task-tag/>")`
         tool of the `ase` MCP server, so a change made meanwhile (e.g. by
-        an agent) is merged instead of overwritten. This `ase_task_save` MCP tool call is the *only*
-        permitted way to persist the plan -- *NEVER* write the plan file
-        via `Write`/`Edit` or by executing a shell command. Do not
-        output anything in this sub-step.
+        an agent) is merged instead of overwritten. This `ase_task_save`
+        MCP tool call is the *only* permitted way to persist the plan --
+        *NEVER* write the plan file via `Write`/`Edit` or by executing a
+        shell command. Do not output anything in this sub-step, except if
+        this save fails with an error <info/>, where you only output the
+        following <template/>:
+
+        <template>
+        ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ WARNING: plan could not be updated: **<info/>**
+        </template>
 
     7.  <if condition="<merge-verdict/> is `MERGED`">
         Only output the following <template/>:
