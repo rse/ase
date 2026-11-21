@@ -24,6 +24,10 @@ ChangeLog
     The plan printed by `ase-task-edit` now omits the attachment blocks of its backmatter, as they
     are irrelevant to refining the plan and are shown by `ase-task-view` instead.
 
+-   IMPROVEMENT [code]: Rename Task Board View `statistics` to `task-stats`
+    The statistics view of the terminal and web task boards is now labeled `task-stats`, in line
+    with the other views `task-lanes`, `task-graph`, `agent-logs`, and `agent-graph`.
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

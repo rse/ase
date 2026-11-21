@@ -26,7 +26,7 @@ export type View    = "lanes" | "graph" | "stats" | "agents" | "flow"
 export const viewLabels: Record<View, string> = {
     lanes:  "task-lanes",
     graph:  "task-graph",
-    stats:  "statistics",
+    stats:  "task-stats",
     agents: "agent-logs",
     flow:   "agent-graph"
 }

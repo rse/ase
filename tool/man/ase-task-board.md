@@ -52,7 +52,7 @@ lines. The markers are:
 Besides the *task lanes* view, the boards show the *task graph* view,
 the dependency graph of the tasks derived from their `After:` keys
 (where an epic implicitly comes after all other tasks of its group),
-the *statistics* view with the statistics of the tasks, and with an
+the *task stats* view with the statistics of the tasks, and with an
 agent relay the *agent logs* view and the *agent graph* view. All
 views are cycled via `v` (or a click onto the `view:` value of the
 header).
@@ -249,9 +249,9 @@ shows the task again as soon as it exists again.
 With `--text`, and also without an interactive terminal, the plan of the
 task is printed as plain text and the command exits.
 
-### Statistics View
+### Task Stats View
 
-The third view *statistics* shows the statistics of the tasks matching the
+The third view *task stats* shows the statistics of the tasks matching the
 `filter:` field (all tasks if empty), refreshed on every change of the
 tasks, within the time range selected by the buttons `total` (all
 tasks, with the number of days since the creation of the oldest
@@ -464,7 +464,7 @@ lower-case letter under the kitty keyboard protocol.
 
 ### Every View
 
-- `v`: Cycle the view: task lanes, task graph, statistics, and (with an
+- `v`: Cycle the view: task lanes, task graph, task stats, and (with an
   agent relay) agent logs and agent graph.
 - `V`: Cycle the view backward.
 - `/`: Focus the `filter:` field (not in the agent logs and agent graph
@@ -475,15 +475,15 @@ lower-case letter under the kitty keyboard protocol.
   overriding `board.web.theme` in the current browser until cycled back
   to its value (web board only).
 - `D`: Delete the selected task, after a confirmation (not in the
-  statistics, agent logs, and agent graph views).
+  task stats, agent logs, and agent graph views).
 - `T`: Transfer the selected task to another state via the transfer
-  popup (not in the statistics, agent logs, and agent graph views).
+  popup (not in the task stats, agent logs, and agent graph views).
 - `A`: Assign the selected task via the assign popup (not in the
-  statistics, agent logs, and agent graph views).
+  task stats, agent logs, and agent graph views).
 - `E`: Request the edit of the selected task by a prompt (not in the
-  statistics, agent logs, and agent graph views).
+  task stats, agent logs, and agent graph views).
 - `R`: Request the selected task by a prompt under a request name (not
-  in the statistics, agent logs, and agent graph views).
+  in the task stats, agent logs, and agent graph views).
 - `M`: Disable or enable the mouse support (terminal board only).
 - `q`, `Ctrl`+`C`: Quit (terminal board only).
 
@@ -536,7 +536,7 @@ lower-case letter under the kitty keyboard protocol.
   predecessors and successors (persisted).
 - `+`/`-`/`0`: Zoom in, out, resp. reset the zoom (web board only).
 
-### Statistics View
+### Task Stats View
 
 - `←`/`→`: Select the previous/next time range (`total`, `within last
   30 days`, or `within last 7 days`).
