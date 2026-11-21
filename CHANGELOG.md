@@ -52,6 +52,10 @@ ChangeLog
     `ase setup update` stops the ASE service again at its end, so a service re-spawned with the old
     code by the MCP bridge of a still running agent tool session during the update does not survive.
 
+-   BUGFIX [infr]: Re-Runnable Website Deployment
+    The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
+    `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.
+
 -   BUGFIX [docs]: Website Corrections
     `Section-Usage` lists all skill groups of a label and `Modal-Help` restores the target of a
     cross-link scrolled to within an active search.
