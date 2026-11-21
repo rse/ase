@@ -107,9 +107,8 @@ empty <todo-what/> or <todo-how/> renders as `(none)`:
     *repeat* the iteration until the *querying* state receives a
     `STOP SKILL` result. The collected decisions are reported *once*,
     when the skill ends: right *before* the final status line of a
-    `STOP SKILL` or `CANCEL` result in the *querying* or *grilling*
-    state, or in the *Loop or Finish* item below. Do not output anything
-    in this item.
+    skill-stopping result in the *querying* or *grilling* state, or in
+    the *Loop or Finish* item below. Do not output anything in this item.
 
 3.  **State: querying:**
 

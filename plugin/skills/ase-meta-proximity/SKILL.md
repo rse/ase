@@ -90,10 +90,10 @@ relevant *child* topics:
         )`
 
         Parse the returned labeled list and set <topic/> to the value of
-        its `TOPIC:` line, <parent/> to the value of its `PARENT:` line,
-        <sibling-1/> to <sibling-4/> to the values of its four `SIBLING:`
-        lines, and <child-1/> to <child-4/> to the values of its four
-        `CHILD:` lines.
+        its non-empty `TOPIC:` line (else keep the current <topic/>),
+        <parent/> to the value of its `PARENT:` line, <sibling-1/> to
+        <sibling-4/> to the values of its four `SIBLING:` lines, and
+        <child-1/> to <child-4/> to the values of its four `CHILD:` lines.
 
         <if condition="
             the sub-agent returned no usable proximity OR

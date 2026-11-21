@@ -17,6 +17,7 @@ allowed-tools:
     - "Bash(mkdir -p *)"
     - "Bash(cp -p *)"
     - "Bash(rm -rf *)"
+    - "Bash(rm -f *)"
     - "Read"
     - "Edit"
     - "Write"

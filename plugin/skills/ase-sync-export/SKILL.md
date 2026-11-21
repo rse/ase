@@ -108,11 +108,14 @@ Procedure
         entry, writes the rendering to the file, and returns a
         confirmation `text` carrying the written byte size plus a
         `notices` array of environment notices. Set <notices/> to the
-        *distinct* notices of all calls. Do not output anything.
+        *distinct* notices of all calls. If a call fails, set <error/> to
+        its error message and continue with the remaining outputs. Do
+        not output anything.
 
     2.  Report the exported files with the following <template/>,
-        listing one bullet line per written file (with <file/> its
-        project-relative path and <note/> the format and the byte size):
+        listing one bullet line per output file (with <file/> its
+        project-relative path and <note/> the format and the byte size,
+        or `FAILED: <error/>` for a failed call):
 
         <template>
         ⧉ **ASE**: **EXPORTED SPECIFICATION**:

@@ -392,8 +392,12 @@ related to a set of code quality aspects.
                     to its *last* two lines and <context-after/> to its
                     *first* two lines.
 
-                    Then, whenever <file-lines/> is non-empty,
-                    *re-derive* both context parts from it, *overriding*
+                    Then, whenever <file-lines/> is non-empty, first
+                    *re-anchor* <line/> to the occurrence of a non-empty
+                    <old-text/> in <file-lines/> nearest to <line/>, as
+                    corrections applied earlier to the same file may have
+                    shifted its lines. Then *re-derive* both context parts
+                    from <file-lines/>, *overriding*
                     the sub-agent supplied values: set <context-before/>
                     to the *up to two* lines of <file-lines/> directly
                     *before* line <line/> (empty if <line/> is `1`) and

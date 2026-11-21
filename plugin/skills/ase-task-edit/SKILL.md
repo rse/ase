@@ -477,8 +477,12 @@ Set <args></args> (set args to empty).
 
         Set <task-content-dirty>false</task-content-dirty>.
 
-        -   If <text/> starts with `ERROR:` or `WARNING:`:
-            Silently ignore the MCP error.
+        -   If <text/> starts with `ERROR:`:
+            Handle it as a failed MCP tool call (see `ase-skill.md`), i.e.,
+            output the corresponding error and *STOP* the skill, as a real
+            load failure *MUST* *NOT* be mistaken for a not yet existing plan.
+
+        -   If <text/> starts with `WARNING:`:
             Set <task-content/> to empty.
             Set <task-render/> to empty.
             Do not output anything.
