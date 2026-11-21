@@ -11,7 +11,7 @@ import { Task }                     from "./ase-task.js"
 import * as TaskFormat              from "./ase-task-format.js"
 import { TaskRequests, attachmentTime } from "./ase-task-request.js"
 import type {
-    AgentOpts, AgentTask, AgentItem, AgentJob,
+    AgentOpts, AgentTask, AgentItem, AgentJob, AgentFollowupJob,
     AgentLog, AgentResult, AgentWork, AgentSelection, AgentSnapshot, LineLevel
 }                                   from "./ase-agent-runtime.js"
 import { Agent, taskFlow, taskFlowRaw, tagsOf, setPlanTag, updateTask } from "./ase-agent-runtime.js"
@@ -458,6 +458,22 @@ class DefinedCore {
                 return ""
             }
             const rendered = renderTemplate(this.def.prompt.template, value)
+
+            /*  render the follow-up prompts, skipping those with a condition rendering to an
+                empty string or "false", and those whose prompt text renders to an empty string  */
+            const followup: AgentFollowupJob[] = []
+            for (const [ n, entry ] of this.def.followup.entries()) {
+                const unmet = entry.when.some((cond) => [ "", "false" ].includes(renderTemplate(cond, value).trim()))
+                const text  = renderTemplate(entry.template, value)
+                if (unmet || (entry.skill === "" && text.trim() === "")) {
+                    await log("info", `follow-up #${n + 1}: skipped (${unmet ? "condition not met" : "empty prompt"})`)
+                    continue
+                }
+                const resume = entry.session === "resume"
+                followup.push(entry.skill !== "" ?
+                    { cmd: `${entry.skill}${text !== "" ? ` ${text}` : ""}`, resume } :
+                    { prompt: text, resume })
+            }
             const env      = this.env(task, work.cwd)
             for (const cmd of this.def.prepare) {
                 try {
@@ -506,6 +522,7 @@ class DefinedCore {
                 ...("skill" in spec ?
                     { cmd: `${spec.skill}${spec.args !== "" ? ` ${spec.args}` : ""}` } :
                     { prompt: spec.text }),
+                followup,
                 model,
                 cwd:     work.cwd,
                 dirs:    work.dirs,
@@ -1095,7 +1112,9 @@ export abstract class DefinedAgent extends Agent {
     protected abstract resolve (own: Partial<AgentOpts>, name: string): Promise<{ def: ResolvedDefinition, identity: Identity }>
 
     /*  register the options of the definitions (as flat long options), where the option
-        "--definition" is registered only for an agent without a definition of its own  */
+        "--definition" is registered only for an agent without a definition of its own, and
+        where the fields of the follow-up prompts ("--followup-<field>") are collected in
+        their given order into the single list "followup" (see "followupTokens")  */
     protected registerDefinitionOptions (cmd: Command, definition: boolean): void {
         for (const option of definitionOptions) {
             if (option.key === "definition" && !definition)
@@ -1104,6 +1123,14 @@ export abstract class DefinedAgent extends Agent {
                 (option.kind !== "flag" ? ` <${option.arg}>` : "")
             if (option.kind === "list")
                 cmd.option(flags, option.desc, (value: string, prev?: string[]) => [ ...(prev ?? []), value ])
+            else if (option.kind === "followup") {
+                const field = option.key.replace(/^followup-/, "")
+                cmd.option(flags, option.desc, (value: string) => {
+                    const prev = cmd.getOptionValue("followup") as string[] | undefined
+                    cmd.setOptionValue("followup", [ ...(prev ?? []), `${field}=${value}` ])
+                    return value
+                })
+            }
             else
                 cmd.option(flags, option.desc)
         }

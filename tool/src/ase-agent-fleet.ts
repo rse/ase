@@ -27,7 +27,7 @@ import { parseScope }                    from "./ase-config-scope.js"
 import { parseRelayURL, redactURL }      from "./ase-agent-relay-client.js"
 import { pidAlive, pidStart }            from "./ase-agent-runtime-exec.js"
 import { relaySchema, relayTls }         from "./ase-agent-relay-server-cli.js"
-import { flattenDefinition }             from "./ase-agent-definition-core.js"
+import { flattenDefinition, followupTokens } from "./ase-agent-definition-core.js"
 import type { ResolvedDefinition }       from "./ase-agent-definition-core.js"
 import type { DefinedAgent }             from "./ase-agent-runtime-engine.js"
 import { processDir, readState, writeState, stateAlive, validateName, agentDefaults } from "./ase-agent-process.js"
@@ -266,8 +266,9 @@ const given = (values: Section, key: string): boolean =>
 
 /*  the command-line arguments of the options of a configuration section, given by
     their long option names, where "true" enables a flag, "false" or an empty value
-    omits an option, a list of values repeats an option, and the map "params" repeats
-    the option "--params <name>=<value>" per parameter  */
+    omits an option, a list of values repeats an option, the map "params" repeats
+    the option "--params <name>=<value>" per parameter, and the list "followup" of
+    follow-up objects gives the options "--followup-<field>" per field  */
 const sectionArgs = (section: string, values: Section): string[] =>
     Object.entries(values).flatMap(([ key, value ]) => {
         if (!/^[a-z][a-z0-9-]*$/.test(key))
@@ -276,6 +277,11 @@ const sectionArgs = (section: string, values: Section): string[] =>
             return []
         if (value === true)
             return [ `--${key}` ]
+        if (key === "followup")
+            return followupTokens(value, `fleet: section "${section}"`, "").flatMap((token) => {
+                const i = token.indexOf("=")
+                return [ `--followup-${token.slice(0, i)}`, token.slice(i + 1) ]
+            })
         if (key === "params" && isSection(value))
             return Object.entries(value).flatMap(([ name, item ]) => {
                 if (item === null || item === undefined)

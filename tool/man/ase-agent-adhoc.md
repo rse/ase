@@ -28,6 +28,7 @@
 \[`--assign-`*item* *who*\]
 \[`--request-`*item* *value*\]
 \[`--prompt-`*item* *value*\]
+\[`--followup-`*item* *value*\]
 \[`--prepare-run` *cmd*\]
 \[`--success-`*item* *value*\]
 \[`--verdict-`*item* *value*\]
@@ -127,7 +128,8 @@ state of `--state-activity`, tags it with the tag value `active` (as
 `<tag-name>:active`), and assigns it to the agent.
 
 It then processes the task through the headless agent tool of `--tool`
-with the prompt of `--prompt-skill`, `--prompt-text`, or `--prompt-file`,
+with the prompt of `--prompt-skill`, `--prompt-text`, or `--prompt-file`
+(followed by the follow-up prompts of `--followup-`*item*, if any),
 checks the success criteria, and finally, again in a single conditional
 save, settles the task: it tags it according to `--tag-success` resp.
 `--tag-failure` (or with the found verdict as the tag value), hands it
@@ -651,6 +653,58 @@ implicitly, but always have to be given explicitly.
   In a definition file, a relative *file* is relative to the
   definition file.
 
+#### Follow-Up
+
+The *follow-up prompts* are invoked one after another after a
+successful prompt, in the same working directory and with the same
+model, each only after the success of its predecessor, and all before
+the finishing of the processing (e.g., before the commit of
+`--finish-commit`). A failed follow-up prompt fails the processing
+(like a failed prompt for the success criterion `exit`), its output
+lines count as output lines of the prompt (e.g., for `--success-match`,
+`--verdict-label`, and `--attach-output`), and the hook `prompt` covers
+the prompt only.
+
+Each of `--followup-skill`, `--followup-text`, and `--followup-file`
+starts a new follow-up prompt (with the same semantics as the
+corresponding option of the prompt), and each of `--followup-args`,
+`--followup-session`, and `--followup-when` belongs to the follow-up
+prompt started last, so their order matters. In a definition file, the
+follow-up prompts are the list `followup` of objects with the fields
+`skill`, `args`, `text`, `file`, `session`, and `when` instead (see
+**DEFINITION FILES**).
+
+- \[`--followup-skill` *name*\]:
+  (repeatable) The skill of a new follow-up prompt, invoked like the
+  skill of `--prompt-skill`.
+
+- \[`--followup-args` *template*\]:
+  The arguments of the skill of the current follow-up prompt, as a
+  template (see **TEMPLATES**) (default: none). Allowed with
+  `--followup-skill` only.
+
+- \[`--followup-text` *template*\]:
+  (repeatable) The prompt text of a new follow-up prompt (instead of a
+  skill), as a template (see **TEMPLATES**), where a follow-up prompt
+  whose text renders to an empty string is skipped.
+
+- \[`--followup-file` *file*\]:
+  (repeatable) A file with the prompt text of a new follow-up prompt
+  (instead of a skill), like `--prompt-file`.
+
+- \[`--followup-session` `fresh`|`resume`\]:
+  The session of the agent tool of the current follow-up prompt:
+  `fresh` for a new session (default), or `resume` to resume the
+  session of the preceding invocation (the prompt or the last follow-up
+  prompt actually invoked), which falls back to a new session with a
+  warning if the agent tool reported no session for it.
+
+- \[`--followup-when` *template*\]:
+  (repeatable) A condition of the current follow-up prompt, as a
+  template (see **TEMPLATES**), where the follow-up prompt is skipped
+  if any of its conditions renders to an empty string or `false`, e.g.,
+  `{param:lint}` for a parameter `lint` of the values `true` and `false`.
+
 #### Prepare
 
 - \[`--prepare-run` *cmd*\]:
@@ -782,7 +836,8 @@ of 240 seconds of the preparing resp. finishing of a processing.
 ## TEMPLATES
 
 The templates of `--prompt-args`, `--prompt-text`, and `--prompt-file`
-expand the following placeholders:
+(and of `--followup-args`, `--followup-text`, `--followup-file`, and
+`--followup-when`) expand the following placeholders:
 
 - `{id}`, `{title}`:
   The id and the title of the task.
@@ -843,8 +898,16 @@ above (without the leading `--`), either flat (`state-incoming:
 PLANNED`) or nested by group (`state: { incoming: PLANNED }`), where a
 key must not be given both flat and nested, a list value repeats a
 repeatable option, a flag takes a boolean, and a relative
-`prompt-file` is relative to the definition file. A definition file is
-either:
+`prompt-file` is relative to the definition file.
+
+The follow-up prompts are given not by the keys `followup-`*item*, but
+by the key `followup`: an object or a list of objects, each with
+exactly one of the fields `skill`, `text`, or `file`, plus optionally
+`args` (with `skill` only), `session`, and `when` (a string or a list
+of strings), where a relative `file` is relative to the definition
+file. As a list option, it replaces the follow-up prompts of a base
+definition as a whole (e.g., `followup: []` removes them). A definition
+file is either:
 
 - a YAML file (`.yaml` or `.yml`), declarative only, or
 
@@ -1146,6 +1209,12 @@ $ ase agent adhoc start -n workflow --state-incoming PLANNED --tag-require workf
 # a further qualification agent of its own tag, based on a built-in definition
 $ ase agent adhoc start -n reviewer -D builtin:qualifier-qualify --tag-name ase-agent-reviewer
 
+# an agent running a project skill, followed by a fresh linting and a resumed fixing
+$ ase agent adhoc start -n workflow --state-incoming PLANNED --tag-require workflow \
+    --prompt-skill my-workflow --prompt-args "{id}" \
+    --followup-skill ase-code-lint --followup-args "--auto --unstaged" \
+    --followup-text "Fix the problems the linter could not correct." --followup-session resume
+
 # an agent of a definition kind of the project (see .ase/agents/reviewer.mts below)
 $ ase agent reviewer start -p 2
 $ ase agent reviewer log -f
@@ -1199,6 +1268,20 @@ export default {
 
 Started via `ase agent reviewer start --params severity=MEDIUM` (resp. with
 `params: { severity: MEDIUM }` in its section of a fleet configuration).
+
+A YAML definition file `.ase/agents/implementer.yaml`, shadowing the
+built-in `implementer` with a linting and a resumed fixing of the
+remaining problems after each implementing:
+
+```yaml
+definition:         builtin:implementer-implement
+followup:
+    -   skill:      ase-code-lint
+        args:       "--auto --unstaged{?changeset-worktree: --worktree {changeset-worktree}}"
+        when:       "{?changeset-type=worktree:true}{?changeset-type=branch:true}"
+    -   text:       "Fix the problems the linter reported but could not correct."
+        session:    resume
+```
 
 ## SEE ALSO
 

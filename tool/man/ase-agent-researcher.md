@@ -367,6 +367,28 @@ All other options belong to the sub-commands (see **COMMANDS**).
     - \[`--prompt-file` *file*\]: The file with the prompt text template
       to invoke instead of a skill. Built-in: not set.
 
+    - \[`--followup-skill` *name*\]: The skill to invoke as a follow-up
+      prompt after a successful prompt, starting a new follow-up
+      (repeatable). Built-in: not set.
+
+    - \[`--followup-args` *template*\]: The argument template of the
+      skill of the current follow-up. Built-in: not set.
+
+    - \[`--followup-text` *template*\]: The prompt text template to
+      invoke as a follow-up prompt instead of a skill (repeatable).
+      Built-in: not set.
+
+    - \[`--followup-file` *file*\]: The file with the prompt text
+      template to invoke as a follow-up prompt instead of a skill
+      (repeatable). Built-in: not set.
+
+    - \[`--followup-session` *session*\]: The session of the current
+      follow-up: `fresh` or `resume`. Generic default: `fresh`.
+      Built-in: not set.
+
+    - \[`--followup-when` *template*\]: A condition of the current
+      follow-up (repeatable). Built-in: not set.
+
     - \[`--prepare-run` *cmd*\]: A shell command run in the working
       directory before the prompt (repeatable). Built-in: not set.
 

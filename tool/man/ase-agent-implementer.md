@@ -72,6 +72,13 @@ A task already `IMPLEMENTED`, but whose changeset branch could not be
 committed or pushed, is instead tagged `ase-agent-implementer:failed`
 and left for a manual intervention.
 
+With `--params lint=true`, a successful implementing is followed by the
+follow-up prompt `ase-code-lint --auto --unstaged`, which lints and
+auto-corrects the still uncommitted change set (in its ASE worktree, if
+any) before it is committed, where a failed linting fails the
+processing. An `attachment:` changeset is never linted, as it is
+implemented outside of the working copy.
+
 In mode `draft`, the implementer instead claims only the `PLANNED` tasks
 without an implementation draft attachment (type `text/x-diff;
 charset=utf-8; kind="draft"`) yet and without the separate tag
@@ -293,8 +300,10 @@ All other options belong to the sub-commands (see **COMMANDS**).
     - \[`--params` *name*`=`*value*\]: The value of a parameter
       declared by the definition (repeatable). Built-in: `effort-wait`
       (`true` or `false`, default: `true`), whether to wait for the
-      effort estimation of a task by the `estimator` agent (see
-      **DESCRIPTION**).
+      effort estimation of a task by the `estimator` agent, and, in mode
+      `implement`, `lint` (`true` or `false`, default: `false`), whether
+      to lint and auto-correct the change set after the implementing
+      (see **DESCRIPTION**).
 
     - \[`--state-incoming` *state*\]: The state of the tasks to claim
       (mandatory for `phase`, repeatable with `--unclaimed` or
@@ -393,6 +402,32 @@ All other options belong to the sub-commands (see **COMMANDS**).
 
     - \[`--prompt-file` *file*\]: The file with the prompt text template
       to invoke instead of a skill. Built-in: not set.
+
+    - \[`--followup-skill` *name*\]: The skill to invoke as a follow-up
+      prompt after a successful prompt, starting a new follow-up
+      (repeatable). Built-in: `ase-code-lint` (mode `implement`).
+
+    - \[`--followup-args` *template*\]: The argument template of the
+      skill of the current follow-up. Built-in: `--auto
+      --unstaged{?changeset-worktree: --worktree {changeset-worktree}}`
+      (mode `implement`).
+
+    - \[`--followup-text` *template*\]: The prompt text template to
+      invoke as a follow-up prompt instead of a skill (repeatable).
+      Built-in: not set.
+
+    - \[`--followup-file` *file*\]: The file with the prompt text
+      template to invoke as a follow-up prompt instead of a skill
+      (repeatable). Built-in: not set.
+
+    - \[`--followup-session` *session*\]: The session of the current
+      follow-up: `fresh` or `resume`. Generic default: `fresh`.
+      Built-in: not set.
+
+    - \[`--followup-when` *template*\]: A condition of the current
+      follow-up (repeatable). Built-in: `{param:lint}` and
+      `{?changeset-type=worktree:true}{?changeset-type=branch:true}`
+      (mode `implement`).
 
     - \[`--prepare-run` *cmd*\]: A shell command run in the working
       directory before the prompt (repeatable). Built-in: not set.
@@ -536,6 +571,9 @@ agent is not running.
 ```sh
 # implement up to two tasks in parallel
 $ ase agent implementer start -p 2
+
+# implement the tasks and lint and auto-correct their change sets
+$ ase agent implementer start --params lint=true
 
 # implement the tasks in a temporary clone, pushing their branches back
 $ ase agent implementer start -r git@github.com:example/project.git

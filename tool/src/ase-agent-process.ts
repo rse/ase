@@ -81,16 +81,23 @@ export const agentDefaults = (): AgentOpts => {
 }
 
 /*  the command-line arguments of the explicitly given options of a command (except "--foreground"),
-    where a repeatable option is repeated per value  */
-const givenArgs = (cmd: Command): string[] =>
-    cmd.options.flatMap((option) => {
+    where a repeatable option is repeated per value, and where the fields of the follow-up prompts
+    ("--followup-<field>") are given in their original order (of their collected list "followup")  */
+const givenArgs = (cmd: Command): string[] => [
+    ...cmd.options.flatMap((option) => {
         const key = option.attributeName()
-        if (option.long === undefined || option.long === "--foreground" || cmd.getOptionValueSource(key) !== "cli")
+        if (option.long === undefined || option.long === "--foreground" || option.long.startsWith("--followup-")
+            || cmd.getOptionValueSource(key) !== "cli")
             return []
         const value = cmd.getOptionValue(key) as string | string[] | boolean
         return value === true ? [ option.long ] :
             (Array.isArray(value) ? value : [ value ]).flatMap((item) => [ option.long!, String(item) ])
+    }),
+    ...((cmd.getOptionValue("followup") ?? []) as string[]).flatMap((token) => {
+        const i = token.indexOf("=")
+        return [ `--followup-${token.slice(0, i)}`, token.slice(i + 1) ]
     })
+]
 
 /*  CLI command group "ase agent <kind>", managing a single agent of a kind
     (named by "--name") in the background or in the foreground  */

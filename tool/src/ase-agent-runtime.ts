@@ -75,16 +75,22 @@ export type AgentLog = (level: LineLevel, msg: string) => Promise<void>
     (exit code 0 without timeout and interrupt), and its agent message text lines  */
 export type AgentResult = { ok: boolean, output: string[] }
 
+/*  a follow-up invocation of a job (see "AgentJob"): a skill command or a raw prompt,
+    in a fresh session of the agent tool or resuming the session of the preceding invocation  */
+export type AgentFollowupJob = { cmd?: string, prompt?: string, resume: boolean }
+
 /*  the invocation of a skill command "<skill> <args>" (rendered per agent tool, see
     "skillPrompt"), or alternatively of an already rendered raw prompt, in a working
     directory, optionally with a model of the agent tool (else its default model),
-    optionally granting access to additional directories, optionally
+    optionally granting access to additional directories, optionally followed by
+    further invocations (each only after the success of its predecessor), optionally
     finished after the invocation (e.g. by committing its result), and
     optionally cleaned up afterwards in any case, even after a failed
     finishing or a timed out preparing (e.g. by removing its temporary worktree)  */
 export type AgentJob = {
     cmd?:     string
     prompt?:  string
+    followup?: AgentFollowupJob[]
     model?:   string
     cwd:      string
     dirs?:    string[]
@@ -103,7 +109,7 @@ export type AgentSnapshot = { desc: string, diff: string } | "obsolete" | null
     which the skill finds the changeset (else empty), and optionally the capturing of the
     change set snapshot after the invocation, before its finishing (where <partial> tells
     whether the skill did not reach its phase success state)  */
-export type AgentWork = Omit<AgentJob, "cmd" | "prompt"> & {
+export type AgentWork = Omit<AgentJob, "cmd" | "prompt" | "followup"> & {
     dirs: string[], sourceDir: string, changesetWorktree: string,
     snapshot?: (partial: boolean) => Promise<AgentSnapshot>
 }
@@ -1064,22 +1070,26 @@ export abstract class Agent {
     /*  the description of the observed tasks (for the start log line)  */
     protected abstract observing (): string
 
-    /*  run the skill of a prepared job via the headless agent tool, logging its decoded JSONL
+    /*  run the skill command or raw prompt <call> of a prepared job via the headless agent
+        tool (resuming the session <call.resume>, if not empty), logging its decoded JSONL
         events in real-time and collecting its agent message text lines as the <output> (without
         buffering them, as the output of the agent tool can be huge), where the quiet entries are
-        only echoed (i.e., not kept in the processing log attachment of the task), and return its success  */
-    private async invoke (taskId: string, job: AgentJob, abort: AbortSignal, log: AgentLog, echo: AgentLog, output: string[]): Promise<boolean> {
+        only echoed (i.e., not kept in the processing log attachment of the task), and return its
+        success and the id of its session (empty if not reported)  */
+    private async invoke (taskId: string, job: AgentJob, call: { cmd?: string, prompt?: string, resume: string },
+        abort: AbortSignal, log: AgentLog, echo: AgentLog, output: string[]): Promise<{ ok: boolean, session: string }> {
         const { tool, timeout, timeoutSpec, budget } = this
         const { cwd } = job
         const cli   = toolSpecs[tool].cli
-        const cmd   = job.cmd ?? ""
+        const cmd   = call.cmd ?? ""
         const i     = cmd.indexOf(" ")
         const model = job.model ?? ""
-        const args  = toolArgs[tool](job.prompt ?? skillPrompt(tool, i < 0 ? cmd : cmd.slice(0, i), i < 0 ? "" : cmd.slice(i + 1)),
-            [ ...new Set(job.dirs ?? []) ].filter((dir) => dir !== cwd).flatMap((dir) => [ "--add-dir", dir ]), model, budget)
+        const args  = toolArgs[tool](call.prompt ?? skillPrompt(tool, i < 0 ? cmd : cmd.slice(0, i), i < 0 ? "" : cmd.slice(i + 1)),
+            [ ...new Set(job.dirs ?? []) ].filter((dir) => dir !== cwd).flatMap((dir) => [ "--add-dir", dir ]), model, budget, call.resume)
         await log("info", `running: ${cli} ${args.map((arg) => arg.includes(" ") ? `"${arg}"` : arg).join(" ")}`)
         const started = Date.now()
         const costs: ToolCosts = { costToken: null, costUSD: null, cread: 0, cwrite: 0, input: 0, apiMs: null }
+        const session = { id: "" }
         const subprocess = execa(cli, args, {
             cwd,
             env:                 { ASE_HEADLESS: "true" },
@@ -1092,7 +1102,7 @@ export abstract class Agent {
             forceKillAfterDelay: 10 * 1000
         })
         for await (const line of readline.createInterface({ input: subprocess.all })) {
-            for (const entry of toolEntries(tool, line, costs)) {
+            for (const entry of toolEntries(tool, line, costs, session)) {
                 if (entry.text === true)
                     output.push(entry.msg)
                 await (entry.quiet === true ? echo : log)(entry.level, `${cli}: ${entry.msg}`)
@@ -1127,7 +1137,7 @@ export abstract class Agent {
         const ok = !abort.aborted && !result.timedOut && result.exitCode === 0
         try {
             if (!telemetryEnabled(this.log))
-                return ok
+                return { ok, session: session.id }
             const tokens: TokenCounts = { cread: costs.cread, cwrite: costs.cwrite, input: costs.input, output: costs.costToken ?? 0 }
             let cost = costs.costUSD
             if (cost === null) {
@@ -1155,7 +1165,7 @@ export abstract class Agent {
         catch (err: unknown) {
             await log("warning", `usage not booked onto task: ${err instanceof Error ? err.message : String(err)}`)
         }
-        return ok
+        return { ok, session: session.id }
     }
 
     /*  process a claimed task via the skill of the headless agent tool in a worker slot
@@ -1183,7 +1193,21 @@ export abstract class Agent {
                         .then((orphan) => orphan.cleanup?.(log))
                         .catch(() => {})
                 })
-                ok = await this.invoke(task.id, job, abort, log, echo, output)
+                let last = await this.invoke(task.id, job, { cmd: job.cmd, prompt: job.prompt, resume: "" }, abort, log, echo, output)
+
+                /*  run the follow-up invocations, each only after the success of its predecessor,
+                    where a resumed one falls back to a fresh session if its predecessor reported none  */
+                const followups = job.followup ?? []
+                for (let n = 0; last.ok && n < followups.length; n++) {
+                    const { cmd, prompt, resume } = followups[n]
+                    if (resume && last.session === "")
+                        await log("warning", `follow-up #${n + 1}: no session of the preceding invocation to resume -- using a fresh session`)
+                    await log("info", `follow-up #${n + 1}: running in ${resume && last.session !== "" ? `resumed session ${last.session}` : "fresh session"}`)
+                    last = await this.invoke(task.id, job, { cmd, prompt, resume: resume ? last.session : "" }, abort, log, echo, output)
+                    if (!last.ok)
+                        await log("warning", `follow-up #${n + 1}: failed`)
+                }
+                ok = last.ok
             }
             catch (err: unknown) {
                 await log("error", err instanceof Error ? err.message : String(err))

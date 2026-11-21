@@ -32,20 +32,31 @@ export const budgetCredits = (budget: string): number =>
     additional directories <add> (the "--add-dir" options), the model <model>, and the native
     cost cap of the budget <budget> in USD (none if empty, and none of Codex at all), streaming JSONL
     events, where risky actions are denied or automatically reviewed instead of being prompted for
-    (the variadic "--add-dir" of Claude has to precede the other options to not consume the prompt)  */
-export const toolArgs: Record<Tool, (prompt: string, add: string[], model: string, budget: string) => string[]> = {
-    "claude":  (prompt, add, model, budget) => [
+    (the variadic "--add-dir" of Claude has to precede the other options to not consume the prompt),
+    in a fresh session, or resuming the session <resume> (if not empty)  */
+export const toolArgs: Record<Tool, (prompt: string, add: string[], model: string, budget: string, resume: string) => string[]> = {
+    "claude":  (prompt, add, model, budget, resume) => [
         ...add, ...modelArgs(model), ...(budget !== "" ? [ "--max-budget-usd", budget ] : []),
+        ...(resume !== "" ? [ "--resume", resume ] : []),
         "-p", "--output-format", "stream-json", "--verbose", "--disallowedTools", "AskUserQuestion",
         "--permission-mode", "auto", "--permission-prompts", "none", prompt
     ],
-    "copilot": (prompt, add, model, budget) => [
+    "copilot": (prompt, add, model, budget, resume) => [
         ...add, ...modelArgs(model), ...(budget !== "" ? [ "--max-ai-credits", String(budgetCredits(budget)) ] : []),
+        ...(resume !== "" ? [ `--resume=${resume}` ] : []),
         "--allow-all-tools", "--no-ask-user", "--no-color", "--output-format", "json", "-p", prompt
     ],
-    "codex":   (prompt, add, model) => [
-        "exec", ...add, ...modelArgs(model), "--json", "--approve-for-me", "--color", "never", prompt
+    "codex":   (prompt, add, model, _budget, resume) => [
+        "exec", ...add, ...modelArgs(model), "--json", "--approve-for-me", "--color", "never",
+        ...(resume !== "" ? [ "resume", resume ] : []), prompt
     ]
+}
+
+/*  the per-tool id of the session of the agent tool reported by a JSONL event (else empty)  */
+const toolSessions: Record<Tool, (ev: any) => string> = {
+    "claude":  (ev) => ev.type === "system" && ev.subtype === "init" && typeof ev.session_id === "string" ? ev.session_id : "",
+    "copilot": (ev) => ev.type === "session.start" && typeof ev.data?.sessionId === "string" ? ev.data.sessionId : "",
+    "codex":   (ev) => ev.type === "thread.started" && typeof ev.thread_id === "string" ? ev.thread_id : ""
 }
 
 /*  the per-tool rendering of the invocation of the skill <skill> with the arguments <args>:
@@ -198,9 +209,10 @@ const toolCosts: Record<Tool, (ev: any, costs: ToolCosts) => void> = {
 
 /*  decode an output line of the agent tool into processing log entries without
     terminal control sequences: a JSONL event via the decoder of the tool (splitting
-    agent message text into its lines, and accounting it into the costs), and any
-    other non-blank line as plain text  */
-export const toolEntries = (tool: Tool, line: string, costs: ToolCosts): ToolEntry[] => {
+    agent message text into its lines, accounting it into the costs, and recording
+    the id of the session of the tool into <session>), and any other non-blank line
+    as plain text  */
+export const toolEntries = (tool: Tool, line: string, costs: ToolCosts, session: { id: string }): ToolEntry[] => {
     let ev: unknown = null
     if (line.startsWith("{")) {
         try {
@@ -215,6 +227,9 @@ export const toolEntries = (tool: Tool, line: string, costs: ToolCosts): ToolEnt
         return plain.trim() !== "" ? [ text(plain) ] : []
     }
     toolCosts[tool](ev, costs)
+    const id = toolSessions[tool](ev)
+    if (id !== "")
+        session.id = id
     return toolEvents[tool](ev).flatMap((entry) => {
         if (entry.text !== true)
             return [ { ...entry, msg: stripVTControlCharacters(entry.msg) } ]

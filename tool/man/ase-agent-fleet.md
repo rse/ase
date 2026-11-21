@@ -234,7 +234,9 @@ value omits an option, and a list repeats an option:
   be given both flat and nested. The values of the parameters
   declared by the definition are given by the map `params` (e.g.,
   `params: { severity: HIGH }`), which repeats the option `--params`
-  *name*`=`*value* per parameter.
+  *name*`=`*value* per parameter, and the follow-up prompts are given by
+  the list `followup` of objects (like in a definition file), which
+  gives the options `--followup-`*field* per field.
 
   The `definition` of `kind: adhoc` (unless a `builtin:` one) and the
   `cwd` of an agent (its own working copy to run the agent tool in,
@@ -255,7 +257,7 @@ resolved and validated on the start of the fleet:
   invalid option name (other than lower-case letters, digits, and
   dashes), and a value other than a string, a number, a boolean, or a
   list of strings and numbers (resp., for `params`, a map of strings,
-  numbers, and booleans);
+  numbers, and booleans, and, for `followup`, a list of objects);
 
 - an unknown agent kind, and an option unknown to the `start` command
   of the agent kind;

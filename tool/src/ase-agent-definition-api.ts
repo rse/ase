@@ -32,6 +32,20 @@ export interface AgentParam {
     allow?:    Many<string>
 }
 
+/*  a follow-up prompt of an agent, invoked after a successful prompt (in order, each only
+    after the success of its predecessor): a skill with its arguments, a prompt text, or a
+    prompt file (like the "prompt"), in a fresh session of the agent tool or resuming the
+    session of the preceding invocation, and only if none of its "when" conditions renders
+    to an empty string or "false"  */
+export interface AgentFollowup {
+    skill?:   string
+    args?:    string
+    text?:    string
+    file?:    string
+    session?: "fresh" | "resume"
+    when?:    Many<string>
+}
+
 /*  the definition of an agent, with the same option groups and options as the options
     "--<group>-<item>" of "ase agent <kind> start" (see its manual page for their semantics),
     including the one-line title and the brief description of its operation (as shown on the
@@ -87,6 +101,7 @@ export interface AgentDefinition {
         text?:     string
         file?:     string
     }
+    followup?: Many<AgentFollowup>
     prepare?: {
         run?:      Many<string>
     }

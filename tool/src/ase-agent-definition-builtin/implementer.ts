@@ -18,6 +18,17 @@ const params = {
     }
 }
 
+/*  the additional parameter of the implementing: whether the change set is linted (and
+    corrected) after a successful implementing, before it is committed (disabled by default)  */
+const paramsImplement = {
+    ...params,
+    "lint": {
+        desc:    "whether to lint and auto-correct the change set via the \"ase-code-lint\" skill after the implementing",
+        default: "false",
+        allow:   [ "true", "false" ]
+    }
+}
+
 /*  with the parameter "effort-wait", a task is claimed only once the estimator is done
     with it, i.e., once it no longer awaits its effort estimation, or once the estimator
     failed on it (and hence tagged it, so it is not estimated again), as the estimator
@@ -88,7 +99,7 @@ export default {
                 "Source: into its Changeset: via the ase-task-implement skill (in a Git worktree where " +
                 "needed), commits and publishes a branch: changeset, attaches a snapshot of the change " +
                 "set, and puts it into IMPLEMENTED on success, else into STALLED.",
-            params,
+            params:    paramsImplement,
             type:      "phase",
             lifecycle: "enterprise",
             workdir:   "changeset",
@@ -98,6 +109,14 @@ export default {
                 skill: "ase-task-implement",
                 args:  "--next DONE{?changeset-type=branch: --changeset worktree}" +
                     "{?changeset-worktree: --worktree {changeset-worktree}} {id}"
+            },
+
+            /*  with the parameter "lint", lint and auto-correct the uncommitted change set before its commit
+                (except an "attachment:" changeset, as it is implemented outside of the working copy)  */
+            followup:  {
+                skill: "ase-code-lint",
+                args:  "--auto --unstaged{?changeset-worktree: --worktree {changeset-worktree}}",
+                when:  [ "{param:lint}", "{?changeset-type=worktree:true}{?changeset-type=branch:true}" ]
             },
             success:   { criterion: [ "status" ] },
             attach:    { changeset: "changeset" },

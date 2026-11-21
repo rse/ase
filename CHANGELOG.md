@@ -15,6 +15,11 @@ ChangeLog
     `ase-task-reboot`, grounding them once in the project artifacts and the Internet/Web, with causes
     resp. arguments tagged by evidence or as unverified, and let the `rebooter` agent pass it.
 
+-   FEATURE [code]: Follow-Up Prompts for Agents
+    Agent definitions declare follow-up prompts (`followup` resp. `--followup-*`), invoked after a
+    successful prompt in a fresh or resumed agent tool session and only if their conditions hold,
+    which the `implementer` agent uses to lint its change set with `--params lint=true`.
+
 -   IMPROVEMENT [code]: Hunk-Only Checks in `ase-{code,spec}-lint` and `ase-code-analyze`
     Under `--staged` and `--unstaged`, `ase-code-lint`, `ase-spec-lint`, and `ase-code-analyze` now
     report (and correct) only the problems within the changed hunks of the Git changeset (from `git

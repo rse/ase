@@ -108,8 +108,9 @@ export type DefinitionCriterion = typeof definitionCriteria[number]
 export const definitionGroups = [ "state", "tag", "assign", "request", "prompt", "prepare", "success", "verdict", "attach", "finish" ]
 
 /*  the options of a definition: their long name (without "--"), their kind (a single
-    value, a repeatable value, or a flag), the name of their argument, and their description  */
-export type DefinitionOption = { key: string, kind: "value" | "list" | "flag", arg: string, desc: string }
+    value, a repeatable value, a flag, or a field of an entry of the ordered list of the
+    follow-up prompts), the name of their argument, and their description  */
+export type DefinitionOption = { key: string, kind: "value" | "list" | "flag" | "followup", arg: string, desc: string }
 const opt = (key: string, kind: DefinitionOption["kind"], arg: string, desc: string): DefinitionOption => ({ key, kind, arg, desc })
 export const definitionOptions: DefinitionOption[] = [
     opt("definition",        "value", "file",          "YAML, TypeScript, or JavaScript file with the definition of the agent " +
@@ -168,6 +169,17 @@ export const definitionOptions: DefinitionOption[] = [
         "(default: \"{id}\" for \"phase\", \"{id}: {prompt}\" for \"request\")"),
     opt("prompt-text",       "value", "template",      "prompt text to invoke (instead of a skill)"),
     opt("prompt-file",       "value", "file",          "file with the prompt text to invoke (instead of a skill)"),
+    opt("followup-skill",    "followup", "name",       "skill to invoke as a follow-up prompt after a successful prompt, " +
+        "starting a new follow-up (repeatable)"),
+    opt("followup-args",     "followup", "template",   "arguments of the skill of the current follow-up (default: none)"),
+    opt("followup-text",     "followup", "template",   "prompt text to invoke as a follow-up prompt (instead of a skill), " +
+        "starting a new follow-up (repeatable)"),
+    opt("followup-file",     "followup", "file",       "file with the prompt text to invoke as a follow-up prompt " +
+        "(instead of a skill), starting a new follow-up (repeatable)"),
+    opt("followup-session",  "followup", "session",    "session of the agent tool of the current follow-up: \"fresh\", " +
+        "or \"resume\" to resume the session of the preceding invocation (default: \"fresh\")"),
+    opt("followup-when",     "followup", "template",   "condition of the current follow-up, " +
+        "which is skipped if a condition renders to an empty string or \"false\" (repeatable)"),
     opt("prepare-run",       "list",  "cmd",           "shell command to run before the prompt (repeatable)"),
     opt("success-criterion", "list",  "criterion",     "success criterion: \"exit\", \"clean\", \"changed\", " +
         "\"verdict\", \"attachment\", or \"status\" (repeatable) " +
@@ -310,6 +322,10 @@ export const attachMatches = (spec: AttachSpec, type: string): boolean =>
     typeParam(type, "kind") === spec.kind
     && (spec.mime === "" || (type.split(";")[0] ?? "").trim().toLowerCase() === spec.mime)
 
+/*  a resolved follow-up prompt (see "AgentFollowup"): the skill (if any) and the parsed
+    template of its arguments or of its prompt text, its session, and its conditions  */
+export type ResolvedFollowup = { skill: string, template: Template, session: "fresh" | "resume", when: Template[] }
+
 /*  the resolved definition of an agent (with one or more incoming states for "phase" and
     none for "request", and with "statePrevious" as a success or failure state restoring
     the incoming state of the claim)  */
@@ -334,6 +350,7 @@ export type ResolvedDefinition = {
     assign:  { name: string, required: boolean, success: string, failure: string }
     request: { name: string, done: string, prompt: AgentPrompt }
     prompt:  { skill: string, template: Template }
+    followup: ResolvedFollowup[]
     prepare: string[]
     success: { criteria: DefinitionCriterion[], match: RegExp[] }
     verdict: { label: string, allow: string[] }
@@ -344,8 +361,8 @@ export type ResolvedDefinition = {
 }
 
 /*  flatten the nested option groups of a definition (e.g. "state: { incoming: PLANNED }"
-    into "state-incoming: PLANNED"), where the map "params" is kept as-is, and where
-    <where> names the definition in errors  */
+    into "state-incoming: PLANNED"), where the map "params" and the follow-up prompts
+    "followup" are kept as-is, and where <where> names the definition in errors  */
 export const flattenDefinition = (data: Record<string, unknown>, where: string): Record<string, unknown> => {
     const flat: Record<string, unknown> = {}
     const set = (key: string, value: unknown) => {
@@ -354,7 +371,7 @@ export const flattenDefinition = (data: Record<string, unknown>, where: string):
         flat[key] = value
     }
     for (const [ key, value ] of Object.entries(data)) {
-        if (key !== "params" && value !== null && typeof value === "object" && !Array.isArray(value)) {
+        if (key !== "params" && key !== "followup" && value !== null && typeof value === "object" && !Array.isArray(value)) {
             if (!definitionGroups.includes(key))
                 throw new Error(`${where}: option "${key}" is no option group (expected one of ` +
                     `${definitionGroups.map((group) => `"${group}"`).join(", ")})`)
@@ -366,6 +383,39 @@ export const flattenDefinition = (data: Record<string, unknown>, where: string):
     }
     return flat
 }
+
+/*  the fields of a follow-up prompt (see "AgentFollowup"), where exactly one of the
+    first three starts an entry of the ordered list of the follow-up prompts  */
+const followupStarts = [ "skill", "text", "file" ]
+const followupFields = [ ...followupStarts, "args", "session", "when" ]
+
+/*  convert the follow-up prompts "followup" <value> of a definition (an object or a list
+    of objects, see "AgentFollowup") into the ordered list of their fields "<field>=<value>"
+    (as given by the options "--followup-<field>", each entry starting with its skill, text,
+    or file, and with a list of conditions "when" given as one field per condition), where a
+    relative file is resolved against the directory <dir> (if given), and where <where> names
+    the definition in errors  */
+export const followupTokens = (value: unknown, where: string, dir: string): string[] =>
+    (Array.isArray(value) ? value : [ value ]).flatMap((entry: unknown, i) => {
+        if (entry === null || typeof entry !== "object" || Array.isArray(entry))
+            throw new Error(`${where}: invalid follow-up #${i + 1} (expected an object)`)
+        const fields = Object.entries(entry as Record<string, unknown>)
+            .flatMap(([ field, val ]) => field === "when" && Array.isArray(val) ?
+                val.map((item: unknown): [ string, unknown ] => [ field, item ]) : [ [ field, val ] as [ string, unknown ] ])
+            .filter(([ , val ]) => val !== null && val !== undefined)
+        for (const [ field, val ] of fields) {
+            if (!followupFields.includes(field))
+                throw new Error(`${where}: follow-up #${i + 1}: unknown field "${field}" ` +
+                    `(expected ${followupFields.map((f) => `"${f}"`).join(", ")})`)
+            if (typeof val !== "string" && typeof val !== "number")
+                throw new Error(`${where}: follow-up #${i + 1}: invalid value of field "${field}" (expected a string)`)
+        }
+        const starts = fields.filter(([ field ]) => followupStarts.includes(field))
+        if (starts.length !== 1)
+            throw new Error(`${where}: follow-up #${i + 1}: exactly one of the fields "skill", "text", or "file" is required`)
+        return [ ...starts, ...fields.filter(([ field ]) => !followupStarts.includes(field)) ].map(([ field, val ]) =>
+            `${field}=${field === "file" && dir !== "" ? path.resolve(dir, String(val)) : String(val)}`)
+    })
 
 /*  the names of the hooks of a definition (see "AgentHooks")  */
 const hookNames = [ "start", "order", "passes", "ready", "prepare", "prompt", "model", "verdict", "success", "settle", "finish", "stop" ]
@@ -459,9 +509,17 @@ const definitionValues = (data: unknown, where: string, dir: string): LoadedDefi
     }
     const values: Record<string, string | string[] | boolean> = {}
     for (const [ key, value ] of Object.entries(flattenDefinition(options, where))) {
+        if (key === "followup") {
+            if (value !== null && value !== undefined)
+                values.followup = followupTokens(value, where, dir)
+            continue
+        }
         const option = definitionOptions.find((opt) => opt.key === key)
         if (option === undefined)
             throw new Error(`${where}: unknown option "${key}"`)
+        else if (option.kind === "followup")
+            throw new Error(`${where}: option "${key}" is for the command line only ` +
+                "(use the list \"followup\" of follow-up objects instead)")
         const scalar = (val: unknown): string => {
             if (typeof val !== "string" && typeof val !== "number")
                 throw new Error(`${where}: invalid value of option "${key}" (expected a string)`)
@@ -745,6 +803,59 @@ const resolvePrompt = (
     return { skill, template }
 }
 
+/*  resolve the follow-up prompts of the processing type <type> from the ordered list
+    of their fields <tokens> ("<field>=<value>", see "followupTokens", where only the
+    field "when" can be given multiple times per follow-up), validated like the prompt
+    (see "resolvePrompt"), with the declared parameters <params>  */
+const resolveFollowups = (tokens: string[], type: DefinitionType, params: string[]): ResolvedFollowup[] => {
+    const fail    = failOption
+    const entries: { fields: Record<string, string>, when: string[] }[] = []
+    for (const token of tokens) {
+        const i     = token.indexOf("=")
+        const field = i < 0 ? "" : token.slice(0, i)
+        const value = token.slice(i + 1)
+        const last  = entries[entries.length - 1]
+        if (!followupFields.includes(field))
+            fail("followup-skill", `invalid follow-up field "${token}"`)
+        else if (followupStarts.includes(field))
+            entries.push({ fields: { [field]: value }, when: [] })
+        else if (last === undefined)
+            fail(`followup-${field}`, "requires a preceding \"--followup-skill\", \"--followup-text\", or \"--followup-file\"")
+        else if (field === "when")
+            last.when.push(value)
+        else if (Object.hasOwn(last.fields, field))
+            fail(`followup-${field}`, "given twice for the same follow-up")
+        else
+            last.fields[field] = value
+    }
+    return entries.map(({ fields: entry, when: conds }) => {
+        if (entry.args !== undefined && entry.skill === undefined)
+            fail("followup-args", "allowed with \"--followup-skill\" only")
+        if (entry.skill !== undefined && !/^(?:[A-Za-z0-9_.-]+:)?[A-Za-z0-9_.-]+$/.test(entry.skill))
+            fail("followup-skill", `invalid skill name "${entry.skill}"`)
+        const session = entry.session ?? "fresh"
+        if (session !== "fresh" && session !== "resume")
+            fail("followup-session", `invalid value "${session}" (expected "fresh" or "resume")`)
+        let template: Template
+        if (entry.skill !== undefined)
+            template = parseTemplate(entry.args ?? "", "followup-args", type, params)
+        else if (entry.text !== undefined)
+            template = parseTemplate(entry.text, "followup-text", type, params)
+        else {
+            let text = ""
+            try {
+                text = fs.readFileSync(path.resolve(entry.file), "utf8")
+            }
+            catch (err: unknown) {
+                fail("followup-file", `cannot read prompt file: ${err instanceof Error ? err.message : String(err)}`)
+            }
+            template = parseTemplate(text, "followup-file", type, params)
+        }
+        const when = conds.map((cond) => parseTemplate(cond, "followup-when", type, params))
+        return { skill: entry.skill ?? "", template, session: session as ResolvedFollowup["session"], when }
+    })
+}
+
 /*  resolve the success criteria, the output line matches, and the accepted verdicts of the
     processing type <type> through the option accessors <list> and <has>, validated against
     the determination of a verdict <verdicting> and the target states per verdict <verdicts>  */
@@ -858,9 +969,11 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
     const given: Record<string, string | string[] | boolean> = {}
     for (const option of definitionOptions) {
         const value = opts[optionAttr(option.key)]
-        if (value !== undefined && value !== false)
+        if (value !== undefined && value !== false && option.kind !== "followup")
             given[option.key] = value as string | string[] | boolean
     }
+    if (Array.isArray(opts.followup))
+        given.followup = opts.followup as string[]
     const loaded = typeof given.definition === "string" ? await loadDefinition(given.definition) : { values: {}, params: {}, hooks: {}, guards: false }
     const values = overlayValues(loaded.values, given)
     const str    = (key: string, def = ""): string => typeof values[key] === "string" ? values[key] as string : def
@@ -995,6 +1108,9 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
     /*  the prompt (see "resolvePrompt")  */
     const { skill, template } = resolvePrompt(str, has, type, Object.keys(decls))
 
+    /*  the follow-up prompts (see "resolveFollowups")  */
+    const followups = resolveFollowups(list("followup"), type, Object.keys(decls))
+
     /*  the success criteria and the verdict (see "resolveSuccess")  */
     const { criteria, match, allow } = resolveSuccess(list, has, type, unclaimed, verdicting, verdicts)
 
@@ -1005,12 +1121,15 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
             fail(key, "empty shell command")
 
     /*  whether a request agent requires the prompts of its requests: by the placeholder
-        "{prompt}" of its prompt template, or potentially by a hook receiving the job (and
-        hence the prompt of the request), resp. uses them optionally by "{prompt}" used only
-        within the conditional "{?prompt:...}", else ignores them  */
-    const consumes: AgentPrompt = type === "request" && (template.required.has("prompt")
+        "{prompt}" of its prompt template (or of the template of a follow-up prompt), or
+        potentially by a hook receiving the job (and hence the prompt of the request), resp.
+        uses them optionally by "{prompt}" used only within the conditional "{?prompt:...}"
+        (or within the condition of a follow-up prompt), else ignores them  */
+    const templates = [ template, ...followups.map((followup) => followup.template) ]
+    const consumes: AgentPrompt = type === "request" && (templates.some((t) => t.required.has("prompt"))
         || ([ "prepare", "prompt", "model", "finish" ] as const).some((hook) => loaded.hooks[hook] !== undefined)) ? "required" :
-        type === "request" && template.names.has("prompt") ? "optional" : "ignored"
+        type === "request" && [ ...templates, ...followups.flatMap((followup) => followup.when) ]
+            .some((t) => t.names.has("prompt")) ? "optional" : "ignored"
 
     return {
         name, title, description, type, workdir, lifecycles, unclaimed, model,
@@ -1026,6 +1145,7 @@ export const resolveDefinition = async (opts: Record<string, unknown>, name: str
         },
         request: { name: requestName, done: str("request-done", "processed"), prompt: consumes },
         prompt:  { skill, template },
+        followup: followups,
         prepare: list("prepare-run"),
         success: { criteria, match },
         verdict: { label: str("verdict-label"), allow },
