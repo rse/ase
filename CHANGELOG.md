@@ -74,6 +74,11 @@ ChangeLog
     `ase_specbook_query` runs in the SpecBook worker thread like lint and export, and the `ase` task
     store plugin no longer reports its own writes during a rescan as external changes.
 
+-   BUGFIX [code]: No Lost Change Detections in the GitHub Task Store Plugin
+    The `github` task store plugin advances its polling state only after all changed issues were
+    collected, so a poll failing midway (e.g. on a network error) no longer silently drops the
+    detected changes, but lets the next poll report them.
+
 -   BUGFIX [code]: No Second Service After a Lost Port Race
     `ase service start` treats a spawned service, which cleanly exits after losing the port race to a
     concurrently started service of the same project, as a successful start, so it no longer clears

@@ -692,11 +692,12 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
         const state  = this.pollState(prjId)
         const params = { ...loc, state: "all" as const, sort: "updated" as const, direction: "asc" as const, since: state.since, per_page: 100 }
         let issues: Issue[]
+        let etag:   string | undefined
         try {
             const r = await this.gh.request("GET /repos/{owner}/{repo}/issues", {
                 ...params, headers: state.etag !== undefined ? { "if-none-match": state.etag } : {}
             })
-            state.etag = r.headers.etag
+            etag   = r.headers.etag
             issues = r.data as Issue[]
             if (issues.length === params.per_page)
                 issues.push(...await this.gh.paginate("GET /repos/{owner}/{repo}/issues", { ...params, page: 2 }) as Issue[])
@@ -707,23 +708,33 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
             throw err
         }
         const change = { added: [] as API.TaskEntry[], updated: [] as API.TaskEntry[], deleted: [] as string[] }
+        const seen   = new Map<number, string>()
+        let since    = state.since
         for (const issue of issues) {
             if (issue.pull_request !== undefined && issue.pull_request !== null)
                 continue
-            if (issue.updated_at > state.since)
-                state.since = issue.updated_at
-            if (state.seen.get(issue.number) === issue.updated_at)
+            if (issue.updated_at > since)
+                since = issue.updated_at
+            const last = seen.get(issue.number) ?? state.seen.get(issue.number)
+            if (last === issue.updated_at)
                 continue
-            const known = state.seen.has(issue.number)
-            state.seen.set(issue.number, issue.updated_at)
+            seen.set(issue.number, issue.updated_at)
             this.loads.delete(`${prjId}#${issue.number}`)
             if (!live(issue))
                 change.deleted.push(idOf(scheme, issue.number))
-            else if (!known && issue.created_at >= this.opened)
+            else if (last === undefined && issue.created_at >= this.opened)
                 change.added.push(await this.entry(loc, lifecycle, scheme, issue))
             else
                 change.updated.push(await this.entry(loc, lifecycle, scheme, issue))
         }
+
+        /*  advance the state only once all changes are collected, so a failed poll is
+            retried by the next one (without overriding newer writes in the meantime)  */
+        state.etag  = etag
+        state.since = since
+        for (const [ number, updated ] of seen)
+            if ((state.seen.get(number) ?? "") < updated)
+                state.seen.set(number, updated)
         if (this.timer !== null && (change.added.length > 0 || change.updated.length > 0 || change.deleted.length > 0))
             listener(prjId, change)
     }
