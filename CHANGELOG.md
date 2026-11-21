@@ -83,6 +83,11 @@ ChangeLog
     The `--followup-*` options collect their values into the command actually parsing them, so
     `ase agent <kind> restart` no longer silently drops them and restarts the agent without them.
 
+-   BUGFIX [code]: No Hidden Label Rejections in the GitHub Task Store Plugin
+    The `github` task store plugin tolerates a failed label creation only for an already existing
+    label, so a rejected one (like an `ase:<key>:<value>` label over 50 characters) is reported
+    with its reason before any relation or comment of the issue is modified.
+
 -   BUGFIX [code, docs]: No Overwrite of Concurrent Issue Changes via Stale Cached Loads
     The `github`, `gitlab`, and `gitea` task store plugins drop the cached load of an issue when
     determining its revision, so a conditional save or a part endpoint retry no longer pairs the

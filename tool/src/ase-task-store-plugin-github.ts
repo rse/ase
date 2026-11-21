@@ -376,10 +376,12 @@ class GitHubTaskStoragePlugin extends TaskIssues.IssueTaskStoragePlugin<Repo> im
             if (known.has(name.toLowerCase()))
                 continue
             await this.gh.rest.issues.createLabel({ ...loc, name, color: name.startsWith("ase:") ? "c5def5" : "ededed" })
-                .catch((err: unknown) => {
-                    /*  tolerate a label created concurrently  */
+                .catch(async (err: unknown) => {
+                    /*  tolerate a label created concurrently, but not a rejected one (like an invalid name)  */
                     if (statusOf(err) !== 422)
                         throw err
+                    if (await found(this.gh.rest.issues.getLabel({ ...loc, name })) === null)
+                        throw new Error(`label "${name}" cannot be created on GitHub (HTTP 422: ${(err as Error).message})`, { cause: err })
                 })
             known.add(name.toLowerCase())
         }
