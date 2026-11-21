@@ -191,6 +191,50 @@ const layout = (table: Table, avail: number,
     return { head, rows, w1, w2 }
 }
 
+/*  a detail card of a question or answer: its group, title, detail, optional
+    rationale, and the grid rows "first" to "last" of its entire table row  */
+type Spot = { group: string, title: Char[], detail: string, reason: Char[] | undefined,
+    first: number, last: number, question: boolean }
+
+/*  draw the detail card of a question or answer in the latest table: its detail
+    (plus its optional rationale, below a blank line) inside a
+    heavy frame of the width of its column, with the number, focus, and topic
+    of the question resp. the short response and the
+    label of the answer as its title in the top edge (inverse, in the frame
+    color, with a blank on both sides), placed absolutely in the question resp.
+    answer column (with the grid rows "first" to "last" of the entire table row)
+    starting at the first grid row of the following table row if it fits into
+    the grid (or no previous table row exists), else ending at the last grid row
+    of the previous table row (so the hovered table row stays visible and
+    reachable), and revealed while any line of the question
+    resp. answer is hovered (appended after all grid rows and the text after the
+    table, as an absolute box paints over the boxes before it only)  */
+const card = (ui: Elements["terminal"], w1: number, w2: number,
+    { group, title, detail, reason, first, last, question }: Spot, rowsTotal: number): RenderElement => {
+    const { Box, Text } = ui
+    const span  = question ? w1 : w2
+    const rim   = (text: string) => uniform(text, false, RIM)
+    const label = [ ...title ]
+    while (width(label) > span - 6)
+        label.pop()
+    const body  = [ ...wrap([ ...uniform("WHAT: ", true, undefined), ...style(detail, undefined) ], span - 4, 0),
+        ...(reason !== undefined ? [ [], ...wrap(reason, span - 4, 0) ] : []) ]
+    const lines = [
+        [ ...rim("┏━"), ...[ ...uniform(" ", true, RIM), ...label, ...uniform(" ", true, RIM) ]
+            .map((char) => ({ ...char, color: RIM, inverse: true })),
+        ...rim(`${"━".repeat(Math.max(0, span - 5 - width(label)))}┓`) ],
+        ...body.map((line) => [ ...rim("┃ "), ...glyphs(line),
+            ...uniform(" ".repeat(Math.max(0, span - 4 - width(line))), false, undefined), ...rim(" ┃") ]),
+        rim(`┗${"━".repeat(span - 2)}┛`)
+    ]
+    const below = last + 2
+    const above = first - 1 - lines.length
+    const top   = below + lines.length <= rowsTotal || above < 0 ? below : above
+    return Box({ position: "absolute", top, left: question ? 2 : w1 + 5, width: span, flexDirection: "column",
+        display: "none", hover: { scope: group, display: "flex" },
+        children: lines.map((line) => Text({ wrap: "truncate-end", children: paint(Text, line) })) })
+}
+
 /*  the grill table: its state and its operations  */
 export const modGrill = () => {
     /*  the last known width of the terminal, the already seen tables, the
@@ -332,43 +376,6 @@ export const modGrill = () => {
             ]
         }
 
-        /*  draw the detail card of a question or answer in the latest table: its detail
-            (plus its optional rationale, below a blank line) inside a
-            heavy frame of the width of its column, with the number, focus, and topic
-            of the question resp. the short response and the
-            label of the answer as its title in the top edge (inverse, in the frame
-            color, with a blank on both sides), placed absolutely in the question resp.
-            answer column (with the grid rows "first" to "last" of the entire table row)
-            starting at the first grid row of the following table row if it fits into
-            the grid (or no previous table row exists), else ending at the last grid row
-            of the previous table row (so the hovered table row stays visible and
-            reachable), and revealed while any line of the question
-            resp. answer is hovered (appended after all grid rows and the text after the
-            table, as an absolute box paints over the boxes before it only)  */
-        const card = (group: string, title: Char[], detail: string, reason: Char[] | undefined,
-            first: number, last: number, question: boolean, rowsTotal: number): RenderElement => {
-            const span  = question ? w1 : w2
-            const rim   = (text: string) => uniform(text, false, RIM)
-            const label = [ ...title ]
-            while (width(label) > span - 6)
-                label.pop()
-            const lines = [
-                [ ...rim("┏━"), ...[ ...uniform(" ", true, RIM), ...label, ...uniform(" ", true, RIM) ]
-                    .map((char) => ({ ...char, color: RIM, inverse: true })),
-                ...rim(`${"━".repeat(Math.max(0, span - 5 - width(label)))}┓`) ],
-                ...[ ...wrap([ ...uniform("WHAT: ", true, undefined), ...style(detail, undefined) ], span - 4, 0),
-                    ...(reason !== undefined ? [ [], ...wrap(reason, span - 4, 0) ] : []) ].map((line) => [ ...rim("┃ "), ...glyphs(line),
-                    ...uniform(" ".repeat(Math.max(0, span - 4 - width(line))), false, undefined), ...rim(" ┃") ]),
-                rim(`┗${"━".repeat(span - 2)}┛`)
-            ]
-            const below = last + 2
-            const above = first - 1 - lines.length
-            const top   = below + lines.length <= rowsTotal || above < 0 ? below : above
-            return Box({ position: "absolute", top, left: question ? 2 : w1 + 5, width: span, flexDirection: "column",
-                display: "none", hover: { scope: group, display: "flex" },
-                children: lines.map((line) => Text({ wrap: "truncate-end", children: paint(Text, line) })) })
-        }
-
         /*  draw the table as a grid: a rule between all rows and one answer per line
             (remembering the grid rows of the table rows of the questions and answers with
             a detail for their cards, and prefixing a detail by "WHAT", and a rationale by
@@ -381,8 +388,7 @@ export const modGrill = () => {
                 [ "│ ", ...padded(head[0]!, w1), " │ ", ...padded(head[1]!, w2), " │" ] }),
             rule("├", "┼", "┤")
         ]
-        const spots: { group: string, title: Char[], detail: string, reason: Char[] | undefined,
-            first: number, last: number, question: boolean }[] = []
+        const spots: Spot[] = []
         rows.forEach((row, k) => {
             const number = table.rows[k]!.number
             const mark   = spots.length
@@ -424,8 +430,7 @@ export const modGrill = () => {
                 spot.last = grid.length - 1
             grid.push(k < rows.length - 1 ? rule("├", "┼", "┤") : rule("└", "┴", "┘"))
         })
-        const cards = spots.map(({ group, title, detail, reason, first, last, question }) =>
-            card(group, title, detail, reason, first, last, question, grid.length))
+        const cards = spots.map((spot) => card(ui, w1, w2, spot, grid.length))
 
         /*  mimic the reply row of the engine: blank row above and bullet gutter  */
         return Box({ flexDirection: "row", marginTop: 1, width: "100%", children: [

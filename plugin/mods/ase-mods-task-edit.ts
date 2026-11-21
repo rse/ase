@@ -43,7 +43,8 @@ export const TOOL = {
     lines and words of the diff, with the codes the diffs of the session end up with, so
     they look alike under any recoloring, where the accent and the removed lines use
     the terminal palette, as the engine maps a color name to a fixed color and
-    refuses "ansi:*"), and the changed share of the words up to which they are shown  */
+    refuses "ansi:*"), the changed share of the words up to which they are shown, and
+    the most word pairs compared for that  */
 const CLOSE  = /^(?:DONE|GRILL|DRAFT|IMPLEMENT|CANCEL)$/i
 const TAG    = /\n<task-plan-tag>[^<]*<\/task-plan-tag>\s*$/
 const HEIGHT = 0.75
@@ -60,6 +61,7 @@ const ADDWD  = "ansi256(157)"
 const DELWD  = "ansi256(217)"
 const DELFG  = "ansi256(16)"
 const ALIKE  = 0.4
+const PAIRS  = 1000000
 
 /*  a task band: the scroll state of its frame, the task, the plan sections under
     focus (empty for the entire task), the loaded task and its predecessor (if it
@@ -258,11 +260,14 @@ const tokens = (lines: Char[][]): Token[] => lines.flatMap((line, row) => {
 })
 
 /*  emphasize the changed words of the removed and added lines of a change (and the
-    blanks between adjacent ones), unless too many of the words changed, where the
-    words alone decide, so a change of the wrapping only emphasizes nothing  */
+    blanks between adjacent ones), unless there are too many words to compare or too
+    many of them changed, where the words alone decide, so a change of the wrapping
+    only emphasizes nothing  */
 const emphasize = (removed: Char[][], added: Char[][]): [ Char[][], Char[][] ] => {
     const a     = tokens(removed)
     const b     = tokens(added)
+    if (a.length * b.length > PAIRS)
+        return [ removed, added ]
     const steps = align(a.map((token) => token.text), b.map((token) => token.text))
     if (steps.filter(({ sign }) => sign !== " ").length > (a.length + b.length) * ALIKE)
         return [ removed, added ]

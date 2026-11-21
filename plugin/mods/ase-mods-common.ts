@@ -22,9 +22,10 @@ import type { Elements, Frozen, MatchedEvent, McpToolResult, ModelCompleteReques
     in a plugin directory, the forked and the plain model completion, the
     waiting, the reading and filling of the prompt, the loading of a task
     (with its entity tag), the running of a repeating timer, the rasterizing
-    of an image (by the MCP tool "ase_rasterize"), the reading of a file
-    as bytes (base64), the swapping of the source of a drawn keyed image,
-    and the probe whether the terminal can show inline images  */
+    of an image (by the MCP tool "ase_rasterize"), the rendering of a diagram
+    (by the MCP tool "ase_diagram"), the reading of a file as bytes (base64),
+    the swapping of the source of a drawn keyed image, and the probe whether
+    the terminal can show inline images  */
 export type Engine = {
     invalidate: () => void,
     read:       (file: string) => Promise<string>,
