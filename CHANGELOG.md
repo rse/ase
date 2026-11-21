@@ -45,6 +45,10 @@ ChangeLog
     The statistics view of the terminal and web task boards is now labeled `task-stats`, in line
     with the other views `task-lanes`, `task-graph`, `agent-logs`, and `agent-graph`.
 
+-   IMPROVEMENT [docs]: npm Statistics on the Website
+    The `Project` pull-down menu of the website header provides a new entry `Statistics`,
+    linking to the npm download statistics of `@rse/ase` on npmchart.com.
+
 -   BUGFIX [code]: Web Search Through Any Search Tool
     The `ase:ase-meta-search` sub-agent no longer has a fixed tool allowlist, but uses any available
     Web search tool (e.g. of an LLM gateway), and `ase-meta-search` and `ase-task-research` provide
@@ -85,9 +89,9 @@ ChangeLog
     The HARD auto-warm buttons of the cache band no longer carry the digit hotkeys `0`-`5`, as a
     digit typed into the empty prompt (e.g. a grilling answer) accidentally pressed them.
 
--   IMPROVEMENT [docs]: npm Statistics on the Website
-    The `Project` pull-down menu of the website header provides a new entry `Statistics`,
-    linking to the npm download statistics of `@rse/ase` on npmchart.com.
+-   UPDATE [infr]: Upgraded NPM Dependencies
+    Upgraded the dependencies of `pages/`, `plugin/`, and `tool/`, among them `@lucide/astro`,
+    `@videojs/html`, `vue`, `undici`, `@gitbeaker/rest`, and `markdownlint-cli2`.
 
 2.1.3 (2026-11-20)
 ------------------
