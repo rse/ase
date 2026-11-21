@@ -91,12 +91,22 @@ currently staged Git changes.
 
     <if condition="
         a `CHANGELOG.md` file exists in the project (or in any affected
+        sub-package), is *not* itself part of the staged changes, but
+        carries *unstaged* changes (check with the command
+        `git diff --name-only -- <changelog-path/>`)
+    ">
+    <ase-tpl-hint level="minimal">
+    The `CHANGELOG.md` changes are still unstaged -- use `git add -p CHANGELOG.md` or `/ase-repo-stage --entry` to stage them before committing.
+    </ase-tpl-hint>
+    </if>
+    <elseif condition="
+        a `CHANGELOG.md` file exists in the project (or in any affected
         sub-package) and is *not* itself part of the staged changes
     ">
     <ase-tpl-hint level="normal">
     The staged changes do not touch `CHANGELOG.md` -- use `/ase-repo-changelog` to update its entries before committing.
     </ase-tpl-hint>
-    </if>
+    </elseif>
 
     </step>
 

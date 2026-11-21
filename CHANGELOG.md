@@ -42,6 +42,11 @@ ChangeLog
     result table listing every problem with its outcome (`APPLIED`, `SKIPPED`, or `FAILED`), so the
     applied changes stay visible also when only the final reply text is shown (e.g. headless).
 
+-   BUGFIX [code]: Accurate Hint on Unstaged `CHANGELOG.md` in `ase-repo-commit`
+    `ase-repo-commit` now hints to stage a `CHANGELOG.md` with only unstaged changes instead of
+    asking to run `ase-repo-changelog` again, and `ase-repo-changelog` hints that its update is
+    still unstaged, which it deliberately keeps, as the file may carry further unrelated changes.
+
 -   BUGFIX [code]: Paint Grilling Detail Cards over the Legend
     The hover cards of the grilling table are now drawn after the text following the table, so a
     card extending below the table paints over the legend instead of being overlapped by it.

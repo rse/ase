@@ -27,6 +27,11 @@ The layout of the entries follows the style of the existing entries
 of the file (e.g. a single line, a title line plus an explaining body,
 or a wrapped sentence), and each entry is kept within about 5 lines.
 
+The updated `CHANGELOG.md` is left *unstaged*, as it may carry further
+unrelated changes. Stage the new entry yourself (e.g. via `git add -p`),
+or use `ase-repo-stage --changelog` to update and stage it together
+with a selection of changes.
+
 ##  SCENARIOS
 
 -   You want the `CHANGELOG.md` brought up to date with recent commits
@@ -43,4 +48,4 @@ Update the most recent ChangeLog section:
 
 ##  SEE ALSO
 
-[`ase-repo-commit`](../ase-repo-commit/help.md), [`ase-docs-proofread`](../ase-docs-proofread/help.md).
+[`ase-repo-commit`](../ase-repo-commit/help.md), [`ase-repo-stage`](../ase-repo-stage/help.md), [`ase-docs-proofread`](../ase-docs-proofread/help.md).

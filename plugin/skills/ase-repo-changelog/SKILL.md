@@ -222,6 +222,22 @@ Processing
     You *MUST* *NOT* output the resulting entries a second time, any
     further summary, or any further explanations.
 
+    The `CHANGELOG.md` file is deliberately left *unstaged*, as it may
+    carry further unrelated changes. Finally, give the closing hint by
+    expanding the following (which, depending on the configured
+    <ase-guidance-level/>, may expand into nothing and hence emit no
+    output at all):
+
+    <if condition="
+        there are staged changes in the Git index, and this skill was
+        *not* invoked by the `ase-repo-stage` skill (which stages the
+        entries itself)
+    ">
+    <ase-tpl-hint level="minimal">
+    The updated `CHANGELOG.md` is still unstaged -- use `git add -p CHANGELOG.md` or `/ase-repo-stage --entry` to stage it before `/ase-repo-commit`.
+    </ase-tpl-hint>
+    </if>
+
     </step>
 
 </flow>
