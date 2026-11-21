@@ -168,6 +168,10 @@ ChangeLog
     The CLI is updated via `npm install -g @rse/ase@<latest>` instead of `npm update -g`, which never
     crosses a major version, so the CLI no longer silently stays behind the updated plugin.
 
+-   BUGFIX [code]: No Unassigning by Confirming the Assign Popup in the Web Task Board
+    The assign popup prefills the assignee of tasks not on the filtered board (graph context nodes,
+    tasks opened via dependency links) from the service, so RETURN no longer unassigns them.
+
 -   BUGFIX [infr]: Re-Runnable Website Deployment
     The GitHub Pages workflow names its artifact per run attempt, so a re-run no longer fails with
     `Multiple artifacts named "github-pages" were unexpectedly found for this workflow run`.

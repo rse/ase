@@ -96,10 +96,24 @@ export const assignUnknown = computed(() => {
         && !assignOptions.value.some((choice) => choice.name === name)
 })
 
-/*  open the assign popup of a task, prefilled with its assignee  */
-const openAssign = (id: string) => {
+/*  open the assign popup of a task, prefilled with its assignee, where the assignee of a task not
+    on the (possibly filtered) board, e.g. opened via a dependency link, is fetched from the service  */
+const openAssign = async (id: string) => {
     const card = board.value?.groups.flatMap((g) => g.lanes).flatMap((l) => l.cards).find((c) => c.id === id)
-    assign.value = { id, name: card?.assignee ?? "", typed: "" }
+    let name = card?.assignee
+    if (name === undefined) {
+        const res = await api<{ plan: { keys: [ string, string ][] } }>(`/task-board/api/task/${encodeURIComponent(id)}`)
+        if (res.error !== undefined) {
+            actionError.value = res.error
+            return
+        }
+        name = (res.plan.keys.find(([ k ]) => k === "Assignee")?.[1] ?? "").trim()
+
+        /*  never open the popup over another one opened meanwhile  */
+        if (confirmDel.value !== null || transfer.value !== null || assign.value !== null || prompt.value !== null)
+            return
+    }
+    assign.value = { id, name, typed: "" }
     nextTick(() => assignEl.value?.select())
 }
 
