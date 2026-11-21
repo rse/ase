@@ -14,6 +14,7 @@
     [`--exclude`|`-e`=*aspect*[`,`...]]
     [`--staged`]
     [`--unstaged`]
+    [`--worktree`|`-w` *name*]
     [*source-reference*]
 
 ##  DESCRIPTION
@@ -105,6 +106,13 @@ the code, and comments contradicting the code.
     counts as changed entirely. Deleted files are skipped. Combined
     with `--staged`, lint the hunks of *any* uncommitted Git changes.
 
+-   `--worktree`|`-w` *name*:
+    Lint inside the existing ASE worktree `.ase/worktree/`*name*
+    instead of the current working copy: `--staged` and `--unstaged`
+    refer to the Git changes of this worktree, and a relative
+    *source-reference* is resolved against it. A missing worktree
+    aborts the skill with an error.
+
 ##  ARGUMENTS
 
 -   *source-reference*:
@@ -177,6 +185,12 @@ Lint only the hunks of the unstaged changes and the untracked source files and a
 
 ```text
 ❯ /ase-code-lint --auto --unstaged
+```
+
+Lint and correct the uncommitted changes of the ASE worktree `feature`:
+
+```text
+❯ /ase-code-lint --auto --unstaged --worktree feature
 ```
 
 ##  SEE ALSO

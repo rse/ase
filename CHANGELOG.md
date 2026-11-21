@@ -20,6 +20,10 @@ ChangeLog
     report (and correct) only the problems within the changed hunks of the Git changeset (from `git
     diff -U0`), instead of all problems of the touched files, where untracked files count entirely.
 
+-   IMPROVEMENT [code]: Worktree Option for `ase-code-lint`
+    Add a `--worktree`/`-w` option to `ase-code-lint`, linting inside an existing ASE worktree, so
+    `--staged` and `--unstaged` refer to its Git changes and relative source references resolve there.
+
 -   IMPROVEMENT [code]: No Attachments in `ase-task-edit` Rendering
     The plan printed by `ase-task-edit` now omits the attachment blocks of its backmatter, as they
     are irrelevant to refining the plan and are shown by `ase-task-view` instead.

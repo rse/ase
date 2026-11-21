@@ -1,6 +1,6 @@
 ---
 name: ase-code-lint
-argument-hint: "[--help|-h] [--auto|-a] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--force|-f] [--include|-i=<aspect>[,...]] [--exclude|-e=<aspect>[,...]] [--staged] [--unstaged] [<source-reference>]"
+argument-hint: "[--help|-h] [--auto|-a] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--force|-f] [--include|-i=<aspect>[,...]] [--exclude|-e=<aspect>[,...]] [--staged] [--unstaged] [--worktree|-w <name>] [<source-reference>]"
 description: >
     Lint source code for potential code quality problems.
     Use when the user wants to "lint" or "check" source code.
@@ -24,7 +24,7 @@ Lint Source Code
 
 <expand name="getopt"
     arg1="ase-code-lint"
-    arg2="--auto|-a --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --force|-f --include|-i=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --exclude|-e=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --staged --unstaged">
+    arg2="--auto|-a --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --force|-f --include|-i=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --exclude|-e=(none|A01|A02|A03|A04|A05|A06|A07|A08|A09|A10|A11|A12|A13|A14|A15|A16|A17|A18|A19|A20|A21)... --staged --unstaged --worktree|-w=">
     $ARGUMENTS
 </expand>
 
@@ -93,6 +93,23 @@ related to a set of code quality aspects.
     transcript. The sub-agents perform the silent reading and checking;
     only their final structured return values are consumed here.
 
+    Set <work-dir></work-dir> (empty). If <getopt-option-worktree/> is
+    not empty, *silently* determine the directory of this existing ASE
+    worktree: if <getopt-option-worktree/> consists of other characters
+    than `A-Z`, `a-z`, `0-9`, `_`, and `-`, set <work-dir/> to empty,
+    else call the `ase_worktree_path(id: "<getopt-option-worktree/>",
+    create: false)` tool of the `ase` MCP server (you *MUST* *NEVER*
+    assemble this path yourself), capture its result into <work-dir/>,
+    and run the command `git -C "<work-dir/>" rev-parse --show-toplevel`
+    (taken exactly as given). If <work-dir/> is empty, the tool call
+    failed, or the command failed (i.e., the worktree does not exist),
+    only output the following <template/> and then *STOP* the entire
+    flow (do not perform any further steps):
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-code-lint**, ▶ ERROR: no worktree **<getopt-option-worktree/>** to lint
+    </template>
+
     <if condition="<getopt-option-staged/> is equal `true` or <getopt-option-unstaged/> is equal `true`">
 
     For this, first *silently* restrict the linting to the *changed*
@@ -101,9 +118,10 @@ related to a set of code quality aspects.
     <getopt-option-unstaged/> are equal `true`, set
     <changes>staged</changes> if only <getopt-option-staged/> is equal
     `true`, and set <changes>unstaged</changes> otherwise. Determine the
-    *repository root* by running the command `git rev-parse
-    --show-toplevel` (taken exactly as given) and capturing its output
-    into <repo-root/>. Then determine the changed files by running the
+    *repository root* <repo-root/>: set it to <work-dir/> if this is not
+    empty, else run the command `git rev-parse --show-toplevel` (taken
+    exactly as given) and capture its output into <repo-root/>. Then
+    determine the changed files by running the
     corresponding commands (taken exactly as given), each listing one
     path relative to <repo-root/> per line, and collect all listed
     paths, dropping duplicates:
@@ -164,10 +182,11 @@ related to a set of code quality aspects.
     <else>
 
     For this, first *silently* resolve `<getopt-arguments/>` to the
-    list <sources/> of individual source code files, expanding any
-    directory or wildcard references with the `Glob` tool (or, if the
-    `Glob` tool is not available, with the `find` command via the
-    `Bash` tool).
+    list <sources/> of individual source code files (with relative
+    references resolved against <work-dir/> if this is not empty),
+    expanding any directory or wildcard references with the `Glob` tool
+    (or, if the `Glob` tool is not available, with the `find` command
+    via the `Bash` tool).
 
     If <sources/> is empty (no *source-reference* given or none of it
     resolvable), only output the following <template/> and then *STOP*
@@ -217,7 +236,8 @@ related to a set of code quality aspects.
     and only if at least one `change-hunks` entry of any of its
     `change-set` entries *overlaps* a changed line range in <ranges/> of
     the `file` of that `change-set` entry (resolving a relative `file`
-    against the current working directory), and *silently drop* all
+    against <work-dir/> if this is not empty, else against the current
+    working directory), and *silently drop* all
     other problems. A change hunk covers the lines `line` to `line` +
     <n/> - 1, where <n/> is the number of lines of its `old_text`, or,
     for a *pure insertion* with an empty `old_text`, the two lines
@@ -647,7 +667,7 @@ related to a set of code quality aspects.
 
         <if condition="<getopt-option-auto/> is not equal `true`">
         <ase-tpl-hint level="verbose">
-        Use `/ase-code-lint --auto` to apply all corrections unattended, `--severity` to raise the reporting floor, `--force` to ignore the project boxing, `--include`/`--exclude` to narrow the checked aspects, and `--staged`/`--unstaged` to lint only the changed hunks.
+        Use `/ase-code-lint --auto` to apply all corrections unattended, `--severity` to raise the reporting floor, `--force` to ignore the project boxing, `--include`/`--exclude` to narrow the checked aspects, `--staged`/`--unstaged` to lint only the changed hunks, and `--worktree` to lint inside an ASE worktree.
         </ase-tpl-hint>
         </if>
 
