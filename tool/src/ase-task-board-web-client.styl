@@ -148,6 +148,13 @@ body
     color: var(--c-signal)
     font-size: 0.6875rem
 
+/*  the separators between the key hints and info items, and the actions after the key caps  */
+.sep
+    margin: 0 0.6rem
+    color: var(--c-mute)
+.action
+    margin-left: 0.4rem
+
 /*  the header  */
 header
     display: flex
@@ -167,11 +174,6 @@ header
     top: 0
     z-index: 5
     color: var(--c-text-soft)
-
-    /*  the separators between the header elements  */
-    .sep
-        margin: 0 0.6rem
-        color: var(--c-mute)
 
     /*  the application name and the read-only header values, emphasized but without a box  */
     .emph
@@ -663,11 +665,6 @@ header
         background: none
         cursor: pointer
         color: var(--c-text-soft)
-
-    /*  the separator between the visible groups and the scroll hint  */
-    .sep
-        margin: 0 0.6rem
-        color: var(--c-mute)
 
     /*  the hint to show the hidden key hints again, separated only from a preceding info
         (and then joined to it, without the gap of the flex layout)  */
@@ -1349,15 +1346,6 @@ footer
             .off
                 color: var(--c-signal)
 
-    /*  the separators between the key hints  */
-    .sep
-        margin: 0 0.6rem
-        color: var(--c-mute)
-
-    /*  the actions after the key caps of the key hints  */
-    .action
-        margin-left: 0.4rem
-
 /*  the key caps of the board footer, the info line, the dialog footer, the deletion confirmation, the transfer popup, the assign popup, and the prompt popup  */
 footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys kbd, #assign .keys kbd, #prompt .keys kbd
     display: inline-block
@@ -1553,11 +1541,6 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
     .keys
         color: var(--c-text-soft)
         font-size: 0.6875rem
-        .sep
-            margin: 0 0.6rem
-            color: var(--c-mute)
-        .action
-            margin-left: 0.4rem
 
 /*  the prompt popup: in accent color, with its question in normal color (but bold),
     and with a multi-line text area for the prompt, in monospace font and accent color
@@ -2065,15 +2048,6 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
         border-radius: 0 0 10px 10px
         color: var(--c-text-soft)
         font-size: 0.6875rem
-
-        /*  the separators between the key hints  */
-        .sep
-            margin: 0 0.6rem
-            color: var(--c-mute)
-
-        /*  the actions after the key caps of the key hints  */
-        .action
-            margin-left: 0.4rem
 
 /*  the edit and close buttons of the header of the task dialog  */
 .close

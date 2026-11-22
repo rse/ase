@@ -21,6 +21,10 @@ ChangeLog
     The `pre-tool-use` hook denies only shell commands printing skill output, but no longer commands
     writing the prefix into files (redirections, `tee`, in-place edits, interpreter file writes).
 
+-   REFACTOR [code]: Shared Separator Styling of the Web Task Board
+    The separators and key hint actions of the web board are styled through one global rule
+    instead of five copies.
+
 2.1.5 (2026-11-21)
 ------------------
 
