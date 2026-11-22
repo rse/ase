@@ -308,7 +308,15 @@ Workflow
         non-empty <change-set/>, the `file` of its first entry and the
         `line` of that entry's first hunk).
 
-    6.  If <problems/> is not empty, set
+    6.  Set <evidence/> to the comma-separated list of one
+        `{ "file": <file/>, "lines": [ <first/>, <last/> ] }` entry per
+        place exhibiting the problem (e.g. every object of a model-wide
+        inconsistency, the defective statement), with the *relative*
+        filename <file/> and the 1-based, inclusive line range
+        <first/>-<last/> of its current state. A place where the change
+        set merely inserts new content is *never* evidence.
+
+    7.  If <problems/> is not empty, set
         <problems><problems/>,</problems> (append a comma).
         Then append the following <template/> to <problems/>:
 
@@ -319,6 +327,7 @@ Workflow
                 "description": <description/>,
                 "file":        <anchor-file/>,
                 "line":        <anchor-line/>,
+                "evidence":    [ <evidence/> ],
                 "change-set": [
                     <change-set/>
                 ]

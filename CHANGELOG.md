@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code, docs]: No Unrelated Findings in Changeset Linting
+    Under `--staged`/`--unstaged`, `ase-code-lint` and `ase-spec-lint` keep a problem only if its new
+    `evidence` lines overlap the changeset, no longer if its correction touches adjacent lines, and
+    count the problems outside the changeset in the summary.
+
 -   SECURITY [code, docs]: Bearer Token Authentication of the ASE Service
     `ase service` requires a bearer token, kept in the user-private `.ase/service.yaml`, on every request
     (`project.service.auth`, user scope only: `none`, `temporary`, or `persisted`). The web board logs in via a

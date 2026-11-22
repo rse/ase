@@ -437,7 +437,15 @@ Workflow
                 }
             </template>
 
-    5.  If <problems/> is not empty, set
+    5.  Set <evidence/> to the comma-separated list of one
+        `{ "file": <file/>, "lines": [ <first/>, <last/> ] }` entry per
+        place exhibiting the problem (e.g. every copy of duplicated
+        code, the undocumented declaration), with the *relative*
+        filename <file/> and the 1-based, inclusive line range
+        <first/>-<last/> of its current state. A place where the change
+        set merely inserts new code is *never* evidence.
+
+    6.  If <problems/> is not empty, set
         <problems><problems/>,</problems> (append a comma).
         Then append the following <template/> to <problems/>:
 
@@ -446,6 +454,7 @@ Workflow
                 "aspect":      <aspect/>,
                 "severity":    <severity/>,
                 "description": <description/>,
+                "evidence":    [ <evidence/> ],
                 "change-set": [
                     <change-set/>
                 ]

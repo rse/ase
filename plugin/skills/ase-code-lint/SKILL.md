@@ -235,16 +235,17 @@ related to a set of code quality aspects.
 
     <if condition="<getopt-option-staged/> is equal `true` or <getopt-option-unstaged/> is equal `true`">
     Then *restrict* <problems/> to the changeset: *keep* a problem if
-    and only if at least one `change-hunks` entry of any of its
-    `change-set` entries *overlaps* a changed line range in <ranges/> of
-    the `file` of that `change-set` entry (resolving a relative `file`
-    against <work-dir/> if this is not empty, else against the current
-    working directory), and *silently drop* all
-    other problems. A change hunk covers the lines `line` to `line` +
-    <n/> - 1, where <n/> is the number of lines of its `old_text`, or,
-    for a *pure insertion* with an empty `old_text`, the two lines
-    `line` - 1 and `line` adjacent to the insertion point.
+    and only if at least one entry of its `evidence` field has a
+    `lines` range *overlapping* a changed line range in <ranges/> of the
+    `file` of that entry (resolving a relative `file` against
+    <work-dir/> if this is not empty, else against the current working
+    directory), and move all other problems into <outside/>. The lines
+    touched by the `change-set` of a problem *never* count, as a
+    correction may edit lines next to the changeset.
     </if>
+    <else>
+    Set <outside/> to empty.
+    </else>
 
     Then determine the *effective severity floor* <floor/>: define the
     ordinal rank `LOW`=1, `MEDIUM`=2, `HIGH`=3.
@@ -264,7 +265,8 @@ related to a set of code quality aspects.
     in <problems/> if and only if its `severity` field is `ACCEPTED` *or*
     `rank(severity)` is greater than or equal to `rank(<floor/>)`;
     *silently drop* all other problems. With the floor `LOW`, all
-    problems are kept. `ACCEPTED` problems are *never* dropped.
+    problems are kept. `ACCEPTED` problems are *never* dropped. Apply
+    the same floor to <outside/>.
 
     Finally, sort the surviving problems in <problems/> by their
     `severity` field from highest to lowest in the fixed order `HIGH`,
@@ -297,6 +299,14 @@ related to a set of code quality aspects.
     ⧉ **ASE**: **LINT SUMMARY**:
 
     *(no problems detected)*
+    </template>
+
+    In both cases, if <outside/> is not empty, append a blank line and
+    the following <template/>, where <count/> is the number of problems
+    in <outside/>. These problems are *never* reported or corrected.
+
+    <template>
+    *(<count/> further problems outside the <changes/> changeset not shown)*
     </template>
 
     You *MUST* *NOT* output anything else in this STEP 2.

@@ -114,6 +114,8 @@ are *never* applied under `--auto`.
     in their current working copy state, so for a file with additional
     unstaged changes, these hunks count as changed, too. Combined with
     `--unstaged`, lint the hunks of *any* uncommitted Git changes.
+    Problems outside the hunks, even if their correction would touch
+    adjacent lines, are only counted in the summary.
 
 -   `--unstaged`:
     Restrict the linting to the specification files with *unstaged* Git
@@ -121,7 +123,8 @@ are *never* applied under `--auto`.
     correct) only the problems within their changed hunks, where an
     untracked file counts as changed entirely. Deleted files are
     skipped. Combined with `--staged`, lint the hunks of *any*
-    uncommitted Git changes.
+    uncommitted Git changes. Problems outside the hunks are only
+    counted in the summary.
 
 ##  ARGUMENTS
 

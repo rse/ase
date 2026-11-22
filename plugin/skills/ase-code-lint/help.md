@@ -105,6 +105,8 @@ the code, and comments contradicting the code.
     current working copy state, so for a file with additional unstaged
     changes, these hunks count as changed, too. Combined with
     `--unstaged`, lint the hunks of *any* uncommitted Git changes.
+    Problems outside the hunks, even if their correction would touch
+    adjacent lines, are only counted in the summary.
 
 -   `--unstaged`:
     Restrict the linting to the source files with *unstaged* Git changes
@@ -112,6 +114,7 @@ the code, and comments contradicting the code.
     the problems within their changed hunks, where an untracked file
     counts as changed entirely. Deleted files are skipped. Combined
     with `--staged`, lint the hunks of *any* uncommitted Git changes.
+    Problems outside the hunks are only counted in the summary.
 
 -   `--worktree`|`-w` *name*:
     Lint inside the existing ASE worktree `.ase/worktree/`*name*
