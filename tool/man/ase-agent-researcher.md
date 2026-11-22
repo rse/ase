@@ -121,8 +121,7 @@ further dispatching.
 
 On its start in the mode `request`, the researcher marks the requests left in
 `kind="research-running"` by any terminated researcher process of the
-same user on the same host (whose run lock is gone or stale and whose
-process is no longer alive) as failed (`kind="research-failed"`), and
+same user on the same host (whose process is no longer alive) as failed (`kind="research-failed"`), and
 restores the previous assignees of their tasks.
 
 Both modes can run side by side as two agents of the kind `researcher`

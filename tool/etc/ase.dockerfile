@@ -12,10 +12,11 @@ FROM        node:24-alpine
 SHELL       [ "/bin/ash", "-eo", "pipefail", "-c" ]
 
 #   install additional tools
-#   (libgcc, libstdc++ and ripgrep are required by the native Claude Code CLI on Alpine Linux)
+#   (libgcc, libstdc++ and ripgrep are required by the native Claude Code CLI on Alpine Linux,
+#   procps provides the "ps -o lstart= -p" of the agent run recovery, unsupported by BusyBox)
 RUN         apk add --no-cache \
                 bash git openssh-client ca-certificates curl jq less vim \
-                ripgrep libgcc libstdc++
+                ripgrep libgcc libstdc++ procps
 
 #   install ASE CLI tool from the locally packed package
 ARG         ASE_VERSION

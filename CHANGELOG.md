@@ -5,6 +5,10 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code, docs]: Immediate Recovery of Crashed Agents Restarted by the Fleet
+    A run whose recorded process is provably dead is recovered right away, independent of its
+    still fresh run lock, by seizing it through an own seize lock. The container image adds `procps`.
+
 -   BUGFIX [code, docs]: No Denied File Edits Containing the `⧉ ASE` Prefix
     The `pre-tool-use` hook denies only shell commands printing skill output, but no longer commands
     writing the prefix into files (redirections, `tee`, in-place edits, interpreter file writes).

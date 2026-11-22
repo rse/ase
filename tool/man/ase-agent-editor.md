@@ -82,8 +82,7 @@ further dispatching.
 
 On its start, the editor marks the requests left in
 `kind="edit-running"` by any terminated editor process of the same user
-on the same host (whose run lock is gone or stale and whose process is
-no longer alive) as failed (`kind="edit-failed"`), and restores the
+on the same host (whose process is no longer alive) as failed (`kind="edit-failed"`), and restores the
 previous assignees of their tasks. See `ase-agent`(1) for the common
 mechanics of all agents.
 

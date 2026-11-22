@@ -107,7 +107,7 @@ export abstract class RequestAgent extends Agent {
     }
 
     /*  recover the requests of terminated agent processes of its kind of the same user
-        on this host (whose run lock is gone or stale and whose process is gone) by marking
+        on this host (whose process is gone, see "AgentRun.alive") by marking
         them as failed and restoring the previous assignee of their tasks, and remove the
         run locks left behind by terminated runs, except those still recording claims, as
         these are left to the recovery of the phase agents sharing the run namespace (like
