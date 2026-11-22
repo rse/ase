@@ -5,6 +5,10 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   UPDATE [infr]: No High Advisories in Transitive NPM Dependencies
+    Upgrades `json-asty`, `@rse/mrcs`, and `@rse/specbook`, and pins fixed versions of `axios`,
+    `fast-xml-parser`, and `underscore` via overrides.
+
 -   BUGFIX [code, docs]: Immediate Recovery of Crashed Agents Restarted by the Fleet
     A run whose recorded process is provably dead is recovered right away, independent of its
     still fresh run lock, by seizing it through an own seize lock. The container image adds `procps`.
