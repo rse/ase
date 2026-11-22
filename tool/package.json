@@ -116,7 +116,7 @@
         "@rse/specbook":                    "1.6.4",
         "markdownlint":                     "0.42.2",
         "tail":                             "2.2.6",
-        "source-code-error":                "1.2.0",
+        "source-code-error":                "1.2.1",
         "pure-uuid":                        "2.0.0",
         "ws":                               "8.23.0",
         "@rse/mrcs":                        "0.9.3",
