@@ -40,10 +40,12 @@ Skill Output
     call in text (like "Called the X tool with ..."), but *always* perform
     it as a *real* tool call.
 
--   *IMPORTANT*: Text you emit *before* or *between* tool calls is either
-    real content (a <template/> output) or *nothing at all*. You *MUST*
-    *NEVER* emit filler or spacer text (like `<br>`, `&nbsp;`, `.`, `…`,
-    or a lone empty line) as a substitute for silence.
+-   *IMPORTANT*: A <template/> which a step requests *before* a tool call
+    *MUST* be emitted as *reply text* *before* that call -- never deferred
+    to a later reply, and never placed only into a thinking block, as
+    thinking is *not* shown to the user. *Only* non-template filler or
+    spacer text (like `<br>`, `&nbsp;`, `.`, `…`, or a lone empty line)
+    is forbidden: you *MUST* *NEVER* emit it as a substitute for silence.
 
 -   *IMPORTANT*: You *MUST* output all <template/> sections *EXACTLY* as provided
     (including newlines), *EXCEPT* for expanding control items, removing

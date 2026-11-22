@@ -50,8 +50,8 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
 
     </if>
 
-    Gather the following facts *without* displaying anything yet, where
-    the tool calls *MAY* be combined or batched:
+    Gather the following facts, where the tool calls *MAY* be combined
+    or batched, for their joint output in STEP 2:
 
     -   *Abstract*: Determine an <abstract/> summary of this project.
         For this, check a potentially existing `README.*` file
@@ -78,10 +78,11 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
 
 2.  <step id="STEP 2: DISPLAY FACTS">
     After gathering, you *MUST* output *all* of the three sections of
-    the following <template/>, completely, in this order, and as plain
-    reply text, even if their commands were combined or batched, and
-    *before* any further tool call. Do not display any further
-    explanation of these results.
+    the following <template/> *now*, completely, in this order, and as
+    plain reply text (not only in a thinking block), even if their
+    commands were combined or batched, and *before* any tool call of
+    STEP 3 (like a `Read`, `Grep`, or `Agent` call). Do not display any
+    further explanation of these results.
 
     <template>
     ⧉ **ASE**: **PROJECT ABSTRACT**:
@@ -99,7 +100,8 @@ Give *insights* into the project through the source code of <getopt-arguments/>.
     </step>
 
 3.  <step id="STEP 3: MODULE STRUCTURE">
-    Display the following <template/>:
+    Output the following <template/> as reply text, *before* any tool
+    call of this step:
 
     <template>
     ⧉ **ASE**: **MODULE STRUCTURE**:

@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: No Dropped Templates Before Tool Calls
+    A template requested before a tool call is emitted as reply text before that call, never only in
+    a thinking block, and only filler text is forbidden, so models no longer stay silent until the last
+    tool call and drop the sections of `ase-code-insight`.
+
 -   BUGFIX [code, docs]: No Unrelated Findings in Changeset Linting
     Under `--staged`/`--unstaged`, `ase-code-lint` and `ase-spec-lint` keep a problem only if its new
     `evidence` lines overlap the changeset, no longer if its correction touches adjacent lines, and
