@@ -68,7 +68,7 @@
 
             <!--  the content: the rendered task plan or attachment of the selected tab, or the task plan editor  -->
             <iframe v-show="editing === null" id="plan" ref="planEl" title="task plan"
-                sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-downloads"
                 :srcdoc="planDoc" @load="restorePlanScroll"></iframe>
             <div v-show="editing !== null" id="editor" ref="editorEl"></div>
 

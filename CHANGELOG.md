@@ -5,6 +5,10 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: Downloadable Binary Attachments in the Web Task Board
+    The sandboxed plan frame of the task dialog grants `allow-downloads`, so the download link of
+    a binary attachment saves the file in Chromium and Firefox, too (#141).
+
 -   UPDATE [infr]: No High Advisories in Transitive NPM Dependencies
     Upgrades `json-asty`, `@rse/mrcs`, and `@rse/specbook`, and pins fixed versions of `axios`,
     `fast-xml-parser`, and `underscore` via overrides.
