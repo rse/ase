@@ -25,6 +25,10 @@ ChangeLog
     The separators and key hint actions of the web board are styled through one global rule
     instead of five copies.
 
+-   REFACTOR [code]: Shorter Start Flow of the ASE Service
+    `ase service start` splits off the serve flow of the detached service, the start lock, and the
+    termination of a failed child process into their own methods.
+
 2.1.5 (2026-11-21)
 ------------------
 

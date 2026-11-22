@@ -540,21 +540,56 @@ export default class ServiceCommand {
         return port
     }
 
+    /*  serve flow: run the detached service spawned by the start flow  */
+    private async doServe (ctx: Context): Promise<number> {
+        /*  adopt the log level of the spawning process, as the
+            detached service is started without any CLI options  */
+        const level = process.env[LEVEL_ENV]
+        if (level !== undefined && isLogLevel(level))
+            this.log.logLevel(level)
+        const raw  = process.env[PORT_ENV]
+        const port = raw !== undefined ? Number(raw) : await Daemon.allocatePort()
+        await this.runService({ ...ctx, port })
+        return await new Promise<number>(() => { /*  never resolves  */ })
+    }
+
+    /*  acquire the lock serializing the service spawning across concurrent processes  */
+    private async lockStart (aseDir: string): Promise<() => Promise<void>> {
+        fs.mkdirSync(aseDir, { recursive: true })
+        return lockfile.lock(path.join(aseDir, "service.start"), {
+            realpath: false,
+            retries:  { retries: 130, factor: 1.5, minTimeout: 50, maxTimeout: 500 },
+            onCompromised: (err: Error) => {
+                this.log.write("warning", `service: start lock compromised: ${err.message}`)
+            }
+        }).catch((err: unknown) => {
+            throw (err as NodeJS.ErrnoException).code === "ELOCKED" ?
+                new Error("service: still being started concurrently") : err
+        })
+    }
+
+    /*  terminate a spawned child process, escalating from SIGTERM to SIGKILL
+        if it does not exit within a grace period  */
+    private static async terminateChild (child: ChildProcess, exitPromise: Promise<void>, exited: () => boolean): Promise<void> {
+        const wait = (ms: number) => Promise.race([
+            exitPromise,
+            new Promise<void>((resolve) => setTimeout(resolve, ms))
+        ])
+        child.kill("SIGTERM")
+        await wait(1000)
+        if (!exited()) {
+            child.kill("SIGKILL")
+            await wait(2000)
+            child.unref()
+        }
+    }
+
     /*  start flow: ensure port, probe, optionally detach (or run in the foreground)  */
     private async doStart (opts: { foreground?: boolean } = {}): Promise<number> {
         const ctx = this.loadContext()
         let port = ctx.port
-        if (process.env[SERVE_ENV] === "1") {
-            /*  adopt the log level of the spawning process, as the
-                detached service is started without any CLI options  */
-            const level = process.env[LEVEL_ENV]
-            if (level !== undefined && isLogLevel(level))
-                this.log.logLevel(level)
-            const raw = process.env[PORT_ENV]
-            port = raw !== undefined ? Number(raw) : await Daemon.allocatePort()
-            await this.runService({ ...ctx, port })
-            return await new Promise<number>(() => { /*  never resolves  */ })
-        }
+        if (process.env[SERVE_ENV] === "1")
+            return this.doServe(ctx)
         if (port !== null) {
             const match = await probe(port, ctx.projectId).catch(() => null)
             if (match === true) {
@@ -575,17 +610,7 @@ export default class ServiceCommand {
         /*  serialize the spawning across concurrent "ase service start" processes, as each one
             would otherwise spawn its own service on its own random port: the lock is held until
             the spawned service answers, so the waiting processes find and reuse it  */
-        fs.mkdirSync(ctx.aseDir, { recursive: true })
-        const unlock = await lockfile.lock(path.join(ctx.aseDir, "service.start"), {
-            realpath: false,
-            retries:  { retries: 130, factor: 1.5, minTimeout: 50, maxTimeout: 500 },
-            onCompromised: (err: Error) => {
-                this.log.write("warning", `service: start lock compromised: ${err.message}`)
-            }
-        }).catch((err: unknown) => {
-            throw (err as NodeJS.ErrnoException).code === "ELOCKED" ?
-                new Error("service: still being started concurrently") : err
-        })
+        const unlock = await this.lockStart(ctx.aseDir)
         try {
             /*  re-probe under the lock, as a concurrent start may have won meanwhile  */
             port = this.loadContext().port
@@ -648,21 +673,8 @@ export default class ServiceCommand {
                     lastErr = new Error(`${reason}${detail}`)
                 }
                 finally {
-                    if (!success && !exited) {
-                        child.kill("SIGTERM")
-                        await Promise.race([
-                            exitPromise,
-                            new Promise<void>((resolve) => setTimeout(resolve, 1000))
-                        ])
-                        if (!exited) {
-                            child.kill("SIGKILL")
-                            await Promise.race([
-                                exitPromise,
-                                new Promise<void>((resolve) => setTimeout(resolve, 2000))
-                            ])
-                            child.unref()
-                        }
-                    }
+                    if (!success && !exited)
+                        await ServiceCommand.terminateChild(child, exitPromise, () => exited)
                     child.removeListener("exit", onExit)
                     if (!success)
                         Service.clearPort(ctx.svc)
