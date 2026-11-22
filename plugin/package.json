@@ -15,7 +15,7 @@
     },
     "devDependencies": {
         "@rse/stx":                         "1.1.7",
-        "@rse/specbook":                    "1.6.3",
+        "@rse/specbook":                    "1.6.5",
         "markdownlint":                     "0.42.2",
         "markdownlint-cli2":                "0.24.2",
         "eslint":                           "10.15.0",
