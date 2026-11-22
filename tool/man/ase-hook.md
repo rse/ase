@@ -55,8 +55,8 @@ format is read and written:
 - `ase hook pre-tool-use`:
   Handle the `PreToolUse` (resp. `preToolUse`) event: auto-approve the
   invocations of *ASE* tools, and deny a shell command printing *ASE*
-  skill output (like `echo '⧉ **ASE**: ...'`), as a tool result is not
-  shown to the user. For Anthropic Claude Code CLI, additionally deny
+  skill output (like `echo '⧉ **ASE**: ...'`), but not one writing it into
+  a file, as a tool result is not shown to the user. For Anthropic Claude Code CLI, additionally deny
   the re-invocation of the *ASE* skill already loaded in the current
   turn of the main agent with identical arguments and without file or task
   changes since its load (except for the hand-offs of the skills with internal

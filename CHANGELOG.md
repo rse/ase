@@ -2,6 +2,13 @@
 ChangeLog
 =========
 
+2.1.6 (2026-11-22)
+------------------
+
+-   BUGFIX [code, docs]: No Denied File Edits Containing the `⧉ ASE` Prefix
+    The `pre-tool-use` hook denies only shell commands printing skill output, but no longer commands
+    writing the prefix into files (redirections, `tee`, in-place edits, interpreter file writes).
+
 2.1.5 (2026-11-21)
 ------------------
 

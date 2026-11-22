@@ -907,8 +907,8 @@ export default class HookCommand {
     }
 
     /*  determine whether a tool invocation should be denied, as it either produces skill
-        output (an ASE template printed by a shell command), which, as a tool result, is
-        never shown to the user, or re-invokes the ASE skill just loaded in the current turn
+        output (an ASE template printed, not written into a file, by a shell command), which,
+        as a tool result, is never shown to the user, or re-invokes the ASE skill just loaded in the current turn
         of the main agent with identical arguments and without file or task changes since its load
         (except for the hand-offs with internal "--int-*" options), and (if so) the reason
         fed back to the model  */
@@ -933,7 +933,8 @@ export default class HookCommand {
         }
         else if (toolName === spec.bashToolName
             && /⧉ (?:\*\*)?ASE(?:\*\*)?:/.test(command)
-            && /<<|\b(?:echo|printf|print|puts)\b|console\.log/.test(command))
+            && /\bcat\b[^\n|;&]*<<|\b(?:echo|printf|print|puts)\b|console\.log/.test(command)
+            && !/(?:^|[^0-9&>=-])>{1,2}\s*(?!&)[^\s&|;]|\btee\b|\b(?:sed|perl|ruby)\b[^\n|;&]*\s-[a-zA-Z]*i|\bopen\s*\(|\bwrite(?:File(?:Sync)?|_text)?\s*\(/.test(command))
             return {
                 deny:   true,
                 reason: "ASE: skill output (templates, tables, and dialogs) MUST be emitted as plain reply " +
