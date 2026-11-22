@@ -18,7 +18,7 @@ import type { JSONRPCMessage }           from "@modelcontextprotocol/sdk/types.j
 import type Log                 from "./ase-lib-log.js"
 import { sessionState }         from "./ase-config-core.js"
 import ServiceCommand           from "./ase-service.js"
-import { SERVICE_HOST as HOST, probe, isConnRefused, loadServiceContext } from "./ase-service.js"
+import { SERVICE_HOST as HOST, probe, isConnRefused, loadServiceContext, serviceAuth } from "./ase-service.js"
 
 /*  the innermost reason of a failed HTTP send, and whether it failed on the socket level  */
 const sendFailure = (err: unknown): { reason: string, socket: boolean } => {
@@ -34,20 +34,15 @@ const sendFailure = (err: unknown): { reason: string, socket: boolean } => {
 export default class MCPCommand {
     constructor (private log: Log) {}
 
-    /*  load service identity context  */
-    private loadContext (): { projectId: string, port: number | null } {
-        return loadServiceContext(this.log)
-    }
-
     /*  run "ase service start" and wait for the service to come up  */
-    private async ensureService (): Promise<{ projectId: string, port: number }> {
-        let ctx = this.loadContext()
+    private async ensureService (): Promise<{ projectId: string, port: number, token: string | null }> {
+        let ctx = loadServiceContext(this.log)
 
         /*  fast path: already running  */
         if (ctx.port !== null) {
-            const match = await probe(ctx.port, ctx.projectId).catch(() => null)
+            const match = await probe(ctx.port, ctx.projectId, ctx.token).catch(() => null)
             if (match === true)
-                return { projectId: ctx.projectId, port: ctx.port }
+                return { projectId: ctx.projectId, port: ctx.port, token: ctx.token }
         }
 
         /*  spawn "ase service start" using the same node entry point  */
@@ -58,13 +53,13 @@ export default class MCPCommand {
         })
 
         /*  re-load context to pick up the freshly persisted port  */
-        ctx = this.loadContext()
+        ctx = loadServiceContext(this.log)
         if (ctx.port === null)
             throw new Error("mcp: service did not register a port after start")
-        const match = await probe(ctx.port, ctx.projectId)
+        const match = await probe(ctx.port, ctx.projectId, ctx.token)
         if (match !== true)
             throw new Error(`mcp: service not responding on port ${ctx.port} after start`)
-        return { projectId: ctx.projectId, port: ctx.port }
+        return { projectId: ctx.projectId, port: ctx.port, token: ctx.token }
     }
 
     /*  determine the GitHub Copilot CLI session id from the environment: unlike
@@ -120,7 +115,8 @@ export default class MCPCommand {
         /*  the service is started in the background (or, if deferred, later),
             so the MCP handshake is never blocked by a slow service start  */
         let projectId = ""
-        let port: number | null = null
+        let port:  number | null = null
+        let token: string | null = null
 
         /*  create MCP STDIO server (lives for the entire bridge lifetime)  */
         const server = new StdioServerTransport()
@@ -188,7 +184,10 @@ export default class MCPCommand {
             if (port === null)
                 throw new Error("mcp: no service port known")
             const url    = new URL(`http://${HOST}:${port}/mcp`)
-            const next   = new StreamableHTTPClientTransport(url, { fetch: fetchWatched })
+            const next   = new StreamableHTTPClientTransport(url, {
+                fetch:       fetchWatched,
+                requestInit: { headers: serviceAuth(token) }
+            })
 
             next.onmessage = (msg: JSONRPCMessage) => {
                 if ("id" in msg && !("method" in msg) && msg.id !== undefined)
@@ -234,6 +233,7 @@ export default class MCPCommand {
             try {
                 const ctx = await this.ensureService()
                 port        = ctx.port
+                token       = ctx.token
                 projectId   = ctx.projectId
                 serviceDown = null
             }
@@ -488,7 +488,7 @@ export default class MCPCommand {
             if (bridgeDone || reconnecting || port === null)
                 return
             try {
-                const match = await probe(port, projectId)
+                const match = await probe(port, projectId, token)
                 if (match !== true)
                     triggerReconnect("health check failed")
             }

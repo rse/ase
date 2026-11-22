@@ -6,6 +6,7 @@
 
 import path                   from "node:path"
 import fs                     from "node:fs"
+import crypto                 from "node:crypto"
 import { fileURLToPath }      from "node:url"
 import { spawn }              from "node:child_process"
 import type { ChildProcess }  from "node:child_process"
@@ -56,8 +57,27 @@ const HOST = SERVICE_HOST
 
 /*  schema for ".ase/service.yaml"  */
 export const serviceSchema = v.nullish(v.strictObject({
-    port: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)))
+    port:  v.optional(v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535))),
+    token: v.optional(v.pipe(v.string(), v.minLength(1)))
 }))
+
+/*  the authentication modes of the service ("project.service.auth"): none at all,
+    a bearer token generated on each start, or a bearer token persisted across restarts  */
+export type AuthMode = "none" | "temporary" | "persisted"
+
+/*  generate a fresh bearer token of the service  */
+export const serviceToken = (): string =>
+    crypto.randomBytes(24).toString("hex")
+
+/*  the bearer token of a service start: the already persisted one under the
+    "persisted" authentication (if any), else a freshly generated one  */
+const startToken = (ctx: Context): string =>
+    ctx.auth === "persisted" && ctx.token !== null ? ctx.token : serviceToken()
+
+/*  the request headers carrying the bearer token of the service (if any, as a service
+    of an older ASE version persists no token and authenticates no request)  */
+export const serviceAuth = (token: string | null): Record<string, string> =>
+    token !== null ? { Authorization: `Bearer ${token}` } : {}
 
 /*  distinguish ECONNREFUSED from other ofetch transport errors  */
 export const isConnRefused = (err: unknown): boolean => {
@@ -67,11 +87,13 @@ export const isConnRefused = (err: unknown): boolean => {
         || e?.cause?.cause?.code === "ECONNREFUSED"
 }
 
-/*  probe the service and verify ASE identity banner  */
-export const probe = async (port: number, projectId: string): Promise<boolean | null> => {
+/*  probe the service and verify ASE identity banner (where a service rejecting
+    the token is reported like a foreign one, as it is unusable either way)  */
+export const probe = async (port: number, projectId: string, token: string | null): Promise<boolean | null> => {
     try {
         const r = await ofetch.raw(`http://${HOST}:${port}/`, {
             method:              "OPTIONS",
+            headers:             serviceAuth(token),
             signal:              AbortSignal.timeout(2000),
             ignoreResponseError: true
         })
@@ -87,10 +109,13 @@ export const probe = async (port: number, projectId: string): Promise<boolean | 
     }
 }
 
-/*  the service identity context: project id, persisted and preferred port, service configuration, and ".ase" directory  */
+/*  the service identity context: project id, persisted port and token, authentication mode,
+    preferred port, service configuration, and ".ase" directory  */
 export interface Context {
     projectId: string
     port:      number | null
+    token:     string | null
+    auth:      AuthMode
     portPref:  number | null
     svc:       Config
     aseDir:    string
@@ -98,6 +123,7 @@ export interface Context {
 
 const SERVE_ENV  = "ASE_SERVICE_SERVE"
 const PORT_ENV   = "ASE_SERVICE_PORT"
+const TOKEN_ENV  = "ASE_SERVICE_TOKEN"
 const LEVEL_ENV  = "ASE_SERVICE_LOG_LEVEL"
 const IDLE_MS    = 30 * 60 * 1000
 const TICK_MS    = 60 * 1000
@@ -118,37 +144,54 @@ export const loadServiceContext = (log: Log): Context => {
     /*  determine project id  */
     const projectId = (cfg.get("project.id") as string | null | undefined) || Task.projectIdOf(Task.projectRoot())
 
-    /*  determine service port  */
+    /*  determine service port and token  */
     const port      = (svc.get("port")       as number | null | undefined) ?? null
+    const token     = (svc.get("token")      as string | null | undefined) ?? null
 
     /*  determine preferred service port  */
     const pref      = cfg.get("project.service.port") as number | string | null | undefined
     const portPref  = pref !== null && pref !== undefined ? Number(pref) : null
 
+    /*  determine authentication mode (on the user scope only, as the project scope is shared)  */
+    const mode      = cfg.getLayered("project.service.auth").find((l) => l.scope.kind === "user")?.value
+    const auth      = mode === "none" || mode === "persisted" ? mode : "temporary"
+
     /*  determine path to ".ase" directory  */
     const aseDir    = path.dirname(svc.filename)
 
     /*  return context information  */
-    return { projectId, port, portPref, svc, aseDir }
+    return { projectId, port, token, auth, portPref, svc, aseDir }
 }
 
 /*  reusable functionality: port persistence and process spawning  */
 export class Service {
-    /*  persist an allocated port into ".ase/service.yaml"  */
-    static persistPort (svc: Config, port: number): void {
+    /*  persist an allocated port and its token (none without authentication)
+        into ".ase/service.yaml" (user-private)  */
+    static persistPort (svc: Config, port: number, token: string | null): void {
         ensureAseGitignore(path.dirname(svc.filename))
         svc.lock(() => {
             svc.read()
             svc.set("port", port)
+            if (token !== null)
+                svc.set("token", token)
+            else
+                svc.delete("token")
             svc.write()
         })
     }
 
-    /*  clear the persisted port and remove ".ase/service.yaml" if it is empty  */
-    static clearPort (svc: Config): void {
+    /*  clear the persisted port and token (except the token under the "persisted"
+        authentication) and remove ".ase/service.yaml" if it is empty, where a running
+        service clears them only as long as the persisted port is still its own one  */
+    static clearPort (ctx: Context, own = false): void {
+        const svc = ctx.svc
         svc.lock(() => {
             svc.read()
+            if (own && svc.get("port") !== ctx.port)
+                return
             svc.delete("port")
+            if (ctx.auth !== "persisted")
+                svc.delete("token")
             const root  = svc.get()
             const empty = root === undefined || root === null || (isMap(root) && root.items.length === 0)
             if (empty) {
@@ -161,7 +204,7 @@ export class Service {
     }
 
     /*  spawn the current executable detached as a background service  */
-    static spawnDetached (aseDir: string, port: number, logLevel: LogLevel): { child: ChildProcess, logFile: string } {
+    static spawnDetached (aseDir: string, port: number, token: string, logLevel: LogLevel): { child: ChildProcess, logFile: string } {
         fs.mkdirSync(aseDir, { recursive: true })
         ensureAseGitignore(aseDir)
         const logFile = path.join(aseDir, "service.log")
@@ -175,7 +218,7 @@ export class Service {
         const entry   = fileURLToPath(new URL("./ase.js", import.meta.url))
         const child   = spawn(process.execPath, [ entry, "service", "start" ], {
             detached: true,
-            env:      { ...process.env, [SERVE_ENV]: "1", [PORT_ENV]: String(port), [LEVEL_ENV]: logLevel },
+            env:      { ...process.env, [SERVE_ENV]: "1", [PORT_ENV]: String(port), [TOKEN_ENV]: token, [LEVEL_ENV]: logLevel },
             stdio:    [ "ignore", fd, fd ]
         })
         fs.closeSync(fd)
@@ -331,7 +374,7 @@ export default class ServiceCommand {
 
     /*  service-side: bind HAPI server until "/stop" command is received or idle timeout happens
         (or, in the foreground, until "/stop" command is received or a termination signal arrives)  */
-    private async runService (ctx: Context & { port: number }, foreground = false): Promise<void> {
+    private async runService (ctx: Context & { port: number, token: string }, foreground = false): Promise<void> {
         /*  establish HAPI HTTP/REST service  */
         const server = Hapi.server({ host: HOST, port: ctx.port })
 
@@ -365,6 +408,29 @@ export default class ServiceCommand {
             return h.continue
         })
 
+        /*  accept only requests carrying the bearer token of the service (unless without
+            authentication), as every local process of every user can reach the loopback interface,
+            except for the routes marked public (the page assets and login of the web board) and the
+            GET requests carrying a capability (the token-derived signature of their path, for the
+            web board resources fetched without headers by the browser)  */
+        const token      = Buffer.from(ctx.token, "utf8")
+        const capability = (p: string): string =>
+            crypto.createHmac("sha256", ctx.token).update(p).digest("hex")
+        const matches    = (given: string, expected: Buffer): boolean => {
+            const buf = Buffer.from(given, "utf8")
+            return buf.length === expected.length && crypto.timingSafeEqual(buf, expected)
+        }
+        server.ext("onPreAuth", (request, h) => {
+            if (ctx.auth === "none" || (request.route.settings.app as { public?: boolean } | undefined)?.public === true)
+                return h.continue
+            const m = /^Bearer[ \t]+(\S+)[ \t]*$/i.exec((request.headers.authorization as string | undefined) ?? "")
+            const cap = request.url.searchParams.get("cap")
+            if (m !== null ? matches(m[1], token) :
+                request.method === "get" && cap !== null && matches(cap, Buffer.from(capability(request.path), "utf8")))
+                return h.continue
+            return h.response({ error: "missing or invalid bearer token of the ASE service" }).code(401).takeover()
+        })
+
         /*  establish the usage tracker of the AI usage accounting (and the OTLP ingress)  */
         const usage = new UsageTracker(this.log, Task.projectRoot(), ctx.projectId, ctx.aseDir, () => {
             lastActivity = Date.now()
@@ -382,7 +448,7 @@ export default class ServiceCommand {
                 this.log.write("error", `service: stop failed: ${err instanceof Error ? err.message : String(err)}`)
             }
             await usage.stop()
-            Service.clearPort(ctx.svc)
+            Service.clearPort(ctx, true)
             process.exit(0)
         }
 
@@ -476,24 +542,28 @@ export default class ServiceCommand {
             other CLI commands; its rendering dependencies marked, MRCS, and ELK load on
             first request only, its board core dependencies at service startup)  */
         const { registerBoardRoutes } = await import("./ase-task-board-web-server.js")
-        registerBoardRoutes(server, this.log)
+        registerBoardRoutes(server, this.log, {
+            token:   ctx.token,
+            persist: ctx.auth === "persisted" && ctx.portPref === ctx.port,
+            capability
+        })
 
         /*  start service  */
         try {
             await server.start()
-            Service.persistPort(ctx.svc, ctx.port)
+            Service.persistPort(ctx.svc, ctx.port, ctx.auth !== "none" ? ctx.token : null)
             this.log.write("info", `service: listening on port ${ctx.port}`)
             usage.start()
         }
         catch (err: unknown) {
             const e = err as Error & { code?: string }
             if (e.code === "EADDRINUSE") {
-                /*  race-loser re-probe: another "ase service start" won the race  */
-                const match = await probe(ctx.port, ctx.projectId).catch(() => null)
+                /*  race-loser re-probe: another "ase service start" won the race (with its own token)  */
+                const match = await probe(ctx.port, ctx.projectId, this.loadContext().token).catch(() => null)
                 if (match === true)
                     process.exit(0)
                 this.log.write("error", `service: port ${ctx.port} in use, but not responding!`)
-                Service.clearPort(ctx.svc)
+                Service.clearPort(ctx, true)
                 process.exit(1)
             }
             this.log.write("error", `service: ${e.message}`)
@@ -549,7 +619,12 @@ export default class ServiceCommand {
             this.log.logLevel(level)
         const raw  = process.env[PORT_ENV]
         const port = raw !== undefined ? Number(raw) : await Daemon.allocatePort()
-        await this.runService({ ...ctx, port })
+
+        /*  adopt the token of the spawning process, which probes the service with it,
+            but keep it away from the environment of all processes the service spawns  */
+        const token = process.env[TOKEN_ENV] || startToken(ctx)
+        Reflect.deleteProperty(process.env, TOKEN_ENV)
+        await this.runService({ ...ctx, port, token })
         return await new Promise<number>(() => { /*  never resolves  */ })
     }
 
@@ -591,7 +666,7 @@ export default class ServiceCommand {
         if (process.env[SERVE_ENV] === "1")
             return this.doServe(ctx)
         if (port !== null) {
-            const match = await probe(port, ctx.projectId).catch(() => null)
+            const match = await probe(port, ctx.projectId, ctx.token).catch(() => null)
             if (match === true) {
                 if (opts.foreground)
                     throw new Error(`service: already running on port ${port} (stop it first with "ase service stop")`)
@@ -603,7 +678,7 @@ export default class ServiceCommand {
         /*  run the service in the foreground, logging to the terminal and without idle timeout  */
         if (opts.foreground) {
             port = await this.allocatePort(ctx)
-            await this.runService({ ...ctx, port }, true)
+            await this.runService({ ...ctx, port, token: startToken(ctx) }, true)
             return await new Promise<number>(() => { /*  never resolves  */ })
         }
 
@@ -613,8 +688,9 @@ export default class ServiceCommand {
         const unlock = await this.lockStart(ctx.aseDir)
         try {
             /*  re-probe under the lock, as a concurrent start may have won meanwhile  */
-            port = this.loadContext().port
-            if (port !== null && await probe(port, ctx.projectId).catch(() => null) === true) {
+            const current = this.loadContext()
+            port = current.port
+            if (port !== null && await probe(port, ctx.projectId, current.token).catch(() => null) === true) {
                 this.log.write("info", `service: already running on port ${port}`)
                 return 0
             }
@@ -624,7 +700,8 @@ export default class ServiceCommand {
             let lastErr: Error = new Error("service failed to start within timeout")
             for (let attempt = 0; attempt < 3; attempt++) {
                 port = await this.allocatePort(ctx)
-                const { child, logFile } = Service.spawnDetached(ctx.aseDir, port, this.log.logLevel())
+                const token = startToken(current)
+                const { child, logFile } = Service.spawnDetached(ctx.aseDir, port, token, this.log.logLevel())
                 let exited   = false
                 let exitCode: number | null = null
                 let resolveExit: () => void = () => {}
@@ -643,15 +720,15 @@ export default class ServiceCommand {
                     for (let i = 0; i < 50; i++) {
                         await new Promise((resolve) => setTimeout(resolve, 100))
                         if (exited) {
-                            /*  race-loser child exits cleanly, as another start won the port  */
-                            if (exitCode === 0 && await probe(port, ctx.projectId).catch(() => null) === true) {
+                            /*  race-loser child exits cleanly, as another start won the port (with its own token)  */
+                            if (exitCode === 0 && await probe(port, ctx.projectId, this.loadContext().token).catch(() => null) === true) {
                                 this.log.write("info", `service: already running on port ${port}`)
                                 success = true
                                 return 0
                             }
                             break
                         }
-                        const s = await probe(port, ctx.projectId).catch(() => null)
+                        const s = await probe(port, ctx.projectId, token).catch(() => null)
                         if (s === true) {
                             this.log.write("info", `service: started on port ${port}`)
                             child.unref()
@@ -677,7 +754,7 @@ export default class ServiceCommand {
                         await ServiceCommand.terminateChild(child, exitPromise, () => exited)
                     child.removeListener("exit", onExit)
                     if (!success)
-                        Service.clearPort(ctx.svc)
+                        Service.clearPort(ctx)
                 }
             }
             throw lastErr
@@ -688,10 +765,10 @@ export default class ServiceCommand {
     }
 
     /*  build the JSON "POST" request options for a service endpoint  */
-    private postRequest (body: Record<string, unknown>, timeoutMs: number) {
+    private postRequest (token: string | null, body: Record<string, unknown>, timeoutMs: number) {
         return {
             method:              "POST" as const,
-            headers:             { "Content-Type": "application/json" },
+            headers:             { "Content-Type": "application/json", ...serviceAuth(token) },
             body,
             signal:              AbortSignal.timeout(timeoutMs),
             ignoreResponseError: true
@@ -705,10 +782,10 @@ export default class ServiceCommand {
             process.stdout.write("service: not running (no port configured)\n")
             return 1
         }
-        const match = await probe(ctx.port, ctx.projectId).catch(() => null)
+        const match = await probe(ctx.port, ctx.projectId, ctx.token).catch(() => null)
         if (match === true) {
             const r = await ofetch.raw(`http://${HOST}:${ctx.port}/command`,
-                this.postRequest({ command: "status" }, 2000))
+                this.postRequest(ctx.token, { command: "status" }, 2000))
             const d        = r._data as { uptimeMs?: number } | null
             const uptimeMs = typeof d?.uptimeMs === "number" ? d.uptimeMs : 0
             const uptime   = prettyMs(uptimeMs, { verbose: true })
@@ -716,7 +793,7 @@ export default class ServiceCommand {
             return 0
         }
         if (match === false) {
-            process.stdout.write(`service: not running (port ${ctx.port} in use by foreign service)\n`)
+            process.stdout.write(`service: not running (port ${ctx.port} in use by foreign service or token rejected)\n`)
             return 1
         }
         process.stdout.write(`service: not running (port ${ctx.port} not responding)\n`)
@@ -726,17 +803,17 @@ export default class ServiceCommand {
     /*  send command: POST /command with the arbitrary cmd token  */
     private async doSend (cmd: string): Promise<number> {
         let ctx = this.loadContext()
-        if (ctx.port === null || await probe(ctx.port, ctx.projectId).catch(() => null) !== true) {
+        if (ctx.port === null || await probe(ctx.port, ctx.projectId, ctx.token).catch(() => null) !== true) {
             /*  auto-start the service once, then re-check  */
             await this.doStart()
             ctx = this.loadContext()
             if (ctx.port === null)
                 throw new Error("service not running (no port configured after auto-start)")
-            if (await probe(ctx.port, ctx.projectId).catch(() => null) !== true)
+            if (await probe(ctx.port, ctx.projectId, ctx.token).catch(() => null) !== true)
                 throw new Error(`service not responding on port ${ctx.port} after auto-start`)
         }
         const r = await ofetch.raw(`http://${HOST}:${ctx.port}/command`,
-            { ...this.postRequest({ command: cmd }, 5000), responseType: "text" })
+            { ...this.postRequest(ctx.token, { command: cmd }, 5000), responseType: "text" })
         const body = typeof r._data === "string" ? r._data : JSON.stringify(r._data)
         process.stdout.write(body)
         if (!body.endsWith("\n"))
@@ -757,26 +834,30 @@ export default class ServiceCommand {
             this.log.write("info", "service: not running (no port configured)")
             return 0
         }
-        const match = await probe(ctx.port, ctx.projectId).catch(() => null)
+        const match = await probe(ctx.port, ctx.projectId, ctx.token).catch(() => null)
         if (match === false) {
-            this.log.write("info", `service: not running (port ${ctx.port} in use by foreign service)`)
+            this.log.write("info", `service: not running (port ${ctx.port} in use by foreign service or token rejected)`)
             return 1
         }
         if (match === null) {
             this.log.write("info", `service: not running (port ${ctx.port} not responding)`)
-            Service.clearPort(ctx.svc)
+            Service.clearPort(ctx)
             return 0
         }
-        const r = await ofetch.raw(`http://${HOST}:${ctx.port}/stop`, this.postRequest({}, 5000))
+        const r = await ofetch.raw(`http://${HOST}:${ctx.port}/stop`, this.postRequest(ctx.token, {}, 5000))
         const ok = r.status >= 200 && r.status < 300
 
         /*  the stopping service clears its port itself, so wait for it and clear the
             port here only as a fallback, as clearing on both sides collides on the lock  */
-        const deadline = ok ? Date.now() + STOP_MS : 0
-        while (Date.now() < deadline && fs.existsSync(ctx.svc.filename))
+        const deadline  = ok ? Date.now() + STOP_MS : 0
+        const persisted = () => {
+            ctx.svc.read()
+            return (ctx.svc.get("port") ?? null) !== null
+        }
+        while (Date.now() < deadline && persisted())
             await new Promise<void>((resolve) => setTimeout(resolve, 50))
-        if (fs.existsSync(ctx.svc.filename))
-            Service.clearPort(ctx.svc)
+        if (ok && persisted())
+            Service.clearPort(ctx)
         return ok ? 0 : 1
     }
 

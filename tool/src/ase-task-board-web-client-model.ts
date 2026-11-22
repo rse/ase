@@ -201,6 +201,79 @@ const busyLabel = (url: string, opts?: RequestInit): BusyLabel => {
     return id !== undefined ? { text: `${text} task`, id: decodeURIComponent(id) } : { text }
 }
 
+/*  the credentials of the service: its bearer token and the capability of its event stream,
+    obtained by exchanging the one-time login nonce in the URL fragment (as opened by
+    "ase task board --web"), and kept per browser tab, so a reload of the page keeps them,
+    resp. permanently, if the service allows it (for a persisted token on a fixed port)  */
+type Auth = { token: string, events: string }
+const authKey = "ase-task-board-auth"
+let auth: Auth | null = null
+
+/*  the lowercase hexadecimal rendering of bytes  */
+const hex = (bytes: Uint8Array): string =>
+    Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
+
+/*  POST a JSON request to a public login route of the service  */
+const post = async <T>(url: string, body: unknown): Promise<T> =>
+    await (await fetch(url, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+    })).json() as T
+
+/*  verify a kept token before sending it, by letting the service prove its knowledge of the
+    token for a random challenge and the port of the page, as another service (e.g. of another
+    user) may have taken over the port meanwhile, possibly relaying the challenge to the real
+    service on another port (unknown if the service cannot be asked at all)  */
+const verified = async (kept: Auth): Promise<boolean | null> => {
+    const challenge = hex(crypto.getRandomValues(new Uint8Array(16)))
+    const res = await post<{ proof?: unknown }>("/task-board/api/prove", { challenge }).catch(() => null)
+    if (res === null)
+        return null
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(kept.token),
+        { name: "HMAC", hash: "SHA-256" }, false, [ "sign" ])
+    const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`prove:${window.location.port}:${challenge}`))
+    return res.proof === hex(new Uint8Array(sig))
+}
+
+/*  log in to the service, with the nonce of the URL fragment (if any), else with the kept credentials
+    (of the tab first, then the permanent ones), where kept credentials refuted by the service are dropped  */
+export const login = async () => {
+    const nonce = new URLSearchParams(window.location.hash.slice(1)).get("nonce")
+    if (nonce !== null) {
+        history.replaceState(null, "", window.location.pathname + window.location.search)
+        try {
+            const res = await post<{ token?: unknown, events?: unknown, persist?: unknown }>("/task-board/api/login", { nonce })
+            if (typeof res.token === "string" && typeof res.events === "string") {
+                auth = { token: res.token, events: res.events }
+                const [ keep, drop ] = res.persist === true ? [ localStorage, sessionStorage ] : [ sessionStorage, localStorage ]
+                keep.setItem(authKey, JSON.stringify(auth))
+                drop.removeItem(authKey)
+                return
+            }
+        }
+        catch {
+            /*  a failed login falls back to the kept credentials (if any)  */
+        }
+    }
+    for (const storage of [ sessionStorage, localStorage ]) {
+        try {
+            const kept = JSON.parse(storage.getItem(authKey) ?? "null") as { token?: unknown, events?: unknown } | null
+            if (typeof kept?.token !== "string" || typeof kept.events !== "string")
+                continue
+            const candidate = { token: kept.token, events: kept.events }
+            const valid     = await verified(candidate)
+            if (valid === true) {
+                auth = candidate
+                return
+            }
+            if (valid === false)
+                storage.removeItem(authKey)
+        }
+        catch {
+            /*  unparsable kept credentials (or an inaccessible storage) are just ignored  */
+        }
+    }
+}
+
 /*  fetch a JSON response of the service (tracked for the busy popup, unless in the background)  */
 type Result<T> = (T & { error?: undefined }) | { error: string }
 export const api = async <T>(url: string, opts?: RequestInit, background = false): Promise<Result<T>> => {
@@ -213,7 +286,13 @@ export const api = async <T>(url: string, opts?: RequestInit, background = false
         }, 800)
     }
     try {
-        return await (await fetch(url, opts)).json()
+        const headers = new Headers(opts?.headers)
+        if (auth !== null)
+            headers.set("Authorization", `Bearer ${auth.token}`)
+        const res = await fetch(url, { ...opts, headers })
+        if (res.status === 401)
+            return { error: "ERROR:\nnot authenticated to the ASE service\n(open with \"ase task board --web\" again)" }
+        return await res.json() as Result<T>
     }
     catch (err: unknown) {
         return { error: err instanceof Error ? err.message : String(err) }
@@ -904,7 +983,7 @@ export const store  = ref<{ kind: "local" | "remote", connected: boolean } | nul
     here; a re-opened stream reloads the board, as changes may have been missed, and
     drops the known agent log lines, as the service passes all of them again  */
 const connect = () => {
-    events = new EventSource("/task-board/events")
+    events = new EventSource(`/task-board/events${auth !== null ? `?cap=${auth.events}` : ""}`)
     events.addEventListener("open", () => {
         online.value    = true
         agentLogs.value = new Map()
@@ -921,12 +1000,12 @@ const connect = () => {
     events.addEventListener("change", () => reload(true))
     events.addEventListener("store", (ev) => { store.value = JSON.parse((ev as MessageEvent).data) })
     events.addEventListener("agents", (ev) => {
-        applyAgents(JSON.parse((ev as MessageEvent).data))
+        applyAgents(JSON.parse((ev as MessageEvent<string>).data) as Agents | null)
         agentsKnown.value = true
         if (view.value === "flow")
             renderFlow(true)
     })
-    events.addEventListener("logs", (ev) => applyAgentLogs(JSON.parse((ev as MessageEvent).data)))
+    events.addEventListener("logs", (ev) => applyAgentLogs(JSON.parse((ev as MessageEvent<string>).data) as AgentLogs))
 }
 
 /*  start the connection to the service: the change event stream, and the

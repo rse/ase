@@ -160,6 +160,11 @@ const configParams: Array<{ name: string, value: string, scopes: string, desc: s
       desc: "Preferred port of the per-project background service on 127.0.0.1, " +
             "falling back to a random port out of 42000..44000 if unavailable. " +
             "If unset, a random port is always used." },
+    { name: "project.service.auth",
+      value: "temporary",
+      scopes: "user",
+      desc: "Authentication of the per-project background service: none at all, a bearer token " +
+            "generated on each start, or a bearer token persisted across restarts." },
     { name: "project.artifact.spec.basedir",
       value: "docs/specbook",
       scopes: "user, project",

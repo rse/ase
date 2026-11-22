@@ -261,6 +261,17 @@ Per-project service:
   `42000`..`44000` if unavailable (default: none). See
   `ase-service-start`(1).
 
+- `project.service.auth` (`none`, `temporary`, or `persisted`, `user`
+  scope only):
+  The authentication of the per-project background service: `none` at
+  all, a bearer token generated on each start (`temporary`, the
+  default), or a bearer token kept in `.ase/service.yaml` across
+  restarts (`persisted`, which on a fixed `project.service.port` is also
+  kept permanently by the browser of the web board), effective on the
+  next start. It is read from the `user` scope only, so a shared project
+  configuration cannot weaken it. See `ase-service`(1) and
+  `ase-task-board`(1).
+
 Project artifacts (all writable on the `user` and `project` scopes
 only), each kind defined by a `basedir` directory (relative to the
 project root, empty for the root itself) and a whitespace-separated

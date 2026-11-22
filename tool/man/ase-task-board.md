@@ -5,6 +5,7 @@
 `ase task board`
 \[`-h`|`--help`\]
 \[`-w`|`--web`\]
+\[`--no-open`\]
 \[`-t`|`--text`\]
 \[`--agent-relay` *url*\]
 \[`-T`|`--task` *id*\]
@@ -188,8 +189,23 @@ the terminal (and enables it again). The terminal board enables the
 With `--web`, the web board is served through the *ASE* service of the
 project (see `ase-service`(1), started if not yet running) under
 `http://127.0.0.1:`*port*`/task-board`, which is printed on standard
-output and opened in the default browser (via `open`, `xdg-open`, resp.
-`start`).
+output (for another browser) and opened in the default browser (via
+`open`, `xdg-open`, resp. `start`, unless `--no-open` is given).
+
+Each URL carries its own one-time login nonce (valid for 10 minutes,
+resp. for 1 minute in the opened URL, as the browser opener exposes it
+to all local users through the process list), which the page exchanges for the bearer token of the service and keeps
+in its browser tab, so a reload keeps the login. Hence, the printed and
+the opened URL differ, and each logs in one browser only. For further
+browsers, `U` in a logged in web board copies a login URL with a fresh
+nonce into the clipboard.
+
+After a restart of the service with a new token, open the web board
+again with `--web` (unnecessary with a `persisted` resp. `none`
+`project.service.auth`). With a `persisted` token on a fixed `project.service.port`, the browser
+keeps the token permanently, so also new tabs and browser restarts keep
+the login. Before using a kept token, the page lets the service prove
+its knowledge of the token, and drops the token on a refuted proof.
 
 It offers the same views and keys as the terminal board, where a task
 is additionally moved by dragging its card onto a reachable lane, a lane
@@ -430,8 +446,12 @@ relay, the agent graph view is skipped.
 
 - \[`-w`|`--web`\]:
   Serve the web board through the *ASE* service of the project, print
-  its URL, open it in the default browser, and exit (see **Web Board**).
-  Takes precedence over `--text`.
+  its URL (for another browser), open it in the default browser, and
+  exit (see **Web Board**). Takes precedence over `--text`.
+
+- \[`--no-open`\]:
+  With `--web`, only print the URL of the web board, without opening
+  it in the default browser.
 
 - \[`-t`|`--text`\]:
   Print the lane overview as plain text and exit (see **Text
@@ -474,6 +494,9 @@ lower-case letter under the kitty keyboard protocol.
 - `L`: Cycle the color theme through `auto`, `light`, and `dark`,
   overriding `board.web.theme` in the current browser until cycled back
   to its value (web board only).
+- `U`: Copy a login URL with a fresh one-time nonce (valid for 10
+  minutes) into the clipboard, for logging in another browser (web
+  board only).
 - `D`: Delete the selected task, after a confirmation (not in the
   task stats, agent logs, and agent graph views).
 - `T`: Transfer the selected task to another state via the transfer

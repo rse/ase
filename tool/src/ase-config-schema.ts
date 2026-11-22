@@ -80,6 +80,7 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "project.task.effort.file":       "1",
         "project.task.effort.line":       "0.025",
         "project.task.effort.iteration":  "2.5",
+        "project.service.auth":           "temporary",
         "project.artifact.spec.basedir":  "docs/specbook",
         "project.artifact.spec.files":    "**/*.{md,txt,svg,png,jpg}",
         "project.artifact.spec.schema":   "",
@@ -135,6 +136,7 @@ export const configWritableScopes: Record<string, ReadonlyArray<ScopeTerm["kind"
     "project.relay.crt":              [ "user", "project" ],
     "project.relay.key":              [ "user", "project" ],
     "project.service.port":           [ "project" ],
+    "project.service.auth":           [ "user" ],
     "project.artifact.spec.basedir":  [ "user", "project" ],
     "project.artifact.spec.files":    [ "user", "project" ],
     "project.artifact.spec.schema":   [ "user", "project" ],
@@ -206,6 +208,8 @@ export const configDescriptions: Record<string, string> = {
     "project.relay.key":              "The PEM private key file of the agent relay server, relative to the configuration file.",
     "project.service.port":           "The preferred port (1024-65535) of the per-project background service on 127.0.0.1, " +
                                       "falling back to a random port if unavailable.",
+    "project.service.auth":           "The authentication of the per-project background service: none at all, a bearer token " +
+                                      "generated on each start, or a bearer token persisted across restarts.",
     "project.artifact.spec.basedir":  "The base directory of the specification files, relative to the project root.",
     "project.artifact.spec.files":    "The whitespace-separated glob specification of the specification files, relative to their base " +
                                       "directory, with \"!\" negating a glob.",
@@ -440,7 +444,8 @@ export const configSchema = v.nullish(v.strictObject({
             key:       v.optional(v.pipe(v.string(), v.minLength(1)))
         })),
         service: v.optional(v.strictObject({
-            port:      portSchema
+            port:      portSchema,
+            auth:      v.optional(v.picklist([ "none", "temporary", "persisted" ]))
         })),
         artifact: v.optional(v.strictObject({
             spec: artifactSpecSchema,

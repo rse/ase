@@ -147,6 +147,7 @@ body
 .warn
     color: var(--c-signal)
     font-size: 0.6875rem
+    white-space: pre-line
 
 /*  the separators between the key hints and info items, and the actions after the key caps  */
 .sep
@@ -272,6 +273,19 @@ header
 
     /*  a double click opens or toggles, so it must not select text  */
     user-select: none
+
+/*  the error box of a failed board loading, centered within the lanes view  */
+#board .berror
+    margin: auto
+    max-width: unquote("min(600px, 90%)")
+    padding: 12px 20px
+    border: 1px solid var(--c-signal)
+    border-radius: 6px
+    background: var(--c-signal-ground)
+    color: var(--c-signal-strong)
+    text-align: center
+    white-space: pre-line
+    user-select: text
 .group
     display: flex
     flex-direction: column
@@ -806,6 +820,7 @@ header
     .aempty
         color: var(--c-mute)
         font-size: 0.8125rem
+        white-space: pre-line
         &.off
             color: var(--c-signal)
 
@@ -991,6 +1006,7 @@ header
     .sempty
         color: var(--c-mute)
         font-size: 0.8125rem
+        white-space: pre-line
         &.off
             color: var(--c-signal)
 
@@ -1833,6 +1849,7 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
     margin: auto
     padding: 16px
     color: var(--c-signal)
+    white-space: pre-line
 
 /*  the task dialog: horizontally centered, of a fixed height, with its rows stacked  */
 #dlg
@@ -2028,6 +2045,7 @@ footer kbd, #hscroll kbd, #dlg .dfoot kbd, #confirm .keys kbd, #transfer .keys k
         border-bottom: 1px solid var(--c-fill)
         color: var(--c-signal)
         font-size: 0.875rem
+        white-space: pre-line
         button
             border: 1px solid var(--c-signal)
             border-radius: 4px

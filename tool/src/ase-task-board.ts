@@ -12,12 +12,13 @@ import { ofetch }                           from "ofetch"
 
 import type Log                             from "./ase-lib-log.js"
 import { Task }                             from "./ase-task.js"
-import { loadServiceContext, SERVICE_HOST } from "./ase-service.js"
+import { loadServiceContext, SERVICE_HOST, serviceAuth } from "./ase-service.js"
 import { writeStdout }                      from "./ase-lib-stdio.js"
 
 /*  internal command options type  */
 interface BoardOpts {
     web?:        boolean
+    open?:       boolean
     text?:       boolean
     agentRelay?: string
     task?:       string
@@ -70,28 +71,44 @@ const textOverview = async (log: Log, relay?: string): Promise<string> => {
 export default class TaskBoardCommand {
     constructor (private log: Log) {}
 
-    /*  ensure the ASE service of the project runs and serves the board, and return its
-        port (a service running other ASE code is never restarted, as this would break
-        the MCP connections of all agent sessions using it)  */
-    private async servicePort (): Promise<number> {
+    /*  ensure the ASE service of the project runs and serves the board, and return the URL
+        of the board (resp. of the task viewer of a task) to print and, if requested, to open,
+        each carrying its own one-time login nonce in its fragment, the one to open with a short
+        lifetime (a service running other ASE code is never restarted, as this would break the
+        MCP connections of all agent sessions using it)  */
+    private async serviceURLs (open: boolean, task?: string): Promise<string[]> {
         const entry = fileURLToPath(new URL("./ase.js", import.meta.url))
         await execa(process.execPath, [ entry, "service", "start" ], { stdin: "ignore" })
-        const port = loadServiceContext(this.log).port
+        const { port, token } = loadServiceContext(this.log)
         if (port === null)
             throw new Error("board: ASE service did not report a port")
-        const res = await ofetch.raw(`http://${SERVICE_HOST}:${port}/task-board/api/ping`,
-            { ignoreResponseError: true, timeout: 5 * 1000 }).catch((err: unknown) => {
+        const base = `http://${SERVICE_HOST}:${port}/task-board`
+        const res  = await ofetch.raw<{ build?: string }>(`${base}/api/ping`,
+            { headers: serviceAuth(token), ignoreResponseError: true, timeout: 5 * 1000 }).catch((err: unknown) => {
             throw new Error(`board: ASE service not reachable on port ${port}`, { cause: err })
         })
         if (res.status === 404)
             throw new Error("board: ASE service runs older ASE code without web board " +
                 "(restart it with \"ase service stop\" once no agent session uses it)")
-        const data = res._data as { build?: string } | null | undefined
-        const { BOARD_BUILD } = await import("./ase-task-board-web-server.js")
+        if (res.status === 401)
+            throw new Error(`board: ASE service on port ${port} rejects the token`)
+        const data = res._data
+        const { BOARD_BUILD, NONCE_OPEN_MS } = await import("./ase-task-board-web-server.js")
         if (data?.build !== BOARD_BUILD)
             this.log.write("warning", "board: ASE service runs other ASE code " +
                 "(restart it with \"ase service stop\" once no agent session uses it)")
-        return port
+
+        /*  obtain the one-time login nonces (except from a service without authentication
+            or of older ASE code, which both persist no token and authenticate nothing)  */
+        const url  = base + (task !== undefined ? `?task=${encodeURIComponent(task)}` : "")
+        const ttls = open ? [ undefined, NONCE_OPEN_MS ] : [ undefined ]
+        if (token === null)
+            return ttls.map(() => url)
+        return Promise.all(ttls.map(async (ttl) => {
+            const login = await ofetch<{ nonce: string }>(`${base}/api/nonce`,
+                { method: "POST", headers: serviceAuth(token), body: { ttl }, timeout: 5 * 1000 })
+            return `${url}#nonce=${login.nonce}`
+        }))
     }
 
     /*  open a URL in the default browser of the platform, waiting only for
@@ -119,8 +136,10 @@ export default class TaskBoardCommand {
             .command("board")
             .description("Show the task board: the lanes of the configured task lifecycle " +
                 "model and the dependency graph of the tasks, following all changes live")
-            .option("-w, --web", "serve the web board through the ASE service of the project " +
-                "and open it in the browser")
+            .option("-w, --web", "serve the web board through the ASE service of the project, " +
+                "print its URL (for another browser), and open it in the default browser")
+            .option("--no-open", "with --web: only print the URL of the web board, " +
+                "without opening it in the default browser")
             .option("-t, --text", "print the lane overview as plain text and exit")
             .option("--agent-relay <url>", "agent relay to receive the live presence of the agents from, " +
                 "as \"ase[s]://<addr>:<port>[/<token>]\" (default: the configured \"project.relay.url\", else none; " +
@@ -138,10 +157,13 @@ export default class TaskBoardCommand {
                     if (opts.agentRelay !== undefined)
                         this.log.write("warning", "board: \"--agent-relay\" is ignored by the web board, " +
                             "which follows the configured \"project.relay.url\"")
-                    const url = `http://${SERVICE_HOST}:${await this.servicePort()}/task-board` +
-                        (opts.task !== undefined ? `?task=${encodeURIComponent(opts.task)}` : "")
-                    await writeStdout(`${url}\n`)
-                    await this.openBrowser(url)
+
+                    /*  print and open URLs with separate one-time login nonces, as the
+                        default browser consumes its nonce before the printed URL is used  */
+                    const [ printed, opened ] = await this.serviceURLs(opts.open !== false, opts.task)
+                    await writeStdout(`${printed}\n`)
+                    if (opened !== undefined)
+                        await this.openBrowser(opened)
                     return
                 }
 

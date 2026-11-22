@@ -290,10 +290,10 @@ export class Config {
     }
 
     /*  determine the file mode of a scope's file: user-private (0600) for the
-        user scope, the "store" files, and any file carrying secrets, else
-        undefined (which lets an existing file's mode be preserved)  */
+        user scope, the "store" and "service" files, and any file carrying secrets,
+        else undefined (which lets an existing file's mode be preserved)  */
     private fileMode (scope: ScopeTerm, doc: Document | null): number | undefined {
-        if (scope.kind === "user" || this.name === "store"
+        if (scope.kind === "user" || this.name === "store" || this.name === "service"
             || (doc !== null && configSecretKeys.some((key) => doc.hasIn(key.split(".")))))
             return 0o600
         return undefined

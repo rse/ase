@@ -23,7 +23,9 @@ candidates), spawns the service as a detached background process
 `.ase/service.log`, trimmed to its last 2000 lines beforehand if larger
 than 1 MB), and probes its readiness for up to 5 seconds.
 
-Once ready, the service persists its port into `.ase/service.yaml`,
+Once ready, the service persists its port and its bearer token (freshly
+generated for a `temporary`, reused for a `persisted`, and absent for a
+`none` `project.service.auth`) into the user-private `.ase/service.yaml`,
 and the command reports `service: started on port` *port*. If the
 spawned service exits during its startup, does not become ready in
 time, or loses its port to a foreign listener, the attempt is aborted
@@ -58,7 +60,7 @@ demand.
 ## FILES
 
 - `.ase/service.yaml`:
-  The persisted port of the running service.
+  The persisted port and bearer token of the running service.
 
 - `.ase/service.log`:
   The log of the detached service.

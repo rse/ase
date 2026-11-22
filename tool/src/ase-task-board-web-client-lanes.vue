@@ -7,7 +7,7 @@
 <!--  the lanes view: the groups of lanes with the task boxes  -->
 <template>
     <div v-show="view === 'lanes'" id="board" ref="boardEl" :class="{ titles, grown }" @scroll="updateScroll">
-        <template v-if="boardError !== null">{{ boardError }}</template>
+        <div v-if="boardError !== null" class="berror">{{ boardError }}</div>
         <template v-for="(g, gi) in board?.groups ?? []" :key="g.title">
             <!--  render each lane of a collapsed phase as a narrow box with its
                   vertically written status and number of cards (expanding the phase on double click)  -->

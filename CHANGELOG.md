@@ -5,6 +5,12 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   SECURITY [code, docs]: Bearer Token Authentication of the ASE Service
+    `ase service` requires a bearer token, kept in the user-private `.ase/service.yaml`, on every request
+    (`project.service.auth`, user scope only: `none`, `temporary`, or `persisted`). The web board logs in via a
+    one-time nonce of `ase task board --web`, and keeps the token per tab, resp. permanently for a
+    persisted token on a fixed port, verified by a port-bound challenge proof before each reuse.
+
 -   BUGFIX [code]: Downloadable Binary Attachments in the Web Task Board
     The sandboxed plan frame of the task dialog grants `allow-downloads`, so the download link of
     a binary attachment saves the file in Chromium and Firefox, too (#141).

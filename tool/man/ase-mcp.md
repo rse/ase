@@ -97,7 +97,7 @@ The service provides the `ase_*` MCP tools of the skills, e.g.,
 ## FILES
 
 - `.ase/service.yaml`:
-  The persisted port of the per-project service.
+  The persisted port and bearer token of the per-project service.
 
 - *per-user state directory*`/session/`*id*`/state.yaml`:
   The internal session state, from which the project directory

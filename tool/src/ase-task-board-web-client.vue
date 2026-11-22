@@ -72,7 +72,7 @@ import BoardPopup                               from "./ase-task-board-web-clien
 import {
     board, actionError, actionNote, view, sel, drag, scroll, filter, filterEl, agents, agentSel, online, store, stats, statsRanges,
     surface, titles, grown, agentLabel, cycleView, clearFilter, scrollBy, updateScroll, updateTabScroll,
-    rowLanes, reload, startService, stopService, flowSel, flowAgents, viewLabels, viewCycleHint, watched, watchError, type AgentFlow, type View
+    rowLanes, reload, login, startService, stopService, flowSel, flowAgents, viewLabels, viewCycleHint, watched, watchError, type AgentFlow, type View
 } from "./ase-task-board-web-client-model"
 import { stopEdit }                  from "./ase-task-board-web-client-editor"
 import { controlStart, controlStop } from "./ase-task-board-web-client-control"
@@ -165,6 +165,7 @@ const hints     = computed(() => {
     ], [
         { key: "Left-Click",    action: "select task" },
         { key: "Double-Click",  action: "view task / shrink lane" },
+        { key: "U",             action: "copy login URL" },
         { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "lanes" ? [ [
@@ -194,6 +195,7 @@ const hints     = computed(() => {
         { key: "Double-Click",  action: "view task, collapse/expand lane/phase" },
         { key: "Drag & Drop",   action: "directly transition task" },
         { key: "Grip-Drag",     action: "resize lane" },
+        { key: "U",             action: "copy login URL" },
         { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "agents" ? [ [
@@ -202,6 +204,7 @@ const hints     = computed(() => {
         { key: "Wheel",         action: "scroll agent log" }
     ], [
         { key: "v/V",           action: cycleHint("agents") },
+        { key: "U",             action: "copy login URL" },
         { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "flow" ? [ [
@@ -211,6 +214,7 @@ const hints     = computed(() => {
         { key: "Left-Drag",     action: "scroll canvas" }
     ], [
         { key: "v/V",           action: cycleHint("flow") },
+        { key: "U",             action: "copy login URL" },
         { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : view.value === "stats" ? [ [
@@ -218,6 +222,7 @@ const hints     = computed(() => {
         { key: "/",             action: "filter tasks" },
         { key: "v/V",           action: cycleHint("stats") }
     ], [
+        { key: "U",             action: "copy login URL" },
         { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ] : [ [
@@ -238,6 +243,7 @@ const hints     = computed(() => {
         { key: "v/V",           action: cycleHint("graph") },
         { key: "+/-/0/Wheel",   action: "zoom in/out/reset" },
         { key: "Left-Drag",     action: "scroll canvas" },
+        { key: "U",             action: "copy login URL" },
         { key: "L",             action: "cycle theme" },
         { key: "?",             action: "hide key hints" }
     ] ]
@@ -259,7 +265,8 @@ const onAnimationStart = (ev: AnimationEvent) => {
         if (anim instanceof CSSAnimation && anim.animationName === "pulse" && anim.startTime !== 0)
             anim.startTime = 0
 }
-onMounted(() => {
+onMounted(async () => {
+    await login()
     startService()
     controlStart()
     window.addEventListener("resize", onResize)

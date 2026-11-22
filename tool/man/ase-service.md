@@ -52,7 +52,15 @@ The service provides:
   `ase-task-board`(1)).
 
 The service accepts requests with a loopback `Host` header only, to
-defeat DNS rebinding attacks from browser pages. A detached service
+defeat DNS rebinding attacks from browser pages. As every local process
+of every user can reach the loopback interface, the service additionally
+requires the bearer token it generates on each start, persisted next to
+its port in the user-private `.ase/service.yaml` (mode `0600`), on every
+request, except the page assets of the web task board, which logs in
+through a one-time nonce (see `ase-task-board`(1)). With
+`project.service.auth` set to `persisted`, the token is kept across
+restarts, and with `none`, no request is authenticated at all (see
+`ase-config`(1)). A detached service
 stops itself after 30 minutes without any request, but never while a
 request is in flight or while it holds open AI usage windows.
 
@@ -88,8 +96,9 @@ exits with status `1`.
 ## FILES
 
 - `.ase/service.yaml`:
-  The per-project service state (the `port` of the running service),
-  removed again once the service stopped.
+  The per-project service state (the `port` and the bearer `token` of
+  the running service), user-private and removed again once the service
+  stopped (except a `persisted` token).
 
 - `.ase/service.log`:
   The standard output and standard error of the detached service,

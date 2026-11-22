@@ -451,13 +451,20 @@ export class UsageTracker {
     }
 
     /*  send a request to the service of the project of a root directory
-        (whose port is persisted in its ".ase/service.yaml")  */
-    static async request (root: string, endpoint: string, body: unknown, timeout = 30 * 1000): Promise<any> {
-        const file = path.join(root, ".ase", "service.yaml")
-        const port = Number((YAML.parse(fs.readFileSync(file, "utf8")) as { port?: unknown } | null)?.port)
+        (whose port and bearer token are persisted in its ".ase/service.yaml")  */
+    static async request (root: string, endpoint: string, body: Record<string, unknown>, timeout = 30 * 1000): Promise<unknown> {
+        const file  = path.join(root, ".ase", "service.yaml")
+        const info  = YAML.parse(fs.readFileSync(file, "utf8")) as { port?: unknown, token?: unknown } | null
+        const port  = Number(info?.port)
+        const token = typeof info?.token === "string" ? info.token : null
         if (!Number.isInteger(port))
             throw new Error(`no service port in "${file}"`)
-        return ofetch(`http://${HOST}:${port}${endpoint}`, { method: "POST", body: body as Record<string, unknown>, timeout })
+        return ofetch(`http://${HOST}:${port}${endpoint}`, {
+            method:  "POST",
+            headers: token !== null ? { Authorization: `Bearer ${token}` } : {},
+            body,
+            timeout
+        })
     }
 
     /*  detach a session from its usage window through the owning project service (used by the

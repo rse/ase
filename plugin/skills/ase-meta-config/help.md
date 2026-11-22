@@ -32,7 +32,7 @@ The recognized keys are grouped under `project.*` (`project.id`, `project.name`,
 `project.boxing`, `project.users`, `project.task.lifecycle`, `project.task.idscheme`,
 `project.task.store.{url,token,crt,key}`, `project.task.default.{source,changeset,target}`,
 `project.task.effort.{scale,factor,file,line,iteration}`, `project.relay.{url,token,crt,key}`,
-`project.service.port`, the `project.artifact.`*kind*`.{basedir,files}` globs, and
+`project.service.{port,auth}`, the `project.artifact.`*kind*`.{basedir,files}` globs, and
 `project.artifact.spec.schema`), `agent.*` (`agent.persona`, `agent.guidance`,
 `agent.diagram.{format,theme,tone}`, and `agent.cache.{guard,threshold,soft,hard}`),
 `telemetry.*` (`telemetry.{enabled,implicit}`, `telemetry.service.{port,token,interval,idle}`,

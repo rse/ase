@@ -56,6 +56,26 @@ const clientAsset = (ext: "html" | "css" | "js"): string => {
     return asset
 }
 
+/*  the authentication of the web board by the service: its bearer token, whether the browser
+    may keep it permanently (only for a persisted token on a fixed port, as the storage of the
+    browser is bound to the port), and the capability (the token-derived signature) of a path,
+    which authenticates the GET requests the browser sends without headers (the event stream
+    and the attachments embedded into documents)  */
+export interface BoardAuth {
+    token:      string
+    persist:    boolean
+    capability: (path: string) => string
+}
+
+/*  the one-time nonces of the web board logins, with their expiry times: "ase task board
+    --web" (resp. a logged-in web board, for another browser) issues login URLs with a fresh
+    nonce, which the page exchanges for the token (as a URL of the token itself would expose
+    it to all local users through the process list of the browser opener, where its nonce
+    lives shortly only)  */
+const NONCE_MS = 10 * 60 * 1000
+export const NONCE_OPEN_MS = 60 * 1000
+const nonces   = new Map<string, number>()
+
 /*  escape a text for embedding into HTML  */
 const escapeHTML = (s: string): string =>
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
@@ -229,14 +249,15 @@ const diffDocument = async (before: PlanText, after: PlanText): Promise<string> 
 /*  render a task plan attachment as a standalone document: its fields and
     its content, with images embedded, Markdown rendered, YAML or JSON data syntax-highlighted, a diff
     colored per line, binary content as a placeholder, and else verbatim text  */
-const attachmentDocument = async (log: Log, id: string, n: number): Promise<string | null> => {
+const attachmentDocument = async (log: Log, auth: BoardAuth, id: string, n: number): Promise<string | null> => {
     const att = (await Task.attachments(log, id))[n]
     if (att === undefined)
         return null
     const fields = ([
         [ "Type", att.type ], [ "Desc", att.desc ], [ "Created", att.created ?? "" ], [ "Modified", att.modified ?? "" ]
     ] as [ string, string ][]).filter(([ , v ]) => v !== "")
-    const url  = `/task-board/api/task/${encodeURIComponent(id)}/attachment/${n}`
+    const route = `/task-board/api/task/${encodeURIComponent(id)}/attachment/${n}`
+    const url   = `${route}?cap=${auth.capability(route)}`
     const type = att.type.split(";")[0].trim().toLowerCase()
 
     /*  embed images (including SVG, as an image context never runs
@@ -426,25 +447,29 @@ const guarded = (handler: Handler): Handler =>
         }
     }
 
-/*  register the page routes of the web board: its client assets and its colors  */
+/*  register the page routes of the web board: its client assets and its colors
+    (public, i.e., without authentication, as they carry no task data)  */
 const registerPageRoutes = (server: Hapi.Server, log: Log): void => {
     /*  the single page of the web board, with its stylesheet and browser-side code,
         and with its color theme (resolved on each page load) on its root element  */
     server.route({
         method:  "GET",
         path:    "/task-board",
+        options: { app: { public: true } },
         handler: (_request, h) => h.response(clientAsset("html")
             .replace(/<html\b/, `<html data-theme="${boardTheme(log)}"`)).type("text/html; charset=utf-8")
     })
     server.route({
         method:  "GET",
         path:    "/task-board/ase-task-board-web-client.css",
+        options: { app: { public: true } },
         handler: (_request, h) => h.response(clientAsset("css")).type("text/css; charset=utf-8")
             .etag(BOARD_BUILD).header("Cache-Control", "no-cache")
     })
     server.route({
         method:  "GET",
         path:    "/task-board/ase-task-board-web-client.js",
+        options: { app: { public: true } },
         handler: (_request, h) => h.response(clientAsset("js")).type("text/javascript; charset=utf-8")
             .etag(BOARD_BUILD).header("Cache-Control", "no-cache")
     })
@@ -454,8 +479,69 @@ const registerPageRoutes = (server: Hapi.Server, log: Log): void => {
     server.route({
         method:  "GET",
         path:    "/task-board/colors.css",
+        options: { app: { public: true } },
         handler: async (_request, h) => h.response(await colorSheet(colorBases(log)))
             .type("text/css; charset=utf-8").header("Cache-Control", "no-cache")
+    })
+}
+
+/*  register the login routes of the web board: the issuing of a one-time nonce (to the
+    token holding CLI resp. web board, with its lifetime), its exchange for the token and the event stream capability
+    (public, i.e., by the page of the web board, authenticated by the nonce itself),
+    and the proof of the token for verifying a token kept by the page  */
+const registerLoginRoutes = (server: Hapi.Server, auth: BoardAuth): void => {
+    /*  drop the expired login nonces  */
+    const purge = () => {
+        const now = Date.now()
+        for (const [ nonce, expires ] of nonces)
+            if (expires <= now)
+                nonces.delete(nonce)
+    }
+    server.route({
+        method:  "POST",
+        path:    "/task-board/api/nonce",
+        options: { payload: { parse: true, allow: "application/json", failAction: "ignore" } },
+        handler: (request, h) => {
+            purge()
+
+            /*  an optionally shorter lifetime, e.g. for an URL passed to the browser opener  */
+            const want  = (request.payload as { ttl?: unknown } | null)?.ttl
+            const ttl   = typeof want === "number" && want > 0 ? Math.min(want, NONCE_MS) : NONCE_MS
+            const nonce = crypto.randomBytes(24).toString("hex")
+            nonces.set(nonce, Date.now() + ttl)
+            return h.response({ nonce, ttl })
+        }
+    })
+    server.route({
+        method:  "POST",
+        path:    "/task-board/api/login",
+        options: { app: { public: true }, payload: { parse: true, allow: "application/json" } },
+        handler: (request, h) => {
+            purge()
+            const nonce = (request.payload as { nonce?: unknown } | null)?.nonce
+            if (typeof nonce !== "string" || !nonces.delete(nonce))
+                return h.response({
+                    error: "invalid or expired login of the web board (open it again with \"ase task board --web\")"
+                }).code(401)
+            return h.response({ token: auth.token, events: auth.capability("/task-board/events"), persist: auth.persist })
+        }
+    })
+
+    /*  the proof of the token for a random challenge of the page (public), which lets the page
+        verify a kept token before sending it, as another service (e.g. of another user) may
+        have taken over the port meanwhile (the "prove:" prefix keeps it apart from all
+        capabilities, which sign paths only, and the signed own port lets the page refute a
+        squatter relaying the challenge to the real service on another port)  */
+    server.route({
+        method:  "POST",
+        path:    "/task-board/api/prove",
+        options: { app: { public: true }, payload: { parse: true, allow: "application/json" } },
+        handler: (request, h) => {
+            const challenge = (request.payload as { challenge?: unknown } | null)?.challenge
+            if (typeof challenge !== "string" || !/^[0-9a-f]{32,128}$/.test(challenge))
+                return h.response({ error: "missing or invalid challenge" }).code(400)
+            return h.response({ proof: auth.capability(`prove:${server.info.port}:${challenge}`) })
+        }
     })
 }
 
@@ -464,7 +550,7 @@ const filterQuery = (request: Hapi.Request): string =>
     typeof request.query.filter === "string" ? request.query.filter : ""
 
 /*  register the view routes of the web board: the board, the task and agent graphs, the statistics, the new task text, and the tasks with their attachments  */
-const registerViewRoutes = (server: Hapi.Server, log: Log): void => {
+const registerViewRoutes = (server: Hapi.Server, log: Log, auth: BoardAuth): void => {
     /*  the board model, reduced onto the tasks matching the filter query  */
     server.route({
         method:  "GET",
@@ -601,7 +687,7 @@ const registerViewRoutes = (server: Hapi.Server, log: Log): void => {
             const n  = String(request.params.n)
             if (!TaskFormat.TASK_ID_RE.test(id))
                 return h.response({ error: `invalid task id "${id}"` }).code(400)
-            const doc = /^\d+$/.test(n) ? await attachmentDocument(log, id, Number(n)) : null
+            const doc = /^\d+$/.test(n) ? await attachmentDocument(log, auth, id, Number(n)) : null
             if (doc === null)
                 return h.response({ error: "no such attachment" }).code(404)
             return h.response({ doc })
@@ -893,9 +979,10 @@ const registerStreamRoutes = (server: Hapi.Server, log: Log): void => {
 }
 
 /*  register the board routes on the ASE service of the project  */
-export const registerBoardRoutes = (server: Hapi.Server, log: Log): void => {
+export const registerBoardRoutes = (server: Hapi.Server, log: Log, auth: BoardAuth): void => {
     registerPageRoutes(server, log)
-    registerViewRoutes(server, log)
+    registerLoginRoutes(server, auth)
+    registerViewRoutes(server, log, auth)
     registerUpdateRoutes(server, log)
     registerStreamRoutes(server, log)
 }

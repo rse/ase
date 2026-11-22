@@ -317,6 +317,29 @@ const notify = (text: string) => {
     }, 5000)
 }
 
+/*  copy a login URL of the web board for another browser, with a fresh one-time nonce,
+    into the clipboard (resp. show it in the status line, if the clipboard is unavailable)  */
+const copyLoginURL = async () => {
+    const res = await api<{ nonce: string, ttl: number }>("/task-board/api/nonce", { method: "POST" })
+    if (res.error !== undefined) {
+        actionError.value = `issuing login URL failed: ${res.error}`
+        return
+    }
+    const url   = `${window.location.origin}${window.location.pathname}${window.location.search}#nonce=${res.nonce}`
+    const valid = `valid once, for ${Math.round(res.ttl / 60000)} minutes`
+    actionError.value = null
+    try {
+        await navigator.clipboard.writeText(url)
+        notify(`login URL for another browser copied to clipboard (${valid})`)
+    }
+    catch {
+        if (noteTimer !== null)
+            clearTimeout(noteTimer)
+        noteTimer = null
+        actionNote.value = `login URL for another browser (${valid}): ${url}`
+    }
+}
+
 /*  cycle the color theme (auto, light, dark) of the page and of the shown task document,
     overriding the configured one in this browser until cycled back to it
     (silently not remembered if the browser storage is unavailable), where
@@ -901,6 +924,7 @@ export const controlStart = () => {
         Mousetrap.bind("v", () => { if (task.value === null) cycleView() })
         Mousetrap.bind("V", () => { if (task.value === null) cycleView(true) })
         Mousetrap.bind("?", () => { if (board.value !== null) toggle("keys", "") })
+        Mousetrap.bind("U", () => { if (task.value === null) copyLoginURL() })
         Mousetrap.bind("/", (ev) => {
             if (task.value !== null || view.value === "agents" || view.value === "flow")
                 return
