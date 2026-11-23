@@ -44,6 +44,12 @@ Resolve Merge Conflicts
 *continue* the in-progress operation, and report the *resolve verdict*.
 </objective>
 
+During the entire operation, you *MUST* *NEVER* create, switch, or
+check out any branch, and always continue the operation on the branch
+currently checked out, as a branch switch destroys the in-progress
+operation state like `MERGE_HEAD` or `REBASE_HEAD` -- this overrides
+any general rule like "branch first if on the default branch".
+
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-resolve.md
 
 Procedure

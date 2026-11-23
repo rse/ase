@@ -41,6 +41,13 @@ into the target branch, *resolve* all merge conflicts *semantically*,
 *check* that the source branch landed, and report the *merge verdict*.
 </objective>
 
+During the entire operation, you *MUST* *NEVER* create, switch, or
+check out any branch beyond the commands explicitly prescribed by the
+steps below, and always commit on the branch currently checked out, as
+a branch switch destroys the in-progress operation state like
+`MERGE_HEAD` or `SQUASH_MSG` -- this overrides any general rule like
+"branch first if on the default branch".
+
 @${CLAUDE_SKILL_DIR}/../../meta/ase-common-resolve.md
 
 <define name="source-rollback">

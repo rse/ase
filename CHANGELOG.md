@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: No Branch Switch During Merge or Resolve
+    `ase-repo-merge` and `ase-repo-resolve` forbid creating or switching branches mid-operation,
+    overriding any "branch first" rule, as a switch destroys `MERGE_HEAD` resp. `SQUASH_MSG` and lets
+    the concluding commit resp. `--continue` fail.
+
 -   BUGFIX [code, docs]: No Whitespace Loss in Partial Staging
     `ase-repo-stage` stages entirely selected files via `git add`, and partially selected ones by line
     numbers through the new MCP tools `ase_stage_diff` and `ase_stage_select`, which derive the patch
