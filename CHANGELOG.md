@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Incompleteness in Diff Coherence Check
+    `ase-repo-diff --coherence` additionally flags the gaps leaving the reconstructed thesis
+    incomplete, like callers not adapted to a changed signature, as the new deviation kind
+    `INCOMPLETE`, so a focused but incomplete diff is no longer judged `COHERENT`.
+
 -   BUGFIX [code, docs]: Verification Lint After Specification Corrections
     `ase-spec-lint` lints the specification once more after applying corrections, reports newly
     introduced diagnostics in a *LINT VERIFICATION*, and under `--auto` first reverts the corrections

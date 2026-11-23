@@ -35,7 +35,8 @@ Summarize Diff
 Summarize the currently staged Git changes into a *concise*,
 *human-readable* narrative of what changed and why, *grouped by intent*
 rather than by file. Optionally *reconstruct the change's single
-intended purpose* and *flag hunks that do not serve it*. Optionally
+intended purpose* and *flag hunks that do not serve it* and *gaps
+that leave it incomplete*. Optionally
 *score* the diff against a *coupling-criticality-coverage-reversibility*
 rubric and emit a *graded risk report* with *mitigations*. Optionally
 render a *blast-radius map*.
@@ -174,16 +175,32 @@ Procedure
             logging, `TODO`/`FIXME` scaffolding, disabled tests), which
             should be just removed and not part of any commit.
 
-    3.  A hunk that *serves* <thesis/> will *not* be reported. Only hunks that
-        do *not* serve it will be reported. If *every* hunk serves the thesis,
-        the diff is *coherent* and you report *no* flagged hunks.
+    3.  Check whether the <diff/> *as a whole* fully accomplishes
+        <thesis/>, and flag every *gap* as the following <deviation/> kind:
 
-        Judge overall *coherence* from the flagged hunks: the diff
-        is `COHERENT` when there are *no* `SCOPE-CREEP` and *no*
-        `STRAY-DEBUG` deviations, otherwise it is `INCOHERENT`. Store
-        the result in <verdict/>.
+        -   `INCOMPLETE`: a change the thesis implies but the diff lacks
+            (e.g. callers or references not adapted to a changed signature,
+            a renamed or removed symbol, a changed configuration key, or a
+            changed format; a rename or replacement applied only partially),
+            which should be completed before committing.
 
-    4.  Emit the following header <template/>:
+        Probe the repository *read-only* and *heuristically* (via `git
+        grep` / `grep` / `git ls-files`, restricted to first-party code)
+        only as needed to find such gaps, e.g. the remaining references of
+        a changed or removed symbol outside the <diff/>. Do not output
+        anything during the probe.
+
+    4.  A hunk that *serves* <thesis/> will *not* be reported. Only hunks that
+        do *not* serve it and gaps the thesis implies will be reported. If
+        *every* hunk serves the thesis and there is *no* gap, the diff is
+        *coherent* and you report *no* flagged hunks.
+
+        Judge overall *coherence* from the flagged hunks and gaps: the
+        diff is `COHERENT` when there are *no* `SCOPE-CREEP`, *no*
+        `STRAY-DEBUG`, and *no* `INCOMPLETE` deviations, otherwise it is
+        `INCOHERENT`. Store the result in <verdict/>.
+
+    5.  Emit the following header <template/>:
 
         <template>
 
@@ -193,28 +210,31 @@ Procedure
 
         </template>
 
-    5.  <if condition="<verdict/> is `INCOHERENT`">
+    6.  <if condition="<verdict/> is `INCOHERENT`">
         Render a *three-column table* with one row per hunk, flagged
-        for *not serving* the <thesis/> above. Output the following table in <template/>.
+        for *not serving* the <thesis/> above, resp. per gap, flagged for
+        *missing* from it. Output the following table in <template/>.
 
-        For each flagged hunk, repeat the third line, where <deviation/>
-        is the deviation kind label, <location/> is the affected file
-        reference, and <reason/> is a *brief* one-sentence note on why
-        the hunk does not serve <thesis/> and what to do with it (e.g.
-        split into its own commit, drop the debug residue).
+        For each flagged hunk or gap, repeat the third line, where
+        <deviation/> is the deviation kind label, <location/> is the
+        affected file reference, and <reason/> is a *brief* one-sentence
+        note on why the hunk does not serve resp. the gap misses
+        <thesis/> and what to do with it (e.g. split into its own commit,
+        drop the debug residue, adapt the remaining callers).
 
         In the <location/> column, mark up all file references as code
         (with backticks), prepend them with `▢ ` and append ` [+N/-M]`
-        (based on the information in <stat/>) to them.
+        (based on the information in <stat/>) to them, except for files
+        outside the <diff/>, which get no ` [+N/-M]` suffix.
 
         Keep the overall texts in <reason/> *very concise* and *brief*.
         Do *not* output any further explanation.
 
         <template>
 
-        | Deviation        | Location    | Why does it not serve the thesis? |
-        | ---------------- | ----------- | --------------------------------- |
-        | **<deviation/>** | <location/> | <reason/>                         |
+        | Deviation        | Location    | Why does it deviate from the thesis? |
+        | ---------------- | ----------- | ------------------------------------ |
+        | **<deviation/>** | <location/> | <reason/>                            |
 
         </template>
         </if>

@@ -27,9 +27,12 @@ intended change* the diff is trying to accomplish - phrased as one crisp
 *thesis* sentence - and then walks *every* hunk to *flag those that do
 not serve it*: **scope creep** (an unrelated feature or drive-by refactor
 riding along) and **stray debug** (leftover prints, commented-out code, or
-disabled tests). It emits an overall **COHERENT** / **INCOHERENT** verdict
-plus a table of the flagged hunks with what to do with each - keeping the
-diff to a *single logical and coherent change* before it is committed.
+disabled tests). It also flags the *gaps* which leave the thesis
+**incomplete** (like callers not adapted to a changed signature, or a
+rename applied only partially). It emits an overall **COHERENT** /
+**INCOHERENT** verdict plus a table of the flagged hunks and gaps with what
+to do with each - keeping the diff to a *single logical, coherent, and
+complete change* before it is committed.
 
 With `--risk`, the skill additionally *scores* the same diff against a
 four-axis **coupling-criticality-coverage-reversibility** rubric and
@@ -61,8 +64,9 @@ intent-grouped summary is shown.
     In addition to the intent-grouped summary, reconstruct the diff's
     *single intended change* as one crisp *thesis* sentence and flag
     *every* hunk that does *not* serve it - *scope creep* or *stray
-    debug* - then emit an overall **COHERENT** / **INCOHERENT** verdict
-    with a table of the flagged hunks.
+    debug* - and every gap leaving it *incomplete*, then emit an overall
+    **COHERENT** / **INCOHERENT** verdict with a table of the flagged
+    hunks and gaps.
 
 -   `--risk`, `-r`:
     In addition to the intent-grouped summary, score the diff against
@@ -80,7 +84,7 @@ intent-grouped summary is shown.
 ##  SCENARIOS
 
 -   You want a readable, intent-grouped summary of the staged changes
--   You want a diff checked for scope creep and stray debug leftovers
+-   You want a diff checked for scope creep, stray debug leftovers, and incompleteness
 -   You want a graded risk report of a change before committing
 -   You want a blast-radius map of what depends on the touched code
 
