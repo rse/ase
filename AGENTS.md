@@ -221,7 +221,10 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             into the modules `task-board-web-client-{model,editor,control}`
             (shared state and service access, task plan editor, and
             actions and key dispatching) and the components
-            `task-board-web-client-{lanes,graph,flow,agents,stats,dialog,popup,title}`
+            `task-board-web-client-{lanes,graph,flow,agents,stats,dialog,popup,title}`,
+            and whose stylesheet imports the styles of the other views
+            and of the task dialog and popups from
+            `task-board-web-client-{views,dialog}.styl`
 
     -   `tool/src/ase-agent-*.ts`: the parts of `ase agent`:
 

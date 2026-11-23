@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-23)
 ------------------
 
+-   REFACTOR [code, docs]: Smaller Stylesheet of the Web Task Board
+    `ase-task-board-web-client.styl` keeps only the base, header, lanes view, and footer styles and
+    imports the agents, statistics, and graph view styles from `ase-task-board-web-client-views.styl`
+    and the task dialog and popup styles from `ase-task-board-web-client-dialog.styl`.
+
 -   REFACTOR [code, docs]: Smaller AI Usage Accounting Module
     `ase-service-otel.ts` keeps only the usage windows of the class `UsageTracker` and moves the OTLP
     decoding and ingress into `ase-service-otel-ingress.ts` and the telemetry configuration, state file,

@@ -1,0 +1,778 @@
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
+*/
+
+/*  the agents view: the framed master list of the agent cards (selected one in signal color,
+    busy ones in accent color, and waiting ones in normal color),
+    and the framed detail view with the agent log, whose lines are broken with a hanging indent
+    behind their timestamp prefix (in normal color), followed by their task id and level prefix,
+    with their level and content in accent color (resp. signal color for warnings and errors)  */
+#agents
+    flex: 1
+    min-height: 0
+    display: flex
+    gap: 12px
+    section
+        position: relative
+        display: flex
+        flex-direction: column
+        min-height: 0
+        border: 1px solid var(--c-border)
+        border-radius: 8px
+        background: var(--c-ground-light)
+        padding: 14px 10px 10px
+    .atitle
+        position: absolute
+        top: 0
+        left: 50%
+        transform: translate(-50%, -50%)
+        max-width: calc(100% - 24px)
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        padding: 0 6px
+        border: 1px solid var(--c-border)
+        border-radius: 5px
+        background: var(--c-paper)
+        color: var(--c-mute)
+        font-size: 0.8125rem
+        font-weight: bold
+    /*  the position within the agent log, on the bottom border of its detail view  */
+    .apos
+        position: absolute
+        bottom: 0
+        right: 12px
+        transform: translate(0, 50%)
+        white-space: nowrap
+        padding: 0 6px
+        border: 1px solid var(--c-border)
+        border-radius: 5px
+        background: var(--c-paper)
+        color: var(--c-mute)
+        font-size: 0.8125rem
+    .amaster
+        flex: 0 0 260px
+
+    /*  the right side: the pane of the operation and the two equally wide panes of the selected agent above its log  */
+    .aright
+        flex: 1
+        min-width: 0
+        display: flex
+        flex-direction: column
+        gap: 16px
+        section
+            padding-left: 16px
+            padding-right: 16px
+    .ainfos
+        flex-shrink: 0
+        display: grid
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+        gap: 12px
+        .afields
+            font-size: 1rem
+            line-height: 1.15
+
+        /*  colored like the active lanes (and like the averages and the efficiency
+            of the statistics view), with the title like their lane header  */
+        section.ainfo
+            border-color: var(--c-accent-line)
+            background: var(--c-accent-ground)
+            color: var(--c-accent-strong)
+            .atitle
+                border-color: var(--c-accent-line)
+                background: var(--c-accent-fill)
+                color: var(--c-accent-strong)
+
+    /*  the pane of the operation of the selected agent (above the two panes): its
+        name (inverse, like on its card) and its title in bold (cut with an ellipsis)
+        above its description, clamped to six lines of the latter  */
+    .aop
+        flex-shrink: 0
+    .aoptext
+        display: flex
+        flex-direction: column
+        gap: 2px
+        font-size: 1rem
+        line-height: 1.3
+    .aophead
+        display: flex
+        align-items: baseline
+        gap: 8px
+        min-width: 0
+        .abadge
+            flex-shrink: 0
+            white-space: nowrap
+        b, .aempty
+            min-width: 0
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+    .aopdesc
+        display: -webkit-box
+        -webkit-box-orient: vertical
+        -webkit-line-clamp: 6
+        line-clamp: 6
+        overflow: hidden
+    .adetail
+        flex: 1
+        min-width: 0
+        min-height: 0
+    .alist
+        flex: 1
+        min-height: 0
+        overflow-y: auto
+        /*  make room for the pulse ring on the top border of the first card,
+            which the scroll container would otherwise clip  */
+        margin-top: -6px
+        padding-top: 6px
+        display: flex
+        flex-direction: column
+        gap: 8px
+    .aempty
+        color: var(--c-mute)
+        font-size: 0.8125rem
+        white-space: pre-line
+        &.off
+            color: var(--c-signal)
+
+/*  the agent cards (of the agents view and of the agent graph) and the agent log  */
+#agents, #flow
+    .acard
+        flex-shrink: 0
+        padding: 6px 10px
+        border: 1px solid var(--c-border)
+        border-radius: 5px
+        background: var(--c-paper)
+        cursor: pointer
+        &:hover
+            border-color: var(--c-accent)
+        &.busy
+            background: var(--c-accent-ground)
+            border-color: var(--c-accent)
+            color: var(--c-accent)
+        &.sel
+            border: 2px solid var(--c-signal)
+            padding: 5px 9px
+            .aname, .afields
+                color: var(--c-signal)
+        &.busy.sel
+            background: var(--c-signal-ground)
+    .aname
+        margin-bottom: 3px
+        padding-right: 1.4em
+        font-weight: bold
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+
+    /*  the heart of the agent (filled for a second after each received heartbeat, else
+        empty) in the top right corner inside the card, in the color of its card, and in
+        the embedded DejaVu Sans Mono (which carries both hearts in a consistent size,
+        whereas the text font would let the browser pick them from differing fallbacks),
+        centered within a box of the same right offset and outer width as the pulse ring
+        on the top border (8px plus twice its 1.25px border), so both are vertically aligned  */
+    .abeat
+        position: absolute
+        top: 6px
+        right: 12px
+        width: 10.5px
+        text-align: center
+        font-family: "DejaVu Sans Mono", monospace
+        color: var(--c-text)
+    .acard.busy .abeat
+        color: var(--c-accent)
+    .acard.sel .abeat
+        top: 5px
+        color: var(--c-signal)
+
+    /*  the agent name with its icon (spaced apart a bit more): inverse in the color of its card  */
+    .abadge
+        padding: 0 9px
+        border-radius: 3px
+        color: var(--c-paper)
+        background: var(--c-text)
+    .aicon
+        margin-right: 4px
+    .acard.busy .abadge
+        background: var(--c-accent)
+    .acard.sel .abadge
+        background: var(--c-signal)
+
+    /*  the fields of the agent card as a two-column grid, aligning the
+        values behind their labels of the same width (the widest one)  */
+    .afields
+        display: grid
+        grid-template-columns: max-content minmax(0, 1fr)
+        align-items: baseline
+        column-gap: 0.4em
+        font-size: 0.875rem
+        line-height: 1.05
+    .aval
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+
+    /*  a value cut at its start (with its text itself isolated left-to-right)  */
+    .aval.astart
+        direction: rtl
+        text-align: left
+
+    /*  the task ids with the task icon (on the agent cards and in the agent log): inverse in
+        the color of their card (resp. their log line), like the ids on the task cards, and on
+        the agent cards with a line height of their own, as the tight one of the fields
+        would let the glyphs exceed their box  */
+    .atasks
+        display: flex
+        flex-wrap: wrap
+        gap: 4px
+        .atask
+            line-height: 1.25
+    .atask
+        display: inline-block
+        padding: 0 4px
+        border-radius: 3px
+        font-weight: bold
+        color: var(--c-paper)
+        background: var(--c-text)
+    .acard.busy .atask
+        background: var(--c-accent)
+    .acard.sel .atask
+        background: var(--c-signal)
+    .aline .atask
+        text-indent: 0
+        line-height: 1.10
+        background: var(--c-accent)
+    .aline.warning .atask, .aline.error .atask
+        background: var(--c-signal)
+    .alog
+        flex: 1
+        min-height: 0
+        overflow-y: auto
+    .aline
+
+        /*  hang the wrapped lines behind the 25 characters of the timestamp prefix
+            (the "ch" unit does not include the letter spacing)  */
+        padding-left: calc(25ch - 25 * 0.015em)
+        text-indent: calc(-25ch + 25 * 0.015em)
+        font-family: "DejaVu Sans Mono", Menlo, monospace
+        font-size: 0.8125rem
+        letter-spacing: -0.015em
+        line-height: 1.2
+        white-space: pre-wrap
+        overflow-wrap: anywhere
+        color: var(--c-accent)
+        .atime
+            color: var(--c-text)
+        &.warning, &.error
+            color: var(--c-signal)
+
+/*  the statistics view (like the agents view, with framed sections): the column chart of the
+    tasks per state (in the dark colors of their lanes, like in the TUI, with the efforts and phases below
+    the states), the stacked bar of the progress of the tasks (the cancelled tasks
+    dim and hatched, the finished ones dark, the work-in-progress ones in accent color, and the
+    open ones light), and the bars of the total usage (the AI and human amounts in accent color,
+    the real times dim, and the stacked token counts in the shades of the accent color, with the
+    compact column chart of the distribution of the effort sizes beside them), below
+    the centered buttons of the time ranges, separated by dots (the one of the shown time range
+    in signal color)  */
+#stats
+    flex: 1
+    min-height: 0
+    display: flex
+    flex-direction: column
+    gap: 16px
+    padding-top: 8px
+    overflow-y: auto
+    section
+        position: relative
+        border: 1px solid var(--c-border)
+        border-radius: 8px
+        background: var(--c-ground-light)
+        padding: 16px 12px 10px
+    .stitle
+        @extend #agents .atitle
+    .sranges
+        display: flex
+        justify-content: center
+        align-items: center
+        gap: 0.6rem
+        button
+            border: 1px solid var(--c-border)
+            border-radius: 4px
+            padding: 2px 12px
+            background: var(--c-ground-light)
+            color: var(--c-text)
+            font: inherit
+            font-size: 0.8125rem
+            font-weight: bold
+            cursor: pointer
+            &:hover
+                border-color: var(--c-signal)
+                background: var(--c-signal-ground)
+                color: var(--c-signal-strong)
+            &.on
+                border-color: var(--c-signal)
+                background: var(--c-signal)
+                color: var(--c-paper)
+    .sempty
+        color: var(--c-mute)
+        font-size: 0.8125rem
+        white-space: pre-line
+        &.off
+            color: var(--c-signal)
+
+    /*  the row of the column charts, taking the remaining height  */
+    .scharts
+        flex: 1
+        min-height: 200px
+
+    /*  the column chart, where each column leaves room for its number on top of it  */
+    .schart
+        min-height: 0
+        display: flex
+        flex-direction: column
+    .sgrid
+        flex: 1
+        min-height: 0
+        display: grid
+        grid-template-rows: minmax(0, 1fr) auto auto auto auto
+        column-gap: 6px
+        /*  the compact column chart (like the effort distribution), without the
+            sub-labels and the groups, filling the height of its row  */
+        &.scompact
+            grid-template-rows: minmax(0, 1fr) auto auto
+    .scol
+        display: flex
+        flex-direction: column
+        justify-content: flex-end
+        align-items: center
+        min-height: 0
+        .scount
+            font-size: 0.8125rem
+            line-height: 1.5
+            font-weight: bold
+            color: var(--c-text-soft)
+        .sbar
+            width: 100%
+            border: 1px solid var(--c-text)
+            border-bottom: 0
+            border-radius: 3px 3px 0 0
+            background: var(--c-text)
+        &.active
+            .scount
+                color: var(--c-accent-strong)
+            .sbar
+                border-color: var(--c-accent)
+                background: var(--c-accent)
+        &.done
+            .scount
+                color: var(--c-line)
+            .sbar
+                border-color: var(--c-mute)
+                background: var(--c-mute)
+    /*  the labels of the columns, cut to their first seven characters (by the
+        component), and without an ellipsis if still too long, for readability  */
+    .sstate
+        padding-top: 4px
+        border-top: 1px solid var(--c-border)
+        text-align: center
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: clip
+        font-size: 0.75rem
+        font-weight: bold
+        color: var(--c-text-soft)
+        &.active
+            color: var(--c-accent-strong)
+        &.done
+            color: var(--c-line)
+    /*  the sub-labels of the columns below their labels (like the effort of the estimated tasks
+        of a state), keeping their height also if empty, to keep the columns of all charts aligned  */
+    .seffort
+        min-height: 1.5em
+        line-height: 1.5
+        text-align: center
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        font-size: 0.75rem
+        color: var(--c-text-soft)
+        &.active
+            color: var(--c-accent-strong)
+        &.done
+            color: var(--c-line)
+    .sphase
+        margin-top: 4px
+        padding-top: 2px
+        border-top: 1px solid var(--c-border-soft)
+        text-align: center
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        font-size: 0.75rem
+        color: var(--c-mute)
+    /*  the footer of the column chart (blank if empty, to keep the
+        columns of all charts aligned), like the forecast of the backlog  */
+    .sfoot
+        padding-top: 2px
+        text-align: center
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        font-size: 0.75rem
+        color: var(--c-mute)
+
+    /*  the stacked bar of the progress, with its legend  */
+    .sstack
+        display: flex
+        height: 22px
+        border: 1px solid var(--c-border)
+        border-radius: 5px
+        overflow: hidden
+        background: var(--c-paper)
+    .spart
+        flex-basis: 0
+        min-width: 2px
+    .slegend
+        display: flex
+        flex-wrap: wrap
+        gap: 4px 16px
+        margin-top: 6px
+        font-size: 0.8125rem
+        color: var(--c-text-soft)
+    .sprogress .slegend
+        justify-content: center
+        column-gap: 0.6rem
+
+    /*  the separators between the entries of the progress legend (like in the TUI)  */
+    .ssep
+        color: var(--c-mute)
+    .sswatch
+        display: inline-block
+        width: 10px
+        height: 10px
+        margin-right: 5px
+        border-radius: 2px
+    .spart, .sswatch
+        &.finished
+            background: var(--c-text)
+        &.cancelled
+            background: repeating-linear-gradient(45deg, var(--c-border-strong) 0 3px, var(--c-ground) 3px 6px)
+        &.wip
+            background: var(--c-accent)
+        &.open, &.ready
+            background: var(--c-fill)
+        &.blocked
+            background: repeating-linear-gradient(45deg, var(--c-signal) 0 3px, var(--c-signal-ground) 3px 6px)
+
+    /*  the rows with two framed sections, the left one taking two thirds (like in the TUI)  */
+    .spair
+        display: grid
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr)
+        gap: 16px
+
+    /*  the right third of a row split into two framed sections side by side  */
+    .ssplit
+        display: grid
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
+        gap: 16px
+
+    /*  the table of the tasks of the highest usage: the id (inverse behind "≡", in the color
+        of its lane), the title (taking the remaining width, cut with an ellipsis), the bar
+        of the total share, the costs, and the input and output tokens (with the "▷" between
+        them vertically aligned)  */
+    .stoplist
+        width: 100%
+        border-collapse: collapse
+        font-size: 0.8125rem
+        th
+            padding: 0 16px 4px 0
+            text-align: left
+            white-space: nowrap
+            font-weight: bold
+            color: var(--c-text)
+        td
+            padding: 2px 16px 2px 0
+            white-space: nowrap
+            color: var(--c-text-soft)
+
+        /*  the rows of a fixed height, so the blank rows for the missing tasks
+            keep the height of the table (like in the TUI)  */
+        tbody tr
+            height: 22px
+        .sblank td
+            color: var(--c-mute)
+        th:last-child, td:last-child
+            padding-right: 0
+        .cid
+            margin-right: 0
+            &.active
+                background: var(--c-accent)
+            &.done
+                background: var(--c-line)
+        .stask
+            width: 100%
+            max-width: 0
+            overflow: hidden
+            text-overflow: ellipsis
+        .sbarcell
+            width: 16%
+            min-width: 60px
+        .snum
+            text-align: right
+            font-variant-numeric: tabular-nums
+        td.snum
+            font-weight: bold
+            color: var(--c-text)
+        .stok
+            display: inline-block
+            text-align: right
+        .sflow
+            margin: 0 0.4em
+            font-weight: normal
+            color: var(--c-mute)
+
+    /*  the averages per finished task and the efficiency of the AI usage, colored like the
+        active lanes (with the title like their lane header): labels with their values
+        right-aligned, where a too long label is cut with an ellipsis  */
+    section.seffect
+        display: flex
+        flex-direction: column
+        gap: 2px
+        line-height: 1.15
+        border-color: var(--c-accent-line)
+        background: var(--c-accent-ground)
+        color: var(--c-accent-strong)
+        .stitle
+            border-color: var(--c-accent-line)
+            background: var(--c-accent-fill)
+            color: var(--c-accent-strong)
+        .sline b
+            color: var(--c-accent-strong)
+        .sline .sflow
+            color: var(--c-accent-light)
+    .sline
+        display: flex
+        justify-content: space-between
+        gap: 8px
+        span:first-child
+            min-width: 0
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+        b
+            white-space: nowrap
+            font-variant-numeric: tabular-nums
+            color: var(--c-text)
+        .sflow
+            margin: 0 0.4em
+            font-weight: normal
+            color: var(--c-mute)
+
+    /*  the bars of the total AI usage by the times, tokens, and costs (columns)  */
+    .smatrix
+        display: grid
+        grid-template-columns: repeat(3, minmax(0, 1fr))
+        gap: 8px 14px
+        align-items: start
+        font-size: 0.8125rem
+    .shead
+        font-weight: bold
+        color: var(--c-text)
+
+    /*  the legend of the token bar below it, in two columns (cache read and
+        write on the left, input and output on the right), aligned with the bar  */
+    .stokens
+        display: grid
+        grid-template-rows: auto auto
+        grid-auto-flow: column
+        justify-content: start
+        gap: 3px 24px
+        margin: 2px 0 0 calc(2.5em + 6px)
+        color: var(--c-mute)
+    .scell
+        display: flex
+        flex-direction: column
+        gap: 3px
+        min-width: 0
+    .srow
+        display: flex
+        align-items: center
+        gap: 6px
+    .sname
+        flex: 0 0 2.5em
+        color: var(--c-mute)
+    .strack
+        flex: 1
+        min-width: 0
+        height: 16px
+        display: flex
+        border: 1px solid var(--c-border-soft)
+        border-radius: 3px
+        overflow: hidden
+        background: var(--c-paper)
+    .sfill
+        flex: none
+        height: 100%
+    .sval
+        flex: 0 0 3.8em
+        text-align: left
+        font-variant-numeric: tabular-nums
+        font-weight: bold
+        color: var(--c-text)
+    .sfill, .sswatch
+        &.ai
+            background: var(--c-accent)
+        &.hr
+            background: var(--c-accent)
+        &.real
+            background: var(--c-mute)
+        &.cread
+            background: var(--c-accent-line)
+        &.cwrite
+            background: var(--c-accent-light)
+        &.input
+            background: var(--c-accent)
+        &.output
+            background: var(--c-accent-strong)
+
+/*  the graph view (and the agent graph view): its frame, with the graph statistics overlaid onto the top-right
+    corner of the graph border (like in the TUI), dimmed, in a box like the graph panel  */
+#gframe, #fframe
+    position: relative
+    flex: 1
+    min-height: 0
+    display: flex
+    flex-direction: column
+    .gstats
+        position: absolute
+        top: 0
+        left: 50%
+        transform: translate(-50%, -50%)
+        max-width: calc(100% - 24px)
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        padding: 0 6px
+        border: 1px solid var(--c-border-soft)
+        border-radius: 5px
+        background: var(--c-ground-light)
+        color: var(--c-mute)
+        font-size: 0.8125rem
+        pointer-events: none
+#graph, #flow
+    flex: 1
+    min-height: 0
+    overflow: auto
+    background: var(--c-ground-light)
+    border: 1px solid var(--c-border-soft)
+    border-radius: 6px
+    cursor: grab
+
+    /*  a double click opens a task (resp. an agent), so it must not select text  */
+    user-select: none
+
+    /*  a zoom-independent gap between the panel border and a larger graph (also when
+        scrolled to its ends or when scrolling the selected task box into view)  */
+    padding: 16px
+    scroll-padding: 16px
+
+    /*  the background is dragged for scrolling  */
+    &.panning
+        cursor: grabbing
+        user-select: none
+
+    /*  a graph smaller than the view is centered in it (via auto margins,
+        which, unlike centering alignments, keep an overflowing graph scrollable),
+        and a larger graph is never shrunk (it is zoomed explicitly only)  */
+    display: flex
+    svg
+        max-width: none
+        display: block
+        flex-shrink: 0
+        margin: auto
+
+        /*  do not clip the pulses and edges on the graph bounds (the graph has no inner padding)  */
+        overflow: visible
+    .node
+        cursor: pointer
+
+        /*  do not clip the pulse of the task boxes of the active nodes  */
+        foreignObject
+            overflow: visible
+    .card
+        box-sizing: border-box
+        height: 100%
+
+    /*  the title within the label lines its fixed-size node has room for  */
+    &.titles .card
+        &[data-lines="1"] .cbody
+            -webkit-line-clamp: 1
+            line-clamp: 1
+        &[data-lines="2"] .cbody
+            -webkit-line-clamp: 2
+            line-clamp: 2
+
+    /*  the dependency context of a filtered graph: dimmed and dashed  */
+    .node.context .card
+        opacity: 0.5
+        border-style: dashed
+    .edge
+        fill: none
+        stroke: var(--c-line)
+        stroke-width: 1.4
+        &.sel
+            stroke: var(--c-signal)
+            stroke-width: 2.5
+        &.dashed
+            stroke-dasharray: 5 4
+    .arrow
+        fill: var(--c-line)
+    .arrow-sel
+        fill: var(--c-signal)
+
+    /*  the lifecycle states of the agent graph, and its agent cards filling their fixed-size nodes  */
+    .state
+        rect
+            fill: var(--c-paper)
+            stroke: var(--c-border-strong)
+            stroke-width: 1.2
+        text
+            fill: var(--c-mute)
+            font-size: 13px
+            font-weight: bold
+            text-anchor: middle
+            dominant-baseline: central
+        &:hover rect
+            stroke: var(--c-accent)
+        &.sel
+            rect
+                stroke: var(--c-signal)
+                stroke-width: 2
+            text
+                fill: var(--c-signal)
+    .acard
+        box-sizing: border-box
+        height: 100%
+
+    /*  the dashed container of the tasks of a group, with the group name in its top-left corner  */
+    .cluster
+        rect
+            fill: none
+            stroke: var(--c-line)
+            stroke-width: 1.4
+            stroke-dasharray: 6 4
+        text
+            fill: var(--c-mute)
+            font-size: 13px
+            font-weight: bold
+
+/*  the arrow marker of the marked edges of the selected node, unique per drawing
+    (as a marker of the hidden drawing of the other view does not render)  */
+#graph .edge.sel
+    marker-end: url(#graph-arrow-sel)
+#flow .edge.sel
+    marker-end: url(#flow-arrow-sel)
+
