@@ -2,6 +2,38 @@
 ChangeLog
 =========
 
+2.1.7 (2026-11-23)
+------------------
+
+-   REFACTOR [code, docs]: Smaller AI Usage Accounting Module
+    `ase-service-otel.ts` keeps only the usage windows of the class `UsageTracker` and moves the OTLP
+    decoding and ingress into `ase-service-otel-ingress.ts` and the telemetry configuration, state file,
+    and project service requests into `ase-service-otel-common.ts`.
+
+-   REFACTOR [code, docs]: Smaller Runtime Base of the Agents
+    `ase-agent-runtime.ts` moves the task types and helpers of the agents into `ase-agent-runtime-task.ts`
+    and their Git workspace handling into the class `AgentWorkspace` of `ase-agent-runtime-workspace.ts`.
+
+-   REFACTOR [code, docs]: Smaller Engine of the Agents
+    `ase-agent-runtime-engine.ts` keeps only the agent facades and moves the shared functionality of the
+    agents of a definition into `ase-agent-runtime-defined.ts` and their phase and request agents into
+    `ase-agent-runtime-delegate.ts`.
+
+-   REFACTOR [code, docs]: Smaller Definition Model of the Agents
+    `ase-agent-definition-core.ts` keeps only the definition resolution and moves the option schema
+    into `ase-agent-definition-schema.ts`, the templates into `ase-agent-definition-template.ts`, and
+    the kind discovery and definition loading into `ase-agent-definition-loader.ts`.
+
+-   REFACTOR [code, docs]: Smaller Task Module
+    `ase-task.ts` keeps only the task plan operations of the class `Task` and moves the `ase task` CLI
+    into `ase-task-cli.ts`, the `ase_task_*` MCP tools into `ase-task-mcp.ts`, and the task store
+    specification and client creation into the class `TaskStoreConnect` of `ase-task-store-connect.ts`.
+
+-   REFACTOR [code, docs]: Smaller Model of the Terminal Task Board
+    `ase-task-board-tui-model.ts` keeps only the pure types and helpers and moves the sub-hooks
+    into `ase-task-board-tui-hooks.ts` and the central state hook `useBoardState` into
+    `ase-task-board-tui-state.ts`.
+
 2.1.6 (2026-11-23)
 ------------------
 

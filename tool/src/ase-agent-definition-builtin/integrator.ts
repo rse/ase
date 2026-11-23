@@ -5,7 +5,7 @@
 */
 
 import type { AgentDefinition } from "../ase-agent-definition-api.js"
-import type { AgentKind }       from "../ase-agent-definition-core.js"
+import type { AgentKind }       from "../ase-agent-definition-loader.js"
 
 /*  integrate the changeset of the task into its target by the Git operation <mode> (described
     as <how>), where the skill itself puts the task into "INTEGRATED" on success, so the task counts as

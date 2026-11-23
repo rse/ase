@@ -5,7 +5,7 @@
 */
 
 import type { AgentHooks } from "../ase-agent-definition-api.js"
-import type { AgentKind }  from "../ase-agent-definition-core.js"
+import type { AgentKind }  from "../ase-agent-definition-loader.js"
 import { estimable }       from "./estimator.js"
 
 /*  the parameters of the implementer: whether a task is claimed only once the estimator

@@ -15,7 +15,7 @@ import type { Marked }           from "marked"
 
 import type Log                  from "./ase-lib-log.js"
 import { Task }                  from "./ase-task.js"
-import { userId }                from "./ase-service-otel.js"
+import { userId }                from "./ase-service-otel-common.js"
 import { Config }                from "./ase-config-core.js"
 import { configSchema, webColorDefaults, webColorNames } from "./ase-config-schema.js"
 import { buildBoard, watchTasks, toneOf, laneMoves, cardMoves, attachmentTabs, isDiff, diffTones, dataLang, dataLoad, dataSpans, newTaskText, createTask, saveTask, TaskConflict, watchAgents } from "./ase-task-board-core.js"

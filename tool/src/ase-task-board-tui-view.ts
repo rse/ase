@@ -15,7 +15,8 @@ import { drawGraphText }                      from "./ase-task-board-graph.js"
 import { drawFlowText, isFlowCard, flowRelations } from "./ase-task-board-flow.js"
 import type { FlowCard }                      from "./ase-task-board-flow.js"
 import { statsRanges, statsRangeLabels, statsRangeLabel } from "./ase-task-board-stats.js"
-import type { BoardCtx, Sel, Carry }          from "./ase-task-board-tui-model.js"
+import type { Sel, Carry }                    from "./ase-task-board-tui-model.js"
+import type { BoardCtx }                      from "./ase-task-board-tui-state.js"
 import { palette, dashed, dashedBold, cx, isClass, pulseFrames, lowerEighths } from "./ase-task-board-tui-style.js"
 
 /*  shorthand for creating React elements without JSX  */

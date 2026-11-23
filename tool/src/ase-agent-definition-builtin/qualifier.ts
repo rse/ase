@@ -5,7 +5,7 @@
 */
 
 import type { AgentDefinition } from "../ase-agent-definition-api.js"
-import type { AgentKind }       from "../ase-agent-definition-core.js"
+import type { AgentKind }       from "../ase-agent-definition-loader.js"
 
 /*  review the changeset of the task (a "worktree" one staged, a "branch:" one against its
     base, an "attachment:" one staged in a temporary Git worktree) and tag the task with the

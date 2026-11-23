@@ -165,9 +165,12 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 
     -   `tool/src/ase-service-*.ts`: the MCP-only tool modules of the
         service (`service-{kv,getopt,markdown,skills,sleep,state,timestamp,diff,stage}`)
-        and its AI usage accounting (`service-otel` for the OTLP ingress,
-        the usage windows of the task assignments, and their bookings onto
-        the usage attachments of the tasks)
+        and its AI usage accounting (`service-otel` for the usage windows
+        of the task assignments and their bookings onto the usage
+        attachments of the tasks, `service-otel-ingress` for the OTLP
+        decoding and the OTLP ingress, and `service-otel-common` for the
+        telemetry configuration, the telemetry state file, and the
+        requests to the project services)
 
     -   `tool/src/ase-spec-worker.ts`: the worker thread entry point, running
         the SpecBook lint and export of the MCP tools `ase_specbook_{lint,export}`
@@ -178,10 +181,15 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         off the event loop of the service
 
     -   `tool/src/ase-task-*.ts`: the task functionality, where `ase-task.ts`
-        itself only forwards the `ase task` CLI and `ase_task_*` MCP tools to
+        itself (the class `Task`) only forwards the task plan operations to
         the task store selected by `project.task.store.url`, through the
         local or remote task store clients of `task-store-client`
         (see `docs/task-api.md`):
+
+        -   `task-cli` for the `ase task` CLI, `task-mcp` for the
+            `ase_task_*` MCP tools, and `task-store-connect` for the
+            project root, the task store specification of the
+            configuration, and the creation of the task store client
 
         -   `task-format` for the textual task format codec and the
             lifecycle models, and `task-request` for the codec of the agent
@@ -202,9 +210,12 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             command, `task-board-{core,graph,flow,filter,stats,diff}` for its
             model (where `flow` is the agent graph along the lifecycle model,
             and `diff` the diff of the last change of a task plan),
-            `task-board-tui` (split into `task-board-tui-{model,control,view,popup,style}`)
-            for the terminal UI, and `task-board-web-server` for the browser
-            UI, served by the service, with its client in
+            `task-board-tui` (split into
+            `task-board-tui-{model,hooks,state,control,view,popup,style}`, where
+            `model` holds the pure types and helpers, `hooks` the sub-hooks, and
+            `state` the central state hook) for the terminal UI, and
+            `task-board-web-server` for the browser UI, served by the
+            service, with its client in
             `ase-task-board-web-client.{html,ts,vue,styl}`, a Vue
             application bundled by Vite, whose root component is split
             into the modules `task-board-web-client-{model,editor,control}`
@@ -215,22 +226,32 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
     -   `tool/src/ase-agent-*.ts`: the parts of `ase agent`:
 
         -   `agent-runtime` for the runtime base of all agents,
+            `agent-runtime-task` for the task types and helpers of the agents,
+            `agent-runtime-workspace` for the Git workspace of an agent (its
+            working copy, the temporary clone of `--repo`, and the working
+            directories and held Git resources of the processed tasks),
             `agent-runtime-tool` for the headless agent tool invocation
             and the decoding of its output, `agent-runtime-exec` for the
             processes, temporary directories, jobs, and Git operations,
             `agent-runtime-claim` for the run locks and task claims of the
             crash recovery, `agent-runtime-{phase,request}` for the runtime bases of the
-            phase resp. request agents, and `agent-runtime-engine` for the
-            engine running every agent of a definition (its phase and
-            request agents) and its facades: the built-in agents, the agents
-            of the definition kinds, and the `adhoc` agent
+            phase resp. request agents, `agent-runtime-defined` for the
+            functionality shared by the agents of a definition (hook context,
+            job preparing and finishing, success criteria, and settling),
+            `agent-runtime-delegate` for the phase and request agents of a
+            definition, and `agent-runtime-engine` for the engine facades
+            running every agent of a definition: the built-in agents, the
+            agents of the definition kinds, and the `adhoc` agent
 
         -   `agent-definition-api` for the public, self-contained types of
             the agent definitions and their hooks (exported as the types of
-            the `@rse/ase` package), `agent-definition-core` for the
-            definition model (options, YAML, TypeScript, JavaScript, and
-            built-in definition loading, discovery of the definition kinds,
-            hooks, validation, and templates), and
+            the `@rse/ase` package), `agent-definition-schema` for the
+            options, parameters, follow-up fields, and hook names of the
+            definitions, `agent-definition-template` for the templates,
+            `agent-definition-loader` for the built-in kinds, the discovery
+            of the definition kinds, and the YAML, TypeScript, JavaScript,
+            and built-in definition loading, `agent-definition-core` for the
+            resolution and validation of the definitions, and
             the directory
             `tool/src/ase-agent-definition-builtin/` with the files
             `{rebooter,condenser,griller,implementer,qualifier,integrator,editor,estimator,researcher}.ts`

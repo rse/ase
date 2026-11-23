@@ -14,7 +14,7 @@ import { AsyncLocalStorage }        from "node:async_hooks"
 import { execa }                    from "execa"
 
 import { Worktree }                 from "./ase-util-worktree.js"
-import type { AgentTask, AgentLog } from "./ase-agent-runtime.js"
+import type { AgentTask, AgentLog } from "./ase-agent-runtime-task.js"
 
 /*  the temporary directory of an agent, and the base directory of "--tempdir"
     if created by the agent (else empty)  */

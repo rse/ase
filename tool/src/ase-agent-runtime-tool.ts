@@ -9,7 +9,7 @@ import { stripVTControlCharacters } from "node:util"
 import type { TokenCounts }         from "./ase-config-schema.js"
 import type { Tool }                from "./ase-setup-common.js"
 import type { AgentUsage }          from "./ase-agent-relay-core.js"
-import type { LineLevel }           from "./ase-agent-runtime.js"
+import type { LineLevel }           from "./ase-agent-runtime-task.js"
 
 /*  a processing log entry decoded from an event of the agent tool,
     where an entry of agent message text is also an output line of the skill,

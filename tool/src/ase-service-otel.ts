@@ -6,15 +6,9 @@
 
 import fs                     from "node:fs"
 import path                   from "node:path"
-import http                   from "node:http"
-import zlib                   from "node:zlib"
 import crypto                 from "node:crypto"
-import { spawn }              from "node:child_process"
-import { fileURLToPath }      from "node:url"
 
-import { ofetch }             from "ofetch"
 import PQueue                 from "p-queue"
-import YAML                   from "yaml"
 import writeFileAtomic        from "write-file-atomic"
 import lockfile               from "proper-lockfile"
 
@@ -23,26 +17,27 @@ import { Config, sessionState }         from "./ase-config-core.js"
 import {
     configSchema, parsePrices, modelPrice, tokenCost, parseRates, userRate
 }                                       from "./ase-config-schema.js"
-import type { TokenCounts, TokenPrice } from "./ase-config-schema.js"
-import { parseScope, userStateDir }     from "./ase-config-scope.js"
+import type { TokenPrice }              from "./ase-config-schema.js"
+import { userStateDir }                 from "./ase-config-scope.js"
 import { Task, UsageUncertain }         from "./ase-task.js"
 import type { TaskUsage }               from "./ase-task.js"
+import {
+    userId, telemetryEnabled, telemetryImplicit, telemetryEndpoint, stateFile, readState, request
+}                                       from "./ase-service-otel-common.js"
+import type {
+    Usage, UsageWindow, UsageJournal, SessionEntry, TelemetryState
+}                                       from "./ase-service-otel-common.js"
+import { OtlpIngress }                  from "./ase-service-otel-ingress.js"
+import type { UsageRecord }             from "./ase-service-otel-ingress.js"
 
-/*  the loopback host of the OTLP ingress and of the project services  */
-const HOST = "127.0.0.1"
-
-/*  the default port of the OTLP ingress, the default interval (in minutes) of the interim
-    bookings of the open usage windows, the default idle time (in minutes) after which a
-    usage window pauses, the length of a minute (in ms), the inactivity (in ms) after which
-    an open usage window is closed, the grace period (in ms) for late batches before
-    the final booking of a closed usage window, the period (in ms) a closed usage window
-    whose task vanished is kept for its task being reported as just renamed, the interval
-    (in ms) of the attempts to take over the OTLP ingress and of the booking checks, the
-    delay (in ms) of the coalesced persisting of the journal after ingested usage records,
-    the maximum number of remembered record keys (for de-duplicating re-sent batches),
-    the maximum OTLP request size, and the timeout (in ms) of the detaching of a session by
-    the session end hook (as Claude Code kills this hook after 1.5 seconds already)  */
-const PORT_DFLT     = 44318
+/*  the default interval (in minutes) of the interim bookings of the open usage windows, the
+    default idle time (in minutes) after which a usage window pauses, the length of a minute
+    (in ms), the inactivity (in ms) after which an open usage window is closed, the grace period
+    (in ms) for late batches before the final booking of a closed usage window, the period (in ms)
+    a closed usage window whose task vanished is kept for its task being reported as just renamed,
+    the interval (in ms) of the attempts to take over the OTLP ingress and of the booking checks,
+    the delay (in ms) of the coalesced persisting of the journal after ingested usage records,
+    and the maximum number of remembered record keys (for de-duplicating re-sent batches)  */
 const INTERVAL_DFLT = 10
 const IDLE_DFLT     = 30
 const MINUTE_MS     = 60 * 1000
@@ -53,324 +48,12 @@ const BIND_MS       = 5 * 1000
 const TICK_MS       = 30 * 1000
 const PERSIST_MS    = 5 * 1000
 const SEEN_MAX      = 10000
-const BODY_MAX      = 32 * 1024 * 1024
-const DETACH_MS     = 500
-
-/*  the id of the current user, the "oneself" of the task assignments  */
-export const userId = (): string =>
-    process.env.USER ?? process.env.LOGNAME ?? "unknown"
-
-/*  whether the AI usage accounting is enabled as a whole ("telemetry.enabled", opt-in), i.e., the
-    OTLP ingress, the usage windows of the task assignments, and the bookings of the
-    "ase agent" jobs  */
-export const telemetryEnabled = (log: Log): boolean => {
-    const cfg = new Config("config", configSchema, log)
-    cfg.read()
-    return String(cfg.get("telemetry.enabled") ?? "false") === "true"
-}
-
-/*  whether the AI usage accounting implicitly accounts the active task of a session while
-    the task is unassigned ("telemetry.implicit", opt-out), i.e., without the session
-    explicitly assigning it to oneself  */
-export const telemetryImplicit = (log: Log): boolean => {
-    const cfg = new Config("config", configSchema, log)
-    cfg.read()
-    return String(cfg.get("telemetry.implicit") ?? "true") === "true"
-}
-
-/*  the OTLP ingress of the user: its base URL and its bearer token, where with <create>
-    a missing token is generated and persisted on the user configuration scope
-    (and without <create> a missing token is reported as empty)  */
-export const telemetryEndpoint = (log: Log, create: boolean): { url: string, token: string } => {
-    const cfg = new Config("config", configSchema, log)
-    cfg.read()
-    const port = Number(cfg.get("telemetry.service.port") ?? PORT_DFLT)
-    let token  = String(cfg.get("telemetry.service.token") ?? "")
-    if (token === "" && create) {
-        token = crypto.randomBytes(24).toString("hex")
-        const user = new Config("config", configSchema, log, parseScope("user"))
-        user.lock(() => {
-            user.read()
-            user.set("telemetry.service.token", token)
-            user.write()
-        })
-    }
-    return { url: `http://${HOST}:${port}`, token }
-}
-
-/*  ==== OTLP decoding ====  */
-
-/*  the subset of the OTLP protobuf messages needed for the usage records (field number to
-    JSON field name, wire value kind, repetition, and sub-message), decoded into the very
-    shape of the OTLP/JSON encoding (with 64-bit integers as decimal strings and bytes as hex)  */
-type ProtoField = [ name: string, kind: "msg" | "string" | "bytes" | "fixed64" | "double" | "int" | "bool", repeated?: boolean, sub?: string ]
-const protoSchemas: Record<string, Record<number, ProtoField>> = {
-    LogsRequest:   { 1: [ "resourceLogs", "msg", true, "ResourceLogs" ] },
-    ResourceLogs:  { 1: [ "resource", "msg", false, "Resource" ], 2: [ "scopeLogs", "msg", true, "ScopeLogs" ] },
-    ScopeLogs:     { 2: [ "logRecords", "msg", true, "LogRecord" ] },
-    LogRecord:     {
-        1:  [ "timeUnixNano", "fixed64" ], 11: [ "observedTimeUnixNano", "fixed64" ],
-        5:  [ "body", "msg", false, "AnyValue" ], 6: [ "attributes", "msg", true, "KeyValue" ]
-    },
-    TracesRequest: { 1: [ "resourceSpans", "msg", true, "ResourceSpans" ] },
-    ResourceSpans: { 1: [ "resource", "msg", false, "Resource" ], 2: [ "scopeSpans", "msg", true, "ScopeSpans" ] },
-    ScopeSpans:    { 2: [ "spans", "msg", true, "Span" ] },
-    Span:          {
-        2:  [ "spanId", "bytes" ], 5: [ "name", "string" ],
-        7:  [ "startTimeUnixNano", "fixed64" ], 8: [ "endTimeUnixNano", "fixed64" ],
-        9:  [ "attributes", "msg", true, "KeyValue" ]
-    },
-    Resource:      { 1: [ "attributes", "msg", true, "KeyValue" ] },
-    KeyValue:      { 1: [ "key", "string" ], 2: [ "value", "msg", false, "AnyValue" ] },
-    AnyValue:      {
-        1:  [ "stringValue", "string" ], 2: [ "boolValue", "bool" ], 3: [ "intValue", "int" ],
-        4:  [ "doubleValue", "double" ], 5: [ "arrayValue", "msg", false, "ArrayValue" ],
-        6:  [ "kvlistValue", "msg", false, "KeyValueList" ]
-    },
-    ArrayValue:    { 1: [ "values", "msg", true, "AnyValue" ] },
-    KeyValueList:  { 1: [ "values", "msg", true, "KeyValue" ] }
-}
-
-/*  decode a protobuf message of a type of the OTLP subset above, skipping all unknown fields  */
-const decodeProto = (buf: Buffer, type: string): Record<string, any> => {
-    const schema = protoSchemas[type]
-    const obj: Record<string, any> = {}
-    let pos = 0
-    const truncated = () => new Error(`truncated protobuf message "${type}"`)
-    const varint = (): bigint => {
-        let result = 0n
-        for (let shift = 0n; ; shift += 7n) {
-            if (pos >= buf.length)
-                throw truncated()
-            const b = buf[pos++]
-            result |= BigInt(b & 0x7f) << shift
-            if ((b & 0x80) === 0)
-                return result
-        }
-    }
-    while (pos < buf.length) {
-        const tag  = Number(varint())
-        const wire = tag & 0x07
-        let raw: bigint | Buffer
-        if (wire === 0)
-            raw = varint()
-        else if (wire === 1 || wire === 5) {
-            const len = wire === 1 ? 8 : 4
-            raw = buf.subarray(pos, pos + len)
-            pos += len
-        }
-        else if (wire === 2) {
-            const len = Number(varint())
-            raw = buf.subarray(pos, pos + len)
-            pos += len
-        }
-        else
-            throw new Error(`unsupported protobuf wire type ${wire} in message "${type}"`)
-        if (pos > buf.length)
-            throw truncated()
-        const field = schema[tag >>> 3]
-        if (field === undefined)
-            continue
-        const [ name, kind, repeated, sub ] = field
-        let value: unknown
-        if (kind === "msg" && Buffer.isBuffer(raw))
-            value = decodeProto(raw, sub!)
-        else if (kind === "string" && Buffer.isBuffer(raw))
-            value = raw.toString("utf8")
-        else if (kind === "bytes" && Buffer.isBuffer(raw))
-            value = raw.toString("hex")
-        else if (kind === "fixed64" && Buffer.isBuffer(raw) && raw.length === 8)
-            value = raw.readBigUInt64LE().toString()
-        else if (kind === "double" && Buffer.isBuffer(raw) && raw.length === 8)
-            value = raw.readDoubleLE()
-        else if (kind === "int" && typeof raw === "bigint")
-            value = BigInt.asIntN(64, raw).toString()
-        else if (kind === "bool" && typeof raw === "bigint")
-            value = raw !== 0n
-        else
-            continue
-        if (repeated)
-            (obj[name] ??= []).push(value)
-        else
-            obj[name] = value
-    }
-    return obj
-}
-
-/*  flatten the OTLP key/value attributes into a map of scalar values  */
-const attributes = (list: unknown): Map<string, string | number | boolean> => {
-    const map = new Map<string, string | number | boolean>()
-    for (const kv of Array.isArray(list) ? list : []) {
-        const val = kv?.value ?? {}
-        if (typeof kv?.key !== "string")
-            continue
-        if (typeof val.stringValue === "string")
-            map.set(kv.key, val.stringValue)
-        else if (val.intValue !== undefined)
-            map.set(kv.key, Number(val.intValue))
-        else if (typeof val.doubleValue === "number")
-            map.set(kv.key, val.doubleValue)
-        else if (typeof val.boolValue === "boolean")
-            map.set(kv.key, val.boolValue)
-    }
-    return map
-}
-
-/*  a usage record, normalized from the OTLP records of all agent tools: the session it
-    belongs to, the time of the event (in ms since the epoch, for an AI request its
-    completion), its key (unique within the
-    session, for de-duplicating re-sent batches), the duration of the AI request (in ms),
-    the token counts (with the input tokens being the uncached ones only, so the cache read,
-    cache write, input, and output tokens are disjoint), the cost (in USD, or null if the
-    tool reports none), and the model; a tool reporting no request durations at all
-    instead marks the sending of a request ("start") and its completion ("end"), whose
-    distance the tracker accounts as the duration  */
-export type UsageRecord = {
-    session: string, time: number, key: string, durationMs: number,
-    tokens: TokenCounts, costUSD: number | null, model: string,
-    mark?: "start" | "end"
-}
-
-/*  extract the usage records of an OTLP/JSON(-shaped) logs or traces request: the
-    "claude_code.api_request" events of Claude Code, the "codex.sse_event" (of kind
-    "response.completed") events of OpenAI Codex CLI (with the duration from the preceding
-    "codex.websocket_request" or "codex.api_request" event of the conversation, as it reports
-    none itself), and the GenAI inference ("chat") spans of GitHub Copilot CLI (and any other
-    tool following the GenAI semantic conventions); records without a session are dropped;
-    the input tokens of Claude Code exclude the cache tokens, while those of Codex (OpenAI
-    style) and of the GenAI semantic conventions include them, so for the latter the cache
-    tokens are subtracted  */
-export const usageRecords = (signal: "logs" | "traces", req: Record<string, any>): UsageRecord[] => {
-    const records: UsageRecord[] = []
-    const num  = (v: unknown) => {
-        const n = typeof v === "string" && v.trim() !== "" ? Number(v) : v
-        return typeof n === "number" && Number.isFinite(n) && n >= 0 ? n : 0
-    }
-    const inclusive = (input: number, cread: number, cwrite: number, output: number): TokenCounts =>
-        ({ cread, cwrite, input: Math.max(0, input - cread - cwrite), output })
-    const nano = (v: unknown) => v !== undefined && /^\d+$/.test(String(v)) ? Number(BigInt(String(v)) / 1000000n) : 0
-    const resources = signal === "logs" ? req.resourceLogs : req.resourceSpans
-    for (const rs of Array.isArray(resources) ? resources : []) {
-        const res    = attributes(rs?.resource?.attributes)
-        const scopes = signal === "logs" ? rs?.scopeLogs : rs?.scopeSpans
-        for (const sc of Array.isArray(scopes) ? scopes : []) {
-            const items = signal === "logs" ? sc?.logRecords : sc?.spans
-            for (const item of Array.isArray(items) ? items : []) {
-                const attrs = attributes(item?.attributes)
-                const attr  = (...keys: string[]) => {
-                    for (const key of keys) {
-                        const val = attrs.get(key) ?? res.get(key)
-                        if (val !== undefined)
-                            return val
-                    }
-                    return undefined
-                }
-                const session = String(attr("session.id", "conversation.id", "gen_ai.conversation.id") ?? "")
-                if (session === "")
-                    continue
-                const model = String(attr("model", "gen_ai.response.model", "gen_ai.request.model") ?? "")
-                if (signal === "logs") {
-                    const name  = String(attr("event.name") ?? item?.body?.stringValue ?? "")
-                    const stamp = Date.parse(String(attr("event.timestamp") ?? ""))
-                    const time  = Number.isFinite(stamp) ? stamp : nano(item?.timeUnixNano) || nano(item?.observedTimeUnixNano)
-                    if (name === "api_request" || name === "claude_code.api_request") {
-                        const cost = attr("cost_usd") ?? (attr("cost_usd_micros") !== undefined ? num(attr("cost_usd_micros")) / 1e6 : undefined)
-                        records.push({
-                            session, time, model,
-                            key:          `claude:${attr("request_id") ?? attr("event.sequence") ?? time}`,
-                            durationMs:   num(attr("duration_ms")),
-                            tokens:       {
-                                cread:  num(attr("cache_read_tokens")),
-                                cwrite: num(attr("cache_creation_tokens")),
-                                input:  num(attr("input_tokens")),
-                                output: num(attr("output_tokens"))
-                            },
-                            costUSD:      cost !== undefined ? num(cost) : null
-                        })
-                    }
-                    else if (name === "codex.sse_event" && attr("event.kind") === "response.completed") {
-                        const duration = num(attr("duration_ms"))
-                        records.push({
-                            session, time, model,
-                            key:          `codex-sse:${time}`,
-                            durationMs:   duration,
-                            tokens:       inclusive(num(attr("input_token_count")), num(attr("cached_token_count")),
-                                num(attr("cache_write_token_count")), num(attr("output_token_count"))),
-                            costUSD:      null,
-                            ...(duration === 0 ? { mark: "end" as const } : {})
-                        })
-                    }
-                    else if (name === "codex.websocket_request" || name === "codex.api_request")
-                        records.push({
-                            session, time, model,
-                            key:          `codex-req:${time}:${attr("attempt") ?? 0}`,
-                            durationMs:   0,
-                            tokens:       { cread: 0, cwrite: 0, input: 0, output: 0 },
-                            costUSD:      null,
-                            mark:         "start"
-                        })
-                }
-                else {
-                    const op = String(attr("gen_ai.operation.name") ?? "")
-                    if (!(op === "chat" || op === "text_completion" || op === "generate_content"
-                        || (op === "" && String(item?.name ?? "").startsWith("chat"))))
-                        continue
-                    if (attr("gen_ai.usage.input_tokens") === undefined && attr("gen_ai.usage.output_tokens") === undefined)
-                        continue
-                    /*  (the "github.copilot.cost" of Copilot is its premium request multiplier
-                        and its "github.copilot.nano_aiu" its AI credits, so neither is a cost in USD;
-                        the cache attributes are taken in their current dotted, their older underscored
-                        (of earlier Copilot CLI versions), and their Codex "cache_write" form)  */
-                    const start = nano(item?.startTimeUnixNano)
-                    const end   = Math.max(start, nano(item?.endTimeUnixNano))
-                    records.push({
-                        session, time: end, model,
-                        key:          `span:${item?.spanId ?? start}`,
-                        durationMs:   end - start,
-                        tokens:       inclusive(
-                            num(attr("gen_ai.usage.input_tokens")),
-                            num(attr("gen_ai.usage.cache_read.input_tokens", "gen_ai.usage.cache_read_input_tokens")),
-                            num(attr("gen_ai.usage.cache_creation.input_tokens", "gen_ai.usage.cache_creation_input_tokens",
-                                "gen_ai.usage.cache_write.input_tokens")),
-                            num(attr("gen_ai.usage.output_tokens"))),
-                        costUSD:      null
-                    })
-                }
-            }
-        }
-    }
-    return records
-}
 
 /*  ==== usage windows ====  */
-
-/*  the accumulated, not yet booked usage of a window: AI request time, human time (the
-    whole real time of the window, as the engineer costs money even while waiting for the
-    AI), and real (wall-clock) time (in ms), the token counts, and the AI and human costs
-    (in USD, the human costs being in addition to the AI costs)  */
-type Usage = TokenCounts & { aiMs: number, hrMs: number, realMs: number, costAI: number, costHR: number }
 
 /*  an empty usage  */
 const usageZero = (): Usage =>
     ({ aiMs: 0, hrMs: 0, realMs: 0, cread: 0, cwrite: 0, input: 0, output: 0, costAI: 0, costHR: 0 })
-
-/*  a usage window of a task: the task id, the assignee being "oneself", its opening and
-    closing time (null while open), the time up to which its real time is accounted, the
-    time of its last activity (its opening, a session attaching, or a usage record), its
-    attached sessions (each with its attachment interval, "until" being null while
-    attached, and whether it is attached only implicitly, i.e., just as long as the
-    unassigned task stays the active task of the session), its not yet booked usage, its
-    time of the last booking, the number of records it received, and the time its task
-    was first found vanished on a booking (if not found since then)  */
-type UsageWindow = {
-    task: string, self: string, opened: number, closed: number | null, realFrom: number, active: number,
-    attach: { session: string, from: number, until: number | null, implicit?: boolean }[],
-    unbooked: Usage, booked: number, records: number, missing?: number
-}
-
-/*  the persistent journal of the usage windows of a project, plus the recently counted
-    record keys (de-duplicating re-sent batches)  */
-type UsageJournal = { windows: UsageWindow[], seen: string[] }
 
 /*  the outcome of an assignment: the previous and new assignee, the window action, the
     booked usage (if closed), and an optional notice  */
@@ -378,15 +61,6 @@ export type AssignResult = {
     from: string, to: string, action: "opened" | "attached" | "closed" | "none",
     booked: TaskUsage | null, notice: string
 }
-
-/*  the per-user session registry entry: the root directory and id of the project
-    whose service owns the usage window the session is attached to, and the time
-    the session ended (if its end could not be reported to this service)  */
-type SessionEntry = { root: string, project: string, ended?: number }
-
-/*  the per-user telemetry state, shared by the services of all projects: the session
-    registry, keyed by session, and the journals of the projects, keyed by project  */
-type TelemetryState = { session?: Record<string, SessionEntry>, booked?: Record<string, UsageJournal> }
 
 /*  the usage tracker of the project service: it owns the usage windows of the tasks of
     the project, accounts the usage records of their attached sessions, books them onto
@@ -396,7 +70,7 @@ export class UsageTracker {
     private journal: UsageJournal = { windows: [], seen: [] }
     private seen     = new Set<string>()
     private queue    = new PQueue({ concurrency: 1 })
-    private ingress: http.Server | null = null
+    private ingress:  OtlpIngress
     private timers: ReturnType<typeof setInterval>[] = []
     private watched  = new Set<string>()
     private unwatch: (() => void) | null = null
@@ -415,29 +89,13 @@ export class UsageTracker {
         private log:      Log,
         private root:     string,
         private project:  string,
-        private aseDir:   string,
-        private activity: () => void
-    ) {}
-
-    /*  ---- telemetry state ----  */
-
-    /*  the per-user telemetry state file, shared by the services of all projects, holding
-        the session registry under its "session" field and the journals of the usage windows
-        under its "booked" field  */
-    static stateFile (): string {
-        return path.join(userStateDir(), "telemetry.json")
+        aseDir:           string,
+        activity:         () => void
+    ) {
+        this.ingress = new OtlpIngress(log, aseDir, activity, (records) => { this.route(records) })
     }
 
-    /*  read the telemetry state file (an empty or missing file being an empty state)  */
-    private static readState (file = UsageTracker.stateFile()): TelemetryState {
-        const text = fs.existsSync(file) ? fs.readFileSync(file, "utf8") : ""
-        return text.trim() !== "" ? JSON.parse(text) as TelemetryState : {}
-    }
-
-    /*  the session registry entry of a session (or undefined if not registered)  */
-    static sessionEntry (session: string): SessionEntry | undefined {
-        return UsageTracker.readState().session?.[session]
-    }
+    /*  ---- session registry ----  */
 
     /*  register resp. unregister a session as attached to a window of this project
         (applied to the telemetry state file by the next persisting of the journal,
@@ -448,64 +106,6 @@ export class UsageTracker {
     }
     private unregister (session: string): void {
         this.sessions.set(session, null)
-    }
-
-    /*  send a request to the service of the project of a root directory
-        (whose port and bearer token are persisted in its ".ase/service.yaml")  */
-    static async request (root: string, endpoint: string, body: Record<string, unknown>, timeout = 30 * 1000): Promise<unknown> {
-        const file  = path.join(root, ".ase", "service.yaml")
-        const info  = YAML.parse(fs.readFileSync(file, "utf8")) as { port?: unknown, token?: unknown } | null
-        const port  = Number(info?.port)
-        const token = typeof info?.token === "string" ? info.token : null
-        if (!Number.isInteger(port))
-            throw new Error(`no service port in "${file}"`)
-        return ofetch(`http://${HOST}:${port}${endpoint}`, {
-            method:  "POST",
-            headers: token !== null ? { Authorization: `Bearer ${token}` } : {},
-            body,
-            timeout
-        })
-    }
-
-    /*  detach a session from its usage window through the owning project service (used by the
-        session end hook, within its tight time limit), if the session is registered at all: for
-        a service which is not reachable in time (e.g. as it crashed or got stopped), the session
-        end is noted in the session registry instead, and the service is started in the
-        background (without awaiting it), which then detaches the session as of its noted end,
-        as otherwise the window stays open until it is closed for inactivity  */
-    static async detachRemote (session: string): Promise<void> {
-        const entry = UsageTracker.sessionEntry(session)
-        if (entry === undefined)
-            return
-        await UsageTracker.request(entry.root, "/usage/detach", { session }, DETACH_MS).catch(async () => {
-            const file    = UsageTracker.stateFile()
-            const release = await lockfile.lock(file, {
-                retries: { retries: 5, minTimeout: 20, maxTimeout: 100 }
-            })
-            let root: string
-            try {
-                const state = UsageTracker.readState(file)
-                const noted = state.session?.[session]
-                if (noted === undefined)
-                    return
-                noted.ended = Date.now()
-                root = noted.root
-                writeFileAtomic.sync(file, JSON.stringify(state, null, 4) + "\n")
-            }
-            finally {
-                await release()
-            }
-            const cli = fileURLToPath(new URL("./ase.js", import.meta.url))
-            spawn(process.execPath, [ cli, "service", "start" ], { cwd: root, detached: true, stdio: "ignore" }).unref()
-        })
-    }
-
-    /*  report the rename of a task to the service of the project of a root directory (used
-        by every rename through "Task.rename"), if a service of the project runs at all  */
-    static async renameRemote (root: string, oldId: string, newId: string): Promise<void> {
-        if (!fs.existsSync(path.join(root, ".ase", "service.yaml")))
-            return
-        await UsageTracker.request(root, "/usage/rename", { old: oldId, new: newId })
     }
 
     /*  ---- journal ----  */
@@ -520,14 +120,14 @@ export class UsageTracker {
     /*  load the journal of this project  */
     private load (): void {
         try {
-            const journal = UsageTracker.readState(UsageTracker.stateFile()).booked?.[this.journalKey]
+            const journal = readState(stateFile()).booked?.[this.journalKey]
             if (journal === undefined)
                 return
             this.journal = journal
             this.seen    = new Set(this.journal.seen)
         }
         catch (err: unknown) {
-            this.log.write("error", `usage: failed to load journal from "${UsageTracker.stateFile()}": ` +
+            this.log.write("error", `usage: failed to load journal from "${stateFile()}": ` +
                 `${err instanceof Error ? err.message : String(err)}`)
         }
     }
@@ -546,7 +146,7 @@ export class UsageTracker {
         this.seen         = new Set(this.journal.seen)
         const sessions    = new Map(this.sessions)
         this.saving = this.saving.then(async () => {
-            const file = UsageTracker.stateFile()
+            const file = stateFile()
             fs.mkdirSync(path.dirname(file), { recursive: true })
             fs.appendFileSync(file, "", "utf8")
             const release = await lockfile.lock(file, {
@@ -555,7 +155,7 @@ export class UsageTracker {
             try {
                 let state: TelemetryState
                 try {
-                    state = UsageTracker.readState(file)
+                    state = readState(file)
                 }
                 catch (err: unknown) {
                     this.log.write("warning", `usage: discarding unreadable telemetry state "${file}": ` +
@@ -588,7 +188,7 @@ export class UsageTracker {
                 await release()
             }
         }).catch((err: unknown) => {
-            this.log.write("error", `usage: failed to save journal into "${UsageTracker.stateFile()}": ` +
+            this.log.write("error", `usage: failed to save journal into "${stateFile()}": ` +
                 `${err instanceof Error ? err.message : String(err)}`)
         })
         return this.saving
@@ -613,8 +213,8 @@ export class UsageTracker {
         and check the bookings and the foreign assignee changes periodically  */
     start (): void {
         this.load()
-        this.bind()
-        this.timers.push(setInterval(() => { this.bind() }, BIND_MS))
+        this.ingress.bind()
+        this.timers.push(setInterval(() => { this.ingress.bind() }, BIND_MS))
         this.timers.push(setInterval(() => { this.tick() }, TICK_MS))
         for (const timer of this.timers)
             timer.unref()
@@ -628,10 +228,7 @@ export class UsageTracker {
         for (const timer of this.timers)
             clearInterval(timer)
         this.timers = []
-        if (this.ingress !== null) {
-            this.ingress.close()
-            this.ingress = null
-        }
+        this.ingress.close()
         if (this.deferred !== null)
             await this.persist()
         else
@@ -1010,7 +607,7 @@ export class UsageTracker {
     private tick (): void {
         let registry: Record<string, SessionEntry> = {}
         try {
-            registry = UsageTracker.readState().session ?? {}
+            registry = readState().session ?? {}
         }
         catch (err: unknown) {
             this.log.write("warning", `usage: failed to read session registry: ${err instanceof Error ? err.message : String(err)}`)
@@ -1279,87 +876,7 @@ export class UsageTracker {
         }
     }
 
-    /*  ---- OTLP ingress ----  */
-
-    /*  take part in the election of the OTLP ingress of the user: unless already holding it,
-        try to bind its port (only if telemetry is activated, i.e., a token exists)  */
-    private bind (): void {
-        if (!telemetryEnabled(this.log)) {
-            if (this.ingress !== null) {
-                this.log.write("info", "usage: telemetry disabled -- releasing the OTLP ingress")
-                this.ingress.close()
-                this.ingress = null
-            }
-            return
-        }
-        if (this.ingress !== null)
-            return
-        const { url, token } = telemetryEndpoint(this.log, false)
-        if (token === "")
-            return
-        const port   = Number(new URL(url).port)
-        const server = http.createServer((req, res) => { this.receive(req, res, port, token) })
-        this.ingress = server
-        server.once("error", () => {
-            /*  port held by another project service (or foreign process): retry later  */
-            this.ingress = null
-            server.close()
-        })
-        server.listen(port, HOST, () => {
-            this.log.write("info", `usage: acting as OTLP ingress on ${url}`)
-        })
-    }
-
-    /*  receive an OTLP/HTTP export request on the ingress  */
-    private receive (req: http.IncomingMessage, res: http.ServerResponse, port: number, token: string): void {
-        const reply = (code: number, json = true) => {
-            res.writeHead(code, { "Content-Type": json ? "application/json" : "application/x-protobuf" })
-            res.end(json ? "{}" : undefined)
-        }
-        const signal = req.url === "/v1/logs" ? "logs" : req.url === "/v1/traces" ? "traces" : req.url === "/v1/metrics" ? "metrics" : ""
-        const host   = (req.headers.host ?? "").toLowerCase()
-        const auth   = Buffer.from(req.headers.authorization ?? "")
-        const wanted = Buffer.from(`Bearer ${token}`)
-        if (req.method !== "POST" || signal === "")
-            return reply(404)
-        if (host !== `${HOST}:${port}` && host !== `localhost:${port}`)
-            return reply(421)
-        if (auth.length !== wanted.length || !crypto.timingSafeEqual(auth, wanted))
-            return reply(401)
-        this.activity()
-        const chunks: Buffer[] = []
-        let size = 0
-        req.on("data", (chunk: Buffer) => {
-            size += chunk.length
-            if (size > BODY_MAX)
-                req.destroy()
-            else
-                chunks.push(chunk)
-        })
-        req.on("end", () => {
-            const json = (req.headers["content-type"] ?? "").includes("json")
-            try {
-                let body = Buffer.concat(chunks)
-                if (req.headers["content-encoding"] === "gzip")
-                    body = zlib.gunzipSync(body, { maxOutputLength: BODY_MAX })
-                if (process.env.ASE_OTEL_CAPTURE === "1") {
-                    const dir = path.join(this.aseDir, "otel-capture")
-                    fs.mkdirSync(dir, { recursive: true })
-                    fs.writeFileSync(path.join(dir, `${Date.now()}-${signal}.${json ? "json" : "pb"}`), body)
-                }
-                if (signal !== "metrics") {
-                    const request = json ? JSON.parse(body.toString("utf8")) :
-                        decodeProto(body, signal === "logs" ? "LogsRequest" : "TracesRequest")
-                    this.route(usageRecords(signal, request))
-                }
-                reply(200, json)
-            }
-            catch (err: unknown) {
-                this.log.write("warning", `usage: invalid OTLP ${signal} request: ${err instanceof Error ? err.message : String(err)}`)
-                reply(400, json)
-            }
-        })
-    }
+    /*  ---- OTLP routing ----  */
 
     /*  route usage records by their session to the owning project service
         (dropping the records of unregistered sessions), with the session registry
@@ -1368,11 +885,11 @@ export class UsageTracker {
         const bySession = Map.groupBy(records, (r) => r.session)
         let registry: Record<string, SessionEntry>
         try {
-            const file = UsageTracker.stateFile()
+            const file = stateFile()
             const stat = fs.statSync(file, { throwIfNoEntry: false })
             const mark = stat !== undefined ? `${stat.ino}:${stat.mtimeMs}:${stat.size}` : ""
             if (this.registry?.mark !== mark)
-                this.registry = { mark, session: stat !== undefined ? (UsageTracker.readState(file).session ?? {}) : {} }
+                this.registry = { mark, session: stat !== undefined ? (readState(file).session ?? {}) : {} }
             registry = this.registry.session
         }
         catch (err: unknown) {
@@ -1387,7 +904,7 @@ export class UsageTracker {
             if (entry.root === this.root)
                 this.ingest(list)
             else {
-                UsageTracker.request(entry.root, "/usage/records", { records: list }).catch((err: unknown) => {
+                request(entry.root, "/usage/records", { records: list }).catch((err: unknown) => {
                     this.log.write("warning", `usage: forwarding records to project "${entry.project}" failed: ` +
                         `${err instanceof Error ? err.message : String(err)}`)
                 })

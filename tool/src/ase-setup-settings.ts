@@ -16,7 +16,7 @@ import type { AstNode }  from "json-asty"
 import type Log          from "./ase-lib-log.js"
 import { toolSpecs }     from "./ase-setup-common.js"
 import type { Tool, Scope } from "./ase-setup-common.js"
-import { telemetryEndpoint, telemetryEnabled } from "./ase-service-otel.js"
+import { telemetryEndpoint, telemetryEnabled } from "./ase-service-otel-common.js"
 
 /*  settings file handling of "ase setup statusline", "ase setup telemetry", the output style, and the function hooks  */
 export class SetupSettings {

@@ -32,7 +32,8 @@ import type { LogLevel }                 from "./ase-lib-log.js"
 import { Daemon }                        from "./ase-lib-daemon-cli.js"
 import { CompatMCP }                     from "./ase-util-compat.js"
 import { DiagramMCP }                    from "./ase-util-diagram.js"
-import { Task, TaskMCP }                 from "./ase-task.js"
+import { Task }                          from "./ase-task.js"
+import { TaskMCP }                       from "./ase-task-mcp.js"
 import { MarkdownMCP }                   from "./ase-service-markdown.js"
 import { ArtifactMCP }                   from "./ase-artifact.js"
 import { SpecMCP }                       from "./ase-spec.js"
@@ -49,7 +50,7 @@ import { MintMCP }                       from "./ase-util-mint.js"
 import { MetricMCP }                     from "./ase-util-metric.js"
 import { RasterizeMCP }                  from "./ase-util-rasterize.js"
 import { UsageTracker }                  from "./ase-service-otel.js"
-import type { UsageRecord }              from "./ase-service-otel.js"
+import type { UsageRecord }              from "./ase-service-otel-ingress.js"
 import pkg                               from "../package.json" with { type: "json" }
 
 /*  shared service host  */

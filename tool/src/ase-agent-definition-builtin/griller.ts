@@ -4,7 +4,7 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
-import type { AgentKind } from "../ase-agent-definition-core.js"
+import type { AgentKind } from "../ase-agent-definition-loader.js"
 
 /*  agent "ase agent griller", processing a plan only on explicit request,
     i.e., once a human assigned the task to the griller (by its name)  */

@@ -6,7 +6,7 @@
 
 import { parseEffort }              from "../ase-task-format.js"
 import type { AgentHookTask, AgentHookContext } from "../ase-agent-definition-api.js"
-import type { AgentKind }           from "../ase-agent-definition-core.js"
+import type { AgentKind }           from "../ase-agent-definition-loader.js"
 
 /*  whether a task carries a valid effort estimation (its "Effort" key), as the task store
     drops a stale one (whose content hash no longer matches the plan body) on loading

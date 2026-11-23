@@ -10,7 +10,8 @@ import type { Key }                           from "ink"
 import { reachableStates, rowLanes, splitHeight, laneWeight } from "./ase-task-board-core.js"
 import { nearestPlace }                       from "./ase-task-board-graph.js"
 import { groupItems, relocate, requestChoices, assignChoices } from "./ase-task-board-tui-model.js"
-import type { BoardCtx, PromptFocus }         from "./ase-task-board-tui-model.js"
+import type { PromptFocus }                   from "./ase-task-board-tui-model.js"
+import type { BoardCtx }                      from "./ase-task-board-tui-state.js"
 import { gridColumns }                        from "./ase-task-board-tui-view.js"
 import {
     refSegs, tabFirst, tabLayout, confirmBox, transferBox, assignBox, promptBox, promptIgnored, promptNext, dropFirst,

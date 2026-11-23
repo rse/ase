@@ -7,11 +7,12 @@
 import { Task }                     from "./ase-task.js"
 import * as TaskFormat              from "./ase-task-format.js"
 import type * as API                from "./ase-task-store-plugin-api.js"
-import type { AgentTask, AgentItem, AgentSelection, AgentLog, LineLevel } from "./ase-agent-runtime.js"
+import type { AgentTask, AgentItem, AgentSelection, AgentLog, LineLevel } from "./ase-agent-runtime-task.js"
 import {
-    Agent, tagsOf, taggedWith,
+    tagsOf, taggedWith,
     flatKeys, setPlanTag, updateTask
-}                                   from "./ase-agent-runtime.js"
+}                                   from "./ase-agent-runtime-task.js"
+import { Agent }                    from "./ase-agent-runtime.js"
 
 /*  the lifecycle states of the phase of an agent: the "incoming" states of the tasks
     to claim, the "activity" state during processing, the "success" state (set by the

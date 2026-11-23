@@ -7,7 +7,7 @@
 import type { Command }                  from "commander"
 
 import type Log                          from "./ase-lib-log.js"
-import { builtinKinds, discoverKinds }   from "./ase-agent-definition-core.js"
+import { builtinKinds, discoverKinds }   from "./ase-agent-definition-loader.js"
 import AgentAdhoc, { AgentBuiltin, AgentOfDefinition } from "./ase-agent-runtime-engine.js"
 import type { DefinedAgent }             from "./ase-agent-runtime-engine.js"
 import AgentProcessCommand               from "./ase-agent-process.js"

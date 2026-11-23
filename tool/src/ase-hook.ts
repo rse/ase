@@ -821,8 +821,8 @@ export default class HookCommand {
                 background, if it is not reachable in time, and imported dynamically
                 to keep it out of all other hooks)  */
             try {
-                const { UsageTracker } = await import("./ase-service-otel.js")
-                await UsageTracker.detachRemote(sessionId)
+                const { detachRemote } = await import("./ase-service-otel-common.js")
+                await detachRemote(sessionId)
             }
             catch (err: unknown) {
                 this.log.write("warning", `hook: failed to detach session from its usage window: ${err instanceof Error ? err.message : String(err)}`)
