@@ -69,7 +69,10 @@ multi-*criteria* decision matrix.
         combined) to find out more and adjust the name <alternative-K/>.
 
         If still unsure after the shared budget is exhausted, pick the
-        best-guess concise name and proceed. Do not output anything.
+        best-guess concise name and proceed. Invoke `ase-meta-search`
+        *never* via the `Skill` tool, and if a sub-agent gives back
+        `ERROR: ...`, treat the shared budget as exhausted and proceed
+        from your own knowledge. Do not output anything.
 
     -   For each alternative <alternative-K/> (K=1-N), decide which *one*
         of *USP* (Unique Selling Point -- what makes it unique), *Crux*

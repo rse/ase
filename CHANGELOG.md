@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: Fallback for Unavailable Web Search
+    `ase-arch-discover` and `ase-meta-evaluate` continue from model knowledge if the `ase-meta-search`
+    sub-agent gives back `ERROR:`, invoke it never via `Skill`, and a STOP of a skill invoked via `Skill`
+    ends only that skill and returns to the calling skill.
+
 -   BUGFIX [code]: No Uncommitted Squash Merges Reported as Merged
     `ase-repo-merge`, `ase-repo-stage`, and `ase-task-implement` judge their Git checks by the output of
     shell-neutral commands, no longer by an invisible exit status, and `ase-repo-merge` reports a squash

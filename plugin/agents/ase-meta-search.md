@@ -27,6 +27,7 @@ MCP tool whose name matches `web.?search` or `search.?web`
 (case-insensitive). Additionally, you *MAY* use the tool `WebFetch` to read
 the pages of the found sources. You *MUST* *NOT* use any other tools.
 
-If *no* Web search tool is available at all, give back only the single
-line `ERROR: no search backend available`.
+If *no* Web search tool is available at all, give back, as your last
+and only message, just the single line `ERROR: no search backend
+available`, without emitting it or any other text beforehand.
 

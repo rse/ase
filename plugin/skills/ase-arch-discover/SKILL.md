@@ -172,6 +172,22 @@ for the technology stack to *provide* the *needed functionality*
         <created-K/>, the last updated date as <updated-K/>, the total
         number of downloads in the last month as <downloads-K/>.
 
+        Use the `ase-meta-search` skill for each *general* discovery
+        below *only* in a sub-agent (`Agent` tool with `subagent_type:
+        "ase:ase-meta-search"`), *never* via the `Skill` tool. If it
+        gives back `ERROR: ...` or no usable components, do *NOT* stop,
+        but discover the initial set from the well-known, established
+        components of your own knowledge instead, still perform the
+        *specific* registry discovery, and output once the following
+        <template/>:
+
+        <template>
+        ⧉ **ASE**: **WARNING**: Web search unavailable -- general discovery fell back to model knowledge and may miss newer components.
+        </template>
+
+        In any case, before item 11, drop every discovered candidate
+        which clearly does not provide the <functionality/>.
+
     4.  If <stack/> is "JavaScript" or "TypeScript":
 
         1.  Based on the essential keywords <keyword-L/> (L=1-M),

@@ -227,6 +227,14 @@ Skill Sequential Processing
     finished skill remains open. Steps that were *skipped* because their
     `condition` attribute was not met *MUST* be treated the same way.
 
+-   *IMPORTANT*: A *STOP* always ends *only* the skill whose instructions
+    contain it. If that skill was invoked via the `Skill` tool from
+    another skill, its STOP returns to this *calling* skill, which takes
+    the stop output as the result of the invocation and continues its
+    own flow. Invoke the `ase-meta-search` skill *never* via the `Skill`
+    tool, but *only* through its `ase:ase-meta-search` sub-agent (`Agent`
+    tool).
+
 -   *IMPORTANT*: You *MUST* *strictly sequentially* execute every <step/> in
     a <flow/>. You *MUST* not implicitly skip any <step/> during
     processing, unless you were explicitly requested to do this or the
