@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code, docs]: No Whitespace Loss in Partial Staging
+    `ase-repo-stage` stages entirely selected files via `git add`, and partially selected ones by line
+    numbers through the new MCP tools `ase_stage_diff` and `ase_stage_select`, which derive the patch
+    from Git's own diff bytes, instead of a hand-written patch losing its whitespace-only lines.
+
 -   BUGFIX [code]: No Self-Invocation of Investigation Sub-Agents
     The investigation sub-agents `ase-code-{analyze,lint}`, `ase-docs-{proofread,refine,shorten}`,
     `ase-repo-review`, and `ase-spec-lint` disallow the `Skill` tool, so they can no longer invoke

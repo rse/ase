@@ -40,6 +40,7 @@ import { KVMCP }                         from "./ase-service-kv.js"
 import { StateMCP }                      from "./ase-service-state.js"
 import { TimestampMCP }                  from "./ase-service-timestamp.js"
 import { DiffMCP }                       from "./ase-service-diff.js"
+import { StageMCP }                      from "./ase-service-stage.js"
 import { SleepMCP }                      from "./ase-service-sleep.js"
 import { GetoptMCP }                     from "./ase-service-getopt.js"
 import { SkillsMCP }                     from "./ase-service-skills.js"
@@ -273,6 +274,7 @@ export default class ServiceCommand {
         new KVMCP().register(mcp)
         new TimestampMCP().register(mcp)
         new DiffMCP().register(mcp)
+        new StageMCP().register(mcp)
         new SleepMCP().register(mcp)
         new GetoptMCP(log).register(mcp)
         new SkillsMCP(log).register(mcp)

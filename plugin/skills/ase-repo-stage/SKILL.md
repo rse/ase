@@ -17,7 +17,6 @@ allowed-tools:
     - "Bash(find *)"
     - "Bash(ln -s *)"
     - "Bash(rm -f *)"
-    - "Write"
     - "Read"
     - "Skill"
 ---
@@ -231,45 +230,45 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
         exactly as given), a private location which, unlike a shared
         `/tmp`, no other user can tamper with. Do not output anything.
 
-    2.  Assemble <patch/> from <diff/>: keep the complete `diff --git`
-        file headers and the `@@` hunk headers of all files and hunks
-        with selected changes, and drop all others. Keep an *entirely*
-        selected hunk *verbatim*. Turn a *partially* selected hunk into
-        a sub-hunk, exactly like an edited hunk of `git add -p`: keep
-        its context lines and its selected `+` and `-` lines, turn every
-        *unselected* `-` line into a context line by replacing its
-        leading `-` by a space, and drop every *unselected* `+` line.
-        Its `@@` header stays unchanged, as `--recount` fixes its counts.
+    2.  Stage every *entirely* selected file diff (all its hunks
+        selected, like every binary one) directly, by running the
+        corresponding command (taken exactly as given) per path of it
+        (both paths for a rename):
 
-        Besides these marker changes, <patch/> stays *byte-exact*: you
-        *MUST* *NEVER* re-wrap, re-indent, or re-encode a line, normalize
-        or strip trailing whitespace, omit the trailing newline, or
-        re-render any part of it as Markdown.
+        `git -C "<repo-root/>" add -A -- "<file/>"`
 
-    3.  Use the `Write` tool to write <patch/> to the patch file
-        `<tmp-dir/>/ase-stage.patch`, and apply it to the *index only*
-        by running the corresponding command (taken exactly as given):
+    3.  <if condition="a file diff is only *partially* selected">
+        Stage the selected changes of these <partial-files/> through the
+        `ase` MCP server only, which derives the patch mechanically from
+        Git's own diff bytes: you *MUST* *NEVER* write, edit, or apply a
+        patch yourself, as a hand-written patch loses whitespace (e.g. a
+        `Write` tool strips the trailing whitespace of every line).
 
-        `git -C "<repo-root/>" apply --cached --recount --whitespace=nowarn "<tmp-dir/>/ase-stage.patch"`
+        First call the `ase_stage_diff(dir: "<repo-root/>", files:
+        [ <partial-files/> ])` tool of the `ase` MCP server, which
+        returns the <digest/> and the diff with each line prefixed by
+        its line number. Set <lines/> to the line numbers (each `<n/>`
+        or a range `<n/>-<m/>`) of all *selected* `+` and `-` lines of
+        this diff. Then call the `ase_stage_select(dir: "<repo-root/>",
+        files: [ <partial-files/> ], digest: "<digest/>", lines: [
+        <lines/> ])` tool of the `ase` MCP server, which stages them
+        exactly like the edited hunks of `git add -p`.
 
-        <if condition="this command fails">
-        Keep the patch file for inspection, only output the following
-        <template/>, and then *STOP*:
+        <if condition="this tool call fails">
+        Do *not* retry, only output the following <template/>, with
+        <error/> being the error message of the tool, and then *STOP*:
 
         <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-stage**, ▶ ERROR: patch failed to apply -- kept as `<tmp-dir/>/ase-stage.patch`
+        ⧉ **ASE**: ✪ skill: **ase-repo-stage**, ▶ ERROR: partial staging failed: <error/>
         </template>
+        </if>
         </if>
 
     4.  Undo the intent-to-add mark of every file of <intent-files/>
         without selected changes by running the corresponding command
-        (taken exactly as given) per file, and then remove the patch
-        file by running the corresponding command (taken exactly as
-        given):
+        (taken exactly as given) per file:
 
         `git -C "<repo-root/>" reset -q -- "<file/>"`
-
-        `rm -f "<tmp-dir/>/ase-stage.patch"`
 
     5.  Only output the following <template/>, with one `○` line per
         staged file and an ultra brief <summary/> of its staged changes:
@@ -433,8 +432,8 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
 
         Capture the same diff again into <after/>, and *stage* exactly
         the changes which <after/> carries beyond <before/> -- the
-        entries just added or updated for the staged selection -- by
-        assembling, writing, and applying them as in STEP 3.2 and 3.3.
+        entries just added or updated for the staged selection -- as in
+        STEP 3.2 and 3.3, with `CHANGELOG.md` as the only file.
         </if>
 
     2.  <if condition="<getopt-option-commit/> is equal `true`">
