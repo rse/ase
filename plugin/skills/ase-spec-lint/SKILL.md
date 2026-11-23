@@ -198,11 +198,7 @@ problems* related to a set of specification quality aspects.
 
     </else>
 
-    Then set <schema/> to the whitespace-separated entries of
-    <ase-spec-schema/>, or to the single entry `std` if
-    <ase-spec-schema/> is empty, where each entry `std` is replaced by
-    the path of the bundled file `meta/ase-format-specbook.yaml`. Set
-    <meta/> to the space-separated paths of the bundled files
+    Then set <meta/> to the space-separated paths of the bundled files
     `meta/ase-format-specbook.md` and `meta/ase-tenets.md`. Form each
     bundled file path by joining <ase-plugin-root/> and the file name
     with exactly *one* `/` separator, as <ase-plugin-root/> may or may
@@ -228,7 +224,7 @@ problems* related to a set of specification quality aspects.
         Agent(
             description:       "Specification Lint Investigation (<index/>/<count/>)",
             subagent_type:     "ase:ase-spec-lint",
-            prompt:            "ASPECTS: <investigation-aspects/>\nFILES: <investigation-files/>\nCORPUS: <corpus/>\nMETA: <meta/>\nSCHEMA: <schema/>\nDIAGNOSTICS:\n<investigation-diagnostics/>",
+            prompt:            "ASPECTS: <investigation-aspects/>\nFILES: <investigation-files/>\nCORPUS: <corpus/>\nMETA: <meta/>\nDIAGNOSTICS:\n<investigation-diagnostics/>",
             run_in_background: false
         )
     ```
@@ -236,9 +232,11 @@ problems* related to a set of specification quality aspects.
     The *investigations* are determined as follows:
 
     -   <if condition="<file-aspects/> is not empty">
-        Partition <sources/>, preserving order, into at most *eight*
-        batches of roughly equal size (a single file yields a single
-        batch). Each batch is one *investigation* with
+        Partition <sources/>, preserving order, into batches of roughly
+        equal size, with one batch per *six* files (rounded up), but at
+        most *four* batches, as every sub-agent first has to load the
+        large format contract at a fixed cost (a single file yields a
+        single batch). Each batch is one *investigation* with
         <investigation-aspects/> set to <file-aspects/>,
         <investigation-files/> set to the files of the batch, and
         <investigation-diagnostics/> set to those entries of

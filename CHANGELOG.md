@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   IMPROVEMENT [code]: Cheaper Sub-Agent Fan-Out of Specification Linting
+    `ase-spec-lint` fans out into at most four per-file sub-agents (one per six files), and each
+    sub-agent queries only the effective schema of its artifacts via `ase_specbook_query`, instead of
+    reading the entire 192 KB schema configuration, so the fan-out costs only a fraction.
+
 -   BUGFIX [code]: No Dropped Templates Before Tool Calls
     A template requested before a tool call is emitted as reply text before that call, never only in
     a thinking block, and only filler text is forbidden, so models no longer stay silent until the last

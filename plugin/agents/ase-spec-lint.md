@@ -24,8 +24,6 @@ Workflow
         specification, to be read for comprehension only.
     -   `META:` the space-separated files <meta/> of the bundled
         **SpecBook** format contract and **ASE Tenets**.
-    -   `SCHEMA:` the space-separated files <schema/> of the **SpecBook
-        SCHEMA Model** of the project, merged in the given order.
     -   `DIAGNOSTICS:` followed by the lines <diagnostics/> of the
         format `- <file/>:<line/>:<column/>: <severity/>: <message/>`,
         each a diagnostic of the syntax linters (*SpecBook* and
@@ -36,15 +34,25 @@ Workflow
 2.  Use the `Read` tool to read all files of <meta/> to learn the
     **SpecBook** format contract and the **ASE Tenets**, especially the
     **SPECIFYING TENETS**. Then use the `Read` tool to read all files of
-    <schema/> to learn the allowed object kinds, properties, nestings,
-    and value constraints of the project. Finally, use the `Read` tool
-    to read all files of <files/>.
+    <files/>.
 
     If <aspects/> contains any of the *model-wide* aspects `S07`...`S10`,
     additionally read *all* files of <corpus/>, as these aspects can be
     judged on the entire specification model only. Otherwise, read only
     those files of <corpus/> which are needed to really comprehend
     <files/>, like the targets of their `[[xxx]]` references.
+
+    Finally, learn the allowed object kinds, properties, nestings, and
+    value constraints of the **SpecBook SCHEMA Model** of the project,
+    but only for the *artifacts* of the files of <files/> (resp. of
+    <corpus/> for any *model-wide* aspect), where every level 1 heading
+    `<kind/>: <name/>` of a file opens an artifact. For this, call the
+    `ase_specbook_query(schema: true, selector: "// ARTIFACT-KIND [
+    @name == '<kind/>' ] / ARTIFACT [ @name == '<name/>' ]", format:
+    "yaml")` tool of the `ase` MCP server once per distinct artifact,
+    emitting all calls in one single message, which yields the
+    *effective* schema of just this artifact. Do *not* read any schema
+    configuration file, as it covers all artifacts and is very large.
 
 3.  Set <problems/> to empty.
     Then check the read specification for the following aspects (each
