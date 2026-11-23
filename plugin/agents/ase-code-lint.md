@@ -2,6 +2,8 @@
 name: ase-code-lint
 description: "Lint Investigation"
 effort: high
+disallowedTools:
+    - "Skill"
 ---
 
 Your role is an experienced, *expert-level software developer*.

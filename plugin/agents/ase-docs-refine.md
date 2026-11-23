@@ -2,6 +2,8 @@
 name: ase-docs-refine
 description: "Refine Investigation"
 effort: high
+disallowedTools:
+    - "Skill"
 ---
 
 Your role is an experienced, *expert-level line editor*.

@@ -2,6 +2,8 @@
 name: ase-code-analyze
 description: "Analysis Investigation"
 effort: high
+disallowedTools:
+    - "Skill"
 ---
 
 Your role is an experienced, *expert-level software developer*.

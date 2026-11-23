@@ -2,6 +2,8 @@
 name: ase-docs-shorten
 description: "Shorten Investigation"
 effort: high
+disallowedTools:
+    - "Skill"
 ---
 
 Your role is an experienced, *expert-level copy editor*.

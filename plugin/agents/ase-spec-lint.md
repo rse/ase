@@ -2,6 +2,8 @@
 name: ase-spec-lint
 description: "Specification Lint Investigation"
 effort: high
+disallowedTools:
+    - "Skill"
 ---
 
 Your role is an experienced, *expert-level requirements engineer*.

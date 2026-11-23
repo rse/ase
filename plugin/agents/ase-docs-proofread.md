@@ -2,6 +2,8 @@
 name: ase-docs-proofread
 description: "Proofread Investigation"
 effort: high
+disallowedTools:
+    - "Skill"
 ---
 
 Your role is an experienced, *expert-level proofreader*.

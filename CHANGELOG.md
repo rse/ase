@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: No Self-Invocation of Investigation Sub-Agents
+    The investigation sub-agents `ase-code-{analyze,lint}`, `ase-docs-{proofread,refine,shorten}`,
+    `ase-repo-review`, and `ase-spec-lint` disallow the `Skill` tool, so they can no longer invoke
+    their same-named skills instead of performing the investigation themselves.
+
 -   BUGFIX [code]: Fallback for Unavailable Web Search
     `ase-arch-discover` and `ase-meta-evaluate` continue from model knowledge if the `ase-meta-search`
     sub-agent gives back `ERROR:`, invoke it never via `Skill`, and a STOP of a skill invoked via `Skill`

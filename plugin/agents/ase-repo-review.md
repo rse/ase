@@ -2,6 +2,8 @@
 name: ase-repo-review
 description: "Review Investigation"
 effort: high
+disallowedTools:
+    - "Skill"
 ---
 
 Your role is an experienced, *expert-level software reviewer* performing
