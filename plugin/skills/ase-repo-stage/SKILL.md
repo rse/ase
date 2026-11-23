@@ -309,9 +309,11 @@ given) per file: `git -C "<repo-root/>" reset -q -- "<file/>"`.
 
         -   <if condition="the working copy carries neither unstaged changes nor untracked files besides those below `.ase/`">
             The working copy already equals the staged state (check it
-            via `git -C "<repo-root/>" diff --quiet` and a re-run of the
-            untracked files command of STEP 1.5), so run <build/> with
-            <repo-root/> as its working directory.
+            via an empty output of the command
+            `git -C "<repo-root/>" diff --name-only`, never via its exit
+            status, and a re-run of the untracked files command of STEP
+            1.5), so run <build/> with <repo-root/> as its working
+            directory.
             </if>
 
         -   <elseif condition="<getopt-option-worktree/> is equal `true`">

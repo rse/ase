@@ -520,8 +520,9 @@ Procedure
 
         -   `branch`: Stage the change set by running the command
             `git -C "<work-dir/>" add --all`. If the command
-            `git -C "<work-dir/>" diff --cached --quiet` fails (i.e.
-            something is staged), craft a commit <message/> in the
+            `git -C "<work-dir/>" diff --cached --name-only` lists any
+            files (judge by its *output*, never by its exit status),
+            craft a commit <message/> in the
             format `<type/>: <summary/>`, where <type/> is one of
             `FEATURE`, `IMPROVEMENT`, `BUGFIX`, `UPDATE`, `CLEANUP`, or
             `REFACTOR` and <summary/> is a 60-80 character,

@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: No Uncommitted Squash Merges Reported as Merged
+    `ase-repo-merge`, `ase-repo-stage`, and `ase-task-implement` judge their Git checks by the output of
+    shell-neutral commands, no longer by an invisible exit status, and `ase-repo-merge` reports a squash
+    merge as merged only if a squash commit landed or no squashed changes are left uncommitted.
+
 -   IMPROVEMENT [code]: Cheaper Sub-Agent Fan-Out of Specification Linting
     `ase-spec-lint` fans out into at most four per-file sub-agents (one per six files), and each
     sub-agent queries only the effective schema of its artifacts via `ase_specbook_query`, instead of

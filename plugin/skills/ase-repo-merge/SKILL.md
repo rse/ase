@@ -261,10 +261,13 @@ processing the entire current skill:
 
         -   `merge`: nothing to do, as the merge commit already exists.
 
-        -   `squash`: if the command `git -C "<target-dir/>" diff --cached --quiet`
-            succeeds, nothing was staged, as the changes of the source
-            branch already are contained in the target branch, so
-            nothing is to be committed. Otherwise, commit the squashed
+        -   `squash`: run the command
+            `git -C "<target-dir/>" diff --cached --name-only`, and
+            judge by its *output*, never by its exit status. If its
+            output is empty, nothing was staged, as the changes of the
+            source branch already are contained in the target branch,
+            so nothing is to be committed. Otherwise (staged files
+            listed), commit the squashed
             changes with the prepared message, listing all squashed
             commits, by running the command
             `git -C "<target-dir/>" commit --no-edit`. If it fails, run
@@ -295,19 +298,31 @@ processing the entire current skill:
 
     2.  <if condition="<getopt-option-mode/> is `squash`">
         A squash merge does not record the source branch as an
-        ancestor, so check that the squash commit landed instead: if
-        <squashed/> is `true`, run the command
-        `git -C "<target-dir/>" rev-parse "<target/>~1"`, and if its
-        output does not equal <target-commit/> (the squash commit is
-        not the direct successor of the previous target), expand the
-        following:
+        ancestor, so judge by evidence instead: capture the output of
+        the command `git -C "<target-dir/>" rev-parse HEAD` into
+        <landed-commit/>.
 
-        <expand name="merge-fail" arg1="changes of branch **<source/>** not contained in branch **<target/>** after squash"></expand>
+        -   If <landed-commit/> equals <target-commit/> (no squash
+            commit), but <squashed/> is `true` or the command
+            `git -C "<target-dir/>" status --porcelain` reports any
+            output (squashed changes left uncommitted), run the command
+            <abort-cmd/> and expand the following:
+
+            <expand name="merge-fail" arg1="squash of **<source/>** into **<target/>** left no commit"></expand>
+
+        -   If <landed-commit/> differs from <target-commit/>, run the
+            command `git -C "<target-dir/>" rev-parse "<target/>~1"`,
+            and if its output does not equal <target-commit/> (the
+            squash commit is not the direct successor of the previous
+            target), expand the following:
+
+            <expand name="merge-fail" arg1="changes of branch **<source/>** not contained in branch **<target/>** after squash"></expand>
         </if>
         <else>
-        Run the command `git merge-base --is-ancestor "<source/>" "<target/>"`.
-        If it fails, the source branch did not land on the target
-        branch, so expand the following:
+        Run the command `git rev-list --count "<target/>..<source/>"`,
+        which counts the source commits missing on the target branch.
+        If its output is not `0`, the source branch did not land on
+        the target branch, so expand the following:
 
         <expand name="merge-fail" arg1="branch **<source/>** not contained in branch **<target/>** after <getopt-option-mode/>"></expand>
         </else>
