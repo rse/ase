@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: Mandatory Final Report in Change Review
+    `ase-repo-review` parses a fenced or prose-wrapped sub-agent result, retries it once, and under
+    `--auto` applies the fixes before the report, which is now always the final reply text with the
+    verdict and either the findings table or the no-findings statement, so it is never unparseable.
+
 -   BUGFIX [code, docs]: Root Documentation Files Classified as DOCS
     Artifact `files` globs prefixed with `/` resolve relative to the project root, so the default DOCS
     kind now also covers the root `{README,LICENSE,CHANGELOG}{,.md,.txt}`, and `ase-sync-reconcile`

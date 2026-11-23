@@ -310,7 +310,8 @@ Procedure
     Set <mode>thorough</mode> if <getopt-option-thorough/> is equal
     `true`, and <mode>focused</mode> otherwise.
 
-    For this, invoke *exactly once* the tool:
+    For this, invoke *exactly once* (apart from the single retry below)
+    the tool:
 
     ```text
         Agent(
@@ -321,10 +322,21 @@ Procedure
         )
     ```
 
-    Parse the single result message of the `Agent` tool as a JSON object,
-    set <summary/> to its `summary` field (a single crisp sentence
-    reconstructing the change's intent), and set <findings/> to its
-    `findings` field (a list).
+    Parse the single result message of the `Agent` tool as a JSON object
+    (if it is wrapped into a code fence or surrounded by prose, parse just
+    its outermost `{...}` object), set <summary/> to its `summary` field
+    (a single crisp sentence reconstructing the change's intent), and set
+    <findings/> to its `findings` field (a list). If no such object with
+    a `findings` list can be parsed, invoke the `Agent` tool *once* more
+    exactly as above, but with ` -- return ONLY the JSON object` appended
+    to its `prompt`, and parse its result the same way. If this fails
+    again, only output the following <template/> and then *STOP*
+    immediately, as you *MUST* *NEVER* invent findings or render the raw
+    result instead:
+
+    <template>
+    ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: review investigation returned no parseable result
+    </template>
 
     Then *derive* the overall <verdict/> from <findings/>: set
     <verdict/> to `REJECT - DEMANDS CHANGES` if *any* finding in
@@ -364,7 +376,40 @@ Procedure
 
 3.  <step id="STEP 3: Verdict and Findings">
 
-    1.  Use the following <template/> to output the overall review in
+    The outputs of this STEP 3 form the *mandatory final report* of the
+    skill: you *MUST* emit them as *one* contiguous reply text *after*
+    the last tool call (as a headless run shows only the final reply
+    text), and it *MUST* *always* carry the verdict, the change intent,
+    and *exactly one* of the findings table or the no-findings
+    statement. You *MUST* *NEVER* omit, summarize, or replace any of
+    them by free prose, not even for a small or trivial change.
+
+    1.  Sort the findings of <findings/> by their `severity` field from
+        highest to lowest in the fixed order `HIGH`, `MEDIUM`, `LOW`,
+        `ACCEPTED`. Within the same severity, keep the order returned
+        by the sub-agent.
+
+        <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
+        *Automatically fix* the findings: for each finding of
+        <findings/> of a `severity` other than `ACCEPTED`, in the
+        sorted order, read the cited file of its `location` (a
+        relative file resolved against <worktree-dir/> if this is not
+        empty, else against the output of the command
+        `git rev-parse --show-toplevel`) and the code around the cited
+        lines, and apply a *minimal*, *focused* correction which
+        resolves exactly this finding via the `Edit` tool (resp. the
+        `Write` tool for a file to be created), without any unrelated
+        change, and without staging or committing anything. Record the
+        outcome of each finding: `APPLIED` if the correction was applied,
+        `FAILED` if an `Edit` or `Write` reported an error, or `SKIPPED`
+        if the finding cannot be resolved by a local correction (e.g. a
+        questioned intent or a design decision demanding a human), in
+        which case nothing is changed for it.
+        </if>
+
+        You *MUST* *NOT* output anything in this STEP 3.1.
+
+    2.  Use the following <template/> to output the overall review in
         <verdict/> and the reconstructed intent <summary/>:
 
         <template>
@@ -375,14 +420,14 @@ Procedure
 
         </template>
 
-        You *MUST* *NOT* output anything else in this STEP 3.1.
+        You *MUST* *NOT* output anything else in this STEP 3.2.
 
-    2.  <if condition="<findings/> is empty">
+    3.  <if condition="<findings/> is empty">
         Only output the following <template/> - with <note/> set to `the
         change was not reviewed` if <verdict/> starts with `SKIPPED`, to
         `no finding reaches severity <floor/>` if <hidden/> is greater
         than `0`, and to `the change is clean` otherwise - and then
-        *SKIP* substep 3 of this STEP 3:
+        *SKIP* substep 4 of this STEP 3:
 
         <template>
 
@@ -391,13 +436,10 @@ Procedure
         </template>
         </if>
 
-    3.  <if condition="<findings/> is NOT empty">
-        Sort the findings by <severity/> from highest to lowest in the
-        fixed order `HIGH`, `MEDIUM`, `LOW`, `ACCEPTED`. Within the same
-        severity, keep the order returned by the sub-agent.
-
-        Then render a *three-column table* with one row per finding by
-        using the following output <template/>. For each finding, repeat
+    4.  <if condition="<findings/> is NOT empty">
+        Render a *three-column table* with one row per finding, in the
+        sorted order of STEP 3.1, by using the following output
+        <template/>. For each finding, repeat
         the third line, set <severity/> to its `severity` field, set
         <dimension/> to its `dimension` field, set <location/> to its
         `location` field, and set <finding/> to its `finding` field.
@@ -422,7 +464,7 @@ Procedure
         Do *not* output any further explanation.
         </if>
 
-    4.  <if condition="<hidden/> is greater than `0`">
+    5.  <if condition="<hidden/> is greater than `0`">
         Output the following <template/>, so that suppressed findings
         are never mistaken for a clean change:
 
@@ -433,26 +475,9 @@ Procedure
         </template>
         </if>
 
-    5.  <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
-        *Automatically fix* the rendered findings: for each finding of
-        <findings/> of a `severity` other than `ACCEPTED`, in the
-        rendered order, read the cited file of its `location` (a
-        relative file resolved against <worktree-dir/> if this is not
-        empty, else against the output of the command
-        `git rev-parse --show-toplevel`) and the code around the cited
-        lines, and apply a *minimal*, *focused* correction which
-        resolves exactly this finding via the `Edit` tool (resp. the
-        `Write` tool for a file to be created), without any unrelated
-        change, and without staging or committing anything. Record the
-        outcome of each finding: `APPLIED` if the correction was applied,
-        `FAILED` if an `Edit` or `Write` reported an error, or `SKIPPED`
-        if the finding cannot be resolved by a local correction (e.g. a
-        questioned intent or a design decision demanding a human), in
-        which case nothing is changed for it.
-
-        As the fixing is interleaved with the tool calls (and a headless
-        run shows only the final reply text), recap the outcomes with
-        the following <template/>, emitted *after* the last tool call:
+    6.  <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
+        Recap the outcomes of the fixing of STEP 3.1 with the following
+        <template/>:
 
         <template>
         ⧉ **ASE**: **REVIEW FIXES**:
@@ -472,7 +497,7 @@ Procedure
         i.e., before the fixing.
         </if>
 
-    6.  Finally, give the closing hints by expanding the following
+    7.  Finally, give the closing hints by expanding the following
         (which, depending on the configured <ase-guidance-level/>, may
         expand into nothing and hence emit no output at all):
 
