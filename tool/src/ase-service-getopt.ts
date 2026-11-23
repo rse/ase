@@ -123,6 +123,12 @@ const parseSpec = (spec: string) => {
     const options:  Option[] = []
     const listOpts: Array<{ long: string, choices: string[] }> = []
     const longs:    string[] = []
+
+    /*  implicitly declare the help option, unless the spec declares it already, so
+        "--help" and "-h" are accepted even if a caller passes only the skill options  */
+    if (!tokens.some((tok) => re.exec(tok)?.[1] === "help"))
+        tokens.unshift(tokens.some((tok) => re.exec(tok)?.[2] === "h") ? "--help" : "--help|-h")
+
     for (const tok of tokens) {
         const m = re.exec(tok)
         if (m === null)
@@ -379,6 +385,7 @@ export class GetoptMCP {
                 "the remaining arguments and returned as `task` (empty if none): " +
                 "a first token `<id>:` (mode `colon`), or additionally a sole " +
                 "token `<id>` (mode `colon-or-bare`, then also `taskOnly: true`). " +
+                "The option `--help|-h` is always accepted, even if not part of `spec`. " +
                 "With the parsed option `help` being `true`, the manual page of the " +
                 "skill `name` is additionally returned as `help` (empty if not available).",
             inputSchema: {

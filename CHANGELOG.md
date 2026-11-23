@@ -5,6 +5,10 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code]: Implicit Help Option in Option Parsing
+    `ase_getopt` always accepts `--help|-h`, even if missing in the passed options specification,
+    so a model passing only the skill options gets the manual page instead of an unknown option error.
+
 -   IMPROVEMENT [code, docs]: Incompleteness in Diff Coherence Check
     `ase-repo-diff --coherence` additionally flags the gaps leaving the reconstructed thesis
     incomplete, like callers not adapted to a changed signature, as the new deviation kind

@@ -94,9 +94,10 @@ placeholders into the context as a side-effect.
     *first* token of a supplied list is validated by the parser against
     the choice set -- subsequent tokens are *not* validated, and skills
     validate each remaining token themselves as they consume it).
-    The tool additionally accepts the negation `--no-<long>` of every
-    option and applies the option aliases and option defaults configured
-    for <getopt-skill/> (see `ase alias`).
+    The tool additionally accepts `--help|-h` (even if missing in
+    `spec`) and the negation `--no-<long>` of every option, and applies
+    the option aliases and option defaults configured for
+    <getopt-skill/> (see `ase alias`).
 
     You *MUST* pass <getopt-args/> *exactly* as given by the user, i.e.,
     *never* add, drop, reorder, rename, or "fix" any option or argument,
