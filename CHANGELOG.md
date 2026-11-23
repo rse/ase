@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code, docs]: Verification Lint After Specification Corrections
+    `ase-spec-lint` lints the specification once more after applying corrections, reports newly
+    introduced diagnostics in a *LINT VERIFICATION*, and under `--auto` first reverts the corrections
+    causing them, so broken corrections no longer slip through to a later export.
+
 -   BUGFIX [code]: No Branch Switch During Merge or Resolve
     `ase-repo-merge` and `ase-repo-resolve` forbid creating or switching branches mid-operation,
     overriding any "branch first" rule, as a switch destroys `MERGE_HEAD` resp. `SQUASH_MSG` and lets

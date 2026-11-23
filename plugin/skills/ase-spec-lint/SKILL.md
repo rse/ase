@@ -210,10 +210,11 @@ problems* related to a set of specification quality aspects.
     the schema via *SpecBook* and for its generic Markdown formatting
     via *markdownlint*, and set <diagnostics/> to those entries of its
     returned `diagnostics` array whose `file` is contained in
-    <sources/>.
+    <sources/>, and set <baseline/> to its *entire* returned
+    `diagnostics` array (the reference of the verification in STEP 3).
     </if>
     <else>
-    Then set <diagnostics/> to empty.
+    Then set <diagnostics/> to empty and <baseline/> to *unset*.
     </else>
 
     Then dispatch the sub-agents by invoking the following tool once per
@@ -358,16 +359,20 @@ problems* related to a set of specification quality aspects.
         "yyyy-LL-dd HH:mm")` tool of the `ase` MCP server *once* to find
         out the current time and store it in <timestamp-modified/>, and
         set <touched/> to empty (the list of files changed by an
-        applied correction). Do not output anything in this substep.
+        applied correction). If <baseline/> is *unset* and <problems/>
+        is not empty, call the `ase_specbook_lint(markdown: true)` tool
+        of the `ase` MCP server *once*, *before* any `Edit`, and set
+        <baseline/> to its entire returned `diagnostics` array. Do not
+        output anything in this substep.
 
         *Critical safety invariant*: the marker set here grants `Edit`
-        auto-approval and *MUST* be cleared again (substep 4 below)
+        auto-approval and *MUST* be cleared again (substep 5 below)
         *before* this skill yields control, *regardless* of how the
         iteration in substep 2 ends - whether it completes normally,
         is aborted early (e.g. an `Edit` failure, an unparseable value,
         or any other unexpected condition), or is otherwise interrupted.
         If you ever stop or bail out of substep 2 early, you *MUST*
-        still perform substep 4 first. Never leave this marker active
+        still perform substep 5 first. Never leave this marker active
         for a later, unrelated `Edit`.
 
     2.  Set <total/> to the number of problems in <problems/>,
@@ -670,8 +675,9 @@ problems* related to a set of specification quality aspects.
                 After applying the changes, add every `file` of
                 <change-set/> to <touched/> (dropping duplicates),
                 record `APPLIED` (or `FAILED`, if an `Edit` reported an
-                error) as the outcome of <index/> in <outcomes/>, and
-                just continue with the next <item/>.
+                error) as the outcome of <index/> in <outcomes/>,
+                together with the applied <change-set/>, and just
+                continue with the next <item/>.
                 </if>
 
             -   <if condition="<result/> starts with 'OTHER'">
@@ -702,25 +708,56 @@ problems* related to a set of specification quality aspects.
 
         </for>
 
-    3.  For every file in <touched/> which carries a `Modified:
+    3.  Set <regressions/> to empty and <reverted/> to `0`.
+
+        <if condition="<touched/> is not empty">
+
+        *Verify* the applied corrections, as they can break the syntax
+        of the specification: call the `ase_specbook_lint(markdown:
+        true)` tool of the `ase` MCP server *once* more and set
+        <regressions/> to the *new* diagnostics of its returned
+        `diagnostics` array, i.e., those whose `file` is contained in
+        <touched/> and which remain *unmatched* when each entry of
+        <baseline/> matches at most one entry of the same `file`,
+        `severity`, and `message` (ignoring `line` and `column`, which
+        shift with the corrections).
+
+        <if condition="<regressions/> is not empty and <getopt-option-auto/> is equal `true`">
+        Attribute every regression to the `APPLIED` correction in
+        <outcomes/> whose change set edited the `file` of the regression
+        with a `new_text` covering, or else nearest to, its `line`. Then
+        *revert* each attributed correction by invoking the `Edit` tool
+        once per change hunk, in reverse order, replacing its `new_text`
+        with its `old_text` again (anchored by its surrounding context
+        lines where needed), change its outcome to `REVERTED`, and
+        increment <reverted/> by one. Remove every file from <touched/>
+        without any remaining `APPLIED` correction. Finally recompute
+        <regressions/> exactly as above.
+        </if>
+
+        </if>
+
+        Do not output anything in this substep.
+
+    4.  For every file in <touched/> which carries a `Modified:
         <timestamp-modified-old/>` frontmatter line, invoke the `Edit`
         tool to replace <timestamp-modified-old/> with
         <timestamp-modified/>, keeping the spacing behind `Modified:`
         unchanged. Do not output anything in this substep.
 
-    4.  *Clear the active edit-capable skill marker* now that all `Edit`
+    5.  *Clear the active edit-capable skill marker* now that all `Edit`
         invocations are done, so a later unrelated `Edit` is *not*
         auto-approved. Call the `ase_state_delete(key: "skill",
         session: "<ase-session-id/>")` tool from the `ase` MCP
         server. Do not output anything in this substep.
 
-    5.  <if condition="<getopt-option-auto/> is equal `true` and <total/> is greater than `0`">
+    6.  <if condition="<getopt-option-auto/> is equal `true` and <total/> is greater than `0`">
 
         Under `--auto`, the problem reports are interleaved with the
         `Edit` invocations (and a headless run shows only the final
         reply text), so recap the outcome of all problems with the
         following <template/>, emitted *after* the last tool call and
-        *together* with the final template of substep 6:
+        *together* with the templates of substeps 7 and 8:
 
         <template>
         ⧉ **ASE**: **LINT RESULT**:
@@ -735,23 +772,38 @@ problems* related to a set of specification quality aspects.
         -   <rows/> has one row `` | <index/> | **<aspect/>** | `<severity/>` | <location/> | <summary/> | **<status/>** | `` per problem of <problems/>, in order
         -   <location/> is the first `` `<file/>`:<line/> `` of the change set of the problem (or its <anchor/> for an empty change set), suffixed with ` (+<n/>)` for <n/> further change hunks
         -   <summary/> is a one-line summary of the <description/> of the problem, at most 60 characters long, with every `|` escaped as `\|`
-        -   <status/> is the outcome of the problem in <outcomes/>, where `SKIPPED` covers both the problems without a derivable correction and the unapplied gap-filling corrections
+        -   <status/> is the outcome of the problem in <outcomes/>, where `SKIPPED` covers both the problems without a derivable correction and the unapplied gap-filling corrections, and `REVERTED` the applied corrections reverted by the verification of substep 3
 
         </if>
 
-    6.  You *MUST* *NOT* output any further additional explanations or
+    7.  <if condition="<regressions/> is not empty or <reverted/> is greater than `0`">
+
+        Report the verification of substep 3 with the following
+        <template/>, where <count/> is the number of entries in
+        <regressions/> and <bullets/> carries one line `` - `<file/>`:<line/>:<column/>: <severity/>: <message/> ``
+        per entry of <regressions/> (or nothing if empty):
+
+        <template>
+        ⧉ **ASE**: **LINT VERIFICATION**: <reverted/> corrections reverted, <count/> new diagnostics left
+
+        <bullets/>
+        </template>
+
+        </if>
+
+    8.  You *MUST* *NOT* output any further additional explanations or
         summaries at the end of this skill processing, except for the
-        result of substep 5 and the following final <template/>:
+        results of substeps 6 and 7 and the following final <template/>:
 
         <template>
         ⧉ **ASE**: **LINT FINISHED**
         </template>
 
-    7.  Finally, give the closing hints by expanding the following
+    9.  Finally, give the closing hints by expanding the following
         (which, depending on the configured <ase-guidance-level/>, may
         each expand into nothing and hence emit no output at all):
 
-        <if condition="at least one problem in <problems/> was left uncorrected">
+        <if condition="at least one problem in <problems/> was left uncorrected, or <regressions/> is not empty">
         <ase-tpl-hint level="normal">
         For problems whose correction demands more than a local edit, use `/ase-spec-edit -g` to resolve them through a grilled one-shot specification edit.
         </ase-tpl-hint>

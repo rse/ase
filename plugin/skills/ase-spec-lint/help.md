@@ -33,6 +33,11 @@ re-proposes the correction without limit) or - with `--auto` - applies
 all corrections automatically. Every applied correction refreshes the
 `Modified:` timestamp of the changed specification files.
 
+After the corrections, the specification is linted once more, and the
+diagnostics newly introduced by the corrections are reported in a
+*LINT VERIFICATION*. With `--auto`, the corrections causing them are
+reverted first.
+
 By default all ten specification quality aspects are checked. The
 `--include` and `--exclude` options narrow this to an *effective aspect
 set*: with `--include` only, exactly the listed aspects are checked;
@@ -76,7 +81,8 @@ are *never* applied under `--auto`.
     user via the interactive dialog, except for the best-guess
     corrections of the aspects `S09 LOGIC` and `S10 COMPLETENESS`,
     which are only reported. A closing *LINT RESULT* table lists every
-    problem with its outcome (`APPLIED`, `SKIPPED`, or `FAILED`).
+    problem with its outcome (`APPLIED`, `SKIPPED`, `FAILED`, or
+    `REVERTED`, if the correction introduced new lint diagnostics).
 
 -   `--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`):
     Set the *severity floor* (default `AUTO`): findings below the chosen
