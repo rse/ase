@@ -194,9 +194,10 @@ const configParams: Array<{ name: string, value: string, scopes: string, desc: s
       scopes: "user, project",
       desc: "Anchor directory of the documentation files, relative to the project root." },
     { name: "project.artifact.docs.files",
-      value: "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**",
+      value: "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/** /{README,LICENSE,CHANGELOG}{,.md,.txt}",
       scopes: "user, project",
-      desc: "Glob spec matching the documentation files, relative to the anchor directory." },
+      desc: "Glob spec matching the documentation files, relative to the anchor directory " +
+            "(or to the project root, if prefixed with \"/\")." },
     { name: "project.artifact.infr.basedir",
       value: "",
       scopes: "user, project",

@@ -68,32 +68,6 @@ export class Artifact {
         return [ ...files ].sort((a, b) => a.localeCompare(b))
     }
 
-    /*  raw-resolve a single kind's configuration spec against the file
-        universe via "seed-then-mutate" miniglob semantics: the spec is a
-        whitespace-separated list of tokens.  */
-    private static rawResolve (spec: string, all: string[]): Set<string> {
-        const tokens = spec.split(/\s+/).filter((t) => t !== "")
-        if (tokens.length === 0)
-            return new Set<string>()
-        const result = new Set<string>(tokens[0].startsWith("!") ? all : [])
-        for (const token of tokens) {
-            const negated = token.startsWith("!")
-            const glob    = negated ? token.slice(1) : token
-            if (glob === "")
-                continue
-            const isMatch = picomatch(glob, { dot: true })
-            for (const file of all) {
-                if (!isMatch(file))
-                    continue
-                if (negated)
-                    result.delete(file)
-                else
-                    result.add(file)
-            }
-        }
-        return result
-    }
-
     /*  read a single scalar configuration value as a plain string  */
     private static configString (cfg: Config, key: string): string {
         const val = cfg.get(key)
@@ -104,7 +78,8 @@ export class Artifact {
 
     /*  read the configured "basedir" anchor and "files" miniglob spec
         for a single kind; "basedir" is project-root-relative (POSIX,
-        "" ≡ project root) and "files" resolves relative to "basedir"  */
+        "" ≡ project root) and "files" resolves relative to "basedir",
+        except for its "/"-prefixed tokens  */
     private static spec (cfg: Config, kind: Exclude<ArtifactKind, "othr">): { basedir: string, files: string } {
         const basedir = path.posix.normalize(Artifact.configString(cfg, `project.artifact.${kind}.basedir`)
             .replace(/\\/g, "/")).replace(/^\/+|\/+$/g, "")
@@ -116,19 +91,35 @@ export class Artifact {
     }
 
     /*  raw-resolve a single kind's "basedir"/"files" spec against the
-        file universe: the "files" miniglob resolves relative to
-        "basedir", then matches are re-prefixed with "basedir" to stay
-        project-relative  */
+        file universe via "seed-then-mutate" miniglob semantics: the spec
+        is a whitespace-separated list of tokens, each resolving relative
+        to "basedir", or relative to the project root if "/"-prefixed  */
     private static resolveKind (basedir: string, files: string, all: string[]): Set<string> {
-        if (basedir === "")
-            return Artifact.rawResolve(files, all)
-        const prefix = `${basedir}/`
-        const local  = all
-            .filter((file) => file.startsWith(prefix))
-            .map((file) => file.slice(prefix.length))
-        const result = new Set<string>()
-        for (const file of Artifact.rawResolve(files, local))
-            result.add(`${prefix}${file}`)
+        const prefix = basedir === "" ? "" : `${basedir}/`
+        const tokens = files.split(/\s+/).filter((t) => t !== "")
+        if (tokens.length === 0)
+            return new Set<string>()
+        const result = new Set<string>(tokens[0].startsWith("!") ?
+            all.filter((file) => file.startsWith(prefix)) : [])
+        for (const token of tokens) {
+            const negated  = token.startsWith("!")
+            const pattern  = negated ? token.slice(1) : token
+            const anchored = pattern.startsWith("/")
+            const glob     = pattern.replace(/^\/+/, "")
+            if (glob === "")
+                continue
+            const isMatch = picomatch(glob, { dot: true })
+            for (const file of all) {
+                if (!anchored && !file.startsWith(prefix))
+                    continue
+                if (!isMatch(anchored ? file : file.slice(prefix.length)))
+                    continue
+                if (negated)
+                    result.delete(file)
+                else
+                    result.add(file)
+            }
+        }
         return result
     }
 

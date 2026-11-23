@@ -81,7 +81,9 @@ a unified diff instead.
 -   *hint*:
     An optional free-form filtering hint that narrows the source and/or
     target artifacts, or the aspects of those artifacts to take into
-    account during reconciliation.
+    account during reconciliation. A file named explicitly by the hint
+    is included, even if its artifact kind is not among the target
+    resp. source kinds.
 
 ##  SCENARIOS
 

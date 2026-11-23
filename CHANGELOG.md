@@ -5,6 +5,11 @@ ChangeLog
 2.1.6 (2026-11-22)
 ------------------
 
+-   BUGFIX [code, docs]: Root Documentation Files Classified as DOCS
+    Artifact `files` globs prefixed with `/` resolve relative to the project root, so the default DOCS
+    kind now also covers the root `{README,LICENSE,CHANGELOG}{,.md,.txt}`, and `ase-sync-reconcile`
+    includes files named explicitly by its hint instead of reporting a kind conflict.
+
 -   BUGFIX [code]: Implicit Help Option in Option Parsing
     `ase_getopt` always accepts `--help|-h`, even if missing in the passed options specification,
     so a model passing only the skill options gets the manual page instead of an unknown option error.

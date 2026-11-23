@@ -87,7 +87,8 @@ export const projectClassificationPresets: Record<string, Record<string, string>
         "project.artifact.code.basedir":  "src",
         "project.artifact.code.files":    "** !**/etc/** !**/{.gitignore,.npmignore,package.json}",
         "project.artifact.docs.basedir":  "doc",
-        "project.artifact.docs.files":    "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**",
+        "project.artifact.docs.files":    "** **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/** " +
+                                          "/{README,LICENSE,CHANGELOG}{,.md,.txt}",
         "project.artifact.infr.basedir":  "",
         "project.artifact.infr.files":    "**/{.github,.claude*,etc}/** **/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}",
         "board.tui.color.dim":            tuiColorDefaults.dim,
@@ -212,18 +213,18 @@ export const configDescriptions: Record<string, string> = {
                                       "generated on each start, or a bearer token persisted across restarts.",
     "project.artifact.spec.basedir":  "The base directory of the specification files, relative to the project root.",
     "project.artifact.spec.files":    "The whitespace-separated glob specification of the specification files, relative to their base " +
-                                      "directory, with \"!\" negating a glob.",
+                                      "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
     "project.artifact.spec.schema":   "The whitespace-separated list of SpecBook schema configuration files (empty: the bundled " +
                                       "standard one \"std\").",
     "project.artifact.code.basedir":  "The base directory of the source code files, relative to the project root.",
     "project.artifact.code.files":    "The whitespace-separated glob specification of the source code files, relative to their base " +
-                                      "directory, with \"!\" negating a glob.",
+                                      "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
     "project.artifact.docs.basedir":  "The base directory of the documentation files, relative to the project root.",
     "project.artifact.docs.files":    "The whitespace-separated glob specification of the documentation files, relative to their base " +
-                                      "directory, with \"!\" negating a glob.",
+                                      "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
     "project.artifact.infr.basedir":  "The base directory of the infrastructure files, relative to the project root.",
     "project.artifact.infr.files":    "The whitespace-separated glob specification of the infrastructure files, relative to their base " +
-                                      "directory, with \"!\" negating a glob.",
+                                      "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
     "agent.persona":                  "The communication style of the AI agent.",
     "agent.guidance":                 "The amount of unsolicited help hints of the AI agent.",
     "agent.diagram.format":           "The rendering of the diagrams of the skills: as an inline image if the terminal supports it " +

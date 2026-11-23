@@ -25,7 +25,9 @@ kinds are:
 - `code`: the source code (by default below `src`, all files
   except `**/etc/**` and `**/{.gitignore,.npmignore,package.json}`).
 - `docs`: the documentation (by default below `doc`, all files plus
-  `**/{README,LICENSE,CHANGELOG}.{md,txt}`, except `{spec,arch}/**`).
+  `**/{README,LICENSE,CHANGELOG}.{md,txt}`, except `{spec,arch}/**`,
+  and the files `{README,LICENSE,CHANGELOG}{,.md,.txt}` of the project
+  root).
 - `infr`: the infrastructure (by default below the project root, the
   files `**/{.github,.claude*,etc}/**` and
   `**/{AGENTS.md,{package,tsconfig*}.json,.{git,npm}ignore}`).
@@ -41,8 +43,11 @@ relative to the base directory), with the defaults given above (see
 
 A *miniglob* specification is a whitespace-separated list of glob
 patterns (in the syntax of *picomatch*, with dot files matched), each
-optionally negated by a `!` prefix. The tokens are applied in order:
-the resulting set starts empty (or with all files, if the first token
+optionally negated by a `!` prefix. A pattern resolves relative to the
+base directory, or, if prefixed with `/` (after any `!`), relative to
+the project root, so it can also match files outside the base
+directory. The tokens are applied in order: the resulting set starts
+empty (or with all files below the base directory, if the first token
 is negated), a plain pattern adds all files matching it, and a negated
 pattern removes all files matching it.
 

@@ -275,8 +275,9 @@ Per-project service:
 Project artifacts (all writable on the `user` and `project` scopes
 only), each kind defined by a `basedir` directory (relative to the
 project root, empty for the root itself) and a whitespace-separated
-`files` glob specification (relative to `basedir`, with `!` negating a
-glob). See `ase-artifact`(1):
+`files` glob specification (relative to `basedir`, or to the project
+root if prefixed with `/`, with `!` negating a glob). See
+`ase-artifact`(1):
 
 - `project.artifact.spec.basedir`, `project.artifact.spec.files`:
   The specification files (default: `docs/specbook` and
@@ -296,7 +297,8 @@ glob). See `ase-artifact`(1):
 
 - `project.artifact.docs.basedir`, `project.artifact.docs.files`:
   The documentation files (default: `doc` and `**
-  **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**`).
+  **/{README,LICENSE,CHANGELOG}.{md,txt} !{spec,arch}/**
+  /{README,LICENSE,CHANGELOG}{,.md,.txt}`).
 
 - `project.artifact.infr.basedir`, `project.artifact.infr.files`:
   The infrastructure files (default: empty and

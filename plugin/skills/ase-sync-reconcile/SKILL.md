@@ -145,6 +145,14 @@ Procedure
         artifacts and/or the aspects of those artifacts you should take
         into account.
 
+        Every existing file which <hint/> names *explicitly* (by its
+        path or file name) is included into the target resp. source
+        artifacts, as <hint/> intends it, even if `ase_artifact_list`
+        classified it into a kind outside <target/> resp. <source/>: the
+        explicit naming overrides the classification. You *MUST* *NOT*
+        report a conflict for such a mismatch, nor create a substitute
+        file within the target kinds instead of updating the named file.
+
         </if>
 
     4.  Read all (optionally filtered) source and target artifacts
