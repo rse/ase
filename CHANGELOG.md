@@ -5,6 +5,22 @@ ChangeLog
 2.1.6 (2026-11-23)
 ------------------
 
+-   SECURITY [code, docs]: Bearer Token Authentication of the ASE Service
+    `ase service` requires a bearer token, kept in the user-private `.ase/service.yaml`, on every request
+    (`project.service.auth`, user scope only: `none`, `temporary`, or `persisted`). The web board logs in via a
+    one-time nonce of `ase task board --web`, and keeps the token per tab, resp. permanently for a
+    persisted token on a fixed port, verified by a port-bound challenge proof before each reuse.
+
+-   IMPROVEMENT [code, docs]: Incompleteness in Diff Coherence Check
+    `ase-repo-diff --coherence` additionally flags the gaps leaving the reconstructed thesis
+    incomplete, like callers not adapted to a changed signature, as the new deviation kind
+    `INCOMPLETE`, so a focused but incomplete diff is no longer judged `COHERENT`.
+
+-   IMPROVEMENT [code]: Cheaper Sub-Agent Fan-Out of Specification Linting
+    `ase-spec-lint` fans out into at most four per-file sub-agents (one per six files), and each
+    sub-agent queries only the effective schema of its artifacts via `ase_specbook_query`, instead of
+    reading the entire 192 KB schema configuration, so the fan-out costs only a fraction.
+
 -   BUGFIX [code]: Mandatory Final Report in Change Review
     `ase-repo-review` parses a fenced or prose-wrapped sub-agent result, retries it once, and under
     `--auto` applies the fixes before the report, which is now always the final reply text with the
@@ -18,11 +34,6 @@ ChangeLog
 -   BUGFIX [code]: Implicit Help Option in Option Parsing
     `ase_getopt` always accepts `--help|-h`, even if missing in the passed options specification,
     so a model passing only the skill options gets the manual page instead of an unknown option error.
-
--   IMPROVEMENT [code, docs]: Incompleteness in Diff Coherence Check
-    `ase-repo-diff --coherence` additionally flags the gaps leaving the reconstructed thesis
-    incomplete, like callers not adapted to a changed signature, as the new deviation kind
-    `INCOMPLETE`, so a focused but incomplete diff is no longer judged `COHERENT`.
 
 -   BUGFIX [code, docs]: Verification Lint After Specification Corrections
     `ase-spec-lint` lints the specification once more after applying corrections, reports newly
@@ -54,11 +65,6 @@ ChangeLog
     shell-neutral commands, no longer by an invisible exit status, and `ase-repo-merge` reports a squash
     merge as merged only if a squash commit landed or no squashed changes are left uncommitted.
 
--   IMPROVEMENT [code]: Cheaper Sub-Agent Fan-Out of Specification Linting
-    `ase-spec-lint` fans out into at most four per-file sub-agents (one per six files), and each
-    sub-agent queries only the effective schema of its artifacts via `ase_specbook_query`, instead of
-    reading the entire 192 KB schema configuration, so the fan-out costs only a fraction.
-
 -   BUGFIX [code]: No Dropped Templates Before Tool Calls
     A template requested before a tool call is emitted as reply text before that call, never only in
     a thinking block, and only filler text is forbidden, so models no longer stay silent until the last
@@ -69,19 +75,9 @@ ChangeLog
     `evidence` lines overlap the changeset, no longer if its correction touches adjacent lines, and
     count the problems outside the changeset in the summary.
 
--   SECURITY [code, docs]: Bearer Token Authentication of the ASE Service
-    `ase service` requires a bearer token, kept in the user-private `.ase/service.yaml`, on every request
-    (`project.service.auth`, user scope only: `none`, `temporary`, or `persisted`). The web board logs in via a
-    one-time nonce of `ase task board --web`, and keeps the token per tab, resp. permanently for a
-    persisted token on a fixed port, verified by a port-bound challenge proof before each reuse.
-
 -   BUGFIX [code]: Downloadable Binary Attachments in the Web Task Board
     The sandboxed plan frame of the task dialog grants `allow-downloads`, so the download link of
     a binary attachment saves the file in Chromium and Firefox, too (#141).
-
--   UPDATE [infr]: No High Advisories in Transitive NPM Dependencies
-    Upgrades `json-asty`, `@rse/mrcs`, and `@rse/specbook`, and pins fixed versions of `axios`,
-    `fast-xml-parser`, and `underscore` via overrides.
 
 -   BUGFIX [code, docs]: Immediate Recovery of Crashed Agents Restarted by the Fleet
     A run whose recorded process is provably dead is recovered right away, independent of its
@@ -90,6 +86,10 @@ ChangeLog
 -   BUGFIX [code, docs]: No Denied File Edits Containing the `⧉ ASE` Prefix
     The `pre-tool-use` hook denies only shell commands printing skill output, but no longer commands
     writing the prefix into files (redirections, `tee`, in-place edits, interpreter file writes).
+
+-   UPDATE [infr]: No High Advisories in Transitive NPM Dependencies
+    Upgrades `json-asty`, `@rse/mrcs`, and `@rse/specbook`, and pins fixed versions of `axios`,
+    `fast-xml-parser`, and `underscore` via overrides.
 
 -   REFACTOR [code]: Shared Separator Styling of the Web Task Board
     The separators and key hint actions of the web board are styled through one global rule
