@@ -2,8 +2,13 @@
 ChangeLog
 =========
 
-2.1.7 (2026-11-23)
+2.1.7 (2026-11-24)
 ------------------
+
+-   FEATURE [code, docs]: Vulnerability Lookup
+    The new `ase util cve` command and MCP tool `ase_cve` gather all information on a CVE id from
+    CVE.org, NVD, EPSS, CISA KEV, OSV.dev, and GitHub Advisories into one record (Markdown, YAML,
+    or JSON), degrading an unreachable source to a warning.
 
 -   REFACTOR [code, docs]: Smaller Stylesheet of the Web Task Board
     `ase-task-board-web-client.styl` keeps only the base, header, lanes view, and footer styles and

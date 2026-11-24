@@ -69,7 +69,8 @@ const subCommands: Record<string, Record<string, Registrar>> = {
         worktree:  async (p) => attach(import("./ase-util-worktree.js"), p),
         mint:      async (p) => attach(import("./ase-util-mint.js"), p),
         metric:    async (p) => attach(import("./ase-util-metric.js"), p),
-        rasterize: async (p) => attach(import("./ase-util-rasterize.js"), p)
+        rasterize: async (p) => attach(import("./ase-util-rasterize.js"), p),
+        cve:       async (p) => attach(import("./ase-util-cve.js"), p)
     }
 }
 

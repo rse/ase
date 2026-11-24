@@ -77,7 +77,7 @@ The service provides the `ase_*` MCP tools of the skills, e.g.,
 `ase_kv_clear`, `ase_kv_batch`, the `ase_task_*` tools, `ase_artifact_list`,
 `ase_artifact_name`, `ase_specbook_lint`, `ase_specbook_export`, `ase_specbook_query`,
 `ase_specbook_search`,
-`ase_diagram`, `ase_rasterize`, `ase_worktree_path`, `ase_mint`, `ase_text_metric`,
+`ase_diagram`, `ase_rasterize`, `ase_worktree_path`, `ase_mint`, `ase_text_metric`, `ase_cve`,
 `ase_getopt`, `ase_markdown_prepare`, `ase_timestamp`, `ase_text_diff`,
 `ase_stage_diff`, `ase_stage_select`, `ase_sleep`,
 `ase_compat`, `ase_component_info`, and `ase_decision_matrix`.

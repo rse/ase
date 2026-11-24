@@ -49,6 +49,7 @@ import { WorktreeMCP }                   from "./ase-util-worktree.js"
 import { MintMCP }                       from "./ase-util-mint.js"
 import { MetricMCP }                     from "./ase-util-metric.js"
 import { RasterizeMCP }                  from "./ase-util-rasterize.js"
+import { CveMCP }                        from "./ase-util-cve.js"
 import { UsageTracker }                  from "./ase-service-otel.js"
 import type { UsageRecord }              from "./ase-service-otel-ingress.js"
 import pkg                               from "../package.json" with { type: "json" }
@@ -283,6 +284,7 @@ export default class ServiceCommand {
         new MintMCP().register(mcp)
         new MetricMCP().register(mcp)
         new RasterizeMCP().register(mcp)
+        new CveMCP().register(mcp)
         new ConfigMCP(log).register(mcp)
         new StateMCP(log).register(mcp)
         return mcp

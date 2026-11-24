@@ -31,6 +31,10 @@
 \[*options*\]
 *input-file*|`-`|`-d`|`--data` *data*
 
+`ase util cve`
+\[`-f`|`--format` *format*\]
+*cve-id*
+
 ## DESCRIPTION
 
 **ase util** is the entry point group for miscellaneous utility
@@ -76,6 +80,10 @@ with status `1`.
   terminal graphics of the Kitty, iTerm2, or SIXEL protocol, or into
   Unicode half-block text art. See `ase-util-rasterize`(1).
 
+- `ase util cve` \[*options*\] *cve-id*:
+  Gather all information on a vulnerability from CVE.org, NVD, EPSS,
+  CISA KEV, OSV.dev, and GitHub Advisories. See `ase-util-cve`(1).
+
 ## EXIT STATUS
 
 The group command without a sub-command exits with status `1`.
@@ -84,7 +92,7 @@ The group command without a sub-command exits with status `1`.
 
 `ase`(1), `ase-util-meta`(1), `ase-util-compat`(1),
 `ase-util-diagram`(1), `ase-util-worktree`(1), `ase-util-mint`(1),
-`ase-util-metric`(1), `ase-util-rasterize`(1).
+`ase-util-metric`(1), `ase-util-rasterize`(1), `ase-util-cve`(1).
 
 ## AUTHOR
 
