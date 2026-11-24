@@ -35,6 +35,10 @@
 \[`-f`|`--format` *format*\]
 *cve-id*
 
+`ase util vex`
+\[`-f`|`--format` *format*\]
+*cve-id*
+
 ## DESCRIPTION
 
 **ase util** is the entry point group for miscellaneous utility
@@ -84,6 +88,11 @@ with status `1`.
   Gather all information on a vulnerability from CVE.org, NVD, EPSS,
   CISA KEV, OSV.dev, and GitHub Advisories. See `ase-util-cve`(1).
 
+- `ase util vex` \[*options*\] *cve-id*:
+  Determine the status the project has published for itself on a
+  vulnerability in its local CSAF, CycloneDX, OpenVEX, or SPDX VEX
+  documents. See `ase-util-vex`(1).
+
 ## EXIT STATUS
 
 The group command without a sub-command exits with status `1`.
@@ -92,7 +101,8 @@ The group command without a sub-command exits with status `1`.
 
 `ase`(1), `ase-util-meta`(1), `ase-util-compat`(1),
 `ase-util-diagram`(1), `ase-util-worktree`(1), `ase-util-mint`(1),
-`ase-util-metric`(1), `ase-util-rasterize`(1), `ase-util-cve`(1).
+`ase-util-metric`(1), `ase-util-rasterize`(1), `ase-util-cve`(1),
+`ase-util-vex`(1).
 
 ## AUTHOR
 

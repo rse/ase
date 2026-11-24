@@ -128,7 +128,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         command group: `setup`, `config`, `alias`, `service`, `mcp`, `hook`,
         `statusline`, `task`, `task-board`, `agent`, `artifact`, `spec`,
         `man`, `util`, and
-        `util-{meta,diagram,worktree,mint,metric,rasterize,compat,cve}`
+        `util-{meta,diagram,worktree,mint,metric,rasterize,compat,cve,vex}`
 
     -   `tool/src/ase-alias-core.ts`: the skill command aliases of
         `ase alias` (loading, merging, and modifying the alias files of
@@ -505,7 +505,9 @@ Beyond `ase setup`, the CLI provides:
     `ase util rasterize` (SVG/PNG/GIF/JPEG rasterizing into PNG, Kitty, iTerm2 IIP,
     SIXEL, or text art, with bundled fonts copied into `dst/font/` at build-time),
     `ase util cve` (vulnerability information merged from CVE.org, NVD, EPSS,
-    CISA KEV, OSV.dev, and GitHub Advisories), and
+    CISA KEV, OSV.dev, and GitHub Advisories), `ase util vex` (the published
+    VEX status of the project on a CVE, out of its local CSAF, CycloneDX,
+    OpenVEX, or SPDX 3 documents), and
     `ase util compat` (expected probe values of the `ase-meta-compat`
     self-test skill, for inspection by humans)
 

@@ -70,7 +70,8 @@ const subCommands: Record<string, Record<string, Registrar>> = {
         mint:      async (p) => attach(import("./ase-util-mint.js"), p),
         metric:    async (p) => attach(import("./ase-util-metric.js"), p),
         rasterize: async (p) => attach(import("./ase-util-rasterize.js"), p),
-        cve:       async (p) => attach(import("./ase-util-cve.js"), p)
+        cve:       async (p) => attach(import("./ase-util-cve.js"), p),
+        vex:       async (p) => attach(import("./ase-util-vex.js"), p)
     }
 }
 

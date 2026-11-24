@@ -10,6 +10,11 @@ ChangeLog
     CVE.org, NVD, EPSS, CISA KEV, OSV.dev, and GitHub Advisories into one record (Markdown, YAML,
     or JSON), degrading an unreachable source to a warning.
 
+-   FEATURE [code, docs]: VEX Status Lookup
+    The new `ase util vex` command and MCP tool `ase_vex` determine the status the project published
+    for itself on a CVE id in its local CSAF, CycloneDX, OpenVEX, or SPDX 3 VEX documents, as verdict
+    `NOT AFFECTED`, `AFFECTED`, `FIXED`, `UNDER INVESTIGATION`, or `UNKNOWN`.
+
 -   REFACTOR [code, docs]: Smaller Stylesheet of the Web Task Board
     `ase-task-board-web-client.styl` keeps only the base, header, lanes view, and footer styles and
     imports the agents, statistics, and graph view styles from `ase-task-board-web-client-views.styl`
