@@ -38,7 +38,10 @@ The *analysis lens* depends on the selected options:
 - `--tests`|`-t`: problems in its *tests*: expected values contradicting
   or lacking an *implementation-independent source* (specification, task
   plan, contract, or standard), and behaviors or edge cases without any
-  test. Tests and the code under test are analyzed as pairs.
+  test. Tests and the code under test are analyzed as pairs. The
+  *structural* insensitivity of tests (insensitive assertions,
+  self-confirming oracles, and mock echoes) is checked by the
+  `A22 TESTING` aspect of `ase-code-lint` instead.
 
 The `--performance`, `--security`, and `--tests` options are *mutually
 exclusive*.

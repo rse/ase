@@ -44,6 +44,11 @@ ChangeLog
     or unsourced expected values, insensitive tests, and missing claims or edge cases, judged
     against the specification, task plans, and standards instead of the implementation.
 
+-   FEATURE [code, docs]: Testing Lint Aspect for `ase-code-lint`
+    The new lint aspect `A22 - TESTING` flags tests which cannot fail or which fail spuriously:
+    insensitive assertions, self-confirming oracles, mock echoes, nondeterminism, and leftover
+    focus or unexplained skip markers.
+
 -   REFACTOR [code, docs]: Smaller Stylesheet of the Web Task Board
     `ase-task-board-web-client.styl` keeps only the base, header, lanes view, and footer styles and
     imports the agents, statistics, and graph view styles from `ase-task-board-web-client-views.styl`
