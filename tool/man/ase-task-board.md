@@ -154,6 +154,10 @@ them ignore the prompts (e.g., the `estimate` requests of `ase agent
 estimator --mode request`, see `ase-agent-estimator`(1)), the prompt
 field is disabled, skipped by `TAB`, and no prompt is sent.
 
+`x` chats about the selected task with the agent tool, which takes
+over the terminal until it ends, continuing the earlier chat about the
+task (see `ase-task-chat`(1)).
+
 `/` focuses the `filter:` field of the header: its keywords are
 matched case-insensitively against the task id and title, AND-combined
 when separated by spaces and OR-combined when separated by commas. Each
@@ -507,6 +511,8 @@ lower-case letter under the kitty keyboard protocol.
   task stats, agent logs, and agent graph views).
 - `R`: Request the selected task by a prompt under a request name (not
   in the task stats, agent logs, and agent graph views).
+- `x`: Chat about the selected task with the agent tool (not in the
+  task stats, agent logs, and agent graph views; terminal board only).
 - `M`: Disable or enable the mouse support (terminal board only).
 - `q`, `Ctrl`+`C`: Quit (terminal board only).
 
@@ -593,7 +599,7 @@ lower-case letter under the kitty keyboard protocol.
 - `PgUp`/`PgDn`: Scroll the content by one page.
 - `e`: Edit the task plan.
 - `#`: Clear the diff of the last change of the task plan.
-- `D`, `T`, `A`, `E`, `R`, `M`, `L`: As in every view.
+- `D`, `T`, `A`, `E`, `R`, `x`, `M`, `L`: As in every view.
 - `⏎`, `ESC`: Close the task dialog.
 
 ### Filter Field
@@ -685,6 +691,9 @@ The following configuration keys (on scope `user` or `project`, see
 
 ## ENVIRONMENT
 
+- `ASE_TOOL`:
+  The agent tool of the terminal board for `x` (default: `claude`).
+
 - `EDITOR`:
   The text editor of the terminal board for `e` and `N` (default:
   `vi`), run through the shell, so a value with arguments is supported.
@@ -735,7 +744,7 @@ $ ase task board --text --agent-relay ase://relay.example.com:42043
 
 `ase`(1), `ase-task`(1), `ase-task-store`(1), `ase-agent`(1),
 `ase-agent-editor`(1), `ase-agent-relay`(1), `ase-service`(1),
-`ase-config`(1).
+`ase-config`(1), `ase-task-chat`(1).
 
 ## AUTHOR
 
