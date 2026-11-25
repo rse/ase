@@ -20,7 +20,7 @@ const MARKER = /\*{0,2}EVALUATION\*{0,2}:\s+\*{0,2}Weighted Multi-Criteria Decis
 
 /*  the color of the best alternatives, and the rating distance (relative to
     the best rating) below which alternatives tie (as in "ase-meta-evaluate")  */
-const WINNER = "blue"
+const WINNER = "ansi256(4)"
 const TIE    = 0.01
 
 /*  the sort marks of the orders (each taking the same columns)  */

@@ -46,8 +46,8 @@ export type Engine = {
 
 /*  the colors of a picked (resp. selected or focused) item, of a code span,
     and of a skill command (the theme color of a command inside the prompt)  */
-export const PICKED  = "red"
-export const CODE    = "blue"
+export const PICKED  = "ansi256(1)"
+export const CODE    = "ansi256(4)"
 export const COMMAND = "suggestion"
 
 /*  the trigger suffix of a synopsis form or an intent ("!!"), resp. of a manual band
