@@ -5,6 +5,10 @@ ChangeLog
 2.1.7 (2026-11-24)
 ------------------
 
+-   BUGFIX [infr]: Robust Website Deployment
+    The GitHub Pages workflow builds and deploys in separate jobs and retries the deployment once
+    after 30 seconds, as the artifact listing API often does not yet show the just uploaded artifact.
+
 -   FEATURE [code, docs]: Vulnerability Triage
     The new skill `ase-code-triage` checks whether the project is affected by a vulnerability, given
     by its CVE id or a description, via its published VEX status, the CVE record or Web facts, and
