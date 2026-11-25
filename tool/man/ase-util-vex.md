@@ -28,12 +28,12 @@ the *npm* package of the `package.json` file (`pkg:npm/`*name*) or the
 of the project, ignoring the version, and if a version or version range
 of the product covers the current version of the `package.json` file.
 Of all such statements, the newest one decides, and among equally
-recent ones the worst case (`AFFECTED` before `UNDER INVESTIGATION`
-before `FIXED` before `NOT AFFECTED`).
+recent ones the worst case (`AFFECTED` before `UNDER-INVESTIGATION`
+before `FIXED` before `NOT-AFFECTED`).
 
 The statuses of the formats are mapped onto the following verdicts:
 
-- `NOT AFFECTED`:
+- `NOT-AFFECTED`:
   *OpenVEX* `not_affected`, *CycloneDX* `not_affected` and
   `false_positive`, *CSAF* `known_not_affected`, *SPDX* `doesNotAffect`.
 
@@ -46,7 +46,7 @@ The statuses of the formats are mapped onto the following verdicts:
   *OpenVEX* `fixed`, *CycloneDX* `resolved` and `resolved_with_pedigree`,
   *CSAF* `fixed` and `first_fixed`, *SPDX* `fixedIn`.
 
-- `UNDER INVESTIGATION`:
+- `UNDER-INVESTIGATION`:
   *OpenVEX* `under_investigation`, *CycloneDX* `in_triage`, *CSAF*
   `under_investigation`, *SPDX* `underInvestigationFor`.
 

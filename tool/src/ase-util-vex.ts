@@ -25,7 +25,7 @@ export const vexFormats = [ "md", "yaml", "json" ] as const
 export type VexFormat = typeof vexFormats[number]
 
 /*  the verdicts on the published status of the project  */
-export type VexVerdict = "NOT AFFECTED" | "AFFECTED" | "FIXED" | "UNDER INVESTIGATION" | "UNKNOWN"
+export type VexVerdict = "NOT-AFFECTED" | "AFFECTED" | "FIXED" | "UNDER-INVESTIGATION" | "UNKNOWN"
 
 /*  the result of determining the published status of the project  */
 export type VexStatement = {
@@ -51,39 +51,39 @@ const vexFiles = picomatch([
 /*  the mappings of the statuses of the formats onto the verdicts
     (CSAF "recommended" is no exploitability statement and hence ignored)  */
 const openvexVerdicts = new Map<string, VexVerdict>([
-    [ "not_affected",           "NOT AFFECTED"        ],
+    [ "not_affected",           "NOT-AFFECTED"        ],
     [ "affected",               "AFFECTED"            ],
     [ "fixed",                  "FIXED"               ],
-    [ "under_investigation",    "UNDER INVESTIGATION" ]
+    [ "under_investigation",    "UNDER-INVESTIGATION" ]
 ])
 const cyclonedxVerdicts = new Map<string, VexVerdict>([
-    [ "not_affected",           "NOT AFFECTED"        ],
-    [ "false_positive",         "NOT AFFECTED"        ],
+    [ "not_affected",           "NOT-AFFECTED"        ],
+    [ "false_positive",         "NOT-AFFECTED"        ],
     [ "exploitable",            "AFFECTED"            ],
     [ "resolved",               "FIXED"               ],
     [ "resolved_with_pedigree", "FIXED"               ],
-    [ "in_triage",              "UNDER INVESTIGATION" ]
+    [ "in_triage",              "UNDER-INVESTIGATION" ]
 ])
 const csafVerdicts = new Map<string, VexVerdict>([
-    [ "known_not_affected",     "NOT AFFECTED"        ],
+    [ "known_not_affected",     "NOT-AFFECTED"        ],
     [ "known_affected",         "AFFECTED"            ],
     [ "first_affected",         "AFFECTED"            ],
     [ "last_affected",          "AFFECTED"            ],
     [ "fixed",                  "FIXED"               ],
     [ "first_fixed",            "FIXED"               ],
-    [ "under_investigation",    "UNDER INVESTIGATION" ],
+    [ "under_investigation",    "UNDER-INVESTIGATION" ],
     [ "unknown",                "UNKNOWN"             ]
 ])
 const spdxVerdicts = new Map<string, VexVerdict>([
-    [ "doesNotAffect",          "NOT AFFECTED"        ],
+    [ "doesNotAffect",          "NOT-AFFECTED"        ],
     [ "affects",                "AFFECTED"            ],
     [ "fixedIn",                "FIXED"               ],
-    [ "underInvestigationFor",  "UNDER INVESTIGATION" ]
+    [ "underInvestigationFor",  "UNDER-INVESTIGATION" ]
 ])
 
 /*  the precedence of the verdicts of equally recent statements (worst case first)  */
 const verdictRank: Record<VexVerdict, number> = {
-    "AFFECTED": 4, "UNDER INVESTIGATION": 3, "UNKNOWN": 2, "FIXED": 1, "NOT AFFECTED": 0
+    "AFFECTED": 4, "UNDER-INVESTIGATION": 3, "UNKNOWN": 2, "FIXED": 1, "NOT-AFFECTED": 0
 }
 
 /*  small helpers for accessing the untyped payloads of the documents  */
@@ -219,7 +219,7 @@ const parseCycloneDx = (doc: Obj, id: string, collect: Collect): void => {
                 collect(purl, "", "", state, verdict, detail, time)
             for (const entry of versions) {
                 const [ status, entryVerdict ]: [ string, VexVerdict ] =
-                    str(entry.status) === "unaffected" ? [ "unaffected", "NOT AFFECTED" ] :
+                    str(entry.status) === "unaffected" ? [ "unaffected", "NOT-AFFECTED" ] :
                         str(entry.status) === "unknown" ? [ "unknown", "UNKNOWN" ] : [ state, verdict ]
                 if (collect(purl, str(entry.version), str(entry.range), status, entryVerdict, detail, time))
                     break
@@ -503,7 +503,7 @@ export class VexMCP {
                 "`*.jsonld`, or any `*.json` below a directory `.vex`, `vex`, `.openvex`, `openvex`, or `csaf`). " +
                 "Only statements on the project itself (its npm package or GitHub repository, covering its " +
                 "current version) count, the newest statement decides, and among equally recent ones the " +
-                "worst case. Returns the `verdict` `NOT AFFECTED`, `AFFECTED`, `FIXED`, `UNDER INVESTIGATION`, " +
+                "worst case. Returns the `verdict` `NOT-AFFECTED`, `AFFECTED`, `FIXED`, `UNDER-INVESTIGATION`, " +
                 "or `UNKNOWN` (no statement found), with the matching statements and the found documents, " +
                 "as `text` in the `format` `md` (Markdown), `yaml`, or `json`. No network access happens. " +
                 "You MUST call this tool whenever the published VEX status of the project on a CVE is needed, " +
