@@ -33,6 +33,11 @@ via `--taken`, plus the reserved id `default`:
   atomically, so a concurrent allocation never yields the same id. The
   *title* is not used.
 
+- `flex`\[`:`*template*\]:
+  The sequence number as for `seq`, plus the slug of the first two
+  words of *title* for the `%s` of *template* (e.g., `flex:%d-%s`
+  yields `50-fleet-files` and `flex:%s-%d` yields `fleet-files-50`).
+
 - `any`:
   The proposed id of `--proposal`, sanitized (whitespace runs replaced
   by `-`, all characters other than `A-Z`, `a-z`, `0-9`, `#`, `_`, and
@@ -40,7 +45,7 @@ via `--taken`, plus the reserved id `default`:
   first two words of *title*.
 
 A slug or proposed id which is already taken gets a numeric suffix
-`-2`, `-3`, etc. As only a `seq` id is reserved, the first save of the
+`-2`, `-3`, etc. As only a `seq` or `flex` id is reserved, the first save of the
 new task should be a create-only one (`ase task save --create`, see
 `ase-task-save`(1)), which fails instead of overwriting a concurrently
 created task of the same id.

@@ -534,9 +534,9 @@ Response `200`:
 - `lifecycle.finished`: the states the `finished` sentinel expands to.
 - `lifecycle.transitions`: the allowed successor states per state.
 - `idscheme`: the task id scheme, `slug[:<words>]`, `seq[:<template>]`,
-  or `any` (see `project.task.idscheme` in `ase-config`(1)).
+  `flex[:<template>]`, or `any` (see `project.task.idscheme` in `ase-config`(1)).
 - `seqmark`: the sequence number high-water mark: the highest sequence
-  number of all task ids conforming to a `seq` scheme which were ever
+  number of all task ids conforming to a `seq` or `flex` scheme which were ever
   removed by `DELETE`, purge, or `PATCH` rename, or allocated by
   `POST /projects/{prjId}/newid` (`0` if none), so a new id never
   reuses such a number.
@@ -578,7 +578,7 @@ Request body:
   → `team`: `OPEN` → `PLANNING`, `CLOSED` → `IMPLEMENTED`). A status
   which is no state of the old model is kept as-is.
 - `idscheme` (optional): the task id scheme, `slug[:<words>]`,
-  `seq[:<template>]`, or `any`. If omitted, a registered project keeps
+  `seq[:<template>]`, `flex[:<template>]`, or `any`. If omitted, a registered project keeps
   its current scheme and a new project gets `slug`. Changing the scheme
   affects newly generated task ids only.
 
@@ -1570,7 +1570,7 @@ export type TaskPlan        = {
 
 /*  a registered project: its id, the name of its task lifecycle
     model ("solo", "team", or "enterprise"), its task id scheme
-    ("slug[:<words>]", "seq[:<template>]", or "any", absent for "slug"),
+    ("slug[:<words>]", "seq[:<template>]", "flex[:<template>]", or "any", absent for "slug"),
     and the high-water mark of its sequence numbers (absent for 0)  */
 export type ProjectEntry = {
     id:        string

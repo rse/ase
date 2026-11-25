@@ -197,12 +197,15 @@ export const DEFAULT_TASK_ID = "default"
 /*  a task id scheme (see "project.task.idscheme"): "slug[:<words>]" (the first
     <words> words of the title, lower-cased and joined with "-", default 2),
     "seq[:<template>]" (a sequence number rendered through a sprintf-style
-    template with exactly one "%d" or "%0<width>d", default "%d"), or "any"
-    (an arbitrary id, proposed by the caller), each with the regular expression
-    "match" of its conforming ids (for "seq" capturing the sequence number)  */
+    template with exactly one "%d" or "%0<width>d", default "%d"),
+    "flex[:<template>]" (like "seq", but with exactly one "%s" for the slug of
+    the title before or after the number, default "%d-%s"), or "any" (an
+    arbitrary id, proposed by the caller), each with the regular expression
+    "match" of its conforming ids (for "seq" and "flex" capturing the number)  */
 export type TaskIdScheme = (
     { kind: "slug", words: number } |
     { kind: "seq", prefix: string, width: number, suffix: string } |
+    { kind: "flex", prefix: string, width: number, slug: "before" | "after", infix: string, suffix: string } |
     { kind: "any" }
 ) & { match: string }
 
@@ -230,6 +233,27 @@ const idSchemes: Record<string, (arg: string | undefined) => TaskIdScheme | stri
         const match = `^${m[1]}([0-9]${width > 0 ? `{${width},}` : "+"})${m[3]}$`
         return { kind: "seq", prefix: m[1], width, suffix: m[3], match }
     },
+    flex: (arg) => {
+        const m = /^((?:[A-Za-z#][A-Za-z#_-]*)?)%(0\d+d|d|s)([A-Za-z#_-]*)%(0\d+d|d|s)([A-Za-z#_-]*)$/.exec(arg ?? "%d-%s")
+        if (m === null || (m[2] === "s") === (m[4] === "s"))
+            return "template has to contain exactly one \"%d\" or \"%0<width>d\" and exactly one \"%s\" (in any order) " +
+                "and otherwise only the characters [A-Za-z#_-] (but not start with \"-\" or \"_\")"
+        const slug  = m[2] === "s" ? "before" : "after"
+        const width = Number.parseInt(/^0(\d+)d$/.exec(slug === "before" ? m[4] : m[2])?.[1] ?? "0", 10)
+        if (width > 16)
+            return "width has to be 0-16"
+
+        /*  a slug directly followed by the number would make their digits ambiguous  */
+        if (slug === "before" && m[3] === "")
+            return "\"%s\" has to be separated from a following \"%d\""
+
+        /*  prefix, infix, and suffix need no quoting, as [A-Za-z#_-] are no metacharacters,
+            and the slug is the one of scheme "slug:2" (without a numeric suffix)  */
+        const number = `([0-9]${width > 0 ? `{${width},}` : "+"})`
+        const words  = "[a-z][a-z0-9]*(?:-[a-z0-9]+)?"
+        const match  = `^${m[1]}${slug === "before" ? words : number}${m[3]}${slug === "before" ? number : words}${m[5]}$`
+        return { kind: "flex", prefix: m[1], width, slug, infix: m[3], suffix: m[5], match }
+    },
     any: (arg) => {
         if (arg !== undefined)
             return "scheme takes no argument"
@@ -242,7 +266,7 @@ export const parseIdScheme = (spec: string): TaskIdScheme => {
     const m        = /^([a-z]+)(?::(.*))?$/.exec(spec)
     const callback = m !== null && Object.hasOwn(idSchemes, m[1]) ? idSchemes[m[1]] : undefined
     if (m === null || callback === undefined)
-        throw new Error(`invalid task id scheme "${spec}" (expected "slug[:<words>]", "seq[:<template>]", or "any")`)
+        throw new Error(`invalid task id scheme "${spec}" (expected "slug[:<words>]", "seq[:<template>]", "flex[:<template>]", or "any")`)
     const scheme = callback(m[2])
     if (typeof scheme === "string")
         throw new Error(`invalid task id scheme "${spec}" (${scheme})`)
@@ -280,10 +304,10 @@ export const idWarning = (spec: string, id: string): string =>
     idConforms(parseIdScheme(spec), id) ? "" :
         `task id "${id}" does not conform to the task id scheme "${spec}" (see "project.task.idscheme")`
 
-/*  the sequence number of a task id conforming to a "seq" task id scheme
+/*  the sequence number of a task id conforming to a "seq" or "flex" task id scheme
     (else 0, as for all ids under any other scheme or beyond the safe integer range)  */
 export const seqNumber = (scheme: TaskIdScheme, id: string): number => {
-    if (scheme.kind !== "seq")
+    if (scheme.kind !== "seq" && scheme.kind !== "flex")
         return 0
     const n = Number.parseInt(new RegExp(scheme.match).exec(id)?.[1] ?? "0", 10)
     return Number.isSafeInteger(n) ? n : 0
@@ -291,15 +315,21 @@ export const seqNumber = (scheme: TaskIdScheme, id: string): number => {
 
 /*  determine the next free task id of a task id scheme, given all existing
     task ids: for "seq" the highest number of all conforming ids and of the
-    high-water mark "seqmark" (of the removed ids) plus one, for "slug" the slug
-    of the title, and for "any" the proposed id (sanitized, else the slug of the
-    title), where a taken slug or id gets a numeric suffix  */
+    high-water mark "seqmark" (of the removed ids) plus one, for "flex" the same
+    plus the slug of the title, for "slug" the slug of the title, and for "any"
+    the proposed id (sanitized, else the slug of the title), where a taken slug
+    or id gets a numeric suffix  */
 export const nextTaskId = (scheme: TaskIdScheme, ids: string[], title = "", proposal = "", seqmark = 0): string => {
     const taken = new Set([ ...ids, DEFAULT_TASK_ID ])
     let base: string
-    if (scheme.kind === "seq") {
-        const n = ids.reduce((max, id) => Math.max(max, seqNumber(scheme, id)), seqmark) + 1
-        return `${scheme.prefix}${String(n).padStart(scheme.width, "0")}${scheme.suffix}`
+    if (scheme.kind === "seq" || scheme.kind === "flex") {
+        const n = String(ids.reduce((max, id) => Math.max(max, seqNumber(scheme, id)), seqmark) + 1).padStart(scheme.width, "0")
+        if (scheme.kind === "seq")
+            return `${scheme.prefix}${n}${scheme.suffix}`
+        const slug = slugify(title, 2)
+        if (slug === "")
+            throw new Error("task id scheme \"flex\" requires a title with at least one word beginning with a letter")
+        return scheme.prefix + (scheme.slug === "before" ? slug : n) + scheme.infix + (scheme.slug === "before" ? n : slug) + scheme.suffix
     }
     else if (scheme.kind === "slug")
         base = slugify(title, scheme.words)

@@ -262,6 +262,14 @@ task store resp. registered in a remote task store (see
   e.g., `FOO-%03d` (`FOO-007`) or `#%d` (`#7`). Conforming ids match
   *prefix*`([0-9]+)`*suffix* (resp. with at least *width* digits).
 
+- `flex`\[`:`*template*\]:
+  Like `seq`, but the *template* (default: `%d-%s`) additionally
+  contains exactly one `%s` before or after the number (if before,
+  separated from it by at least one character), which is the slug of
+  the task title as for `slug:2`, e.g., `%d-%s` (`50-fleet-files`),
+  `%03d-%s` (`050-fleet-files`), or `%s-%d` (`fleet-files-50`). This
+  scheme is not supported by the GitHub, GitLab, and Gitea task stores.
+
 - `any`:
   An arbitrary id, as proposed by the caller. Conforming ids match
   `^[A-Za-z0-9#][A-Za-z0-9#_-]*$`.

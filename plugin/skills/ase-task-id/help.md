@@ -23,7 +23,7 @@ task id via the `ase_task_id` MCP tool.
     `_`, and `-`, but not starting with `_` or `-`). If omitted, the
     currently active task id is reported. An id not conforming to the task id scheme of the
     project (`project.task.idscheme`: `slug[:<words>]`, `seq[:<template>]`,
-    or `any`) is accepted, but noticed.
+    `flex[:<template>]`, or `any`) is accepted, but noticed.
 
 ##  SCENARIOS
 

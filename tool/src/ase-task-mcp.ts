@@ -477,18 +477,20 @@ export class TaskMCP {
                 "by searching all existing task ids. The scheme is either `slug[:<words>]` (the first " +
                 "`<words>` (default: 2) words of `title`, lower-cased and joined with `-`), " +
                 "`seq[:<template>]` (the highest sequence number of all existing and ever removed ids plus one, rendered " +
-                "through the sprintf-style `<template>` like `FOO-%03d`, `#%d`, or `%d` (the default)), or " +
+                "through the sprintf-style `<template>` like `FOO-%03d`, `#%d`, or `%d` (the default)), " +
+                "`flex[:<template>]` (like `seq`, but with the slug of `title` like for `slug:2` via `%s` " +
+                "before or after the number, like `%d-%s` (the default) or `%s-%d`), or " +
                 "`any` (the `proposal`, else derived from `title` like for `slug:2`). A slug or proposed id " +
                 "which is already taken gets a numeric suffix `-2`, `-3`, etc. " +
                 "Returns the `scheme`, the new `id`, and the regular expression `match` of all ids " +
-                "conforming to the scheme (for `seq` capturing the sequence number, for `slug` accepting " +
-                "the numeric suffix). For scheme `seq` the id is reserved (never handed out again), " +
+                "conforming to the scheme (for `seq` and `flex` capturing the sequence number, for `slug` accepting " +
+                "the numeric suffix). For schemes `seq` and `flex` the id is reserved (never handed out again), " +
                 "for the other schemes it is not, so for allocating several ids at once pass the " +
                 "already allocated ones as `taken`, and on the first save of the new task pass " +
                 "`create: true` to `ase_task_save` to detect a concurrently created task with the same id.",
             inputSchema: {
                 title: z.string().optional()
-                    .describe("title of the new task (required for scheme `slug`, ignored for scheme `seq`)"),
+                    .describe("title of the new task (required for schemes `slug` and `flex`, ignored for scheme `seq`)"),
                 proposal: z.string().optional()
                     .describe("proposed task id (used for scheme `any` only)"),
                 taken: z.array(z.string()).optional()

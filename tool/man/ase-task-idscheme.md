@@ -51,6 +51,11 @@ set task id scheme of project from "`*from*`" to "`*scheme*`"`.
       starting with `_` or `-`), e.g., `FOO-%03d` or `#%d`. This scheme
       is required by the GitHub, GitLab, and Gitea task stores, as their
       task ids are the issue numbers (e.g., `seq:#%d`).
+    - `flex`\[`:`*template*\]: like `seq`, but the *template* (default:
+      `%d-%s`) additionally contains exactly one `%s`, the slug of the
+      task title as for `slug:2`, before or after the number (if before,
+      separated from it by at least one character), e.g., `%d-%s` or
+      `%s-%d`.
     - `any`: an arbitrary id, as proposed by the caller.
 
 ## FILES
@@ -80,6 +85,9 @@ $ ase task idscheme "seq:ASE-%03d"
 
 # switch to issue numbers like "#42" (quoted, as "#" starts a comment)
 $ ase task idscheme "seq:#%d"
+
+# switch to sequence numbers plus title slugs like "50-fleet-files"
+$ ase task idscheme "flex:%d-%s"
 ```
 
 ## SEE ALSO

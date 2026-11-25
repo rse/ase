@@ -19,7 +19,7 @@ export type TaskPlan        = {
 
 /*  a registered project: its id, the name of its task lifecycle
     model ("solo", "team", or "enterprise"), its task id scheme
-    ("slug[:<words>]", "seq[:<template>]", or "any", absent for "slug"),
+    ("slug[:<words>]", "seq[:<template>]", "flex[:<template>]", or "any", absent for "slug"),
     and the high-water mark of its sequence numbers (absent for 0)  */
 export type ProjectEntry = {
     id:        string
@@ -102,8 +102,8 @@ export interface TaskStoragePlugin {
     projectSet (prjId: string, lifecycle: string, idscheme: string): Promise<WriteResult>
 
     /*  optionally persist the high-water mark of the sequence numbers of a
-        registered project (the highest one ever removed or allocated), so scheme
-        "seq" never reuses the number of a deleted, purged, renamed, or allocated task  */
+        registered project (the highest one ever removed or allocated), so schemes "seq"
+        and "flex" never reuse the number of a deleted, purged, renamed, or allocated task  */
     projectMark? (prjId: string, seqmark: number): Promise<void>
 
     /*  unregister a project without deleting its task plans;

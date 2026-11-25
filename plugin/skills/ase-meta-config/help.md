@@ -70,8 +70,9 @@ exported at session start as `<ase-project-task-lifecycle/>`. Finally,
 of `slug[:<words>]` (the default, the first *words* (default: 2) words of
 the task title, lower-cased and joined with `-`), `seq[:<template>]` (a
 continuously increasing sequence number, rendered through a sprintf-style
-*template* like `FOO-%03d`, `#%d`, or `%d` (the default)), or `any` (an
-arbitrary unique id chosen by the agent). Additionally,
+*template* like `FOO-%03d`, `#%d`, or `%d` (the default)), `flex[:<template>]`
+(like `seq`, plus the slug of the task title via `%s`, like `%d-%s` (the
+default) or `%s-%d`), or `any` (an arbitrary unique id chosen by the agent). Additionally,
 `project.task.default.{source,changeset,target}` select the defaults of
 the `Source:`, `Changeset:`, and `Target:` task plan keys (`worktree`,
 `worktree`, and `source` by default), which an absent key reads as, where

@@ -128,7 +128,7 @@ export class Task {
     /*  allocate the next free task id according to the effective task id scheme,
         derived from a title (scheme "slug") or a proposed id (scheme "any"),
         by searching all existing task ids plus the additionally taken ones and,
-        for scheme "seq", the high-water mark of the removed and allocated ids
+        for schemes "seq" and "flex", the high-water mark of the removed and allocated ids
         (reserving the allocated one); returns the scheme, the id, and the
         regular expression matching the ids conforming to the scheme  */
     static async newId (log: Log, title = "", proposal = "", taken: string[] = []): Promise<{ scheme: string, id: string, match: string }> {

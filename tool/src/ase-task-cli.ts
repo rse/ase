@@ -415,7 +415,7 @@ export default class TaskCommand {
             .description("Get or set the task id scheme of the project: without <scheme> the effective " +
                 "scheme is printed, with <scheme> the project in the task store is switched to it " +
                 "(for a local task store by setting \"project.task.idscheme\" on scope \"project\")")
-            .argument("[<scheme>]", "Task id scheme (slug[:<words>]|seq[:<template>]|any)")
+            .argument("[<scheme>]", "Task id scheme (slug[:<words>]|seq[:<template>]|flex[:<template>]|any)")
             .action(async (scheme?: string) => {
                 if (scheme === undefined)
                     await writeStdout(`${await Task.idScheme(this.log)}\n`)

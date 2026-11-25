@@ -160,7 +160,7 @@ Task plans (all writable on the `user` and `project` scopes only,
   pipeline (default: `solo`). See `ase-task-lifecycle`(1).
 
 - `project.task.idscheme` (`slug`\[`:`*words*\], `seq`\[`:`*template*\],
-  or `any`):
+  `flex`\[`:`*template*\], or `any`):
   The task id scheme (default: `slug`). See `ase-task-idscheme`(1) and
   `ase-task-newid`(1).
 

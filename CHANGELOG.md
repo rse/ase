@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-24)
 ------------------
 
+-   FEATURE [code, docs]: Sequence Number Plus Title Slug Task Ids
+    The new task id scheme `flex[:<template>]` combines a reserved sequence number (`%d` or
+    `%0<width>d`) with the slug of the task title (`%s`) in any order, like `flex:%d-%s`
+    (the default, e.g. `50-fleet-files`) or `flex:%s-%d`. (GitHub issue #142)
+
 -   FEATURE [code, docs]: Multiple Artifact Base Directories
     `project.artifact.<kind>.basedir` accepts a whitespace-separated list of literal directories,
     whose files are united, where the `spec` ones are passed to the upgraded SpecBook 1.6.6, and

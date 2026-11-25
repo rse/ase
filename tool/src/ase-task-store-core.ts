@@ -143,7 +143,7 @@ export class TaskStoreCore {
     }
 
     /*  raise the high-water mark of the sequence numbers to the highest one of removed
-        or allocated task ids, so scheme "seq" never hands out their numbers again  */
+        or allocated task ids, so schemes "seq" and "flex" never hand out their numbers again  */
     private async retire (prjId: string, project: ProjectView, ids: string[]): Promise<void> {
         const scheme  = TaskFormat.parseIdScheme(project.idscheme)
         const seqmark = ids.reduce((max, id) => Math.max(max, TaskFormat.seqNumber(scheme, id)), project.seqmark)
@@ -532,7 +532,7 @@ export class TaskStoreCore {
 
     /*  allocate the next free task id according to the task id scheme, derived
         from a title (scheme "slug") or a proposed id (scheme "any"), considering
-        all existing ids plus the additionally taken ones; for scheme "seq" the
+        all existing ids plus the additionally taken ones; for schemes "seq" and "flex" the
         allocated number is reserved by raising the high-water mark, so a
         concurrent allocation never yields the same id  */
     async taskNewId (prjId: string, raw: { title?: unknown, proposal?: unknown, taken?: unknown }): Promise<{ scheme: string, id: string }> {
