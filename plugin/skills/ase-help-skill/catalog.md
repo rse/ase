@@ -28,6 +28,7 @@
 ⎈   **CODING**
 ○   `ase-code-analyze`:    Analyze Source Code
 ○   `ase-code-lint`:       Lint Source Code
+○   `ase-code-triage`:     Triage Vulnerability Exposure
 ○   `ase-code-explain`:    Explain Source Code
 ○   `ase-code-insight`:    Project Insight
 ○   `ase-code-edit`:       Edit Source Code

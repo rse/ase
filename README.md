@@ -23,7 +23,7 @@ Code](https://claude.com/product/claude-code) — and with reduced support also 
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
 [OpenAI Codex CLI](https://github.com/openai/codex).
 
-**ASE** ships with 61 agent skills, agent hooks, agent sub-agents, an
+**ASE** ships with 62 agent skills, agent hooks, agent sub-agents, an
 underlying Model-Context-Protocol (MCP) service and a Command-Line Interface
 (CLI) with a task store, task boards, and autonomous agents, incorporating
 reasonable methodology and automation aspects, to support the recurring
@@ -166,6 +166,12 @@ see whether **ASE** is right for you:
   in its logic, semantics, and control flow?
   &rarr; [`/ase-code-analyze`](plugin/skills/ase-code-analyze/help.md)
   `@tool/src/*.ts`
+
+- **Vulnerability Triage**:
+  You want to know whether your project is affected by a vulnerability,
+  given by its CVE id or just by a description, with a brief reason?
+  &rarr; [`/ase-code-triage`](plugin/skills/ase-code-triage/help.md)
+  `--why CVE-2021-44228`
 
 - **Automated Change Logs**:
   You want to get your `CHANGELOG.md` entries

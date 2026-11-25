@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-24)
 ------------------
 
+-   FEATURE [code, docs]: Vulnerability Triage
+    The new skill `ase-code-triage` checks whether the project is affected by a vulnerability, given
+    by its CVE id or a description, via its published VEX status, the CVE record or Web facts, and
+    the project artifacts, and emits an `AFFECTED`, `NOT-AFFECTED`, or `INCONCLUSIVE` verdict.
+
 -   FEATURE [code, docs]: Vulnerability Lookup
     The new `ase util cve` command and MCP tool `ase_cve` gather all information on a CVE id from
     CVE.org, NVD, EPSS, CISA KEV, OSV.dev, and GitHub Advisories into one record (Markdown, YAML,

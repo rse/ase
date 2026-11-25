@@ -48,6 +48,7 @@ export const skillGroups: SkillGroup[] = [
             "ase-code-insight",
             "ase-code-explain",
             "ase-code-lint",
+            "ase-code-triage",
             "ase-spec-lint",
             "ase-docs-shorten",
             "ase-docs-refine",
