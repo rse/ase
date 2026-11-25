@@ -211,18 +211,22 @@ export const configDescriptions: Record<string, string> = {
                                       "falling back to a random port if unavailable.",
     "project.service.auth":           "The authentication of the per-project background service: none at all, a bearer token " +
                                       "generated on each start, or a bearer token persisted across restarts.",
-    "project.artifact.spec.basedir":  "The base directory of the specification files, relative to the project root.",
+    "project.artifact.spec.basedir":  "The whitespace-separated list of base directories of the specification files, relative to " +
+                                      "the project root.",
     "project.artifact.spec.files":    "The whitespace-separated glob specification of the specification files, relative to their base " +
                                       "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
     "project.artifact.spec.schema":   "The whitespace-separated list of SpecBook schema configuration files (empty: the bundled " +
                                       "standard one \"std\").",
-    "project.artifact.code.basedir":  "The base directory of the source code files, relative to the project root.",
+    "project.artifact.code.basedir":  "The whitespace-separated list of base directories of the source code files, relative to " +
+                                      "the project root.",
     "project.artifact.code.files":    "The whitespace-separated glob specification of the source code files, relative to their base " +
                                       "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
-    "project.artifact.docs.basedir":  "The base directory of the documentation files, relative to the project root.",
+    "project.artifact.docs.basedir":  "The whitespace-separated list of base directories of the documentation files, relative to " +
+                                      "the project root.",
     "project.artifact.docs.files":    "The whitespace-separated glob specification of the documentation files, relative to their base " +
                                       "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
-    "project.artifact.infr.basedir":  "The base directory of the infrastructure files, relative to the project root.",
+    "project.artifact.infr.basedir":  "The whitespace-separated list of base directories of the infrastructure files, relative " +
+                                      "to the project root.",
     "project.artifact.infr.files":    "The whitespace-separated glob specification of the infrastructure files, relative to their base " +
                                       "directory (or to the project root, if prefixed with \"/\"), with \"!\" negating a glob.",
     "agent.persona":                  "The communication style of the AI agent.",

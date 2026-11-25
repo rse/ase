@@ -273,11 +273,11 @@ Per-project service:
   `ase-task-board`(1).
 
 Project artifacts (all writable on the `user` and `project` scopes
-only), each kind defined by a `basedir` directory (relative to the
-project root, empty for the root itself) and a whitespace-separated
-`files` glob specification (relative to `basedir`, or to the project
-root if prefixed with `/`, with `!` negating a glob). See
-`ase-artifact`(1):
+only), each kind defined by a whitespace-separated `basedir` list of
+directories (relative to the project root, empty for the root itself)
+and a whitespace-separated `files` glob specification (relative to
+each `basedir` directory, or to the project root if prefixed with `/`,
+with `!` negating a glob). See `ase-artifact`(1):
 
 - `project.artifact.spec.basedir`, `project.artifact.spec.files`:
   The specification files (default: `docs/specbook` and

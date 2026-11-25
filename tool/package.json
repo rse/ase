@@ -113,7 +113,7 @@
         "undici":                           "8.13.1",
         "picomatch":                        "4.0.7",
         "lru-cache":                        "11.5.3",
-        "@rse/specbook":                    "1.6.5",
+        "@rse/specbook":                    "1.6.6",
         "markdownlint":                     "0.42.2",
         "tail":                             "2.2.6",
         "source-code-error":                "1.2.1",

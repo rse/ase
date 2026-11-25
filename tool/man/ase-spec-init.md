@@ -12,8 +12,10 @@
 **ase spec init** initializes the *SpecBook*-based specification below
 `project.artifact.spec.basedir` (see `ase-spec`(1)): it creates every
 specification Markdown file which the *SpecBook* schema configuration
-`project.artifact.spec.schema` assigns artifacts onto and which does
-not exist yet, creating the base directory on demand. Each created file
+`project.artifact.spec.schema` assigns artifacts onto, whose artifacts
+are not present below any of the base directories yet, and which does
+not exist yet, inside the first base directory, creating it on demand.
+Each created file
 carries a frontmatter with the `Created` and `Modified` timestamps and
 the level 1 headings of all artifacts assigned onto it, in the order of
 the schema configuration. An already existing file is never touched.
@@ -24,7 +26,7 @@ The created files are printed to standard output as a single line
 files were created` if all files already exist.
 
 Unlike `specbook init`, no *SpecBook* project configuration file
-`.specbook.yaml` is created, as the base directory and the schema
+`.specbook.yaml` is created, as the base directories and the schema
 configuration are taken from the *ASE* configuration (see
 `ase-config`(1)).
 

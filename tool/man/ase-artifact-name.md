@@ -11,7 +11,7 @@
 
 **ase artifact name** resolves a *filename*, given relative to the base
 directory of an artifact *kind*, to a project-relative (POSIX-style)
-path by prefixing it with the configured base directory
+path by prefixing it with the first configured base directory of
 `project.artifact.`*kind*`.basedir` (see `ase-artifact`(1)), and prints
 it. The file does not have to exist. The skills use it to name a new
 file of a kind, e.g., a new specification or source code file.

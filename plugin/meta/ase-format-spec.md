@@ -42,8 +42,9 @@ SpecBook Project Instantiation
     SPEC Model**.
 
 -   The **SpecBook SPEC Model** of this project is the set of specification
-    Markdown files below the directory <ase-spec-basedir/> (relative
-    to the project root, recursively, where every `.md` file is a
+    Markdown files below the whitespace-separated list of directories
+    <ase-spec-basedir/> (relative to the project root, jointly forming
+    the specification, recursively, where every `.md` file is a
     specification file, whatever its name), whose files are resolved
     via the `ase_artifact_list(kind: [ "spec" ])` tool of the `ase` MCP
     server.

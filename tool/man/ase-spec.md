@@ -46,11 +46,12 @@
 exporting, querying, and previewing the *SpecBook*-based project
 specification (SPEC), and for searching shareable *SpecBook* schema
 configurations. The specification consists of the Markdown files (plus
-their embedded assets) of the artifact kind `spec` below the base
-directory `project.artifact.spec.basedir` (default: `docs/specbook`,
-relative to the project root). Every `.md` file below the base directory
-(recursively, except below `.`-prefixed entries), whatever its name,
-is taken as a specification file.
+their embedded assets) of the artifact kind `spec` below the
+whitespace-separated list of base directories
+`project.artifact.spec.basedir` (default: `docs/specbook`, relative to
+the project root), which jointly form the specification. Every `.md`
+file below a base directory (recursively, except below `.`-prefixed
+entries), whatever its name, is taken as a specification file.
 
 The specification is governed by the *SpecBook* YAML schema
 configuration `project.artifact.spec.schema`: a whitespace-separated

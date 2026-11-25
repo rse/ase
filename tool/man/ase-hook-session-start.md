@@ -60,7 +60,7 @@ following steps:
    transparency `project.boxing`, the task
    lifecycle model `project.task.lifecycle`, the defaults
    `project.task.default.source`, `project.task.default.changeset`, and
-   `project.task.default.target`, the specification base directory
+   `project.task.default.target`, the specification base directories
    `project.artifact.spec.basedir`, and the schema configuration
    `project.artifact.spec.schema`.
 

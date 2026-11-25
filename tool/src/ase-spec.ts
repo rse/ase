@@ -102,13 +102,13 @@ export class Spec {
     }
 
     /*  the source options of the reading commands: the specification below
-        the "spec" artifact base directory, or, under "schema", the effective
+        the "spec" artifact base directories, or, under "schema", the effective
         schema configuration itself (to which no base directory applies)  */
     private static source (log: Log, options: SpecSourceOptions) {
         const schema = options.schema ?? false
         return {
             config:    Spec.configFiles(log),
-            basedir:   schema ? undefined : Artifact.basedir(log, "spec"),
+            basedir:   schema ? undefined : Artifact.basedirs(log, "spec"),
             gitignore: Spec.gitignore,
             schema,
             fetch:     options.fetch
@@ -177,23 +177,23 @@ export class Spec {
         to one of them  */
     private static readonly gitignore = true
 
-    /*  initialize the absent artifact files of the schema configuration below
-        the "spec" artifact base directory, letting SpecBook persist its project
-        options file ".specbook.yaml" into a throw-away working directory, as
-        ASE keeps these options in its own configuration, where "sample"
+    /*  initialize the artifact files of the schema configuration absent below
+        all "spec" artifact base directories into the first one, letting SpecBook
+        persist its project options file ".specbook.yaml" into a throw-away working
+        directory, as ASE keeps these options in its own configuration, where "sample"
         scaffolds one sample object per allowed object kind into the files  */
     static async init (log: Log, sample = false, fetch?: FetchMode): Promise<string[]> {
-        const basedir = Artifact.basedir(log, "spec")
-        const cwd     = await fs.promises.mkdtemp(path.join(os.tmpdir(), "ase-spec-"))
+        const basedirs = Artifact.basedirs(log, "spec")
+        const cwd      = await fs.promises.mkdtemp(path.join(os.tmpdir(), "ase-spec-"))
         try {
             const result = await Spec.unmarked(Spec.api(log).then((api) => api.init({
-                config: Spec.configFiles(log),
-                basedir,
+                config:  Spec.configFiles(log),
+                basedir: basedirs,
                 cwd,
                 fetch,
                 sample
             })))
-            return result.files.map((file) => Spec.relativize(path.join(basedir, file)))
+            return result.files.map((file) => Spec.relativize(path.join(basedirs[0], file)))
         }
         finally {
             await fs.promises.rm(cwd, { recursive: true, force: true })
@@ -201,12 +201,12 @@ export class Spec {
     }
 
     /*  lint the specification Markdown files below the "spec" artifact
-        base directory against the schema configuration, optionally
+        base directories against the schema configuration, optionally
         followed by the generic Markdown linting  */
     static async lint (log: Log, markdown = false, fetch?: FetchMode): Promise<Diagnostic[]> {
         const result = await Spec.unmarked(Spec.api(log).then((api) => api.lint({
             config:    Spec.configFiles(log),
-            basedir:   Artifact.basedir(log, "spec"),
+            basedir:   Artifact.basedirs(log, "spec"),
             gitignore: Spec.gitignore,
             fetch
         })))
@@ -503,7 +503,7 @@ export default class SpecCommand {
                 "output file (\"-\" for stdout, repeatable), with the format inferred " +
                 "from the filename extension unless explicitly prefixed " +
                 "(default: \"index.html\", resp. \"schema.html\" under \"--schema\", " +
-                "inside the specification base directory)",
+                "inside the first specification base directory)",
                 (value: string, previous: string[]) => previous.concat(value), new Array<string>())
             .option("-w, --watch", "keep the outputs in sync by re-exporting on every source change")
             .option("-S, --schema", "export the effective schema configuration itself instead of the specification")
@@ -515,7 +515,7 @@ export default class SpecCommand {
                 const omit     = omitOf(opts.omit)
                 const fetch    = opts.fetch
                 const outputs  = (opts.output.length > 0 ? opts.output :
-                    [ path.join(Artifact.basedir(this.log, "spec"), schema ? "schema.html" : "index.html") ])
+                    [ path.join(Artifact.basedirs(this.log, "spec")[0], schema ? "schema.html" : "index.html") ])
                     .map(parseOutputSpec)
 
                 /*  a re-export has to land somewhere it can be picked up again,

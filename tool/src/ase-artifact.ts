@@ -76,49 +76,64 @@ export class Artifact {
         return String(isScalar(val) ? val.value : val)
     }
 
-    /*  read the configured "basedir" anchor and "files" miniglob spec
-        for a single kind; "basedir" is project-root-relative (POSIX,
-        "" ≡ project root) and "files" resolves relative to "basedir",
-        except for its "/"-prefixed tokens  */
-    private static spec (cfg: Config, kind: Exclude<ArtifactKind, "othr">): { basedir: string, files: string } {
-        const basedir = path.posix.normalize(Artifact.configString(cfg, `project.artifact.${kind}.basedir`)
-            .replace(/\\/g, "/")).replace(/^\/+|\/+$/g, "")
-            .replace(/^\.$/, "")
-        if (basedir.split("/").includes(".."))
-            throw new Error(`artifact: configured "basedir" "${basedir}" must not escape the project root`)
-        const files   = Artifact.configString(cfg, `project.artifact.${kind}.files`)
-        return { basedir, files }
+    /*  read the configured "basedir" anchors and "files" miniglob spec
+        for a single kind; "basedir" is a whitespace-separated list of
+        literal project-root-relative directories (POSIX, "" ≡ project root),
+        and "files" resolves relative to each of them, except for its
+        "/"-prefixed tokens  */
+    private static spec (cfg: Config, kind: Exclude<ArtifactKind, "othr">): { basedirs: string[], files: string } {
+        const basedirs = new Array<string>()
+        const entries  = Artifact.configString(cfg, `project.artifact.${kind}.basedir`)
+            .split(/\s+/).filter((entry) => entry !== "")
+        for (const entry of entries.length > 0 ? entries : [ "" ]) {
+            const basedir = path.posix.normalize(entry.replace(/\\/g, "/") || ".")
+                .replace(/^\/+|\/+$/g, "").replace(/^\.$/, "")
+            if (basedir.split("/").includes(".."))
+                throw new Error(`artifact: configured "basedir" "${basedir}" must not escape the project root`)
+            if (picomatch.scan(basedir).isGlob)
+                throw new Error(`artifact: configured "basedir" "${basedir}" must be a literal directory`)
+            if (!basedirs.includes(basedir))
+                basedirs.push(basedir)
+        }
+        const files = Artifact.configString(cfg, `project.artifact.${kind}.files`)
+        return { basedirs, files }
     }
 
     /*  raw-resolve a single kind's "basedir"/"files" spec against the
         file universe via "seed-then-mutate" miniglob semantics: the spec
         is a whitespace-separated list of tokens, each resolving relative
-        to "basedir", or relative to the project root if "/"-prefixed  */
-    private static resolveKind (basedir: string, files: string, all: string[]): Set<string> {
-        const prefix = basedir === "" ? "" : `${basedir}/`
+        to a "basedir", or relative to the project root if "/"-prefixed,
+        where the files of all base directories are united  */
+    private static resolveKind (basedirs: string[], files: string, all: string[]): Set<string> {
         const tokens = files.split(/\s+/).filter((t) => t !== "")
+        const result = new Set<string>()
         if (tokens.length === 0)
-            return new Set<string>()
-        const result = new Set<string>(tokens[0].startsWith("!") ?
-            all.filter((file) => file.startsWith(prefix)) : [])
-        for (const token of tokens) {
-            const negated  = token.startsWith("!")
-            const pattern  = negated ? token.slice(1) : token
-            const anchored = pattern.startsWith("/")
-            const glob     = pattern.replace(/^\/+/, "")
-            if (glob === "")
-                continue
-            const isMatch = picomatch(glob, { dot: true })
-            for (const file of all) {
-                if (!anchored && !file.startsWith(prefix))
+            return result
+        for (const basedir of basedirs) {
+            const prefix = basedir === "" ? "" : `${basedir}/`
+            const own    = new Set<string>(tokens[0].startsWith("!") ?
+                all.filter((file) => file.startsWith(prefix)) : [])
+            for (const token of tokens) {
+                const negated  = token.startsWith("!")
+                const pattern  = negated ? token.slice(1) : token
+                const anchored = pattern.startsWith("/")
+                const glob     = pattern.replace(/^\/+/, "")
+                if (glob === "")
                     continue
-                if (!isMatch(anchored ? file : file.slice(prefix.length)))
-                    continue
-                if (negated)
-                    result.delete(file)
-                else
-                    result.add(file)
+                const isMatch = picomatch(glob, { dot: true })
+                for (const file of all) {
+                    if (!anchored && !file.startsWith(prefix))
+                        continue
+                    if (!isMatch(anchored ? file : file.slice(prefix.length)))
+                        continue
+                    if (negated)
+                        own.delete(file)
+                    else
+                        own.add(file)
+                }
             }
+            for (const file of own)
+                result.add(file)
         }
         return result
     }
@@ -132,8 +147,8 @@ export class Artifact {
         /*  raw-resolve all four configured kinds  */
         const raw = new Map<Exclude<ArtifactKind, "othr">, Set<string>>()
         for (const kind of configuredKinds) {
-            const { basedir, files } = Artifact.spec(cfg, kind)
-            raw.set(kind, Artifact.resolveKind(basedir, files, all))
+            const { basedirs, files } = Artifact.spec(cfg, kind)
+            raw.set(kind, Artifact.resolveKind(basedirs, files, all))
         }
 
         /*  partition the universe by descending precedence  */
@@ -159,8 +174,8 @@ export class Artifact {
         }))
     }
 
-    /*  resolve a base-relative "filename" within a kind's "basedir" to a
-        project-root-relative POSIX path; the implicit "othr" catch-all
+    /*  resolve a base-relative "filename" within a kind's first "basedir" to
+        a project-root-relative POSIX path; the implicit "othr" catch-all
         has no configured "basedir" and is therefore rejected  */
     static resolveName (log: Log, kind: ArtifactKind, filename: string): string {
         if (kind === "othr")
@@ -172,20 +187,19 @@ export class Artifact {
             throw new Error("artifact: filename must not contain \"..\" segments")
         const cfg = new Config("config", configSchema, log)
         cfg.read()
-        const { basedir } = Artifact.spec(cfg, kind)
+        const [ basedir ] = Artifact.spec(cfg, kind).basedirs
         return basedir === "" ? file : `${basedir}/${file}`
     }
 
-    /*  resolve the configured "basedir" of a kind to an absolute path;
-        the implicit "othr" catch-all has no configured "basedir" and is
-        therefore rejected  */
-    static basedir (log: Log, kind: ArtifactKind): string {
+    /*  resolve the configured "basedir" directories of a kind to absolute
+        paths (at least one); the implicit "othr" catch-all has no configured
+        "basedir" and is therefore rejected  */
+    static basedirs (log: Log, kind: ArtifactKind): string[] {
         if (kind === "othr")
             throw new Error("artifact: kind \"othr\" has no configured basedir")
         const cfg = new Config("config", configSchema, log)
         cfg.read()
-        const { basedir } = Artifact.spec(cfg, kind)
-        return path.join(Task.projectRoot(), basedir)
+        return Artifact.spec(cfg, kind).basedirs.map((basedir) => path.join(Task.projectRoot(), basedir))
     }
 }
 
@@ -228,7 +242,7 @@ export default class ArtifactCommand {
         artifact
             .command("name")
             .description("Resolve a base-relative filename within an artifact kind to a project-relative path")
-            .argument("<filename>", "base-relative filename within the kind's basedir")
+            .argument("<filename>", "base-relative filename within the kind's first basedir")
             .option("--kind <kind>",
                 "artifact kind " +
                 `(${configuredKinds.join("|")})`,
@@ -291,7 +305,7 @@ export class ArtifactMCP {
             title: "ASE artifact name",
             description:
                 "Resolve a base-relative `filename` within an artifact `kind` to a project-relative path " +
-                "by prefixing it with the kind's configured `basedir`. " +
+                "by prefixing it with the first directory of the kind's configured `basedir`. " +
                 "Recognized kinds are `spec`, `code`, `docs`, and `infr` " +
                 "(the implicit `othr` catch-all has no basedir and is rejected). " +
                 "If `kind` is omitted, it defaults to `code`. " +
@@ -300,7 +314,7 @@ export class ArtifactMCP {
                 kind: z.string().optional()
                     .describe("artifact kind (`spec`, `code`, `docs`, `infr`); defaults to `code`"),
                 filename: z.string()
-                    .describe("base-relative filename within the kind's basedir")
+                    .describe("base-relative filename within the kind's first basedir")
             },
             outputSchema: {
                 name: z.string().describe("project-relative file path")

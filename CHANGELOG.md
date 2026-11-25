@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-24)
 ------------------
 
+-   FEATURE [code, docs]: Multiple Artifact Base Directories
+    `project.artifact.<kind>.basedir` accepts a whitespace-separated list of literal directories,
+    whose files are united, where the `spec` ones are passed to the upgraded SpecBook 1.6.6, and
+    `ase spec init`, `ase spec export`, and `ase artifact name` use the first one.
+
 -   BUGFIX [infr]: Robust Website Deployment
     The GitHub Pages workflow builds and deploys in separate jobs and retries the deployment once
     after 30 seconds, as the artifact listing API often does not yet show the just uploaded artifact.

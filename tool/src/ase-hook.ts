@@ -480,8 +480,8 @@ export default class HookCommand {
         const defaultChangeset = setting("project.task.default.changeset", "ASE_PROJECT_TASK_DEFAULT_CHANGESET", "worktree")
         const defaultTarget    = setting("project.task.default.target",    "ASE_PROJECT_TASK_DEFAULT_TARGET",    "source")
 
-        /*  determine the specification base directory and the whitespace-separated
-            list of SpecBook schema configurations (empty: the bundled standard schema)  */
+        /*  determine the whitespace-separated lists of specification base directories
+            and of SpecBook schema configurations (empty: the bundled standard schema)  */
         const specBasedir = String(cfg.get("project.artifact.spec.basedir") ?? "")
         const specSchema  = String(cfg.get("project.artifact.spec.schema")  ?? "")
 

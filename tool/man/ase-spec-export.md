@@ -60,9 +60,9 @@ The MCP tool `ase_specbook_export` provides the same to the skills.
   mixes into the export on standard output. An unknown format prefix and
   a not inferable format are errors. A relative *file* is relative to the
   current working directory. Default: the HTML rendering into
-  `index.html` (resp. `schema.html` under `--schema`) inside the
+  `index.html` (resp. `schema.html` under `--schema`) inside the first
   specification base directory (e.g., `docs/specbook/index.html`).
-  A `md` output inside the specification base directory is refused,
+  A `md` output inside any specification base directory is refused,
   as it would be parsed as a specification file itself.
 
 - \[`-w`|`--watch`\]:

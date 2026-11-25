@@ -34,12 +34,13 @@ kinds are:
 - `othr`: the implicit catch-all of all other files.
 
 The first four kinds are configured by the configuration keys
-`project.artifact.`*kind*`.basedir` (the base directory, relative to
-the project root, where an empty value denotes the project root itself,
-and which must not escape the project root via `..`) and
-`project.artifact.`*kind*`.files` (a *miniglob* specification, resolved
-relative to the base directory), with the defaults given above (see
-`ase-config`(1)).
+`project.artifact.`*kind*`.basedir` (a whitespace-separated list of
+literal base directories, relative to the project root, where an empty
+value denotes the project root itself, and which must not escape the
+project root via `..`) and `project.artifact.`*kind*`.files` (a
+*miniglob* specification, resolved relative to each base directory,
+with the files of all base directories united), with the defaults
+given above (see `ase-config`(1)).
 
 A *miniglob* specification is a whitespace-separated list of glob
 patterns (in the syntax of *picomatch*, with dot files matched), each
