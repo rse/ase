@@ -1,10 +1,11 @@
 ---
 name: ase-code-analyze
-argument-hint: "[--help|-h] [--auto|-a] [--no-changelog|-C] [--performance|-p] [--security|-s] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] [--staged] [--unstaged] [--worktree|-w <name>] [<source-reference>]"
+argument-hint: "[--help|-h] [--auto|-a] [--no-changelog|-C] [--performance|-p] [--security|-s] [--tests|-t] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--prefix|-P=<prefix>] [--staged] [--unstaged] [--worktree|-w <name>] [<source-reference>]"
 description: >
     Analyze the source code for problems in either the logic and
     semantics and its related control flow, performance and efficiency,
-    or security (with `--auto` fixed automatically).
+    security, or the evidentiary quality of its tests (with `--auto`
+    fixed automatically).
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -26,7 +27,7 @@ Analyze Source Code
 
 <expand name="getopt"
     arg1="ase-code-analyze"
-    arg2="--auto|-a --no-changelog|-C --performance|-p --security|-s --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --prefix|-P= --staged --unstaged --worktree|-w=">
+    arg2="--auto|-a --no-changelog|-C --performance|-p --security|-s --tests|-t --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --prefix|-P= --staged --unstaged --worktree|-w=">
     $ARGUMENTS
 </expand>
 
@@ -36,20 +37,21 @@ related source code, for problems - read-only, *without* applying any
 changes, unless `--auto` requests to fix the reported problems
 automatically. The *analysis lens* depends on the selected options: problems
 in its *logic* and *semantics* and its related *control flow*, or
-problems in *performance* and *efficiency*, or problems in *security*.
+problems in *performance* and *efficiency*, or problems in *security*,
+or problems in the *evidentiary quality* of its *tests*.
 </objective>
 
 <flow>
 
 1.  <step id="STEP 1: Sanity Check Usage">
 
-    <if condition="<getopt-option-performance/> is equal `true` and <getopt-option-security/> is equal `true`">
+    <if condition="more than one of <getopt-option-performance/>, <getopt-option-security/>, and <getopt-option-tests/> is equal `true`">
 
     Only output the following <template/> and then *STOP* the entire flow
     (do not perform any further steps):
 
     <template>
-    ⧉ **ASE**: ✪ skill: **ase-code-analyze**, ▶ ERROR: options `--performance` and `--security` are mutually exclusive
+    ⧉ **ASE**: ✪ skill: **ase-code-analyze**, ▶ ERROR: options `--performance`, `--security`, and `--tests` are mutually exclusive
     </template>
 
     </if>
@@ -99,6 +101,7 @@ problems in *performance* and *efficiency*, or problems in *security*.
     For this, first determine the *analysis lens* <lens/>: set
     <lens>performance</lens> if <getopt-option-performance/> is equal
     `true`, set <lens>security</lens> if <getopt-option-security/> is
+    equal `true`, set <lens>tests</lens> if <getopt-option-tests/> is
     equal `true`, and set <lens>logic</lens> otherwise.
 
     Set <work-dir></work-dir> (empty). If <getopt-option-worktree/> is
@@ -241,7 +244,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
     Then *restrict* <problems/> to the changeset: *keep* a problem if
     and only if its `line` lies within a changed line range in <ranges/>
     of its `file` (resolving a relative `file` against <work-dir/> if
-    this is not empty, else against the current working directory), and
+    this is not empty, else against the current working directory), or,
+    if <lens/> is `tests`, its `file` is *not* in <sources/> (an unchanged
+    counterpart test resp. code under test, paired by the tests lens), and
     *silently drop* all other problems.
     </if>
 
@@ -325,7 +330,21 @@ problems in *performance* and *efficiency*, or problems in *security*.
 
     </if>
 
-    <if condition="<getopt-option-performance/> is NOT equal `true`">
+    <if condition="<getopt-option-tests/> is equal `true`">
+
+    <template>
+
+    ⧉ **ASE**: **PROBLEM** (Severity: **<severity/>**): **<id-prefix/>P<n/>**: **<title/>**
+
+    <description/>
+
+    ⊙ SOURCE: <evidence/>
+
+    </template>
+
+    </if>
+
+    <if condition="<getopt-option-performance/> is NOT equal `true` and <getopt-option-tests/> is NOT equal `true`">
 
     <template>
 
@@ -352,7 +371,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
         `ase-issue-<id-prefix/>*` keys, leaving any unrelated keys in the
         shared store intact),
         followed by one `{ command: "set", key: "ase-issue-<id-prefix/>P<n/>",
-        val: "<title/>: <description/>" }` entry per reported problem.
+        val: "<title/>: <description/>" }` entry per reported problem,
+        where, if <lens/> is `tests`, the `val` is suffixed by
+        ` -- SOURCE: <evidence/>`, so the source survives for the fixing.
 
     <if condition="<getopt-option-auto/> is not equal `true`">
     Finally, give a final hint by expanding the following (which,
@@ -411,8 +432,9 @@ problems in *performance* and *efficiency*, or problems in *security*.
         the correction was applied, `FAILED` if an `Edit` or `Write`
         reported an error, or `SKIPPED` if the problem cannot be resolved
         by a local correction (e.g. a design decision or a questioned
-        intent demanding a human), in which case nothing is changed for
-        it. Do not output anything beyond the tool invocations.
+        intent demanding a human) or, if <lens/> is `tests`, its
+        `evidence` is `none found` (an expected value is never invented
+        without a source), in which case nothing is changed for it. Do not output anything beyond the tool invocations.
 
     3.  <if condition="<outcomes/> contains at least one `APPLIED` outcome">
         Remove the persisted problems of all applied corrections, so

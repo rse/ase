@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-2.1.7 (2026-11-24)
+2.1.7 (2026-11-25)
 ------------------
 
 -   IMPROVEMENT [code, docs]: Aligned Change Set Selection of Repository Skills
@@ -38,6 +38,11 @@ ChangeLog
     The new `ase util vex` command and MCP tool `ase_vex` determine the status the project published
     for itself on a CVE id in its local CSAF, CycloneDX, OpenVEX, or SPDX 3 VEX documents, as verdict
     `NOT-AFFECTED`, `AFFECTED`, `FIXED`, `UNDER-INVESTIGATION`, or `UNKNOWN`.
+
+-   FEATURE [code]: Test Analysis Lens for `ase-code-analyze`
+    The new option `--tests`|`-t` analyzes tests and the code under test as pairs for contradicting
+    or unsourced expected values, insensitive tests, and missing claims or edge cases, judged
+    against the specification, task plans, and standards instead of the implementation.
 
 -   REFACTOR [code, docs]: Smaller Stylesheet of the Web Task Board
     `ase-task-board-web-client.styl` keeps only the base, header, lanes view, and footer styles and
