@@ -30,6 +30,7 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-changes.md
 
 <purpose name="ase-repo-review">
 Review Changes
@@ -61,205 +62,26 @@ Procedure
 
 1.  <step id="STEP 1: Determine Change Set">
 
-    1.  <if condition="<getopt-option-commit/> is not empty and (<getopt-option-branch/> is not empty or <getopt-option-staged/> is equal `true` or <getopt-option-unstaged/> is equal `true`)">
-        Only output the following <template/> and then *STOP* immediately:
+    1.  Select the change set to review:
 
-        <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: option `--commit` cannot be combined with `--branch`, `--staged`, or `--unstaged`
-        </template>
-        </if>
+        <expand name="changes-select"
+            arg1="✪ skill: **ase-repo-review**"
+            arg2="<getopt-option-staged/>"
+            arg3="<getopt-option-unstaged/>"
+            arg4="<getopt-option-worktree/>"
+            arg5="<getopt-option-branch/>"
+            arg6="<getopt-option-commit/>"></expand>
 
-        <if condition="<getopt-option-worktree/> is not empty and (<getopt-option-branch/> is not empty or <getopt-option-commit/> is not empty)">
-        Only output the following <template/> and then *STOP* immediately:
+        Set <scope><changes-scope/></scope>.
 
-        <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: option `--worktree` cannot be combined with `--branch` or `--commit`
-        </template>
-        </if>
+    2.  Determine *whether there are changes at all*, as a lightweight
+        gate only, as the full diff is fetched by the sub-agent in STEP 2:
 
-        Set <worktree-dir></worktree-dir> (empty).
+        <expand name="changes-capture" arg1="names"></expand>
 
-        <if condition="<getopt-option-worktree/> is not empty">
-        Determine the directory of this existing ASE worktree: if
-        <getopt-option-worktree/> consists of other characters than
-        `A-Z`, `a-z`, `0-9`, `_`, and `-`, keep <worktree-dir/> empty,
-        else call the
-        `ase_worktree_path(id: "<getopt-option-worktree/>", create: false)`
-        tool of the `ase` MCP server (you *MUST* *NEVER* assemble this
-        path yourself), capture its result into <worktree-dir/>, and run
-        the command `git -C "<worktree-dir/>" rev-parse --show-toplevel`
-        (taken exactly as given). If <worktree-dir/> is empty, the tool
-        call failed, or the command failed (i.e., the worktree does not
-        exist), only output the following <template/> and then *STOP*
-        immediately:
+        Set <diff><changes-output/></diff>.
 
-        <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: no worktree **<getopt-option-worktree/>** to review
-        </template>
-        </if>
-
-        Set <changes/> to the *uncommitted* changes to review: to
-        `staged and unstaged` if both <getopt-option-staged/> and
-        <getopt-option-unstaged/> are equal `true`, to `staged` if only
-        <getopt-option-staged/> is equal `true`, to `unstaged` if only
-        <getopt-option-unstaged/> is equal `true`, and to empty otherwise.
-        Here, the `unstaged` changes always include the *untracked* files.
-
-    2.  <if condition="<getopt-option-branch/> is not empty">
-        Determine the *base* of the branch:
-
-        1.  Check that <getopt-option-branch/> matches the regexp
-            `^[A-Za-z0-9_@][A-Za-z0-9._/+@-]*$`, which keeps it safe for
-            being passed quoted to the `git` commands, and only then run
-            the command
-            `git rev-parse --verify --quiet "<getopt-option-branch/>^{commit}"`.
-            If the check or the command fails, only output the following
-            <template/> and then *STOP* immediately:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: branch **<getopt-option-branch/>** does not exist
-            </template>
-
-        2.  Determine the *candidate base branches* by running the command
-            `git for-each-ref --format="%(refname:short)" refs/heads/`
-            (taken exactly as given), excluding <getopt-option-branch/>
-            itself. For each <candidate/>, run the command
-            `git rev-list --count "<candidate/>..<getopt-option-branch/>"`
-            to count the commits of the branch since its fork point from
-            <candidate/>, and *drop* every candidate with a count of `0`,
-            as it already contains the branch. Set <base/> to the
-            remaining candidate with the *smallest* count (the *nearest*
-            fork point); on a tie, prefer the checked-out branch (the
-            output of `git branch --show-current`), and then the first
-            candidate. If no candidate remains, only output the following
-            <template/> and then *STOP* immediately:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: no base branch determinable for branch **<getopt-option-branch/>**
-            </template>
-
-        3.  Run the command
-            `git merge-base "<base/>" "<getopt-option-branch/>"` and
-            capture its output into <base-commit/>.
-
-        4.  Only output the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-review**, ⎇ branch: **<getopt-option-branch/>**, ⎇ base: **<base/>**
-            </template>
-
-        </if>
-        <elseif condition="<getopt-option-commit/> is not empty">
-        Check that <getopt-option-commit/> matches the regexp
-        `^[A-Za-z0-9_@][A-Za-z0-9._/+@~^-]*$`, which keeps it safe for
-        being passed quoted to the `git` commands, and only then run the
-        command
-        `git rev-parse --verify --quiet "<getopt-option-commit/>^{commit}"`
-        and capture its output into <commit-id/>. If the check or the
-        command fails, only output the following <template/> and then
-        *STOP* immediately:
-
-        <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: commit **<getopt-option-commit/>** does not exist
-        </template>
-        </elseif>
-
-    3.  Determine *whether there are changes at all* by running the
-        corresponding command(s) (taken exactly as given) and capturing
-        their combined output - the bare *list of changed file names* -
-        into <diff/>. This is a lightweight gate; the full diff is fetched
-        by the sub-agent in STEP 2, so capturing only the file-name list
-        here is sufficient:
-
-        <if condition="<getopt-option-branch/> is not empty and <changes/> is not empty">
-        Determine the *worktree* of the branch by running the command
-        `git worktree list --porcelain` and setting <worktree-dir/> to the
-        `worktree` path of the entry whose `branch` line is
-        `refs/heads/<getopt-option-branch/>` (or to empty if there is
-        none, as a branch not checked out anywhere carries no uncommitted
-        changes).
-
-        If <worktree-dir/> is not empty, set <scope>branch
-        <getopt-option-branch/> since base commit <base-commit/> plus the
-        <changes/> changes in worktree <worktree-dir/></scope> and run:
-
-        -   If <changes/> is equal `staged and unstaged`:
-
-            `git -C "<worktree-dir/>" diff --name-only "<base-commit/>"`
-
-            `git -C "<worktree-dir/>" ls-files --others --exclude-standard`
-
-        -   If <changes/> is equal `staged`:
-
-            `git -C "<worktree-dir/>" diff --cached --name-only "<base-commit/>"`
-
-        -   If <changes/> is equal `unstaged`:
-
-            `git diff --name-only "<base-commit/>..<getopt-option-branch/>"`
-
-            `git -C "<worktree-dir/>" diff --name-only`
-
-            `git -C "<worktree-dir/>" ls-files --others --exclude-standard`
-
-        From the output of the `ls-files` command, *skip* every listed
-        entry below the `.ase/` directory -- it carries *ASE*'s own
-        state, and hence is never part of the user's change set.
-
-        Otherwise, set <scope>branch <getopt-option-branch/> since base
-        commit <base-commit/></scope> and run:
-
-        `git diff --name-only "<base-commit/>..<getopt-option-branch/>"`
-        </if>
-        <elseif condition="<getopt-option-branch/> is not empty">
-        Set <scope>branch <getopt-option-branch/> since base commit
-        <base-commit/></scope> and run:
-
-        `git diff --name-only "<base-commit/>..<getopt-option-branch/>"`
-        </elseif>
-        <elseif condition="<getopt-option-commit/> is not empty">
-        Set <scope>commit <commit-id/></scope> and run:
-
-        `git show --format= --name-only --diff-merges=first-parent "<commit-id/>"`
-        </elseif>
-        <elseif condition="<worktree-dir/> is not empty">
-        Set <scope/> and run the command(s) exactly like for the
-        uncommitted changes of the current working copy below (by
-        <changes/>, i.e. `staged` if it is empty), but with each command
-        prefixed by `git -C "<worktree-dir/>"` instead of `git`, and with
-        ` in worktree <worktree-dir/>` appended to <scope/> (e.g.
-        <scope>unstaged in worktree <worktree-dir/></scope> and the
-        commands `git -C "<worktree-dir/>" diff --name-only` and
-        `git -C "<worktree-dir/>" ls-files --others --exclude-standard`).
-        </elseif>
-        <elseif condition="<changes/> is equal `staged and unstaged`">
-        Set <scope>staged and unstaged</scope> and run:
-
-        `git diff --name-only HEAD`
-
-        `git ls-files --others --exclude-standard`
-
-        From the output of the second command, *skip* every listed
-        entry below the `.ase/` directory -- it carries *ASE*'s own
-        state, and hence is never part of the user's change set.
-        </elseif>
-        <elseif condition="<changes/> is equal `unstaged`">
-        Set <scope>unstaged</scope> and run:
-
-        `git diff --name-only`
-
-        `git ls-files --others --exclude-standard`
-
-        From the output of the second command, *skip* every listed
-        entry below the `.ase/` directory -- it carries *ASE*'s own
-        state, and hence is never part of the user's change set.
-        </elseif>
-        <else>
-        Set <scope>staged</scope> and run:
-
-        `git diff --cached --name-only HEAD`
-        </else>
-
-    4.  <if condition="<diff/> is empty">
+    3.  <if condition="<diff/> is empty">
         Only output the following <template/> and then *STOP* immediately:
 
         <template>
@@ -267,7 +89,7 @@ Procedure
         </template>
         </if>
 
-    5.  <if condition="<getopt-option-auto/> is equal `true` and (<getopt-option-commit/> is not empty or (<getopt-option-branch/> is not empty and (<worktree-dir/> is empty or <changes/> is empty)))">
+    4.  <if condition="<getopt-option-auto/> is equal `true` and (<getopt-option-commit/> is not empty or (<getopt-option-branch/> is not empty and (<worktree-dir/> is empty or <changes/> is empty)))">
         The automatic fixing edits the reviewed files on disk, so it
         requires the reviewed state to *be* on disk. Only output the
         following <template/> and then *STOP* immediately:

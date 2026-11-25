@@ -1,6 +1,6 @@
 ---
 name: ase-repo-task
-argument-hint: "[--help|-h] [--focus|-f <section>[,...]] [--staged] [--unstaged] [--branch|-b <branch>] [--commit|-c <commit>] [<task-id>[:]] [<scope>]"
+argument-hint: "[--help|-h] [--focus|-f <section>[,...]] [--staged] [--unstaged] [--worktree|-w <name>] [--branch|-b <branch>] [--commit|-c <commit>] [<task-id>[:]] [<scope>]"
 description: >
     Derive a new task plan from a Git change set -- the staged changes
     (or, with `--unstaged`, the unstaged and untracked changes, with
@@ -34,6 +34,7 @@ allowed-tools:
 @${CLAUDE_SKILL_DIR}/../../meta/ase-control.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-skill.md
 @${CLAUDE_SKILL_DIR}/../../meta/ase-getopt.md
+@${CLAUDE_SKILL_DIR}/../../meta/ase-common-changes.md
 
 <purpose name="ase-repo-task">
 Derive a Task from a Change Set
@@ -41,7 +42,7 @@ Derive a Task from a Change Set
 
 <expand name="getopt"
     arg1="ase-repo-task"
-    arg2="--focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --staged --unstaged --branch|-b= --commit|-c="
+    arg2="--focus|-f=(all|SPECIFICATION|SPEC|WHAT|DESIGN|DES|HOW|VERIFICATION|VERIFY|VER|WHEN)... --staged --unstaged --worktree|-w= --branch|-b= --commit|-c="
     arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
@@ -120,156 +121,30 @@ plan exclusively via the `ase_task_save` MCP tool.
 
 2.  **Determine Change Set:**
 
-    1.  <if condition="<getopt-option-commit/> is not empty and (<getopt-option-branch/> is not empty or <getopt-option-staged/> is equal `true` or <getopt-option-unstaged/> is equal `true`)">
-        Only output the following <template/> and then *STOP* immediately:
+    1.  Select the change set to derive from:
 
-        <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-task**, ▶ ERROR: option `--commit` cannot be combined with `--branch`, `--staged`, or `--unstaged`
-        </template>
-        </if>
+        <expand name="changes-select"
+            arg1="✪ skill: **ase-repo-task**"
+            arg2="<getopt-option-staged/>"
+            arg3="<getopt-option-unstaged/>"
+            arg4="<getopt-option-worktree/>"
+            arg5="<getopt-option-branch/>"
+            arg6="<getopt-option-commit/>"></expand>
 
-        Set <changes/> to the *uncommitted* changes to derive from: to
-        `staged and unstaged` if both <getopt-option-staged/> and
-        <getopt-option-unstaged/> are equal `true`, to `staged` if only
-        <getopt-option-staged/> is equal `true`, to `unstaged` if only
-        <getopt-option-unstaged/> is equal `true`, and to empty otherwise.
-        Here, the `unstaged` changes always include the *untracked* files.
+        Set <revision><changes-revision/></revision>.
 
-    2.  <if condition="<getopt-option-branch/> is not empty">
-        Determine the *base* of the branch:
+    2.  Capture the *change set* and its commit messages. Do not output
+        anything:
 
-        1.  Check that <getopt-option-branch/> matches the regexp
-            `^[A-Za-z0-9_@][A-Za-z0-9._/+@-]*$`, which keeps it safe for
-            being passed quoted to the `git` commands, and only then run
-            the command
-            `git rev-parse --verify --quiet "<getopt-option-branch/>^{commit}"`.
-            If the check or the command fails, only output the following
-            <template/> and then *STOP* immediately:
+        <expand name="changes-capture" arg1="patch"></expand>
 
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-task**, ▶ ERROR: branch **<getopt-option-branch/>** does not exist
-            </template>
+        Set <diff><changes-output/></diff>.
 
-        2.  Determine the *candidate base branches* by running the command
-            `git for-each-ref --format="%(refname:short)" refs/heads/`
-            (taken exactly as given), excluding <getopt-option-branch/>
-            itself. For each <candidate/>, run the command
-            `git rev-list --count "<candidate/>..<getopt-option-branch/>"`
-            to count the commits of the branch since its fork point from
-            <candidate/>, and *drop* every candidate with a count of `0`,
-            as it already contains the branch. Set <base/> to the
-            remaining candidate with the *smallest* count (the *nearest*
-            fork point); on a tie, prefer the checked-out branch (the
-            output of `git branch --show-current`), and then the first
-            candidate. If no candidate remains, only output the following
-            <template/> and then *STOP* immediately:
+        <expand name="changes-capture" arg1="messages"></expand>
 
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-task**, ▶ ERROR: no base branch determinable for branch **<getopt-option-branch/>**
-            </template>
+        Set <messages><changes-output/></messages>.
 
-        3.  Run the command
-            `git merge-base "<base/>" "<getopt-option-branch/>"` and
-            capture its output into <base-commit/>.
-
-        4.  Only output the following <template/>:
-
-            <template>
-            ⧉ **ASE**: ✪ skill: **ase-repo-task**, ⎇ branch: **<getopt-option-branch/>**, ⎇ base: **<base/>**
-            </template>
-
-        </if>
-        <elseif condition="<getopt-option-commit/> is not empty">
-        Check that <getopt-option-commit/> matches the regexp
-        `^[A-Za-z0-9_@][A-Za-z0-9._/+@~^-]*$`, which keeps it safe for
-        being passed quoted to the `git` commands, and only then run the
-        command
-        `git rev-parse --verify --quiet "<getopt-option-commit/>^{commit}"`
-        and capture its output into <commit-id/>. If the check or the
-        command fails, only output the following <template/> and then
-        *STOP* immediately:
-
-        <template>
-        ⧉ **ASE**: ✪ skill: **ase-repo-task**, ▶ ERROR: commit **<getopt-option-commit/>** does not exist
-        </template>
-        </elseif>
-
-    3.  Capture the *change set* by running the corresponding commands
-        (taken exactly as given) and capturing their combined output into
-        <diff/>, the commit messages into <messages/> (or empty), and the
-        revision the change set *results* in into <revision/> (or empty
-        for the files on disk). From the output of every `ls-files`
-        command, *skip* every listed entry below the `.ase/` directory --
-        it carries *ASE*'s own state, and hence is never part of the
-        user's change set -- and treat every remaining untracked file as
-        *newly added* in its entirety. Do not output anything.
-
-        <if condition="<getopt-option-branch/> is not empty">
-        Determine the *worktree* of the branch by running the command
-        `git worktree list --porcelain` and setting <worktree-dir/> to the
-        `worktree` path of the entry whose `branch` line is
-        `refs/heads/<getopt-option-branch/>` (or to empty if there is
-        none, as a branch not checked out anywhere carries no uncommitted
-        changes). Set <revision><getopt-option-branch/></revision>.
-
-        -   If <changes/> is empty or <worktree-dir/> is empty:
-
-            `git diff "<base-commit/>..<getopt-option-branch/>"`
-
-        -   Else if <changes/> is equal `staged and unstaged`:
-
-            `git -C "<worktree-dir/>" diff "<base-commit/>"`
-
-            `git -C "<worktree-dir/>" ls-files --others --exclude-standard`
-
-        -   Else if <changes/> is equal `staged`:
-
-            `git -C "<worktree-dir/>" diff --cached "<base-commit/>"`
-
-        -   Else if <changes/> is equal `unstaged`:
-
-            `git diff "<base-commit/>..<getopt-option-branch/>"`
-
-            `git -C "<worktree-dir/>" diff`
-
-            `git -C "<worktree-dir/>" ls-files --others --exclude-standard`
-
-        In the three worktree cases, the resulting files are the files
-        on disk below <worktree-dir/>, so set <revision></revision>
-        (empty) there. Additionally capture the commit messages:
-
-        `git log --format="%h %B" "<base-commit/>..<getopt-option-branch/>"`
-        </if>
-        <elseif condition="<getopt-option-commit/> is not empty">
-        Set <revision><commit-id/></revision> and run:
-
-        `git show --format= --patch --diff-merges=first-parent "<commit-id/>"`
-
-        Additionally capture the commit message:
-
-        `git log -1 --format="%h %B" "<commit-id/>"`
-        </elseif>
-        <elseif condition="<changes/> is equal `staged and unstaged`">
-        Run:
-
-        `git diff HEAD`
-
-        `git ls-files --others --exclude-standard`
-        </elseif>
-        <elseif condition="<changes/> is equal `unstaged`">
-        Run:
-
-        `git diff`
-
-        `git ls-files --others --exclude-standard`
-        </elseif>
-        <else>
-        Run:
-
-        `git diff --cached HEAD`
-        </else>
-
-    4.  <if condition="<diff/> is empty">
+    3.  <if condition="<diff/> is empty">
         Only output the following <template/> and then *STOP* immediately:
 
         <template>

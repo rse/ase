@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-24)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Aligned Change Set Selection of Repository Skills
+    `ase-repo-diff` gained `--staged`, `--unstaged`, `--worktree`, `--branch`, and `--commit` like
+    `ase-repo-review` (renaming its short options to `-C`, `-R`, and `-B`), and `ase-repo-task`
+    gained `--worktree`, all sharing the change set selection of the new `ase-common-changes.md`.
+
 -   FEATURE [code, docs]: Sequence Number Plus Title Slug Task Ids
     The new task id scheme `flex[:<template>]` combines a reserved sequence number (`%d` or
     `%0<width>d`) with the slug of the task title (`%s`) in any order, like `flex:%d-%s`

@@ -10,6 +10,7 @@
     [`--focus`|`-f` *section*[,...]]
     [`--staged`]
     [`--unstaged`]
+    [`--worktree`|`-w` *name*]
     [`--branch`|`-b` *branch*]
     [`--commit`|`-c` *commit*]
     [*task-id*[`:`]]
@@ -20,8 +21,9 @@
 The `ase-repo-task` skill *reverse-engineers* a Git change set -- the
 *staged* changes (or, with `--unstaged`, the *unstaged* and *untracked*
 changes, with both `--staged` and `--unstaged`, *all* uncommitted
-changes, with `--branch`, the changes of a *branch* against its *base*,
-or, with `--commit`, a *single commit*) -- into a *new task plan*.
+changes, with `--worktree`, those of an ASE worktree, with `--branch`,
+the changes of a *branch* against its *base*, or, with `--commit`, a
+*single commit*) -- into a *new task plan*.
 Optionally, the change set is first narrowed to a *scope* topic.
 
 The task plan describes the change set as a *still-to-be-done* change
@@ -73,6 +75,13 @@ plan.
     uncommitted changes. Combined with `--branch`, additionally derive
     from the unstaged changes and untracked files of the worktree where
     the *branch* is checked out.
+
+-   `--worktree`|`-w` *name*:
+    Derive from the *staged* resp. *unstaged* changes of the existing ASE
+    worktree `.ase/worktree/`*name* instead of those of the current
+    working copy. A missing worktree aborts the skill with an error.
+    This option cannot be combined with `--branch` (which locates the
+    worktree of its branch itself) or `--commit`.
 
 -   `--branch`|`-b` *branch*:
     Derive from the commits of *branch* (any Git revision) since its fork

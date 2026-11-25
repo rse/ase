@@ -397,7 +397,7 @@ Procedure
         </else>
 
         <ase-tpl-hint level="normal">
-        Use `/ase-repo-diff` and `/ase-repo-review` inside a part's worktree to summarize and review it before committing.
+        Use `/ase-repo-diff --unstaged -w <part-id>` and `/ase-repo-review --unstaged -w <part-id>` to summarize and review a part's worktree before committing.
         </ase-tpl-hint>
 
         <ase-tpl-hint level="verbose">
