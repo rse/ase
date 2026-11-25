@@ -409,7 +409,7 @@ export const modCacheControl = () => {
         if (hard) {
             lines.push(Box({ flexDirection: "row", children: [
                 Text({ children: "⛁ cache:" }),
-                Text({ color: "blue", bold: true,
+                Text({ color: "ansi256(4)", bold: true,
                     children: ` ${ball()} warm ⏱ ${minutes(coldIn())} left` }),
                 Text({ children: ` ▶ auto-warmed until ${clock(S.until)}` })
             ] }))
@@ -426,10 +426,10 @@ export const modCacheControl = () => {
         else if (st === "cooling") {
             lines.push(Box({ flexDirection: "row", children: [
                 Text({ children: "⛁ cache:" }),
-                Text({ color: "red", bold: true,
+                Text({ color: "ansi256(1)", bold: true,
                     children: ` ${ball()} cooling ⏱ ${minutes(left())} left` }),
                 Text({ children: " ▶ next prompt: " }),
-                Text({ color: "red", bold: true, children: `rewrites ${tokens(S.ctx)} tokens` })
+                Text({ color: "ansi256(1)", bold: true, children: `rewrites ${tokens(S.ctx)} tokens` })
             ] }))
             lines.push(Box({ flexDirection: "row", columnGap: 1, children: [
                 Text({ children: "⛁ cache: hard auto-warm:" }),
@@ -447,10 +447,10 @@ export const modCacheControl = () => {
         else {
             lines.push(Box({ flexDirection: "row", children: [
                 Text({ children: "⛁ cache:" }),
-                Text({ color: "red", bold: true,
+                Text({ color: "ansi256(1)", bold: true,
                     children: ` ${ball()} cold ⏱ ${minutes(-left())} ago` }),
                 Text({ children: " ▶ next prompt: " }),
-                Text({ color: "red", bold: true, children: `rewrites ${tokens(S.ctx)} tokens` })
+                Text({ color: "ansi256(1)", bold: true, children: `rewrites ${tokens(S.ctx)} tokens` })
             ] }))
             lines.push(Text({ children: `⛁ cache: cold restarts so far: ${S.colds.length} ` +
                 `(${tokens(coldTokens())} tokens rewritten)` }))

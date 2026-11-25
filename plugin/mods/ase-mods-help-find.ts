@@ -33,7 +33,7 @@ const FALLBACK  = "sonnet"
 /*  the color of the box around (and of the rationale inside) the command and
     rationale of a proposal, the title placed into the top edge of the frame,
     and the share of the band columns taken by the master view  */
-const BOXED  = "blue"
+const BOXED  = "ansi256(4)"
 const TITLE  = "[ ⧉ ASE: Find Skill Command ]"
 const MASTER = 0.3
 

@@ -28,7 +28,7 @@ const HINT   = /^argument-hint:\s*"(.*)"\s*$/m
 const GROUP  = /\[(?:[^[\]]|\[[^\]]*\])*\]|\((?:[^()]|\([^)]*\))*\)|\S+/g
 const NBSP   = String.fromCodePoint(0xA0)
 const SYNTAX = "gray"
-const REFER  = "red"
+const REFER  = "ansi256(1)"
 const INDENT = 2
 const TITLE  = "[ ⧉ ASE: Show Skill Synopsis ]"
 

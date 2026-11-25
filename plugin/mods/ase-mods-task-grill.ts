@@ -53,7 +53,7 @@ export const TOOL = {
 
 /*  the full name of the tool, and the color of the frame of a detail card  */
 const NAME = "mcp__ase__ase_mods_grill_details"
-const RIM  = "blue"
+const RIM  = "ansi256(4)"
 
 /*  the marker line above a grilling table (single-round and multi-round,
     optionally labeled with the perspective and/or grounding)  */
@@ -72,7 +72,7 @@ const STAR  = "★"
 const TOPIC = /^\*{0,2}\d+\*{0,2}\s+▶\s+(.*?):(?:\s|$)/
 
 /*  the colors of the recommendation and current decision markers  */
-const MARKS = new Map([ [ "★", "red" ], [ "⚑", "blue" ] ])
+const MARKS = new Map([ [ "★", "ansi256(1)" ], [ "⚑", "ansi256(4)" ] ])
 
 /*  color the recommendation and current decision markers of styled characters
     (in the color of a picked resp. selected line, if given)  */
