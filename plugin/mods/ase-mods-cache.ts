@@ -321,6 +321,7 @@ export const modCacheControl = () => {
         S.ended     = ""
         if (S.warm === "soft")
             warmOff()
+        k.invalidate()
     }
 
     /*  track a main-loop request: whether it read or rewrote the cache, with
@@ -422,12 +423,13 @@ export const modCacheControl = () => {
     /*  draw the escalation of a cooling cache (without or after a spent SOFT
         auto-warm) resp. of a cold cache, or a held HARD auto-warm (stoppable), into
         the band above the prompt (terminal only), inside the self-drawn frame, on
-        top of the drawing beneath, yielding to a survey  */
+        top of the drawing beneath, yielding to a survey and to a running turn
+        (whose next request uses the cache anyway)  */
     const render = (e: BandRender, ui: Elements["terminal"], drawn: RenderElement | null,
         k: Controller): RenderElement | undefined => {
         const st   = kind()
         const hard = S.warm === "hard" && S.held && st !== "cold"
-        if (e.props.hasSurvey
+        if (e.props.hasSurvey || S.working
             || !(hard || st === "cold" || (st === "cooling" && (spent() || (S.warm === "" && !armed())))))
             return undefined
         const { Box, Text, Button } = ui
