@@ -269,6 +269,22 @@ shows the task again as soon as it exists again.
 With `--text`, and also without an interactive terminal, the plan of the
 task is printed as plain text and the command exits.
 
+### Task Chat
+
+In the web board, `x` (or the button `⌨` in the header of the task
+dialog) shows the *task chat* of a task below its plan in its task
+dialog, resp. hides it again: the chat with the agent tool (of
+`$ASE_TOOL` of the *ASE* service, else `claude`) about the task,
+shared with `ase task chat` and with every other browser showing it
+(see `ase-task-chat`(1)). Showing the chat starts the agent tool,
+unless it runs already, and a chat whose agent tool ended starts again
+when shown again. A shown chat has the focus, framed in the signal
+color, and then takes all keys: a click onto the task plan gives them
+back to the task dialog, a click into the chat to the chat again, and
+`Alt`+`X` (resp. `Option`+`X`) hides the chat also while it has the
+keys, while the agent tool keeps running. The chat shows the colors
+of the board, while the agent tool keeps its own color theme.
+
 ### Task Stats View
 
 The third view *task stats* shows the statistics of the tasks matching the
@@ -512,7 +528,7 @@ lower-case letter under the kitty keyboard protocol.
 - `R`: Request the selected task by a prompt under a request name (not
   in the task stats, agent logs, and agent graph views).
 - `x`: Chat about the selected task with the agent tool (not in the
-  task stats, agent logs, and agent graph views; terminal board only).
+  task stats, agent logs, and agent graph views). See **Task Chat**.
 - `M`: Disable or enable the mouse support (terminal board only).
 - `q`, `Ctrl`+`C`: Quit (terminal board only).
 
@@ -599,6 +615,8 @@ lower-case letter under the kitty keyboard protocol.
 - `PgUp`/`PgDn`: Scroll the content by one page.
 - `e`: Edit the task plan.
 - `#`: Clear the diff of the last change of the task plan.
+- `Alt`+`X`: Show or hide the chat, also while it has the keys (web
+  board only). See **Task Chat**.
 - `D`, `T`, `A`, `E`, `R`, `x`, `M`, `L`: As in every view.
 - `⏎`, `ESC`: Close the task dialog.
 

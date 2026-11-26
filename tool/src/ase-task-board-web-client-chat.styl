@@ -1,0 +1,42 @@
+/*
+**  Agentic Software Engineering (ASE)
+**  Copyright (c) 2025-2026 Dr. Ralf S. Engelschall <rse@engelschall.com>
+**  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
+*/
+
+/*  the chat about the task of the task dialog: below the task plan, with the
+    terminal emulator filling it and its note on top of the emulator, framed in the
+    signal color while it has the focus (and hence all keys), like the focused inputs  */
+#chat
+    position: relative
+    flex: 0 0 45%
+    min-height: 0
+    overflow: hidden
+    border-top: 1px solid var(--c-border)
+    background: var(--c-paper)
+    &:focus-within
+        outline: 1px solid var(--c-signal)
+        outline-offset: -1px
+
+    /*  the terminal emulator, sized explicitly within the margins on all sides (as it
+        sizes its root element to the full width and height otherwise, and else covers the frame)  */
+    .cterm
+        position: absolute
+        top: 4px
+        left: 8px
+        width: unquote("calc(100% - 16px)")
+        height: unquote("calc(100% - 8px)")
+
+    /*  the note on the start, end, or failure of the agent tool  */
+    .cnote
+        position: absolute
+        left: 50%
+        top: 50%
+        transform: translate(-50%, -50%)
+        padding: 6px 12px
+        border: 1px solid var(--c-border-strong)
+        border-radius: 4px
+        background: var(--c-paper)
+        color: var(--c-signal)
+        font-size: 0.8125rem
+

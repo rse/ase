@@ -20,15 +20,17 @@ terminal is attached to it, so
   terminal) and keeps running, and a later **ase task chat** about the
   task shows its entire output again and continues it,
 
-- the chats about different tasks run in parallel, each attached to
-  from one terminal at a time (a second terminal is refused, as the
-  chat is attached to elsewhere).
+- the chat can be attached to from several terminals at once, and
+  from the web board (see **Task Chat** in `ase-task-board`(1)),
+  where it has the size of the smallest of them, and
+
+- the chats about different tasks run in parallel.
 
 In macOS terminals, `Option`+`X` detaches where `Option` acts as
 `Alt` (resp. Meta), and also as is where it types `≈` (e.g., in the
 US, British, German, Swiss, French, and Spanish layouts).
 
-A chat which no terminal is attached to ends after 30 minutes, and all
+A chat which nothing is attached to ends after 30 minutes, and all
 chats end with the *ASE* service. When the
 agent tool ends (e.g., through its `/exit`), **ase task chat** ends,
 too, and a later chat about the task starts the agent tool again.

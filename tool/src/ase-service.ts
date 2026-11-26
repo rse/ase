@@ -580,7 +580,7 @@ export default class ServiceCommand {
             accepted from no other page than one of the service itself (even without
             authentication), as a browser page may open a WebSocket to any origin  */
         const { registerChatRoutes } = await import("./ase-task-chat-server-bind.js")
-        const chat = registerChatRoutes(server, this.log)
+        const chat = registerChatRoutes(server, this.log, capability)
         server.listener.on("upgrade", (req: IncomingMessage, socket: Duplex, head: Buffer) => {
             socket.on("error", () => { socket.destroy() })
             const reject = (status: number, error: string) => {
