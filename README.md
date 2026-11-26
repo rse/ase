@@ -298,9 +298,10 @@ see whether **ASE** is right for you:
 - **Diff Summary**:
   You want a raw Git diff turned into a concise, human-readable
   narrative of what changed and why, grouped by intent, and with
-  optional intent-coherence check, risk grading and blast radius?
+  optional per-file explanation, intent-coherence check, risk grading
+  and blast radius?
   &rarr; [`/ase-repo-diff`](plugin/skills/ase-repo-diff/help.md)
-  `-c -r -b`
+  `-E -C -R -B`
 
 - **Change Review**:
   You want the staged Git changes, a branch, or a commit reviewed the

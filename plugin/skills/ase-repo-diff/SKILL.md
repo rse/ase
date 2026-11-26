@@ -1,13 +1,14 @@
 ---
 name: ase-repo-diff
-argument-hint: "[--help|-h] [--coherence|-C] [--risk|-R] [--blast|-B] [--staged] [--unstaged] [--worktree|-w <name>] [--branch|-b <branch>] [--commit|-c <commit>]"
+argument-hint: "[--help|-h] [--explain|-E] [--coherence|-C] [--risk|-R] [--blast|-B] [--staged] [--unstaged] [--worktree|-w <name>] [--branch|-b <branch>] [--commit|-c <commit>]"
 description: >
     Summarize the currently staged Git changes (or, with `--unstaged`,
     the unstaged and untracked changes, with `--branch`, a branch against
     its base, or, with `--commit`, a single commit) as a human-readable,
     intent-grouped narrative. Use when the user wants a concise and
-    brief report of what changed and why. Optionally can check the diff
-    for intent coherence and show a risk and blast radius report.
+    brief report of what changed and why. Optionally can explain each
+    changed file in plain language, check the diff for intent coherence,
+    and show a risk and blast radius report.
 user-invocable: true
 disable-model-invocation: false
 effort: high
@@ -40,7 +41,7 @@ Summarize Diff
 
 <expand name="getopt"
     arg1="ase-repo-diff"
-    arg2="--coherence|-C --risk|-R --blast|-B --staged --unstaged --worktree|-w= --branch|-b= --commit|-c=">
+    arg2="--explain|-E --coherence|-C --risk|-R --blast|-B --staged --unstaged --worktree|-w= --branch|-b= --commit|-c=">
     $ARGUMENTS
 </expand>
 
@@ -48,7 +49,9 @@ Summarize Diff
 Summarize the currently staged (and/or unstaged) Git changes, the
 changes of a branch against its base, or a single commit into a *concise*,
 *human-readable* narrative of what changed and why, *grouped by intent*
-rather than by file. Optionally *reconstruct the change's single
+rather than by file. Optionally *explain each changed file* in plain
+language, from its state *before* over its state *after* to *why it is
+correct*. Optionally *reconstruct the change's single
 intended purpose* and *flag hunks that do not serve it* and *gaps
 that leave it incomplete*. Optionally
 *score* the diff against a *coupling-criticality-coverage-reversibility*
@@ -157,16 +160,17 @@ Procedure
 
     4.  <if condition="
             <ase-project-boxing/> is equal `black` and
-            (<getopt-option-coherence/> is equal `true` or
+            (<getopt-option-explain/> is equal `true` or
+             <getopt-option-coherence/> is equal `true` or
              <getopt-option-risk/> is equal `true` or
              <getopt-option-blast/> is equal `true`)
         ">
         The project source artifacts are classified as a *black box*, so
-        the user does *not* want the changes scrutinized or their
-        coherence, risk, and blast-radius findings surfaced. The
-        requested scrutiny of STEP 3 through STEP 5 is therefore
-        suppressed: only output the following <template/> and then *SKIP*
-        the remaining steps STEP 3 through STEP 5:
+        the user does *not* want the changes explained per file or
+        scrutinized, or their coherence, risk, and blast-radius findings
+        surfaced. The requested scrutiny of STEP 3 through STEP 6 is
+        therefore suppressed: only output the following <template/> and
+        then *SKIP* the remaining steps STEP 3 through STEP 6:
 
         <template>
         ⧉ **ASE**: **DIFF SCRUTINY**: *suppressed* (`project.boxing` is `black`)
@@ -175,7 +179,94 @@ Procedure
 
     </step>
 
-3.  <step id="STEP 3: Assess Intent Coherence"
+3.  <step id="STEP 3: Explain Per File"
+        condition="<getopt-option-explain/> is equal `true` and <diff/> is NOT empty and <ase-project-boxing/> is not equal `black`">
+
+    1.  From the *same* captured <diff/> and <stat/>, walk *every*
+        changed file and explain it in *plain language* to a reader who
+        no longer remembers the change (or never saw it), along the
+        following three aspects:
+
+        -   `BEFORE`: the situation *before* the change: how the code
+            behaved resp. what the file provided, or that the file did not
+            exist yet.
+
+        -   `AFTER`: *what* the file does differently now and *why*, with
+            the reason phrased in terms of the goal of its intent group
+            from STEP 2.
+
+        -   `CORRECT`: *why* the new state works as intended: the concrete
+            *evidence* guaranteeing it, like the case it now covers, the
+            check or guard enforcing it, the type constraint ruling out the
+            failure, or the test exercising it, cited as `file:line`.
+            The claim *MUST* be *falsifiable*: an expectation read off the
+            changed code itself is *no* evidence. If no such evidence
+            exists, do *not* assert correctness, but prefix the aspect with
+            `UNVERIFIED:` and name what would prove it.
+
+        Probe the repository (restricted to first-party code) only as
+        needed to find this evidence (e.g. the tests or callers
+        exercising a changed function), as follows. Do not output
+        anything during the probe.
+
+        <expand name="changes-probe"></expand>
+
+    2.  Phrase each aspect in *1-2 short, simple sentences*. Keep the
+        *established terms* (the IT terms of software engineering, like
+        "Interface", "Cache", or "Migration", and the domain terms of the
+        project) instead of lay substitutes, but avoid bare symbol names,
+        and never merely paraphrase the diff (like "adds three methods").
+
+    3.  Order the files in *comprehension order*: follow the order of the
+        intent groups of STEP 2, and within each group go *bottom-up* from
+        the foundations to their users (e.g. types and interfaces before
+        implementations, before tests and documentation).
+
+        <if condition="<ase-project-boxing/> is equal `grey`">
+        Explain only the *significant* files this way, and collapse the
+        remaining *trivial* files (like mechanical renames, version bumps,
+        or generated files) into one final summary line.
+        </if>
+
+    4.  Emit the following <template/>, with one block per explained
+        file, where <file/> is the file reference, <before/>, <after/>,
+        and <correct/> are the three aspects, and - *only* if trivial files
+        were collapsed - <files/> is the list of the collapsed file
+        references and <summary/> a one-sentence note on what changed in
+        them. Otherwise omit the final `*TRIVIAL*` line.
+
+        Mark up all file references as code (with backticks), prepend
+        them with `▢ ` and append ` [+N/-M]` (based on the information in
+        <stat/>) to them, except for the `file:line` citations of files
+        outside the <diff/>, which get no ` [+N/-M]` suffix. Separate
+        multiple file references with `, ` (a comma and space).
+
+        Keep the overall report *concise*. Do *not* output any further
+        explanation.
+
+        <template>
+
+        ⧉ **ASE**: **CHANGE EXPLANATION REPORT**:
+
+        ⧉ **ASE**: **EXPLAIN**: <file/>:
+        -   **BEFORE**: <before/>
+        -   **AFTER**: <after/>
+        -   **CORRECT**: <correct/>
+
+        ⧉ **ASE**: **EXPLAIN**: <file/>:
+        -   **BEFORE**: <before/>
+        -   **AFTER**: <after/>
+        -   **CORRECT**: <correct/>
+
+        [...]
+
+        <if condition="trivial files were collapsed">⧉ **ASE**: **EXPLAIN**: *TRIVIAL*: <files/>: <summary/></if>
+
+        </template>
+
+    </step>
+
+4.  <step id="STEP 4: Assess Intent Coherence"
         condition="<getopt-option-coherence/> is equal `true` and <diff/> is NOT empty and <ase-project-boxing/> is not equal `black`">
 
     1.  From the *same* captured <diff/> and <stat/>, *reconstruct the
@@ -276,7 +367,7 @@ Procedure
         </if>
     </step>
 
-4.  <step id="STEP 4: Score Against Risk Rubric"
+5.  <step id="STEP 5: Score Against Risk Rubric"
         condition="<getopt-option-risk/> is equal `true` and <diff/> is NOT empty and <ase-project-boxing/> is not equal `black`">
 
     1.  Score the *same* captured <diff/> and <stat/> information
@@ -349,7 +440,7 @@ Procedure
         </template>
     </step>
 
-5.  <step id="STEP 5: Render Blast-Radius Map"
+6.  <step id="STEP 6: Render Blast-Radius Map"
         condition="<getopt-option-blast/> is equal `true` and <diff/> is NOT empty and <ase-project-boxing/> is not equal `black`">
 
     1.  From the *same* captured <diff/> and <stat/>, *extract the
@@ -409,7 +500,7 @@ Procedure
 
     </step>
 
-6.  <step id="STEP 6: Give Final Hints">
+7.  <step id="STEP 7: Give Final Hints">
 
     Finally, give the closing hints by expanding the following (which,
     depending on the configured <ase-guidance-level/>, may each expand
@@ -431,12 +522,13 @@ Procedure
     </ase-tpl-hint>
 
     <if condition="
+        <getopt-option-explain/> is not equal `true` or
         <getopt-option-coherence/> is not equal `true` or
         <getopt-option-risk/> is not equal `true` or
         <getopt-option-blast/> is not equal `true`
     ">
     <ase-tpl-hint level="verbose">
-    Use `/ase-repo-diff --coherence --risk --blast<selection/>` to additionally scrutinize the intent coherence, the risk profile, and the blast radius of the changes.
+    Use `/ase-repo-diff --explain --coherence --risk --blast<selection/>` to additionally explain each changed file and scrutinize the intent coherence, the risk profile, and the blast radius of the changes.
     </ase-tpl-hint>
     </if>
 

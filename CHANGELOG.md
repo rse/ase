@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-25)
 ------------------
 
+-   FEATURE [code, docs]: Plain-Language Per-File Explanation of Diffs
+    The new option `--explain`|`-E` of `ase-repo-diff` explains every changed file in plain
+    language: its state before, its state after and why, and why it is correct, backed by
+    `file:line`-cited evidence or openly marked as unverified. (Idea of PR #84)
+
 -   BUGFIX [code]: Reliable HARD Auto-Warm of the Prompt Cache
     The cache controller times the TTL from the start of a request, pings at once on a HARD
     auto-warm request, offers it only while a ping can still reach the cache, and tells why a

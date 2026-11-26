@@ -7,6 +7,7 @@
 
 `ase-repo-diff`
     [`--help`|`-h`]
+    [`--explain`|`-E`]
     [`--coherence`|`-C`]
     [`--risk`|`-R`]
     [`--blast`|`-B`]
@@ -31,6 +32,16 @@ group, each naming the affected files with their per-file `[+N/-M]`
 line counts - giving you the essence of the changes at a glance. The
 commit messages (of `--branch` and `--commit`) only contribute the
 *rationale*, while the diff stays authoritative.
+
+With `--explain`, the skill additionally *explains every changed file*
+in *plain language*, for a reader who no longer remembers the change
+or never saw it: the situation **BEFORE** the change, what the file
+does differently **AFTER** it and why, and why the new state is
+**CORRECT**. The latter cites the concrete *evidence* (the covered
+case, the guarding check, the ruling-out type, or the exercising test)
+as `file:line`, and openly says **UNVERIFIED** where no such evidence
+exists, instead of just asserting correctness. The files are explained
+in *comprehension order*: the foundations before their users.
 
 With `--coherence`, the skill additionally *reconstructs the single
 intended change* the diff is trying to accomplish - phrased as one crisp
@@ -65,14 +76,22 @@ and appends a short bullet list of the per-module impact -
 giving a visual sense of *what a diff endangers* before a deeper review.
 
 For a project with `black` boxing (`project.boxing`), the scrutiny of
-`--coherence`, `--risk`, and `--blast` is suppressed, and only the
-intent-grouped summary is shown.
+`--explain`, `--coherence`, `--risk`, and `--blast` is suppressed, and
+only the intent-grouped summary is shown. For a project with `grey`
+boxing, `--explain` explains only the significant files and summarizes
+the trivial ones in a single line.
 
 The scrutiny always probes the repository in the *resulting* state of
 the inspected changes: at the revision of `--branch` resp. `--commit`,
 in the worktree of `--worktree`, and in the working copy otherwise.
 
 ##  OPTIONS
+
+-   `--explain`|`-E`:
+    In addition to the intent-grouped summary, explain *every* changed
+    file in *plain language*: its state *before*, its state *after* and
+    why, and why it is *correct*, backed by `file:line`-cited evidence
+    or openly marked as *unverified*.
 
 -   `--coherence`|`-C`:
     In addition to the intent-grouped summary, reconstruct the diff's
@@ -141,6 +160,7 @@ single commit.
 
 -   You want a readable, intent-grouped summary of the staged changes
 -   You want your not yet staged changes summarized
+-   You want each changed file explained: before, after, and why it is correct
 -   You want a diff checked for scope creep, stray debug leftovers, and incompleteness
 -   You want a graded risk report of a change before committing
 -   You want a blast-radius map of what depends on the touched code
@@ -152,6 +172,12 @@ Summarize the currently staged changes:
 
 ```text
 ❯ /ase-repo-diff
+```
+
+Summarize the staged changes and explain each changed file:
+
+```text
+❯ /ase-repo-diff --explain
 ```
 
 Summarize the staged changes and append an intent-coherence report:
@@ -184,10 +210,10 @@ Summarize the branch `feature` against its base with a risk report:
 ❯ /ase-repo-diff -b feature -R
 ```
 
-Summarize the last commit:
+Summarize the last commit and explain each of its files:
 
 ```text
-❯ /ase-repo-diff -c HEAD
+❯ /ase-repo-diff -c HEAD -E
 ```
 
 ##  SEE ALSO
