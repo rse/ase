@@ -413,27 +413,48 @@ export const computeMonthCost = (now: Date): number => {
     Without any prices, a zero cost is cached, so that %Y stays hidden and
     the download is retried only once the cache expires.  */
 export const refreshMonthCostCache = async (now: Date): Promise<void> => {
-    const cache = readPricesCache()
-    if (cache === null || now.getTime() - cache.fetchedAt >= PRICES_TTL)
-        await refreshPricesCache(now)
-    const current = activePrices()
-    writeMonthCostCache({
-        version:    SCHEME,
-        prices:     current?.digest ?? "",
-        month:      monthKeyOf(now),
-        costUsd:    current !== null ? computeMonthCost(now) : 0,
-        computedAt: now.getTime()
-    })
+    try {
+        const cache = readPricesCache()
+        if (cache === null || now.getTime() - cache.fetchedAt >= PRICES_TTL)
+            await refreshPricesCache(now)
+        const current = activePrices()
+        writeMonthCostCache({
+            version:    SCHEME,
+            prices:     current?.digest ?? "",
+            month:      monthKeyOf(now),
+            costUsd:    current !== null ? computeMonthCost(now) : 0,
+            computedAt: now.getTime()
+        })
+    }
+    finally {
+        fs.rmSync(cacheFile("month-cost.lock"), { force: true })
+    }
 }
 
+/*  the age after which the lock of a running refresh is taken as left over
+    by a crashed one, as a scan of large session logs can take minutes  */
+const REFRESH_LOCK_TTL = 15 * 60 * 1000
+
 /*  spawn a detached background process that recomputes the cache without
-    blocking the current statusline render; any failure is swallowed since a
+    blocking the current statusline render, unless a refresh is already
+    running (as every render of every session would else spawn another one
+    while a slow scan is still running); any failure is swallowed since a
     missed refresh only means the next render keeps using the stale value  */
 const spawnMonthCostRefresh = (): void => {
     try {
         const entry = process.argv[1]
         if (entry === undefined)
             return
+        const lock = cacheFile("month-cost.lock")
+        try {
+            fs.writeFileSync(lock, String(Date.now()), { encoding: "utf8", flag: "wx" })
+        }
+        catch (_e) {
+            const since = Number(fs.readFileSync(lock, "utf8"))
+            if (Number.isFinite(since) && Date.now() - since < REFRESH_LOCK_TTL)
+                return
+            fs.writeFileSync(lock, String(Date.now()), "utf8")
+        }
         const child = spawn(process.execPath, [ entry, "statusline", "--refresh-month-cost" ],
             { detached: true, stdio: "ignore" })
         child.unref()
