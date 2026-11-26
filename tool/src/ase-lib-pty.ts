@@ -18,20 +18,30 @@ import type Log                  from "./ase-lib-log.js"
 /*  the shared pseudo-terminal sessions, each running a program in a pseudo-terminal of the
     companion program "pty-to-stdio" (as it keeps the native code of a pseudo-terminal out of this
     package), keyed by an opaque string, kept running while detached until they are idle, and
-    attached to by one client at a time over a (by the caller already authenticated) WebSocket,
-    where a binary frame to the client is output of the program (all of it replayed on attaching),
-    a text frame to the client is { type: "exit", code } resp. { type: "error", message }, and a
-    text frame from the client is { type: "input", data } resp. { type: "resize", cols, rows }  */
+    shared by all clients attached to them over a (by the caller already authenticated)
+    WebSocket, where a binary frame to a client is output of the program (all of it replayed on
+    attaching), a text frame to a client is { type: "exit", code } resp. { type: "error", message },
+    and a text frame from a client is { type: "input", data } resp. { type: "resize", cols, rows },
+    and where the terminal of a session has the smallest size of all its clients (as in tmux)  */
 
 /*  the limits of the sessions: the replayed output (the screen plus a long scrollback, as the data
     of an inline image is sent only once), the not yet sent data of a client (a full replay plus a
     margin, beyond which it cannot keep up), the size of a message of a client (a pasted text, as
-    the companion takes frames up to 1 MiB), the running sessions, and the terminal size  */
+    the companion takes frames up to 1 MiB), the running sessions, the clients of a session, and
+    the terminal size  */
 const HISTORY_MAX  = 4 * 1024 * 1024
 const BUFFER_MAX   = 8 * 1024 * 1024
 const PAYLOAD_MAX  = 1024 * 1024
 const SESSIONS_MAX = 16
+const CLIENTS_MAX  = 8
 export const SIZE_MAX = 1000
+
+/*  the smallest size of a client that counts (a hidden or detaching emulator reports a tiny one,
+    which the program would redraw its screen for), and the delay of the second step of a forced
+    redraw of the program  */
+const SIZE_MIN_COLS = 20
+const SIZE_MIN_ROWS = 5
+const REDRAW_MS     = 100
 
 /*  the interval of the keepalive pings of the clients, the time without a client after which a
     session ends, and the length of the error output of the companion kept for a failed start  */
@@ -60,15 +70,19 @@ export type PtySpec = {
 }
 
 /*  a session: its process (null before the start and after the end), its start waiting for a
-    client (see "start"), its exit code, its replayed output, its client, and its idle timer  */
+    client (see "start"), its exit code, its replayed output, its clients with their sizes (null
+    until told), its size, and its idle timer  */
 type Pending = { spec: PtySpec, companion: string[], timer: ReturnType<typeof setTimeout> }
+type Size    = { cols: number, rows: number }
 type Session = {
     child:   ResultPromise | null
     pending: Pending | null
     exited:  number | null
     history: Buffer[]
     size:    number
-    client:  WebSocket | null
+    clients: Map<WebSocket, Size | null>
+    cols:    number
+    rows:    number
     idle:    ReturnType<typeof setTimeout> | null
 }
 
@@ -98,7 +112,7 @@ export class PtyHost {
 
     /*  whether any session runs or has a client  */
     active (): boolean {
-        return [ ...this.sessions.values() ].some((s) => s.child !== null || s.pending !== null || s.client !== null)
+        return [ ...this.sessions.values() ].some((s) => s.child !== null || s.pending !== null || s.clients.size > 0)
     }
 
     /*  whether a session runs, and whether no further session may start  */
@@ -110,7 +124,7 @@ export class PtyHost {
         return [ ...this.sessions.values() ].filter((s) => s.child !== null || s.pending !== null).length >= SESSIONS_MAX
     }
 
-    /*  start a session, unless it runs already, where an ended session is cleared on its client,
+    /*  start a session, unless it runs already, where an ended session is cleared on its clients,
         and where its program starts once a client tells the size of its terminal (so the program
         asks that terminal its questions, e.g. whether it shows images, and starts at its size),
         resp. at once for an attached client, and at the latest after a short wait  */
@@ -123,7 +137,17 @@ export class PtyHost {
         if (this.full())
             throw new Error(`${this.label}: too many running sessions (maximum: ${SESSIONS_MAX})`)
         if (s === undefined) {
-            s = { child: null, pending: null, exited: null, history: [], size: 0, client: null, idle: null }
+            s = {
+                child:   null,
+                pending: null,
+                exited:  null,
+                history: [],
+                size:    0,
+                clients: new Map(),
+                cols:    spec.cols,
+                rows:    spec.rows,
+                idle:    null
+            }
             this.sessions.set(key, s)
         }
         else if (s.exited !== null)
@@ -132,31 +156,32 @@ export class PtyHost {
         session.exited  = null
         session.history = []
         session.size    = 0
-        if (session.client !== null)
-            this.spawn(key, session, spec, companion, spec.cols, spec.rows)
+        this.fit(session, false)
+        if (session.clients.size > 0)
+            this.spawn(key, session, spec, companion)
         else {
             session.pending = { spec, companion, timer: setTimeout(() => { this.launch(key, session) }, START_MS) }
             this.idle(key, session)
         }
     }
 
-    /*  start the waiting program of a session, at the given terminal size (else its own)  */
-    private launch (key: string, s: Session, size?: { cols: number, rows: number }): void {
+    /*  start the waiting program of a session, at its size  */
+    private launch (key: string, s: Session): void {
         const pending = s.pending
         if (pending === null)
             return
         clearTimeout(pending.timer)
         s.pending = null
-        this.spawn(key, s, pending.spec, pending.companion, size?.cols ?? pending.spec.cols, size?.rows ?? pending.spec.rows)
+        this.spawn(key, s, pending.spec, pending.companion)
     }
 
     /*  run the program of a session, where the companion runs in a neutral directory (so a
         launcher like "npx" picks up nothing of the project) and starts the program in its
         working directory  */
-    private spawn (key: string, session: Session, spec: PtySpec, companion: string[], cols: number, rows: number): void {
+    private spawn (key: string, session: Session, spec: PtySpec, companion: string[]): void {
         /*  run the program in the companion, without collecting its output  */
         const [ file, ...args ] = companion
-        const child = execa(file, [ ...args, "--cols", String(cols), "--rows", String(rows),
+        const child = execa(file, [ ...args, "--cols", String(session.cols), "--rows", String(session.rows),
             "--cwd", spec.cwd, "--", spec.file, ...spec.args ], {
             cwd: os.homedir(), env: spec.env, extendEnv: false, stdin: "pipe", buffer: false, reject: false
         })
@@ -205,12 +230,12 @@ export class PtyHost {
             reject(404, `${this.label}: no session "${key}" (start it first)`)
             return
         }
-        if (s.client !== null) {
-            reject(409, `${this.label}: session "${key}" is attached to elsewhere`)
+        if (s.clients.size >= CLIENTS_MAX) {
+            reject(429, `${this.label}: too many clients of session "${key}" (maximum: ${CLIENTS_MAX})`)
             return
         }
         this.wss.handleUpgrade(req, socket, head, (ws) => {
-            s.client = ws
+            s.clients.set(ws, null)
             this.idle(key, s)
             if (s.history.length > 0)
                 ws.send(Buffer.concat(s.history), { binary: true })
@@ -228,21 +253,26 @@ export class PtyHost {
                 const rows = ptyDimension(msg?.rows)
                 if (msg?.type === "input" && typeof msg.data === "string")
                     s.child?.stdin?.write(frame("i", Buffer.from(msg.data, "utf8")))
-                else if (msg?.type === "resize" && cols !== null && rows !== null && s.pending !== null)
-                    this.launch(key, s, { cols, rows })
                 else if (msg?.type === "resize" && cols !== null && rows !== null) {
-                    const payload = Buffer.alloc(4)
-                    payload.writeUInt16BE(cols, 0)
-                    payload.writeUInt16BE(rows, 2)
-                    s.child?.stdin?.write(frame("r", payload))
+                    /*  a tiny size counts as none, and the first size of a client redraws the
+                        program, as its replayed output may end in a screen of another size  */
+                    const first = s.clients.get(ws) === null
+                    const size  = cols >= SIZE_MIN_COLS && rows >= SIZE_MIN_ROWS ? { cols, rows } : null
+                    s.clients.set(ws, size)
+                    if (s.pending === null)
+                        this.fit(s, true, first && size !== null)
+                    else if (size !== null) {
+                        this.fit(s, false)
+                        this.launch(key, s)
+                    }
                 }
             })
             ws.on("pong", () => {
                 this.unanswered.delete(ws)
             })
             ws.on("close", () => {
-                if (s.client === ws)
-                    s.client = null
+                s.clients.delete(ws)
+                this.fit(s, true)
                 this.idle(key, s)
             })
             ws.on("error", (err) => {
@@ -255,29 +285,64 @@ export class PtyHost {
     stop (): void {
         clearInterval(this.timer)
         for (const [ key, s ] of this.sessions) {
-            s.client?.close(1001, "server shutting down")
+            for (const ws of s.clients.keys())
+                ws.close(1001, "server shutting down")
             this.end(key, s)
         }
         this.wss.close()
     }
 
-    /*  send output resp. a message to the client of a session, terminating it if it
-        cannot keep up (as a skipped output would corrupt its screen)  */
+    /*  send output resp. a message to all clients of a session, terminating those which
+        cannot keep up (as a skipped output would corrupt their screen)  */
     private send (s: Session, data: Buffer | string): void {
-        const ws = s.client
-        if (ws === null || ws.readyState !== WebSocket.OPEN)
+        for (const ws of s.clients.keys()) {
+            if (ws.readyState !== WebSocket.OPEN)
+                continue
+            if (ws.bufferedAmount > BUFFER_MAX)
+                ws.terminate()
+            else
+                ws.send(data, { binary: typeof data !== "string" })
+        }
+    }
+
+    /*  size the terminal of a session to the smallest size of its clients, resizing the
+        running program on a change (if requested), resp. (with <redraw>) without a change by a
+        resize to one row less and back, as the program redraws its screen on a change only  */
+    private fit (s: Session, resize: boolean, redraw = false): void {
+        const sizes = [ ...s.clients.values() ].filter((size) => size !== null)
+        if (sizes.length === 0)
             return
-        if (ws.bufferedAmount > BUFFER_MAX)
-            ws.terminate()
-        else
-            ws.send(data, { binary: typeof data !== "string" })
+        const cols = Math.min(...sizes.map((size) => size.cols))
+        const rows = Math.min(...sizes.map((size) => size.rows))
+        if (cols === s.cols && rows === s.rows) {
+            if (resize && redraw && s.child !== null) {
+                this.resize(s, cols, Math.max(1, rows - 1))
+                setTimeout(() => {
+                    if (s.cols === cols && s.rows === rows)
+                        this.resize(s, cols, rows)
+                }, REDRAW_MS)
+            }
+            return
+        }
+        s.cols = cols
+        s.rows = rows
+        if (resize)
+            this.resize(s, cols, rows)
+    }
+
+    /*  resize the running program of a session  */
+    private resize (s: Session, cols: number, rows: number): void {
+        const payload = Buffer.alloc(4)
+        payload.writeUInt16BE(cols, 0)
+        payload.writeUInt16BE(rows, 2)
+        s.child?.stdin?.write(frame("r", payload))
     }
 
     /*  end a session after the idle time, while no client is attached  */
     private idle (key: string, s: Session): void {
         if (s.idle !== null)
             clearTimeout(s.idle)
-        s.idle = s.client !== null ? null : setTimeout(() => {
+        s.idle = s.clients.size > 0 ? null : setTimeout(() => {
             this.log.write("info", `${this.label}: "${key}" idle`)
             this.end(key, s)
         }, IDLE_MS)
@@ -303,17 +368,15 @@ export class PtyHost {
 
     /*  ping all clients, terminating those which have not answered the previous ping  */
     private keepalive (): void {
-        for (const s of this.sessions.values()) {
-            const ws = s.client
-            if (ws === null)
-                continue
-            if (this.unanswered.has(ws)) {
-                ws.terminate()
-                continue
+        for (const s of this.sessions.values())
+            for (const ws of s.clients.keys()) {
+                if (this.unanswered.has(ws)) {
+                    ws.terminate()
+                    continue
+                }
+                this.unanswered.add(ws)
+                ws.ping()
             }
-            this.unanswered.add(ws)
-            ws.ping()
-        }
     }
 }
 

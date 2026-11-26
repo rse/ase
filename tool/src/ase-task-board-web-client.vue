@@ -156,6 +156,7 @@ const hints     = computed(() => {
         { key: "A",             action: "assign task" },
         { key: "E",             action: "edit by prompt" },
         { key: "R",             action: "request by prompt" },
+        { key: "x",             action: "chat" },
         { key: "N",             action: "new task" },
         { key: "g/ESC",         action: "shrink lane" }
     ], [
@@ -180,6 +181,7 @@ const hints     = computed(() => {
         { key: "A",             action: "assign task" },
         { key: "E",             action: "edit by prompt" },
         { key: "R",             action: "request by prompt" },
+        { key: "x",             action: "chat" },
         { key: "N",             action: "new task" },
         { key: "m",             action: `${minned ? "maximize/expand" : "minimize/collapse"} lane` },
         { key: "g",             action: "grow lane" }
@@ -235,6 +237,7 @@ const hints     = computed(() => {
         { key: "A",             action: "assign task" },
         { key: "E",             action: "edit by prompt" },
         { key: "R",             action: "request by prompt" },
+        { key: "x",             action: "chat" },
         { key: "N",             action: "new task" },
         { key: "t",             action: `${titles.value ? "collapse" : "expand"} titles` },
         { key: "s",             action: `${surface.value.standalone ? "hide" : "show"} standalone tasks` }

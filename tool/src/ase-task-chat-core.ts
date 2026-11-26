@@ -121,7 +121,8 @@ export const chatSupported = (tool: Tool): boolean =>
     failed with by itself is forgotten, so the next chat about the task starts a new session
     instead of failing again (but not one of an agent tool ended by a signal, reported as 128 plus
     its number, nor one of a failed start of the companion, where the agent tool wrote nothing)  */
-export const chatSpec = async (log: Log, id: string, tool: Tool, cols: number, rows: number): Promise<PtySpec> => {
+export const chatSpec = async (log: Log, id: string, tool: Tool, cols: number, rows: number,
+    palette = false): Promise<PtySpec> => {
     Task.validateId(id)
     const args = chatArgs[tool]
     if (args === null)
@@ -142,12 +143,22 @@ export const chatSpec = async (log: Log, id: string, tool: Tool, cols: number, r
         resume = false
 
     /*  run the agent tool in the project root (as it keeps its sessions per directory), in a
-        terminal with all colors (as all clients, terminals and browsers, are emulating xterm)  */
+        terminal with all colors (as all clients, terminals and browsers, are emulating xterm),
+        resp. for a client mapping the 256-color palette onto its own colors (<palette>), with the
+        palette only and in the fixed dark color theme of Claude, whose colors that client maps,
+        and as the Ghostty its emulator is built on (so the inline images of ASE use the Kitty
+        Graphics Protocol, which the emulator renders)  */
+    const mapped = palette && tool === "claude"
+    const env    = { ...chatEnv(id), TERM: "xterm-256color", COLORTERM: "truecolor" } as Record<string, string>
+    if (mapped) {
+        Reflect.deleteProperty(env, "COLORTERM")
+        env.TERM_PROGRAM = "ghostty"
+    }
     return {
         file: cli,
-        args: args(session, resume),
+        args: [ ...args(session, resume), ...(mapped ? [ "--settings", JSON.stringify({ theme: "dark" }) ] : []) ],
         cwd:  Task.projectRoot(),
-        env:  { ...chatEnv(id), TERM: "xterm-256color", COLORTERM: "truecolor" },
+        env,
         cols,
         rows,
         exit: (code, output) => {

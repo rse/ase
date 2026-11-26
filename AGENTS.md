@@ -221,13 +221,14 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             service, with its client in
             `ase-task-board-web-client.{html,ts,vue,styl}`, a Vue
             application bundled by Vite, whose root component is split
-            into the modules `task-board-web-client-{model,editor,control}`
-            (shared state and service access, task plan editor, and
+            into the modules `task-board-web-client-{model,editor,chat,control}`
+            (shared state and service access, task plan editor, task chat
+            with its lazily loaded terminal emulator, and
             actions and key dispatching) and the components
-            `task-board-web-client-{lanes,graph,flow,agents,stats,dialog,popup,title}`,
+            `task-board-web-client-{lanes,graph,flow,agents,stats,dialog,popup,title,chat}`,
             and whose stylesheet imports the styles of the other views
-            and of the task dialog and popups from
-            `task-board-web-client-{views,dialog}.styl`
+            and of the task dialog, its popups, and its chat from
+            `task-board-web-client-{views,dialog,chat}.styl`
 
         -   the task chat: `task-chat` for the `ase task chat` CLI
             command, `task-chat-core` for the interactive agent tool
