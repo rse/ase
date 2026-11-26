@@ -141,9 +141,12 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         `lib-color` for the confining of the SVG colors to a palette,
         `lib-fetch` for the HTTP requests through an `undici` dispatcher,
         `lib-daemon-cli` for the start/status/log/stop/restart CLI commands of all
-        background processes (servers, agents, and the agent fleet), and
+        background processes (servers, agents, and the agent fleet),
         `lib-server-cli` and `lib-server-bind` for the CLI commands and the
-        HTTP binding of the task store and agent relay servers)
+        HTTP binding of the task store and agent relay servers, `lib-pty`
+        for the shared pseudo-terminal sessions on top of the companion program
+        `pty-to-stdio` with their WebSocket binding, and `lib-pty-client` for
+        the terminal client attaching to such a session)
 
     -   `tool/src/ase-setup-*.ts`: the parts of `ase setup`
         (`setup-common` for the shared types and sub-process runner,
@@ -227,8 +230,11 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             `task-board-web-client-{views,dialog}.styl`
 
         -   the task chat: `task-chat` for the `ase task chat` CLI
-            command, and `task-chat-core` for the interactive agent tool
-            invocation and the persisted session of the chat of each task
+            command, `task-chat-core` for the interactive agent tool
+            invocation and the persisted session of the chat of each task,
+            `task-chat-server-bind` for the route of the chats in the
+            service, which keeps them running in pseudo-terminals, and
+            `task-chat-client` for attaching the terminal to a chat
 
     -   `tool/src/ase-agent-*.ts`: the parts of `ase agent`:
 
@@ -442,8 +448,9 @@ Beyond `ase setup`, the CLI provides:
 
 -   `ase task`: the persisted task plans, including `ase task board` for
     the interactive task board in terminal and browser, `ase task chat`
-    for the chat with the agent tool about a task (resuming the session
-    of the task), and `ase task store` for the task store server
+    for the chat with the agent tool about a task (kept running by the
+    service and resuming the session of the task), and `ase task
+    store` for the task store server
 
 -   `ase agent`: the autonomous agents, each running in its own process,
     managed individually via `ase agent <kind> start|status|log|stop|restart`

@@ -9,13 +9,14 @@ import os                    from "node:os"
 import path                  from "node:path"
 import crypto                from "node:crypto"
 
-import { execa }             from "execa"
 import which                 from "which"
 import lockfile              from "proper-lockfile"
 import writeFileAtomic       from "write-file-atomic"
 import YAML                  from "yaml"
 import * as v                from "valibot"
 
+import type Log              from "./ase-lib-log.js"
+import type { PtySpec }      from "./ase-lib-pty.js"
 import { userStateDir }      from "./ase-config-scope.js"
 import { Task }              from "./ase-task.js"
 import { toolSpecs }         from "./ase-setup-common.js"
@@ -110,12 +111,17 @@ export const chatEnv = (id: string): Record<string, string> => {
     return { ...env, ASE_TASK_ID: id }
 }
 
-/*  chat about the task <id> with the agent tool <tool> in the foreground, with the task as the
-    active task of its session (see "chatEnv"), resuming the session of the task,
-    else creating it, and return the exit code of the agent tool, where a session the agent tool
-    failed with by itself is forgotten (but not one of an agent tool ended by a signal), so the
-    next chat about the task starts a new session instead of failing again  */
-export const runChat = async (id: string, tool: Tool): Promise<number> => {
+/*  whether the task chat supports an agent tool  */
+export const chatSupported = (tool: Tool): boolean =>
+    chatArgs[tool] !== null
+
+/*  the start of the chat about the task <id> with the agent tool <tool> by the ASE service, with
+    the task as the active task of its session (see "chatEnv"), resuming the session
+    of the task, else creating it, in a terminal of the given size, where a session the agent tool
+    failed with by itself is forgotten, so the next chat about the task starts a new session
+    instead of failing again (but not one of an agent tool ended by a signal, reported as 128 plus
+    its number, nor one of a failed start of the companion, where the agent tool wrote nothing)  */
+export const chatSpec = async (log: Log, id: string, tool: Tool, cols: number, rows: number): Promise<PtySpec> => {
     Task.validateId(id)
     const args = chatArgs[tool]
     if (args === null)
@@ -135,16 +141,26 @@ export const runChat = async (id: string, tool: Tool): Promise<number> => {
     if (resume && tool === "claude" && !claudeSaved(session))
         resume = false
 
-    /*  run the agent tool in the project root, as it keeps its sessions per directory  */
-    const result = await execa(cli, args(session, resume),
-        { cwd: Task.projectRoot(), env: chatEnv(id), extendEnv: false, stdio: "inherit", reject: false })
-    if (result.exitCode === undefined)
-        return 1
-    if (result.exitCode !== 0)
-        await sessions((known) => {
-            if (known[id] === session)
-                Reflect.deleteProperty(known, id)
-        })
-    return result.exitCode
+    /*  run the agent tool in the project root (as it keeps its sessions per directory), in a
+        terminal with all colors (as all clients, terminals and browsers, are emulating xterm)  */
+    return {
+        file: cli,
+        args: args(session, resume),
+        cwd:  Task.projectRoot(),
+        env:  { ...chatEnv(id), TERM: "xterm-256color", COLORTERM: "truecolor" },
+        cols,
+        rows,
+        exit: (code, output) => {
+            if (code === 0 || code >= 128 || !output)
+                return
+            sessions((known) => {
+                if (known[id] === session)
+                    Reflect.deleteProperty(known, id)
+            }).catch((err: unknown) => {
+                log.write("warning", `chat: forgetting the session of task "${id}" failed: ` +
+                    `${err instanceof Error ? err.message : String(err)}`)
+            })
+        }
+    }
 }
 

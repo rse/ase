@@ -155,8 +155,8 @@ estimator --mode request`, see `ase-agent-estimator`(1)), the prompt
 field is disabled, skipped by `TAB`, and no prompt is sent.
 
 `x` chats about the selected task with the agent tool, which takes
-over the terminal until it ends, continuing the earlier chat about the
-task (see `ase-task-chat`(1)).
+over the terminal until it ends or the chat is detached with
+`Alt`+`X` (see `ase-task-chat`(1)).
 
 `/` focuses the `filter:` field of the header: its keywords are
 matched case-insensitively against the task id and title, AND-combined

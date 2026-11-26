@@ -10,9 +10,13 @@ import crypto                 from "node:crypto"
 import { fileURLToPath }      from "node:url"
 import { spawn }              from "node:child_process"
 import type { ChildProcess }  from "node:child_process"
+import { STATUS_CODES }       from "node:http"
+import type { IncomingMessage } from "node:http"
+import type { Duplex }        from "node:stream"
 
 import { Command }            from "commander"
 import Hapi                   from "@hapi/hapi"
+import { execa }              from "execa"
 import { ofetch, FetchError } from "ofetch"
 import { isMap }              from "yaml"
 import prettyMs               from "pretty-ms"
@@ -165,6 +169,18 @@ export const loadServiceContext = (log: Log): Context => {
 
     /*  return context information  */
     return { projectId, port, token, auth, portPref, svc, aseDir }
+}
+
+/*  ensure the ASE service of the project runs and return its port and token, where <area>
+    prefixes the errors (a service running other ASE code is never restarted, as this would
+    break the MCP connections of all agent sessions using it)  */
+export const serviceEnsure = async (log: Log, area: string): Promise<{ port: number, token: string | null }> => {
+    const entry = fileURLToPath(new URL("./ase.js", import.meta.url))
+    await execa(process.execPath, [ entry, "service", "start" ], { stdin: "ignore" })
+    const { port, token } = loadServiceContext(log)
+    if (port === null)
+        throw new Error(`${area}: ASE service did not report a port`)
+    return { port, token }
 }
 
 /*  reusable functionality: port persistence and process spawning  */
@@ -427,13 +443,16 @@ export default class ServiceCommand {
             const buf = Buffer.from(given, "utf8")
             return buf.length === expected.length && crypto.timingSafeEqual(buf, expected)
         }
+        const authorized = (authorization: string | undefined, cap: string | null, p: string, method: string): boolean => {
+            const m = /^Bearer[ \t]+(\S+)[ \t]*$/i.exec(authorization ?? "")
+            return m !== null ? matches(m[1], token) :
+                method === "get" && cap !== null && matches(cap, Buffer.from(capability(p), "utf8"))
+        }
         server.ext("onPreAuth", (request, h) => {
             if (ctx.auth === "none" || (request.route.settings.app as { public?: boolean } | undefined)?.public === true)
                 return h.continue
-            const m = /^Bearer[ \t]+(\S+)[ \t]*$/i.exec((request.headers.authorization as string | undefined) ?? "")
-            const cap = request.url.searchParams.get("cap")
-            if (m !== null ? matches(m[1], token) :
-                request.method === "get" && cap !== null && matches(cap, Buffer.from(capability(request.path), "utf8")))
+            if (authorized(request.headers.authorization as string | undefined, request.url.searchParams.get("cap"),
+                request.path, request.method))
                 return h.continue
             return h.response({ error: "missing or invalid bearer token of the ASE service" }).code(401).takeover()
         })
@@ -448,6 +467,7 @@ export default class ServiceCommand {
             if (stopping)
                 return
             stopping = true
+            chat.stop()
             try {
                 await server.stop({ timeout: 1000 })
             }
@@ -555,6 +575,41 @@ export default class ServiceCommand {
             capability
         })
 
+        /*  serve the task chats of the project, whose WebSocket handshakes, which the HTTP server
+            passes by all extensions, are authenticated here like all other requests, and are
+            accepted from no other page than one of the service itself (even without
+            authentication), as a browser page may open a WebSocket to any origin  */
+        const { registerChatRoutes } = await import("./ase-task-chat-server-bind.js")
+        const chat = registerChatRoutes(server, this.log)
+        server.listener.on("upgrade", (req: IncomingMessage, socket: Duplex, head: Buffer) => {
+            socket.on("error", () => { socket.destroy() })
+            const reject = (status: number, error: string) => {
+                const body = JSON.stringify({ error })
+                socket.end(`HTTP/1.1 ${status} ${STATUS_CODES[status] ?? "Error"}\r\n` +
+                    "Content-Type: application/json\r\n" +
+                    `Content-Length: ${Buffer.byteLength(body)}\r\n` +
+                    "Connection: close\r\n\r\n" + body)
+            }
+            try {
+                const url    = new URL(req.url ?? "/", `http://${HOST}`)
+                const origin = req.headers.origin
+                if (!allowedHosts.has((req.headers.host ?? "").toLowerCase()))
+                    reject(421, "invalid Host header")
+                else if (origin !== undefined
+                    && !(origin.startsWith("http://") && allowedHosts.has(origin.slice(7).toLowerCase())))
+                    reject(403, "invalid Origin header")
+                else if (ctx.auth !== "none"
+                    && !authorized(req.headers.authorization, url.searchParams.get("cap"), url.pathname, "get"))
+                    reject(401, "missing or invalid bearer token of the ASE service")
+                else if (!chat.upgrade(req, socket, head, url.pathname, reject))
+                    reject(404, "not found")
+            }
+            catch (err: unknown) {
+                this.log.write("error", `service: WebSocket upgrade failed: ${err instanceof Error ? err.message : String(err)}`)
+                socket.destroy()
+            }
+        })
+
         /*  start service  */
         try {
             await server.start()
@@ -601,6 +656,10 @@ export default class ServiceCommand {
 
             /*  never idle out while holding usage windows, as their sessions keep on reporting  */
             if (usage.active())
+                return
+
+            /*  nor while a task chat runs or is attached to  */
+            if (chat.active())
                 return
             if (Date.now() - lastActivity > IDLE_MS) {
                 this.log.write("info", "service: idle timeout reached, stopping")

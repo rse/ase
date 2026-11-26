@@ -22,7 +22,7 @@ import { editRefused, editPrompt, requestEdit, requestsOf } from "./ase-task-req
 import type { TaskRequests }                  from "./ase-task-request.js"
 import type { StatsRange }                    from "./ase-task-board-stats.js"
 import type { GraphLayout, Place }            from "./ase-task-board-graph.js"
-import { runChat }                            from "./ase-task-chat-core.js"
+import { runChat }                            from "./ase-task-chat-client.js"
 import { parseTool }                          from "./ase-setup-common.js"
 import { agentLogWidth, agentOpLines, agentOpHeight, AGENT_INFO_H } from "./ase-task-board-tui-view.js"
 import { agentLogLines, agentLogKey }         from "./ase-task-board-tui-popup.js"
@@ -438,17 +438,17 @@ export const useEditorActions = (ctx: {
     const chat = async (id: string): Promise<void> => {
         const envTool = process.env.ASE_TOOL ?? ""
         const tool    = parseTool(envTool !== "" ? envTool : "claude")
-        let   code    = 0
+        let   code    = null as number | null
         await handOver(async () => {
-            code = await runChat(id, tool)
+            code = await runChat(log, id, tool)
         })
         if (await Task.source(log, id) === null) {
             setDialog((d) => d?.id === id ? null : d)
             setNotice(`task "${id}" no longer exists`)
             return
         }
-        setNotice(code === 0 ? `chat about task "${id}" ended` :
-            `chatting about task "${id}" failed: agent tool ended with exit code ${code}`)
+        setNotice(code === null ? `chat about task "${id}" detached (it keeps running)` :
+            code === 0 ? `chat about task "${id}" ended` : `chat about task "${id}" ended with exit code ${code}`)
     }
 
     /*  edit a task with $EDITOR; a draft which failed to save is kept and

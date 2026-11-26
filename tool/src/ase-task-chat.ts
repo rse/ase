@@ -8,7 +8,7 @@ import { Command }      from "commander"
 
 import type Log         from "./ase-lib-log.js"
 import { parseTool }    from "./ase-setup-common.js"
-import { runChat }      from "./ase-task-chat-core.js"
+import { runChat }      from "./ase-task-chat-client.js"
 
 /*  CLI sub-command "ase task chat"  */
 export default class TaskChatCommand {
@@ -34,8 +34,10 @@ export default class TaskChatCommand {
                 if (!process.stdin.isTTY || !process.stdout.isTTY)
                     throw new Error("chat: requires a terminal on standard input and output")
                 const id   = arg ?? process.env.ASE_TASK_ID ?? "default"
-                const code = await runChat(id, tool)
-                if (code !== 0) {
+                const code = await runChat(this.log, id, tool)
+                if (code === null)
+                    this.log.write("info", `chat: detached from the chat about task "${id}" (it keeps running)`)
+                else if (code !== 0) {
                     this.log.write("warning", `chat: agent tool ended with exit code ${code}`)
                     process.exitCode = code
                 }
