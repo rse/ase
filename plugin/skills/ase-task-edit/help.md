@@ -60,8 +60,8 @@ the same value. An implementation draft (an attachment block of type
 than the frontmatter's is *stale*: it is reported with a warning after
 each rendering of the plan, together with a hint that
 `ase-task-implement --draft` has to be run again to re-create the
-draft for the changed plan, as `ase-task-integrate --draft` refuses a
-stale draft.
+draft for the changed plan, as `ase-task-prove --draft` and
+`ase-task-integrate --draft` refuse a stale draft.
 
 ##  OPTIONS
 

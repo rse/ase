@@ -186,5 +186,6 @@ its target:
 ##  SEE ALSO
 
 [`ase-task-implement`](../ase-task-implement/help.md), [`ase-repo-merge`](../ase-repo-merge/help.md),
-[`ase-task-status`](../ase-task-status/help.md), [`ase-task-delete`](../ase-task-delete/help.md).
+[`ase-task-status`](../ase-task-status/help.md), [`ase-task-delete`](../ase-task-delete/help.md),
+[`ase-task-prove`](../ase-task-prove/help.md).
 

@@ -81,6 +81,7 @@ export const skillGroups: SkillGroup[] = [
             "ase-task-estimate",
             "ase-task-reboot",
             "ase-task-implement",
+            "ase-task-prove",
             "ase-task-integrate",
             "ase-task-view",
             "ase-task-list",
@@ -144,7 +145,7 @@ const subGroups: Record<string, SkillGroup[]> = {
         { label: "TASK: HANDLE",   skills: [ "ase-task-id", "ase-task-status", "ase-task-assign" ] },
         { label: "TASK: EDIT",     skills: [ "ase-task-edit", "ase-task-view", "ase-task-grill", "ase-task-research",
             "ase-task-estimate", "ase-task-reboot", "ase-task-condense", "ase-task-dissect" ] },
-        { label: "TASK: EXECUTE",  skills: [ "ase-task-implement", "ase-task-integrate" ] }
+        { label: "TASK: EXECUTE",  skills: [ "ase-task-implement", "ase-task-prove", "ase-task-integrate" ] }
     ]
 }
 export const skillPrefixGroups: SkillGroup[] = prefixes.flatMap((prefix) => {

@@ -60,7 +60,7 @@ const skillGroups: [ string, string[] ][] = [
     [ "TASK: HANDLE",   [ "ase-task-id", "ase-task-status", "ase-task-assign" ] ],
     [ "TASK: EDIT",     [ "ase-task-edit", "ase-task-view", "ase-task-grill", "ase-task-research",
         "ase-task-estimate", "ase-task-reboot", "ase-task-condense", "ase-task-dissect" ] ],
-    [ "TASK: EXECUTE",  [ "ase-task-implement", "ase-task-integrate" ] ]
+    [ "TASK: EXECUTE",  [ "ase-task-implement", "ase-task-prove", "ase-task-integrate" ] ]
 ]
 
 /*  the order of the command groups: a copy of the column order of "manColumns"

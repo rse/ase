@@ -13,7 +13,9 @@ entire configuration in a terminal UI (see the highlights below).
 
 Task plans can now be **grounded** in the project artifacts and the Internet/Web already while
 editing them, and a new skill reverse-engineers any **change set** (staged changes, a branch, or a
-commit) into a task plan, precise enough for a re-implementation.
+commit) into a task plan, precise enough for a re-implementation. Another new skill **proves** an
+implementation against the verification claims of its plan, by running and, where meaningful,
+falsifying the witness of each one.
 
 The **prompt cache** of Claude Code is now under control: its state is shown in the footer, big
 idle caches are kept warm automatically, and you are asked before a prompt is sent into a big cold
@@ -68,6 +70,9 @@ ase config edit
 
 -   **Change Set to Task**: `ase-repo-task` reverse-engineers the staged or unstaged changes,
     a branch (`--branch`), or a commit (`--commit`) into a new task plan.
+
+-   **Implementation Proof**: `ase-task-prove` runs and falsifies the witness of each
+    verification claim of a plan and persists a `PROVEN` / `NOT PROVEN` proof ledger.
 
 -   **Configuration Editor**: `ase config edit` opens a terminal UI with a parameter view
     and a scope view, storing edited values immediately on any writable scope.

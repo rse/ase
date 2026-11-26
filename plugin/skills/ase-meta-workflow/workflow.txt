@@ -96,12 +96,15 @@ ase-task-dissect    -> TASK
 TASK                -> ase-task-reboot
 ase-task-reboot     -> TASK
 TASK                -> ase-task-implement
+TASK                -> ase-task-prove
 TASK                -> ase-task-integrate
 TASK                -> ase-task-view
 TASK                -> ase-task-list
 TASK                -> ase-task-rename
 TASK                -> ase-task-delete
 ase-task-implement  -> ARTIFACT
+ase-task-prove      -> TASK
+ase-task-prove      -> END
 ase-task-integrate  -> ARTIFACT
 ase-task-view       -> END
 ase-task-list       -> END

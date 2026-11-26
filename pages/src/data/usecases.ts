@@ -573,12 +573,13 @@ export const useCases: UseCase[] = [
             {
                 icon:     PlaneTakeoff,
                 eyebrow:  "Realization",
-                title:    "Draft, Then Apply",
+                title:    "Draft, Prove, Then Apply",
                 body:     "With `tokens` being the current task, the id can be left out: the draft " +
-                          "creates the change set as an attachment, then it is applied to the " +
-                          "code base.",
+                          "creates the change set as an attachment, its verification claims are " +
+                          "proven by falsifying their tests, then it is applied to the code base.",
                 commands: [
                     "**/ase-task-implement** --draft",
+                    "**/ase-task-prove** --draft",
                     "**/ase-task-integrate** --draft"
                 ]
             },

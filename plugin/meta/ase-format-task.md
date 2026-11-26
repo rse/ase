@@ -233,7 +233,7 @@ You *MUST* honor the following hints on this *task* format:
     `..` or `//`. An attachment <name/> is non-empty and consists of the
     characters `A-Z`, `a-z`, `0-9`, `_`, and `-` only. The attachment name
     `draft` is the *implementation draft*, selected by the `--draft` option
-    of `ase-task-implement` and `ase-task-integrate`.
+    of `ase-task-implement`, `ase-task-prove`, and `ase-task-integrate`.
 
     A branch or attachment <name/> can carry the placeholder `{id}`, which
     reads as the task id with every character other than `A-Z`, `a-z`,
@@ -338,6 +338,12 @@ You *MUST* honor the following hints on this *task* format:
     the task store keeps it on every overwrite of the plan (silently ignoring a
     changed, removed, or added usage attachment), and the entity tag of a
     conditional save does not cover it, so a booking meanwhile never fails a save.
+
+    The *proof ledger* carries the last `PROVEN` / `NOT PROVEN` verdict of
+    `ase-task-prove`, with its evidence as Markdown. It carries the `Type` key
+    value `text/markdown; charset=utf-8; kind="proof"`, is *replaced* in place
+    on every proof (keeping its `Created` key, but leaving the `Modified` key of
+    the frontmatter alone), and becomes stale like any other attachment.
 
     A skill which changes the content of an attachment refreshes its `Modified`
     key with the current timestamp -- the very same value it writes into the

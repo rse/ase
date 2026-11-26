@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-25)
 ------------------
 
+-   FEATURE [code, docs]: Task Plan Implementation Proof
+    The new skill `ase-task-prove` runs the witness of each `REG` and `CON` verification claim of a
+    task plan, falsifies each test case or spec witness by reverting resp. mutating the change,
+    and persists a proof ledger attachment with a `PROVEN` / `NOT PROVEN` verdict.
+
 -   IMPROVEMENT [code, docs]: Aligned Change Set Selection of Repository Skills
     `ase-repo-diff` gained `--staged`, `--unstaged`, `--worktree`, `--branch`, and `--commit` like
     `ase-repo-review` (renaming its short options to `-C`, `-R`, and `-B`), and `ase-repo-task`

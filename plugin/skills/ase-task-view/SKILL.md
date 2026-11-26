@@ -141,7 +141,7 @@ Procedure
 
         <if condition="<task-content/> is not empty">
         <ase-tpl-hint level="normal">
-        Use `/ase-task-edit` or `/ase-task-grill` to refine this plan, `/ase-task-implement --draft` to draft its implementation, `/ase-task-implement` to realize it, and `/ase-task-integrate` to deliver it.
+        Use `/ase-task-edit` or `/ase-task-grill` to refine this plan, `/ase-task-implement --draft` to draft its implementation, `/ase-task-implement` to realize it, `/ase-task-prove` to prove it, and `/ase-task-integrate` to deliver it.
         </ase-tpl-hint>
 
         <if condition="<getopt-option-full/> is not equal `true` and the backmatter of <task-content/> contains an elided `Data` payload">
@@ -152,7 +152,7 @@ Procedure
 
         <if condition="the implementation draft attachment block was reported as *stale* above">
         <ase-tpl-hint level="minimal">
-        Run `/ase-task-implement --draft` again to re-create the implementation draft for the changed plan, as `/ase-task-integrate --draft` refuses a stale draft.
+        Run `/ase-task-implement --draft` again to re-create the implementation draft for the changed plan, as `/ase-task-prove --draft` and `/ase-task-integrate --draft` refuse a stale draft.
         </ase-tpl-hint>
         </if>
         </if>

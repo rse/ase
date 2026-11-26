@@ -785,7 +785,7 @@ Set <args></args> (set args to empty).
         </template>
 
         <ase-tpl-hint level="minimal">
-        Run `/ase-task-implement --draft` again to re-create the implementation draft for the changed plan, as `/ase-task-integrate --draft` refuses a stale draft.
+        Run `/ase-task-implement --draft` again to re-create the implementation draft for the changed plan, as `/ase-task-prove --draft` and `/ase-task-integrate --draft` refuse a stale draft.
         </ase-tpl-hint>
         </if>
 

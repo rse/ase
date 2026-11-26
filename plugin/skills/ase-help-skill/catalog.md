@@ -66,6 +66,7 @@
 ○   `ase-task-estimate`:   Estimate the Effort of a Task Plan
 ○   `ase-task-reboot`:     Reboot a Task Plan
 ○   `ase-task-implement`:  Implement a Task Plan
+○   `ase-task-prove`:      Prove a Task Plan Implementation
 ○   `ase-task-integrate`:  Integrate a Task Change Set
 ○   `ase-task-status`:     Configure Task Status
 ○   `ase-task-assign`:     Assign a Task Plan

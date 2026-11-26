@@ -751,11 +751,29 @@ Procedure
     2.  Check the tool <result/> and dispatch accordingly:
 
         -   If <result/> is `DONE` or `CANCEL`:
-            Only output the following <template/> and then *STOP*.
+            Only output the following <template/>, directly followed by
+            the hint, and then *STOP*.
 
             <template>
             ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **plan implemented -- done**
             </template>
+
+            Set <prove-args></prove-args> (empty). If
+            <getopt-option-worktree/> is not empty, append
+            ` --worktree <getopt-option-worktree/>`, if
+            <getopt-option-source/> is not empty and <changeset-type/>
+            is `branch`, append ` --source <getopt-option-source/>`, and
+            if <getopt-option-draft/> is `true`, append ` --draft`, else
+            if <getopt-option-changeset/> is not empty, append
+            ` --changeset <getopt-option-changeset/>`, so the proof
+            targets the very change set just created. Give the following
+            hint only if the `VERIFICATION (WHEN)` section of the plan has
+            a `REG` or `CON` bullet-point in a state other than `[-]` and
+            `[>]`, as the proof otherwise has nothing to prove:
+
+            <ase-tpl-hint level="normal">
+            Use `/ase-task-prove<prove-args/>` to obtain evidence that the implementation satisfies the `REG` and `CON` claims of the plan, as a green test run alone is not evidence.
+            </ase-tpl-hint>
 
         -   If <result/> is `EDIT`:
             <expand name="task-next-handoff" arg1="ase-task-edit"

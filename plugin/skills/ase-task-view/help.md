@@ -28,7 +28,8 @@ older than the `Modified:` key of the plan frontmatter is *stale*, as
 the plan changed after the draft was created. Such a draft is reported
 with a warning after the rendering, together with a hint that
 `ase-task-implement --draft` has to be run again, as
-`ase-task-integrate --draft` refuses a stale draft.
+`ase-task-prove --draft` and `ase-task-integrate --draft` refuse a
+stale draft.
 
 The frontmatter keys `Source:`, `Changeset:`, and `Target:` are
 rendered as well, stating where the change set of the plan is

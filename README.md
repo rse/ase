@@ -23,7 +23,7 @@ Code](https://claude.com/product/claude-code) — and with reduced support also 
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
 [OpenAI Codex CLI](https://github.com/openai/codex).
 
-**ASE** ships with 62 agent skills, agent hooks, agent sub-agents, an
+**ASE** ships with 63 agent skills, agent hooks, agent sub-agents, an
 underlying Model-Context-Protocol (MCP) service and a Command-Line Interface
 (CLI) with a task store, task boards, and autonomous agents, incorporating
 reasonable methodology and automation aspects, to support the recurring
@@ -182,6 +182,12 @@ see whether **ASE** is right for you:
   You have a named, persisted task plan and now want it implemented as a
   single, complete change set across your project artifacts?
   &rarr; [`/ase-task-implement`](plugin/skills/ase-task-implement/help.md)
+  `hello`
+
+- **Implementation Proof**:
+  You have implemented a task plan and now want evidence that its tests
+  really decide its verification claims, by falsifying each of them?
+  &rarr; [`/ase-task-prove`](plugin/skills/ase-task-prove/help.md)
   `hello`
 
 - **Change Set Integration**:
