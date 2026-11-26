@@ -16,7 +16,7 @@ import {
     surface, growable, grown, openTask, closeTask, clearDiff, selectTab, selectAgent, toggle, cycleView, stepStatsRange
 } from "./ase-task-board-web-client-model"
 import { startEdit, startNew, onEditorKey } from "./ase-task-board-web-client-editor"
-import { toggleChat }                      from "./ase-task-board-web-client-chat"
+import { toggleChat, placeChat }           from "./ase-task-board-web-client-chat"
 
 /*  delete a task (after its confirmation), closing its task dialog
     (the task viewer stays open and notices the vanished task on its reload)  */
@@ -318,6 +318,11 @@ const notify = (text: string) => {
     }, 5000)
 }
 
+/*  place the chat beside resp. below the task plan of the task dialog, with a note  */
+export const chatPlace = () => {
+    notify(placeChat())
+}
+
 /*  copy a login URL of the web board for another browser, with a fresh one-time nonce,
     into the clipboard (resp. show it in the status line, if the clipboard is unavailable)  */
 const copyLoginURL = async () => {
@@ -446,7 +451,8 @@ const dialogKeys: Record<string, (id: string) => void> = {
 
 /*  in the task dialog, RETURN and ESC close it (except in the task viewer, as a browser tab
     cannot be closed by its page), "e" edits its plan, "E" edits it by a prompt, "R" requests it by a prompt,
-    "x" (and Alt+X, see "onChatKey") shows or hides the chat about it, "D" deletes, "T" transitions, and "A" assigns its task,
+    "x" (and Alt+X, see "onChatKey") shows or hides the chat about it, "X" places it beside resp.
+    below the task plan, "D" deletes, "T" transitions, and "A" assigns its task,
     "#" clears the diff of its plan, "L" cycles the color theme,
     the left/right arrows (also Tab/Shift+Tab) switch its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
 const onDialogKey = (ev: KeyboardEvent) => {
@@ -462,6 +468,10 @@ const onDialogKey = (ev: KeyboardEvent) => {
     else if (ev.key === "x" && !ev.ctrlKey && !ev.metaKey && !ev.altKey && task.value !== null) {
         ev.preventDefault()
         toggleChat(task.value.id)
+    }
+    else if (ev.key === "X" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+        ev.preventDefault()
+        chatPlace()
     }
     else if (Object.hasOwn(dialogKeys, ev.key) && !ev.ctrlKey && !ev.metaKey && !ev.altKey && task.value !== null) {
         ev.preventDefault()

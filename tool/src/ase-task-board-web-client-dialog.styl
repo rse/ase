@@ -470,6 +470,26 @@
             &:hover
                 opacity: 0.8
 
+    /*  the content: the task plan (or its editor) and the chat below it, filling the remaining
+        height of the fixed-height dialog  */
+    .dbody
+        flex: 1
+        min-height: 0
+        display: flex
+        flex-direction: column
+
+    /*  the content with the chat beside the task plan  */
+    .dbody.beside
+        flex-direction: row
+
+    /*  the task plan (or its editor) within the content  */
+    .dmain
+        flex: 1
+        min-height: 0
+        min-width: 0
+        display: flex
+        flex-direction: column
+
     /*  the content: the rendered task plan or attachment of the selected tab, filling the remaining
         height of the fixed-height dialog, so the dialog keeps the same margin at the top and the bottom  */
     #plan

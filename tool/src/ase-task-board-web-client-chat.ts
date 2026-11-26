@@ -7,7 +7,7 @@
 import { ref, watch }             from "vue"
 import type { GhosttyTheme, ResttyFontInput, Restty, PtyTransport } from "restty"
 
-import { api, openTask, task }    from "./ase-task-board-web-client-model"
+import { api, openTask, task, surface, toggle } from "./ase-task-board-web-client-model"
 
 /*  the task whose task dialog shows the chat about it (as opening another task must not start
     its chat), cleared on closing the task dialog (as opening it again must not start the chat
@@ -18,6 +18,18 @@ watch(task, (shown) => {
     if (shown === null)
         chatTask.value = null
 })
+
+/*  the smallest window width for the chat beside the task plan (two columns of 600 pixels)  */
+const BESIDE_MIN = 1200
+
+/*  place the chat beside resp. below the task plan of the task dialog (remembered like the other
+    display state), answering a note on its new place, resp. why it stays  */
+export const placeChat = (): string => {
+    if (!surface.value.beside && window.innerWidth < BESIDE_MIN)
+        return "chat: the window is too narrow to place the chat beside the task plan"
+    toggle("beside", "")
+    return `chat: placed ${surface.value.beside ? "beside" : "below"} the task plan`
+}
 
 /*  show the chat about a task in its task dialog (opening it), resp. hide it again  */
 export const toggleChat = (id: string): void => {

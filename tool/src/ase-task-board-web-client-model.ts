@@ -15,7 +15,7 @@ export type EditState = "pending" | "active" | "failed"
 export type Card    = { id: string, title: string, group: string, tone: string, moves?: string[], edit: EditState | "", finished: boolean, assignee: string, effort: string }
 export type Lane    = { status: string, active: boolean, weight: number, dashed: boolean, kind: "initial" | "regular" | "terminal", cards: Card[] }
 export type Group   = { title: string, lanes: Lane[] }
-export type Surface = { view: View, minimized: string[], collapsed: string[], heights: Record<string, number>, titles: boolean, keys: boolean, standalone: boolean }
+export type Surface = { view: View, minimized: string[], collapsed: string[], heights: Record<string, number>, titles: boolean, keys: boolean, standalone: boolean, beside: boolean }
 export type Board   = { mode: string, project: string, version: string, warnings: string[], users: string[], self: string, moves: Record<string, string[]>, groups: Group[] }
 export type Tone    = "active" | "done" | "idle"
 export type Ref     = { id: string, tone: Tone }
@@ -409,7 +409,7 @@ export const selectAgent = (id: string) => {
     shared by all boards of the project in this browser only (see the "storage" event), except
     the view, which each tab keeps on its own (in the session storage, initially the last view
     of any tab), where an invalid or unavailable stored state falls back to the default state  */
-export const surface   = ref<Surface>({ view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true })
+export const surface   = ref<Surface>({ view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true, beside: false })
 const surfaceKey   = (project: string) => `ase-task-board:surface:${project}`
 const surfaceParse = (text: string | null): Surface => {
     const strings = (x: unknown) => Array.isArray(x) && x.every((e) => typeof e === "string") ? x : []
@@ -432,7 +432,8 @@ const surfaceParse = (text: string | null): Surface => {
             .filter((entry): entry is [ string, number ] => typeof entry[1] === "number" && Number.isFinite(entry[1]) && entry[1] > 0)),
         titles:     flag(s.titles, false),
         keys:       flag(s.keys, true),
-        standalone: flag(s.standalone, true)
+        standalone: flag(s.standalone, true),
+        beside:     flag(s.beside, false)
     }
 }
 const surfaceLoad  = (project: string): Surface => {
@@ -858,10 +859,11 @@ const onStorage = (ev: StorageEvent) => {
 }
 
 /*  toggle a minimized lane, a collapsed phase (resp. multiple at once, all removed if all are
-    listed already, else all missing ones added), or the showing of task titles, key hints, or standalone tasks  */
-export const toggle = (list: "minimized" | "collapsed" | "titles" | "keys" | "standalone", entry: string | string[]) => {
+    listed already, else all missing ones added), or the showing of task titles, key hints, or standalone tasks,
+    or the place of the chat in the task dialog (beside instead of below the task plan)  */
+export const toggle = (list: "minimized" | "collapsed" | "titles" | "keys" | "standalone" | "beside", entry: string | string[]) => {
     const s = { ...surface.value }
-    if (list === "titles" || list === "keys" || list === "standalone")
+    if (list === "titles" || list === "keys" || list === "standalone" || list === "beside")
         s[list] = !s[list]
     else {
         const entries = Array.isArray(entry) ? entry : [ entry ]
