@@ -1,13 +1,14 @@
 ---
 name: ase-repo-review
-argument-hint: "[--help|-h] [--auto|-a] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--thorough|-t] [--staged] [--unstaged] [--worktree|-w <name>] [--branch|-b <branch>] [--commit|-c <commit>]"
+argument-hint: "[--help|-h] [--auto|-a] [--severity|-S=(AUTO|LOW|MEDIUM|HIGH)] [--thorough|-t] [--evidence|-e] [--staged] [--unstaged] [--worktree|-w <name>] [--branch|-b <branch>] [--commit|-c <commit>]"
 description: >
     Perform a holistic, human-reviewer-style critique of the currently
     staged Git changes (or, with `--unstaged`, of the unstaged and
     untracked changes, with `--branch`, of a branch against its base,
     or, with `--commit`, of a single commit) and emit an approve/reject verdict
     with prioritized, severity-tagged, line-cited findings (with `--auto`
-    fixed automatically). Use when the
+    fixed automatically, and with `--evidence` backed by a per-dimension
+    evidence ledger). Use when the
     user wants the staged diff, a branch, or a commit "reviewed",
     "critiqued", or "code-reviewed".
 user-invocable: true
@@ -38,7 +39,7 @@ Review Changes
 
 <expand name="getopt"
     arg1="ase-repo-review"
-    arg2="--auto|-a --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --thorough|-t --staged --unstaged --worktree|-w= --branch|-b= --commit|-c=">
+    arg2="--auto|-a --severity|-S=(AUTO|LOW|MEDIUM|HIGH) --thorough|-t --evidence|-e --staged --unstaged --worktree|-w= --branch|-b= --commit|-c=">
     $ARGUMENTS
 </expand>
 
@@ -50,7 +51,8 @@ the change's *own intent* and against *correctness*, *design fit*,
 *clarity*, *robustness*, *propagation*, freedom of *residue*, and
 *project-convention conformance* - and emit a single *approve /
 request-changes verdict* backed by *prioritized*, *severity-tagged*,
-*line-cited* findings. This is a *synthesizing critique*, not a mechanical
+*line-cited* findings, optionally backed by a per-dimension *evidence
+ledger* of *falsifiable*, *line-cited* statuses. This is a *synthesizing critique*, not a mechanical
 scan: it complements `ase-code-lint` (mechanical quality), `ase-code-analyze`
 (logic/semantics), and `ase-repo-diff` (intent narrative and risk).
 </objective>
@@ -110,7 +112,7 @@ Procedure
     findings surfaced (an *explicitly* given severity floor lifts this
     skip). *Skip* the entire review investigation: do
     *not* invoke the `Agent` tool and do *not* read any change, set
-    <findings/> to the *empty* list, set <hidden/> to `0`, set
+    <findings/> and <evidence/> to the *empty* list, set <hidden/> to `0`, set
     <verdict/> to `SKIPPED (boxing: black)`, set <summary/> to a
     *one-line* neutral restatement of the change intent derived solely
     from STEP 1, and proceed *directly* to STEP 3.
@@ -130,7 +132,9 @@ Procedure
     value is consumed here.
 
     Set <mode>thorough</mode> if <getopt-option-thorough/> is equal
-    `true`, and <mode>focused</mode> otherwise.
+    `true`, and <mode>focused</mode> otherwise. Set <ledger> -- with
+    evidence ledger</ledger> if <getopt-option-evidence/> is equal
+    `true`, and <ledger></ledger> (empty) otherwise.
 
     For this, invoke *exactly once* (apart from the single retry below)
     the tool:
@@ -139,7 +143,7 @@ Procedure
         Agent(
             description:       "Review Investigation",
             subagent_type:     "ase:ase-repo-review",
-            prompt:            "Review in <mode/> mode the changes of scope: <scope/>",
+            prompt:            "Review in <mode/> mode the changes of scope: <scope/><ledger/>",
             run_in_background: false
         )
     ```
@@ -147,11 +151,15 @@ Procedure
     Parse the single result message of the `Agent` tool as a JSON object
     (if it is wrapped into a code fence or surrounded by prose, parse just
     its outermost `{...}` object), set <summary/> to its `summary` field
-    (a single crisp sentence reconstructing the change's intent), and set
-    <findings/> to its `findings` field (a list). If no such object with
-    a `findings` list can be parsed, invoke the `Agent` tool *once* more
-    exactly as above, but with ` -- return ONLY the JSON object` appended
-    to its `prompt`, and parse its result the same way. If this fails
+    (a single crisp sentence reconstructing the change's intent), set
+    <findings/> to its `findings` field (a list), and set <evidence/> to
+    its `evidence` field (a list) if <getopt-option-evidence/> is equal
+    `true`, and to the *empty* list otherwise. If no such object with
+    a `findings` list (and, if <getopt-option-evidence/> is equal `true`,
+    an `evidence` list) can be parsed, invoke the `Agent` tool *once* more
+    exactly as above, but with ` -- return ONLY the JSON object` inserted
+    into its `prompt` directly *before* <ledger/> (so the `prompt` still
+    ends with any <ledger/>), and parse its result the same way. If this fails
     again, only output the following <template/> and then *STOP*
     immediately, as you *MUST* *NEVER* invent findings or render the raw
     result instead:
@@ -160,12 +168,49 @@ Procedure
     ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: review investigation returned no parseable result
     </template>
 
+    <if condition="<getopt-option-evidence/> is equal `true`">
+    Then *enforce the falsifiability* of <evidence/>, as the sub-agent's
+    statuses are claims and not yet facts, by correcting each entry in
+    turn:
+
+    -   An entry of an unknown dimension (not one of the dimensions
+        listed below) or with a `status` other than `✓`, `✗`, `?`, and
+        `–` is dropped, and of several entries of the same dimension
+        only the first one is kept.
+
+    -   Each of the dimensions `INTENT`, `PROPAGATION`, `COVERAGE`,
+        `RESIDUE`, `CORRECTNESS`, `DESIGN`, `CLARITY`, `ROBUSTNESS`,
+        `SECURITY`, `PERFORMANCE`, `CONVENTION`, `TESTING`, and
+        `DOCUMENTATION` without an entry is appended in this order to
+        the end of <evidence/> as `?`, with the justification `not
+        assessed`.
+
+    -   A `✓` entry without a `file:line` resp. `file:N-M` citation in
+        its `location` field becomes `?`, with the justification `no
+        citation, no evidence`.
+
+    -   An entry of a dimension for which <findings/> holds a finding of a
+        `severity` other than `ACCEPTED` becomes `✗`, with the location of
+        its most severe such finding and the justification `<n/>
+        finding(s)`, where <n/> is the number of these findings, as the
+        findings are authoritative.
+
+    -   A `✗` entry of a dimension for which <findings/> holds *no* such
+        finding becomes `?`, with the justification `gap claimed without
+        finding`.
+
+    Then set <n-shown/>, <n-gap/>, <n-unverified/>, and <n-na/> to the
+    number of the `✓`, `✗`, `?`, and `–` entries of <evidence/>.
+    </if>
+
     Then *derive* the overall <verdict/> from <findings/>: set
     <verdict/> to `REJECT - DEMANDS CHANGES` if *any* finding in
     <findings/> has a `severity` field of `HIGH`; otherwise set
-    <verdict/> to `APPROVE`. The verdict is derived *before* the
-    severity floor below, so the floor only affects which findings are
-    *rendered*, never the verdict.
+    <verdict/> to `APPROVE`, followed by ` - <n-unverified/> UNVERIFIED`
+    if <getopt-option-evidence/> is equal `true` and <n-unverified/> is greater than `0`,
+    as an approval is only as strong as its evidence. The verdict is
+    derived *before* the severity floor below, so the floor only affects
+    which findings are *rendered*, never the verdict.
 
     Then determine the *effective severity floor* <floor/> and its
     origin <floor-origin/>: define the ordinal rank `LOW`=1, `MEDIUM`=2,
@@ -202,9 +247,11 @@ Procedure
     skill: you *MUST* emit them as *one* contiguous reply text *after*
     the last tool call (as a headless run shows only the final reply
     text), and it *MUST* *always* carry the verdict, the change intent,
-    and *exactly one* of the findings table or the no-findings
-    statement. You *MUST* *NEVER* omit, summarize, or replace any of
-    them by free prose, not even for a small or trivial change.
+    *exactly one* of the findings table or the no-findings statement,
+    and, if <getopt-option-evidence/> is equal `true` and <verdict/> does
+    not start with `SKIPPED`, the evidence ledger. You *MUST*
+    *NEVER* omit, summarize, or replace any of them by free prose, not
+    even for a small or trivial change.
 
     1.  Sort the findings of <findings/> by their `severity` field from
         highest to lowest in the fixed order `HIGH`, `MEDIUM`, `LOW`,
@@ -297,7 +344,37 @@ Procedure
         </template>
         </if>
 
-    6.  <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
+    6.  <if condition="<getopt-option-evidence/> is equal `true` and <verdict/> does not start with `SKIPPED`">
+        Render the *evidence ledger* with one row per entry of
+        <evidence/>, in the order returned by the sub-agent, by using the
+        following output <template/>. For each entry, repeat the last
+        line, set <status/> to its `status` field, <dimension/> to its
+        `dimension` field, and <justification/> to its `justification`
+        field, prefixed with its `location` field (marked up as code with
+        backticks, prepended with `▢ `, and followed by `: `) if this is
+        not empty. Escape every literal `|` inside a row as `\|`.
+
+        <if condition="<ase-project-boxing/> is equal `grey`">
+        Omit the rows of the `–` entries, as grey boxing surfaces only
+        the essentials (they still count in <n-na/>).
+        </if>
+
+        <template>
+
+        ⧉ **ASE**: **REVIEW EVIDENCE**: <n-shown/> ✓ shown, <n-gap/> ✗ gap, <n-unverified/> ? unverified, <n-na/> – n/a
+
+        | Status        | Dimension    | Evidence         |
+        | ------------- | ------------ | ---------------- |
+        | **<status/>** | <dimension/> | <justification/> |
+
+        </template>
+
+        A `✗` reflects *all* findings of its dimension, including those
+        hidden by the severity floor. Do *not* output any further
+        explanation.
+        </if>
+
+    7.  <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
         Recap the outcomes of the fixing of STEP 3.1 with the following
         <template/>:
 
@@ -315,11 +392,11 @@ Procedure
         -   <location/> is the `location` of the finding, marked up as code (with backticks)
         -   <summary/> is a one-line summary of the `finding` text, at most 60 characters long, with every `|` escaped as `\|`
 
-        The <verdict/> above stays the verdict of the *reviewed* state,
-        i.e., before the fixing.
+        The <verdict/> and the evidence ledger above stay those of the
+        *reviewed* state, i.e., before the fixing.
         </if>
 
-    7.  Finally, give the closing hints by expanding the following
+    8.  Finally, give the closing hints by expanding the following
         (which, depending on the configured <ase-guidance-level/>, may
         expand into nothing and hence emit no output at all):
 
@@ -343,9 +420,11 @@ Procedure
         ` -b <getopt-option-branch/>` to <rerun/> if
         <getopt-option-branch/> is not empty, append
         ` -c <getopt-option-commit/>` to <rerun/> if
-        <getopt-option-commit/> is not empty, and
+        <getopt-option-commit/> is not empty,
         append ` -t` to <rerun/> if <getopt-option-thorough/> is equal
-        `true`, so that the re-run reviews the same scope in the same mode.
+        `true`, and append ` -e` to <rerun/> if <getopt-option-evidence/>
+        is equal `true`, so that the re-run reviews the same scope in the
+        same mode.
 
         <ase-tpl-hint level="normal">
         Use `<rerun/>` to re-run the review with all findings shown (a fresh review, so its findings can differ).

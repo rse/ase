@@ -20,7 +20,8 @@ unstaged`, each optionally followed by `in worktree <worktree-dir/>`,
 by `plus the <changes/> changes in worktree <worktree-dir/>`, where
 <changes/> is one of `staged`, `unstaged`, or `staged and unstaged`, or
 `commit <commit-id/>`) and the reporting *mode* (`focused` or
-`thorough`) of the review.
+`thorough`) of the review, and, if it ends with `with evidence ledger`,
+requests the per-dimension *evidence ledger* of step 7 below.
 
 Workflow
 --------
@@ -316,16 +317,79 @@ Workflow
             }
         </template>
 
-7.  You *MUST* *NOT* propose, apply, or render any document
+7.  Set <evidence/> to empty. *Only* if the prompt requests the
+    *evidence ledger*, record for *each* of the dimensions of step 6, in
+    their order there, *what the sources actually show*, so that an
+    approval rests on *falsifiable* evidence and not merely on the
+    absence of findings. For each dimension, first hunt for the
+    *strongest reason* the change could be wrong or incomplete in it,
+    and only then determine its <status/> as exactly one of:
+
+    -   `✓` *shown*: a line you *read* settles the dimension for the
+        change, so that anybody can *falsify* the claim by reading the
+        cited lines: the guard ruling out a failure, the adapted call
+        site, the updated documentation line, the test case, or (for an
+        absence claim, like no residue) the inspected range itself.
+        *No* `file:line` citation, *no* `✓`.
+
+    -   `✗` *gap*: at least one finding of step 6 of this dimension has a
+        severity other than `ACCEPTED`.
+
+    -   `?` *unverified*: deciding it needs an execution, a source which
+        could not be found, or an expectation merely inferred.
+
+    -   `–` *n/a*: the dimension does not apply to the change (e.g.
+        `PERFORMANCE` for a pure documentation change).
+
+    The following stricter rules apply to a `✓`:
+
+    -   For `CORRECTNESS` and `COVERAGE`, the expected behavior *MUST*
+        come from an *implementation-independent source* (specification,
+        contract, docstring, standard, hand computation, or test), never
+        from the changed code itself. Otherwise the status is `?`.
+
+    -   For `TESTING`, the cited test case *MUST* turn red if the change
+        were reverted, and the text *MUST* say why. A test which cannot
+        fail is *no* evidence.
+
+    -   For a dimension whose findings are all `ACCEPTED`, the `✓` cites
+        the place where the concern is addressed.
+
+    Set <justification/> to an *ultra-brief* single sentence: for `✓`
+    *why* the cited lines settle the claim, for `✗` the number of its
+    findings, for `?` *which* execution or source is missing, and for `–`
+    *why* the dimension does not apply. Set <location/> to the cited
+    `file:N` resp. `file:N-M` for `✓` (mandatory), to the location of the
+    most severe finding for `✗`, and to empty for `?` and `–`. Mark up
+    verbatim identifiers in <justification/> as for <finding/> above.
+
+    If <evidence/> is not empty, set <evidence><evidence/>,</evidence>
+    (append a comma). Then append the following <template/> to
+    <evidence/>:
+
+    <template>
+        {
+            "dimension":     <dimension/>,
+            "status":        <status/>,
+            "location":      <location/>,
+            "justification": <justification/>
+        }
+    </template>
+
+8.  You *MUST* *NOT* propose, apply, or render any document
     changes yourself. Instead, return *exclusively* as the last message
     a single JSON block (no markdown, no prose, no preamble, no summary)
-    of the following shape:
+    of the following shape, where the `evidence` field is present
+    *only* if the prompt requests the evidence ledger:
 
     ```json
     {
         "summary": <summary/>,
         "findings": [
             <findings/>
+        ],
+        "evidence": [
+            <evidence/>
         ]
     }
     ```

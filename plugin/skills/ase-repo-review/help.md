@@ -10,6 +10,7 @@
     [`--auto`|`-a`]
     [`--severity`|`-S`=(`AUTO`|`LOW`|`MEDIUM`|`HIGH`)]
     [`--thorough`|`-t`]
+    [`--evidence`|`-e`]
     [`--staged`]
     [`--unstaged`]
     [`--worktree`|`-w` *name*]
@@ -62,6 +63,18 @@ sub-agent so that the silent reading and read-only repository probing
 never leak into the transcript; only the structured verdict and findings
 are rendered.
 
+With `--evidence`, the verdict is additionally backed by an **evidence
+ledger**: one *status* per dimension - **✓** *shown*, **✗** *gap*,
+**?** *unverified*, or **–** *n/a* - so that an approval rests on
+*falsifiable* evidence instead of the mere absence of findings. A **✓**
+requires a `file:line` citation anybody can falsify by reading the
+cited lines ("no citation, no ✓"), for correctness and coverage it
+requires an *implementation-independent* source (like a specification,
+contract, or test) instead of the changed code itself, and for testing
+it requires a test case which would fail if the change were reverted.
+A **✗** stands exactly for the dimensions with non-`ACCEPTED` findings,
+and the number of **?** shows up in an approval, like **APPROVE - 2 UNVERIFIED**.
+
 The skill *complements* rather than duplicates its neighbors:
 `ase-code-lint` flags *mechanical* code-quality issues, `ase-code-analyze`
 inspects *logic and semantics*, `ase-repo-diff` narrates *what changed*
@@ -103,6 +116,14 @@ before it is committed or merged.
     findings: report every well-grounded concern, including minor nits,
     and additionally *plausible* concerns whose impact cannot be fully
     proven, marked with "*Plausible:*" and rated at most `MEDIUM`.
+
+-   `--evidence`|`-e`:
+    Additionally render the *evidence ledger*: per dimension a status
+    `✓` (shown, with a mandatory `file:line` citation), `✗` (gap, i.e.
+    findings exist), `?` (unverified), or `–` (n/a), with a one-line
+    justification. A `✓` without citation is downgraded to `?`, and the
+    number of `?` statuses is appended to an `APPROVE` verdict. For a
+    project with `grey` boxing, the `–` rows are omitted.
 
 -   `--staged`:
     Review the *staged* changes of the working copy. This is the default
@@ -159,6 +180,7 @@ single commit.
 -   You want a feature branch reviewed before merging it
 -   You want a single, already committed change reviewed
 -   You want the findings of a review fixed automatically
+-   You want an approval backed by line-cited, falsifiable evidence per dimension
 
 ##  EXAMPLES
 
@@ -172,6 +194,12 @@ Review the staged changes, reporting only `MEDIUM` and `HIGH` findings:
 
 ```text
 ❯ /ase-repo-review -S MEDIUM
+```
+
+Review the staged changes and back the verdict by an evidence ledger:
+
+```text
+❯ /ase-repo-review --evidence
 ```
 
 Review the unstaged and untracked changes only:

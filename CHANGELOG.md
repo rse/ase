@@ -5,10 +5,15 @@ ChangeLog
 2.1.7 (2026-11-25)
 ------------------
 
+-   FEATURE [code, docs]: Falsifiable Evidence Ledger of Reviews
+    The new option `--evidence`|`-e` of `ase-repo-review` backs the verdict by a per-dimension
+    status `✓`/`✗`/`?`/`–`, where a `✓` requires a falsifiable `file:line` citation, and every
+    `?` shows up in an `APPROVE` verdict.
+
 -   FEATURE [code, docs]: Plain-Language Per-File Explanation of Diffs
     The new option `--explain`|`-E` of `ase-repo-diff` explains every changed file in plain
     language: its state before, its state after and why, and why it is correct, backed by
-    `file:line`-cited evidence or openly marked as unverified. (Idea of PR #84)
+    `file:line`-cited evidence or openly marked as unverified.
 
 -   BUGFIX [code]: Reliable HARD Auto-Warm of the Prompt Cache
     The cache controller times the TTL from the start of a request, pings at once on a HARD
