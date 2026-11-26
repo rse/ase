@@ -4,6 +4,11 @@
 **  Licensed under Apache 2.0 <https://spdx.org/licenses/Apache-2.0>
 */
 
+/*  the task dialog with the chat beside the task plan: nearly as wide as the window
+    (except in the task viewer, whose task dialog spans the entire window anyway)  */
+#dlg.wide:not(.full)
+    width: 98vw
+
 /*  the chat about the task of the task dialog: below the task plan, with the
     terminal emulator filling it and its note on top of the emulator, framed in the
     signal color while it has the focus (and hence all keys), like the focused inputs  */
@@ -12,6 +17,7 @@
     flex: 0 0 45%
     min-height: 0
     overflow: hidden
+    min-width: 0
     border-top: 1px solid var(--c-border)
     background: var(--c-paper)
     &:focus-within
@@ -39,4 +45,10 @@
         background: var(--c-paper)
         color: var(--c-signal)
         font-size: 0.8125rem
+
+/*  the chat beside the task plan  */
+.dbody.beside > #chat
+    flex-basis: 50%
+    border-top: none
+    border-left: 1px solid var(--c-border)
 

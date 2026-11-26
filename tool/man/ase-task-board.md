@@ -283,7 +283,10 @@ color, and then takes all keys: a click onto the task plan gives them
 back to the task dialog, a click into the chat to the chat again, and
 `Alt`+`X` (resp. `Option`+`X`) hides the chat also while it has the
 keys, while the agent tool keeps running. The chat shows the colors
-of the board, while the agent tool keeps its own color theme.
+of the board, while the agent tool keeps its own color theme. The
+button `◧` places the chat beside the task plan in a wide task dialog,
+resp. the button `⬓` below it again, remembered in the browser, as does
+`X` while the task dialog has the keys, unless the window is too narrow.
 
 ### Task Stats View
 
@@ -617,6 +620,8 @@ lower-case letter under the kitty keyboard protocol.
 - `#`: Clear the diff of the last change of the task plan.
 - `Alt`+`X`: Show or hide the chat, also while it has the keys (web
   board only). See **Task Chat**.
+- `X`: Place the chat beside resp. below the task plan (web board
+  only). See **Task Chat**.
 - `D`, `T`, `A`, `E`, `R`, `x`, `M`, `L`: As in every view.
 - `⏎`, `ESC`: Close the task dialog.
 
