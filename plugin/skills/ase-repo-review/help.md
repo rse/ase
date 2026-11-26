@@ -90,9 +90,15 @@ before it is committed or merged.
     ones) after the review, with a minimal correction per finding
     applied to the reviewed files on disk, but neither staged nor
     committed. A finding which demands a human decision (e.g. a
-    questioned intent) is skipped. A closing *REVIEW FIXES* table lists
-    every finding with its outcome (`APPLIED`, `SKIPPED`, or `FAILED`),
-    while the verdict stays the one of the reviewed state. Requires the
+    questioned intent) is skipped. Afterwards, an *independent*,
+    *targeted check*, which sees neither the review nor the rationale of
+    the fixes, judges each applied fix solely from its finding and the
+    resulting code as `VERIFIED` (with a falsifiable `file:line`
+    citation), `UNRESOLVED`, `REGRESSED` (a new defect introduced), or
+    `UNVERIFIED`. A closing *REVIEW FIXES* table lists every finding
+    with its outcome (`APPLIED`, `SKIPPED`, or `FAILED`) and its check,
+    plus a note for every fix not verified, while the verdict stays the
+    one of the reviewed state. Requires the
     reviewed state on disk, i.e., not with `--commit`, and with
     `--branch` only together with `--staged` or `--unstaged` of the
     worktree where the *branch* is checked out.

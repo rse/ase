@@ -23,6 +23,9 @@ by `plus the <changes/> changes in worktree <worktree-dir/>`, where
 `thorough`) of the review, and, if it ends with `with evidence ledger`,
 requests the per-dimension *evidence ledger* of step 7 below.
 
+If the prompt instead starts with `Verify the fixes`, *skip* the entire
+*Workflow* below and perform *only* the *Fix Verification* at its end.
+
 Workflow
 --------
 
@@ -390,6 +393,72 @@ Workflow
         ],
         "evidence": [
             <evidence/>
+        ]
+    }
+    ```
+
+Fix Verification
+----------------
+
+The prompt gives the *scope* (as above) and, after ` -- fixes: `, a
+JSON array of the *applied fixes*, each with its 1-based `index`, the
+`dimension`, `location`, and `finding` of the review finding it fixes,
+and the comma-separated `file:N-M` line range(s) `fixed` of the
+corrected code. The fixes were applied by somebody else, so judge them
+*independently*: you see neither the fixer's rationale nor the review,
+and you *MUST* *NOT* assume a fix is correct merely because it exists.
+
+1.  Set <base-dir/> to <worktree-dir/> if the scope names a worktree
+    (`in worktree <worktree-dir/>` or `changes in worktree
+    <worktree-dir/>`), and otherwise to the output of the command
+    `git rev-parse --show-toplevel` (taken exactly as given), and
+    resolve every relative path of the fixes against <base-dir/>.
+
+2.  For *each* fix, read via the `Read` tool the files of its `fixed`
+    range(s) and of its `location` on disk, with enough surrounding
+    code to comprehend them, and, if the fix changed a contract (a
+    signature, a type, a key, an option, or a format), probe its
+    dependents read-only via `git -C "<base-dir/>" grep`. Then first
+    hunt for the *strongest reason* the concern of its `finding` still
+    holds or the fix broke something, and only then determine its
+    <status/> as exactly one of:
+
+    -   `VERIFIED`: lines you *read* prove the concern of the `finding`
+        resolved, so that anybody can *falsify* the claim by reading the
+        cited lines. *No* `file:line` citation, *no* `VERIFIED`.
+
+    -   `UNRESOLVED`: the concern still holds, fully or partially.
+
+    -   `REGRESSED`: the fix introduced a *new* defect (a bug, a broken
+        contract or dependent, a lost behavior, or a convention
+        violation), which takes precedence over `VERIFIED` and
+        `UNRESOLVED`.
+
+    -   `UNVERIFIED`: deciding it needs an execution or a source which
+        could not be found.
+
+    Set <location/> to the cited `file:N` resp. `file:N-M` proving the
+    status (mandatory for `VERIFIED`, `UNRESOLVED`, and `REGRESSED`, and
+    empty for `UNVERIFIED`), and <justification/> to an *ultra-brief*
+    single sentence: *why* the cited lines settle the concern, *which*
+    part of the concern remains, *which* new defect was introduced, resp.
+    *which* execution or source is missing. Mark up verbatim identifiers
+    in <justification/> as for <finding/> of the review above.
+
+3.  Do *not* check anything beyond the given fixes, and do *not* modify
+    anything. Return *exclusively* as the last message a single JSON
+    block (no markdown, no prose, no preamble, no summary) of the
+    following shape, with one entry per fix:
+
+    ```json
+    {
+        "checks": [
+            {
+                "index":         <index/>,
+                "status":        <status/>,
+                "location":      <location/>,
+                "justification": <justification/>
+            }
         ]
     }
     ```

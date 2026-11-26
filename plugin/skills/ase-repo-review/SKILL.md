@@ -276,6 +276,60 @@ Procedure
         which case nothing is changed for it.
         </if>
 
+        <if condition="<getopt-option-auto/> is equal `true` and at least one outcome of the fixing above is `APPLIED`">
+        Then *verify the applied fixes* by an *independent*, *targeted
+        check*: the fixing above is anchored on its own rationale, so a
+        fresh sub-agent, which sees neither this rationale nor the
+        review, judges each fix solely from its finding and the
+        resulting code.
+
+        First, after *all* corrections are applied, determine for each
+        finding of outcome `APPLIED` its <fixed/> location: the line
+        range(s) of its corrected code in the resulting files, freshly
+        determined (as later corrections may have shifted the lines),
+        given as comma-separated relative `file:N-M`. Then set <fixes/>
+        to a JSON array with one object `{ "index": <index/>,
+        "dimension": <dimension/>, "location": <location/>, "finding":
+        <finding/>, "fixed": <fixed/> }` per such finding, where
+        <index/> is its 1-based position among the findings of a
+        `severity` other than `ACCEPTED` in the sorted order (i.e., its
+        row in the *REVIEW FIXES* table of STEP 3.7).
+
+        Then invoke *exactly once* (apart from the single retry below)
+        the tool:
+
+        ```text
+            Agent(
+                description:       "Fix Verification",
+                subagent_type:     "ase:ase-repo-review",
+                prompt:            "Verify the fixes in scope: <scope/> -- fixes: <fixes/>",
+                run_in_background: false
+            )
+        ```
+
+        Parse its single result message as a JSON object (if it is
+        wrapped into a code fence or surrounded by prose, parse just its
+        outermost `{...}` object) and set <checks/> to its `checks`
+        field (a list). If no such object with a `checks` list can be
+        parsed, invoke the `Agent` tool *once* more exactly as above,
+        but with ` -- return ONLY the JSON object` appended to its
+        `prompt`, and parse its result the same way. If this fails
+        again, set <checks/> to the *empty* list, as the fixes are
+        already applied and hence the report still has to be emitted,
+        but you *MUST* *NEVER* invent checks.
+
+        Then *enforce the falsifiability* of <checks/>: drop each entry
+        whose `index` matches no entry of <fixes/>, add for each entry of
+        <fixes/> without an entry one of status `UNVERIFIED` with the
+        justification `not checked`, and turn each `VERIFIED` entry
+        without a `file:line` resp. `file:N-M` citation in its
+        `location` field into `UNVERIFIED`, with the justification `no
+        citation, no evidence`. Then set <n-verified/>,
+        <n-unresolved/>, <n-regressed/>, and <n-unverified/> to the
+        number of the `VERIFIED`, `UNRESOLVED`, `REGRESSED`, and
+        `UNVERIFIED` entries of <checks/>.
+        </if>
+
         You *MUST* *NOT* output anything in this STEP 3.1.
 
     2.  Use the following <template/> to output the overall review in
@@ -379,32 +433,45 @@ Procedure
         <template/>:
 
         <template>
-        ⧉ **ASE**: **REVIEW FIXES**:
+        ⧉ **ASE**: **REVIEW FIXES**: <counts/>
 
-        | *#* | *Severity* | *Location* | *Summary* | *Status* |
-        | --: | ---------- | ---------- | --------- | -------- |
+        | *#* | *Severity* | *Location* | *Summary* | *Status* | *Check* |
+        | --: | ---------- | ---------- | --------- | -------- | ------- |
         <rows/>
+
+        <notes/>
         </template>
 
         Hints:
 
-        -   <rows/> has one row `| <index/> | **<severity/>** | <location/> | <summary/> | **<status/>** |` per fixed finding, in order
+        -   <counts/> is `<n-verified/> verified, <n-unresolved/> unresolved, <n-regressed/> regressed, <n-unverified/> unverified` if at least one outcome is `APPLIED`, and `no fix applied` otherwise
+        -   <rows/> has one row `| <index/> | **<severity/>** | <location/> | <summary/> | **<status/>** | <check/> |` per fixed finding, in order
         -   <location/> is the `location` of the finding, marked up as code (with backticks)
         -   <summary/> is a one-line summary of the `finding` text, at most 60 characters long, with every `|` escaped as `\|`
+        -   <check/> is the `status` of the entry of <checks/> with this <index/>, marked up as bold, for an `APPLIED` outcome, and `–` otherwise
+        -   <notes/> has one line `- **#<index/> <check-status/>**: <check-reference/><check-justification/>` per entry of <checks/> of a `status` other than `VERIFIED`, in order of <index/>, and is empty if there is no such entry
+        -   <check-reference/> is the `location` of the entry, marked up as code (with backticks), prepended with `▢ `, and followed by `: `, or empty for an empty `location`, and <check-justification/> is its `justification`, with every `|` escaped as `\|`
 
         The <verdict/> and the evidence ledger above stay those of the
-        *reviewed* state, i.e., before the fixing.
+        *reviewed* state, i.e., before the fixing, as the *Check* column
+        stems from a targeted check of the fixes only, not from a
+        re-review of the change.
         </if>
 
     8.  Finally, give the closing hints by expanding the following
         (which, depending on the configured <ase-guidance-level/>, may
         expand into nothing and hence emit no output at all):
 
-        <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
+        <if condition="<getopt-option-auto/> is equal `true` and at least one outcome of the fixing is `APPLIED` and <n-verified/> is equal to the number of `APPLIED` outcomes">
         <ase-tpl-hint level="normal">
-        The fixes are applied, but not staged -- review them, and re-run the review to verify them.
+        The fixes are applied and independently verified, but not staged -- review and stage them.
         </ase-tpl-hint>
         </if>
+        <elseif condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
+        <ase-tpl-hint level="normal">
+        The fixes are applied, but not staged, and not all of them are verified -- review them, and re-run the review to verify them.
+        </ase-tpl-hint>
+        </elseif>
         <elseif condition="<verdict/> starts with `REJECT`">
         <ase-tpl-hint level="normal">
         Use `/ase-task-edit` to derive a solution approach and plan for the findings which demand changes.

@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-25)
 ------------------
 
+-   FEATURE [code, docs]: Independent Check of Review Fixes
+    With `--auto`, `ase-repo-review` lets a fresh sub-agent check every applied fix solely from
+    its finding and the resulting code, and shows the outcome `VERIFIED` (with a falsifiable
+    `file:line` citation), `UNRESOLVED`, `REGRESSED`, or `UNVERIFIED` per fix. (Idea of PR #84)
+
 -   FEATURE [code, docs]: Falsifiable Evidence Ledger of Reviews
     The new option `--evidence`|`-e` of `ase-repo-review` backs the verdict by a per-dimension
     status `✓`/`✗`/`?`/`–`, where a `✓` requires a falsifiable `file:line` citation, and every
