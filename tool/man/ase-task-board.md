@@ -287,6 +287,8 @@ of the board, while the agent tool keeps its own color theme. The
 button `◧` places the chat beside the task plan in a wide task dialog,
 resp. the button `⬓` below it again, remembered in the browser, as does
 `X` while the task dialog has the keys, unless the window is too narrow.
+Dragging the bar between the task plan and the chat resizes both,
+remembered in the browser, too.
 
 ### Task Stats View
 

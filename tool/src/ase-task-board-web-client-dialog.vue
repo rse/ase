@@ -70,14 +70,15 @@
             <div v-if="actionNote !== null || (watched !== null && actionError !== null)" class="dnote">{{ actionNote ?? actionError }}</div>
 
             <!--  the content: the rendered task plan or attachment of the selected tab, or the task plan editor,
-                  and below resp. beside it the chat about the task (if shown)  -->
+                  and below resp. beside it the chat about the task (if shown), behind a bar resizing both  -->
             <div class="dbody" :class="{ beside }">
-                <div class="dmain">
+                <div class="dmain" :style="chatTask === task.id ? { flex: `0 0 ${share * 100}%` } : {}">
                     <iframe v-show="editing === null" id="plan" ref="planEl" title="task plan"
                         sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-downloads"
                         :srcdoc="planDoc" @load="restorePlanScroll"></iframe>
                     <div v-show="editing !== null" id="editor" ref="editorEl"></div>
                 </div>
+                <div v-if="chatTask === task.id" class="dsplit" title="resize chat" @pointerdown="splitDown"></div>
                 <Chat v-if="chatTask === task.id" :id="task.id" :key="task.id" />
             </div>
 
@@ -92,12 +93,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { ref, computed } from "vue"
 import TaskTitle from "./ase-task-board-web-client-title.vue"
 import Chat from "./ase-task-board-web-client-chat.vue"
 import {
     task, editing, notice, tab, tabDocs, taskDiff, tabScroll, tabScrolls, planEl, tabsEl, actionError, actionNote, watched,
-    surface, openTask, closeTask, selectTab, updateTabScroll, themed
+    surface, setSplit, SHARE_MIN, SHARE_MAX, openTask, closeTask, selectTab, updateTabScroll, themed
 } from "./ase-task-board-web-client-model"
 import {
     editorEl, startEdit, saveEdit, stopEdit, leaveEdit, restoreDraft, dropDraft
@@ -111,6 +112,32 @@ const planDoc = computed(() => themed(tab.value === 0 ? (taskDiff.value ?? task.
 
 /*  whether the chat is shown beside the task plan (in a wide task dialog)  */
 const beside = computed(() => chatTask.value === task.value?.id && surface.value.beside)
+
+/*  the share of the task plan in the place of the chat (shown while dragging the bar, and
+    remembered once dropped), where the bar captures the pointer, as the task plan and the chat
+    (an iframe and a canvas) would take it  */
+const dragging  = ref<number | null>(null)
+const share     = computed(() => dragging.value ?? surface.value.split[beside.value ? "beside" : "below"])
+const splitDown = (ev: PointerEvent) => {
+    const bar  = ev.currentTarget as HTMLElement
+    const body = bar.parentElement!.getBoundingClientRect()
+    const move = (e: PointerEvent) => {
+        const at = beside.value ? (e.clientX - body.left) / body.width : (e.clientY - body.top) / body.height
+        dragging.value = Math.min(SHARE_MAX, Math.max(SHARE_MIN, at))
+    }
+    const up = () => {
+        bar.removeEventListener("pointermove",   move)
+        bar.removeEventListener("pointerup",     up)
+        bar.removeEventListener("pointercancel", up)
+        if (dragging.value !== null)
+            setSplit(beside.value ? "beside" : "below", dragging.value)
+        dragging.value = null
+    }
+    bar.setPointerCapture(ev.pointerId)
+    bar.addEventListener("pointermove",   move)
+    bar.addEventListener("pointerup",     up)
+    bar.addEventListener("pointercancel", up)
+}
 
 /*  restore the scroll position of the document of the selected tab once it is loaded  */
 const restorePlanScroll = () => {
