@@ -29,12 +29,32 @@ import type { AgentUsage, AgentFlow, AgentPrompt } from "./ase-agent-relay-core.
 import { telemetryEnabled }         from "./ase-service-otel-common.js"
 import { toolArgs, toolEntries, skillPrompt, budgetCredits } from "./ase-agent-runtime-tool.js"
 import type { ToolCosts }           from "./ase-agent-runtime-tool.js"
-import { withinJobTimeout, gitInside } from "./ase-agent-runtime-exec.js"
+import { withinJobTimeout, jobTimeout, gitInside } from "./ase-agent-runtime-exec.js"
 import { AgentRun }                 from "./ase-agent-runtime-claim.js"
 import type {
     AgentOpts, AgentTask, AgentItem, AgentSelection, LineLevel, AgentLog, AgentJob, AgentWork
 }                                   from "./ase-agent-runtime-task.js"
 import { AgentWorkspace }           from "./ase-agent-runtime-workspace.js"
+
+/*  the prompt of the follow-up invocation of the headless agent tool, continuing the session
+    of a processing to let the agent report the decisions it made, grouped by the focus areas
+    of the grilling (see "ase-task-grill") and ranked by impact  */
+const decisionPrompt =
+    "Do not use any tool, change anything, or continue or retry the task: only answer. " +
+    "List only the decisions you actually took in this session where you chose between real " +
+    "alternatives (including every deviation from the task plan and every recommendation you " +
+    "accepted), not the ones already fixed by the plan or the request. Group them under " +
+    "\"### DOMAIN\" (the what of the solution), \"### INTERFACE\" (externally observable behavior, " +
+    "UI, API), \"### ARCHITECTURE\" (structure, wiring, placement, dependencies), " +
+    "\"### IMPLEMENTATION\" (other inner details), \"### REGRESSION\" (what must not break), and " +
+    "\"### CONFIRMATION\" (what proves the behavior), in this order, omitting empty ones, each " +
+    "decision as \"- **[<impact>] <decision>**: <reason> (instead of: <rejected alternatives>)\", " +
+    "highest impact first, with the impact HIGH (changes behavior, contracts, or data, or is hard " +
+    "to reverse), MEDIUM (shapes the design locally), or LOW (is easily reversible). Keep the " +
+    "headings and impact words verbatim in English, write everything else in the language of " +
+    "the task plan, and output nothing before the first heading or after the last decision " +
+    "(and no code fence). " +
+    "If you took no such decision, output only the English word NONE."
 
 /*  parse a duration "<number><unit>" with unit s, m, or h into milliseconds  */
 const parseDuration = (spec: string): number => {
@@ -325,19 +345,22 @@ export abstract class Agent {
     protected abstract observing (): string
 
     /*  run the skill command or raw prompt <call> of a prepared job via the headless agent
-        tool (resuming the session <call.resume>, if not empty), logging its decoded JSONL
-        events in real-time and collecting its agent message text lines as the <output> (without
-        buffering them, as the output of the agent tool can be huge), where the quiet entries are
-        only echoed (i.e., not kept in the processing log attachment of the task), and return its
-        success and the id of its session (empty if not reported)  */
+        tool (resuming the session <call.resume>, if not empty, and if <capped> within at most
+        the fixed job timeout), logging its decoded JSONL events in real-time and collecting its
+        agent message text lines as the <output> (without buffering them, as the output of the
+        agent tool can be huge), where the quiet entries are only echoed (i.e., not kept in the
+        processing log attachment of the task), and return its success and the id of its
+        session (empty if not reported)  */
     private async invoke (taskId: string, job: AgentJob, call: { cmd?: string, prompt?: string, resume: string },
-        abort: AbortSignal, log: AgentLog, echo: AgentLog, output: string[]): Promise<{ ok: boolean, session: string }> {
+        abort: AbortSignal, log: AgentLog, echo: AgentLog, output: string[],
+        capped = false): Promise<{ ok: boolean, session: string }> {
         const { tool, timeout, timeoutSpec, budget } = this
         const { cwd } = job
         const cli   = toolSpecs[tool].cli
         const cmd   = call.cmd ?? ""
         const i     = cmd.indexOf(" ")
         const model = job.model ?? ""
+        const limit = capped ? Math.min(timeout, jobTimeout) : timeout
         const args  = toolArgs[tool](call.prompt ?? skillPrompt(tool, i < 0 ? cmd : cmd.slice(0, i), i < 0 ? "" : cmd.slice(i + 1)),
             [ ...new Set(job.dirs ?? []) ].filter((dir) => dir !== cwd).flatMap((dir) => [ "--add-dir", dir ]), model, budget, call.resume)
         await log("info", `running: ${cli} ${args.map((arg) => arg.includes(" ") ? `"${arg}"` : arg).join(" ")}`)
@@ -351,7 +374,7 @@ export abstract class Agent {
             all:                 true,
             buffer:              false,
             reject:              false,
-            timeout,
+            timeout:             limit,
             cancelSignal:        abort,
             forceKillAfterDelay: 10 * 1000
         })
@@ -368,7 +391,7 @@ export abstract class Agent {
         if (abort.aborted)
             await log("warning", `${cli} aborted by interrupt`)
         else if (result.timedOut)
-            await log("warning", `${cli} timed out after ${timeoutSpec}`)
+            await log("warning", `${cli} timed out after ${capped ? `${limit / 1000}s` : timeoutSpec}`)
         else if (result.exitCode === undefined)
             await log("warning", `${cli} failed: ${result.shortMessage}`)
         else
@@ -423,10 +446,11 @@ export abstract class Agent {
     }
 
     /*  process a claimed task via the skill of the headless agent tool in a worker slot
-        and afterwards settle it; finally the processing log is appended to the
-        attachment of the task  */
+        and afterwards settle it; finally the processing log and the reported decisions
+        are appended to the attachments of the task  */
     private async handle (task: AgentTask, claimed: string, slot: number, abort: AbortSignal): Promise<void> {
         const lines: string[] = []
+        const decisions: string[] = []
         const prefix = `${this.name}[${slot}]: ${task.id}`
         const log    = (level: LineLevel, msg: string) => this.write(level, prefix, msg, lines, task.id)
         const echo   = (level: LineLevel, msg: string) => this.write(level, prefix, msg, undefined, task.id)
@@ -441,6 +465,7 @@ export abstract class Agent {
             const output: string[] = []
             let ok = false
             let job: AgentJob | null = null
+            let session = ""
             try {
                 job = await withinJobTimeout("preparing the job", () => this.prepare(task, this.parallelized, log), (pending) => {
                     late = pending
@@ -461,7 +486,8 @@ export abstract class Agent {
                     if (!last.ok)
                         await log("warning", `follow-up #${n + 1}: failed`)
                 }
-                ok = last.ok
+                ok      = last.ok
+                session = last.session
             }
             catch (err: unknown) {
                 await log("error", err instanceof Error ? err.message : String(err))
@@ -482,6 +508,22 @@ export abstract class Agent {
                 }
             }
 
+            /*  continue the session of the skill (also of a failed one, unless interrupted)
+                in the still existing working directory to let the agent report the decisions
+                it made, kept only on success, where an interrupt of it spares the finished job  */
+            let spared = false
+            if (job !== null && session !== "" && !abort.aborted) {
+                const report = await this.invoke(task.id, job, { prompt: decisionPrompt, resume: session },
+                    abort, log, echo, decisions, true)
+                    .catch(async (err: unknown) => {
+                        await log("warning", `decisions not reported: ${err instanceof Error ? err.message : String(err)}`)
+                        return { ok: false }
+                    })
+                if (!report.ok)
+                    decisions.length = 0
+                spared = abort.aborted
+            }
+
             /*  clean up the job in any case (a failure is reported only)  */
             const cleanup = job?.cleanup
             if (cleanup !== undefined) {
@@ -494,7 +536,7 @@ export abstract class Agent {
             }
 
             /*  settle the task by the results of the skill invocation and the job  */
-            await this.settle(task, ok, finished, abort.aborted, output, log)
+            await this.settle(task, ok, finished, abort.aborted && !spared, output, log)
         }
         catch (err: unknown) {
             await log("error", err instanceof Error ? err.message : String(err))
@@ -522,6 +564,24 @@ export abstract class Agent {
         }
         catch (err: unknown) {
             await this.write("error", prefix, `processing log not attached: ${err instanceof Error ? err.message : String(err)}`, undefined, task.id)
+        }
+
+        /*  append the reported decisions (if any, i.e., with a heading, but without any preamble)
+            to the attachment of the task, each led by an empty line separating it from the
+            previously appended ones  */
+        const reported = decisions.join("\n").replace(/^[\s\S]*?(?=^### )/m, "").trim()
+        if (!/^### /m.test(reported))
+            return
+        try {
+            const attached = await Task.attach(this.log, task.id, {
+                Type: "text/markdown; charset=utf-8; kind=\"decisions\"",
+                Created: now, Modified: now, Data: `\n## ${this.name} (${now})\n\n${reported}\n`
+            }, true)
+            if (attached)
+                await this.write("info", prefix, "decisions attached to task", undefined, task.id)
+        }
+        catch (err: unknown) {
+            await this.write("error", prefix, `decisions not attached: ${err instanceof Error ? err.message : String(err)}`, undefined, task.id)
         }
     }
 
