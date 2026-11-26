@@ -15,7 +15,8 @@ export type EditState = "pending" | "active" | "failed"
 export type Card    = { id: string, title: string, group: string, tone: string, moves?: string[], edit: EditState | "", finished: boolean, assignee: string, effort: string }
 export type Lane    = { status: string, active: boolean, weight: number, dashed: boolean, kind: "initial" | "regular" | "terminal", cards: Card[] }
 export type Group   = { title: string, lanes: Lane[] }
-export type Surface = { view: View, minimized: string[], collapsed: string[], heights: Record<string, number>, titles: boolean, keys: boolean, standalone: boolean, beside: boolean }
+export type Surface = { view: View, minimized: string[], collapsed: string[], heights: Record<string, number>, titles: boolean, keys: boolean, standalone: boolean, beside: boolean, split: Split }
+export type Split   = { below: number, beside: number }
 export type Board   = { mode: string, project: string, version: string, warnings: string[], users: string[], self: string, moves: Record<string, string[]>, groups: Group[] }
 export type Tone    = "active" | "done" | "idle"
 export type Ref     = { id: string, tone: Tone }
@@ -409,11 +410,12 @@ export const selectAgent = (id: string) => {
     shared by all boards of the project in this browser only (see the "storage" event), except
     the view, which each tab keeps on its own (in the session storage, initially the last view
     of any tab), where an invalid or unavailable stored state falls back to the default state  */
-export const surface   = ref<Surface>({ view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true, beside: false })
+export const surface   = ref<Surface>({ view: "lanes", minimized: [], collapsed: [], heights: {}, titles: false, keys: true, standalone: true, beside: false, split: { below: 0.55, beside: 0.5 } })
 const surfaceKey   = (project: string) => `ase-task-board:surface:${project}`
 const surfaceParse = (text: string | null): Surface => {
     const strings = (x: unknown) => Array.isArray(x) && x.every((e) => typeof e === "string") ? x : []
     const flag    = (x: unknown, fallback: boolean) => typeof x === "boolean" ? x : fallback
+    const share   = (x: unknown, fallback: number) => typeof x === "number" && x >= SHARE_MIN && x <= SHARE_MAX ? x : fallback
     let s = {} as Partial<Record<keyof Surface, unknown>>
     try {
         const parsed: unknown = JSON.parse(text ?? "{}")
@@ -424,6 +426,7 @@ const surfaceParse = (text: string | null): Surface => {
         /*  invalid stored state  */
     }
     const heights = typeof s.heights === "object" && s.heights !== null && !Array.isArray(s.heights) ? s.heights : {}
+    const split   = (typeof s.split === "object" && s.split !== null ? s.split : {}) as Partial<Record<keyof Split, unknown>>
     return {
         view:       viewOrder(true).find((v) => v === s.view) ?? "lanes",
         minimized:  strings(s.minimized),
@@ -433,7 +436,8 @@ const surfaceParse = (text: string | null): Surface => {
         titles:     flag(s.titles, false),
         keys:       flag(s.keys, true),
         standalone: flag(s.standalone, true),
-        beside:     flag(s.beside, false)
+        beside:     flag(s.beside, false),
+        split:      { below: share(split.below, 0.55), beside: share(split.beside, 0.5) }
     }
 }
 const surfaceLoad  = (project: string): Surface => {
@@ -873,6 +877,14 @@ export const toggle = (list: "minimized" | "collapsed" | "titles" | "keys" | "st
             [ ...items, ...entries.filter((e) => !items.includes(e)) ]
     }
     applySurface(s, true)
+}
+
+/*  set the share of the task plan in the task dialog with the chat below resp. beside it (within
+    the bounds of a share), applied right away and remembered like the height weights of lanes  */
+export const SHARE_MIN = 0.15
+export const SHARE_MAX = 0.85
+export const setSplit = (place: keyof Split, share: number) => {
+    applySurface({ ...surface.value, split: { ...surface.value.split, [place]: share } }, true)
 }
 
 /*  set (resp. with null reset) the height weights of lanes, applied right away
