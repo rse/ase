@@ -48,6 +48,9 @@ const TTL_LONG  = 60 * MIN
 const BEAT      = Math.min(30 * 1000, TTL_SHORT / 10)
 const COOLING   = TTL_SHORT
 
+/*  the least time left for a ping to reach the cache before it expires  */
+const RESCUE    = 15 * 1000
+
 /*  the title of the band above the prompt  */
 const TITLE = "[ ⧉ ASE: Cache Escalation ]"
 
@@ -105,15 +108,15 @@ export const modCacheControl = () => {
         (with their rewritten tokens), its turn state, its auto-warm (none, SOFT, or
         HARD until a time, with its pings), whether SOFT already ran while idle (with
         its pings), whether the band stays shown for a HARD auto-warm (until the
-        next interaction), and whether a compaction left the next ping to write
-        the cache of the compacted conversation  */
+        next interaction), why a HARD auto-warm ended early, and whether a
+        compaction left the next ping to write the cache of the compacted conversation  */
     const S = {
         id: "", activity: 0, ctx: 0,
         ttl: TTL_LONG, ttlSource: "default",
         colds: [] as { tokens: number }[],
         working: false, compacted: false, rebased: false,
         warm: "" as "" | "soft" | "hard", until: 0, pings: 0,
-        softUsed: false, softPings: 0, held: false
+        softUsed: false, softPings: 0, held: false, ended: ""
     }
 
     /*  the time of the latest event, the heartbeat timer, whether the settings
@@ -163,16 +166,19 @@ export const modCacheControl = () => {
         return left() + n * step
     }
 
-    /*  start resp. stop auto-warming the cache  */
+    /*  start resp. stop auto-warming the cache (telling why a HARD one ended early)  */
     const warmOn = (mode: "soft" | "hard", hours = 0) => {
         S.warm  = mode
         S.until = now + hours * 60 * MIN
         S.pings = 0
         S.held  = mode === "hard"
+        S.ended = ""
         if (mode === "soft")
             S.softUsed = true
     }
-    const warmOff = () => {
+    const warmOff = (reason = "") => {
+        if (S.warm === "hard")
+            S.ended = reason
         S.warm = ""
         S.held = false
     }
@@ -185,7 +191,7 @@ export const modCacheControl = () => {
         if (S.working || S.activity === 0 || pinging)
             return
         if (left() <= 0)
-            return warmOff()
+            return warmOff("the cache expired before the next ping")
         if (S.warm === "hard" && now >= S.until)
             return warmOff()
         if (now - S.activity < ttl() - margin())
@@ -199,15 +205,19 @@ export const modCacheControl = () => {
         k.invalidate()
 
         /*  ping without overlapping a ping of the next beat, asking for haste
-            in the prompt (instead of an "effort", which would cost the cache)  */
+            in the prompt (instead of an "effort", which would cost the cache),
+            and with the cache kept warm from its sending on  */
         pinging  = true
         const id = S.id
         const rebased = S.rebased
+        const sent    = now
         const reply = await k.fork("ASE cache controller keep-alive ping. You have no tools. " +
             "Answer straight away without thinking it over. Reply with only: ok")
             .catch(() => undefined).finally(() => { pinging = false })
-        if (reply === undefined || !reply.isAnswered)
-            return warmOff()
+        if (reply === undefined)
+            return warmOff("the ping failed")
+        if (!reply.isAnswered)
+            return warmOff(`the ping failed (${reply.reason})`)
 
         /*  drop the outcome of a ping overtaken by a new turn or session  */
         if (S.working || S.id !== id)
@@ -220,9 +230,25 @@ export const modCacheControl = () => {
         /*  stop on a ping which wrote the cache, unless a compaction changed the conversation  */
         S.rebased = false
         if (!rebased && u.cache_creation_input_tokens > 0.1 * Math.max(1, u.cache_read_input_tokens))
-            return warmOff()
+            return warmOff("the ping rewrote the already cold cache")
         now        = await k.now()
-        S.activity = now
+        S.activity = sent
+    }
+
+    /*  start the HARD auto-warm on request (telling whether the cache lives long
+        enough for a ping, else the redrawn band tells it is too late), pinging
+        at once when a ping is due  */
+    const hardOn = async (hours: number, k: Controller) => {
+        now = await k.now()
+        k.invalidate()
+        if (S.activity === 0 || left() < RESCUE)
+            return false
+        warmOn("hard", hours)
+        k.invalidate()
+        keepWarm(k).catch(() => {
+            /*  ignore a failed ping, the next beat retries  */
+        }).finally(() => { k.invalidate() })
+        return true
     }
 
     /*  the periodic step: loading the settings (until the service answered),
@@ -259,6 +285,7 @@ export const modCacheControl = () => {
         S.rebased   = false
         S.softUsed  = false
         S.softPings = 0
+        S.ended     = ""
         warmOff()
     }
 
@@ -291,12 +318,14 @@ export const modCacheControl = () => {
         S.softUsed  = false
         S.softPings = 0
         S.held      = false
+        S.ended     = ""
         if (S.warm === "soft")
             warmOff()
     }
 
     /*  track a main-loop request: whether it read or rewrote the cache, with
-        the TTL detected from the usage (or measured from the idle gap)  */
+        the TTL detected from the usage (or measured from the idle gap), and
+        with the cache kept warm from its start on  */
     const step = (u: TurnUsage, startedAt: number, at: number) => {
         now = at
         const total   = totalInput(u)
@@ -333,7 +362,7 @@ export const modCacheControl = () => {
             S.ttlSource = "measured"
         }
         S.ctx      = total
-        S.activity = now
+        S.activity = startedAt
     }
 
     /*  take over the figures of the status line  */
@@ -382,11 +411,9 @@ export const modCacheControl = () => {
                 `(usage: \`/${COMMAND.name} ${COMMAND.argumentHint}\`)`
         else if (value === "off" || (value === "" && S.warm === "hard"))
             warmOff()
-        else if (S.activity > 0 && left() > 0)
-            warmOn("hard", value === "" ? settings.hard[0] ?? 4
-                : Math.min(24, Math.max(0.1, Number(value))))
-        else
-            return "**ERROR**: no warm prompt cache to auto-warm"
+        else if (!await hardOn(value === "" ? settings.hard[0] ?? 4
+            : Math.min(24, Math.max(0.1, Number(value))), k))
+            return "**ERROR**: no prompt cache warm long enough to auto-warm"
         k.invalidate()
         return S.warm === "hard" ? `HARD auto-warm of the prompt cache until ${clock(S.until)}`
             : "HARD auto-warm of the prompt cache stopped"
@@ -431,18 +458,29 @@ export const modCacheControl = () => {
                 Text({ children: " ▶ next prompt: " }),
                 Text({ color: "ansi256(1)", bold: true, children: `rewrites ${tokens(S.ctx)} tokens` })
             ] }))
-            lines.push(Box({ flexDirection: "row", columnGap: 1, children: [
-                Text({ children: "⛁ cache: hard auto-warm:" }),
-                ...settings.hard.flatMap((hours, i) => [
-                    ...(i > 0 ? [ Text({ children: "|" }) ] : []),
-                    Button({ key: `warm-${hours}`, label: `${hours}h`, plain: true,
-                        children: Text({ bold: true, children: `${hours}h` }), onPress: () => {
-                            warmOn("hard", hours)
-                            k.invalidate()
-                        } })
-                ])
-            ] }))
-            hints = `click/ctrl+x tab: start standard HARD auto-warm · ${hints}`
+
+            /*  offer the HARD auto-warm only while a ping still reaches the cache,
+                even after the time of the drawing went stale for one beat  */
+            if (left() >= RESCUE + BEAT) {
+                lines.push(Box({ flexDirection: "row", columnGap: 1, children: [
+                    Text({ children: "⛁ cache: hard auto-warm:" }),
+                    ...settings.hard.flatMap((hours, i) => [
+                        ...(i > 0 ? [ Text({ children: "|" }) ] : []),
+                        Button({ key: `warm-${hours}`, label: `${hours}h`, plain: true,
+                            children: Text({ bold: true, children: `${hours}h` }), onPress: () => {
+                                hardOn(hours, k).catch(() => {
+                                    /*  ignore a failed start, the band still offers it  */
+                                })
+                            } })
+                    ])
+                ] }))
+                hints = `click/ctrl+x tab: start standard HARD auto-warm · ${hints}`
+            }
+            else
+                lines.push(Text({ children: "⛁ cache: hard auto-warm: too late, " +
+                    "as the cache expires before a ping could reach it" }))
+            if (S.ended !== "")
+                lines.push(Text({ children: `⛁ cache: hard auto-warm: ended early, as ${S.ended}` }))
         }
         else {
             lines.push(Box({ flexDirection: "row", children: [
@@ -454,6 +492,8 @@ export const modCacheControl = () => {
             ] }))
             lines.push(Text({ children: `⛁ cache: cold restarts so far: ${S.colds.length} ` +
                 `(${tokens(coldTokens())} tokens rewritten)` }))
+            if (S.ended !== "")
+                lines.push(Text({ children: `⛁ cache: hard auto-warm: ended early, as ${S.ended}` }))
             if (S.softPings > 0)
                 lines.push(Text({ children: `⛁ cache: soft auto-warm: already extended by ` +
                     `${S.softPings}/${settings.soft} pings` }))

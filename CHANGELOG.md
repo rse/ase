@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-25)
 ------------------
 
+-   BUGFIX [code]: Reliable HARD Auto-Warm of the Prompt Cache
+    The cache controller times the TTL from the start of a request, pings at once on a HARD
+    auto-warm request, offers it only while a ping can still reach the cache, and tells why a
+    HARD auto-warm ended early.
+
 -   FEATURE [code, docs]: Task Plan Implementation Proof
     The new skill `ase-task-prove` runs the witness of each `REG` and `CON` verification claim of a
     task plan, falsifies each test case or spec witness by reverting resp. mutating the change,
