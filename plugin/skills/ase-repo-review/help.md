@@ -122,6 +122,8 @@ before it is committed or merged.
     findings: report every well-grounded concern, including minor nits,
     and additionally *plausible* concerns whose impact cannot be fully
     proven, marked with "*Plausible:*" and rated at most `MEDIUM`.
+    A change set of more than two files is reviewed in depth in up to
+    eight slices of files, plus once as a whole, at a higher cost.
 
 -   `--evidence`|`-e`:
     Additionally render the *evidence ledger*: per dimension a status

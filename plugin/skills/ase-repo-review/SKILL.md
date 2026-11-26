@@ -134,10 +134,28 @@ Procedure
     Set <mode>thorough</mode> if <getopt-option-thorough/> is equal
     `true`, and <mode>focused</mode> otherwise. Set <ledger> -- with
     evidence ledger</ledger> if <getopt-option-evidence/> is equal
-    `true`, and <ledger></ledger> (empty) otherwise.
+    `true`, and <ledger></ledger> (empty) otherwise. Set <files/> to the
+    file names of <diff/> of STEP 1, in their listed order, with every
+    duplicate dropped, and <n-files/> to their number.
 
-    For this, invoke *exactly once* (apart from the single retry below)
-    the tool:
+    <if condition="<mode/> is equal `thorough` and <n-files/> is greater than `2`">
+    The thorough review of a larger change set is *fanned out*, so
+    that every file gets the *undivided attention* of a sub-agent
+    instead of a share of one: split <files/>, in their order, into
+    <n-parts/> consecutive *slices* of at most ⌈<n-files/> / 8⌉ files
+    each, where <n-parts/> is the resulting number of slices (at most
+    `8`). Set <parts/> to the list of the part `whole` (which judges the
+    change set as a whole) followed by one part `files <slice/>` per
+    slice, where <slice/> is the JSON array of the file names of the
+    slice, like `["src/a.ts","src/b.ts"]`.
+    </if>
+    <else>
+    Set <parts/> to the *empty* list, as a focused review or a small
+    change set is judged as a whole by a single sub-agent.
+    </else>
+
+    <if condition="<parts/> is empty">
+    Invoke *exactly once* (apart from the single retry below) the tool:
 
     ```text
         Agent(
@@ -148,25 +166,89 @@ Procedure
         )
     ```
 
-    Parse the single result message of the `Agent` tool as a JSON object
-    (if it is wrapped into a code fence or surrounded by prose, parse just
-    its outermost `{...}` object), set <summary/> to its `summary` field
-    (a single crisp sentence reconstructing the change's intent), set
-    <findings/> to its `findings` field (a list), and set <evidence/> to
-    its `evidence` field (a list) if <getopt-option-evidence/> is equal
-    `true`, and to the *empty* list otherwise. If no such object with
-    a `findings` list (and, if <getopt-option-evidence/> is equal `true`,
-    an `evidence` list) can be parsed, invoke the `Agent` tool *once* more
-    exactly as above, but with ` -- return ONLY the JSON object` inserted
-    into its `prompt` directly *before* <ledger/> (so the `prompt` still
-    ends with any <ledger/>), and parse its result the same way. If this fails
-    again, only output the following <template/> and then *STOP*
-    immediately, as you *MUST* *NEVER* invent findings or render the raw
-    result instead:
+    </if>
+    <else>
+    Invoke the following tool *once per part* <part/> of <parts/>
+    (apart from the single retry below), with *all* invocations issued
+    *in parallel* within a *single* message, and with <label/> set to
+    `whole` for the part `whole` and to `<i/>/<n-parts/>` for the
+    <i/>-th part of a slice:
+
+    ```text
+        Agent(
+            description:       "Review Investigation (<label/>)",
+            subagent_type:     "ase:ase-repo-review",
+            prompt:            "Review in <mode/> mode the changes of scope: <scope/> -- part: <part/><ledger/>",
+            run_in_background: false
+        )
+    ```
+
+    </else>
+
+    Parse the single result message of each `Agent` tool invocation as
+    a JSON object (if it is wrapped into a code fence or surrounded by
+    prose, parse just its outermost `{...}` object). If no such object
+    with a `findings` list (and, if <getopt-option-evidence/> is equal
+    `true`, an `evidence` list) can be parsed, invoke the `Agent` tool
+    *once* more exactly as for this invocation, but with ` -- return
+    ONLY the JSON object` inserted into its `prompt` directly *before*
+    <ledger/> (so the `prompt` still ends with any <ledger/>), and parse
+    its result the same way. If this fails again for *any* invocation,
+    only output the following <template/> and then *STOP* immediately,
+    as you *MUST* *NEVER* invent findings or render the raw result
+    instead:
 
     <template>
     ⧉ **ASE**: ✪ skill: **ase-repo-review**, ▶ ERROR: review investigation returned no parseable result
     </template>
+
+    <if condition="<parts/> is empty">
+    Set <summary/> to the `summary` field of the parsed object (a single
+    crisp sentence reconstructing the change's intent), set <findings/>
+    to its `findings` field (a list), and set <evidence/> to its
+    `evidence` field (a list) if <getopt-option-evidence/> is equal
+    `true`, and to the *empty* list otherwise.
+    </if>
+    <else>
+    *Merge* the parsed objects of all parts, as each part saw only its
+    share of the change set:
+
+    -   Set <summary/> to the `summary` field of the part `whole`, as
+        only this part reconstructs the intent of the entire change set.
+
+    -   Set <findings/> to the `findings` of the part `whole`, followed
+        by the `findings` of the parts of the slices in their order.
+        Then drop every finding which states the *same concern* in the
+        same `dimension` at the same or an overlapping `location` as an
+        earlier finding, where the more severe of both (in the order
+        `HIGH`, `MEDIUM`, `LOW`, `ACCEPTED`) takes the place of the
+        earlier one, as the parts overlap at their borders.
+
+    -   <if condition="<getopt-option-evidence/> is equal `true`">
+        First turn every `✓` entry of a part without a `file:line` resp.
+        `file:N-M` citation in its `location` field into `?`, with the
+        justification `no citation, no evidence`, as one uncited share
+        must not hide behind the citations of the others.
+        Next add a `?` entry, with the justification `not assessed`,
+        for every dimension other than `INTENT` a slice part did not
+        return, as its share of this dimension was never judged.
+        Then set <evidence/> to one entry per dimension returned by any
+        part, in the order of the dimensions listed below (as for a
+        single sub-agent), with the merged
+        `status`: `✗` if any part returned `✗`, otherwise `?` if any
+        part returned `?` (as one unverified share leaves the entire
+        dimension unverified), otherwise `✓` if any part returned `✓`,
+        and otherwise `–`. Take the `location` and `justification` of
+        the merged entry from the first entry of this `status` (the
+        part `whole` first), but for a merged `✓` join the `location`
+        fields of *all* `✓` entries with `, ` and their `justification`
+        fields with `; `, as each part vouches only for its own share.
+        The falsifiability is enforced on the merged entries below.
+        </if>
+        <else>
+        Set <evidence/> to the *empty* list.
+        </else>
+    </else>
 
     <if condition="<getopt-option-evidence/> is equal `true`">
     Then *enforce the falsifiability* of <evidence/>, as the sub-agent's
@@ -255,8 +337,8 @@ Procedure
 
     1.  Sort the findings of <findings/> by their `severity` field from
         highest to lowest in the fixed order `HIGH`, `MEDIUM`, `LOW`,
-        `ACCEPTED`. Within the same severity, keep the order returned
-        by the sub-agent.
+        `ACCEPTED`. Within the same severity, keep the order of
+        <findings/> of STEP 2.
 
         <if condition="<getopt-option-auto/> is equal `true` and <findings/> contains a finding of a `severity` other than `ACCEPTED`">
         *Automatically fix* the findings: for each finding of
@@ -400,7 +482,7 @@ Procedure
 
     6.  <if condition="<getopt-option-evidence/> is equal `true` and <verdict/> does not start with `SKIPPED`">
         Render the *evidence ledger* with one row per entry of
-        <evidence/>, in the order returned by the sub-agent, by using the
+        <evidence/>, in its order of STEP 2, by using the
         following output <template/>. For each entry, repeat the last
         line, set <status/> to its `status` field, <dimension/> to its
         `dimension` field, and <justification/> to its `justification`

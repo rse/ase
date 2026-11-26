@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-25)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Per-File Fan-Out of Thorough Reviews
+    With `--thorough`, `ase-repo-review` reviews a change set of more than two files by parallel
+    sub-agents, one per slice of files (at most eight), plus one for the cross-file dimensions, and
+    merges their findings and evidence.
+
 -   FEATURE [code, docs]: Independent Check of Review Fixes
     With `--auto`, `ase-repo-review` lets a fresh sub-agent check every applied fix solely from
     its finding and the resulting code, and shows the outcome `VERIFIED` (with a falsifiable

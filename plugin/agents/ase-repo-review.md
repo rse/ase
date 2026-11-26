@@ -23,6 +23,12 @@ by `plus the <changes/> changes in worktree <worktree-dir/>`, where
 `thorough`) of the review, and, if it ends with `with evidence ledger`,
 requests the per-dimension *evidence ledger* of step 7 below.
 
+In the `thorough` mode, the review of a larger change set is shared
+among several reviewers, and the prompt then names *your* share after
+` -- part: `: either `whole`, i.e. the change set *as a whole*, or
+`files <slice/>`, i.e. the files of the JSON array <slice/>. Set <part/>
+to this share, and to empty if the prompt names none.
+
 If the prompt instead starts with `Verify the fixes`, *skip* the entire
 *Workflow* below and perform *only* the *Fix Verification* at its end.
 
@@ -124,6 +130,13 @@ Workflow
     `git show "<revision/>:<path/>"` instead. Do *not* read untracked
     *binary*, *generated*, or *build output* files: judge them from the
     file listing alone (they usually surface as `RESIDUE`).
+
+    If <part/> is `files <slice/>`, read in full and trace only the
+    files of <slice/>, plus their related files, and take the rest of
+    <diff/> as context only, as the other files are reviewed by others.
+    If <part/> is `whole`, read the files only as far as needed to judge
+    the cross-file dimensions of step 6, as every file is reviewed in
+    depth by others.
 
 3.  *Probe the repository read-only and heuristically* (via `git grep`,
     `grep`, `git ls-files`, restricted to first-party code, and, if
@@ -258,6 +271,16 @@ Workflow
         <finding/> text of such a concern with "*Plausible:*" and rate
         its severity at most `MEDIUM`.
 
+    If <part/> is `whole`, judge *only* the cross-file dimensions
+    `INTENT`, `PROPAGATION`, `TESTING`, and `DOCUMENTATION`, and *only*
+    across the change set as a whole: scope creep and incompleteness,
+    dependents and sibling places left untouched, inconsistencies
+    between the changed files, and tests and documentation left stale.
+    If <part/> is `files <slice/>`, judge *all* dimensions except
+    `INTENT`, but report *only* concerns raised by the changes of the
+    files of <slice/> (a missed dependent is still cited at its own
+    location, even outside of <slice/>).
+
     For *each* finding:
 
     1.  Set <dimension/> to exactly one of `INTENT`, `PROPAGATION`,
@@ -321,7 +344,8 @@ Workflow
         </template>
 
 7.  Set <evidence/> to empty. *Only* if the prompt requests the
-    *evidence ledger*, record for *each* of the dimensions of step 6, in
+    *evidence ledger*, record for *each* of the dimensions of step 6
+    (if <part/> is not empty, only for those judged in your share), in
     their order there, *what the sources actually show*, so that an
     approval rests on *falsifiable* evidence and not merely on the
     absence of findings. For each dimension, first hunt for the
