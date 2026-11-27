@@ -5,6 +5,11 @@ ChangeLog
 2.1.8 (2026-11-27)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Evidence-Only Commit Messages
+    `ase-repo-commit` derives the message solely from the staged diff (narrowed to the largest
+    files for big diffs), never from session recollection or with secrets, and hints at
+    splitting mixed-type changes resp. at staging when the index is empty.
+
 -   IMPROVEMENT [code]: Calm Cold Cache Escalation
     The cache escalation band shows a cold cache and the tokens rewritten by the next prompt
     in blue instead of red when the cache is below the threshold `agent.cache.threshold`.

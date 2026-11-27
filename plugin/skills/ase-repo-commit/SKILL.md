@@ -35,19 +35,30 @@ currently staged Git changes.
 
 1.  <step id="STEP 1: Find out staged changes">
 
-    Run the following command to find out details of what changes are
-    currently staged in the Git *index* for commit, capturing its output
-    into <diff/>:
+    Run the following command to find out the overview of what changes
+    are currently staged in the Git *index* for commit, capturing its
+    output into <stat/>:
 
-    `git diff --cached`
+    `git diff --cached --stat`
 
-    <if condition="<diff/> is empty">
-    Only output the following <template/> and then *STOP* immediately:
+    <if condition="<stat/> is empty">
+    Only output the following <template/>, then expand the following
+    hint, and then *STOP* immediately:
 
     <template>
     ⧉ **ASE**: ✪ skill: **ase-repo-commit**, ▶ status: **no changes to commit**
     </template>
+
+    <ase-tpl-hint level="normal">
+    Nothing is staged -- use `git add -p` or `/ase-repo-stage` to stage the intended changes first.
+    </ase-tpl-hint>
     </if>
+
+    Then capture the staged changes themselves into <diff/>: if <stat/>
+    reports a total of up to about 1000 changed lines, run `git diff
+    --cached`, otherwise run `git diff --cached -- <path/>` only for
+    the (up to) 5 files with the most changed lines, and rely on <stat/>
+    for the remaining files.
 
     </step>
 
@@ -75,6 +86,21 @@ currently staged Git changes.
     -   Use *no* period at the end
     -   Use *no* Markdown formatting
     -   Never add `Co-Authored-By` trailers to commit messages
+    -   Derive it *exclusively* from <stat/> and <diff/>, and never from
+        the recollection of edits of the session, as these may be still
+        unstaged or belong to a parallel session
+    -   Never include secrets, tokens, credentials, or internal URLs
+
+    <if condition="
+        the staged changes clearly span *multiple* <type/>s or unrelated
+        concerns, so that the single <type/> chosen for <message/> covers
+        them only partially
+    ">
+    Set <mixed/> to a comma-separated list of the spanned <type/>s.
+    </if>
+    <else>
+    Set <mixed/> to empty.
+    </else>
 
     Output this crafted commit message with the following <template/>:
 
@@ -88,6 +114,12 @@ currently staged Git changes.
     Finally, give the closing hint by expanding the following (which,
     depending on the configured <ase-guidance-level/>, may expand into
     nothing and hence emit no output at all):
+
+    <if condition="<mixed/> is not empty">
+    <ase-tpl-hint level="minimal">
+    The staged changes mix <mixed/> -- consider splitting them into separate commits with `/ase-repo-dissect --sequential` or `/ase-repo-stage`.
+    </ase-tpl-hint>
+    </if>
 
     <if condition="
         a `CHANGELOG.md` file exists in the project (or in any affected

@@ -16,7 +16,10 @@ output of `git diff --cached` and produces a single-line message of
 the form `<type>: <summary>` where *type* is one of `FEATURE`,
 `IMPROVEMENT`, `BUGFIX`, `UPDATE`, `CLEANUP`, or `REFACTOR`, and
 *summary* is a 60-80 character imperative-mood summary without
-trailing period or Markdown formatting.
+trailing period or Markdown formatting. The message describes only
+what is actually staged, never other edits of the session, and hints
+at splitting the staged changes when they mix multiple types of
+change.
 
 ##  SCENARIOS
 
