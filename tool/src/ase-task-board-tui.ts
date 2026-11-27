@@ -264,7 +264,7 @@ const lateErasing = (stream: NodeJS.WriteStream): NodeJS.WriteStream => {
 /*  run the terminal board (resp. with a task id, the task viewer) until the user quits  */
 export const runTUI = async (log: Log, relay?: string, watched?: string): Promise<void> => {
     const initial = await buildBoard(log)
-    const project = Task.projectIdOf(Task.projectRoot())
+    const project = Task.projectId(log)
     loadPalette(log)
 
     /*  defer stderr log output while Ink draws, as it bypasses patchConsole  */

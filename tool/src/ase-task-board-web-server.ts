@@ -301,9 +301,9 @@ const attachmentDocument = async (log: Log, auth: BoardAuth, id: string, n: numb
 }
 
 /*  serialize the board for the browser  */
-const boardJSON = (board: Board, lifecycle: TaskFormat.TaskLifecycle, users: string[]) => ({
+const boardJSON = (board: Board, lifecycle: TaskFormat.TaskLifecycle, users: string[], project: string) => ({
     mode:     board.mode,
-    project:  Task.projectIdOf(Task.projectRoot()),
+    project,
     version:  pkg.version,
     warnings: board.warnings,
     users,
@@ -556,7 +556,7 @@ const registerViewRoutes = (server: Hapi.Server, log: Log, auth: BoardAuth): voi
         method:  "GET",
         path:    "/task-board/api/board",
         handler: guarded(async (request, h) =>
-            h.response(boardJSON(filterBoard(await currentBoard(log), filterQuery(request)), await Task.lifecycle(log), Task.users(log))))
+            h.response(boardJSON(filterBoard(await currentBoard(log), filterQuery(request)), await Task.lifecycle(log), Task.users(log), Task.projectId(log))))
     })
 
     /*  the dependency graph as SVG, reduced onto the tasks matching the

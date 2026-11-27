@@ -63,6 +63,12 @@ export class Task {
         return projectIdOf(root)
     }
 
+    /*  the id of the project: the configured "project.id", else the sanitized basename of the
+        project root (see "TaskStoreConnect.spec")  */
+    static projectId (log: Log): string {
+        return TaskStoreConnect.spec(log).projectId
+    }
+
     /*  the configuration files of the task store specification, and the invalidation
         of the cached specification (see "TaskStoreConnect.{configFiles,invalidate}")  */
     static configFiles (log: Log): string[] {

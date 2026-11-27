@@ -31,7 +31,7 @@ const textOverview = async (log: Log, relay?: string): Promise<string> => {
     const [ board, agents ] = await Promise.all([ buildBoard(log), fetchAgents(log, relay) ])
     const busy  = busyAgents(agents)
     const out   = [
-        `⧉ ASE: Task Board · project: ${Task.projectIdOf(Task.projectRoot())} · mode: ${board.mode} · tasks: ${board.cards.size}`,
+        `⧉ ASE: Task Board · project: ${Task.projectId(log)} · mode: ${board.mode} · tasks: ${board.cards.size}`,
         ""
     ]
     for (const group of board.groups) {
