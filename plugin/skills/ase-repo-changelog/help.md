@@ -43,15 +43,18 @@ of the file from its content, and writes the entries in its vocabulary:
     `FEATURE`, `IMPROVEMENT`, `BUGFIX`, `UPDATE`, `CLEANUP`, or
     `REFACTOR`, and *artifact-kind* is one or more comma-separated
     *artifact class* tags out of `spec`, `code`, `docs`, `infr`, or
-    `othr`. Entries are grouped and sorted by this prefix.
+    `othr`. Entries are grouped and sorted by this prefix. A breaking
+    change is marked as in `<change-type> [<artifact-kind>]: **BREAKING**: <summary>`.
 
 -   `KAC`: *Keep a Changelog*, where the entries are collected in a
     `## [Unreleased]` section, below the headers `### Added`,
     `### Changed`, `### Deprecated`, `### Removed`, `### Fixed`, and
-    `### Security`.
+    `### Security`. A breaking change is marked as in
+    `- **BREAKING**: <summary>`.
 
 -   `CCL`: *Conventional Changelog*, where the entries are placed below
-    headers like `### Features` and `### Bug Fixes`.
+    headers like `### Features` and `### Bug Fixes`, and the breaking
+    changes below `### ⚠ BREAKING CHANGES`.
 
 An empty file gets the `RSE` format, while the style of a file in an
 unrecognized format is mimicked. The date in a dated section header is
@@ -60,6 +63,14 @@ also updated to the current date.
 The layout of the entries follows the style of the existing entries
 of the file (e.g. a single line, a title line plus an explaining body,
 or a wrapped sentence), and each entry is kept within about 5 lines.
+
+Every entry is backed by a Git commit or uncommitted change, and none is
+invented. Merge commits and changes without a notable effect for the
+users (like version bumps, typo fixes, or test-only and CI-only changes)
+get no entry. Breaking changes, indicated by a Conventional Commits `!`
+marker or `BREAKING CHANGE:` footer or evident from the diff, are marked
+and come first within their group. References to pull requests or issues
+in the commit messages are never taken over.
 
 The updated `CHANGELOG.md` is left *unstaged*, as it may carry further
 unrelated changes. Stage the new entry yourself (e.g. via `git add -p`),

@@ -10,6 +10,11 @@ ChangeLog
     sub-agents, one per slice of files (at most eight), plus one for the cross-file dimensions, and
     merges their findings and evidence.
 
+-   IMPROVEMENT [code, docs]: Stricter ChangeLog Entries
+    `ase-repo-changelog` skips merge commits and non-notable changes, never invents entries or
+    takes over pull request or issue references, and marks breaking changes, e.g. via
+    `**BREAKING**: ` after the tags of the `RSE` format, first within their group.
+
 -   FEATURE [code, docs]: Independent Check of Review Fixes
     With `--auto`, `ase-repo-review` lets a fresh sub-agent check every applied fix solely from
     its finding and the resulting code, and shows the outcome `VERIFIED` (with a falsifiable

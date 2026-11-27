@@ -203,19 +203,22 @@ Processing
         name as the baseline tag.
 
     Then check all Git commits between `HEAD` and this baseline tag with
-    the command `git log <baseline/>..HEAD --numstat --pretty=format:'%h: %s'`.
+    the command `git log <baseline/>..HEAD --no-merges --numstat --pretty=format:'%h: %s'`.
 
     If *no* such version section exists (very first, still untagged
     release), skip the baseline tag and check *all* Git commits with the
-    command `git log HEAD --numstat --pretty=format:'%h: %s'` instead.
+    command `git log HEAD --no-merges --numstat --pretty=format:'%h: %s'` instead.
     If this version section has no corresponding Git tag either,
     use the commit which introduced the header text <header/> of the
     *first* section instead (like `N.M.K (` for `RSE`, or
     `## [Unreleased]` for `KAC`), determined with the command
     `git log -1 --format=%h -S '<header/>' -- "<filename/>"`, and check
     all Git commits from it on with the command
-    `git log <commit/>^..HEAD --numstat --pretty=format:'%h: %s'`, resp.
+    `git log <commit/>^..HEAD --no-merges --numstat --pretty=format:'%h: %s'`, resp.
     *all* Git commits if no such commit exists.
+
+    Store the revision range of the used command (`<baseline/>..HEAD`,
+    `HEAD`, resp. `<commit/>^..HEAD`) in <range/>.
 
     For finding the corresponding staged Git *changes* in the Git
     *index*, use the command `git diff --cached --numstat`, but silently
@@ -253,7 +256,17 @@ Processing
 
     For each Git commit, reduce the Git commit messages to an entry in
     the format <format/>, following the *Entry Quality* rules of the
-    *ChangeLog Format* above, and determine its *change type*.
+    *ChangeLog Format* above, and determine its *change type*. Skip the
+    commits and changes without a notable effect (*Notability*), never
+    take over pull/merge request or issue references of the commit
+    messages (*References*), and never invent an entry not backed by a
+    commit or change (*Traceability*).
+
+    Determine the *breaking* entries (*Breaking*): for the Git commits,
+    besides a `!` marker in the commit subject, find the commits with a
+    `BREAKING CHANGE:` footer with the command
+    `git log <range/> --no-merges -E --grep='^BREAKING[ -]CHANGE:' --pretty=format:'%h'`.
+    For the staged resp. <changes/> changes, judge it from their diff.
 
     <if condition="<format/> is equal `RSE`">
     For each entry, also determine the <artifact-kind/> *artifact kind*
@@ -295,7 +308,8 @@ Processing
     entries in the current section only. Instead of the
     chronological commit order, group the entries by their *change
     types*, in the order and with the grouping of the format <format/>
-    (e.g. below the level-3 change type headers for `KAC` and `CCL`).
+    (e.g. below the level-3 change type headers for `KAC` and `CCL`),
+    with the *breaking* entries first within their group.
 
     <if condition="<changes/> is not empty">
     Restrict the consolidation and sorting to the entries added or

@@ -52,8 +52,13 @@ Format `RSE`
         -   `infr`:  infrastructure/build/tooling artifacts
         -   `othr`:  any other artifacts
 
+    A *breaking* change additionally carries the marker `**BREAKING**: `
+    directly after the tags, as in
+    `<change-type/> [<artifact-kind/>]: **BREAKING**: <summary/>`.
+
 -   *Order*: the entries of a section are grouped and sorted according
-    to the above <change-type/> list.
+    to the above <change-type/> list, where the *breaking* entries come
+    first within their group.
 
 Format `KAC`
 ------------
@@ -67,8 +72,8 @@ Format `KAC`
     are *never* touched.
 
 -   *Entries*: each entry is a plain list item `- <summary/>`, *without*
-    any change-type or artifact-kind tags, below the level-3 header of
-    its change type:
+    any change-type or artifact-kind tags, resp. `- **BREAKING**: <summary/>`
+    for a *breaking* change, below the level-3 header of its change type:
 
         -   `### Added`:      new features
         -   `### Changed`:    changes in existing functionality
@@ -78,7 +83,8 @@ Format `KAC`
         -   `### Security`:   vulnerability fixes
 
 -   *Order*: the change type headers of a section follow the above
-    list, where empty ones are omitted.
+    list, where empty ones are omitted, and the *breaking* entries come
+    first below their header.
 
 Format `CCL`
 ------------
@@ -155,6 +161,28 @@ For all formats, a decent *ChangeLog* entry follows these rules:
 
 -   *Granularity*: one entry per logical change, where closely related
     changes are merged into a single entry.
+
+-   *Traceability*: each new or updated entry traces back to at least
+    one Git commit or uncommitted change it is derived from, where a
+    merged entry covers all of these. Entries are *never* invented.
+
+-   *Notability*: changes without a notable effect for the users of the
+    project get *no* entry, like merge commits, version bumps, pure
+    typo fixes, changes of only tests or CI pipelines, and commits which
+    are reverted again within the same range. A Conventional Commits
+    type like `chore`, `ci`, `test`, or `docs` hints at such a change.
+
+-   *Breaking*: a change which is incompatible for the users of the
+    project, like a removed or renamed command, option, configuration
+    key, or API, is marked as *breaking* as defined by the format
+    (`OTHER` mimics the marker of the file, if any). For commits, the
+    Conventional Commits marker `!` (like `feat!:`) or a footer
+    `BREAKING CHANGE:` indicates it. Otherwise, mark only evidently
+    incompatible changes.
+
+-   *References*: references to pull/merge requests or issues (like
+    `#123`, `(#123)`, or `GH-123`) in Git commit messages are *never*
+    taken over into an entry.
 
 -   *Editing*: an existing `CHANGELOG.md` is *changed* in place with the
     `Edit` tool and *never* re-written with the `Write` tool, and its
