@@ -57,8 +57,9 @@ const COMPANION         = "pty-to-stdio"
 const COMPANION_VERSION = "0.9.0"
 
 /*  the start of a session: the program with its arguments, working directory, environment, and
-    initial terminal size, and the handler of its end by itself, receiving its exit code and
-    whether the program wrote any output at all (as without, the companion failed to start it)  */
+    initial terminal size, the handler of its end by itself, receiving its exit code and
+    whether the program wrote any output at all (as without, the companion failed to start it),
+    and an optional observer of its output  */
 export type PtySpec = {
     file: string
     args: string[]
@@ -67,6 +68,7 @@ export type PtySpec = {
     cols: number
     rows: number
     exit: (code: number, output: boolean) => void
+    output?: (data: Buffer) => void
 }
 
 /*  a session: its process (null before the start and after the end), its start waiting for a
@@ -105,7 +107,9 @@ export class PtyHost {
     private unanswered = new WeakSet<WebSocket>()
     private timer:      ReturnType<typeof setInterval>
 
-    constructor (private log: Log, private label: string) {
+    /*  <busy> tells whether the program of a session is working, which then keeps running without
+        a client beyond the idle time (until it is done)  */
+    constructor (private log: Log, private label: string, private busy: (key: string) => boolean = () => false) {
         this.timer = setInterval(() => { this.keepalive() }, PING_MS)
         this.timer.unref()
     }
@@ -189,6 +193,7 @@ export class PtyHost {
         this.idle(key, session)
         let errors = ""
         child.stdout.on("data", (data: Buffer) => {
+            spec.output?.(data)
             session.history.push(data)
             session.size += data.length
             while (session.size > HISTORY_MAX && session.history.length > 1)
@@ -338,11 +343,15 @@ export class PtyHost {
         s.child?.stdin?.write(frame("r", payload))
     }
 
-    /*  end a session after the idle time, while no client is attached  */
+    /*  end a session after the idle time, while no client is attached and its program is not working  */
     private idle (key: string, s: Session): void {
         if (s.idle !== null)
             clearTimeout(s.idle)
         s.idle = s.clients.size > 0 ? null : setTimeout(() => {
+            if (s.child !== null && this.busy(key)) {
+                this.idle(key, s)
+                return
+            }
             this.log.write("info", `${this.label}: "${key}" idle`)
             this.end(key, s)
         }, IDLE_MS)
