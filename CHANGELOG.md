@@ -5,6 +5,11 @@ ChangeLog
 2.1.8 (2026-11-27)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Reviewed, Deviation-Reporting, and Safe Implementation
+    `ase-task-implement` reports every deviation from the plan (marked `↯`), never performs
+    destructive, security-sensitive, or outside side-effecting operations unless `--unsecure`
+    is given, and with `--review` fixes the effect-graded findings of a fresh reviewer once.
+
 -   IMPROVEMENT [code, docs]: No Banner on Forked Sessions
     The `SessionStart` hook omits the ASE banner for a forked session (`--fork-session`),
     as the conversation of the parent session, including its banner, is shown again.

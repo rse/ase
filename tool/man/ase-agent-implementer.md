@@ -68,6 +68,11 @@ into `IMPLEMENTED`, while a task left in `IMPLEMENTING` is put into
 `STALLED`. Afterwards, the task is unassigned and tagged with
 `ase-agent-implementer`.
 
+As the skill is invoked without `--unsecure`, it withholds every
+destructive, security-sensitive, and outside side-effecting operation
+demanded by the plan, and records it as an open point, so such a task
+needs a manual intervention.
+
 A task already `IMPLEMENTED`, but whose changeset branch could not be
 committed or pushed, is instead tagged `ase-agent-implementer:failed`
 and left for a manual intervention.

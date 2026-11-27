@@ -27,7 +27,11 @@ In the `thorough` mode, the review of a larger change set is shared
 among several reviewers, and the prompt then names *your* share after
 ` -- part: `: either `whole`, i.e. the change set *as a whole*, or
 `files <slice/>`, i.e. the files of the JSON array <slice/>. Set <part/>
-to this share, and to empty if the prompt names none.
+to this share, and to empty if the prompt names none. In the `focused`
+mode, a part `files <slice/>` instead *restricts* the change set to the
+files of <slice/>, as the changes of all other files pre-existed and are
+*not* under review: then set <part/> to empty and drop these other files
+from <diff/> of step 1, so you judge *all* dimensions on <slice/> alone.
 
 If the prompt instead starts with `Verify the fixes`, *skip* the entire
 *Workflow* below and perform *only* the *Fix Verification* at its end.

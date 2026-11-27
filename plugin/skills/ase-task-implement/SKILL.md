@@ -1,6 +1,6 @@
 ---
 name: ase-task-implement
-argument-hint: "[--help|-h] [--next|-n <option>[,...]] [--worktree|-w <name>] [--source|-s <source>] [--changeset|-c <changeset>] [--draft|-d] [--no-cleanup|-K] [--stateless|-S] [--ground|-G] [<id>]"
+argument-hint: "[--help|-h] [--next|-n <option>[,...]] [--worktree|-w <name>] [--source|-s <source>] [--changeset|-c <changeset>] [--draft|-d] [--no-cleanup|-K] [--stateless|-S] [--ground|-G] [--review|-r] [--unsecure|-U] [<id>]"
 description: >
     Implement current or given task plan, optionally as an implementation
     draft attachment only. Use when the user calls to "implement", "realize",
@@ -22,7 +22,7 @@ Implement a Task Plan
 
 <expand name="getopt"
     arg1="ase-task-implement"
-    arg2="--next|-n=(none|DONE|EDIT|INTEGRATE|DELETE)... --worktree|-w= --source|-s= --changeset|-c= --draft|-d --no-cleanup|-K --stateless|-S --ground|-G --int-reuse-task"
+    arg2="--next|-n=(none|DONE|EDIT|INTEGRATE|DELETE)... --worktree|-w= --source|-s= --changeset|-c= --draft|-d --no-cleanup|-K --stateless|-S --ground|-G --review|-r --unsecure|-U --int-reuse-task"
     arg3="colon-or-bare">
     $ARGUMENTS
 </expand>
@@ -407,7 +407,7 @@ Procedure
         change -- without refreshing the `Modified:` key -- by taking over the
         stored `Effort:` key and calling the `ase_task_save` tool of the
         `ase` MCP server *exactly* as described for the final save in
-        sub-step 5 below. Do not output anything.
+        sub-step 6 below. Do not output anything.
         </if>
 
     2.  Perform a *final implementation* of the task plan inside
@@ -416,6 +416,17 @@ Procedure
         <task-content/>:
 
         <expand name="changeset-land" arg1="<work-dir/>"></expand>
+
+        <if condition="<getopt-option-review/> is equal `true`">
+        Before modifying any artifact, capture the *baseline* of
+        <work-dir/>, so the review below can tell the changes of this run
+        from uncommitted changes already present there: set
+        <baseline-status/> to the output of the command
+        `git -C "<work-dir/>" status --porcelain --untracked-files=all`
+        and <baseline-hashes/> to the output of the command
+        `git -C "<work-dir/>" hash-object -- <file/> [...]` for its listed,
+        not deleted files <file/> (empty if none). Do not output anything.
+        </if>
 
         <if condition="<getopt-option-ground/> is equal `true`">
         Ground the implementation *before* modifying any artifact:
@@ -446,10 +457,20 @@ Procedure
         Start collecting the decisions you take on your own while
         implementing:
 
-        <expand name="decision-collect" arg1="the task plan"></expand>
+        <expand name="decision-collect" arg1="the task plan" arg2="true"></expand>
 
         Set <open-points></open-points> (empty). It collects, one entry
         each, whatever ends up waiting for the *user*.
+
+        Whenever a point of the plan turns out to be *wrong* -- it
+        contradicts the artifacts, the `SPEC` artifacts it does not
+        explicitly revise, or another point, a consumed interface does
+        not match the one produced by another point, or a stated command
+        cannot work -- *rule* on the *smallest* change which satisfies
+        the intent of the plan and stays consistent with the `SPEC`
+        artifacts, realize it, and collect it as a *deviation* in
+        <decisions/>, instead of either silently doing something else or
+        stopping.
 
         The implementation is *complete or it is not done*: you *MUST*
         *NEVER* conclude this step while any point of the task plan is
@@ -465,12 +486,54 @@ Procedure
         the decision in <decisions/> as defined by `decision-collect`,
         instead of asking the user and stopping. Only a *genuine
         blocker*, which no defensible assumption can bridge (a missing
-        credential, an inaccessible external system), may leave a point
-        unimplemented; append such a point to <open-points/> instead,
-        naming what remains open and why. Append to <open-points/> as
-        well whatever else now waits for the user once this run ends --
-        follow-ups you deliberately left out of scope, each with its
-        reason, and results which genuinely need their review.
+        credential, an inaccessible external system, an operation
+        withheld for safety as described below, or a plan so broken
+        that *every* way to realize it would be a mere guess), may leave
+        a point unimplemented; append such a point to <open-points/>
+        instead, naming what remains open and why. Append to
+        <open-points/> as well whatever else now waits for the user once
+        this run ends -- follow-ups you deliberately left out of scope,
+        each with its reason, and results which genuinely need their
+        review.
+
+        <if condition="<getopt-option-unsecure/> is not equal `true`">
+        Discarding the change set does *not* undo every operation, so you
+        *MUST* *NEVER* *perform* any of the following operations on your
+        own, even if a point of the plan explicitly demands it:
+
+        -   *irreversible* or *destructive* operations, like deleting or
+            overwriting data, databases, or files outside the change set,
+            dropping database objects, force-pushing, or rewriting the
+            Git history,
+
+        -   *security-sensitive* actions, like creating, rotating,
+            revoking, or exposing credentials, keys, or tokens, changing
+            the permissions, access controls, or security configuration
+            of systems, or disabling security checks,
+
+        -   *side effects outside* of <work-dir/>, like pushing to,
+            merging into, or deleting shared branches, publishing
+            packages or releases, deploying, or modifying external
+            systems or services.
+
+        Changing the artifacts of the change set which merely *realize*
+        such an operation (e.g. a migration script dropping a table) is
+        fine -- only *executing* it is forbidden. Leave the affected part
+        of the point unrealized instead, so its checkbox becomes `[/]`
+        resp. stays `[ ]`, and append an open point to <open-points/>
+        naming the withheld operation and its point, with the hint that
+        `--unsecure` permits it.
+        </if>
+        <else>
+        The user explicitly permitted the irreversible, destructive,
+        security-sensitive, and outside side-effecting operations demanded
+        by the plan, so perform them as stated, while every *file*
+        modification still stays confined to <work-dir/>. The sole
+        exception is a <task-changeset/> of `attachment:draft`, as a draft
+        is a reviewable dry-run only: withhold the operations exactly as
+        without `--unsecure`, but name them in the open points *without*
+        the hint that `--unsecure` permits them.
+        </else>
 
         You *MUST* *skip* every bullet-point of <task-content/> in
         checkbox state `[-]` (cancelled) or `[>]` (deferred): neither
@@ -513,7 +576,85 @@ Procedure
         way.
         </if>
 
-    3.  Store the change set according to <changeset-type/>:
+    3.  <if condition="<getopt-option-review/> is equal `true`">
+        Set <run-files/> to the JSON array of the files listed by the
+        command `git -C "<work-dir/>" status --porcelain --untracked-files=all`
+        which this run changed: those absent from <baseline-status/>, with
+        a changed status line, or with a content hash differing from
+        <baseline-hashes/>.
+        </if>
+
+        <if condition="<getopt-option-review/> is equal `true` and <run-files/> is not empty">
+        Review the change set with a *fresh context*, as the implementing
+        context shares the blind spots of its author. Set <review-part/>
+        to empty if <baseline-status/> is empty, and to
+        ` -- part: files <run-files/>` otherwise, so uncommitted changes
+        present before this run are neither reviewed nor fixed:
+
+        1.  Invoke *exactly once* (apart from the single retry below) the
+            tool:
+
+            ```text
+                Agent(
+                    description:       "Review Investigation",
+                    subagent_type:     "ase:ase-repo-review",
+                    prompt:            "Review in focused mode the changes of scope: staged and unstaged in worktree <work-dir/><review-part/>",
+                    run_in_background: false
+                )
+            ```
+
+            Parse its single result message as a JSON object (if it is
+            wrapped into a code fence or surrounded by prose, parse just
+            its outermost `{...}` object) and set <findings/> to its
+            `findings` field. If no such object with a `findings` list
+            can be parsed, invoke the tool *once* more with
+            ` -- return ONLY the JSON object` appended to its `prompt`.
+            If this fails again, append the open point that the review
+            returned no parseable result to <open-points/>, *skip* the
+            remaining items of this sub-step, and *continue* processing.
+            You *MUST* *NEVER* invent findings.
+
+        2.  Drop every finding of severity `ACCEPTED`, and *re-grade*
+            every other one by its *effect*: what a user of the software
+            or a later developer actually gets if the change set ships
+            as-is -- not the label of the reviewer, and not whether the
+            plan mentions the triggering case. A finding which demands
+            something contradicting the plan, or realizing a `[-]` or
+            `[>]` point, is *declined*.
+
+        3.  Append every finding re-graded to `LOW` as a *deferred minor*,
+            with its location, to <open-points/>, without fixing it.
+
+        4.  Fix every finding re-graded to `HIGH` or `MEDIUM` in *one
+            single* pass inside <work-dir/>, honoring the plan and the
+            internalized tenets, and never touching the uncommitted
+            changes present before this run. Collect every such finding you decide
+            *not* to fix, and every declined finding, in <decisions/>,
+            regardless of the *Relevant* condition of `decision-collect`,
+            with the focus id of its most related point of the plan
+            (`IMP` if there is none) and why the change set stands.
+            <if condition="<task-content/> contains a `##  VERIFICATION (WHEN)` section heading">
+            Verify each fix of a behavioral defect by a test which
+            reproduces the finding, observed *failing* before and
+            *passing* after the fix, and finally re-run *all* checks of
+            the `REG` and `CON` points performed before, so the
+            checkboxes below reflect the *final* change set. A fix
+            without a test which failed first is *unverified*: append it
+            to <open-points/>.
+            </if>
+            There is *no* second review and *no* second fix pass: append
+            whatever remains unfixed to <open-points/>.
+
+        5.  Set <n-fixed/>, <n-deferred/>, and <n-declined/> to the number
+            of fixed, deferred, and declined or not fixed findings, and
+            only output the following <template/>:
+
+            <template>
+            ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ▶ status: **change set reviewed** (<n-fixed/> fixed, <n-deferred/> deferred, <n-declined/> declined)
+            </template>
+        </if>
+
+    4.  Store the change set according to <changeset-type/>:
 
         -   `worktree`: Leave the change set *uncommitted* in
             <work-dir/>. Do not output anything.
@@ -554,7 +695,7 @@ Procedure
             `git worktree remove --force "<work-dir/>"` (taken exactly as
             given). Do not output anything.
 
-    4.  Update the checkboxes of the body bullet-points of <task-content/>
+    5.  Update the checkboxes of the body bullet-points of <task-content/>
         as follows, changing *nothing else* of a bullet-point:
 
         -   Set the checkbox of every `DOM`, `IFC`, `ARC`, and `IMP`
@@ -583,7 +724,7 @@ Procedure
             bullet-point *untouched*, as only the user resolves its
             cancelled or deferred state.
 
-    5.  Update the frontmatter and backmatter of <task-content/> as
+    6.  Update the frontmatter and backmatter of <task-content/> as
         follows, *creating* each of the `Status:` and `Modified:` keys
         the plan does not carry yet at its position in the key order of
         the plan <format/>:
@@ -604,7 +745,7 @@ Procedure
         -   Refresh the `Modified:` key with the current time in
             ISO-style format, determined by calling the
             `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the `ase`
-            MCP server, but *only* if step 4 changed at least one
+            MCP server, but *only* if step 5 changed at least one
             checkbox, as the key tracks "body" changes only -- a
             frontmatter-only update leaves it *untouched*. Set
             <timestamp-modified/> to the resulting `Modified:` key value,
@@ -673,13 +814,13 @@ Procedure
         plan file via `Write`/`Edit` or by executing a shell command.
         Do not output anything in this sub-step.
 
-    6.  Only output the following <template/>:
+    7.  Only output the following <template/>:
 
         <template>
         ⧉ **ASE**: ◉ task: **<ase-task-id/>**, ⇢ changeset: **<task-changeset/>**, ▶ status: **plan implemented**
         </template>
 
-    7.  Close the implementation with the summary of what this run left
+    8.  Close the implementation with the summary of what this run left
         open and what it decided on its own. Both the box and the table
         are written in the conversation language and the active persona
         style, list *one entry per line* resp. *row*, and are *omitted
@@ -704,7 +845,7 @@ Procedure
         <expand name="decision-report"
             arg1="◉ task: **<ase-task-id/>**"></expand>
 
-    8.  Give the closing hint by expanding the following (which,
+    9.  Give the closing hint by expanding the following (which,
         depending on the configured <ase-guidance-level/>, may expand
         into nothing and hence emit no output at all):
 

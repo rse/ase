@@ -15,6 +15,8 @@
     [`--no-cleanup`|`-K`]
     [`--stateless`|`-S`]
     [`--ground`|`-G`]
+    [`--review`|`-r`]
+    [`--unsecure`|`-U`]
     [*id*]
 
 ##  DESCRIPTION
@@ -114,18 +116,36 @@ change set grew large nor because an open question stands in the way.
 Undecided details and defensible alternatives are therefore *decided by
 the skill itself*, guided by the surrounding artifacts and the
 internalized tenets, instead of interrupting the run with a question.
+A point which turns out to be *wrong* -- contradicting the artifacts,
+the specification, or another point, or not working as stated -- is
+realized by the smallest change which satisfies the intent of the plan,
+and is always reported as a *deviation*.
+
+Unless `--unsecure` is given, the skill never *performs* irreversible or
+destructive operations, security-sensitive actions, or side effects
+outside of its worktree (like dropping a database, rotating keys,
+pushing, publishing, or deploying), even if the plan demands them: such
+parts stay unrealized and are reported as open points, so the plan
+becomes `STALLED` (for `team` and `enterprise`, unless `--stateless` is
+given). Changing the artifacts which merely realize such an operation
+is still done. A plan so broken that every way to realize it would be a
+mere guess is not guessed through either.
+
 Once the change set is applied, the run closes with up to two summaries:
 the `OPEN POINTS` box lists everything now waiting for the user --
 points left unimplemented on a *genuine blocker* no assumption can
-bridge, follow-ups deliberately left out of scope with their reason,
-and results needing review -- and a `WHAT`/`WHY` table lists the
-*own decisions* of the skill, i.e. those neither made in the plan nor
-during grilling, so they can be revisited or overruled.
+bridge, withheld operations, follow-ups deliberately left out of scope
+with their reason, and results needing review -- and a `WHAT`/`WHY`
+table lists the *own decisions* of the skill, i.e. those neither made in
+the plan nor during grilling, so they can be revisited or overruled.
 
-The table covers only decisions of the focus areas `DOM` (domain), `IFC`
-(interface), and `ARC` (architecture), ranked in this order and numbered
-`D01`, `D02`, etc., each with a brief, keyword-prefixed decision and
-rationale. Either summary is omitted entirely when it has no content.
+The table covers the decisions of the focus areas `DOM` (domain), `IFC`
+(interface), and `ARC` (architecture), plus every deviation from the
+plan (marked `↯`, also of the focus areas `IMP`, `REG`, and `CON`) and
+every review finding not fixed under `--review`, ranked in this order
+and numbered `D01`, `D02`, etc., each with a brief, keyword-prefixed
+decision and rationale. Either summary is omitted entirely when it has
+no content.
 
 After implementation, the user is asked whether to stop, hand off to
 `ase-task-edit`, hand off to `ase-task-integrate`, or delete the task
@@ -197,6 +217,22 @@ plan, unless `--next` pre-selects this choice.
     usable facts are found, a warning is shown and the implementation
     falls back to model knowledge.
 
+-   `--review`|`-r`:
+    Review the implemented change set, before it is stored, by an
+    independent reviewer with a fresh context. Its findings are
+    re-graded by their actual effect if the change set ships as-is:
+    the `HIGH` and `MEDIUM` ones are fixed in a single pass (each fix of
+    a behavioral defect proven by a test which fails before and passes
+    after it, unless the plan omits its verification), the `LOW` ones
+    are reported as deferred minors in the `OPEN POINTS` box, and the
+    declined or not fixed ones as own decisions. There is no second
+    review.
+
+-   `--unsecure`|`-U`:
+    Permit the irreversible, destructive, security-sensitive, and
+    outside side-effecting operations demanded by the plan, which are
+    otherwise withheld and reported as open points.
+
 ##  ARGUMENTS
 
 -   *id*:
@@ -211,6 +247,7 @@ plan, unless `--next` pre-selects this choice.
 -   You want the change set attached to the plan for review only
 -   You want a dry-run of the implementation as a reviewable draft
 -   You want the implementation isolated in a Git worktree
+-   You want the change set reviewed and fixed before it is stored
 
 ##  EXAMPLES
 
@@ -245,6 +282,13 @@ branch `feature-hello`:
 
 ```text
 ❯ /ase-task-implement --changeset branch:feature-hello hello
+```
+
+Implement the current task plan and let its change set be reviewed and
+fixed by a fresh reviewer before it is stored:
+
+```text
+❯ /ase-task-implement --review
 ```
 
 ##  SEE ALSO

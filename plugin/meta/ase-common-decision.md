@@ -6,8 +6,9 @@ Decision Skill Common Steps
 
 Start collecting the *own decisions* of the skill run in <decisions/>,
 where <arg1/> names the sources of the *user decisions* (like the query
-or the task plan). Set <decisions></decisions> (empty). Do not output
-anything.
+or the task plan), and the optional <arg2/> (`true` or `false`, default
+`false`) additionally collects every *deviation* from <arg1/>. Set
+<decisions></decisions> (empty). Do not output anything.
 
 From now on, until the skill finishes, whenever you decide a detail on
 your own -- picking one of several defensible alternatives -- append one
@@ -24,9 +25,21 @@ entry to <decisions/>, but *only* if all of the following holds:
     `ase-common-grill.md`). Decisions of any other focus area are *not*
     collected.
 
+<if condition="<arg2/> is equal `true`">
+Additionally, collect *every deviation* from <arg1/>, regardless of the
+*Relevant* condition above: whenever you realize a point of <arg1/>
+differently than stated -- because it contradicts the artifacts, the
+specification, or another point, or cannot work as stated -- append one
+entry marked as *deviation*, carrying the focus id of the deviated point.
+A deviation without such an entry is a decision made *in secret*, and
+hence *forbidden*.
+</if>
+
 Each entry carries its focus id <decision-focus/> (`DOM`, `IFC`, or
-`ARC`), its decision <decision-text/> with 1-3 comma-separated keywords
-<decision-keywords/> summarizing it, and its rationale
+`ARC`, and for an entry collected regardless of the *Relevant*
+condition also `IMP`, `REG`, or `CON`), its decision <decision-text/>
+with 1-3 comma-separated keywords <decision-keywords/> summarizing it,
+and its rationale
 <rationale-text/> with 1-3 comma-separated keywords
 <rationale-keywords/> summarizing it. Both <decision-text/> and
 <rationale-text/> are a *single*, very brief and concise sentence.
@@ -46,13 +59,15 @@ revisit or overrule every decision taken on their behalf.
     </if>
 
 2.  *Sort* the entries by descending focus area order -- first all
-    `DOM`, then all `IFC`, and then all `ARC` ones -- and, within each
+    `DOM`, then all `IFC`, then all `ARC`, then all `IMP`, then all
+    `REG`, and then all `CON` ones -- and, within each
     focus area, by descending impact on the solution. Number them in this
     order with <nn/> of `01`, `02`, etc. Do not output anything.
 
 3.  For every entry, assemble the cell <decision-N-what/> out of
     `**D<nn/>** ▶ <decision-focus/> ▷ **<decision-keywords/>**: <decision-text/>`
-    and the cell <decision-N-why/> out of
+    (with `↯ ` inserted directly before <decision-focus/> for an entry
+    marked as *deviation*) and the cell <decision-N-why/> out of
     `**<rationale-keywords/>**: <rationale-text/>`. Keep every cell at
     most *160 characters* long -- compact the text until it fits --, so
     it never spans more than about 4 lines of its table cell. In every
@@ -63,7 +78,10 @@ revisit or overrule every decision taken on their behalf.
     output anything.
 
 4.  Output only the following <template/>. Align all column edges of the
-    table:
+    table. In the legend, insert `**IMP**: Implementation`,
+    `**REG**: Regression`, `**CON**: Confirmation`, and `**↯**: deviation`,
+    each separated by two spaces, directly before `**Dnn**`, but each
+    *only* if at least one entry carries it:
 
     <template>
     ⧉ **ASE**: <arg1/>, ▶ status: **own decisions taken -- please review**
