@@ -13,7 +13,8 @@ import VuePlugin         from "@vitejs/plugin-vue"
 const basedir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 
 /*  build the browser client of the web board (Vue, Stylus) into
-    "dst/ase-task-board-web-client.{html,js,css}", served under "/task-board/"  */
+    "dst/ase-task-board-web-client.{html,js,css}", and the lazily loaded chunk of the
+    terminal emulator of the task chat, served under "/task-board/"  */
 export default defineConfig({
     root:      path.join(basedir, "src"),
     base:      "/task-board/",
