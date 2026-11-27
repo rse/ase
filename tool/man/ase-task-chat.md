@@ -30,8 +30,9 @@ In macOS terminals, `Option`+`X` detaches where `Option` acts as
 `Alt` (resp. Meta), and also as is where it types `≈` (e.g., in the
 US, British, German, Swiss, French, and Spanish layouts).
 
-A chat which nothing is attached to ends after 30 minutes, and all
-chats end with the *ASE* service. When the
+A chat which nothing is attached to ends after 30 minutes, but not
+while the agent tool is still working on a turn (then once it is done),
+and all chats end with the *ASE* service. When the
 agent tool ends (e.g., through its `/exit`), **ase task chat** ends,
 too, and a later chat about the task starts the agent tool again.
 

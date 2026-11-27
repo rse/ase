@@ -111,6 +111,21 @@ export const chatEnv = (id: string): Record<string, string> => {
     return { ...env, ASE_TASK_ID: id }
 }
 
+/*  whether the agent tool of a chat is working on a turn, from the window title Claude sets in its
+    output (a spinner glyph while working, "✳" while waiting for input), scanned across the chunks
+    of the output (the tail of the last one kept for a title split between two)  */
+export type ChatBusy = { busy: boolean, tail: Buffer }
+export const chatBusyScan = (state: ChatBusy, data: Buffer): void => {
+    const all = Buffer.concat([ state.tail, data ])
+    const at  = Math.max(all.lastIndexOf("\x1b]0;"), all.lastIndexOf("\x1b]2;"))
+    if (at >= 0) {
+        const end = [ all.indexOf(0x07, at), all.indexOf(0x1b, at + 4) ].filter((i) => i >= 0).sort((a, b) => a - b)[0]
+        if (end !== undefined)
+            state.busy = !all.subarray(at + 4, end).toString("utf8").startsWith("✳")
+    }
+    state.tail = all.subarray(Math.max(0, all.length - 1024))
+}
+
 /*  whether the task chat supports an agent tool  */
 export const chatSupported = (tool: Tool): boolean =>
     chatArgs[tool] !== null

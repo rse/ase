@@ -18,7 +18,8 @@ import { PtyHost, ptyDimension, SIZE_MAX } from "./ase-lib-pty.js"
 import { parseTool }            from "./ase-setup-common.js"
 import type { Tool }            from "./ase-setup-common.js"
 import * as TaskFormat          from "./ase-task-format.js"
-import { chatSpec, chatSupported } from "./ase-task-chat-core.js"
+import { chatSpec, chatSupported, chatBusyScan } from "./ase-task-chat-core.js"
+import type { ChatBusy }        from "./ase-task-chat-core.js"
 
 /*  the task chats of the ASE service: whether any of them is in use, their end, and the
     hand-over of a (by the service already authenticated) WebSocket handshake to the chat
@@ -50,7 +51,10 @@ const fonts = new Map<string, { data: Buffer, hash: string } | null>([
     the web board, while its WebSocket is handed over by the service, which authenticates all
     handshakes  */
 export const registerChatRoutes = (server: Hapi.Server, log: Log, capability: (path: string) => string): ChatBinding => {
-    const host = new PtyHost(log, "chat")
+    /*  the busy state of the running chats, which keeps a working chat running without a client
+        beyond the idle time of its session  */
+    const busy = new Map<string, ChatBusy>()
+    const host = new PtyHost(log, "chat", (id) => busy.get(id)?.busy === true)
 
     /*  the fonts of the chat in the web board (public like all page assets, as they carry
         no task data)  */
@@ -107,7 +111,17 @@ export const registerChatRoutes = (server: Hapi.Server, log: Log, capability: (p
             if (host.full())
                 return h.response({ error: "chat: too many running chats" }).code(429)
             try {
-                await host.start(id, await chatSpec(log, id, tool, cols, rows, p?.palette === true))
+                const spec  = await chatSpec(log, id, tool, cols, rows, p?.palette === true)
+                const state = { busy: false, tail: Buffer.alloc(0) }
+                const exit  = spec.exit
+                spec.output = (data) => { chatBusyScan(state, data) }
+                spec.exit   = (code, output) => {
+                    if (busy.get(id) === state)
+                        busy.delete(id)
+                    exit(code, output)
+                }
+                busy.set(id, state)
+                await host.start(id, spec)
             }
             catch (err: unknown) {
                 const message = err instanceof Error ? err.message : String(err)
