@@ -2,8 +2,13 @@
 ChangeLog
 =========
 
-2.1.7 (2026-11-25)
+2.1.7 (2026-11-27)
 ------------------
+
+-   FEATURE [code, docs]: Sequential Change Set Curation
+    The new option `--sequential`|`-q` of `ase-repo-dissect` walks the parts one after another
+    through the Git index: staged and build-checked, optionally explained and reviewed (and
+    auto-fixed), then accepted for your commit, changed, skipped, or regrouped.
 
 -   IMPROVEMENT [code, docs]: Per-File Fan-Out of Thorough Reviews
     With `--thorough`, `ase-repo-review` reviews a change set of more than two files by parallel
@@ -18,7 +23,7 @@ ChangeLog
 -   FEATURE [code, docs]: Independent Check of Review Fixes
     With `--auto`, `ase-repo-review` lets a fresh sub-agent check every applied fix solely from
     its finding and the resulting code, and shows the outcome `VERIFIED` (with a falsifiable
-    `file:line` citation), `UNRESOLVED`, `REGRESSED`, or `UNVERIFIED` per fix. (Idea of PR #84)
+    `file:line` citation), `UNRESOLVED`, `REGRESSED`, or `UNVERIFIED` per fix.
 
 -   FEATURE [code, docs]: Falsifiable Evidence Ledger of Reviews
     The new option `--evidence`|`-e` of `ase-repo-review` backs the verdict by a per-dimension

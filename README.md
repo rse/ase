@@ -313,10 +313,14 @@ see whether **ASE** is right for you:
 
 - **Change Set Dissection**:
   You have one large, mixed change set, but want it split into cohesive
-  parts, each landing in its own Git WorkTree so it can be reviewed and
-  committed atomically?
+  parts, either each landing in its own Git WorkTree so it can be reviewed
+  and committed atomically, or walked one by one through the Git index,
+  each staged and build-checked, optionally explained and reviewed,
+  changed on demand, and then committed by yourself?
   &rarr; [`/ase-repo-dissect`](plugin/skills/ase-repo-dissect/help.md)
-  `-m 4`
+  `-m 4` or
+  [`/ase-repo-dissect`](plugin/skills/ase-repo-dissect/help.md)
+  `--sequential --review`
 
 - **Partial Staging**:
   You want only the hunks of a topic, of the last ChangeLog entry, of

@@ -4,6 +4,9 @@ Dissect Skill Common Steps
 
 <define name="dissect-derive">
 
+Set <min-parts><arg4/></min-parts>, the *lower bound* of the part count
+the calling skill passed in, or `2` if the `arg4` attribute is absent.
+
 *Dissect* <content/> into *cohesive parts* by strictly honoring the
 following ruleset:
 
@@ -17,7 +20,7 @@ following ruleset:
     it achieves. Cut along the *semantics* first, and let a file-wise
     boundary result only when it *coincides* with a domain boundary.
 
-2.  *Bound the part count*: derive at least *2* and at most
+2.  *Bound the part count*: derive at least *<min-parts/>* and at most
     *<getopt-option-max-parts/>* parts. Prefer *fewer* and *larger*
     cohesive parts over *many* and *tiny* ones.
 
@@ -76,7 +79,7 @@ covers) and an *ultra brief* <rationale/> (*why* exactly these input
 elements form *one* cohesive part). Store the resulting parts in
 <parts/> and their number in <n/>.
 
-<if condition="fewer than 2 cohesive parts exist">
+<if condition="fewer than <min-parts/> cohesive parts exist">
 The epic is *not* dissectable, because it carries a *single* cohesive
 purpose (or too few input elements) and splitting it would only produce
 artificial fragments. Only output the following <template/> and then
