@@ -127,8 +127,8 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 
     -   `tool/src/ase-<command>.ts`: one module per CLI command resp.
         command group: `setup`, `config`, `alias`, `service`, `mcp`, `hook`,
-        `statusline`, `task`, `task-board`, `agent`, `artifact`, `spec`,
-        `man`, `util`, and
+        `statusline`, `task`, `task-board`, `task-chat`, `agent`, `artifact`,
+        `spec`, `man`, `util`, and
         `util-{meta,diagram,worktree,mint,metric,rasterize,compat,cve,vex}`
 
     -   `tool/src/ase-alias-core.ts`: the skill command aliases of
@@ -226,6 +226,10 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
             and whose stylesheet imports the styles of the other views
             and of the task dialog and popups from
             `task-board-web-client-{views,dialog}.styl`
+
+        -   the task chat: `task-chat` for the `ase task chat` CLI
+            command, and `task-chat-core` for the interactive agent tool
+            invocation and the persisted session of the chat of each task
 
     -   `tool/src/ase-agent-*.ts`: the parts of `ase agent`:
 
@@ -438,8 +442,9 @@ Beyond `ase setup`, the CLI provides:
 -   `ase statusline`: the statusline renderer
 
 -   `ase task`: the persisted task plans, including `ase task board` for
-    the interactive task board in terminal and browser, and `ase task
-    store` for the task store server
+    the interactive task board in terminal and browser, `ase task chat`
+    for the chat with the agent tool about a task (resuming the session
+    of the task), and `ase task store` for the task store server
 
 -   `ase agent`: the autonomous agents, each running in its own process,
     managed individually via `ase agent <kind> start|status|log|stop|restart`

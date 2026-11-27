@@ -716,11 +716,12 @@ const handleNavKey = (ctx: BoardCtx, input: string, key: Key): void => {
     }
 }
 
-/*  request the deletion, transfer, assignment, edit by prompt, or request by prompt of a task
-    in every view (under the kitty keyboard protocol, Shift+<letter> arrives as the lower-case
-    letter with the shift modifier), answering whether the key was such a request  */
+/*  request the deletion, transfer, assignment, edit by prompt, request by prompt, or (by the
+    lower-case "x") chat of a task in every view (under the kitty keyboard protocol, Shift+<letter>
+    arrives as the lower-case letter with the shift modifier), answering whether the key was such
+    a request  */
 const handleTaskKey = (ctx: BoardCtx, input: string, key: Key, target: string): boolean => {
-    const { all, cycle, setNotice, setConfirm, setTransfer, startAssign, startPrompt, startRequest } = ctx
+    const { all, cycle, setNotice, setConfirm, setTransfer, startAssign, startPrompt, startRequest, startChat } = ctx
     const shifted = (letter: string) => input === letter.toUpperCase() || (input === letter && key.shift)
     if (shifted("d"))
         setConfirm({ id: target, yes: false })
@@ -738,6 +739,8 @@ const handleTaskKey = (ctx: BoardCtx, input: string, key: Key, target: string): 
         startPrompt(target)
     else if (shifted("r"))
         startRequest(target)
+    else if (input === "x" && !key.shift)
+        startChat(target)
     else
         return false
     return true
