@@ -13,7 +13,7 @@ port persisted in `.ase/service.yaml`, and removes the persisted port
 (and the file, if it becomes empty). This also stops a service running
 in the foreground via `ase service start --foreground`. On stop, the
 service persists the journal of its AI usage windows, so no usage is
-lost.
+lost. This also ends all task chats (see `ase-task-chat`(1)).
 
 If no port is persisted, or nothing listens on the persisted port, an
 informational message is logged, a stale port is removed, and the

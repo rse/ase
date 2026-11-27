@@ -60,7 +60,8 @@ const commands: Record<string, Registrar> = {
     hence are registered onto an already established parent command  */
 const subCommands: Record<string, Record<string, Registrar>> = {
     task: {
-        board:    async (p) => attach(import("./ase-task-board.js"), p)
+        board:    async (p) => attach(import("./ase-task-board.js"), p),
+        chat:     async (p) => attach(import("./ase-task-chat.js"), p)
     },
     util: {
         meta:      async (p) => attach(import("./ase-util-meta.js"), p),
