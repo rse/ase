@@ -5,6 +5,10 @@ ChangeLog
 2.1.8 (2026-11-27)
 ------------------
 
+-   IMPROVEMENT [code, docs]: No Banner on Forked Sessions
+    The `SessionStart` hook omits the ASE banner for a forked session (`--fork-session`),
+    as the conversation of the parent session, including its banner, is shown again.
+
 -   IMPROVEMENT [code, docs]: Intent Playback in Brainstorming
     `ase-meta-brainstorm` asks only unsettled, reasoned questions building on previous answers
     (possibly none), covers non-goals and anti-goals, and plays back the intent, marking stated

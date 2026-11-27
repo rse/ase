@@ -507,6 +507,11 @@ export default class HookCommand {
             boxing, lifecycle, defaultSource, defaultChangeset, defaultTarget,
             specBasedir, specSchema, getoptTuned, taskId, sessionId, headless
         }, md, path.dirname(fileMd), style)
+
+        /*  suppress the banner on a forked session, as the conversation
+            of the parent session (with its banner) is shown again above  */
+        if (input.source === "fork")
+            delete payload.systemMessage
         await writeStdout(JSON.stringify(payload))
         return 0
     }

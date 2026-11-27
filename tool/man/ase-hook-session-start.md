@@ -125,7 +125,8 @@ following steps:
     `additionalContext` (`copilot`).
 
     Additionally, for `claude` and `codex`, unless running headless
-    (`ASE_HEADLESS` is `true`) or with guidance level `none`, a
+    (`ASE_HEADLESS` is `true`), with guidance level `none`, or for a
+    forked session (event `source` of `fork`), a
     deterministic *ASE* banner (version, user, project, task, session,
     persona, guidance, and boxing, plus usage hints for guidance level
     `normal` and `verbose`) is emitted as the top-level field
