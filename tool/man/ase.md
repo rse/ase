@@ -98,7 +98,8 @@ The following top-level commands exist:
 
 - `ase task` *command* \[...\]:
   Manage the persisted task plans in the task store, show the task
-  board, and run the task store server. See `ase-task`(1).
+  board, chat with the agent tool about a task, and run the task store
+  server. See `ase-task`(1).
 
 - `ase artifact` *command* \[...\]:
   Resolve project artifact kinds to project-relative file lists. See
@@ -188,8 +189,9 @@ The command-specific ones are described in their own manual pages.
 
 - *per-user state directory*:
   The machine-local per-user *ASE* state (session configurations, task
-  lifecycle deviation warnings, agent run records, telemetry state, and
-  the display state of the terminal task board), never roamed or versioned: `$ASE_STATE_DIR`, if set, else
+  lifecycle deviation warnings, agent run records, telemetry state, the
+  display state of the terminal task board, and the sessions of the
+  task chats), never roamed or versioned: `$ASE_STATE_DIR`, if set, else
   `$ASE_CONFIG_DIR`, if set, else `~/Library/Application Support/ase`
   on macOS, `%LOCALAPPDATA%\ase` on Windows, and
   `$XDG_STATE_HOME/ase` (falling back to `~/.local/state/ase`) on Linux

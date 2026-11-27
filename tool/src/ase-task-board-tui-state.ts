@@ -172,7 +172,8 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
     }, [ all, prompt ])
 
     /*  quit the task viewer once its dialog is closed, resp. with a warning once
-        its task vanished (except while an edit may rename it, which the dialog follows)  */
+        its task vanished (except while an edit or a task chat holds the terminal, which may
+        rename it, which the dialog follows)  */
     const seen = React.useRef("")
     React.useEffect(() => {
         if (watched === undefined)
@@ -393,8 +394,9 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         })
     }
 
-    /*  the actions of the $EDITOR (with the drafts of the failed to be saved texts, per task)  */
-    const { edit, create } = useEditorActions({ log, all, mouseOn, setSel, setDialog, setNotice, track })
+    /*  the actions of the $EDITOR (with the drafts of the failed to be saved texts, per task)
+        and of the task chat  */
+    const { edit, create, chat } = useEditorActions({ log, all, mouseOn, setSel, setDialog, setNotice, track })
 
     /*  delete a task (after its confirmation), closing its read dialog
         (in the task viewer only once it vanished, as closing it quits the process)  */
@@ -477,6 +479,19 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         const run = id !== null ? edit(id) : create()
         run.catch((err: unknown) => {
             setNotice(`${id !== null ? `editing task "${id}"` : "creating task"} failed: ${err instanceof Error ? err.message : String(err)}`)
+        }).finally(() => {
+            editing.current = false
+        })
+    }
+
+    /*  chat about a task with the agent tool, guarded like an edit, as both hand the terminal over  */
+    const startChat = (id: string) => {
+        if (editing.current)
+            return
+        editing.current = true
+        setNotice(null)
+        chat(id).catch((err: unknown) => {
+            setNotice(`chatting about task "${id}" failed: ${err instanceof Error ? err.message : String(err)}`)
         }).finally(() => {
             editing.current = false
         })
@@ -661,7 +676,7 @@ export const useBoardState = (log: Log, initial: Board, relay?: string, watched?
         transferCard, transferList, fit, viewH, viewW, x, y, nodes, dim, pulse, now, beatOf, store, busy, busyTick,
         agents, working, cycleView, agentList, agentIdx, agent, agentOp, logLines, logH, logFirst, logMax, selectAgent, scrollLog, stats, usage, range, setRange, stepRange,
         flow, flowLayout, flowSel, setFlowSel, flowPlaces, focusAgent, scrollFlow,
-        toggle, toggleFlag, setHeights, startEdit, startPrompt, startRequest, cancelPrompt, submitPrompt, remove, transferTo,
+        toggle, toggleFlag, setHeights, startEdit, startChat, startPrompt, startRequest, cancelPrompt, submitPrompt, remove, transferTo,
         startAssign, assignTo, drop
     }
 }
