@@ -37,21 +37,22 @@ import pkg                       from "../package.json" with { type: "json" }
 export const BOARD_BUILD = (() => {
     const dir  = path.dirname(fileURLToPath(import.meta.url))
     const hash = crypto.createHash("sha1")
-    for (const f of [ "core.js", "diff.js", "filter.js", "flow.js", "graph.js", "stats.js", "web-server.js", "web-client.html", "web-client.css", "web-client.js" ])
+    for (const f of [ "core.js", "diff.js", "filter.js", "flow.js", "graph.js", "stats.js", "web-server.js", "web-client.html", "web-client.css", "web-client.js", "web-client-restty.js" ])
         hash.update(fs.readFileSync(path.join(dir, `ase-task-board-${f}`)))
     return `${pkg.version}:${hash.digest("hex")}`
 })()
 
 /*  the static assets of the browser client of the web board: its HTML page,
-    its stylesheet, and its code (all built by Vite out of the Vue client),
+    its stylesheet, and its code (all built by Vite out of the Vue client), plus
+    the lazily loaded chunk of the terminal emulator of the task chat,
     installed next to this module and loaded once on first use  */
 const clientAssets = new Map<string, string>()
-const clientAsset = (ext: "html" | "css" | "js"): string => {
-    let asset = clientAssets.get(ext)
+const clientAsset = (suffix: ".html" | ".css" | ".js" | "-restty.js"): string => {
+    let asset = clientAssets.get(suffix)
     if (asset === undefined) {
         const dir = path.dirname(fileURLToPath(import.meta.url))
-        asset = fs.readFileSync(path.join(dir, `ase-task-board-web-client.${ext}`), "utf8")
-        clientAssets.set(ext, asset)
+        asset = fs.readFileSync(path.join(dir, `ase-task-board-web-client${suffix}`), "utf8")
+        clientAssets.set(suffix, asset)
     }
     return asset
 }
@@ -456,21 +457,30 @@ const registerPageRoutes = (server: Hapi.Server, log: Log): void => {
         method:  "GET",
         path:    "/task-board",
         options: { app: { public: true } },
-        handler: (_request, h) => h.response(clientAsset("html")
+        handler: (_request, h) => h.response(clientAsset(".html")
             .replace(/<html\b/, `<html data-theme="${boardTheme(log)}"`)).type("text/html; charset=utf-8")
     })
     server.route({
         method:  "GET",
         path:    "/task-board/ase-task-board-web-client.css",
         options: { app: { public: true } },
-        handler: (_request, h) => h.response(clientAsset("css")).type("text/css; charset=utf-8")
+        handler: (_request, h) => h.response(clientAsset(".css")).type("text/css; charset=utf-8")
             .etag(BOARD_BUILD).header("Cache-Control", "no-cache")
     })
     server.route({
         method:  "GET",
         path:    "/task-board/ase-task-board-web-client.js",
         options: { app: { public: true } },
-        handler: (_request, h) => h.response(clientAsset("js")).type("text/javascript; charset=utf-8")
+        handler: (_request, h) => h.response(clientAsset(".js")).type("text/javascript; charset=utf-8")
+            .etag(BOARD_BUILD).header("Cache-Control", "no-cache")
+    })
+
+    /*  the lazily loaded chunk of the terminal emulator of the task chat  */
+    server.route({
+        method:  "GET",
+        path:    "/task-board/ase-task-board-web-client-restty.js",
+        options: { app: { public: true } },
+        handler: (_request, h) => h.response(clientAsset("-restty.js")).type("text/javascript; charset=utf-8")
             .etag(BOARD_BUILD).header("Cache-Control", "no-cache")
     })
 

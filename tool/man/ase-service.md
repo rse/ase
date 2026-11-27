@@ -49,7 +49,8 @@ The service provides:
   `44318`), routing the received records to the service of the project
   owning the session (see `ase-setup-telemetry`(1)),
 - the web task board of `ase task board --web` (see
-  `ase-task-board`(1)).
+  `ase-task-board`(1)),
+- the task chats of `ase task chat` (see `ase-task-chat`(1)).
 
 The service accepts requests with a loopback `Host` header only, to
 defeat DNS rebinding attacks from browser pages. As every local process
@@ -62,7 +63,8 @@ through a one-time nonce (see `ase-task-board`(1)). With
 restarts, and with `none`, no request is authenticated at all (see
 `ase-config`(1)). A detached service
 stops itself after 30 minutes without any request, but never while a
-request is in flight or while it holds open AI usage windows.
+request is in flight, while it holds open AI usage windows, or while a
+task chat runs or is attached to.
 
 Without a *command*, the usage information is shown and the command
 exits with status `1`.

@@ -823,7 +823,7 @@ export const renderDialog = ({ card, group, id, pred, succ, tint, tabs, tab, fir
     const free   = Math.max(0, innerW - pos.length - 1)
     const keys   = (notice !== null ? " " + sanitize(notice) :
         (diffed ? " #: clear diff ·" : "") +
-        " ←/→/⇤/⇥: switch tab · ↑/↓/⇈/⇊: scroll · e: edit · E: edit by prompt · R: request by prompt · T: transition · A: assign · D: delete · M: toggle mouse · " +
+        " ←/→/⇤/⇥: switch tab · ↑/↓/⇈/⇊: scroll · e: edit · E: edit by prompt · R: request by prompt · x: chat · T: transition · A: assign · D: delete · M: toggle mouse · " +
         (viewer ? "q: quit" : "⏎/ESC: close")).slice(0, free)
 
     return h(Box, { key: "dialog", top: 0, left, width, height: rows, ...cx("popup", "border-dim") },

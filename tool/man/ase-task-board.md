@@ -154,6 +154,10 @@ them ignore the prompts (e.g., the `estimate` requests of `ase agent
 estimator --mode request`, see `ase-agent-estimator`(1)), the prompt
 field is disabled, skipped by `TAB`, and no prompt is sent.
 
+`x` chats about the selected task with the agent tool, which takes
+over the terminal until it ends or the chat is detached with
+`Alt`+`X` (see `ase-task-chat`(1)).
+
 `/` focuses the `filter:` field of the header: its keywords are
 matched case-insensitively against the task id and title, AND-combined
 when separated by spaces and OR-combined when separated by commas. Each
@@ -264,6 +268,25 @@ shows the task again as soon as it exists again.
 
 With `--text`, and also without an interactive terminal, the plan of the
 task is printed as plain text and the command exits.
+
+### Task Chat
+
+In the web board, `x` (or the button `⌨` in the header of the task
+dialog) shows the *task chat* of a task below its plan in its task
+dialog, resp. hides it again: the chat with the agent tool (of
+`$ASE_TOOL` of the *ASE* service, else `claude`) about the task,
+shared with `ase task chat` and with every other browser showing it
+(see `ase-task-chat`(1)). Showing the chat starts the agent tool,
+unless it runs already, and a chat whose agent tool ended starts again
+when shown again. A shown chat has the focus, framed in the signal
+color, and then takes all keys: a click onto the task plan gives them
+back to the task dialog, a click into the chat to the chat again, and
+`Alt`+`X` (resp. `Option`+`X`) hides the chat also while it has the
+keys, while the agent tool keeps running. The chat shows the colors
+of the board, while the agent tool keeps its own color theme. The
+button `◧` places the chat beside the task plan in a wide task dialog,
+resp. the button `⬓` below it again, remembered in the browser, as does
+`X` while the task dialog has the keys, unless the window is too narrow.
 
 ### Task Stats View
 
@@ -507,6 +530,8 @@ lower-case letter under the kitty keyboard protocol.
   task stats, agent logs, and agent graph views).
 - `R`: Request the selected task by a prompt under a request name (not
   in the task stats, agent logs, and agent graph views).
+- `x`: Chat about the selected task with the agent tool (not in the
+  task stats, agent logs, and agent graph views). See **Task Chat**.
 - `M`: Disable or enable the mouse support (terminal board only).
 - `q`, `Ctrl`+`C`: Quit (terminal board only).
 
@@ -593,7 +618,11 @@ lower-case letter under the kitty keyboard protocol.
 - `PgUp`/`PgDn`: Scroll the content by one page.
 - `e`: Edit the task plan.
 - `#`: Clear the diff of the last change of the task plan.
-- `D`, `T`, `A`, `E`, `R`, `M`, `L`: As in every view.
+- `Alt`+`X`: Show or hide the chat, also while it has the keys (web
+  board only). See **Task Chat**.
+- `X`: Place the chat beside resp. below the task plan (web board
+  only). See **Task Chat**.
+- `D`, `T`, `A`, `E`, `R`, `x`, `M`, `L`: As in every view.
 - `⏎`, `ESC`: Close the task dialog.
 
 ### Filter Field
@@ -685,6 +714,9 @@ The following configuration keys (on scope `user` or `project`, see
 
 ## ENVIRONMENT
 
+- `ASE_TOOL`:
+  The agent tool of the terminal board for `x` (default: `claude`).
+
 - `EDITOR`:
   The text editor of the terminal board for `e` and `N` (default:
   `vi`), run through the shell, so a value with arguments is supported.
@@ -735,7 +767,7 @@ $ ase task board --text --agent-relay ase://relay.example.com:42043
 
 `ase`(1), `ase-task`(1), `ase-task-store`(1), `ase-agent`(1),
 `ase-agent-editor`(1), `ase-agent-relay`(1), `ase-service`(1),
-`ase-config`(1).
+`ase-config`(1), `ase-task-chat`(1).
 
 ## AUTHOR
 
