@@ -118,4 +118,5 @@ Add the session changes related to a topic to the already staged ones:
 
 [`ase-repo-dissect`](../ase-repo-dissect/help.md), [`ase-repo-diff`](../ase-repo-diff/help.md),
 [`ase-repo-review`](../ase-repo-review/help.md), [`ase-repo-commit`](../ase-repo-commit/help.md),
-[`ase-repo-changelog`](../ase-repo-changelog/help.md).
+[`ase-repo-changelog`](../ase-repo-changelog/help.md),
+[`ase-repo-agents`](../ase-repo-agents/help.md).

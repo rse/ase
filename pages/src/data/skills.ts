@@ -62,6 +62,7 @@ export const skillGroups: SkillGroup[] = [
             "ase-repo-review",
             "ase-repo-diff",
             "ase-repo-changelog",
+            "ase-repo-agents",
             "ase-repo-commit",
             "ase-repo-dissect",
             "ase-repo-stage",

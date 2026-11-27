@@ -18,7 +18,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 
 -   `plugin/`: the agent tool plugin
 
-    -   `plugin/skills/ase-xxx-xxx/`: the 63 skills, each with a `SKILL.md`
+    -   `plugin/skills/ase-xxx-xxx/`: the 64 skills, each with a `SKILL.md`
         (agent instructions) and a `help.md` (Unix-style manual page), plus
         optional skill-specific files (like `ase-help-intent/data.md`, the
         concatenation of all `help.md` files, generated at build-time, or
@@ -38,8 +38,9 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         control flow, getopt, and skill output conventions
         (`ase-{constitution,tenets,persona,dialog,control,getopt,skill}.md`),
         the common steps shared by groups of skills (`ase-common-*.md`),
-        and the artifact formats (`ase-format-{meta,task,spec,changelog}.md`), where
-        the specification format `ase-format-spec.md` includes the SpecBook
+        and the artifact formats
+        (`ase-format-{meta,task,spec,changelog,agents}.md`), where the
+        specification format `ase-format-spec.md` includes the SpecBook
         models and formats description `ase-format-specbook.md` and the
         standard SpecBook schema configuration `ase-format-specbook.yaml`,
         both generated at build-time by *SpecBook* (`@rse/specbook`)

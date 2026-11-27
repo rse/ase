@@ -860,7 +860,8 @@ export const useCases: UseCase[] = [
         label:       "Versioning",
         title:       "Use Case: Versioning",
         description: "How to land a change set with ASE: summarize the diff, dissect it into atomic " +
-                     "parts, review it, update the ChangeLog, and write the commit message.",
+                     "parts, review it, update the ChangeLog and the agent guidance, and write " +
+                     "the commit message.",
         abstract:    "The last mile decides what the history will look like in a year. The running " +
                      "example here is *the finished `--json` change set* — summarized, split into " +
                      "atomic parts, reviewed, and committed.",
@@ -912,11 +913,13 @@ export const useCases: UseCase[] = [
                 eyebrow:  "Paperwork",
                 title:    "Leave It Clean",
                 body:     "The steps usually skipped: the ChangeLog entry is derived from the actual " +
-                          "change set, and the documentation is reconciled against the code that just " +
-                          "changed — so no paperwork debt is carried into tomorrow.",
+                          "change set, and the documentation and the agent guidance are reconciled " +
+                          "against the code that just changed — so no paperwork debt is carried into " +
+                          "tomorrow.",
                 commands: [
                     "**/ase-repo-changelog**",
-                    "**/ase-sync-reconcile** --source code --target docs the --json output mode"
+                    "**/ase-sync-reconcile** --source code --target docs the --json output mode",
+                    "**/ase-repo-agents**"
                 ]
             },
             {

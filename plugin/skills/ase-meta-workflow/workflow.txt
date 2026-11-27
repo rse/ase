@@ -33,6 +33,7 @@ START               -> ase-repo-merge
 START               -> ase-repo-resolve
 START               -> ase-repo-import
 START               -> ase-repo-task
+START               -> ase-repo-agents
 ase-help-skill      -> END
 ase-meta-config     -> END
 ase-meta-why        -> END
@@ -67,6 +68,7 @@ ase-repo-stage      -> END
 ase-repo-merge      -> END
 ase-repo-resolve    -> END
 ase-repo-import     -> END
+ase-repo-agents     -> END
 START               -> SKETCH
 START               -> TASK
 START               -> ase-sync-import
@@ -114,5 +116,7 @@ ase-sync-import     -> ARTIFACT
 ARTIFACT            -> ase-sync-export
 ARTIFACT            -> ase-sync-reconcile
 ase-sync-reconcile  -> ARTIFACT
+ARTIFACT            -> ase-repo-agents
+ase-repo-agents     -> ARTIFACT
 TASK                -> END
 ARTIFACT            -> END

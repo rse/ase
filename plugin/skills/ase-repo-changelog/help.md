@@ -148,4 +148,7 @@ Create entries in the *Keep a Changelog* format:
 
 ##  SEE ALSO
 
-[`ase-repo-commit`](../ase-repo-commit/help.md), [`ase-repo-stage`](../ase-repo-stage/help.md), [`ase-docs-proofread`](../ase-docs-proofread/help.md).
+[`ase-repo-commit`](../ase-repo-commit/help.md),
+[`ase-repo-stage`](../ase-repo-stage/help.md),
+[`ase-repo-agents`](../ase-repo-agents/help.md),
+[`ase-docs-proofread`](../ase-docs-proofread/help.md).

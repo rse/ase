@@ -23,7 +23,7 @@ Code](https://claude.com/product/claude-code) — and with reduced support also 
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
 [OpenAI Codex CLI](https://github.com/openai/codex).
 
-**ASE** ships with 63 agent skills, agent hooks, agent sub-agents, an
+**ASE** ships with 64 agent skills, agent hooks, agent sub-agents, an
 underlying Model-Context-Protocol (MCP) service and a Command-Line Interface
 (CLI) with a task store, task boards, and autonomous agents, incorporating
 reasonable methodology and automation aspects, to support the recurring
@@ -177,6 +177,12 @@ see whether **ASE** is right for you:
   You want to get your `CHANGELOG.md` entries
   automatically derived from your recent Git commits?
   &rarr; [`/ase-repo-changelog`](plugin/skills/ase-repo-changelog/help.md)
+
+- **Agent Guidance Files**:
+  You want your `AGENTS.md` generated, or kept in sync with the project
+  overview, layout, build commands, and code style of your repository?
+  &rarr; [`/ase-repo-agents`](plugin/skills/ase-repo-agents/help.md)
+  `--section BUILD,STYLE`
 
 - **Plan Implementation**:
   You have a named, persisted task plan and now want it implemented as a

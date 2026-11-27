@@ -135,4 +135,5 @@ specification as a unified diff, without applying it:
 ##  SEE ALSO
 
 [`ase-repo-changelog`](../ase-repo-changelog/help.md),
+[`ase-repo-agents`](../ase-repo-agents/help.md),
 [`ase-task-implement`](../ase-task-implement/help.md).

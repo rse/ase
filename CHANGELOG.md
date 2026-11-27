@@ -5,6 +5,11 @@ ChangeLog
 2.1.7 (2026-11-27)
 ------------------
 
+-   FEATURE [code, docs]: Agent Guidance File Updating
+    The new skill `ase-repo-agents` generates resp. updates the `About`, `Repository Layout`,
+    `Build System`, and `Code Style` sections of an `AGENTS.md` from read-only verified repository
+    facts, correcting only drifted facts and keeping all hand-written sections verbatim.
+
 -   FEATURE [code, docs]: Sequential Change Set Curation
     The new option `--sequential`|`-q` of `ase-repo-dissect` walks the parts one after another
     through the Git index: staged and build-checked, optionally explained and reviewed (and

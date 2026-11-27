@@ -17,6 +17,9 @@ commit) into a task plan, precise enough for a re-implementation. Another new sk
 implementation against the verification claims of its plan, by running and, where meaningful,
 falsifying the witness of each one.
 
+A further new skill generates or updates the **agent guidance** `AGENTS.md` of a repository from
+facts verified read-only against it.
+
 The **prompt cache** of Claude Code is now under control: its state is shown in the footer, big
 idle caches are kept warm automatically, and you are asked before a prompt is sent into a big cold
 cache. Markdown **tables**, which Claude Code draws vertically in too narrow terminals, are now
@@ -73,6 +76,9 @@ ase config edit
 
 -   **Implementation Proof**: `ase-task-prove` runs and falsifies the witness of each
     verification claim of a plan and persists a `PROVEN` / `NOT PROVEN` proof ledger.
+
+-   **Agent Guidance Files**: `ase-repo-agents` generates a missing or updates an
+    existing `AGENTS.md` from facts verified read-only against the repository.
 
 -   **Configuration Editor**: `ase config edit` opens a terminal UI with a parameter view
     and a scope view, storing edited values immediately on any writable scope.

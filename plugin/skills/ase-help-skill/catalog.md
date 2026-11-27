@@ -44,6 +44,7 @@
 
 ⎈   **VERSION CONTROL**
 ○   `ase-repo-changelog`:  Update ChangeLog Entries
+○   `ase-repo-agents`:     Update Agent Guidance
 ○   `ase-repo-commit`:     Git Commit Message
 ○   `ase-repo-diff`:       Summarize Diff
 ○   `ase-repo-review`:     Review Changes
