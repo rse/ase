@@ -15,16 +15,6 @@ ChangeLog
     through the Git index: staged and build-checked, optionally explained and reviewed (and
     auto-fixed), then accepted for your commit, changed, skipped, or regrouped.
 
--   IMPROVEMENT [code, docs]: Per-File Fan-Out of Thorough Reviews
-    With `--thorough`, `ase-repo-review` reviews a change set of more than two files by parallel
-    sub-agents, one per slice of files (at most eight), plus one for the cross-file dimensions, and
-    merges their findings and evidence.
-
--   IMPROVEMENT [code, docs]: Stricter ChangeLog Entries
-    `ase-repo-changelog` skips merge commits and non-notable changes, never invents entries or
-    takes over pull request or issue references, and marks breaking changes, e.g. via
-    `**BREAKING**: ` after the tags of the `RSE` format, first within their group.
-
 -   FEATURE [code, docs]: Independent Check of Review Fixes
     With `--auto`, `ase-repo-review` lets a fresh sub-agent check every applied fix solely from
     its finding and the resulting code, and shows the outcome `VERIFIED` (with a falsifiable
@@ -40,20 +30,10 @@ ChangeLog
     language: its state before, its state after and why, and why it is correct, backed by
     `file:line`-cited evidence or openly marked as unverified.
 
--   BUGFIX [code]: Reliable HARD Auto-Warm of the Prompt Cache
-    The cache controller times the TTL from the start of a request, pings at once on a HARD
-    auto-warm request, offers it only while a ping can still reach the cache, and tells why a
-    HARD auto-warm ended early.
-
 -   FEATURE [code, docs]: Task Plan Implementation Proof
     The new skill `ase-task-prove` runs the witness of each `REG` and `CON` verification claim of a
     task plan, falsifies each test case or spec witness by reverting resp. mutating the change,
     and persists a proof ledger attachment with a `PROVEN` / `NOT PROVEN` verdict.
-
--   IMPROVEMENT [code, docs]: Aligned Change Set Selection of Repository Skills
-    `ase-repo-diff` gained `--staged`, `--unstaged`, `--worktree`, `--branch`, and `--commit` like
-    `ase-repo-review` (renaming its short options to `-C`, `-R`, and `-B`), and `ase-repo-task`
-    gained `--worktree`, all sharing the change set selection of the new `ase-common-changes.md`.
 
 -   FEATURE [code, docs]: Sequence Number Plus Title Slug Task Ids
     The new task id scheme `flex[:<template>]` combines a reserved sequence number (`%d` or
@@ -64,10 +44,6 @@ ChangeLog
     `project.artifact.<kind>.basedir` accepts a whitespace-separated list of literal directories,
     whose files are united, where the `spec` ones are passed to the upgraded SpecBook 1.6.6, and
     `ase spec init`, `ase spec export`, and `ase artifact name` use the first one.
-
--   BUGFIX [infr]: Robust Website Deployment
-    The GitHub Pages workflow builds and deploys in separate jobs and retries the deployment once
-    after 30 seconds, as the artifact listing API often does not yet show the just uploaded artifact.
 
 -   FEATURE [code, docs]: Vulnerability Triage
     The new skill `ase-code-triage` checks whether the project is affected by a vulnerability, given
@@ -93,6 +69,39 @@ ChangeLog
     The new lint aspect `A22 - TESTING` flags tests which cannot fail or which fail spuriously:
     insensitive assertions, self-confirming oracles, mock echoes, nondeterminism, and leftover
     focus or unexplained skip markers.
+
+-   IMPROVEMENT [code, docs]: Per-File Fan-Out of Thorough Reviews
+    With `--thorough`, `ase-repo-review` reviews a change set of more than two files by parallel
+    sub-agents, one per slice of files (at most eight), plus one for the cross-file dimensions, and
+    merges their findings and evidence.
+
+-   IMPROVEMENT [code, docs]: Stricter ChangeLog Entries
+    `ase-repo-changelog` skips merge commits and non-notable changes, never invents entries or
+    takes over pull request or issue references, and marks breaking changes, e.g. via
+    `**BREAKING**: ` after the tags of the `RSE` format, first within their group.
+
+-   IMPROVEMENT [code, docs]: Aligned Change Set Selection of Repository Skills
+    `ase-repo-diff` gained `--staged`, `--unstaged`, `--worktree`, `--branch`, and `--commit` like
+    `ase-repo-review` (renaming its short options to `-C`, `-R`, and `-B`), and `ase-repo-task`
+    gained `--worktree`, all sharing the change set selection of the new `ase-common-changes.md`.
+
+-   IMPROVEMENT [code]: Falsifiable Verification Claims
+    The `CON` claims of task plans and the confirmations of `ase-task-grill` must now fix the
+    observable outcome, the expected value, and its implementation-independent source, so that
+    they can actually fail.
+
+-   IMPROVEMENT [code]: Terminal Palette Colors of the Mods
+    The blue and red of the cache band, code spans, picked items, and decision matrices now follow
+    the palette of the terminal (ANSI colors 4 and 1) instead of fixed theme colors.
+
+-   BUGFIX [code]: Reliable HARD Auto-Warm of the Prompt Cache
+    The cache controller times the TTL from the start of a request, pings at once on a HARD
+    auto-warm request, offers it only while a ping can still reach the cache, tells why a HARD
+    auto-warm ended early, and keeps its escalation band hidden while a turn is running.
+
+-   BUGFIX [infr]: Robust Website Deployment
+    The GitHub Pages workflow builds and deploys in separate jobs and retries the deployment once
+    after 30 seconds, as the artifact listing API often does not yet show the just uploaded artifact.
 
 -   REFACTOR [code, docs]: Smaller Stylesheet of the Web Task Board
     `ase-task-board-web-client.styl` keeps only the base, header, lanes view, and footer styles and
