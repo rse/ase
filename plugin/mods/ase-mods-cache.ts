@@ -485,12 +485,14 @@ export const modCacheControl = () => {
                 lines.push(Text({ children: `⛁ cache: hard auto-warm: ended early, as ${S.ended}` }))
         }
         else {
+            /*  alarm in red only for a big cache, else just inform in blue  */
+            const color = S.ctx >= settings.threshold ? "ansi256(1)" : "ansi256(4)"
             lines.push(Box({ flexDirection: "row", children: [
                 Text({ children: "⛁ cache:" }),
-                Text({ color: "ansi256(1)", bold: true,
+                Text({ color, bold: true,
                     children: ` ${ball()} cold ⏱ ${minutes(-left())} ago` }),
                 Text({ children: " ▶ next prompt: " }),
-                Text({ color: "ansi256(1)", bold: true, children: `rewrites ${tokens(S.ctx)} tokens` })
+                Text({ color, bold: true, children: `rewrites ${tokens(S.ctx)} tokens` })
             ] }))
             lines.push(Text({ children: `⛁ cache: cold restarts so far: ${S.colds.length} ` +
                 `(${tokens(coldTokens())} tokens rewritten)` }))

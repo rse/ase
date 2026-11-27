@@ -2,6 +2,13 @@
 ChangeLog
 =========
 
+2.1.8 (2026-11-27)
+------------------
+
+-   IMPROVEMENT [code]: Calm Cold Cache Escalation
+    The cache escalation band shows a cold cache and the tokens rewritten by the next prompt
+    in blue instead of red when the cache is below the threshold `agent.cache.threshold`.
+
 2.1.7 (2026-11-27)
 ------------------
 
