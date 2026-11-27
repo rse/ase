@@ -61,6 +61,17 @@ Honor the following tenets throughout the brainstorming:
     because a wall of open questions overwhelms and yields shallow
     answers.
 
+-   **Look Before You Ask**:
+    Never ask what the topic, the project context, or a previous answer
+    already settles, and say why you ask, because every redundant or
+    unmotivated question costs the user attention without moving the
+    brainstorming forward.
+
+-   **Surface Assumptions**:
+    Mark everything you filled in yourself as an assumption with its
+    reason, because a default the user never heard is one they could
+    not reject.
+
 -   **YAGNI Ruthlessly**:
     Actively prune ideas that serve speculative future needs rather
     than the stated purpose, because unbuilt features still cost
@@ -114,27 +125,39 @@ Honor the following tenets throughout the brainstorming:
 
     Before generating any ideas, *explore the project context* (review
     relevant existing files, documentation, and recent changes) and
-    determine the <m/> (<m/> = 1..<getopt-option-max-clarify/>)
+    determine the <m/> (<m/> = 0..<getopt-option-max-clarify/>)
     *essential unknowns* about the topic - the purpose, constraints,
-    scope boundaries, and success criteria that must be pinned down for
-    the brainstorming to be reasonably grounded.
+    scope boundaries, success criteria, non-goals, and anti-goals (what
+    would make the result a failure even if it technically works) that
+    must be pinned down for the brainstorming to be reasonably grounded.
+    Never count an unknown which the topic, the project context, or the
+    grounding facts <ground-facts/> (if any) already settle.
 
     Notice: you are intentionally constrained to just
-    1..<getopt-option-max-clarify/> unknowns, as too much upfront intent
+    0..<getopt-option-max-clarify/> unknowns, as too much upfront intent
     clarification kills the brainstorming of ideas later. So, you *MUST*
     reduce the clarifications of the unknowns to the absolute minimum in
-    general and cap them at <getopt-option-max-clarify/>!
+    general and cap them at <getopt-option-max-clarify/>! If <m/> is 0,
+    skip the following iteration cycle entirely.
 
     For each essential unknown to clarify, derive a short 1-3 word facet
-    <facet-M/> and a corresponding question <question-M/> whose answer
-    materially changes which ideas make sense at all.
+    <facet-M/> upfront, but formulate its question <question-M/> only at
+    the start of its iteration cycle <M/>, building on the previous
+    answers <answer-1/>...<answer-M-1/>, so that each question helps the
+    user to think through a consequence or a case of what they already
+    said. If the previous answers already settle a remaining unknown,
+    drop it and decrease <m/> accordingly.
 
     1.  For each <question-M/> in the iteration cycle <M/> (<M/>=1...<m/>):
 
-        1.  Output the following <template/>:
+        1.  Formulate the question <question-M/> whose answer materially
+            changes which ideas make sense at all, and the reason
+            <why-M/> (a single sentence of not more than 20 words) stating
+            what its answer changes about the idea space. Then output the
+            following <template/>:
 
             <template>
-            ⧉ **ASE**: FACET <M/>/<m/>: **<facet-M/>**, QUESTION: **<question-M/>**
+            ⧉ **ASE**: FACET <M/>/<m/>: **<facet-M/>**, QUESTION: **<question-M/>**, WHY: <why-M/>
             </template>
 
         2.  Determine *2 to 4* grounded candidate answers
@@ -198,11 +221,72 @@ Honor the following tenets throughout the brainstorming:
 
     </step>
 
-4.  <step id="STEP 4: Diverge Idea Space">
+4.  <step id="STEP 4: Play Back Intent">
+
+    1.  Distill the intent <intent/> behind the topic from the <topic/>,
+        the answers <answer-M/> (if any), and the project context, as up
+        to 6 aspects <aspect-K/> (a short 1-3 word label like `Purpose`,
+        `Goals`, `Non-Goals`, `Anti-Goals`, `Constraints`, or `Success
+        Criteria`), each with a statement <statement-K/> (a single
+        sentence of not more than 30 words) and its origin <origin-K/>:
+        `stated` if it was explicitly said by the user in the <topic/>
+        or an answer <answer-M/>, or `assumed: <reason/>` (with a short
+        reason of not more than 12 words) if you filled it in yourself.
+        Never present an assumption of yours as stated by the user.
+
+        Output the following <template/>:
+
+        <template>
+        ⧉ **ASE**: **INTENT**:
+        - **<aspect-1/>**: <statement-1/> (<origin-1/>)
+        - **<aspect-2/>**: <statement-2/> (<origin-2/>)
+        [...]
+        </template>
+
+        If <getopt-option-max-clarify/> is 0, the user opted out of any
+        intake dialog: skip the following sub-steps 2 and 3 and continue
+        directly with the next step.
+
+    2.  In the following, you *MUST* *NOT* use your built-in
+        <user-dialog-tool/> tool! Instead, you *MUST* just show a
+        custom dialog according to the expanded `custom-dialog`
+        definition. You *MUST* closely follow this definition.
+
+        <expand name="custom-dialog" arg1="--other">
+            Intent: Is this intent correct and complete? Confirm it, or type a correction.
+            Confirm: diverge on this intent
+        </expand>
+
+    3.  Dispatch on the dialog <result/>:
+
+        -   If <result/> is `CANCEL`:
+            Only output the following <template/> and then immediately *STOP*
+            processing the entire current skill:
+
+            <template>
+            ⧉ **ASE**: ✪ skill: **ase-meta-brainstorm**, ▶ status: **brainstorm cancelled**
+            </template>
+
+        -   If <result/> starts with `ERROR:`:
+            Ask the user interactively, without a special tool, whether
+            the intent is correct and complete, and dispatch the response
+            of the user as below.
+
+        -   If <result/> matches `OTHER: <text/>`:
+            Incorporate the correction <text/> into the intent <intent/>
+            (its corrected or added aspects get the origin `stated`) and
+            continue again with sub-step 1 of this STEP 4.
+
+        -   Otherwise (`Confirm`):
+            Continue with the next step.
+
+    </step>
+
+5.  <step id="STEP 5: Diverge Idea Space">
 
     Generate a *broad* space of candidate ideas that address the
-    <topic/> within the constraints established by the answers
-    <answer-M/>. Do *not* draw on the grounding facts <ground-facts/>
+    <topic/> within the confirmed intent <intent/>.
+    Do *not* draw on the grounding facts <ground-facts/>
     (if any) here, as known solutions would anchor the diverging.
 
     Deliberately pursue *diverse angles* - e.g. the minimal/MVP-first
@@ -228,7 +312,7 @@ Honor the following tenets throughout the brainstorming:
 
     </step>
 
-5.  <step id="STEP 5: Converge Idea Space">
+6.  <step id="STEP 6: Converge Idea Space">
 
     Converge the candidate ideas <idea-N/> into a smaller, structured
     set and finally into a recommendation.
@@ -242,7 +326,8 @@ Honor the following tenets throughout the brainstorming:
         <cluster-C/> (a short 1-4 word label, C=1...<c/>), collapsing
         near-duplicates and discarding ideas pruned by *You Aren't Gonna
         Need It (YAGNI)* (speculative, out-of-scope, or contradicting
-        documented context).
+        documented context) and ideas which hit a non-goal or anti-goal
+        of the intent <intent/>.
 
         For each cluster and its contained retained ideas, output the
         following <template/> (<cluster-summary-C/> is a single-sentence
@@ -258,7 +343,8 @@ Honor the following tenets throughout the brainstorming:
         <cluster-C/> (e.g. `2, 5, 9`).
 
     2.  *Score*: for each retained idea <idea-N/> in the clusters, rank its *fit* against the
-        purpose and constraints on a Likert scale of 0 (poor) to 10
+        purpose, goals, and constraints of the intent <intent/> on a
+        Likert scale of 0 (poor) to 10
         (excellent), considering *value*, *uniqueness*, *risk*, and
         *alignment with the existing code base*. Keep only ideas in the
         clusters with a rank of at least <getopt-option-min-rank/>.

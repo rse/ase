@@ -5,6 +5,11 @@ ChangeLog
 2.1.8 (2026-11-27)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Intent Playback in Brainstorming
+    `ase-meta-brainstorm` asks only unsettled, reasoned questions building on previous answers
+    (possibly none), covers non-goals and anti-goals, and plays back the intent, marking stated
+    vs. assumed aspects, for confirmation or correction before diverging.
+
 -   IMPROVEMENT [code, docs]: Evidence-Only Commit Messages
     `ase-repo-commit` derives the message solely from the staged diff (narrowed to the largest
     files for big diffs), never from session recollection or with secrets, and hints at

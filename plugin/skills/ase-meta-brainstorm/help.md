@@ -19,9 +19,13 @@
 The `ase-meta-brainstorm` skill guides a collaborative ideation
 session on a *topic* *before* any implementation begins. It first
 *clarifies intent* by exploring the project context and interviewing
-the user - one grounded, multiple-choice question at a time - about
-purpose, constraints, scope, and success criteria (asking at most
-`--max-clarify`, default 3, questions). It then *diverges* into a broad
+the user - one grounded, multiple-choice question at a time, each with
+its reason and building on the previous answers - about purpose,
+constraints, scope, success criteria, and non-goals or anti-goals
+(asking at most `--max-clarify`, default 3, questions, and none which
+the topic or the project context already answers). It then *plays back*
+the intent, marking what you stated and what was assumed, for you to
+confirm or correct. It then *diverges* into a broad
 space of candidate ideas (at least `--min-ideas`, default 12) pursued from
 deliberately diverse angles (MVP-first, risk-first, UX-first,
 reuse-first, and wildcard), without judging them.
@@ -40,7 +44,9 @@ the highest-ranked option or a principled synthesis of the shortlist.
 -   `--max-clarify`|`-c=3`:
     The *maximum* number of essential-unknown clarification questions
     asked in the *clarify intent* phase (default: 3). Lower it for a
-    faster, leaner intake, raise it for more upfront grounding.
+    faster, leaner intake, raise it for more upfront grounding. With 0,
+    the intent is still played back, but not confirmed, so the session
+    runs without any intake dialog.
 
 -   `--min-ideas`|`-i=12`:
     The *minimum* number of candidate ideas to generate in the *diverge*
