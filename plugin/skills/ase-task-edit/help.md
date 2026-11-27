@@ -33,6 +33,13 @@ project: it names the actual files and symbols to change, the actual
 build, lint, and test procedures, and a `CHANGELOG.md` entry if such a
 file exists.
 
+Every generated or refined plan is silently self-reviewed: each
+requirement is covered, each bullet-point decides something concrete
+(no vague placeholders, no spelled-out code bodies), names are spelled
+consistently, and a generated plan additionally covers the most likely
+failure modes in its verification. A generated plan spanning several
+independent parts leads to a hint to split it via `ase-task-dissect`.
+
 Before a new plan is generated, the skill determines its *kind of
 change* (stored in the `Kind:` key of the plan) and internalizes the
 corresponding tenets (for example KISS, YAGNI, and DRY for crafting,

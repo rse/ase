@@ -70,6 +70,42 @@ Set <task-grounded>true</task-grounded>.
 </if>
 </define>
 
+<define name="review-plan">
+*Self-review* the plan in <task-content/> *once* against <arg1/>, in the
+sections in <sections/> only (all other sections stay read-only), where
+<arg2/> is `full` for a generated plan and `delta` for a refined plan
+(then only the bullet-points changed by the refinement are reviewed).
+*Fix* every finding *in-place*, without a further review round, and do
+not output anything:
+
+1.  **Coverage**: Every requirement of <arg1/> maps to at least one
+    bullet-point. Add a bullet-point for every uncovered requirement.
+
+2.  **Decisions**: Every reviewed bullet-point *decides* something
+    according to the plan <format/>. Replace every *gap* with the
+    concrete decision derived from <arg1/> and the grounding (or, if
+    none can be derived, phrase the open decision explicitly, so a later
+    grilling decides it), and reduce every *transcript* to its file,
+    signature, values, and checks.
+
+3.  **Consistency**: Every file path, identifier, signature, option, and
+    configuration key of the reviewed bullet-points is spelled
+    *identically* in all bullet-points of the plan. Unify every deviation.
+
+4.  **Failure Modes**: Only if <arg2/> is `full`, the plan has a
+    `##  VERIFICATION (WHEN)` section, and `VERIFICATION` is in
+    <sections/>: determine the up to *five* inputs, conditions, or
+    failure modes which <arg1/> implies but no bullet-point exercises
+    (like empty, missing, malformed, huge, or concurrent inputs), most
+    likely to bite a user first, and add a falsifiable `CON` bullet-point
+    for each, stating the behavior a reasonable user expects. Add none
+    if all of them are already covered.
+
+5.  **Proportion**: Only if <arg2/> is `full`: the plan is *not* longer
+    than the change it describes (except for the unified diff preview of
+    a `RESOLVING` plan). Otherwise, shorten it along the second check.
+</define>
+
 <define name="apply-refinement">
 Determine the *kind of change* of the refined plan:
 
@@ -152,6 +188,10 @@ Set the `Kind:` frontmatter key of <task-content/> to <task-kind/> --
 *creating* the key at its position in the key order of the plan
 <format/> if it is absent.
 </if>
+
+<expand name="review-plan"
+    arg1="the refinement instruction <instruction/>"
+    arg2="delta"></expand>
 
 Set <task-content-dirty>true</task-content-dirty>.
 </define>
@@ -309,6 +349,17 @@ You *MUST* completely omit the `##  VERIFICATION (WHEN)` section
 <task-content/>.
 </if>
 
+<expand name="review-plan"
+    arg1="the <instruction/>"
+    arg2="full"></expand>
+
+<if condition="<getopt-option-focus/> is equal `all`">
+*Check the scope* of the plan: if it spans several *independent* parts
+(like subsystems or features), each yielding a self-contained change and
+each of which a reviewer could reject while approving the others, set
+<task-dissect>true</task-dissect>. Do not output anything.
+</if>
+
 Call the `ase_timestamp(format: "yyyy-LL-dd HH:mm")` tool of the
 `ase` MCP server and use the `text` field of its response
 for fresh <timestamp-created/> and <timestamp-modified/>
@@ -334,7 +385,8 @@ Set <args></args> (set args to empty).
         Set <issue-id></issue-id> (empty),
         <task-allocated>false</task-allocated>,
         <task-grounded>false</task-grounded>,
-        <ground-facts></ground-facts> (empty), and
+        <ground-facts></ground-facts> (empty),
+        <task-dissect>false</task-dissect>, and
         <task-origin>task inherited</task-origin>.
         Inherit the always existing <ase-task-id/> from the current context.
         Inherit the always existing <ase-session-id/> from the current context.
@@ -786,6 +838,17 @@ Set <args></args> (set args to empty).
 
         <ase-tpl-hint level="minimal">
         Run `/ase-task-implement --draft` again to re-create the implementation draft for the changed plan, as `/ase-task-prove --draft` and `/ase-task-integrate --draft` refuse a stale draft.
+        </ase-tpl-hint>
+        </if>
+
+        <if condition="<task-dissect/> is equal `true`">
+        Directly *after* any rendering, give the scope hint by expanding
+        the following construct (which, depending on the configured
+        <ase-guidance-level/>, may expand into nothing and hence emit no
+        output at all), and then set <task-dissect>false</task-dissect>:
+
+        <ase-tpl-hint level="minimal">
+        The plan spans several independent parts: consider `/ase-task-dissect` to split it into separate, individually reviewable task plans.
         </ase-tpl-hint>
         </if>
 

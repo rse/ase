@@ -5,6 +5,11 @@ ChangeLog
 2.1.8 (2026-11-27)
 ------------------
 
+-   IMPROVEMENT [code, docs]: Self-Reviewed Task Plans
+    `ase-task-edit` self-reviews every generated or refined plan for coverage, decisive bullet-points
+    (no gaps, no transcripts), consistent names, and uncovered failure modes, and hints at
+    `ase-task-dissect` for a plan of independent parts. Plans copy pinned spec values verbatim.
+
 -   FEATURE [code, docs]: Agent Session Diagnosis
     The new skill `ase-help-diagnose` diagnoses the current or a named agent session, in general
     or for an issue hint, reporting `path:line`-cited findings with root causes and recommendations.

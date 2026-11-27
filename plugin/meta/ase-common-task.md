@@ -176,6 +176,10 @@ Then derive the plan from this grounding, where:
 -   the `##  SPECIFICATION (WHAT)` bullet-points are *consistent* with the
     existing specification, and explicitly state any intended deviation
     from it,
+-   every exact value pinned by the specification or the <instruction/>
+    (like version floors, limits, names, identifiers, and literal texts)
+    is copied *verbatim* into the bullet-points depending on it, instead
+    of being paraphrased or rounded,
 -   the `##  DESIGN (HOW)` bullet-points name the *actual* files, modules,
     interfaces, symbols, and configuration items to change, and place new
     ones according to the existing structure and conventions, instead of

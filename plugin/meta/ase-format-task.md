@@ -397,6 +397,13 @@ You *MUST* honor the following hints on this *task* format:
     computation, or domain decision), and the check deciding it -- never an expectation read off the
     implementation.
 
+    Every bullet-point *decides* something the implementer cannot decide alone, *unambiguously*, but
+    not completely: an `IFC` or `IMP` <text/> names the exact file, the exact signature (name,
+    parameters, and result type), and the exact values pinned by the specification, but no code body
+    which the signature already determines. A bullet-point deciding nothing (like "TBD", "handle edge
+    cases", "add appropriate validation", or "add tests") is a *gap*, and a spelled-out code body
+    (except for the unified diff preview of a `RESOLVING` plan) is a *transcript* -- avoid both.
+
     Bullet-points of types `DOM` and `IFC` (in this order) belong to the `SPECIFICATION (WHAT)` section.
     Bullet-points of types `ARC` and `IMP` (in this order) belong to the `DESIGN (HOW)` section.
     Bullet-points of types `REG` and `CON` (in this order) belong to the `VERIFICATION (WHEN)` section.
