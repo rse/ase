@@ -16,6 +16,7 @@ import {
     surface, growable, grown, openTask, closeTask, clearDiff, selectTab, selectAgent, toggle, cycleView, stepStatsRange
 } from "./ase-task-board-web-client-model"
 import { startEdit, startNew, onEditorKey } from "./ase-task-board-web-client-editor"
+import { toggleChat, placeChat }           from "./ase-task-board-web-client-chat"
 
 /*  delete a task (after its confirmation), closing its task dialog
     (the task viewer stays open and notices the vanished task on its reload)  */
@@ -317,6 +318,11 @@ const notify = (text: string) => {
     }, 5000)
 }
 
+/*  place the chat beside resp. below the task plan of the task dialog, with a note  */
+export const chatPlace = () => {
+    notify(placeChat())
+}
+
 /*  copy a login URL of the web board for another browser, with a fresh one-time nonce,
     into the clipboard (resp. show it in the status line, if the clipboard is unavailable)  */
 const copyLoginURL = async () => {
@@ -445,7 +451,9 @@ const dialogKeys: Record<string, (id: string) => void> = {
 
 /*  in the task dialog, RETURN and ESC close it (except in the task viewer, as a browser tab
     cannot be closed by its page), "e" edits its plan, "E" edits it by a prompt, "R" requests it by a prompt,
-    "D" deletes, "T" transitions, and "A" assigns its task, "#" clears the diff of its plan, "L" cycles the color theme,
+    "x" (and Alt+X, see "onChatKey") shows or hides the chat about it, "X" places it beside resp.
+    below the task plan, "D" deletes, "T" transitions, and "A" assigns its task,
+    "#" clears the diff of its plan, "L" cycles the color theme,
     the left/right arrows (also Tab/Shift+Tab) switch its tab, and the up/down arrows and PgUp/PgDn scroll its content  */
 const onDialogKey = (ev: KeyboardEvent) => {
     const win = planEl.value?.contentWindow ?? null
@@ -456,6 +464,14 @@ const onDialogKey = (ev: KeyboardEvent) => {
     else if (ev.key === "e" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
         ev.preventDefault()
         startEdit()
+    }
+    else if (ev.key === "x" && !ev.ctrlKey && !ev.metaKey && !ev.altKey && task.value !== null) {
+        ev.preventDefault()
+        toggleChat(task.value.id)
+    }
+    else if (ev.key === "X" && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+        ev.preventDefault()
+        chatPlace()
     }
     else if (Object.hasOwn(dialogKeys, ev.key) && !ev.ctrlKey && !ev.metaKey && !ev.altKey && task.value !== null) {
         ev.preventDefault()
@@ -555,8 +571,8 @@ const onAgentsKey = (ev: KeyboardEvent) => {
     ev.preventDefault()
 }
 
-/*  on the board, act on the selected task: view, edit, edit by prompt, request by prompt, delete,
-    transition, or assign it, or create a new task (answering whether the key is such an action)  */
+/*  on the board, act on the selected task: view, edit, edit by prompt, request by prompt, chat about,
+    delete, transition, or assign it, or create a new task (answering whether the key is such an action)  */
 const onTaskKey = (ev: KeyboardEvent, id: string, carrying: boolean): boolean => {
     if (ev.key === "Enter") {
         if (id !== "")
@@ -572,6 +588,11 @@ const onTaskKey = (ev: KeyboardEvent, id: string, carrying: boolean): boolean =>
     }
     else if (ev.key === "N")
         startNew()
+    else if (ev.key === "x") {
+        /*  open the task dialog of the selected task with its chat  */
+        if (id !== "" && !carrying)
+            toggleChat(id)
+    }
     else if (Object.hasOwn(dialogKeys, ev.key)) {
         /*  only the deletion is also offered while carrying a task  */
         if (id !== "" && (ev.key === "D" || !carrying))
@@ -887,9 +908,31 @@ const onPromptKey = (ev: KeyboardEvent) => {
     }
 }
 
+/*  whether a key is within the chat, whose terminal emulator takes all keys itself  */
+const inChat = (target: EventTarget | null): boolean =>
+    target instanceof Element && target.closest("#chat") !== null
+
+/*  show resp. hide the chat of the task dialog with Alt+X also while the chat has the keys (in
+    the capture phase, before the terminal emulator sees the key, and by its code, as Alt+X types
+    a character on macOS), but not within an input outside the chat (like the task plan editor,
+    whose Emacs keymap binds it)  */
+const onChatKey = (ev: KeyboardEvent) => {
+    if (task.value === null || !ev.altKey || ev.ctrlKey || ev.metaKey || ev.code !== "KeyX")
+        return
+    const target = ev.target
+    if (!inChat(target) && target instanceof HTMLElement
+        && (target.isContentEditable || target.matches("input, textarea, select")))
+        return
+    ev.preventDefault()
+    ev.stopImmediatePropagation()
+    toggleChat(task.value.id)
+}
+
 /*  dispatch a key to the deletion confirmation, the transfer popup, the assign popup,
-    the prompt popup, the task plan editor, the task dialog, or the board  */
+    the prompt popup, the task plan editor, the task dialog, or the board (except within the chat)  */
 const onKey = (ev: KeyboardEvent) => {
+    if (inChat(ev.target))
+        return
     if (confirmDel.value !== null)
         onConfirmKey(ev, confirmDel.value)
     else if (transfer.value !== null)
@@ -933,9 +976,14 @@ export const controlStart = () => {
         })
     }
 
+    /*  the single-key bindings ignore the keys within the chat, too  */
+    const stop = Mousetrap.stopCallback
+    Mousetrap.stopCallback = (ev, element, combo) => inChat(element) || stop.call(Mousetrap, ev, element, combo)
+
     /*  (in the task dialog, "onDialogKey" handles it, as only keydown passes from its document)  */
     Mousetrap.bind("L", () => { if (task.value === null) cycleTheme() })
     window.addEventListener("keydown", onBusyKey, true)
+    window.addEventListener("keydown", onChatKey, true)
     document.addEventListener("keydown", onKey)
 }
 
@@ -943,6 +991,7 @@ export const controlStart = () => {
 export const controlStop = () => {
     Mousetrap.reset()
     window.removeEventListener("keydown", onBusyKey, true)
+    window.removeEventListener("keydown", onChatKey, true)
     document.removeEventListener("keydown", onKey)
     if (noteTimer !== null)
         clearTimeout(noteTimer)
