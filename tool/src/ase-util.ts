@@ -13,7 +13,7 @@ export default class UtilCommand {
         /*  register CLI top-level command "ase util"  */
         const util = program
             .command("util")
-            .description("Utility commands (meta, compat, diagram, worktree, mint, metric, rasterize, cve, vex)")
+            .description("Utility commands (meta, compat, diagram, worktree, mint, metric, rasterize, cve, vex, session)")
             .action(() => {
                 util.outputHelp()
                 process.exit(1)

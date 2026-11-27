@@ -5,6 +5,12 @@ ChangeLog
 2.1.8 (2026-11-27)
 ------------------
 
+-   FEATURE [code, docs]: Agent Session Diagnosis
+    The new skill `ase-help-diagnose` diagnoses the current or a named agent session, in general
+    or for an issue hint, reporting `path:line`-cited findings with root causes and recommendations.
+    The new `ase util session` command and MCP tool `ase_session` summarize the on-disk transcript
+    of a Claude Code, Codex, or Copilot CLI session as metadata and a normalized event timeline.
+
 -   IMPROVEMENT [code, docs]: Reviewed, Deviation-Reporting, and Safe Implementation
     `ase-task-implement` reports every deviation from the plan (marked `↯`), never performs
     destructive, security-sensitive, or outside side-effecting operations unless `--unsecure`

@@ -111,7 +111,8 @@ The following top-level commands exist:
 - `ase util` *command* \[...\]:
   Utility commands (meta files, compatibility probes, diagram rendering,
   worktree resolution, identifier minting, text measuring, SVG
-  rasterizing, vulnerability lookup, and VEX status lookup). See
+  rasterizing, vulnerability lookup, VEX status lookup, and session
+  transcript summarizing). See
   `ase-util`(1).
 
 - `ase agent` *agent* *command* \[...\]:

@@ -40,7 +40,7 @@ export type Catalog = {
     in the column order of "Section-Usage.astro"), so keep both in sync, where
     any skill not listed here is caught by a trailing "OTHER" group  */
 const skillGroups: [ string, string[] ][] = [
-    [ "HELP",           [ "ase-help-skill", "ase-help-intent" ] ],
+    [ "HELP",           [ "ase-help-skill", "ase-help-intent", "ase-help-diagnose" ] ],
     [ "META: CONFIG",   [ "ase-meta-config", "ase-meta-alias", "ase-meta-compat" ] ],
     [ "META: EXPLAIN",  [ "ase-meta-why", "ase-meta-eli5" ] ],
     [ "META: JUDGE",    [ "ase-meta-evaluate", "ase-meta-diaboli", "ase-meta-steelman" ] ],

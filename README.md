@@ -23,7 +23,7 @@ Code](https://claude.com/product/claude-code) — and with reduced support also 
 tool [GitHub Copilot CLI](https://github.com/features/copilot/cli) or
 [OpenAI Codex CLI](https://github.com/openai/codex).
 
-**ASE** ships with 64 agent skills, agent hooks, agent sub-agents, an
+**ASE** ships with 65 agent skills, agent hooks, agent sub-agents, an
 underlying Model-Context-Protocol (MCP) service and a Command-Line Interface
 (CLI) with a task store, task boards, and autonomous agents, incorporating
 reasonable methodology and automation aspects, to support the recurring
@@ -297,6 +297,12 @@ see whether **ASE** is right for you:
   and want the fitting `/ase-xxx-xxx` commands generated for you?
   &rarr; [`/ase-help-intent`](plugin/skills/ase-help-intent/help.md)
   `split my huge change set into separate commits`
+
+- **Session Diagnosis**:
+  You want to know what went wrong in an agent session, why it took so long,
+  or why a skill did not fire, with every finding backed by its transcript line?
+  &rarr; [`/ase-help-diagnose`](plugin/skills/ase-help-diagnose/help.md)
+  `why did it run the build three times?`
 
 </td>
 <td width="50%" valign="top">

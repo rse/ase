@@ -21,6 +21,7 @@ export const skillGroups: SkillGroup[] = [
         skills: [
             "ase-help-skill",
             "ase-help-intent",
+            "ase-help-diagnose",
             "ase-meta-config",
             "ase-meta-alias",
             "ase-meta-why",

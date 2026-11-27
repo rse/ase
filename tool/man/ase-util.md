@@ -39,6 +39,11 @@
 \[`-f`|`--format` *format*\]
 *cve-id*
 
+`ase util session`
+\[`-t`|`--tool` *tool*\]
+\[`-f`|`--format` *format*\]
+\[*session-id*\]
+
 ## DESCRIPTION
 
 **ase util** is the entry point group for miscellaneous utility
@@ -93,6 +98,11 @@ with status `1`.
   vulnerability in its local CSAF, CycloneDX, OpenVEX, or SPDX VEX
   documents. See `ase-util-vex`(1).
 
+- `ase util session` \[*options*\] \[*session-id*\]:
+  Summarize the on-disk transcript of an *Anthropic Claude Code CLI*,
+  *OpenAI Codex CLI*, or *GitHub Copilot CLI* session as metadata and a
+  normalized event timeline. See `ase-util-session`(1).
+
 ## EXIT STATUS
 
 The group command without a sub-command exits with status `1`.
@@ -102,7 +112,7 @@ The group command without a sub-command exits with status `1`.
 `ase`(1), `ase-util-meta`(1), `ase-util-compat`(1),
 `ase-util-diagram`(1), `ase-util-worktree`(1), `ase-util-mint`(1),
 `ase-util-metric`(1), `ase-util-rasterize`(1), `ase-util-cve`(1),
-`ase-util-vex`(1).
+`ase-util-vex`(1), `ase-util-session`(1).
 
 ## AUTHOR
 

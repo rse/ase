@@ -11,6 +11,7 @@ START               -> ase-meta-search
 START               -> ase-meta-brainstorm
 START               -> ase-meta-compat
 START               -> ase-help-intent
+START               -> ase-help-diagnose
 START               -> ase-arch-discover
 START               -> ase-code-insight
 START               -> ase-code-explain
@@ -47,6 +48,7 @@ ase-meta-search     -> END
 ase-meta-brainstorm -> END
 ase-meta-compat     -> END
 ase-help-intent     -> END
+ase-help-diagnose   -> END
 ase-arch-discover   -> END
 ase-code-insight    -> END
 ase-code-explain    -> END

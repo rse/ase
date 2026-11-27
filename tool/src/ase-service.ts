@@ -51,6 +51,7 @@ import { MetricMCP }                     from "./ase-util-metric.js"
 import { RasterizeMCP }                  from "./ase-util-rasterize.js"
 import { CveMCP }                        from "./ase-util-cve.js"
 import { VexMCP }                        from "./ase-util-vex.js"
+import { SessionMCP }                    from "./ase-util-session.js"
 import { UsageTracker }                  from "./ase-service-otel.js"
 import type { UsageRecord }              from "./ase-service-otel-ingress.js"
 import pkg                               from "../package.json" with { type: "json" }
@@ -287,6 +288,7 @@ export default class ServiceCommand {
         new RasterizeMCP().register(mcp)
         new CveMCP().register(mcp)
         new VexMCP().register(mcp)
+        new SessionMCP().register(mcp)
         new ConfigMCP(log).register(mcp)
         new StateMCP(log).register(mcp)
         return mcp

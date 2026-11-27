@@ -2,6 +2,7 @@
 ⎈   **HELP**
 ○   `ase-help-skill`:      Show the Manual Page of an ASE Skill
 ○   `ase-help-intent`:     Match an Intent to ASE Commands
+○   `ase-help-diagnose`:   Diagnose an Agent Session
 
 ⎈   **RESEARCH**
 ○   `ase-meta-search`:     Search the Internet/Web

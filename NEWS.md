@@ -20,6 +20,9 @@ falsifying the witness of each one.
 A further new skill generates or updates the **agent guidance** `AGENTS.md` of a repository from
 facts verified read-only against it.
 
+When a session went wrong, another new skill **diagnoses** it, the current one or an earlier one
+of Claude Code, Codex, or Copilot CLI, and reports what happened with transcript-cited evidence.
+
 The **prompt cache** of Claude Code is now under control: its state is shown in the footer, big
 idle caches are kept warm automatically, and you are asked before a prompt is sent into a big cold
 cache. Markdown **tables**, which Claude Code draws vertically in too narrow terminals, are now
@@ -79,6 +82,9 @@ ase config edit
 
 -   **Agent Guidance Files**: `ase-repo-agents` generates a missing or updates an
     existing `AGENTS.md` from facts verified read-only against the repository.
+
+-   **Session Diagnosis**: `ase-help-diagnose` diagnoses an agent session along several
+    dimensions, backed by `ase util session` resp. the MCP tool `ase_session`.
 
 -   **Configuration Editor**: `ase config edit` opens a terminal UI with a parameter view
     and a scope view, storing edited values immediately on any writable scope.

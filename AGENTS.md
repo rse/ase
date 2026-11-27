@@ -18,7 +18,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
 
 -   `plugin/`: the agent tool plugin
 
-    -   `plugin/skills/ase-xxx-xxx/`: the 64 skills, each with a `SKILL.md`
+    -   `plugin/skills/ase-xxx-xxx/`: the 65 skills, each with a `SKILL.md`
         (agent instructions) and a `help.md` (Unix-style manual page), plus
         optional skill-specific files (like `ase-help-intent/data.md`, the
         concatenation of all `help.md` files, generated at build-time, or
@@ -129,7 +129,7 @@ Copilot CLI* and *OpenAI Codex CLI* are secondary targets, selected via
         command group: `setup`, `config`, `alias`, `service`, `mcp`, `hook`,
         `statusline`, `task`, `task-board`, `agent`, `artifact`, `spec`,
         `man`, `util`, and
-        `util-{meta,diagram,worktree,mint,metric,rasterize,compat,cve,vex}`
+        `util-{meta,diagram,worktree,mint,metric,rasterize,compat,cve,vex,session}`
 
     -   `tool/src/ase-alias-core.ts`: the skill command aliases of
         `ase alias` (loading, merging, and modifying the alias files of
@@ -508,7 +508,9 @@ Beyond `ase setup`, the CLI provides:
     `ase util cve` (vulnerability information merged from CVE.org, NVD, EPSS,
     CISA KEV, OSV.dev, and GitHub Advisories), `ase util vex` (the published
     VEX status of the project on a CVE, out of its local CSAF, CycloneDX,
-    OpenVEX, or SPDX 3 documents), and
+    OpenVEX, or SPDX 3 documents), `ase util session` (the metadata and the
+    normalized event timeline of the on-disk transcript of a Claude Code, Codex,
+    or Copilot CLI session), and
     `ase util compat` (expected probe values of the `ase-meta-compat`
     self-test skill, for inspection by humans)
 
