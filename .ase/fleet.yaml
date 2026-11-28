@@ -36,6 +36,7 @@ PA-ESTIMATOR:
 PA-IMPLEMENTER:
     kind:           implementer
     mode:           implement
+    parallel:       1
 PA-QUALIFIER:
     kind:           qualifier
     mode:           judge
