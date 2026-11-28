@@ -37,11 +37,11 @@ PA-IMPLEMENTER:
     kind:           implementer
     mode:           implement
     parallel:       1
-PA-QUALIFIER:
-    kind:           qualifier
-    mode:           judge
-PA-INTEGRATOR:
-    kind:           integrator
-    mode:           squash
-    parallel:       1
+#PA-QUALIFIER:
+#    kind:           qualifier
+#    mode:           judge
+#PA-INTEGRATOR:
+#    kind:           integrator
+#    mode:           squash
+#    parallel:       1
 
